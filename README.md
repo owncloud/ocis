@@ -6,6 +6,13 @@
 * standalone repos for each service
 * hyperreva as wrapper repository for standalone binary
 
+Suggested repos naming schema:
+* reva-hyper 
+  * reva-phoenix
+  * reva-my-service1
+  * reva-my-service2
+  * ...
+
 ## Technical details
 * microservices: [go-kit/kit](https://github.com/go-kit/kit)
 * cli: [spf13/cobra](https://github.com/spf13/cobra)
