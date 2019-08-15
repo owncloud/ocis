@@ -1,4 +1,4 @@
-# hyperreva
+# reva-hyper
 
 ## Organizational structure
 * using reva as library
