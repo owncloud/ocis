@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	revahyperCommand, allCommandFns := NewRevahHyperCommand()
+	revahyperCommand, allCommandFns := NewRevaHyperCommand()
 
 	basename := filepath.Base(os.Args[0])
 	if err := commandFor(basename, revahyperCommand, allCommandFns).Execute(); err != nil {
@@ -18,8 +18,8 @@ func main() {
 	}
 }
 
-// NewRevahHyperCommand is the entry point for reva-hyper
-func NewRevahHyperCommand() (*cobra.Command, []func() *cobra.Command) {
+// NewRevaHyperCommand is the entry point for reva-hyper
+func NewRevaHyperCommand() (*cobra.Command, []func() *cobra.Command) {
 
 	apiserver := func() *cobra.Command { return revaphoenix.NewRevaPhoenixCommand("phoenix") }
 
