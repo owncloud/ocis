@@ -94,15 +94,15 @@ release-dirs:
 	mkdir -p $(DIST)/binaries $(DIST)/release
 
 .PHONY: release-linux
-release-linux: gorunpkg
+release-linux: gorunpkg release-dirs
 	gorunpkg github.com/mitchellh/gox -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-windows
-release-windows: gorunpkg
+release-windows: gorunpkg release-dirs
 	gorunpkg github.com/mitchellh/gox -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'windows' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-darwin
-release-darwin: gorunpkg
+release-darwin: gorunpkg release-dirs
 	gorunpkg github.com/mitchellh/gox -tags 'netgo $(TAGS)' -ldflags '$(LDFLAGS)' -os 'darwin' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-copy
