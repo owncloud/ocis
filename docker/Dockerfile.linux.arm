@@ -1,0 +1,16 @@
+FROM arm32v6/alpine:edge
+
+RUN apk update && \
+	apk upgrade && \
+	apk add ca-certificates mailcap && \
+	rm -rf /var/cache/apk/*
+
+LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
+  org.label-schema.name="Reva Phoenix" \
+  org.label-schema.vendor="ownCloud GmbH" \
+  org.label-schema.schema-version="1.0"
+
+ENTRYPOINT ["/usr/bin/reva-phoenix"]
+CMD ["server"]
+
+COPY bin/reva-phoenix /usr/bin/reva-phoenix
