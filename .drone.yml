@@ -24,7 +24,7 @@ steps:
   - make vet
   volumes:
   - name: gopath
-    path: /arv/app
+    path: /srv/app
 
 - name: staticcheck
   pull: always
@@ -33,7 +33,7 @@ steps:
   - make staticcheck
   volumes:
   - name: gopath
-    path: /arv/app
+    path: /srv/app
 
 - name: lint
   pull: always
@@ -42,7 +42,7 @@ steps:
   - make lint
   volumes:
   - name: gopath
-    path: /arv/app
+    path: /srv/app
 
 - name: build
   pull: always
@@ -51,7 +51,7 @@ steps:
   - make build
   volumes:
   - name: gopath
-    path: /arv/app
+    path: /srv/app
 
 - name: test
   pull: always
@@ -60,7 +60,7 @@ steps:
   - make test
   volumes:
   - name: gopath
-    path: /arv/app
+    path: /srv/app
 
 - name: codacy
   pull: always
@@ -119,6 +119,10 @@ steps:
     repo: owncloud/reva-phoenix
     username:
       from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
 
 volumes:
 - name: gopath
@@ -173,6 +177,10 @@ steps:
     repo: owncloud/reva-phoenix
     username:
       from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
 
 volumes:
 - name: gopath
@@ -227,6 +235,10 @@ steps:
     repo: owncloud/reva-phoenix
     username:
       from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
 
 volumes:
 - name: gopath

@@ -56,7 +56,7 @@ def testing():
         'volumes': [
           {
             'name': 'gopath',
-            'path': '/arv/app'
+            'path': '/srv/app'
           }
         ]
       },
@@ -70,7 +70,7 @@ def testing():
         'volumes': [
           {
             'name': 'gopath',
-            'path': '/arv/app'
+            'path': '/srv/app'
           }
         ]
       },
@@ -84,7 +84,7 @@ def testing():
         'volumes': [
           {
             'name': 'gopath',
-            'path': '/arv/app'
+            'path': '/srv/app'
           }
         ]
       },
@@ -98,7 +98,7 @@ def testing():
         'volumes': [
           {
             'name': 'gopath',
-            'path': '/arv/app'
+            'path': '/srv/app'
           }
         ]
       },
@@ -112,7 +112,7 @@ def testing():
         'volumes': [
           {
             'name': 'gopath',
-            'path': '/arv/app'
+            'path': '/srv/app'
           }
         ]
       },
@@ -121,9 +121,9 @@ def testing():
         'image': 'plugins/codacy:1',
         'pull': 'always',
         'settings': {
-        	'token': {
-        		'from_secret': 'codacy_token'
-        	}
+          'token': {
+            'from_secret': 'codacy_token'
+          }
         }
       }
     ],
@@ -185,16 +185,23 @@ def docker(arch):
         'image': 'plugins/docker:18.09',
         'pull': 'always',
         'settings': {
-        	'username': {
-        		'from_secret': 'docker_username'
-        	},
-        	'password': {
-        		'from_secret': 'docker_password'
-        	},
-        	'auto_tag': True,
-        	'auto_tag_suffix': 'linux-%s' % arch,
-        	'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
-        	'repo': 'owncloud/reva-phoenix',
+          'username': {
+            'from_secret': 'docker_username'
+          },
+          'password': {
+            'from_secret': 'docker_password'
+          },
+          'auto_tag': True,
+          'auto_tag_suffix': 'linux-%s' % arch,
+          'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
+          'repo': 'owncloud/reva-phoenix',
+        },
+        'when': {
+          'event': {
+            'exclude': [
+              'pull_request'
+            ]
+          }
         }
       },
     ],
@@ -271,27 +278,27 @@ def binary(name):
         'image': 'plugins/s3:1',
         'pull': 'always',
         'settings': {
-        	'endpoint': {
-        		'from_secret': 's3_endpoint'
-        	},
-        	'access_key': {
-        		'from_secret': 'aws_access_key_id'
-        	},
-        	'secret_key': {
-        		'from_secret': 'aws_secret_access_key'
-        	},
-        	'bucket': {
-        		'from_secret': 's3_bucket'
-        	},
-        	'path_style': True,
-        	'strip_prefix': 'dist/release/',
-        	'source': 'dist/release/*',
-        	'target': '/reva/phoenix/testing'
+          'endpoint': {
+            'from_secret': 's3_endpoint'
+          },
+          'access_key': {
+            'from_secret': 'aws_access_key_id'
+          },
+          'secret_key': {
+            'from_secret': 'aws_secret_access_key'
+          },
+          'bucket': {
+            'from_secret': 's3_bucket'
+          },
+          'path_style': True,
+          'strip_prefix': 'dist/release/',
+          'source': 'dist/release/*',
+          'target': '/reva/phoenix/testing'
         },
         'when': {
-        	'event': [
-        		'push'
-        	]
+          'event': [
+            'push'
+          ]
         }
       },
       {
@@ -299,27 +306,27 @@ def binary(name):
         'image': 'plugins/s3:1',
         'pull': 'always',
         'settings': {
-        	'endpoint': {
-        		'from_secret': 's3_endpoint'
-        	},
-        	'access_key': {
-        		'from_secret': 'aws_access_key_id'
-        	},
-        	'secret_key': {
-        		'from_secret': 'aws_secret_access_key'
-        	},
-        	'bucket': {
-        		'from_secret': 's3_bucket'
-        	},
-        	'path_style': True,
-        	'strip_prefix': 'dist/release/',
-        	'source': 'dist/release/*',
-        	'target': '/reva/phoenix/${DRONE_TAG##v}'
+          'endpoint': {
+            'from_secret': 's3_endpoint'
+          },
+          'access_key': {
+            'from_secret': 'aws_access_key_id'
+          },
+          'secret_key': {
+            'from_secret': 'aws_secret_access_key'
+          },
+          'bucket': {
+            'from_secret': 's3_bucket'
+          },
+          'path_style': True,
+          'strip_prefix': 'dist/release/',
+          'source': 'dist/release/*',
+          'target': '/reva/phoenix/${DRONE_TAG##v}'
         },
         'when': {
-        	'event': [
-        		'tag'
-        	]
+          'event': [
+            'tag'
+          ]
         }
       },
       {
@@ -327,17 +334,17 @@ def binary(name):
         'image': 'plugins/github-release:1',
         'pull': 'always',
         'settings': {
-        	'api_key': {
-        		'from_secret': 'github_token'
-        	},
-        	'files': [
-        		'dist/release/*'
-        	]
+          'api_key': {
+            'from_secret': 'github_token'
+          },
+          'files': [
+            'dist/release/*'
+          ]
         },
         'when': {
-        	'event': [
-        		'tag'
-        	]
+          'event': [
+            'tag'
+          ]
         }
       }
     ],
