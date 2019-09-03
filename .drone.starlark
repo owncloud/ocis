@@ -181,6 +181,23 @@ def docker(arch):
         ]
       },
       {
+        'name': 'dryrun',
+        'image': 'plugins/docker:18.09',
+        'pull': 'always',
+        'settings': {
+          'dry_run': True,
+          'tags': 'linux-%s' % arch,
+          'auto_tag_suffix': 'linux-%s' % arch,
+          'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
+          'repo': 'owncloud/reva-phoenix',
+        },
+        'when': {
+          'event': [
+            'pull_request'
+          ]
+        }
+      },
+      {
         'name': 'docker',
         'image': 'plugins/docker:18.09',
         'pull': 'always',

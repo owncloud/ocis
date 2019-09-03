@@ -107,6 +107,19 @@ steps:
   - name: gopath
     path: /srv/app
 
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-amd64
+    dockerfile: docker/Dockerfile.linux.amd64
+    dry_run: true
+    repo: owncloud/reva-phoenix
+    tags: linux-amd64
+  when:
+    event:
+    - pull_request
+
 - name: docker
   pull: always
   image: plugins/docker:18.09
@@ -165,6 +178,19 @@ steps:
   - name: gopath
     path: /srv/app
 
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-arm64
+    dockerfile: docker/Dockerfile.linux.arm64
+    dry_run: true
+    repo: owncloud/reva-phoenix
+    tags: linux-arm64
+  when:
+    event:
+    - pull_request
+
 - name: docker
   pull: always
   image: plugins/docker:18.09
@@ -222,6 +248,19 @@ steps:
   volumes:
   - name: gopath
     path: /srv/app
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-arm
+    dockerfile: docker/Dockerfile.linux.arm
+    dry_run: true
+    repo: owncloud/reva-phoenix
+    tags: linux-arm
+  when:
+    event:
+    - pull_request
 
 - name: docker
   pull: always
