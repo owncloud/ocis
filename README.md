@@ -11,7 +11,7 @@
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/reva/phoenix).
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/reva/phoenix/).
 
 ## Development
 
