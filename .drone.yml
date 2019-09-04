@@ -1,0 +1,643 @@
+---
+kind: pipeline
+type: docker
+name: testing
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: vet
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make vet
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: staticcheck
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make staticcheck
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: lint
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make lint
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make build
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: test
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make test
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: codacy
+  pull: always
+  image: plugins/codacy:1
+  settings:
+    token:
+      from_secret: codacy_token
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+---
+kind: pipeline
+type: docker
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make build
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-amd64
+    dockerfile: docker/Dockerfile.linux.amd64
+    dry_run: true
+    repo: owncloud/reva-hyper
+    tags: linux-amd64
+  when:
+    event:
+    - pull_request
+
+- name: docker
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    dockerfile: docker/Dockerfile.linux.amd64
+    password:
+      from_secret: docker_password
+    repo: owncloud/reva-hyper
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make build
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-arm64
+    dockerfile: docker/Dockerfile.linux.arm64
+    dry_run: true
+    repo: owncloud/reva-hyper
+    tags: linux-arm64
+  when:
+    event:
+    - pull_request
+
+- name: docker
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    dockerfile: docker/Dockerfile.linux.arm64
+    password:
+      from_secret: docker_password
+    repo: owncloud/reva-hyper
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make build
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag_suffix: linux-arm
+    dockerfile: docker/Dockerfile.linux.arm
+    dry_run: true
+    repo: owncloud/reva-hyper
+    tags: linux-arm
+  when:
+    event:
+    - pull_request
+
+- name: docker
+  pull: always
+  image: plugins/docker:18.09
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm
+    dockerfile: docker/Dockerfile.linux.arm
+    password:
+      from_secret: docker_password
+    repo: owncloud/reva-hyper
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: linux
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-linux
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: finish
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-finish
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: upload-push
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/testing
+  when:
+    event:
+    - push
+
+- name: upload-tag
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/${DRONE_TAG##v}
+  when:
+    event:
+    - tag
+
+- name: github-release
+  pull: always
+  image: plugins/github-release:1
+  settings:
+    api_key:
+      from_secret: github_token
+    files:
+    - dist/release/*
+  when:
+    event:
+    - tag
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: darwin
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-darwin
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: finish
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-finish
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: upload-push
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/testing
+  when:
+    event:
+    - push
+
+- name: upload-tag
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/${DRONE_TAG##v}
+  when:
+    event:
+    - tag
+
+- name: github-release
+  pull: always
+  image: plugins/github-release:1
+  settings:
+    api_key:
+      from_secret: github_token
+    files:
+    - dist/release/*
+  when:
+    event:
+    - tag
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: windows
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make generate
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: build
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-windows
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: finish
+  pull: always
+  image: webhippie/golang:1.12
+  commands:
+  - make release-finish
+  volumes:
+  - name: gopath
+    path: /srv/app
+
+- name: upload-push
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/testing
+  when:
+    event:
+    - push
+
+- name: upload-tag
+  pull: always
+  image: plugins/s3:1
+  settings:
+    access_key:
+      from_secret: aws_access_key_id
+    bucket:
+      from_secret: s3_bucket
+    endpoint:
+      from_secret: s3_endpoint
+    path_style: true
+    secret_key:
+      from_secret: aws_secret_access_key
+    source: dist/release/*
+    strip_prefix: dist/release/
+    target: /reva/hyper/${DRONE_TAG##v}
+  when:
+    event:
+    - tag
+
+- name: github-release
+  pull: always
+  image: plugins/github-release:1
+  settings:
+    api_key:
+      from_secret: github_token
+    files:
+    - dist/release/*
+  when:
+    event:
+    - tag
+
+volumes:
+- name: gopath
+  temp: {}
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+  - refs/pull/**
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: docker
+name: manifest
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: manifest
+  pull: always
+  image: plugins/manifest
+  settings:
+    auto_tag: true
+    ignore_missing: true
+    password:
+      from_secret: docker_password
+    spec: docker/manifest.tmpl
+    username:
+      from_secret: docker_username
+
+- name: microbadger
+  pull: always
+  image: plugins/webhook
+  settings:
+    urls:
+      from_secret: microbadger_url
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/tags/**
+
+depends_on:
+- amd64
+- arm64
+- arm
+- linux
+- darwin
+- windows
+
+...
