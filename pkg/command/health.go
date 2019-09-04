@@ -1,4 +1,4 @@
-package service
+package command
 
 import (
 	"github.com/rs/zerolog/log"
@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// HealthCommand is the entrypoint for the health command.
-func HealthCommand() *cobra.Command {
+// Health is the entrypoint for the health command.
+func Health() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "health",
 		Short: "Check health status",

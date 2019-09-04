@@ -1,4 +1,4 @@
-package service
+package command
 
 import (
 	"github.com/rs/zerolog/log"
@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// ServerCommand is the entrypoint for the server command.
-func ServerCommand() *cobra.Command {
+// Server is the entrypoint for the server command.
+func Server() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "server",
 		Short: "Start integrated server",

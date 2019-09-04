@@ -1,4 +1,4 @@
-package service
+package command
 
 import (
 	"os"
@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// RootCommand is the entry point for the reva-phoenix command.
-func RootCommand() *cobra.Command {
+// Root is the entry point for the reva-phoenix command.
+func Root() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "reva-phoenix",
 		Short:   "Reva service for phoenix",
@@ -39,8 +39,8 @@ func RootCommand() *cobra.Command {
 	viper.SetDefault("log.color", true)
 	viper.BindEnv("log.color", "PHOENIX_LOG_COLOR")
 
-	cmd.AddCommand(ServerCommand())
-	cmd.AddCommand(HealthCommand())
+	cmd.AddCommand(Server())
+	cmd.AddCommand(Health())
 
 	return cmd
 }

@@ -3,11 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/reva-phoenix/pkg/service"
+	"github.com/owncloud/reva-phoenix/pkg/command"
 )
 
 func main() {
-	if err := service.RootCommand().Execute(); err != nil {
+	if err := command.Root().Execute(); err != nil {
 		os.Exit(1)
 	}
 }
