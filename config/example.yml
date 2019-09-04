@@ -1,0 +1,5 @@
+server:
+  addr: 0.0.0.0:8080
+
+metrics:
+  addr: 0.0.0.0:8090

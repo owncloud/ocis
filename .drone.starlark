@@ -1,0 +1,424 @@
+def main(ctx):
+  before = testing()
+
+  stages = [
+    docker('amd64'),
+    docker('arm64'),
+    docker('arm'),
+    binary('linux'),
+    binary('darwin'),
+    binary('windows'),
+  ]
+
+  after = manifest()
+
+  for b in before:
+    for s in stages:
+      s['depends_on'].append(b['name'])
+
+  for s in stages:
+    for a in after:
+      a['depends_on'].append(s['name'])
+
+  return before + stages + after
+
+def testing():
+  return [{
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'testing',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'generate',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make generate'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'vet',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make vet'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'staticcheck',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make staticcheck'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'lint',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make lint'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'build',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make build'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'test',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make test'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'codacy',
+        'image': 'plugins/codacy:1',
+        'pull': 'always',
+        'settings': {
+          'token': {
+            'from_secret': 'codacy_token'
+          }
+        }
+      }
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {}
+      }
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**'
+      ]
+    }
+  }]
+
+def docker(arch):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': arch,
+    'platform': {
+      'os': 'linux',
+      'arch': arch,
+    },
+    'steps': [
+      {
+        'name': 'generate',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make generate'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'build',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make build'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'dryrun',
+        'image': 'plugins/docker:18.09',
+        'pull': 'always',
+        'settings': {
+          'dry_run': True,
+          'tags': 'linux-%s' % arch,
+          'auto_tag_suffix': 'linux-%s' % arch,
+          'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
+          'repo': 'owncloud/reva-phoenix',
+        },
+        'when': {
+          'event': [
+            'pull_request'
+          ]
+        }
+      },
+      {
+        'name': 'docker',
+        'image': 'plugins/docker:18.09',
+        'pull': 'always',
+        'settings': {
+          'username': {
+            'from_secret': 'docker_username'
+          },
+          'password': {
+            'from_secret': 'docker_password'
+          },
+          'auto_tag': True,
+          'auto_tag_suffix': 'linux-%s' % arch,
+          'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
+          'repo': 'owncloud/reva-phoenix',
+        },
+        'when': {
+          'event': {
+            'exclude': [
+              'pull_request'
+            ]
+          }
+        }
+      },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {}
+      }
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**'
+      ]
+    }
+  }
+
+def binary(name):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': name,
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'generate',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make generate'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'build',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make release-%s' % name
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'finish',
+        'image': 'webhippie/golang:1.12',
+        'pull': 'always',
+        'commands': [
+          'make release-finish'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          }
+        ]
+      },
+      {
+        'name': 'upload-push',
+        'image': 'plugins/s3:1',
+        'pull': 'always',
+        'settings': {
+          'endpoint': {
+            'from_secret': 's3_endpoint'
+          },
+          'access_key': {
+            'from_secret': 'aws_access_key_id'
+          },
+          'secret_key': {
+            'from_secret': 'aws_secret_access_key'
+          },
+          'bucket': {
+            'from_secret': 's3_bucket'
+          },
+          'path_style': True,
+          'strip_prefix': 'dist/release/',
+          'source': 'dist/release/*',
+          'target': '/reva/phoenix/testing'
+        },
+        'when': {
+          'event': [
+            'push'
+          ]
+        }
+      },
+      {
+        'name': 'upload-tag',
+        'image': 'plugins/s3:1',
+        'pull': 'always',
+        'settings': {
+          'endpoint': {
+            'from_secret': 's3_endpoint'
+          },
+          'access_key': {
+            'from_secret': 'aws_access_key_id'
+          },
+          'secret_key': {
+            'from_secret': 'aws_secret_access_key'
+          },
+          'bucket': {
+            'from_secret': 's3_bucket'
+          },
+          'path_style': True,
+          'strip_prefix': 'dist/release/',
+          'source': 'dist/release/*',
+          'target': '/reva/phoenix/${DRONE_TAG##v}'
+        },
+        'when': {
+          'event': [
+            'tag'
+          ]
+        }
+      },
+      {
+        'name': 'github-release',
+        'image': 'plugins/github-release:1',
+        'pull': 'always',
+        'settings': {
+          'api_key': {
+            'from_secret': 'github_token'
+          },
+          'files': [
+            'dist/release/*'
+          ]
+        },
+        'when': {
+          'event': [
+            'tag'
+          ]
+        }
+      }
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {}
+      }
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**'
+      ]
+    }
+  }
+
+def manifest():
+  return [{
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'manifest',
+    'steps': [
+      {
+        'name': 'manifest',
+        'image': 'plugins/manifest',
+        'pull': 'always',
+        'settings': {
+          'username': {
+            'from_secret': 'docker_username'
+          },
+          'password': {
+            'from_secret': 'docker_password'
+          },
+          'spec': 'docker/manifest.tmpl',
+          'auto_tag': 'true',
+          'ignore_missing': 'true',
+        },
+      },
+      {
+        'name': 'microbadger',
+        'image': 'plugins/webhook',
+        'pull': 'always',
+        'settings': {
+          'urls': {
+            'from_secret': 'microbadger_url'
+          }
+        },
+      }
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**'
+      ]
+    }
+  }]
