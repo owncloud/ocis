@@ -356,7 +356,9 @@ def binary(name):
           },
           'files': [
             'dist/release/*'
-          ]
+          ],
+          'title': '${DRONE_SEMVER}',
+          'note': 'You can find the detailed changelog at https://github.com/owncloud/reva-phoenix/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}'
         },
         'when': {
           'event': [
