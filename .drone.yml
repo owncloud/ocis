@@ -377,6 +377,8 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
+    note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    title: ${DRONE_SEMVER}
   when:
     event:
     - tag
@@ -479,6 +481,8 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
+    note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    title: ${DRONE_SEMVER}
   when:
     event:
     - tag
@@ -581,6 +585,8 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
+    note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    title: ${DRONE_SEMVER}
   when:
     event:
     - tag
