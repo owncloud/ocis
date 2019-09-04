@@ -1,0 +1,29 @@
+[run]
+watch_all = true
+watch_dirs = ["cmd", "pkg"]
+watch_exts = [".go"]
+ignore = [".git", "bin", "dist"]
+ignore_files = []
+build_delay = 1500
+interrupt_timout = 15
+graceful_kill = false
+
+init_cmds = [
+  ["make", "build"],
+  [
+    "./bin/reva-hyper",
+    "--log-level",
+    "debug",
+    "server"
+  ]
+]
+
+cmds = [
+  ["make", "build"],
+  [
+    "./bin/reva-hyper",
+    "--log-level",
+    "debug",
+    "server"
+  ]
+]
