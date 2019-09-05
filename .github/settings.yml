@@ -1,6 +1,7 @@
+---
 repository:
   name: ocis-phoenix
-  description: :atom_symbol: Service to serve Phoenix for Reva/oCIS
+  description: ':atom_symbol: Service to serve Phoenix for Reva/oCIS'
   homepage:
   topics: reva, ocis
 
@@ -62,3 +63,5 @@ branches:
         contexts:
           - continuous-integration/drone/pr
       enforce_admins: false
+
+...
