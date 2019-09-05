@@ -378,6 +378,7 @@ steps:
     files:
     - dist/release/*
     note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    overwrite: true
     title: ${DRONE_SEMVER}
   when:
     event:
@@ -482,6 +483,7 @@ steps:
     files:
     - dist/release/*
     note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    overwrite: true
     title: ${DRONE_SEMVER}
   when:
     event:
@@ -586,6 +588,7 @@ steps:
     files:
     - dist/release/*
     note: You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}
+    overwrite: true
     title: ${DRONE_SEMVER}
   when:
     event:
