@@ -1,5 +1,5 @@
 repository:
-  name: reva-hyper
+  name: reva-phoenix
   description: :atom_symbol: Service to serve phoenix for reva
   homepage:
   topics: reva, ocis
