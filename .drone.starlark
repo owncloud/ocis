@@ -189,7 +189,7 @@ def docker(arch):
           'tags': 'linux-%s' % arch,
           'auto_tag_suffix': 'linux-%s' % arch,
           'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
-          'repo': 'owncloud/reva-ocs',
+          'repo': 'owncloud/ocis-ocs',
         },
         'when': {
           'event': [
@@ -211,7 +211,7 @@ def docker(arch):
           'auto_tag': True,
           'auto_tag_suffix': 'linux-%s' % arch,
           'dockerfile': 'docker/Dockerfile.linux.%s' % arch,
-          'repo': 'owncloud/reva-ocs',
+          'repo': 'owncloud/ocis-ocs',
         },
         'when': {
           'event': {
@@ -310,7 +310,7 @@ def binary(name):
           'path_style': True,
           'strip_prefix': 'dist/release/',
           'source': 'dist/release/*',
-          'target': '/reva/ocs/testing'
+          'target': '/ocis/ocs/testing'
         },
         'when': {
           'event': [
@@ -338,7 +338,7 @@ def binary(name):
           'path_style': True,
           'strip_prefix': 'dist/release/',
           'source': 'dist/release/*',
-          'target': '/reva/ocs/${DRONE_TAG##v}'
+          'target': '/ocis/ocs/${DRONE_TAG##v}'
         },
         'when': {
           'event': [
@@ -358,7 +358,7 @@ def binary(name):
             'dist/release/*'
           ],
           'title': '${DRONE_TAG}',
-          'note': 'You can find the detailed changelog at https://github.com/owncloud/reva-ocs/blob/master/CHANGELOG.md',
+          'note': 'You can find the detailed changelog at https://github.com/owncloud/ocis-ocs/blob/master/CHANGELOG.md',
           'overwrite': True
         },
         'when': {
