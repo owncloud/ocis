@@ -10,7 +10,7 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.label-schema.vendor="ownCloud GmbH" \
   org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/usr/bin/reva-phoenix"]
+ENTRYPOINT ["/usr/bin/ocis-phoenix"]
 CMD ["server"]
 
-COPY bin/reva-phoenix /usr/bin/reva-phoenix
+COPY bin/ocis-phoenix /usr/bin/ocis-phoenix

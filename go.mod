@@ -1,4 +1,4 @@
-module github.com/owncloud/reva-phoenix
+module github.com/owncloud/ocis-phoenix
 
 go 1.12
 
