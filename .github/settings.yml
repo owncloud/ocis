@@ -1,6 +1,6 @@
 repository:
-  name: reva-hyper
-  description: :atom_symbol: Provide reva as single binary
+  name: ocis
+  description: :atom_symbol: ownCloud Infinit Scale stack
   homepage:
   topics: reva, ocis
 
