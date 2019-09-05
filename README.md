@@ -1,4 +1,4 @@
-# ownCloud Infinit Scale: WebDAV
+# ownCloud Infinite Scale: WebDAV
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-webdav/status.svg)](https://cloud.drone.io/owncloud/ocis-webdav)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
