@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := reva-hyper
+NAME := ocis
 IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist

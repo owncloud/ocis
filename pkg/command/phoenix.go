@@ -1,7 +1,7 @@
 package command
 
 import (
-	phoenix "github.com/owncloud/reva-phoenix/pkg/command"
+	phoenix "github.com/owncloud/ocis-phoenix/pkg/command"
 	"github.com/spf13/cobra"
 )
 

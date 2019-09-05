@@ -4,17 +4,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/owncloud/reva-hyper/pkg/version"
+	"github.com/owncloud/ocis/pkg/version"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// Root is the entry point for the reva-phoenix command.
+// Root is the entry point for the ocis-phoenix command.
 func Root() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "reva-hyper",
+		Use:     "ocis",
 		Short:   "ownCloud infinite scale stack",
 		Long:    ``,
 		Version: version.String,
@@ -40,6 +40,8 @@ func Root() *cobra.Command {
 	viper.BindEnv("log.color", "HYPER_LOG_COLOR")
 
 	cmd.AddCommand(Phoenix())
+	cmd.AddCommand(Webdav())
+	cmd.AddCommand(Ocs())
 	cmd.AddCommand(Health())
 
 	return cmd
@@ -76,8 +78,8 @@ func setupLogger() {
 func setupConfig() {
 	viper.SetConfigName("hyper")
 
-	viper.AddConfigPath("/etc/reva")
-	viper.AddConfigPath("$HOME/.reva")
+	viper.AddConfigPath("/etc/ocis")
+	viper.AddConfigPath("$HOME/.ocis")
 	viper.AddConfigPath("./config")
 
 	if err := viper.ReadInConfig(); err != nil {

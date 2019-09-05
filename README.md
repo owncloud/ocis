@@ -1,29 +1,29 @@
-# Reva: Hyper
+# ownCloud Infinit Scale
 
-[![Build Status](https://cloud.drone.io/api/badges/owncloud/reva-hyper/status.svg)](https://cloud.drone.io/owncloud/reva-hyper)
+[![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis/status.svg)](https://cloud.drone.io/owncloud/ocis)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/app/owncloud/reva-hyper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/reva-hyper&amp;utm_campaign=Badge_Grade)
-[![Go Doc](https://godoc.org/github.com/owncloud/reva-hyper?status.svg)](http://godoc.org/github.com/owncloud/reva-hyper)
-[![Go Report](http://goreportcard.com/badge/github.com/owncloud/reva-hyper)](http://goreportcard.com/report/github.com/owncloud/reva-hyper)
-[![](https://images.microbadger.com/badges/image/owncloud/reva-hyper.svg)](http://microbadger.com/images/owncloud/reva-hyper "Get your own image badge on microbadger.com")
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/app/owncloud/ocis?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis&amp;utm_campaign=Badge_Grade)
+[![Go Doc](https://godoc.org/github.com/owncloud/ocis?status.svg)](http://godoc.org/github.com/owncloud/ocis)
+[![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis)](http://goreportcard.com/report/github.com/owncloud/ocis)
+[![](https://images.microbadger.com/badges/image/owncloud/ocis.svg)](http://microbadger.com/images/owncloud/ocis "Get your own image badge on microbadger.com")
 
 **This project is under heavy development, it's not in a working state yet!**
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/reva/hyper/).
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/ocis/).
 
 ## Development
 
 Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.11.
 
 ```console
-git clone https://github.com/owncloud/reva-hyper.git
-cd reva-hyper
+git clone https://github.com/owncloud/ocis.git
+cd ocis
 
 make generate build
 
-./bin/reva-hyper -h
+./bin/ocis -h
 ```
 
 ## Security
