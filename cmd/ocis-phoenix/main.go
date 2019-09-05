@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/reva-phoenix/pkg/command"
+	"github.com/owncloud/ocis-phoenix/pkg/command"
 )
 
 func main() {
