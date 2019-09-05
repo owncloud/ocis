@@ -72,6 +72,10 @@ lint: gorunpkg
 generate: gorunpkg
 	go generate $(GENERATE)
 
+.PHONY: changelog
+changelog: gorunpkg
+	gorunpkg github.com/restic/calens >| CHANGELOG.md
+
 .PHONY: test
 test: gorunpkg
 	gorunpkg github.com/haya14busa/goverage -v -coverprofile coverage.out $(PACKAGES)
