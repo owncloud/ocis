@@ -4,17 +4,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/owncloud/reva-webdav/pkg/version"
+	"github.com/owncloud/ocis-webdav/pkg/version"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// Root is the entry point for the reva-webdav command.
+// Root is the entry point for the ocis-webdav command.
 func Root() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "reva-webdav",
+		Use:     "ocis-webdav",
 		Short:   "Reva service for webdav",
 		Long:    ``,
 		Version: version.String,
@@ -74,10 +74,10 @@ func setupLogger() {
 }
 
 func setupConfig() {
-	viper.SetConfigName("phoenix")
+	viper.SetConfigName("webdav")
 
-	viper.AddConfigPath("/etc/reva")
-	viper.AddConfigPath("$HOME/.reva")
+	viper.AddConfigPath("/etc/ocis")
+	viper.AddConfigPath("$HOME/.ocis")
 	viper.AddConfigPath("./config")
 
 	if err := viper.ReadInConfig(); err != nil {

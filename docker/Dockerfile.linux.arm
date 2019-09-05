@@ -10,7 +10,7 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.label-schema.vendor="ownCloud GmbH" \
   org.label-schema.schema-version="1.0"
 
-ENTRYPOINT ["/usr/bin/reva-webdav"]
+ENTRYPOINT ["/usr/bin/ocis-webdav"]
 CMD ["server"]
 
-COPY bin/reva-webdav /usr/bin/reva-webdav
+COPY bin/ocis-webdav /usr/bin/ocis-webdav

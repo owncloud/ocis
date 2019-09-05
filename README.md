@@ -1,29 +1,29 @@
-# Reva: WebDAV
+# ownCloud Infinit Scale: WebDAV
 
-[![Build Status](https://cloud.drone.io/api/badges/owncloud/reva-webdav/status.svg)](https://cloud.drone.io/owncloud/reva-webdav)
+[![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-webdav/status.svg)](https://cloud.drone.io/owncloud/ocis-webdav)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/afe89eb0894848c5b67dc0343afd1df9)](https://www.codacy.com/app/owncloud/reva-webdav?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/reva-webdav&amp;utm_campaign=Badge_Grade)
-[![Go Doc](https://godoc.org/github.com/owncloud/reva-webdav?status.svg)](http://godoc.org/github.com/owncloud/reva-webdav)
-[![Go Report](http://goreportcard.com/badge/github.com/owncloud/reva-webdav)](http://goreportcard.com/report/github.com/owncloud/reva-webdav)
-[![](https://images.microbadger.com/badges/image/owncloud/reva-webdav.svg)](http://microbadger.com/images/owncloud/reva-webdav "Get your own image badge on microbadger.com")
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0913fcc866a344b587bb867fcec5b848)](https://www.codacy.com/app/owncloud/ocis-webdav?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-webdav&amp;utm_campaign=Badge_Grade)
+[![Go Doc](https://godoc.org/github.com/owncloud/ocis-webdav?status.svg)](http://godoc.org/github.com/owncloud/ocis-webdav)
+[![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-webdav)](http://goreportcard.com/report/github.com/owncloud/ocis-webdav)
+[![](https://images.microbadger.com/badges/image/owncloud/ocis-webdav.svg)](http://microbadger.com/images/owncloud/ocis-webdav "Get your own image badge on microbadger.com")
 
 **This project is under heavy development, it's not in a working state yet!**
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/reva/webdav/).
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/webdav/).
 
 ## Development
 
 Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.11.
 
 ```console
-git clone https://github.com/owncloud/reva-webdav.git
-cd reva-webdav
+git clone https://github.com/owncloud/ocis-webdav.git
+cd ocis-webdav
 
 make generate build
 
-./bin/reva-webdav -h
+./bin/ocis-webdav -h
 ```
 
 ## Security

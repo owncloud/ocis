@@ -1,6 +1,6 @@
 repository:
-  name: reva-webdav
-  description: :atom_symbol: Service to serve webdav for reva
+  name: ocis-webdav
+  description: :atom_symbol: Service to serve WebDAV for Reva/oCIS
   homepage:
   topics: reva, ocis
 

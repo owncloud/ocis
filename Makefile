@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := reva-webdav
+NAME := ocis-webdav
 IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
