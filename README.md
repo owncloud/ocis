@@ -1,4 +1,4 @@
-# ownCloud Infinit Scale: OCS
+# ownCloud Infinite Scale: OCS
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-ocs/status.svg)](https://cloud.drone.io/owncloud/ocis-ocs)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
