@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/reva-webdav/pkg/command"
+	"github.com/owncloud/ocis-webdav/pkg/command"
 )
 
 func main() {

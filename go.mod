@@ -1,4 +1,4 @@
-module github.com/owncloud/reva-webdav
+module github.com/owncloud/ocis-webdav
 
 go 1.12
 
