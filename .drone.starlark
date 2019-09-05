@@ -357,8 +357,8 @@ def binary(name):
           'files': [
             'dist/release/*'
           ],
-          'title': '${DRONE_SEMVER}',
-          'note': 'You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md#changelog-for-${DRONE_SEMVER##.}',
+          'title': '${DRONE_TAG}',
+          'note': 'You can find the detailed changelog at https://github.com/owncloud/reva-hyper/blob/master/CHANGELOG.md',
           'overwrite': True
         },
         'when': {
