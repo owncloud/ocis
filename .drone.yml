@@ -114,7 +114,7 @@ steps:
     auto_tag_suffix: linux-amd64
     dockerfile: docker/Dockerfile.linux.amd64
     dry_run: true
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     tags: linux-amd64
   when:
     event:
@@ -129,7 +129,7 @@ steps:
     dockerfile: docker/Dockerfile.linux.amd64
     password:
       from_secret: docker_password
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     username:
       from_secret: docker_username
   when:
@@ -185,7 +185,7 @@ steps:
     auto_tag_suffix: linux-arm64
     dockerfile: docker/Dockerfile.linux.arm64
     dry_run: true
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     tags: linux-arm64
   when:
     event:
@@ -200,7 +200,7 @@ steps:
     dockerfile: docker/Dockerfile.linux.arm64
     password:
       from_secret: docker_password
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     username:
       from_secret: docker_username
   when:
@@ -256,7 +256,7 @@ steps:
     auto_tag_suffix: linux-arm
     dockerfile: docker/Dockerfile.linux.arm
     dry_run: true
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     tags: linux-arm
   when:
     event:
@@ -271,7 +271,7 @@ steps:
     dockerfile: docker/Dockerfile.linux.arm
     password:
       from_secret: docker_password
-    repo: owncloud/reva-phoenix
+    repo: owncloud/ocis-phoenix
     username:
       from_secret: docker_username
   when:
@@ -344,7 +344,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/testing
+    target: /ocis/phoenix/testing
   when:
     event:
     - push
@@ -364,7 +364,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/${DRONE_TAG##v}
+    target: /ocis/phoenix/${DRONE_TAG##v}
   when:
     event:
     - tag
@@ -377,7 +377,7 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
-    note: You can find the detailed changelog at https://github.com/owncloud/reva-phoenix/blob/master/CHANGELOG.md
+    note: You can find the detailed changelog at https://github.com/owncloud/ocis-phoenix/blob/master/CHANGELOG.md
     overwrite: true
     title: ${DRONE_TAG}
   when:
@@ -449,7 +449,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/testing
+    target: /ocis/phoenix/testing
   when:
     event:
     - push
@@ -469,7 +469,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/${DRONE_TAG##v}
+    target: /ocis/phoenix/${DRONE_TAG##v}
   when:
     event:
     - tag
@@ -482,7 +482,7 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
-    note: You can find the detailed changelog at https://github.com/owncloud/reva-phoenix/blob/master/CHANGELOG.md
+    note: You can find the detailed changelog at https://github.com/owncloud/ocis-phoenix/blob/master/CHANGELOG.md
     overwrite: true
     title: ${DRONE_TAG}
   when:
@@ -554,7 +554,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/testing
+    target: /ocis/phoenix/testing
   when:
     event:
     - push
@@ -574,7 +574,7 @@ steps:
       from_secret: aws_secret_access_key
     source: dist/release/*
     strip_prefix: dist/release/
-    target: /reva/phoenix/${DRONE_TAG##v}
+    target: /ocis/phoenix/${DRONE_TAG##v}
   when:
     event:
     - tag
@@ -587,7 +587,7 @@ steps:
       from_secret: github_token
     files:
     - dist/release/*
-    note: You can find the detailed changelog at https://github.com/owncloud/reva-phoenix/blob/master/CHANGELOG.md
+    note: You can find the detailed changelog at https://github.com/owncloud/ocis-phoenix/blob/master/CHANGELOG.md
     overwrite: true
     title: ${DRONE_TAG}
   when:
