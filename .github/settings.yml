@@ -1,6 +1,7 @@
+---
 repository:
   name: ocis-ocs
-  description: :atom_symbol: Service to serve OCS for Reva/oCIS
+  description: ':atom_symbol: Service to serve OCS for Reva/oCIS'
   homepage:
   topics: reva, ocis
 
@@ -62,3 +63,5 @@ branches:
         contexts:
           - continuous-integration/drone/pr
       enforce_admins: false
+
+...
