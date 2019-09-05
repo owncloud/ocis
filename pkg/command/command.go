@@ -4,17 +4,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/owncloud/reva-ocs/pkg/version"
+	"github.com/owncloud/ocis-ocs/pkg/version"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// Root is the entry point for the reva-ocs command.
+// Root is the entry point for the ocis-ocs command.
 func Root() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "reva-ocs",
+		Use:     "ocis-ocs",
 		Short:   "Reva service for ocs",
 		Long:    ``,
 		Version: version.String,
@@ -74,10 +74,10 @@ func setupLogger() {
 }
 
 func setupConfig() {
-	viper.SetConfigName("phoenix")
+	viper.SetConfigName("ocs")
 
-	viper.AddConfigPath("/etc/reva")
-	viper.AddConfigPath("$HOME/.reva")
+	viper.AddConfigPath("/etc/ocis")
+	viper.AddConfigPath("$HOME/.ocis")
 	viper.AddConfigPath("./config")
 
 	if err := viper.ReadInConfig(); err != nil {
