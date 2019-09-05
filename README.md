@@ -1,4 +1,4 @@
-# ownCloud Infinit Scale: Phoenix
+# ownCloud Infinite Scale: Phoenix
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-phoenix/status.svg)](https://cloud.drone.io/owncloud/ocis-phoenix)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
