@@ -56,9 +56,7 @@ branches:
         required_approving_review_count: 1
         dismiss_stale_reviews: false
         require_code_owner_reviews: false
-        dismissal_restrictions:
-          users: []
-          teams: []
+        dismissal_restrictions: {}
       required_status_checks:
         strict: true
         contexts:
