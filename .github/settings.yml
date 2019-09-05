@@ -2,11 +2,11 @@
 repository:
   name: ocis-phoenix
   description: ':atom_symbol: Service to serve Phoenix for Reva/oCIS'
-  homepage:
   topics: reva, ocis
 
   private: false
   has_issues: true
+  has_projects: false
   has_wiki: false
   has_downloads: false
 
@@ -56,10 +56,17 @@ branches:
         required_approving_review_count: 1
         dismiss_stale_reviews: false
         require_code_owner_reviews: false
+        dismissal_restrictions:
+          users: []
+          teams: []
       required_status_checks:
         strict: true
         contexts:
           - continuous-integration/drone/pr
       enforce_admins: false
+      restrictions:
+        users: []
+        teams:
+          - ci
 
 ...
