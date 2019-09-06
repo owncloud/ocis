@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:generate gorunpkg github.com/UnnoTed/fileb0x embed.yml
+//go:generate go run github.com/UnnoTed/fileb0x embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {
