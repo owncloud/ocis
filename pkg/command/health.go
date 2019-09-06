@@ -1,6 +1,10 @@
 package command
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,9 +17,32 @@ func Health() *cobra.Command {
 		Short: "Check health status",
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Info().
-				Str("addr", viper.GetString("debug.addr")).
-				Msg("Executed health command")
+			resp, err := http.Get(
+				fmt.Sprintf(
+					"http://%s/healthz",
+					viper.GetString("debug.addr"),
+				),
+			)
+
+			if err != nil {
+				log.Error().
+					Err(err).
+					Msg("Failed to request health check")
+
+				os.Exit(1)
+			}
+
+			defer resp.Body.Close()
+
+			if resp.StatusCode != 200 {
+				log.Error().
+					Int("code", resp.StatusCode).
+					Msg("Health seems to be in bad state")
+
+				os.Exit(1)
+			}
+
+			os.Exit(0)
 		},
 	}
 
