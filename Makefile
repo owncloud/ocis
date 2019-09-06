@@ -119,4 +119,4 @@ release-check:
 release-finish: release-copy release-check
 
 phoenix:
-	mkdir phoenix/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.0/phoenix.tar.gz | tar xvzf - -C phoenix/
+	mkdir phoenix/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.1/phoenix.tar.gz | tar xvzf - -C phoenix/
