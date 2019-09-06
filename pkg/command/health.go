@@ -14,14 +14,14 @@ func Health() *cobra.Command {
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
 			log.Info().
-				Str("addr", viper.GetString("metrics.addr")).
+				Str("addr", viper.GetString("debug.addr")).
 				Msg("Executed health command")
 		},
 	}
 
-	cmd.Flags().String("metrics-addr", "", "Address to metrics endpoint")
-	viper.BindPFlag("metrics.addr", cmd.Flags().Lookup("metrics-addr"))
-	viper.BindEnv("metrics.addr", "PHOENIX_METRICS_ADDR")
+	cmd.Flags().String("debug-addr", "", "Address to debug endpoint")
+	viper.BindPFlag("debug.addr", cmd.Flags().Lookup("debug-addr"))
+	viper.BindEnv("debug.addr", "PHOENIX_DEBUG_ADDR")
 
 	return cmd
 }

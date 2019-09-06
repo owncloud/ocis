@@ -14,7 +14,7 @@ endif
 
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f)
-GENERATE ?= $(PACKAGES)
+GENERATE ?= $(IMPORT)/pkg/assets
 
 TAGS ?=
 
@@ -50,7 +50,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST)
+	rm -rf $(BIN) $(DIST) phoenix/
 
 .PHONY: fmt
 fmt:
@@ -69,7 +69,7 @@ lint: gorunpkg
 	for PKG in $(PACKAGES); do gorunpkg golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: gorunpkg
+generate: gorunpkg phoenix
 	go generate $(GENERATE)
 
 .PHONY: changelog
@@ -125,3 +125,6 @@ gorunpkg:
 ifndef HAS_GORUNPKG
 	go get -u github.com/vektah/gorunpkg
 endif
+
+phoenix:
+	mkdir phoenix/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.0/phoenix.tar.gz | tar xvzf - -C phoenix/
