@@ -1,8 +1,17 @@
 ---
-server:
-  addr: 0.0.0.0:8080
-
-metrics:
+debug:
   addr: 0.0.0.0:8090
+  token:
+  pprof: false
+
+http:
+  addr: 0.0.0.0:8080
+  root: /
+
+asset:
+  path:
+
+config:
+  file:
 
 ...

@@ -1,6 +1,10 @@
 package command
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,15 +17,38 @@ func Health() *cobra.Command {
 		Short: "Check health status",
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Info().
-				Str("addr", viper.GetString("metrics.addr")).
-				Msg("Executed health command")
+			resp, err := http.Get(
+				fmt.Sprintf(
+					"http://%s/healthz",
+					viper.GetString("debug.addr"),
+				),
+			)
+
+			if err != nil {
+				log.Error().
+					Err(err).
+					Msg("Failed to request health check")
+
+				os.Exit(1)
+			}
+
+			defer resp.Body.Close()
+
+			if resp.StatusCode != 200 {
+				log.Error().
+					Int("code", resp.StatusCode).
+					Msg("Health seems to be in bad state")
+
+				os.Exit(1)
+			}
+
+			os.Exit(0)
 		},
 	}
 
-	cmd.Flags().String("metrics-addr", "", "Address to metrics endpoint")
-	viper.BindPFlag("metrics.addr", cmd.Flags().Lookup("metrics-addr"))
-	viper.BindEnv("metrics.addr", "PHOENIX_METRICS_ADDR")
+	cmd.Flags().String("debug-addr", "", "Address to debug endpoint")
+	viper.BindPFlag("debug.addr", cmd.Flags().Lookup("debug-addr"))
+	viper.BindEnv("debug.addr", "PHOENIX_DEBUG_ADDR")
 
 	return cmd
 }
