@@ -14,11 +14,5 @@ func init() {
 	viper.SetDefault("http.root", "/")
 
 	viper.SetDefault("asset.path", "")
-
-	viper.SetDefault("config.custom", "")
-	viper.SetDefault("config.server", "")
-	viper.SetDefault("config.theme", "owncloud")
-	viper.SetDefault("config.version", "0.1.0")
-	viper.SetDefault("config.client", "")
-	viper.SetDefault("config.apps", []string{"files"})
+	viper.SetDefault("config.file", "")
 }

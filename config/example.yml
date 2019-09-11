@@ -12,12 +12,6 @@ asset:
   path:
 
 config:
-  custom:
-  server:
-  theme: owncloud
-  version: 0.1.0
-  client:
-  apps:
-    - files
+  file:
 
 ...

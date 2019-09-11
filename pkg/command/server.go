@@ -65,12 +65,7 @@ func Server() *cobra.Command {
 					Handler: server.Router(
 						server.WithRoot(viper.GetString("http.root")),
 						server.WithPath(viper.GetString("asset.path")),
-						server.WithCustom(viper.GetString("config.custom")),
-						server.WithServer(viper.GetString("config.server")),
-						server.WithTheme(viper.GetString("config.theme")),
-						server.WithVersion(viper.GetString("config.version")),
-						server.WithClient(viper.GetString("config.client")),
-						server.WithApps(viper.GetStringSlice("config.apps")),
+						server.WithConfig(viper.GetString("config.file")),
 					),
 					ReadTimeout:  5 * time.Second,
 					WriteTimeout: 10 * time.Second,
@@ -142,29 +137,9 @@ func Server() *cobra.Command {
 	viper.BindPFlag("asset.path", cmd.Flags().Lookup("asset-path"))
 	viper.BindEnv("asset.path", "PHOENIX_ASSET_PATH")
 
-	cmd.Flags().String("config-custom", "", "Path to custom config")
-	viper.BindPFlag("config.custom", cmd.Flags().Lookup("config-custom"))
-	viper.BindEnv("config.custom", "PHOENIX_CONFIG_CUSTOM")
-
-	cmd.Flags().String("config-server", "", "URL to ownCloud server")
-	viper.BindPFlag("config.server", cmd.Flags().Lookup("config-server"))
-	viper.BindEnv("config.server", "PHOENIX_CONFIG_SERVER")
-
-	cmd.Flags().String("config-theme", "", "The to use with Phoenix")
-	viper.BindPFlag("config.theme", cmd.Flags().Lookup("config-theme"))
-	viper.BindEnv("config.theme", "PHOENIX_CONFIG_THEME")
-
-	cmd.Flags().String("config-version", "", "Config version for Phoenix")
-	viper.BindPFlag("config.version", cmd.Flags().Lookup("config-version"))
-	viper.BindEnv("config.version", "PHOENIX_CONFIG_VERSION")
-
-	cmd.Flags().String("config-client", "", "Client ID used for OAuth2")
-	viper.BindPFlag("config.client", cmd.Flags().Lookup("config-client"))
-	viper.BindEnv("config.client", "PHOENIX_CONFIG_CLIENT")
-
-	cmd.Flags().StringSlice("config-apps", []string{}, "List of enabled apps")
-	viper.BindPFlag("config.apps", cmd.Flags().Lookup("config-apps"))
-	viper.BindEnv("config.apps", "PHOENIX_CONFIG_APPS")
+	cmd.Flags().String("config-file", "", "Path to phoenix config")
+	viper.BindPFlag("config.file", cmd.Flags().Lookup("config-file"))
+	viper.BindEnv("config.file", "PHOENIX_CONFIG_FILE")
 
 	return cmd
 }

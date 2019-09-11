@@ -15,14 +15,9 @@ import (
 
 // server gets initialized by Router and configures the router.
 type server struct {
-	root    string
-	path    string
-	custom  string
-	server  string
-	theme   string
-	version string
-	client  string
-	apps    []string
+	root   string
+	path   string
+	config string
 }
 
 // Router initializes a router for the http server.
@@ -61,12 +56,7 @@ func Router(opts ...Option) *chi.Mux {
 		root.Mount(
 			"/config.json",
 			config.Handler(
-				config.WithCustom(s.custom),
-				config.WithServer(s.server),
-				config.WithTheme(s.theme),
-				config.WithVersion(s.version),
-				config.WithClient(s.client),
-				config.WithApps(s.apps),
+				config.WithConfig(s.config),
 			),
 		)
 
