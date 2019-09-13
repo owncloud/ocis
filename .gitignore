@@ -4,3 +4,5 @@ coverage.out
 /dist
 
 /phoenix
+
+/pkg/assets/embed.go
