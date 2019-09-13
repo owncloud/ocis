@@ -2,9 +2,11 @@ package command
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/oklog/run"
@@ -40,6 +42,45 @@ func Server() *cobra.Command {
 						Str("addr", viper.GetString("debug.addr")).
 						Msg("Starting debug server")
 
+					if strings.HasPrefix(viper.GetString("debug.addr"), "unix://") {
+						socket := strings.TrimPrefix(viper.GetString("debug.addr"), "unix://")
+
+						if err := os.Remove(socket); err != nil && !os.IsNotExist(err) {
+							log.Error().
+								Err(err).
+								Str("socket", socket).
+								Msg("Failed to remove existing debug socket")
+
+							return err
+						}
+
+						listener, err := net.ListenUnix(
+							"unix",
+							&net.UnixAddr{
+								Name: socket,
+								Net:  "unix",
+							},
+						)
+
+						if err != nil {
+							log.Error().
+								Err(err).
+								Msg("Failed to initialize debug unix socket")
+
+							return err
+						}
+
+						if err = os.Chmod(socket, os.FileMode(0666)); err != nil {
+							log.Error().
+								Err(err).
+								Msg("Failed to change debug socket permissions")
+
+							return err
+						}
+
+						return server.Serve(listener)
+					}
+
 					return server.ListenAndServe()
 				}, func(reason error) {
 					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -51,6 +92,17 @@ func Server() *cobra.Command {
 							Msg("Failed to shutdown debug server gracefully")
 
 						return
+					}
+
+					if strings.HasPrefix(viper.GetString("debug.addr"), "unix://") {
+						socket := strings.TrimPrefix(viper.GetString("debug.addr"), "unix://")
+
+						if err := os.Remove(socket); err != nil && !os.IsNotExist(err) {
+							log.Error().
+								Err(err).
+								Str("socket", socket).
+								Msg("Failed to remove debug server socket")
+						}
 					}
 
 					log.Info().
@@ -76,6 +128,45 @@ func Server() *cobra.Command {
 						Str("addr", viper.GetString("http.addr")).
 						Msg("Starting http server")
 
+					if strings.HasPrefix(viper.GetString("http.addr"), "unix://") {
+						socket := strings.TrimPrefix(viper.GetString("http.addr"), "unix://")
+
+						if err := os.Remove(socket); err != nil && !os.IsNotExist(err) {
+							log.Error().
+								Err(err).
+								Str("socket", socket).
+								Msg("Failed to remove existing http socket")
+
+							return err
+						}
+
+						listener, err := net.ListenUnix(
+							"unix",
+							&net.UnixAddr{
+								Name: socket,
+								Net:  "unix",
+							},
+						)
+
+						if err != nil {
+							log.Error().
+								Err(err).
+								Msg("Failed to initialize http unix socket")
+
+							return err
+						}
+
+						if err = os.Chmod(socket, os.FileMode(0666)); err != nil {
+							log.Error().
+								Err(err).
+								Msg("Failed to change http socket permissions")
+
+							return err
+						}
+
+						return server.Serve(listener)
+					}
+
 					return server.ListenAndServe()
 				}, func(reason error) {
 					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -87,6 +178,17 @@ func Server() *cobra.Command {
 							Msg("Failed to shutdown http server gracefully")
 
 						return
+					}
+
+					if strings.HasPrefix(viper.GetString("http.addr"), "unix://") {
+						socket := strings.TrimPrefix(viper.GetString("http.addr"), "unix://")
+
+						if err := os.Remove(socket); err != nil && !os.IsNotExist(err) {
+							log.Error().
+								Err(err).
+								Str("socket", socket).
+								Msg("Failed to remove http server socket")
+						}
 					}
 
 					log.Info().
