@@ -14,7 +14,9 @@ init_cmds = [
     "./bin/ocis-phoenix",
     "--log-level",
     "debug",
-    "server"
+    "server",
+    "--asset-path",
+    "phoenix/"
   ]
 ]
 
@@ -24,6 +26,8 @@ cmds = [
     "./bin/ocis-phoenix",
     "--log-level",
     "debug",
-    "server"
+    "server",
+    "--asset-path",
+    "phoenix/"
   ]
 ]
