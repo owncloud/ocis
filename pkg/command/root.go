@@ -74,7 +74,7 @@ func setupLogger() {
 	}
 }
 
-// setupConfig prepares the config
+// setupConfig prepares the config.
 func setupConfig() {
 	viper.SetConfigName("phoenix")
 
