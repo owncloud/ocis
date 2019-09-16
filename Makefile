@@ -118,5 +118,9 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
+.PHONY: docs
+docs:
+	cd docs; hugo
+
 phoenix:
 	mkdir phoenix/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.1/phoenix.tar.gz | tar xvzf - -C phoenix/

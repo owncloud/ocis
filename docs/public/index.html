@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+
+<html id="html" lang="en-us">
+	<head>
+	<meta name="generator" content="Hugo 0.54.0" />
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+		<meta name="viewport" content="width=device-width"/>
+
+		<title>
+			ownCloud Infinite Scale: Phoenix
+		</title>
+
+		<meta name="description" content="Serve Phoenix for Reva/oCIS">
+		<meta name="author" content="ownCloud GmbH">
+
+		<link rel="stylesheet" href="syntax.css" />
+
+<style type="text/css">
+	body,
+	div,
+	dl,
+	dt,
+	dd,
+	ul,
+	ol,
+	li,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	pre,
+	form,
+	fieldset,
+	input,
+	textarea,
+	p,
+	blockquote,
+	th,
+	td {
+		margin: 0;
+		padding: 0;
+	}
+
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	:before,
+	:after {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	img,
+	object,
+	embed {
+		max-width: 100%;
+		height: auto;
+	}
+
+	object,
+	embed {
+		height: 100%;
+	}
+
+	img {
+		margin: 1.25% 0;
+		-ms-interpolation-mode: bicubic;
+	}
+
+	html {
+		background-color: #F0F1F3;
+		padding: 2%;
+	}
+
+	body {
+		font-size: 16px;
+		line-height: 1.6;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+		color: #242424;
+		max-width: 800px;
+		margin: 5% auto;
+	}
+
+	body::after {
+		clear: both;
+		content: "";
+		display: table;
+	}
+
+	header {
+		margin-bottom: 8%;
+	}
+
+	footer {
+		text-align: center;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h1 a {
+		color: #263A48;
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	h1,
+	h2 {
+		font-size: 36px;
+		padding-bottom: 0.3em;
+		margin-bottom: 0.4em;
+		border-bottom: 1px solid #eee
+	}
+
+	h2 {
+		font-size: 22px;
+		padding-bottom: 0.6em;
+		margin-bottom: 0.6em;
+		margin-top: 2.5em;
+	}
+
+	h3 {
+		font-size: 18px;
+		margin-bottom: 0.3em;
+	}
+
+	h1 small a {
+		color: #98999C;
+		font-size: 15px;
+		font-weight: normal;
+		float: right;
+		position: absolute;
+		top: 15px;
+		right: 20px;
+	}
+
+	section {
+		background: #fff;
+		margin-bottom: 1%;
+		position: relative;
+		padding: 6% 8%;
+	}
+
+	blockquote {
+		border-left: 3px solid #d54e21;
+		font-size: 16px;
+		padding: 0 0 0 20px;
+		color: #d54e21;
+	}
+
+	blockquote a {
+		color: #d54e21;
+		font-weight: 500;
+	}
+
+	blockquote code {
+		color: #d54e21;
+	}
+
+	.highlight pre {
+		padding: 10px;
+	}
+
+	.highlight {
+		margin-bottom: 4%;
+	}
+
+	a {
+		color: #1e8cbe;
+		text-decoration: underline;
+	}
+
+	a:hover {
+		color: #d54e21;
+	}
+
+	ul {
+		list-style: none;
+	}
+
+	ol {
+		list-style: number;
+	}
+
+	ol li {
+		color: #98999C;
+		margin-bottom: 5px;
+	}
+
+	ol li:last-child {
+		margin-bottom: 0;
+	}
+
+	p,
+	ul,
+	ol,
+	blockquote  {
+		margin-bottom: 4%;
+	}
+
+	ul ul {
+		padding-top: 0;
+		margin-bottom: 0;
+		margin-left: 4%;
+	}
+
+	ul ul li:before {
+		content: '-';
+		display: inline-block;
+		padding-right: 2%;
+	}
+
+	ul.col-2 {
+		color: #98999C;
+		-webkit-column-count: 2;
+		-moz-column-count: 2;
+		column-count: 2;
+		-webkit-column-gap: 20px;
+		-moz-column-gap: 20px;
+		column-gap: 20px;
+	}
+
+	dl dt {
+		font-weight: bold;
+	}
+
+	dl dd {
+		padding-left: 10px;
+	}
+
+	@media screen and (min-width: 500px) {
+		ul.col-2 {
+			-webkit-column-count: 3;
+			-moz-column-count: 3;
+			column-count: 3;
+			-webkit-column-gap: 20px;
+			-moz-column-gap: 20px;
+			column-gap: 20px;
+		}
+	}
+
+	nav {
+		background: #F0F1F3;
+		min-width: 215px;
+		margin-bottom: 5px;
+		margin-top: 15px;
+	}
+
+	nav:first-of-type a {
+		color: #d54e21;
+		border-radius: 0;
+	}
+
+	nav:first-of-type a:hover {
+		color: #d54e21;
+	}
+
+	nav:first-of-type a:before {
+		background-color: #d54e21;
+	}
+
+	nav.affix {
+		position: fixed;
+		top: 20px;
+	}
+
+	nav.affix-bottom {
+		position: absolute;
+	}
+
+	nav a {
+		border-radius: 3px;
+		font-size: 15px;
+		display: block;
+		cursor: pointer;
+		font-weight: 500;
+		position: relative;
+		text-decoration: none;
+		padding: 10px 12px;
+		width: 100%;
+		padding-right: 3px;
+		border-bottom: 2px solid #fff;
+	}
+
+	nav a:before {
+		content: '';
+		width: 4px;
+		display: block;
+		left: 0;
+		position: absolute;
+		height: 100%;
+		display: none;
+		background: #1e8cbe;
+		top: 0;
+	}
+
+	nav a:hover {
+		background-color: #E6E8EA;
+		color: #1e8cbe;
+		text-decoration: underline;
+	}
+
+	nav a:hover:before {
+		display: block;
+	}
+
+	nav a:last-of-type {
+		border-bottom: none;
+	}
+
+	.gist {
+		margin-top: 5.1%;
+		margin-bottom: 5%;
+	}
+
+	@media screen and (max-width: 1050px) {
+		body {
+			margin: 0 auto;
+		}
+	}
+
+	@media screen and (max-width: 767px) {
+		header span {
+			display: none;
+		}
+
+		h1 {
+			font-size: 26px;
+		}
+
+		h2 {
+			font-size: 20px;
+		}
+	}
+
+	@media screen and (max-width: 514px) {
+		p,
+		ul,
+		ol,
+		blockquote  {
+			margin-bottom: 8%;
+		}
+	}
+</style>
+
+	</head>
+
+	<body>
+		<section id="Menu">
+			<header>
+				<h1>
+					ownCloud Infinite Scale: Phoenix
+				</h1>
+
+				<p>
+					Serve Phoenix for Reva/oCIS
+				</p>
+			</header>
+
+			<nav>
+				
+					<a href="#about">
+						About
+					</a>
+				
+					<a href="#getting-started">
+						Getting Started
+					</a>
+				
+					<a href="#building">
+						Building
+					</a>
+				
+					<a href="#license">
+						License
+					</a>
+				
+			</nav>
+		</section>
+
+		
+			<section id="about">
+				<h1>
+					<a href="#about">
+						About
+					</a>
+
+					<small>
+						<a href="#html">
+							Back to Top
+						</a>
+					</small>
+				</h1>
+
+				TBD
+			</section>
+		
+			<section id="getting-started">
+				<h1>
+					<a href="#getting-started">
+						Getting Started
+					</a>
+
+					<small>
+						<a href="#html">
+							Back to Top
+						</a>
+					</small>
+				</h1>
+
+				<h2 id="installation">Installation</h2>
+
+<p>So far we are offering two different variants for the installation. You can choose between <a href="docker">Docker</a> or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.</p>
+
+<h3 id="docker">Docker</h3>
+
+<p>TBD</p>
+
+<h3 id="binaries">Binaries</h3>
+
+<p>TBD</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.</p>
+
+<h3 id="envrionment-variables">Envrionment variables</h3>
+
+<p>If you prefer to configure the service with environment variables you can see the available variables below.</p>
+
+<h4 id="global">Global</h4>
+
+<dl>
+<dt>PHOENIX_LOG_LEVEL<br /></dt>
+<dd>Set logging level, defaults to <code>info</code><br />
+<br /></dd>
+<dt>PHOENIX_LOG_COLOR<br /></dt>
+<dd>Enable colored logging, defaults to <code>true</code><br />
+<br /></dd>
+<dt>PHOENIX_LOG_PRETTY<br /></dt>
+<dd>Enable pretty logging, defaults to <code>true</code><br />
+<br /></dd>
+</dl>
+
+<h4 id="server">Server</h4>
+
+<dl>
+<dt>PHOENIX_DEBUG_ADDR<br /></dt>
+<dd>Address to bind debug server, defaults to <code>0.0.0.0:8090</code><br />
+<br /></dd>
+<dt>PHOENIX_DEBUG_TOKEN<br /></dt>
+<dd>Token to grant metrics access, empty default value<br />
+<br /></dd>
+<dt>PHOENIX_DEBUG_PPROF<br /></dt>
+<dd>Enable pprof debugging, defaults to <code>false</code><br />
+<br /></dd>
+<dt>PHOENIX_HTTP_ADDR<br /></dt>
+<dd>Address to bind http server, defaults to <code>0.0.0.0:8080</code><br />
+<br /></dd>
+<dt>PHOENIX_HTTP_ROOT<br /></dt>
+<dd>Root path for http endpoint, defaults to <code>/</code><br />
+<br /></dd>
+<dt>PHOENIX_ASSET_PATH<br /></dt>
+<dd>Path to custom assets, empty default value<br />
+<br /></dd>
+<dt>PHOENIX_CONFIG_FILE<br /></dt>
+<dd>Path to phoenix config, empty default value<br />
+<br /></dd>
+</dl>
+
+<h4 id="health">Health</h4>
+
+<dl>
+<dt>PHOENIX_DEBUG_ADDR<br /></dt>
+<dd>Address to debug endpoint, defaults to <code>0.0.0.0:8090</code><br />
+<br /></dd>
+</dl>
+
+<h3 id="commandline-flags">Commandline flags</h3>
+
+<p>If you prefer to configure the service with commandline flags you can see the available variables below.</p>
+
+<h4 id="global-1">Global</h4>
+
+<dl>
+<dt>&ndash;log-level<br /></dt>
+<dd>Set logging level, defaults to <code>info</code><br />
+<br /></dd>
+<dt>&ndash;log-color<br /></dt>
+<dd>Enable colored logging, defaults to <code>true</code><br />
+<br /></dd>
+<dt>&ndash;log-pretty<br /></dt>
+<dd>Enable pretty logging, defaults to <code>true</code><br />
+<br /></dd>
+</dl>
+
+<h4 id="server-1">Server</h4>
+
+<dl>
+<dt>&ndash;debug-addr<br /></dt>
+<dd>Address to bind debug server, defaults to <code>0.0.0.0:8090</code><br />
+<br /></dd>
+<dt>&ndash;debug-token<br /></dt>
+<dd>Token to grant metrics access, empty default value<br />
+<br /></dd>
+<dt>&ndash;debug-pprof<br /></dt>
+<dd>Enable pprof debugging, defaults to <code>false</code><br />
+<br /></dd>
+<dt>&ndash;http-addr<br /></dt>
+<dd>Address to bind http server, defaults to <code>0.0.0.0:8080</code><br />
+<br /></dd>
+<dt>&ndash;http-root<br /></dt>
+<dd>Root path for http endpoint, defaults to <code>/</code><br />
+<br /></dd>
+<dt>&ndash;asset-path<br /></dt>
+<dd>Path to custom assets, empty default value<br />
+<br /></dd>
+<dt>&ndash;config-file<br /></dt>
+<dd>Path to phoenix config, empty default value<br />
+<br /></dd>
+</dl>
+
+<h4 id="health-1">Health</h4>
+
+<dl>
+<dt>&ndash;debug-addr<br /></dt>
+<dd>Address to debug endpoint, defaults to <code>0.0.0.0:8090</code><br />
+<br /></dd>
+</dl>
+
+<h3 id="configuration-file">Configuration file</h3>
+
+<p>So far we support the file formats <code>JSON</code> and <code>YAML</code>, if you want to get a full example configuration just take a look at <a href="repo">our repository</a>, there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it&rsquo;s placed at <code>/etc/ocis/phoenix.yml</code>, <code>${HOME}/.ocis/phoenix.yml</code> or <code>$(pwd)/config/phoenix.yml</code>.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formated help output if you execute the binary via <code>ocis-phoenix --help</code>.</p>
+
+<h3 id="server-2">Server</h3>
+
+<p>The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">ocis-phoenix server --help</code></pre></div>
+
+<h3 id="health-2">Health</h3>
+
+<p>The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">ocis-phoenix health --help</code></pre></div>
+
+<h2 id="metrics">Metrics</h2>
+
+<p>This service provides some <a href="prom">Prometheus</a> metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag <code>--debug-token</code> or the environment variable <code>PHOENIX_DEBUG_TOKEN</code> mentioned above. By default the metrics endpoint is bound to <code>http://0.0.0.0:8090/metrics</code>.</p>
+
+<dl>
+<dt>go_gc_duration_seconds<br /></dt>
+<dd>A summary of the GC invocation durations<br />
+<br /></dd>
+<dt>go_gc_duration_seconds_sum<br /></dt>
+<dd>A summary of the GC invocation durations<br />
+<br /></dd>
+<dt>go_gc_duration_seconds_count<br /></dt>
+<dd>A summary of the GC invocation durations<br />
+<br /></dd>
+<dt>go_goroutines<br /></dt>
+<dd>Number of goroutines that currently exist<br />
+<br /></dd>
+<dt>go_info<br /></dt>
+<dd>Information about the Go environment<br />
+<br /></dd>
+<dt>go_memstats_alloc_bytes<br /></dt>
+<dd>Number of bytes allocated and still in use<br />
+<br /></dd>
+<dt>go_memstats_alloc_bytes_total<br /></dt>
+<dd>Total number of bytes allocated, even if freed<br />
+<br /></dd>
+<dt>go_memstats_buck_hash_sys_bytes<br /></dt>
+<dd>Number of bytes used by the profiling bucket hash table<br />
+<br /></dd>
+<dt>go_memstats_frees_total<br /></dt>
+<dd>Total number of frees<br />
+<br /></dd>
+<dt>go_memstats_gc_cpu_fraction<br /></dt>
+<dd>The fraction of this program&rsquo;s available CPU time used by the GC since the program started<br />
+<br /></dd>
+<dt>go_memstats_gc_sys_bytes<br /></dt>
+<dd>Number of bytes used for garbage collection system metadata<br />
+<br /></dd>
+<dt>go_memstats_heap_alloc_bytes<br /></dt>
+<dd>Number of heap bytes allocated and still in use<br />
+<br /></dd>
+<dt>go_memstats_heap_idle_bytes<br /></dt>
+<dd>Number of heap bytes waiting to be used<br />
+<br /></dd>
+<dt>go_memstats_heap_inuse_bytes<br /></dt>
+<dd>Number of heap bytes that are in use<br />
+<br /></dd>
+<dt>go_memstats_heap_objects<br /></dt>
+<dd>Number of allocated objects<br />
+<br /></dd>
+<dt>go_memstats_heap_released_bytes<br /></dt>
+<dd>Number of heap bytes released to OS<br />
+<br /></dd>
+<dt>go_memstats_heap_sys_bytes<br /></dt>
+<dd>Number of heap bytes obtained from system<br />
+<br /></dd>
+<dt>go_memstats_last_gc_time_seconds<br /></dt>
+<dd>Number of seconds since 1970 of last garbage collection<br />
+<br /></dd>
+<dt>go_memstats_lookups_total<br /></dt>
+<dd>Total number of pointer lookups<br />
+<br /></dd>
+<dt>go_memstats_mallocs_total<br /></dt>
+<dd>Total number of mallocs<br />
+<br /></dd>
+<dt>go_memstats_mcache_inuse_bytes<br /></dt>
+<dd>Number of bytes in use by mcache structures<br />
+<br /></dd>
+<dt>go_memstats_mcache_sys_bytes<br /></dt>
+<dd>Number of bytes used for mcache structures obtained from system<br />
+<br /></dd>
+<dt>go_memstats_mspan_inuse_bytes<br /></dt>
+<dd>Number of bytes in use by mspan structures<br />
+<br /></dd>
+<dt>go_memstats_mspan_sys_bytes<br /></dt>
+<dd>Number of bytes used for mspan structures obtained from system<br />
+<br /></dd>
+<dt>go_memstats_next_gc_bytes<br /></dt>
+<dd>Number of heap bytes when next garbage collection will take place<br />
+<br /></dd>
+<dt>go_memstats_other_sys_bytes<br /></dt>
+<dd>Number of bytes used for other system allocations<br />
+<br /></dd>
+<dt>go_memstats_stack_inuse_bytes<br /></dt>
+<dd>Number of bytes in use by the stack allocator<br />
+<br /></dd>
+<dt>go_memstats_stack_sys_bytes<br /></dt>
+<dd>Number of bytes obtained from system for stack allocator<br />
+<br /></dd>
+<dt>go_memstats_sys_bytes<br /></dt>
+<dd>Number of bytes obtained from system<br />
+<br /></dd>
+<dt>go_threads<br /></dt>
+<dd>Number of OS threads created<br />
+<br /></dd>
+<dt>promhttp_metric_handler_requests_in_flight<br /></dt>
+<dd>Current number of scrapes being served<br />
+<br /></dd>
+<dt>promhttp_metric_handler_requests_total<br /></dt>
+<dd>Total number of scrapes by HTTP status code<br />
+<br />
+<br />
+<br />
+<br /></dd>
+</dl>
+
+			</section>
+		
+			<section id="building">
+				<h1>
+					<a href="#building">
+						Building
+					</a>
+
+					<small>
+						<a href="#html">
+							Back to Top
+						</a>
+					</small>
+				</h1>
+
+				<p>As this project is built with Go, so you need to install that first. The installation of Go is out of the scope of this document, please follow the official documentation for <a href="golang">Go</a>. After the installation of the required tools you need to get the sources:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">git clone https://github.com/owncloud/ocis-hello.git
+cd ocis-hello</code></pre></div>
+
+<p>All required tool besides Go itself and make are bundled or getting automatically installed within the <code>GOPATH</code>. All commands to build this project are part of our <code>Makefile</code>.</p>
+
+<h2 id="backend">Backend</h2>
+
+<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">make generate
+make build</code></pre></div>
+
+<p>The above commands will download a <a href="phoenix">Phoenix</a> release and embed it into the binary. Finally you should have the binary within the <code>bin/</code> folder now, give it a try with <code>./bin/ocis-hello -h</code> to see all available options.</p>
+
+			</section>
+		
+			<section id="license">
+				<h1>
+					<a href="#license">
+						License
+					</a>
+
+					<small>
+						<a href="#html">
+							Back to Top
+						</a>
+					</small>
+				</h1>
+
+				This project is licensed under the <a href="license">Apache 2.0</a> license. For the license of the used libraries you have to check the respective sources.
+			</section>
+		
+	</body>
+</html>

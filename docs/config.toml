@@ -1,0 +1,16 @@
+baseURL = "https://owncloud.github.io/ocis-phoenix/"
+languageCode = "en-us"
+title = "ownCloud Infinite Scale: Phoenix"
+pygmentsUseClasses = true
+
+[blackfriday]
+  angledQuotes = true
+  fractions = false
+  plainIDAnchors = true
+  smartlists = true
+  extensions = ["hardLineBreak"]
+
+[params]
+  author = "ownCloud GmbH"
+  description = "Serve Phoenix for Reva/oCIS"
+  keywords = "reva, ocis"

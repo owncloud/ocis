@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ownCloud Infinite Scale: Phoenix</title>
+    <link>https://owncloud.github.io/ocis-phoenix/</link>
+    <description>Recent content on ownCloud Infinite Scale: Phoenix</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 02 May 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://owncloud.github.io/ocis-phoenix/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>https://owncloud.github.io/ocis-phoenix/about/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://owncloud.github.io/ocis-phoenix/about/</guid>
+      <description>TBD</description>
+    </item>
+    
+    <item>
+      <title>Getting Started</title>
+      <link>https://owncloud.github.io/ocis-phoenix/getting-started/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://owncloud.github.io/ocis-phoenix/getting-started/</guid>
+      <description>Installation So far we are offering two different variants for the installation. You can choose between Docker or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
+Docker TBD
+Binaries TBD
+Configuration We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.</description>
+    </item>
+    
+    <item>
+      <title>Building</title>
+      <link>https://owncloud.github.io/ocis-phoenix/building/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://owncloud.github.io/ocis-phoenix/building/</guid>
+      <description>As this project is built with Go, so you need to install that first. The installation of Go is out of the scope of this document, please follow the official documentation for Go. After the installation of the required tools you need to get the sources:
+git clone https://github.com/owncloud/ocis-hello.git cd ocis-hello All required tool besides Go itself and make are bundled or getting automatically installed within the GOPATH. All commands to build this project are part of our Makefile.</description>
+    </item>
+    
+    <item>
+      <title>License</title>
+      <link>https://owncloud.github.io/ocis-phoenix/license/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://owncloud.github.io/ocis-phoenix/license/</guid>
+      <description>This project is licensed under the Apache 2.0 license. For the license of the used libraries you have to check the respective sources.</description>
+    </item>
+    
+  </channel>
+</rss>
