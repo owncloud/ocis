@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html id="html" lang="{{ with .Site.LanguageCode }}{{ . }}{{ else }}en-US{{ end }}">
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+		<meta name="viewport" content="width=device-width"/>
+
+		<title>
+			{{ .Site.Title }}
+		</title>
+
+		<meta name="description" content="{{ with .Site.Params.description }}{{ . }}{{ end }}">
+		<meta name="author" content="{{ with .Site.Params.author }}{{ . }}{{ end }}">
+
+		{{ partial "style.html" . }}
+	</head>
+
+	<body>
+		<section id="Menu">
+			<header>
+				<h1>
+					{{ .Site.Title }}
+				</h1>
+
+				<p>
+					{{ .Site.Params.description }}
+				</p>
+			</header>
+
+			<nav>
+				{{ range .Data.Pages.ByWeight }}
+					<a href="#{{ .Params.anchor }}">
+						{{ .Title }}
+					</a>
+				{{ end }}
+			</nav>
+		</section>
+
+		{{ range .Data.Pages.ByWeight }}
+			<section id="{{ .Params.anchor }}">
+				<h1>
+					<a href="#{{ .Params.anchor }}">
+						{{ .Title }}
+					</a>
+
+					<small>
+						<a href="#html">
+							Back to Top
+						</a>
+					</small>
+				</h1>
+
+				{{ .Content | markdownify }}
+			</section>
+		{{ end }}
+	</body>
+</html>

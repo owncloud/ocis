@@ -10,7 +10,10 @@ def main(ctx):
     binary('windows'),
   ]
 
-  after = manifest()
+  after = [
+    manifest(),
+    documentation()
+  ]
 
   for b in before:
     for s in stages:
@@ -385,7 +388,7 @@ def binary(name):
   }
 
 def manifest():
-  return [{
+  return {
     'kind': 'pipeline',
     'type': 'docker',
     'name': 'manifest',
@@ -424,4 +427,54 @@ def manifest():
         'refs/tags/**'
       ]
     }
-  }]
+  }
+
+def documentation():
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'documentation',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'generate',
+        'image': 'webhippie/hugo:latest',
+        'pull': 'always',
+        'commands': [
+          'make docs'
+        ]
+      },
+      {
+        'name': 'publish',
+        'image': 'plugins/gh-pages:1',
+        'pull': 'always',
+        'settings': {
+          'username': {
+            'from_secret': 'github_username'
+          },
+          'password': {
+            'from_secret': 'github_token'
+          },
+          'pages_directory': 'docs/public/',
+          'temporary_base': 'tmp/',
+        },
+        'when': {
+          'event': {
+            'exclude': [
+              'pull_request'
+            ]
+          }
+        }
+      }
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/pull/**'
+      ]
+    }
+  }

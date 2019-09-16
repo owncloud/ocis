@@ -125,3 +125,7 @@ gorunpkg:
 ifndef HAS_GORUNPKG
 	go get -u github.com/vektah/gorunpkg
 endif
+
+.PHONY: docs
+docs:
+	cd docs; hugo
