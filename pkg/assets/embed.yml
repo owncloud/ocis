@@ -10,8 +10,8 @@ compression:
 
 custom:
   - files:
-    - "../../phoenix/"
-    base: "../../phoenix/"
+    - "../../assets/"
+    base: "../../assets/"
     prefix: ""
     exclude:
     - "appinfo/**"

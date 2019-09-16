@@ -16,7 +16,7 @@ init_cmds = [
     "debug",
     "server",
     "--asset-path",
-    "phoenix/"
+    "assets/"
   ]
 ]
 
@@ -28,6 +28,6 @@ cmds = [
     "debug",
     "server",
     "--asset-path",
-    "phoenix/"
+    "assets/"
   ]
 ]

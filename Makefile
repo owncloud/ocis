@@ -48,7 +48,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST) phoenix/
+	rm -rf $(BIN) $(DIST) assets/
 
 .PHONY: fmt
 fmt:
@@ -67,7 +67,7 @@ lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: phoenix
+generate: assets
 	go generate $(GENERATE)
 
 .PHONY: changelog
@@ -122,5 +122,5 @@ release-finish: release-copy release-check
 docs:
 	cd docs; hugo
 
-phoenix:
-	mkdir phoenix/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.1/phoenix.tar.gz | tar xvzf - -C phoenix/
+assets:
+	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.1/phoenix.tar.gz | tar xvzf - -C assets/
