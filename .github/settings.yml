@@ -1,7 +1,8 @@
 ---
 repository:
   name: ocis-webdav
-  description: ':atom_symbol: Service to serve WebDAV for Reva/oCIS'
+  description: ':atom_symbol: Serve WebDAV API for Reva/oCIS'
+  homepage: https://owncloud.github.io/ocis-webdav/
   topics: reva, ocis
 
   private: false

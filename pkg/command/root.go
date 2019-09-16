@@ -45,6 +45,7 @@ func Root() *cobra.Command {
 	return cmd
 }
 
+// setupLogger prepares the logger.
 func setupLogger() {
 	switch strings.ToLower(viper.GetString("log.level")) {
 	case "panic":
@@ -73,6 +74,7 @@ func setupLogger() {
 	}
 }
 
+// setupConfig prepares the config.
 func setupConfig() {
 	viper.SetConfigName("webdav")
 

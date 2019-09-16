@@ -649,4 +649,48 @@ depends_on:
 - darwin
 - windows
 
+---
+kind: pipeline
+type: docker
+name: documentation
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: generate
+  pull: always
+  image: webhippie/hugo:latest
+  commands:
+  - make docs
+
+- name: publish
+  pull: always
+  image: plugins/gh-pages:1
+  settings:
+    pages_directory: docs/public/
+    password:
+      from_secret: github_token
+    temporary_base: tmp/
+    username:
+      from_secret: github_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/pull/**
+
+depends_on:
+- amd64
+- arm64
+- arm
+- linux
+- darwin
+- windows
+
 ...
