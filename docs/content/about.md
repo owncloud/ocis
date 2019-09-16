@@ -5,4 +5,4 @@ anchor: "about"
 weight: 10
 ---
 
-TBD
+This service provides the OCS API which is required by some ownCloud clients.
