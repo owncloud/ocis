@@ -1,8 +1,11 @@
 ---
 server:
   addr: 0.0.0.0:8280
+  token:
+  pprof: false
 
 metrics:
   addr: 0.0.0.0:8290
+  root: /
 
 ...
