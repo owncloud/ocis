@@ -1,7 +1,8 @@
 ---
 repository:
   name: ocis-ocs
-  description: ':atom_symbol: Service to serve OCS for Reva/oCIS'
+  description: ':atom_symbol: Serve OCS API for Reva/oCIS'
+  homepage: https://owncloud.github.io/ocis-ocs/
   topics: reva, ocis
 
   private: false
