@@ -37,9 +37,6 @@ Fork -> Patch -> Push -> Pull Request
 
 ## License
 
-Apache-2.0
-
-
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav?ref=badge_large)
 
 ## Copyright
