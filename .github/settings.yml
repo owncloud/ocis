@@ -49,6 +49,8 @@ labels:
 teams:
   - name: ci
     permission: admin
+  - name: internal developers
+    permission: write
 
 branches:
   - name: master
