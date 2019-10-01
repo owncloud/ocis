@@ -49,6 +49,8 @@ labels:
 teams:
   - name: ci
     permission: admin
+  - name: employees
+    permission: push
 
 branches:
   - name: master
