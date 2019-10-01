@@ -50,7 +50,7 @@ teams:
   - name: ci
     permission: admin
   - name: internal developers
-    permission: write
+    permission: push
 
 branches:
   - name: master
