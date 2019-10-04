@@ -5,7 +5,7 @@ anchor: "building"
 weight: 30
 ---
 
-As this project is built with Go, so you need to install that first. The installation of Go is out of the scope of this document, please follow the official documentation for [Go](golang). After the installation of the required tools you need to get the sources:
+As this project is built with Go, so you need to install that first. The installation of Go is out of the scope of this document, please follow the official documentation for [Go](golang), to build this project you have to install Go >= v1.12. After the installation of the required tools you need to get the sources:
 
 {{< highlight txt >}}
 git clone https://github.com/owncloud/ocis-ocs.git
