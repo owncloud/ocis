@@ -3,6 +3,8 @@ languageCode = "en-us"
 title = "ownCloud Infinite Scale Stack"
 pygmentsUseClasses = true
 
+disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
+
 [blackfriday]
   angledQuotes = true
   fractions = false
@@ -12,5 +14,5 @@ pygmentsUseClasses = true
 
 [params]
   author = "ownCloud GmbH"
-  description = "Launch all oCIS services"
+  description = "Simple deployment for oCIS"
   keywords = "reva, ocis"
