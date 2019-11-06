@@ -5,14 +5,13 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0913fcc866a344b587bb867fcec5b848)](https://www.codacy.com/app/owncloud/ocis-webdav?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-webdav&amp;utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-webdav?status.svg)](http://godoc.org/github.com/owncloud/ocis-webdav)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-webdav)](http://goreportcard.com/report/github.com/owncloud/ocis-webdav)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav?ref=badge_shield)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-webdav.svg)](http://microbadger.com/images/owncloud/ocis-webdav "Get your own image badge on microbadger.com")
 
 **This project is under heavy development, it's not in a working state yet!**
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/webdav/).
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/webdav/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.cio/ocis-webdav/)
 
 ## Development
 
@@ -37,7 +36,7 @@ Fork -> Patch -> Push -> Pull Request
 
 ## License
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fowncloud%2Focis-webdav?ref=badge_large)
+Apache-2.0
 
 ## Copyright
 
