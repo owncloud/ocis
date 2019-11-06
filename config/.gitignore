@@ -1,2 +1,3 @@
-ocis.yml
-ocis.json
+*
+!example.json
+!example.yml
