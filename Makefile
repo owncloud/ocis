@@ -123,4 +123,4 @@ docs:
 	cd docs; hugo
 
 assets:
-	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.3/phoenix.tar.gz | tar xvzf - -C assets/
+	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/0.2.5/phoenix.tar.gz | tar xvzf - -C assets/
