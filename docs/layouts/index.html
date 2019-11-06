@@ -38,7 +38,7 @@
 
 		{{ range .Data.Pages.ByWeight }}
 			<section id="{{ .Params.anchor }}">
-				<h1>
+				<h2>
 					<a href="#{{ .Params.anchor }}">
 						{{ .Title }}
 					</a>
@@ -48,7 +48,7 @@
 							Back to Top
 						</a>
 					</small>
-				</h1>
+				</h2>
 
 				{{ .Content | markdownify }}
 			</section>
