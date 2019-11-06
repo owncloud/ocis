@@ -1,4 +1,3 @@
-phoenix.yml
-phoenix.json
-
-config.json
+*
+!example.json
+!example.yml
