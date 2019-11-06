@@ -1,2 +1,3 @@
-ocs.yml
-ocs.json
+*
+!example.json
+!example.yml
