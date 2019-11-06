@@ -3,6 +3,8 @@ languageCode = "en-us"
 title = "ownCloud Infinite Scale: OCS"
 pygmentsUseClasses = true
 
+disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
+
 [blackfriday]
   angledQuotes = true
   fractions = false
