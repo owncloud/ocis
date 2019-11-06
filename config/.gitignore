@@ -1,2 +1,3 @@
-webdav.yml
-webdav.json
+*
+!example.json
+!example.yml
