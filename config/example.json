@@ -1,0 +1,18 @@
+{
+  "debug": {
+    "addr": "0.0.0.0:8390",
+    "token": "",
+    "pprof": false
+  },
+  "http": {
+    "addr": "0.0.0.0:8380",
+    "root": "/"
+  },
+  "tracing": {
+    "enabled": false,
+    "type": "jaeger",
+    "endpoint": "localhost:6831",
+    "collector": "http://localhost:14268/api/traces",
+    "service": "graph"
+  }
+}
