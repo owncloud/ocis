@@ -138,7 +138,28 @@ def changelog(ctx):
       'os': 'linux',
       'arch': 'amd64',
     },
+    'clone': {
+      'disable': True,
+    },
     'steps': [
+      {
+        'name': 'clone',
+        'image': 'plugins/git-action:1',
+        'pull': 'always',
+        'settings': {
+          'actions': [
+            'clone',
+          ],
+          'branch': ctx.build.branch if ctx.build.event == 'pull_request' else 'master',
+          'netrc_machine': 'github.com',
+          'netrc_username': {
+            'from_secret': 'github_username',
+          },
+          'netrc_password': {
+            'from_secret': 'github_token',
+          },
+        },
+      },
       {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
