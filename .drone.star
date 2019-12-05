@@ -141,7 +141,7 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'toolhippie/calens:latest',
+        'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
           'make changelog',
@@ -149,7 +149,7 @@ def changelog(ctx):
       },
       {
         'name': 'output',
-        'image': 'toolhippie/calens:latest',
+        'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
           'cat CHANGELOG.md',
