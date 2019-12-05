@@ -126,6 +126,7 @@ func Server(cfg *config.Config) cli.Command {
 
 				if err != nil {
 					log.Errorf("Server [http] failed to initialize: %w", err)
+					cancel()
 					return err
 				}
 

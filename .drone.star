@@ -33,31 +33,6 @@ def testing(ctx):
     },
     'steps': [
       {
-        'name': 'frontend',
-        'image': 'webhippie/nodejs:latest',
-        'pull': 'always',
-        'commands': [
-          'yarn install --frozen-lockfile',
-          'yarn lint',
-          'yarn test',
-          'yarn build',
-        ],
-      },
-      {
-        'name': 'generate',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make generate',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
         'name': 'vet',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
@@ -71,34 +46,34 @@ def testing(ctx):
           },
         ],
       },
-      {
-        'name': 'staticcheck',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make staticcheck',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'lint',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make lint',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+      # {
+      #   'name': 'staticcheck',
+      #   'image': 'webhippie/golang:1.13',
+      #   'pull': 'always',
+      #   'commands': [
+      #     'make staticcheck',
+      #   ],
+      #   'volumes': [
+      #     {
+      #       'name': 'gopath',
+      #       'path': '/srv/app',
+      #     },
+      #   ],
+      # },
+      # {
+      #   'name': 'lint',
+      #   'image': 'webhippie/golang:1.13',
+      #   'pull': 'always',
+      #   'commands': [
+      #     'make lint',
+      #   ],
+      #   'volumes': [
+      #     {
+      #       'name': 'gopath',
+      #       'path': '/srv/app',
+      #     },
+      #   ],
+      # },
       {
         'name': 'build',
         'image': 'webhippie/golang:1.13',
