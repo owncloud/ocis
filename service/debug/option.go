@@ -78,7 +78,7 @@ func Pprof(p bool) Option {
 // Zpages provides a function to set the zpages option.
 func Zpages(z bool) Option {
 	return func(o *Options) {
-		o.Pprof = z
+		o.Zpages = z
 	}
 }
 
