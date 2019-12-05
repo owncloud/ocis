@@ -150,7 +150,9 @@ def changelog(ctx):
           'actions': [
             'clone',
           ],
+          'remote': 'https://github.com/%s' % (ctx.repo.slug),
           'branch': ctx.build.branch if ctx.build.event == 'pull_request' else 'master',
+          'path': '/drone/src',
           'netrc_machine': 'github.com',
           'netrc_username': {
             'from_secret': 'github_username',
