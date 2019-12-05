@@ -13,10 +13,8 @@ import (
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
-func handleMe(writer http.ResponseWriter, req *http.Request) {
-	displayName := "Alice"
-	id := "1234-5678-9000-000"
-	me := &msgraph.User{
+func createUserModel(displayName string, id string) *msgraph.User {
+	return &msgraph.User{
 		DisplayName: &displayName,
 		GivenName:   &displayName,
 		DirectoryObject: msgraph.DirectoryObject{
@@ -26,7 +24,10 @@ func handleMe(writer http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	js, err := json.Marshal(me)
+}
+
+func writeResponse(v interface{}, writer http.ResponseWriter) {
+	js, err := json.Marshal(v)
 	if err != nil {
 		//p.srv.Logger().Errorf("owncloud-plugin: error encoding response as json %s", err)
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -36,6 +37,21 @@ func handleMe(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(js)
+}
+
+func handleMe(writer http.ResponseWriter, req *http.Request) {
+	me := createUserModel("Alice", "1234-5678-9000-000")
+	writeResponse(me, writer)
+}
+
+func handleUsers(writer http.ResponseWriter, req *http.Request) {
+	users := make([]*msgraph.User, 4)
+	users[0] = createUserModel("Alice", "1234-5678-9000-000")
+	users[1] = createUserModel("Bob", "1234-5678-9000-001")
+	users[2] = createUserModel("Carol", "1234-5678-9000-002")
+	users[3] = createUserModel("Dave", "1234-5678-9000-003")
+	// TODO: the response has to hold a root element named value ...
+	writeResponse(users, writer)
 }
 
 func Server(opts ...Option) (web.Service, error) {
@@ -64,5 +80,6 @@ func Server(opts ...Option) (web.Service, error) {
 
 	service.Init()
 	service.HandleFunc("/v1.0/me", handleMe)
+	service.HandleFunc("/v1.0/users", handleUsers)
 	return service, nil
 }
