@@ -46,34 +46,34 @@ def testing(ctx):
           },
         ],
       },
-      {
-        'name': 'staticcheck',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make staticcheck',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'lint',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make lint',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+      # {
+      #   'name': 'staticcheck',
+      #   'image': 'webhippie/golang:1.13',
+      #   'pull': 'always',
+      #   'commands': [
+      #     'make staticcheck',
+      #   ],
+      #   'volumes': [
+      #     {
+      #       'name': 'gopath',
+      #       'path': '/srv/app',
+      #     },
+      #   ],
+      # },
+      # {
+      #   'name': 'lint',
+      #   'image': 'webhippie/golang:1.13',
+      #   'pull': 'always',
+      #   'commands': [
+      #     'make lint',
+      #   ],
+      #   'volumes': [
+      #     {
+      #       'name': 'gopath',
+      #       'path': '/srv/app',
+      #     },
+      #   ],
+      # },
       {
         'name': 'build',
         'image': 'webhippie/golang:1.13',
