@@ -26,7 +26,9 @@ require (
 	github.com/restic/calens v0.1.0 // indirect
 	github.com/spf13/viper v1.5.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
+	github.com/yaegashi/msgraph.go v0.0.0-20191104022859-3f9096c750b2
 	go.opencensus.io v0.22.2
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
 	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
+	gopkg.in/ldap.v3 v3.1.0
 )
