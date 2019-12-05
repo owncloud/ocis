@@ -186,7 +186,7 @@ def changelog(ctx):
       },
     ],
     'depends_on': [
-      'manifest',
+      'testing',
     ],
     'trigger': {
       'ref': [
