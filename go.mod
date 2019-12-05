@@ -30,4 +30,5 @@ require (
 	go.opencensus.io v0.22.2
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
 	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a
+	gopkg.in/ldap.v3 v3.1.0
 )

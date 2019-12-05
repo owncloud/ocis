@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis-graph/pkg/flagset"
 	"github.com/owncloud/ocis-graph/pkg/version"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
+	ldap "gopkg.in/ldap.v3"
 )
 
 func createUserModel(displayName string, id string) *msgraph.User {
@@ -45,11 +46,48 @@ func handleMe(writer http.ResponseWriter, req *http.Request) {
 }
 
 func handleUsers(writer http.ResponseWriter, req *http.Request) {
-	users := make([]*msgraph.User, 4)
-	users[0] = createUserModel("Alice", "1234-5678-9000-000")
-	users[1] = createUserModel("Bob", "1234-5678-9000-001")
-	users[2] = createUserModel("Carol", "1234-5678-9000-002")
-	users[3] = createUserModel("Dave", "1234-5678-9000-003")
+	con, err := ldap.Dial("tcp", "localhost:10389")
+	if err != nil {
+		//p.srv.Logger().Errorf("owncloud-plugin: error encoding response as json %s", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("ldap dail failed"))
+		return
+	}
+	err = con.Bind("cn=admin,dc=example,dc=org", "admin")
+	if err != nil {
+		//p.srv.Logger().Errorf("owncloud-plugin: error encoding response as json %s", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("ldap bind failed"))
+		return
+	}
+
+	// Search for the given username
+	searchRequest := ldap.NewSearchRequest(
+		"ou=groups,dc=example,dc=org",
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+		"(objectclass=*)",
+		[]string{"dn", "uuid", "uid", "givenName", "mail"},
+		nil,
+	)
+
+	sr, err := con.Search(searchRequest)
+	if err != nil {
+		//p.srv.Logger().Errorf("owncloud-plugin: error encoding response as json %s", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("ldap search failed: " + err.Error()))
+		return
+	}
+	users := make([]*msgraph.User, len(sr.Entries))
+	for i := 0; i < len(sr.Entries); i++ {
+		users[i] = createUserModel(sr.Entries[i].DN, "1234-5678-9000-000")
+	}
+	/*
+		users := make([]*msgraph.User, 4)
+		users[0] = createUserModel("Alice", "1234-5678-9000-000")
+		users[1] = createUserModel("Bob", "1234-5678-9000-001")
+		users[2] = createUserModel("Carol", "1234-5678-9000-002")
+		users[3] = createUserModel("Dave", "1234-5678-9000-003")
+	*/
 	// TODO: the response has to hold a root element named value ...
 	writeResponse(users, writer)
 }
