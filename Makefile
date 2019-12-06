@@ -2,6 +2,18 @@ SHELL := bash
 NAME := ocis-pkg
 IMPORT := github.com/owncloud/$(NAME)
 
+ifeq ($(OS), Windows_NT)
+	UNAME := Windows
+else
+	UNAME := $(shell uname -s)
+endif
+
+ifeq ($(UNAME), Darwin)
+	GOBUILD ?= go build -i
+else
+	GOBUILD ?= go build
+endif
+
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f)
 GENERATE ?= $(PACKAGES)
@@ -52,4 +64,4 @@ test:
 
 .PHONY: build
 build:
-	go build -i -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./...
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./...
