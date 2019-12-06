@@ -4,101 +4,100 @@ import (
 	"os"
 	"strings"
 
+	"github.com/micro/cli"
+	"github.com/owncloud/ocis-ocs/pkg/config"
+	"github.com/owncloud/ocis-ocs/pkg/flagset"
 	"github.com/owncloud/ocis-ocs/pkg/version"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
+	"github.com/owncloud/ocis-pkg/log"
 	"github.com/spf13/viper"
 )
 
-// Root is the entry point for the ocis-ocs command.
-func Root() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "ocis-ocs",
-		Short:   "Reva service for ocs",
-		Long:    ``,
-		Version: version.String,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			setupLogger()
-			setupConfig()
+// Execute is the entry point for the ocis-ocs command.
+func Execute() error {
+	cfg := config.New()
+
+	app := &cli.App{
+		Name:     "ocis-ocs",
+		Version:  version.String,
+		Usage:    "Serve OCS API for oCIS",
+		Compiled: version.Compiled(),
+
+		Authors: []cli.Author{
+			{
+				Name:  "ownCloud GmbH",
+				Email: "support@owncloud.com",
+			},
+		},
+
+		Flags: flagset.RootWithConfig(cfg),
+
+		Before: func(c *cli.Context) error {
+			logger := NewLogger(cfg)
+
+			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+			viper.SetEnvPrefix("OCS")
+			viper.AutomaticEnv()
+
+			if c.IsSet("config-file") {
+				viper.SetConfigFile(c.String("config-file"))
+			} else {
+				viper.SetConfigName("ocs")
+
+				viper.AddConfigPath("/etc/ocis")
+				viper.AddConfigPath("$HOME/.ocis")
+				viper.AddConfigPath("./config")
+			}
+
+			if err := viper.ReadInConfig(); err != nil {
+				switch err.(type) {
+				case viper.ConfigFileNotFoundError:
+					logger.Info().
+						Msg("Continue without config")
+				case viper.UnsupportedConfigError:
+					logger.Fatal().
+						Err(err).
+						Msg("Unsupported config type")
+				default:
+					logger.Fatal().
+						Err(err).
+						Msg("Failed to read config")
+				}
+			}
+
+			if err := viper.Unmarshal(&cfg); err != nil {
+				logger.Fatal().
+					Err(err).
+					Msg("Failed to parse config")
+			}
+
+			return nil
+		},
+
+		Commands: []cli.Command{
+			Server(cfg),
+			Health(cfg),
 		},
 	}
 
-	cmd.PersistentFlags().String("log-level", "", "Set logging level")
-	viper.BindPFlag("log.level", cmd.PersistentFlags().Lookup("log-level"))
-	viper.SetDefault("log.level", "info")
-	viper.BindEnv("log.level", "OCS_LOG_LEVEL")
+	cli.HelpFlag = &cli.BoolFlag{
+		Name:  "help,h",
+		Usage: "Show the help",
+	}
 
-	cmd.PersistentFlags().Bool("log-pretty", false, "Enable pretty logging")
-	viper.BindPFlag("log.pretty", cmd.PersistentFlags().Lookup("log-pretty"))
-	viper.SetDefault("log.pretty", true)
-	viper.BindEnv("log.pretty", "OCS_LOG_PRETTY")
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:  "version,v",
+		Usage: "Print the version",
+	}
 
-	cmd.PersistentFlags().Bool("log-color", false, "Enable colored logging")
-	viper.BindPFlag("log.color", cmd.PersistentFlags().Lookup("log-color"))
-	viper.SetDefault("log.color", true)
-	viper.BindEnv("log.color", "OCS_LOG_COLOR")
-
-	cmd.AddCommand(Server())
-	cmd.AddCommand(Health())
-
-	return cmd
+	return app.Run(os.Args)
 }
 
-// setupLogger prepares the logger.
-func setupLogger() {
-	switch strings.ToLower(viper.GetString("log.level")) {
-	case "panic":
-		zerolog.SetGlobalLevel(zerolog.PanicLevel)
-	case "fatal":
-		zerolog.SetGlobalLevel(zerolog.FatalLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
-
-	if viper.GetBool("log.pretty") {
-		log.Logger = log.Output(
-			zerolog.ConsoleWriter{
-				Out:     os.Stderr,
-				NoColor: !viper.GetBool("log.color"),
-			},
-		)
-	}
-}
-
-// setupConfig prepares the config.
-func setupConfig() {
-	viper.SetConfigName("ocs")
-
-	viper.AddConfigPath("/etc/ocis")
-	viper.AddConfigPath("$HOME/.ocis")
-	viper.AddConfigPath("./config")
-
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			log.Debug().
-				Msg("Continue without config")
-		case viper.UnsupportedConfigError:
-			log.Fatal().
-				Msg("Unsupported config type")
-		default:
-			if e := log.Debug(); e.Enabled() {
-				log.Fatal().
-					Err(err).
-					Msg("Failed to read config")
-			} else {
-				log.Fatal().
-					Msg("Failed to read config")
-			}
-		}
-	}
+// NewLogger initializes a service-specific logger instance.
+func NewLogger(cfg *config.Config) log.Logger {
+	return log.NewLogger(
+		log.Name("ocs"),
+		log.Level(cfg.Log.Level),
+		log.Pretty(cfg.Log.Pretty),
+		log.Color(cfg.Log.Color),
+	)
 }

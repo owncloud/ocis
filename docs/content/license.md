@@ -5,6 +5,4 @@ anchor: "license"
 weight: 40
 ---
 
-This project is licensed under the [Apache 2.0](license) license. For the license of the used libraries you have to check the respective sources.
-
-[license]: https://github.com/owncloud/ocis-ocs/blob/master/LICENSE
+This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis-ocs/blob/master/LICENSE) license. For the license of the used libraries you have to check the respective sources.
