@@ -1,12 +1,12 @@
 ---
 debug:
-  addr: 0.0.0.0:8390
+  addr: 0.0.0.0:9124
   token:
   pprof: false
+  zpages: false
 
-server:
-  addr: 0.0.0.0:8380
-  root: /
+http:
+  addr: 0.0.0.0:9120
 
 tracing:
   enabled: false

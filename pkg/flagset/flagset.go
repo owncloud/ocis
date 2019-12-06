@@ -22,6 +22,18 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "GRAPH_LOG_LEVEL",
 			Destination: &cfg.Log.Level,
 		},
+		&cli.BoolTFlag{
+			Name:        "log-pretty",
+			Usage:       "Enable pretty logging",
+			EnvVar:      "GRAPH_LOG_PRETTY",
+			Destination: &cfg.Log.Pretty,
+		},
+		&cli.BoolTFlag{
+			Name:        "log-color",
+			Usage:       "Enable colored logging",
+			EnvVar:      "GRAPH_LOG_COLOR",
+			Destination: &cfg.Log.Color,
+		},
 	}
 }
 
@@ -30,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:8390",
+			Value:       "0.0.0.0:9124",
 			Usage:       "Address to debug endpoint",
 			EnvVar:      "GRAPH_DEBUG_ADDR",
 			Destination: &cfg.Debug.Addr,
@@ -77,7 +89,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:8390",
+			Value:       "0.0.0.0:9124",
 			Usage:       "Address to bind debug server",
 			EnvVar:      "GRAPH_DEBUG_ADDR",
 			Destination: &cfg.Debug.Addr,
@@ -103,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:8380",
+			Value:       "0.0.0.0:9120",
 			Usage:       "Address to bind http server",
 			EnvVar:      "GRAPH_HTTP_ADDR",
 			Destination: &cfg.HTTP.Addr,

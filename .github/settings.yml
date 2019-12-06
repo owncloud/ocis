@@ -1,7 +1,7 @@
 ---
 repository:
   name: ocis-graph
-  description: ':atom_symbol: Graph API Service for OCIS'
+  description: ':atom_symbol: Serve Graph API for oCIS'
   homepage: https://owncloud.github.io/ocis-graph/
   topics: reva, ocis
 

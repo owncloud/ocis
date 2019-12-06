@@ -5,4 +5,4 @@ anchor: "about"
 weight: 10
 ---
 
-This service provides a simple graph world example API to show the integration of custom plugins within [Phoenix](https://github.com/owncloud/phoenix).
+This service provides a simple graph world API which can be used by clients or other extensions.

@@ -1,6 +1,6 @@
 baseURL = "https://owncloud.github.io/ocis-graph/"
 languageCode = "en-us"
-title = "ownCloud Infinite Scale: graph"
+title = "ownCloud Infinite Scale: Graph"
 pygmentsUseClasses = true
 
 disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
@@ -14,5 +14,5 @@ disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
 
 [params]
   author = "ownCloud GmbH"
-  description = "Example service for Reva/oCIS"
+  description = "Serve Graph API for oCIS"
   keywords = "reva, ocis"

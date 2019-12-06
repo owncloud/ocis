@@ -12,6 +12,7 @@ endif
 
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
+GENERATE ?= $(PACKAGES)
 
 TAGS ?=
 
@@ -48,6 +49,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
+	rm -rf $(BIN) $(DIST)
 
 .PHONY: fmt
 fmt:
@@ -65,6 +67,10 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
+.PHONY: generate
+generate:
+	go generate $(GENERATE)
+
 .PHONY: changelog
 changelog:
 	go run github.com/restic/calens >| CHANGELOG.md
@@ -81,10 +87,10 @@ install: $(SOURCES)
 build: $(BIN)/$(EXECUTABLE) $(BIN)/$(EXECUTABLE)-debug
 
 $(BIN)/$(EXECUTABLE): $(SOURCES)
-	go build -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
+	go build -i -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	go build -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	go build -i -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
@@ -124,41 +130,41 @@ docs:
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-$(GOPATH)/bin/protoc-gen-go:
-	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+# $(GOPATH)/bin/protoc-gen-go:
+# 	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
 
-$(GOPATH)/bin/protoc-gen-micro:
-	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
+# $(GOPATH)/bin/protoc-gen-micro:
+# 	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
 
-$(GOPATH)/bin/protoc-gen-microweb:
-	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
+# $(GOPATH)/bin/protoc-gen-microweb:
+# 	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
 
-$(GOPATH)/bin/protoc-gen-swagger:
-	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+# $(GOPATH)/bin/protoc-gen-swagger:
+# 	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
-pkg/proto/v0/graph.pb.go: pkg/proto/v0/graph.proto
-	protoc \
-		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--go_out=logtostderr=true:pkg/proto/v0 graph.proto
+# pkg/proto/v0/example.pb.go: pkg/proto/v0/example.proto
+# 	protoc \
+# 		-I=third_party/ \
+# 		-I=pkg/proto/v0/ \
+# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
 
-pkg/proto/v0/graph.pb.micro.go: pkg/proto/v0/graph.proto
-	protoc \
-		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--micro_out=logtostderr=true:pkg/proto/v0 graph.proto
+# pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
+# 	protoc \
+# 		-I=third_party/ \
+# 		-I=pkg/proto/v0/ \
+# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
 
-pkg/proto/v0/graph.pb.web.go: pkg/proto/v0/graph.proto
-	protoc \
-		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--microweb_out=logtostderr=true:pkg/proto/v0 graph.proto
+# pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
+# 	protoc \
+# 		-I=third_party/ \
+# 		-I=pkg/proto/v0/ \
+# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
 
-pkg/proto/v0/graph.swagger.json: pkg/proto/v0/graph.proto
-	protoc \
-		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--swagger_out=logtostderr=true:pkg/proto/v0 graph.proto
+# pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
+# 	protoc \
+# 		-I=third_party/ \
+# 		-I=pkg/proto/v0/ \
+# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
 
-.PHONY: protobuf
-protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/graph.pb.go pkg/proto/v0/graph.pb.micro.go pkg/proto/v0/graph.pb.web.go pkg/proto/v0/graph.swagger.json
+# .PHONY: protobuf
+# protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
