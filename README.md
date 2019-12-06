@@ -11,11 +11,11 @@
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/phoenix/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.cio/ocis-phoenix/)
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/phoenix/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis-phoenix/)
 
 ## Development
 
-Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.12.
+Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.12. For the frontend it's also required to have [NodeJS](https://nodejs.org/en/download/package-manager/) and [Yarn](https://yarnpkg.com/lang/en/docs/install/) installed.
 
 ```console
 git clone https://github.com/owncloud/ocis-phoenix.git

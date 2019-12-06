@@ -4,5 +4,3 @@ coverage.out
 /dist
 
 /assets
-
-/pkg/assets/embed.go

@@ -5,22 +5,24 @@ import (
 	"os"
 	"path"
 
-	"github.com/rs/zerolog/log"
+	"github.com/owncloud/ocis-phoenix/pkg/config"
+	"github.com/owncloud/ocis-pkg/log"
 )
 
 //go:generate go run github.com/UnnoTed/fileb0x embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {
-	path string
+	logger log.Logger
+	config *config.Config
 }
 
 // Open just implements the HTTP filesystem interface.
 func (a assets) Open(original string) (http.File, error) {
-	if a.path != "" {
-		if stat, err := os.Stat(a.path); err == nil && stat.IsDir() {
+	if a.config.Asset.Path != "" {
+		if stat, err := os.Stat(a.config.Asset.Path); err == nil && stat.IsDir() {
 			custom := path.Join(
-				a.path,
+				a.config.Asset.Path,
 				original,
 			)
 
@@ -34,7 +36,8 @@ func (a assets) Open(original string) (http.File, error) {
 				return f, nil
 			}
 		} else {
-			log.Warn().
+			a.logger.Warn().
+				Str("path", a.config.Asset.Path).
 				Msg("Assets directory doesn't exist")
 		}
 	}
@@ -49,11 +52,9 @@ func (a assets) Open(original string) (http.File, error) {
 
 // New returns a new http filesystem to serve assets.
 func New(opts ...Option) http.FileSystem {
-	a := new(assets)
+	options := newOptions(opts...)
 
-	for _, opt := range opts {
-		opt(a)
+	return assets{
+		config: options.Config,
 	}
-
-	return a
 }

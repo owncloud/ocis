@@ -1,7 +1,7 @@
 ---
 repository:
   name: ocis-phoenix
-  description: ':atom_symbol: Serve Phoenix for Reva/oCIS'
+  description: ':atom_symbol: Serve Phoenix for oCIS'
   homepage: https://owncloud.github.io/ocis-phoenix/
   topics: reva, ocis
 

@@ -5,27 +5,30 @@ anchor: "getting-started"
 weight: 20
 ---
 
-## Installation
+### Installation
 
-So far we are offering two different variants for the installation. You can choose between [Docker](docker) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
+So far we are offering two different variants for the installation. You can choose between [Docker](https://www.docker.com/) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
 
-### Docker
-
-TBD
-
-### Binaries
+#### Docker
 
 TBD
 
-## Configuration
+#### Binaries
+
+TBD
+
+### Configuration
 
 We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.
 
-### Envrionment variables
+#### Envrionment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
-#### Global
+##### Global
+
+PHOENIX_CONFIG_FILE
+: Path to config file, empty default value
 
 PHOENIX_LOG_LEVEL
 : Set logging level, defaults to `info`
@@ -36,10 +39,25 @@ PHOENIX_LOG_COLOR
 PHOENIX_LOG_PRETTY
 : Enable pretty logging, defaults to `true`
 
-#### Server
+##### Server
+
+PHOENIX_TRACING_ENABLED
+: Enable sending traces, defaults to `false`
+
+PHOENIX_TRACING_TYPE
+: Tracing backend type, defaults to `jaeger`
+
+PHOENIX_TRACING_ENDPOINT
+: Endpoint for the agent, empty default value
+
+PHOENIX_TRACING_COLLECTOR
+: Endpoint for the collector, empty default value
+
+PHOENIX_TRACING_SERVICE
+: Service name for tracing, defaults to `phoenix`
 
 PHOENIX_DEBUG_ADDR
-: Address to bind debug server, defaults to `0.0.0.0:8090`
+: Address to bind debug server, defaults to `0.0.0.0:9104`
 
 PHOENIX_DEBUG_TOKEN
 : Token to grant metrics access, empty default value
@@ -47,28 +65,31 @@ PHOENIX_DEBUG_TOKEN
 PHOENIX_DEBUG_PPROF
 : Enable pprof debugging, defaults to `false`
 
-PHOENIX_HTTP_ADDR
-: Address to bind http server, defaults to `0.0.0.0:8080`
+PHOENIX_DEBUG_ZPAGES
+: Enable zpages debugging, defaults to `false`
 
-PHOENIX_HTTP_ROOT
-: Root path for http endpoint, defaults to `/`
+PHOENIX_HTTP_ADDR
+: Address to bind http server, defaults to `0.0.0.0:9100`
 
 PHOENIX_ASSET_PATH
 : Path to custom assets, empty default value
 
-PHOENIX_CONFIG_FILE
+PHOENIX_WEB_CONFIG
 : Path to phoenix config, empty default value
 
-#### Health
+##### Health
 
 PHOENIX_DEBUG_ADDR
-: Address to debug endpoint, defaults to `0.0.0.0:8090`
+: Address to debug endpoint, defaults to `0.0.0.0:9104`
 
-### Commandline flags
+#### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below.
 
-#### Global
+##### Global
+
+--config-file
+: Path to config file, empty default value
 
 --log-level
 : Set logging level, defaults to `info`
@@ -79,10 +100,25 @@ If you prefer to configure the service with commandline flags you can see the av
 --log-pretty
 : Enable pretty logging, defaults to `true`
 
-#### Server
+##### Server
+
+--tracing-enabled
+: Enable sending traces, defaults to `false`
+
+--tracing-type
+: Tracing backend type, defaults to `jaeger`
+
+--tracing-endpoint
+: Endpoint for the agent, empty default value
+
+--tracing-collector
+: Endpoint for the collector, empty default value
+
+--tracing-service
+: Service name for tracing, defaults to `phoenix`
 
 --debug-addr
-: Address to bind debug server, defaults to `0.0.0.0:8090`
+: Address to bind debug server, defaults to `0.0.0.0:9104`
 
 --debug-token
 : Token to grant metrics access, empty default value
@@ -90,32 +126,32 @@ If you prefer to configure the service with commandline flags you can see the av
 --debug-pprof
 : Enable pprof debugging, defaults to `false`
 
---http-addr
-: Address to bind http server, defaults to `0.0.0.0:8080`
+--debug-zpages
+: Enable zpages debugging, defaults to `false`
 
---http-root
-: Root path for http endpoint, defaults to `/`
+--http-addr
+: Address to bind http server, defaults to `0.0.0.0:9100`
 
 --asset-path
 : Path to custom assets, empty default value
 
---config-file
+--web-config
 : Path to phoenix config, empty default value
 
-#### Health
+##### Health
 
 --debug-addr
-: Address to debug endpoint, defaults to `0.0.0.0:8090`
+: Address to debug endpoint, defaults to `0.0.0.0:9104`
 
-### Configuration file
+#### Configuration file
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](repo), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/phoenix.yml`, `${HOME}/.ocis/phoenix.yml` or `$(pwd)/config/phoenix.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-phoenix/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/phoenix.yml`, `${HOME}/.ocis/phoenix.yml` or `$(pwd)/config/phoenix.yml`.
 
-## Usage
+### Usage
 
 The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formated help output if you execute the binary via `ocis-phoenix --help`.
 
-### Server
+#### Server
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
@@ -123,7 +159,7 @@ The server command is used to start the http and debug server on two addresses w
 ocis-phoenix server --help
 {{< / highlight >}}
 
-### Health
+#### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
@@ -131,9 +167,9 @@ The health command is used to execute a health check, if the exit code equals ze
 ocis-phoenix health --help
 {{< / highlight >}}
 
-## Metrics
+### Metrics
 
-This service provides some [Prometheus](prom) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `PHOENIX_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:8090/metrics`.
+This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `PHOENIX_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9104/metrics`.
 
 go_gc_duration_seconds
 : A summary of the GC invocation durations
@@ -230,7 +266,3 @@ promhttp_metric_handler_requests_in_flight
 
 promhttp_metric_handler_requests_total
 : Total number of scrapes by HTTP status code
-
-[docker]: https://www.docker.com/
-[repo]: https://github.com/owncloud/ocis-phoenix/tree/master/config
-[prom]: https://prometheus.io/
