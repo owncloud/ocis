@@ -2,6 +2,7 @@ package svc
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -30,8 +31,15 @@ func NewService(opts ...Option) Service {
 		mux:    m,
 	}
 
-	m.HandleFunc("/v1.0/me", svc.Me)
-	m.HandleFunc("/v1.0/users", svc.Users)
+	m.Route("/v1.0", func(r chi.Router) {
+		r.Get("/me", svc.Me)
+		r.Route("/users", func(r chi.Router) {
+			r.Get("/", svc.Users)
+			r.Route("/{userId}", func(r chi.Router) {
+				r.Get("/", svc.Users)
+			})
+		})
+	})
 
 	return svc
 }
@@ -67,6 +75,12 @@ func (g Graph) Me(w http.ResponseWriter, r *http.Request) {
 
 // Users implements the Service interface.
 func (g Graph) Users(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userId")
+	filter := "(objectclass=*)"
+	if userID != "" {
+		filter = fmt.Sprintf("(entryuuid=%s)", userID)
+	}
+
 	con, err := ldap.Dial("tcp", "localhost:10389")
 
 	if err != nil {
@@ -82,19 +96,20 @@ func (g Graph) Users(w http.ResponseWriter, r *http.Request) {
 	}
 
 	search := ldap.NewSearchRequest(
-		"ou=groups,dc=example,dc=org",
+		"ou=users,dc=example,dc=org",
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
 		0,
 		0,
 		false,
-		"(objectclass=*)",
-		[]string{
-			"dn",
-			"uuid",
+		filter,
+		[]string{"dn",
 			"uid",
-			"givenName",
+			"givenname",
 			"mail",
+			"displayname",
+			"entryuuid",
+			"sn",
 		},
 		nil,
 	)
@@ -107,14 +122,24 @@ func (g Graph) Users(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users := make([]*msgraph.User, len(result.Entries))
+	if userID != "" {
+		if len(result.Entries) == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		user := createUserModelFromLDAP(result.Entries[0])
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, user)
+		return
+	}
+
+	var users []*msgraph.User
 
 	for _, user := range result.Entries {
 		users = append(
 			users,
-			createUserModel(
-				user.DN,
-				"1234-5678-9000-000",
+			createUserModelFromLDAP(
+				user,
 			),
 		)
 	}
@@ -127,6 +152,25 @@ func createUserModel(displayName string, id string) *msgraph.User {
 	return &msgraph.User{
 		DisplayName: &displayName,
 		GivenName:   &displayName,
+		DirectoryObject: msgraph.DirectoryObject{
+			Entity: msgraph.Entity{
+				ID: &id,
+			},
+		},
+	}
+}
+
+func createUserModelFromLDAP(entry *ldap.Entry) *msgraph.User {
+	displayName := entry.GetAttributeValue("displayname")
+	givenName := entry.GetAttributeValue("givenname")
+	mail := entry.GetAttributeValue("mail")
+	surName := entry.GetAttributeValue("sn")
+	id := entry.GetAttributeValue("entryuuid")
+	return &msgraph.User{
+		DisplayName: &displayName,
+		GivenName:   &givenName,
+		Surname:     &surName,
+		Mail:        &mail,
 		DirectoryObject: msgraph.DirectoryObject{
 			Entity: msgraph.Entity{
 				ID: &id,
