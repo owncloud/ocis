@@ -4,16 +4,15 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
- * Chg #1: Initial release of basic version
+ * Chg #7: Initial release of basic version
 
 ## Details
 
- * Change #1: Initial release of basic version
+ * Change #7: Initial release of basic version
 
-   Just prepared an initial basic version to serve a graph world API that also provides a Phoenix
-   extension to demonstrate the plugin architecture in combination with Phoenix and ownCloud
-   Infinite Scale.
+   Just prepare an initial basic version to serve a graph world API that can be used by Phoenix or
+   other extensions.
 
-   https://github.com/owncloud/ocis-graph/issues/1
+   https://github.com/owncloud/ocis-graph/issues/7
 
 

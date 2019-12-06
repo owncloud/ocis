@@ -3,74 +3,49 @@ package debug
 import (
 	"io"
 	"net/http"
-	"net/http/pprof"
 
-	"github.com/justinas/alice"
-	"github.com/micro/go-micro/util/log"
-	"github.com/owncloud/ocis-graph/pkg/middleware"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opencensus.io/zpages"
+	"github.com/owncloud/ocis-graph/pkg/config"
+	"github.com/owncloud/ocis-graph/pkg/version"
+	"github.com/owncloud/ocis-pkg/service/debug"
 )
 
-type Handler struct {
-	*http.ServeMux
-}
-
-func (h *Handler) healthz(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-
-	io.WriteString(w, http.StatusText(http.StatusOK))
-}
-
-func (h *Handler) readyz(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-
-	io.WriteString(w, http.StatusText(http.StatusOK))
-}
-
+// Server initializes the debug service and server.
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
-	log.Infof("Server [debug] listening on [%s]", options.Config.Debug.Addr)
 
-	mux := http.NewServeMux()
-	handler := &Handler{mux}
+	return debug.NewService(
+		debug.Logger(options.Logger),
+		debug.Name("graph"),
+		debug.Version(version.String),
+		debug.Address(options.Config.Debug.Addr),
+		debug.Token(options.Config.Debug.Token),
+		debug.Pprof(options.Config.Debug.Pprof),
+		debug.Zpages(options.Config.Debug.Zpages),
+		debug.Health(health(options.Config)),
+		debug.Ready(ready(options.Config)),
+	), nil
+}
 
-	handler.Handle("/metrics", alice.New(
-		middleware.Token(
-			options.Config.Debug.Token,
-		),
-	).Then(
-		promhttp.Handler(),
-	))
+// health implements the health check.
+func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
 
-	handler.HandleFunc("/healthz", handler.healthz)
-	handler.HandleFunc("/readyz", handler.readyz)
+		// TODO(tboerger): check if services are up and running
 
-	if options.Config.Debug.Pprof {
-		handler.HandleFunc("/debug/pprof/", pprof.Index)
-		handler.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-		handler.HandleFunc("/debug/pprof/profile", pprof.Profile)
-		handler.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-		handler.HandleFunc("/debug/pprof/trace", pprof.Trace)
+		io.WriteString(w, http.StatusText(http.StatusOK))
 	}
+}
 
-	if options.Config.Debug.Zpages {
-		zpages.Handle(mux, "/debug")
+// ready implements the ready check.
+func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+
+		// TODO(tboerger): check if services are up and running
+
+		io.WriteString(w, http.StatusText(http.StatusOK))
 	}
-
-	return &http.Server{
-		Addr: options.Config.Debug.Addr,
-		Handler: alice.New(
-			middleware.RealIP,
-			middleware.RequestID,
-			middleware.Cache,
-			middleware.Cors,
-			middleware.Secure,
-			middleware.Version,
-		).Then(
-			handler,
-		),
-	}, nil
 }

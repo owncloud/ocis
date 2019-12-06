@@ -7,7 +7,7 @@ weight: 20
 
 ### Installation
 
-So far we are offering two different variants for the installation. You can choose between [Docker](docker) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
+So far we are offering two different variants for the installation. You can choose between [Docker](https://www.docker.com/) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
 
 #### Docker
 
@@ -27,6 +27,9 @@ If you prefer to configure the service with environment variables you can see th
 
 ##### Global
 
+GRAPH_CONFIG_FILE
+: Path to config file, empty default value
+
 GRAPH_LOG_LEVEL
 : Set logging level, defaults to `info`
 
@@ -38,8 +41,23 @@ GRAPH_LOG_PRETTY
 
 ##### Server
 
+GRAPH_TRACING_ENABLED
+: Enable sending traces, defaults to `false`
+
+GRAPH_TRACING_TYPE
+: Tracing backend type, defaults to `jaeger`
+
+GRAPH_TRACING_ENDPOINT
+: Endpoint for the agent, empty default value
+
+GRAPH_TRACING_COLLECTOR
+: Endpoint for the collector, empty default value
+
+GRAPH_TRACING_SERVICE
+: Service name for tracing, defaults to `graph`
+
 GRAPH_DEBUG_ADDR
-: Address to bind debug server, defaults to `0.0.0.0:8390`
+: Address to bind debug server, defaults to `0.0.0.0:9124`
 
 GRAPH_DEBUG_TOKEN
 : Token to grant metrics access, empty default value
@@ -47,22 +65,25 @@ GRAPH_DEBUG_TOKEN
 GRAPH_DEBUG_PPROF
 : Enable pprof debugging, defaults to `false`
 
-GRAPH_HTTP_ADDR
-: Address to bind http server, defaults to `0.0.0.0:8380`
+GRAPH_DEBUG_ZPAGES
+: Enable zpages debugging, defaults to `false`
 
-GRAPH_HTTP_ROOT
-: Root path for http endpoint, defaults to `/`
+GRAPH_HTTP_ADDR
+: Address to bind http server, defaults to `0.0.0.0:9120`
 
 ##### Health
 
 GRAPH_DEBUG_ADDR
-: Address to debug endpoint, defaults to `0.0.0.0:8390`
+: Address to debug endpoint, defaults to `0.0.0.0:9124`
 
 #### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below.
 
 ##### Global
+
+--config-file
+: Path to config file, empty default value
 
 --log-level
 : Set logging level, defaults to `info`
@@ -75,8 +96,23 @@ If you prefer to configure the service with commandline flags you can see the av
 
 ##### Server
 
+--tracing-enabled
+: Enable sending traces, defaults to `false`
+
+--tracing-type
+: Tracing backend type, defaults to `jaeger`
+
+--tracing-endpoint
+: Endpoint for the agent, empty default value
+
+--tracing-collector
+: Endpoint for the collector, empty default value
+
+--tracing-service
+: Service name for tracing, defaults to `graph`
+
 --debug-addr
-: Address to bind debug server, defaults to `0.0.0.0:8390`
+: Address to bind debug server, defaults to `0.0.0.0:9124`
 
 --debug-token
 : Token to grant metrics access, empty default value
@@ -84,20 +120,20 @@ If you prefer to configure the service with commandline flags you can see the av
 --debug-pprof
 : Enable pprof debugging, defaults to `false`
 
---http-addr
-: Address to bind http server, defaults to `0.0.0.0:8380`
+--debug-zpages
+: Enable zpages debugging, defaults to `false`
 
---http-root
-: Root path for http endpoint, defaults to `/`
+--http-addr
+: Address to bind http server, defaults to `0.0.0.0:9120`
 
 ##### Health
 
 --debug-addr
-: Address to debug endpoint, defaults to `0.0.0.0:8390`
+: Address to debug endpoint, defaults to `0.0.0.0:9124`
 
 #### Configuration file
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](repo), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/graph.yml`, `${HOME}/.ocis/graph.yml` or `$(pwd)/config/graph.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-graph/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/graph.yml`, `${HOME}/.ocis/graph.yml` or `$(pwd)/config/graph.yml`.
 
 ### Usage
 
@@ -121,7 +157,7 @@ ocis-graph health --help
 
 ### Metrics
 
-This service provides some [Prometheus](prom) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `GRAPH_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:8390/metrics`.
+This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `GRAPH_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9124/metrics`.
 
 go_gc_duration_seconds
 : A summary of the GC invocation durations
@@ -218,7 +254,3 @@ promhttp_metric_handler_requests_in_flight
 
 promhttp_metric_handler_requests_total
 : Total number of scrapes by HTTP status code
-
-[docker]: https://www.docker.com/
-[repo]: https://github.com/owncloud/ocis-graph/tree/master/config
-[prom]: https://prometheus.io/

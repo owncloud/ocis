@@ -10,12 +10,12 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli"
-	"github.com/micro/go-micro/util/log"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-graph/pkg/config"
 	"github.com/owncloud/ocis-graph/pkg/flagset"
+	"github.com/owncloud/ocis-graph/pkg/metrics"
 	"github.com/owncloud/ocis-graph/pkg/server/debug"
 	"github.com/owncloud/ocis-graph/pkg/server/http"
 	"go.opencensus.io/stats/view"
@@ -29,6 +29,8 @@ func Server(cfg *config.Config) cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Action: func(c *cli.Context) error {
+			logger := NewLogger(cfg)
+
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
 				case "agent":
@@ -39,12 +41,11 @@ func Server(cfg *config.Config) cli.Command {
 					)
 
 					if err != nil {
-						log.Error(
-							"Failed to create agent tracing on [%s] endpoint and [%s] collector: %w",
-							cfg.Tracing.Endpoint,
-							cfg.Tracing.Collector,
-							err,
-						)
+						logger.Error().
+							Err(err).
+							Str("endpoint", cfg.Tracing.Endpoint).
+							Str("collector", cfg.Tracing.Collector).
+							Msg("Failed to create agent tracing")
 
 						return err
 					}
@@ -62,12 +63,11 @@ func Server(cfg *config.Config) cli.Command {
 					)
 
 					if err != nil {
-						log.Error(
-							"Failed to create jaeger tracing on [%s] endpoint and [%s] collector: %w",
-							cfg.Tracing.Endpoint,
-							cfg.Tracing.Collector,
-							err,
-						)
+						logger.Error().
+							Err(err).
+							Str("endpoint", cfg.Tracing.Endpoint).
+							Str("collector", cfg.Tracing.Collector).
+							Msg("Failed to create jaeger tracing")
 
 						return err
 					}
@@ -81,12 +81,11 @@ func Server(cfg *config.Config) cli.Command {
 					)
 
 					if err != nil {
-						log.Error(
-							"Failed to create zipkin tracing on [%s] endpoint and [%s] collector: %w",
-							cfg.Tracing.Endpoint,
-							cfg.Tracing.Collector,
-							err,
-						)
+						logger.Error().
+							Err(err).
+							Str("endpoint", cfg.Tracing.Endpoint).
+							Str("collector", cfg.Tracing.Collector).
+							Msg("Failed to create zipkin tracing")
 
 						return err
 					}
@@ -101,7 +100,9 @@ func Server(cfg *config.Config) cli.Command {
 					trace.RegisterExporter(exporter)
 
 				default:
-					log.Warnf("Unknown tracing backend [%s]", t)
+					logger.Warn().
+						Str("type", t).
+						Msg("Unknown tracing backend")
 				}
 
 				trace.ApplyConfig(
@@ -110,42 +111,59 @@ func Server(cfg *config.Config) cli.Command {
 					},
 				)
 			} else {
-				log.Debug("Tracing is not enabled")
+				logger.Debug().
+					Msg("Tracing is not enabled")
 			}
 
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
+				metrics     = metrics.New()
 			)
+
+			defer cancel()
 
 			{
 				server, err := http.Server(
+					http.Logger(logger),
 					http.Context(ctx),
 					http.Config(cfg),
+					http.Metrics(metrics),
 				)
 
 				if err != nil {
-					log.Errorf("Server [http] failed to initialize: %w", err)
-					cancel()
+					logger.Info().
+						Err(err).
+						Str("transport", "http").
+						Msg("Failed to initialize server")
+
 					return err
 				}
 
 				gr.Add(func() error {
 					return server.Run()
 				}, func(_ error) {
-					log.Infof("Server [http] shutting down")
+					logger.Info().
+						Str("transport", "http").
+						Msg("Shutting down server")
+
 					cancel()
 				})
 			}
 
 			{
 				server, err := debug.Server(
+					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),
 				)
 
 				if err != nil {
-					log.Errorf("Server [debug] failed to initialize: %w", err)
+					logger.Info().
+						Err(err).
+						Str("transport", "debug").
+						Msg("Failed to initialize server")
+
 					return err
 				}
 
@@ -158,9 +176,14 @@ func Server(cfg *config.Config) cli.Command {
 					defer cancel()
 
 					if err := server.Shutdown(ctx); err != nil {
-						log.Errorf("Server [debug] shutdown failed: %w", err)
+						logger.Info().
+							Err(err).
+							Str("transport", "debug").
+							Msg("Failed to shutdown server")
 					} else {
-						log.Infof("Server [debug] shutting down")
+						logger.Info().
+							Str("transport", "debug").
+							Msg("Shutting down server")
 					}
 				})
 			}

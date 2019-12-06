@@ -12,6 +12,7 @@ var (
 	Date = "00000000"
 )
 
+// Compiled returns the compile time of this service.
 func Compiled() time.Time {
 	t, _ := time.Parse("20060102", Date)
 	return t
