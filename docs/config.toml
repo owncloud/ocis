@@ -14,5 +14,5 @@ disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
 
 [params]
   author = "ownCloud GmbH"
-  description = "Serve OCS API for Reva/oCIS"
+  description = "Serve OCS API for oCIS"
   keywords = "reva, ocis"

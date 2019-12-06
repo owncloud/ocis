@@ -1,11 +1,18 @@
 ---
-server:
-  addr: 0.0.0.0:8280
+debug:
+  addr: 0.0.0.0:9114
   token:
   pprof: false
+  zpages: false
 
-metrics:
-  addr: 0.0.0.0:8290
-  root: /
+http:
+  addr: 0.0.0.0:9110
+
+tracing:
+  enabled: false
+  type: jaeger
+  endpoint: localhost:6831
+  collector: http://localhost:14268/api/traces
+  service: ocs
 
 ...
