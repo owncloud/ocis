@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"github.com/owncloud/ocis-graph/pkg/config"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 	ldap "gopkg.in/ldap.v3"
 )
@@ -25,7 +26,8 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Graph{
-		mux: m,
+		config: options.Config,
+		mux:    m,
 	}
 
 	m.HandleFunc("/v1.0/me", svc.Me)
@@ -36,7 +38,8 @@ func NewService(opts ...Option) Service {
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	mux *chi.Mux
+	config *config.Config
+	mux    *chi.Mux
 }
 
 // ServeHTTP implements the Service interface.
