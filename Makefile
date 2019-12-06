@@ -6,8 +6,16 @@ DIST := dist
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
+	UNAME := Windows
 else
 	EXECUTABLE := $(NAME)
+	UNAME := $(shell uname -s)
+endif
+
+ifeq ($(UNAME), Darwin)
+	GOBUILD ?= go build -i
+else
+	GOBUILD ?= go build
 endif
 
 PACKAGES ?= $(shell go list ./...)
@@ -87,10 +95,10 @@ install: $(SOURCES)
 build: $(BIN)/$(EXECUTABLE) $(BIN)/$(EXECUTABLE)-debug
 
 $(BIN)/$(EXECUTABLE): $(SOURCES)
-	go build -i -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	go build -i -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
