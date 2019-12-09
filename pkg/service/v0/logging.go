@@ -24,12 +24,17 @@ func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }
 
-// Me implements the Service interface.
-func (l logging) Me(w http.ResponseWriter, r *http.Request) {
-	l.next.Me(w, r)
+// GetMe implements the Service interface.
+func (l logging) GetMe(w http.ResponseWriter, r *http.Request) {
+	l.next.GetMe(w, r)
 }
 
-// Users implements the Service interface.
-func (l logging) Users(w http.ResponseWriter, r *http.Request) {
-	l.next.Users(w, r)
+// GetUsers implements the Service interface.
+func (l logging) GetUsers(w http.ResponseWriter, r *http.Request) {
+	l.next.GetUsers(w, r)
+}
+
+// GetUser implements the Service interface.
+func (l logging) GetUser(w http.ResponseWriter, r *http.Request) {
+	l.next.GetUser(w, r)
 }
