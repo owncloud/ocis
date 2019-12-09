@@ -8,7 +8,7 @@ repository:
   private: false
   has_issues: true
   has_projects: false
-  has_wiki: false
+  has_wiki: true
   has_downloads: false
 
   default_branch: master
