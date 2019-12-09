@@ -1,3 +1,21 @@
+# Changelog for unreleased
+
+The following sections list the changes for unreleased.
+
+## Summary
+
+ * Chg #9: Add root path to static middleware
+
+## Details
+
+ * Change #9: Add root path to static middleware
+
+   Currently the `Static` middleware always serves from the root path, but all our HTTP handlers
+   accept a custom root path which also got to be applied to the static file handling.
+
+   https://github.com/owncloud/ocis-pkg/issues/9
+
+
 # Changelog for 1.1.0
 
 The following sections list the changes for 1.1.0.
