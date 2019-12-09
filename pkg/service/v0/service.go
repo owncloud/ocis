@@ -27,13 +27,14 @@ func NewService(opts ...Option) Service {
 		logger: &options.Logger,
 	}
 
-	m.Route("/v1.0", func(r chi.Router) {
-		r.Get("/me", svc.GetMe)
-		r.Route("/users", func(r chi.Router) {
-			r.Get("/", svc.GetUsers)
-			r.Route("/{userID}", func(r chi.Router) {
-				r.Use(svc.UserCtx)
-				r.Get("/", svc.GetUser)
+	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+		r.Route("/v1.0", func(r chi.Router) {
+			r.Route("/users", func(r chi.Router) {
+				r.Get("/", svc.GetUsers)
+				r.Route("/{userID}", func(r chi.Router) {
+					r.Use(svc.UserCtx)
+					r.Get("/", svc.GetUser)
+				})
 			})
 		})
 	})
