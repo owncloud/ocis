@@ -121,6 +121,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
+			Name:        "http-root",
+			Value:       "/",
+			Usage:       "Root path of http server",
+			EnvVar:      "PHOENIX_HTTP_ROOT",
+			Destination: &cfg.HTTP.Root,
+		},
+		&cli.StringFlag{
 			Name:        "asset-path",
 			Value:       "",
 			Usage:       "Path to custom assets",

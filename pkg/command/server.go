@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -28,6 +29,13 @@ func Server(cfg *config.Config) cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			if cfg.HTTP.Root != "/" {
+				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+			}
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

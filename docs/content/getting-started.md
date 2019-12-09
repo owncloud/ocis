@@ -71,6 +71,9 @@ PHOENIX_DEBUG_ZPAGES
 PHOENIX_HTTP_ADDR
 : Address to bind http server, defaults to `0.0.0.0:9100`
 
+PHOENIX_HTTP_ROOT
+: Root path of http server, defaults to `/`
+
 PHOENIX_ASSET_PATH
 : Path to custom assets, empty default value
 
@@ -131,6 +134,9 @@ If you prefer to configure the service with commandline flags you can see the av
 
 --http-addr
 : Address to bind http server, defaults to `0.0.0.0:9100`
+
+--http-root
+: Root path of http server, defaults to `/`
 
 --asset-path
 : Path to custom assets, empty default value

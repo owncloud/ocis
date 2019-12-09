@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/owncloud/ocis-phoenix/pkg/assets"
 	"github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-phoenix/pkg/flagset"
 	"github.com/owncloud/ocis-phoenix/pkg/service/v0"
@@ -40,12 +39,6 @@ func Server(opts ...Option) (http.Service, error) {
 			),
 			middleware.Logger(
 				options.Logger,
-			),
-			middleware.Static(
-				assets.New(
-					assets.Logger(options.Logger),
-					assets.Config(options.Config),
-				),
 			),
 		),
 	)

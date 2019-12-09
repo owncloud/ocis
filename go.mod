@@ -14,8 +14,8 @@ require (
 	github.com/ogier/pflag v0.0.1 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg v1.1.0
-	github.com/spf13/viper v1.5.0
+	github.com/owncloud/ocis-pkg v1.2.0
+	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
-	golang.org/x/net v0.0.0-20191206103017-1ddd1de85cb0
+	golang.org/x/net v0.0.0-20191207000613-e7e4b65ae663
 )
