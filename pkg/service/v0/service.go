@@ -25,7 +25,9 @@ func NewService(opts ...Option) Service {
 		mux:    m,
 	}
 
-	m.HandleFunc("/", svc.Dummy)
+	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+		r.Get("/", svc.Dummy)
+	})
 
 	return svc
 }
@@ -43,5 +45,8 @@ func (g Ocs) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Dummy implements the Service interface.
 func (g Ocs) Dummy(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+
+	w.Write([]byte(http.StatusText(http.StatusOK)))
 }
