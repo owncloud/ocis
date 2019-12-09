@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/owncloud/ocis-graph/pkg/service/v0/errorcode"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis-graph/pkg/config"
@@ -35,17 +37,15 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 		var user *ldap.Entry
 		var err error
 
-		if userID := chi.URLParam(r, "userID"); userID != "" {
-			user, err = g.ldapGetUser(userID)
-		} else {
-			// TODO: we should not give this error out to users
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			render.Status(r, http.StatusNotFound)
+		userID := chi.URLParam(r, "userID")
+		if userID == "" {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
+		user, err = g.ldapGetUser(userID)
 		if err != nil {
-			g.logger.Info().Msgf("error reading user: %s", err.Error())
-			render.Status(r, http.StatusNotFound)
+			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
 			return
 		}
 
@@ -64,7 +64,8 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(me)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msgf("Failed to marshal object %s", me)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
 		return
 	}
 
@@ -76,16 +77,16 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	con, err := g.initLdap()
 	if err != nil {
-		// TODO: we should not give this error out to users
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msg("Failed to initialize ldap")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
 		return
 	}
 
 	result, err := g.ldapSearch(con, "(objectclass=*)")
 
 	if err != nil {
-		// TODO: we should not give this error out to users
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectclass=*)'")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
 		return
 	}
 
