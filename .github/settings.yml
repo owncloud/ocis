@@ -47,9 +47,9 @@ labels:
     description: This will not be worked on
   - name: effort/trivial
     color: c2e0c6
-  - name: effort/0.5d
-    color: c2e0c6
   - name: effort/0.25d
+    color: c2e0c6
+  - name: effort/0.5d
     color: c2e0c6
   - name: effort/1d
     color: c2e0c6
