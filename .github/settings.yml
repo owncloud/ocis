@@ -45,6 +45,22 @@ labels:
   - name: wontfix
     color: ffffff
     description: This will not be worked on
+  - name: effort/trivial
+    color: c2e0c6
+  - name: effort/0.5d
+    color: c2e0c6
+  - name: effort/0.25d
+    color: c2e0c6
+  - name: effort/1d
+    color: c2e0c6
+  - name: effort/2d
+    color: c2e0c6
+  - name: effort/4d
+    color: c2e0c6
+  - name: effort/5d
+    color: c2e0c6
+  - name: effort/10d
+    color: c2e0c6
 
 teams:
   - name: ci
