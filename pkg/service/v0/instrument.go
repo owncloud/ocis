@@ -24,12 +24,17 @@ func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	i.next.ServeHTTP(w, r)
 }
 
-// Me implements the Service interface.
-func (i instrument) Me(w http.ResponseWriter, r *http.Request) {
-	i.next.Me(w, r)
+// GetMe implements the Service interface.
+func (i instrument) GetMe(w http.ResponseWriter, r *http.Request) {
+	i.next.GetMe(w, r)
 }
 
-// Users implements the Service interface.
-func (i instrument) Users(w http.ResponseWriter, r *http.Request) {
-	i.next.Users(w, r)
+// GetUsers implements the Service interface.
+func (i instrument) GetUsers(w http.ResponseWriter, r *http.Request) {
+	i.next.GetUsers(w, r)
+}
+
+// GetUsers implements the Service interface.
+func (i instrument) GetUser(w http.ResponseWriter, r *http.Request) {
+	i.next.GetUser(w, r)
 }
