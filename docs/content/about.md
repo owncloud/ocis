@@ -5,4 +5,4 @@ anchor: "about"
 weight: 10
 ---
 
-This service embeds [Phoenix](https://github.com/owncloud/phoenix) to provide a UI for the ownCloud Infinite Scale stack.
+This service embeds [Phoenix](https://github.com/owncloud/phoenix) to provide a UI for ownCloud Infinite Scale.
