@@ -120,5 +120,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "WEBDAV_HTTP_ADDR",
 			Destination: &cfg.HTTP.Addr,
 		},
+		&cli.StringFlag{
+			Name:        "http-root",
+			Value:       "/",
+			Usage:       "Root path of http server",
+			EnvVar:      "WEBDAV_HTTP_ROOT",
+			Destination: &cfg.HTTP.Root,
+		},
 	}
 }

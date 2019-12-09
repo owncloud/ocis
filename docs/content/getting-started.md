@@ -71,6 +71,9 @@ WEBDAV_DEBUG_ZPAGES
 WEBDAV_HTTP_ADDR
 : Address to bind http server, defaults to `0.0.0.0:9115`
 
+WEBDAV_HTTP_ROOT
+: Root path of http server, defaults to `/`
+
 ##### Health
 
 WEBDAV_DEBUG_ADDR
@@ -125,6 +128,9 @@ If you prefer to configure the service with commandline flags you can see the av
 
 --http-addr
 : Address to bind http server, defaults to `0.0.0.0:9115`
+
+--http-root
+: Root path of http server, defaults to `/`
 
 ##### Health
 
