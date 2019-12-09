@@ -55,6 +55,7 @@ func New(opts ...Option) http.FileSystem {
 	options := newOptions(opts...)
 
 	return assets{
+		logger: options.Logger,
 		config: options.Config,
 	}
 }
