@@ -30,6 +30,16 @@ type Tracing struct {
 	Service   string
 }
 
+// Ldap defined the avialable LDAP configuration.
+type Ldap struct {
+	Network      string
+	Address      string
+	UserName     string
+	Password     string
+	BaseDNUsers  string
+	BaseDNGroups string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
@@ -37,6 +47,7 @@ type Config struct {
 	Debug   Debug
 	HTTP    HTTP
 	Tracing Tracing
+	Ldap    Ldap
 }
 
 // New initializes a new configuration with or without defaults.

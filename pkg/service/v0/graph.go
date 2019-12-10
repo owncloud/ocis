@@ -130,14 +130,14 @@ func (g Graph) ldapGetUser(userID string) (*ldap.Entry, error) {
 }
 
 func (g Graph) initLdap() (*ldap.Conn, error) {
-	g.logger.Info().Msg("Dailing ldap.... ")
-	con, err := ldap.Dial("tcp", "localhost:10389")
+	g.logger.Info().Msgf("Dailing ldap %s://%s", g.config.Ldap.Network, g.config.Ldap.Address)
+	con, err := ldap.Dial(g.config.Ldap.Network, g.config.Ldap.Address)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if err := con.Bind("cn=admin,dc=example,dc=org", "admin"); err != nil {
+	if err := con.Bind(g.config.Ldap.UserName, g.config.Ldap.Password); err != nil {
 		return nil, err
 	}
 	return con, nil
@@ -145,7 +145,7 @@ func (g Graph) initLdap() (*ldap.Conn, error) {
 
 func (g Graph) ldapSearch(con *ldap.Conn, filter string) (*ldap.SearchResult, error) {
 	search := ldap.NewSearchRequest(
-		"ou=users,dc=example,dc=org",
+		g.config.Ldap.BaseDNUsers,
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
 		0,
