@@ -127,5 +127,47 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "GRAPH_HTTP_ROOT",
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name:        "ldap-network",
+			Value:       "tcp",
+			Usage:       "Network protocol to use to connect to the Ldap server",
+			EnvVar:      "GRAPH_LDAP_NETWORK",
+			Destination: &cfg.Ldap.Network,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-address",
+			Value:       "localhost:9125",
+			Usage:       "Address to connect to the Ldap server",
+			EnvVar:      "GRAPH_LDAP_ADDRESS",
+			Destination: &cfg.Ldap.Address,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-username",
+			Value:       "cn=admin,dc=example,dc=org",
+			Usage:       "User to bind to the Ldap server",
+			EnvVar:      "GRAPH_LDAP_USERNAME",
+			Destination: &cfg.Ldap.UserName,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-password",
+			Value:       "admin",
+			Usage:       "Password to bind to the Ldap server",
+			EnvVar:      "GRAPH_LDAP_PASSWORD",
+			Destination: &cfg.Ldap.Password,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-basedn-users",
+			Value:       "ou=users,dc=example,dc=org",
+			Usage:       "BaseDN to look for users",
+			EnvVar:      "GRAPH_LDAP_BASEDN_USERS",
+			Destination: &cfg.Ldap.BaseDNUsers,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-basedn-groups",
+			Value:       "ou=groups,dc=example,dc=org",
+			Usage:       "BaseDN to look for users",
+			EnvVar:      "GRAPH_LDAP_BASEDN_GROUPS",
+			Destination: &cfg.Ldap.BaseDNGroups,
+		},
 	}
 }
