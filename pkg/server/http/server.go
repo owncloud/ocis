@@ -1,12 +1,12 @@
 package http
 
 import (
-	"github.com/owncloud/ocis-pkg/middleware"
-	"github.com/owncloud/ocis-pkg/service/http"
 	"github.com/owncloud/ocis-konnectd/pkg/config"
 	"github.com/owncloud/ocis-konnectd/pkg/flagset"
 	"github.com/owncloud/ocis-konnectd/pkg/service/v0"
 	"github.com/owncloud/ocis-konnectd/pkg/version"
+	"github.com/owncloud/ocis-pkg/middleware"
+	"github.com/owncloud/ocis-pkg/service/http"
 )
 
 // Server initializes the http service and server.

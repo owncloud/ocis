@@ -3,8 +3,8 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis-konnectd/pkg/config"
+	"github.com/owncloud/ocis-pkg/log"
 )
 
 // Option defines a single option function.
