@@ -7,7 +7,7 @@ RUN apk update && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
-  org.label-schema.name="oCIS" \
+  org.label-schema.name="ownCloud Infinite Scale" \
   org.label-schema.vendor="ownCloud GmbH" \
   org.label-schema.schema-version="1.0"
 
