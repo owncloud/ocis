@@ -15,14 +15,11 @@ You can download prebuilt binaries from the GitHub releases or from our [downloa
 
 ## Development
 
-Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.13. For the frontend it's also required to have [NodeJS](https://nodejs.org/en/download/package-manager/) and [Yarn](https://yarnpkg.com/lang/en/docs/install/) installed.
+Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.13.
 
 ```console
 git clone https://github.com/owncloud/ocis-graph.git
 cd ocis-graph
-
-yarn install
-yarn build
 
 make generate build
 
