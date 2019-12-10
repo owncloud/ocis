@@ -124,7 +124,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, users)
+	render.JSON(w, r, &listResponse{Value: users})
 }
 
 // GetUser implements the Service interface.
@@ -164,7 +164,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, groups)
+	render.JSON(w, r, &listResponse{Value: groups})
 }
 
 // GetGroup implements the Service interface.
@@ -280,3 +280,7 @@ type key int
 
 const userIDKey key = 0
 const groupIDKey key = 1
+
+type listResponse struct {
+	Value interface{} `json:"value,omitempty"`
+}
