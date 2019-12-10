@@ -36,6 +36,13 @@ func NewService(opts ...Option) Service {
 					r.Get("/", svc.GetUser)
 				})
 			})
+			r.Route("/groups", func(r chi.Router) {
+				r.Get("/", svc.GetGroups)
+				r.Route("/{groupID}", func(r chi.Router) {
+					r.Use(svc.GroupCtx)
+					r.Get("/", svc.GetGroup)
+				})
+			})
 		})
 	})
 
