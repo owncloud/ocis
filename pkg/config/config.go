@@ -40,14 +40,23 @@ type Ldap struct {
 	BaseDNGroups string
 }
 
+// OpenIDConnect defined the avialable OpenID Connect configuration.
+type OpenIDConnect struct {
+	Endpoint    string
+	Realm       string
+	SigningAlgs []string
+	Insecure    bool
+}
+
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
-	Ldap    Ldap
+	File          string
+	Log           Log
+	Debug         Debug
+	HTTP          HTTP
+	Tracing       Tracing
+	Ldap          Ldap
+	OpenIDConnect OpenIDConnect
 }
 
 // New initializes a new configuration with or without defaults.

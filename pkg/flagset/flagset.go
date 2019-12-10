@@ -169,5 +169,25 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "GRAPH_LDAP_BASEDN_GROUPS",
 			Destination: &cfg.Ldap.BaseDNGroups,
 		},
+		&cli.StringFlag{
+			Name:        "oidc-endpoint",
+			Value:       "",
+			Usage:       "OpenIDConnect endpoint",
+			EnvVar:      "GRAPH_OIDC_ENDPOINT",
+			Destination: &cfg.OpenIDConnect.Endpoint,
+		},
+		&cli.BoolFlag{
+			Name:        "oidc-insecure",
+			Usage:       "OpenIDConnect endpoint",
+			EnvVar:      "GRAPH_OIDC_INSECURE",
+			Destination: &cfg.OpenIDConnect.Insecure,
+		},
+		&cli.StringFlag{
+			Name:        "oidc-realm",
+			Value:       "",
+			Usage:       "OpenIDConnect realm",
+			EnvVar:      "GRAPH_OIDC_REALM",
+			Destination: &cfg.OpenIDConnect.Realm,
+		},
 	}
 }

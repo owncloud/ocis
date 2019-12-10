@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis-graph/pkg/config"
 	"github.com/owncloud/ocis-pkg/log"
+	"github.com/owncloud/ocis-pkg/oidc"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 	ldap "gopkg.in/ldap.v3"
 )
@@ -42,7 +42,8 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
-		user, err = g.ldapGetSingleEntry(userID, g.config.Ldap.BaseDNUsers)
+		filter := fmt.Sprintf("(entryuuid=%s)", userID)
+		user, err = g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
@@ -64,7 +65,8 @@ func (g Graph) GroupCtx(next http.Handler) http.Handler {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
-		group, err := g.ldapGetSingleEntry(groupID, g.config.Ldap.BaseDNGroups)
+		filter := fmt.Sprintf("(entryuuid=%s)", groupID)
+		group, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNGroups, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read group %s", groupID)
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
@@ -78,21 +80,21 @@ func (g Graph) GroupCtx(next http.Handler) http.Handler {
 
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
-	me := createUserModel(
-		"Alice",
-		"1234-5678-9000-000",
-	)
+	claims := oidc.FromContext(r.Context())
+	g.logger.Info().Interface("Claims", claims).Msg("Claims in /me")
 
-	resp, err := json.Marshal(me)
-
+	filter := fmt.Sprintf("(uid=%s)", claims.PreferredUsername)
+	user, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("Failed to marshal object %s", me)
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		g.logger.Info().Err(err).Msgf("Failed to read user %s", claims.PreferredUsername)
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
 		return
 	}
 
+	me := createUserModelFromLDAP(user)
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, resp)
+	render.JSON(w, r, me)
 }
 
 // GetUsers implements the Service interface.
@@ -175,12 +177,11 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, createGroupModelFromLDAP(group))
 }
 
-func (g Graph) ldapGetSingleEntry(resourceID string, baseDn string) (*ldap.Entry, error) {
+func (g Graph) ldapGetSingleEntry(baseDn string, filter string) (*ldap.Entry, error) {
 	conn, err := g.initLdap()
 	if err != nil {
 		return nil, err
 	}
-	filter := fmt.Sprintf("(entryuuid=%s)", resourceID)
 	result, err := g.ldapSearch(conn, filter, baseDn)
 	if err != nil {
 		return nil, err
@@ -227,18 +228,6 @@ func (g Graph) ldapSearch(con *ldap.Conn, filter string, baseDN string) (*ldap.S
 	)
 
 	return con.Search(search)
-}
-
-func createUserModel(displayName string, id string) *msgraph.User {
-	return &msgraph.User{
-		DisplayName: &displayName,
-		GivenName:   &displayName,
-		DirectoryObject: msgraph.DirectoryObject{
-			Entity: msgraph.Entity{
-				ID: &id,
-			},
-		},
-	}
 }
 
 func createUserModelFromLDAP(entry *ldap.Entry) *msgraph.User {
