@@ -93,5 +93,6 @@ branches:
         users: []
         teams:
           - ci
+          - employees
 
 ...
