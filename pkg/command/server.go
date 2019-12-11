@@ -26,12 +26,26 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Name:      "server",
+		Usage:     "Start integrated server",
+		Flags:     flagset.ServerWithConfig(cfg),
+		ArgsUsage: "identity-manger name (one of ldap, kc, dummy, cookie",
 		Before: func(c *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+			}
+
+			// StringSliceFlag doesn't support Destination
+			if len(c.StringSlice("trusted-proxy")) > 0 {
+				cfg.Konnectd.TrustedProxy = c.StringSlice("trusted-proxy")
+			}
+
+			if len(c.StringSlice("allow-scope")) > 0 {
+				cfg.Konnectd.AllowScope = c.StringSlice("allow-scope")
+			}
+
+			if len(c.StringSlice("signing-private-key")) > 0 {
+				cfg.Konnectd.SigningPrivateKeyFiles = c.StringSlice("signing-private-key")
 			}
 
 			return nil

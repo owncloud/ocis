@@ -1,5 +1,7 @@
 package config
 
+import "stash.kopano.io/kc/konnect/bootstrap"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -20,6 +22,8 @@ type HTTP struct {
 	Addr      string
 	Namespace string
 	Root      string
+	TLSCert   string
+	TLSKey    string
 }
 
 // Tracing defines the available tracing configuration.
@@ -33,11 +37,12 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
+	File     string
+	Log      Log
+	Debug    Debug
+	HTTP     HTTP
+	Tracing  Tracing
+	Konnectd bootstrap.Config
 }
 
 // New initializes a new configuration with or without defaults.
