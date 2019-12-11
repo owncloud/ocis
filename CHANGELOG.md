@@ -1,3 +1,21 @@
+# Changelog for unreleased
+
+The following sections list the changes for unreleased.
+
+## Summary
+
+ * Enh #8: Introduce OpenID Connect middleware
+
+## Details
+
+ * Enhancement #8: Introduce OpenID Connect middleware
+
+   Added an openid connect middleware that will try to authenticate users using OpenID Connect.
+   The claims will be added to the context of the request.
+
+   https://github.com/owncloud/ocis-pkg/issues/8
+
+
 # Changelog for 1.2.0
 
 The following sections list the changes for 1.2.0.
