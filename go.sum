@@ -657,6 +657,7 @@ github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca/go.mod h1:ce1O1j6Ut
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/yaegashi/msgraph.go v0.0.0-20191104022859-3f9096c750b2 h1:37LbK2gAU+1oaWKC5NTz+fNOsR2LgdRj/SAFVMucgss=
 github.com/yaegashi/msgraph.go v0.0.0-20191104022859-3f9096c750b2/go.mod h1:tso14hwzqX4VbnWTNsxiL0DvMb2OwbGISFA7jDibdWc=
+github.com/yaegashi/msgraph.go v0.0.0-20191206184644-860e82e7ce3b h1:cDzhOBSEXM4yhv5oBG13+PxlVhIzwtcS5affFh7VNJk=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=

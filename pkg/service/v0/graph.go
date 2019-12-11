@@ -42,7 +42,7 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
-		user, err = g.ldapGetUser(userID)
+		user, err = g.ldapGetSingleEntry(userID, g.config.Ldap.BaseDNUsers)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
@@ -50,6 +50,28 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), userIDKey, user)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// GroupCtx middleware is used to load an User object from
+// the URL parameters passed through as the request. In case
+// the User could not be found, we stop here and return a 404.
+func (g Graph) GroupCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		groupID := chi.URLParam(r, "groupID")
+		if groupID == "" {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
+			return
+		}
+		group, err := g.ldapGetSingleEntry(groupID, g.config.Ldap.BaseDNGroups)
+		if err != nil {
+			g.logger.Info().Err(err).Msgf("Failed to read group %s", groupID)
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), groupIDKey, group)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -82,7 +104,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := g.ldapSearch(con, "(objectclass=*)")
+	result, err := g.ldapSearch(con, "(objectclass=*)", g.config.Ldap.BaseDNUsers)
 
 	if err != nil {
 		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectclass=*)'")
@@ -102,7 +124,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, users)
+	render.JSON(w, r, &listResponse{Value: users})
 }
 
 // GetUser implements the Service interface.
@@ -113,18 +135,58 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, createUserModelFromLDAP(user))
 }
 
-func (g Graph) ldapGetUser(userID string) (*ldap.Entry, error) {
+// GetGroups implements the Service interface.
+func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
+	con, err := g.initLdap()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("Failed to initialize ldap")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		return
+	}
+
+	result, err := g.ldapSearch(con, "(objectclass=*)", g.config.Ldap.BaseDNGroups)
+
+	if err != nil {
+		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectclass=*)'")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		return
+	}
+
+	var groups []*msgraph.Group
+
+	for _, group := range result.Entries {
+		groups = append(
+			groups,
+			createGroupModelFromLDAP(
+				group,
+			),
+		)
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: groups})
+}
+
+// GetGroup implements the Service interface.
+func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
+	group := r.Context().Value(groupIDKey).(*ldap.Entry)
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, createGroupModelFromLDAP(group))
+}
+
+func (g Graph) ldapGetSingleEntry(resourceID string, baseDn string) (*ldap.Entry, error) {
 	conn, err := g.initLdap()
 	if err != nil {
 		return nil, err
 	}
-	filter := fmt.Sprintf("(entryuuid=%s)", userID)
-	result, err := g.ldapSearch(conn, filter)
+	filter := fmt.Sprintf("(entryuuid=%s)", resourceID)
+	result, err := g.ldapSearch(conn, filter, baseDn)
 	if err != nil {
 		return nil, err
 	}
 	if len(result.Entries) == 0 {
-		return nil, errors.New("user not found")
+		return nil, errors.New("resource not found")
 	}
 	return result.Entries[0], nil
 }
@@ -143,9 +205,9 @@ func (g Graph) initLdap() (*ldap.Conn, error) {
 	return con, nil
 }
 
-func (g Graph) ldapSearch(con *ldap.Conn, filter string) (*ldap.SearchResult, error) {
+func (g Graph) ldapSearch(con *ldap.Conn, filter string, baseDN string) (*ldap.SearchResult, error) {
 	search := ldap.NewSearchRequest(
-		g.config.Ldap.BaseDNUsers,
+		baseDN,
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases,
 		0,
@@ -159,6 +221,7 @@ func (g Graph) ldapSearch(con *ldap.Conn, filter string) (*ldap.SearchResult, er
 			"displayname",
 			"entryuuid",
 			"sn",
+			"cn",
 		},
 		nil,
 	)
@@ -197,8 +260,27 @@ func createUserModelFromLDAP(entry *ldap.Entry) *msgraph.User {
 	}
 }
 
+func createGroupModelFromLDAP(entry *ldap.Entry) *msgraph.Group {
+	id := entry.GetAttributeValue("entryuuid")
+	displayName := entry.GetAttributeValue("cn")
+
+	return &msgraph.Group{
+		DisplayName: &displayName,
+		DirectoryObject: msgraph.DirectoryObject{
+			Entity: msgraph.Entity{
+				ID: &id,
+			},
+		},
+	}
+}
+
 // The key type is unexported to prevent collisions with context keys defined in
 // other packages.
 type key int
 
 const userIDKey key = 0
+const groupIDKey key = 1
+
+type listResponse struct {
+	Value interface{} `json:"value,omitempty"`
+}
