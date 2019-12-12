@@ -9,8 +9,8 @@ require (
 	github.com/micro/cli v0.2.0
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-graph v0.0.0-20191210114050-fc7e3d748b12
-	github.com/owncloud/ocis-hello v0.0.0-20191209151829-dd129732c21d
+	github.com/owncloud/ocis-graph v0.0.0-20191211134602-307fdc810c1c
+	github.com/owncloud/ocis-hello v0.0.0-20191211135609-45fb78b1a73a
 	github.com/owncloud/ocis-konnectd v0.0.0-20191210084549-0f2829ca1bff
 	github.com/owncloud/ocis-ocs v0.0.0-20191210090203-3f4c51b962f3
 	github.com/owncloud/ocis-phoenix v0.0.0-20191209152623-c73b270f8783
