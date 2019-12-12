@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 
+	"github.com/micro/cli"
 	"github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-phoenix/pkg/metrics"
 	"github.com/owncloud/ocis-pkg/log"
@@ -17,6 +18,7 @@ type Options struct {
 	Context context.Context
 	Config  *config.Config
 	Metrics *metrics.Metrics
+	Flags   []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -55,5 +57,12 @@ func Config(val *config.Config) Option {
 func Metrics(val *metrics.Metrics) Option {
 	return func(o *Options) {
 		o.Metrics = val
+	}
+}
+
+// Flags provides a function to set the flags option.
+func Flags(val []cli.Flag) Option {
+	return func(o *Options) {
+		o.Flags = append(o.Flags, val...)
 	}
 }
