@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis-ocs/pkg/metrics"
 	"github.com/owncloud/ocis-ocs/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
-	"github.com/owncloud/ocis/pkg/register"
 )
 
 // OCSCommand is the entrypoint for the ocs command.
@@ -78,7 +77,7 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	return cfg.OCS
 }
 
-func init() {
-	register.AddCommand(OCSCommand)
-	register.AddHandler(OCSHandler)
-}
+// func init() {
+// 	register.AddCommand(OCSCommand)
+// 	register.AddHandler(OCSHandler)
+// }

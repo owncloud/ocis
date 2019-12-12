@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis-konnectd/pkg/metrics"
 	"github.com/owncloud/ocis-konnectd/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
-	"github.com/owncloud/ocis/pkg/register"
 )
 
 // KonnectdCommand is the entrypoint for the konnectd command.
@@ -78,7 +77,7 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	return cfg.Konnectd
 }
 
-func init() {
-	register.AddCommand(KonnectdCommand)
-	register.AddHandler(KonnectdHandler)
-}
+// func init() {
+// 	register.AddCommand(KonnectdCommand)
+// 	register.AddHandler(KonnectdHandler)
+// }

@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis-webdav/pkg/metrics"
 	"github.com/owncloud/ocis-webdav/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
-	"github.com/owncloud/ocis/pkg/register"
 )
 
 // WebDAVCommand is the entrypoint for the webdav command.
@@ -78,7 +77,7 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	return cfg.WebDAV
 }
 
-func init() {
-	register.AddCommand(WebDAVCommand)
-	register.AddHandler(WebDAVHandler)
-}
+// func init() {
+// 	register.AddCommand(WebDAVCommand)
+// 	register.AddHandler(WebDAVHandler)
+// }

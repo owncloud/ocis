@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis-phoenix/pkg/metrics"
 	"github.com/owncloud/ocis-phoenix/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
-	"github.com/owncloud/ocis/pkg/register"
 )
 
 // PhoenixCommand is the entrypoint for the phoenix command.
@@ -78,7 +77,7 @@ func configurePhoenix(cfg *config.Config) *svcconfig.Config {
 	return cfg.Phoenix
 }
 
-func init() {
-	register.AddCommand(PhoenixCommand)
-	register.AddHandler(PhoenixHandler)
-}
+// func init() {
+// 	register.AddCommand(PhoenixCommand)
+// 	register.AddHandler(PhoenixHandler)
+// }
