@@ -1,9 +1,7 @@
 package http
 
 import (
-	"github.com/owncloud/ocis-ocs/pkg/config"
-	"github.com/owncloud/ocis-ocs/pkg/flagset"
-	"github.com/owncloud/ocis-ocs/pkg/service/v0"
+	svc "github.com/owncloud/ocis-ocs/pkg/service/v0"
 	"github.com/owncloud/ocis-ocs/pkg/version"
 	"github.com/owncloud/ocis-pkg/middleware"
 	"github.com/owncloud/ocis-pkg/service/http"
@@ -20,8 +18,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Version(version.String),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
-		http.Flags(flagset.RootWithConfig(config.New())...),
-		http.Flags(flagset.ServerWithConfig(config.New())...),
+		http.Flags(options.Flags...),
 	)
 
 	handle := svc.NewService(
