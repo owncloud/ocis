@@ -33,7 +33,7 @@ func HelloCommand(cfg *config.Config) cli.Command {
 }
 
 // HelloHandler defines the direct server handler.
-func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureHello(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -47,8 +47,7 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, 
 		)
 
 		if err != nil {
-			logger.Info().
-				Err(err).
+			logger.Err(err).
 				Str("transport", "http").
 				Msg("Failed to initialize server")
 
@@ -57,8 +56,8 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, 
 
 		gr.Add(func() error {
 			return server.Run()
-		}, func(_ error) {
-			logger.Info().
+		}, func(err error) {
+			logger.Err(err).
 				Str("transport", "http").
 				Msg("Shutting down server")
 
@@ -75,8 +74,7 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, 
 		)
 
 		if err != nil {
-			logger.Info().
-				Err(err).
+			logger.Err(err).
 				Str("transport", "grpc").
 				Msg("Failed to initialize server")
 
@@ -102,7 +100,9 @@ func configureHello(cfg *config.Config) *svcconfig.Config {
 	cfg.Hello.Log.Pretty = cfg.Log.Pretty
 	cfg.Hello.Log.Color = cfg.Log.Color
 	cfg.Hello.Tracing.Enabled = false
+	cfg.Hello.HTTP.Addr = "localhost:9105"
 	cfg.Hello.HTTP.Root = "/"
+	cfg.Hello.GRPC.Addr = "localhost:9106"
 
 	return cfg.Hello
 }

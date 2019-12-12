@@ -32,7 +32,7 @@ func GraphCommand(cfg *config.Config) cli.Command {
 }
 
 // GraphHandler defines the direct server handler.
-func GraphHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func GraphHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureGraph(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -56,8 +56,8 @@ func GraphHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, 
 
 		gr.Add(func() error {
 			return server.Run()
-		}, func(_ error) {
-			logger.Info().
+		}, func(err error) {
+			logger.Err(err).
 				Str("transport", "http").
 				Msg("Shutting down server")
 
@@ -73,6 +73,7 @@ func configureGraph(cfg *config.Config) *svcconfig.Config {
 	cfg.Graph.Log.Pretty = cfg.Log.Pretty
 	cfg.Graph.Log.Color = cfg.Log.Color
 	cfg.Graph.Tracing.Enabled = false
+	cfg.Graph.HTTP.Addr = "localhost:9107"
 	cfg.Graph.HTTP.Root = "/"
 
 	return cfg.Graph

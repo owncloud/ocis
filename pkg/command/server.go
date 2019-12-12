@@ -129,7 +129,7 @@ func Server(cfg *config.Config) cli.Command {
 			defer cancel()
 
 			for _, fn := range register.Handlers {
-				fn(ctx, cancel, gr, cfg)
+				fn(ctx, cancel, &gr, cfg)
 			}
 
 			{

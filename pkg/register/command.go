@@ -20,7 +20,7 @@ var (
 type Command func(*config.Config) cli.Command
 
 // Handler defines the register handler.
-type Handler func(context.Context, context.CancelFunc, run.Group, *config.Config) error
+type Handler func(context.Context, context.CancelFunc, *run.Group, *config.Config) error
 
 // AddCommand appends a command to Commands.
 func AddCommand(cmd Command) {
