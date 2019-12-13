@@ -84,8 +84,3 @@ func MicroGateway(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 	// add it to the run group
 	return nil
 }
-
-// func init() {
-// 	fmt.Println("doing things")
-// 	register.AddHandler(MicroGateway)
-// }
