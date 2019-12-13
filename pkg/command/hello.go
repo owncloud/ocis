@@ -57,9 +57,8 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 
 		gr.Add(func() error {
 			return server.Run()
-		}, func(err error) {
+		}, func(_ error) {
 			logger.Info().
-				Err(err).
 				Str("transport", "http").
 				Msg("Shutting down server")
 
