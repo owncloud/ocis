@@ -128,8 +128,11 @@ func Server(cfg *config.Config) cli.Command {
 
 			defer cancel()
 
+			// register a micro gateway
+			// mapi.MicroGateway(ctx, cancel, &gr, cfg)
+
 			for _, fn := range register.Handlers {
-				fn(ctx, cancel, gr, cfg)
+				fn(ctx, cancel, &gr, cfg)
 			}
 
 			{

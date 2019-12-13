@@ -32,7 +32,7 @@ func OCSCommand(cfg *config.Config) cli.Command {
 }
 
 // OCSHandler defines the direct server handler.
-func OCSHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func OCSHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureOCS(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -73,6 +73,7 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	cfg.OCS.Log.Pretty = cfg.Log.Pretty
 	cfg.OCS.Log.Color = cfg.Log.Color
 	cfg.OCS.Tracing.Enabled = false
+	cfg.OCS.HTTP.Addr = "localhost:9110"
 	cfg.OCS.HTTP.Root = "/"
 
 	return cfg.OCS

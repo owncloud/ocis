@@ -32,7 +32,7 @@ func WebDAVCommand(cfg *config.Config) cli.Command {
 }
 
 // WebDAVHandler defines the direct server handler.
-func WebDAVHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func WebDAVHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureWebDAV(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -73,6 +73,7 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	cfg.WebDAV.Log.Pretty = cfg.Log.Pretty
 	cfg.WebDAV.Log.Color = cfg.Log.Color
 	cfg.WebDAV.Tracing.Enabled = false
+	cfg.WebDAV.HTTP.Addr = "localhost:9115"
 	cfg.WebDAV.HTTP.Root = "/"
 
 	return cfg.WebDAV

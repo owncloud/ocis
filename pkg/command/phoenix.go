@@ -32,7 +32,7 @@ func PhoenixCommand(cfg *config.Config) cli.Command {
 }
 
 // PhoenixHandler defines the direct server handler.
-func PhoenixHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func PhoenixHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configurePhoenix(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -73,6 +73,7 @@ func configurePhoenix(cfg *config.Config) *svcconfig.Config {
 	cfg.Phoenix.Log.Pretty = cfg.Log.Pretty
 	cfg.Phoenix.Log.Color = cfg.Log.Color
 	cfg.Phoenix.Tracing.Enabled = false
+	cfg.Phoenix.HTTP.Addr = "localhost:9100"
 	cfg.Phoenix.HTTP.Root = "/"
 
 	return cfg.Phoenix
