@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis-ocs/pkg/metrics"
 	"github.com/owncloud/ocis-ocs/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
+	"github.com/owncloud/ocis/pkg/register"
 )
 
 // OCSCommand is the entrypoint for the ocs command.
@@ -31,7 +32,7 @@ func OCSCommand(cfg *config.Config) cli.Command {
 }
 
 // OCSHandler defines the direct server handler.
-func OCSHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func OCSHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureOCS(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -72,12 +73,13 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	cfg.OCS.Log.Pretty = cfg.Log.Pretty
 	cfg.OCS.Log.Color = cfg.Log.Color
 	cfg.OCS.Tracing.Enabled = false
+	cfg.OCS.HTTP.Addr = "localhost:9109"
 	cfg.OCS.HTTP.Root = "/"
 
 	return cfg.OCS
 }
 
-// func init() {
-// 	register.AddCommand(OCSCommand)
-// 	register.AddHandler(OCSHandler)
-// }
+func init() {
+	register.AddCommand(OCSCommand)
+	register.AddHandler(OCSHandler)
+}

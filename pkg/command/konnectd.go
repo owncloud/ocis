@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis-konnectd/pkg/metrics"
 	"github.com/owncloud/ocis-konnectd/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
+	"github.com/owncloud/ocis/pkg/register"
 )
 
 // KonnectdCommand is the entrypoint for the konnectd command.
@@ -31,7 +32,7 @@ func KonnectdCommand(cfg *config.Config) cli.Command {
 }
 
 // KonnectdHandler defines the direct server handler.
-func KonnectdHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func KonnectdHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureKonnectd(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -72,12 +73,13 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Pretty = cfg.Log.Pretty
 	cfg.Konnectd.Log.Color = cfg.Log.Color
 	cfg.Konnectd.Tracing.Enabled = false
+	cfg.Konnectd.HTTP.Addr = "localhost:9011"
 	cfg.Konnectd.HTTP.Root = "/"
 
 	return cfg.Konnectd
 }
 
-// func init() {
-// 	register.AddCommand(KonnectdCommand)
-// 	register.AddHandler(KonnectdHandler)
-// }
+func init() {
+	register.AddCommand(KonnectdCommand)
+	register.AddHandler(KonnectdHandler)
+}
