@@ -57,7 +57,8 @@ func GraphHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 		gr.Add(func() error {
 			return server.Run()
 		}, func(err error) {
-			logger.Err(err).
+			logger.Info().
+				Err(err).
 				Str("transport", "http").
 				Msg("Shutting down server")
 

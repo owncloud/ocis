@@ -47,7 +47,8 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 		)
 
 		if err != nil {
-			logger.Err(err).
+			logger.Info().
+				Err(err).
 				Str("transport", "http").
 				Msg("Failed to initialize server")
 
@@ -57,7 +58,8 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 		gr.Add(func() error {
 			return server.Run()
 		}, func(err error) {
-			logger.Err(err).
+			logger.Info().
+				Err(err).
 				Str("transport", "http").
 				Msg("Shutting down server")
 
@@ -74,7 +76,8 @@ func HelloHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group,
 		)
 
 		if err != nil {
-			logger.Err(err).
+			logger.Info().
+				Err(err).
 				Str("transport", "grpc").
 				Msg("Failed to initialize server")
 
