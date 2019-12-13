@@ -73,7 +73,7 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	cfg.OCS.Log.Pretty = cfg.Log.Pretty
 	cfg.OCS.Log.Color = cfg.Log.Color
 	cfg.OCS.Tracing.Enabled = false
-	cfg.OCS.HTTP.Addr = "localhost:9109"
+	cfg.OCS.HTTP.Addr = "localhost:9110"
 	cfg.OCS.HTTP.Root = "/"
 
 	return cfg.OCS
