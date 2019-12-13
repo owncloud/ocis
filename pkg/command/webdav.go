@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis-webdav/pkg/metrics"
 	"github.com/owncloud/ocis-webdav/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
+	"github.com/owncloud/ocis/pkg/register"
 )
 
 // WebDAVCommand is the entrypoint for the webdav command.
@@ -31,7 +32,7 @@ func WebDAVCommand(cfg *config.Config) cli.Command {
 }
 
 // WebDAVHandler defines the direct server handler.
-func WebDAVHandler(ctx context.Context, cancel context.CancelFunc, gr run.Group, cfg *config.Config) error {
+func WebDAVHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
 	scfg := configureWebDAV(cfg)
 	logger := command.NewLogger(scfg)
 	m := metrics.New()
@@ -72,12 +73,13 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	cfg.WebDAV.Log.Pretty = cfg.Log.Pretty
 	cfg.WebDAV.Log.Color = cfg.Log.Color
 	cfg.WebDAV.Tracing.Enabled = false
+	cfg.WebDAV.HTTP.Addr = "localhost:9108"
 	cfg.WebDAV.HTTP.Root = "/"
 
 	return cfg.WebDAV
 }
 
-// func init() {
-// 	register.AddCommand(WebDAVCommand)
-// 	register.AddHandler(WebDAVHandler)
-// }
+func init() {
+	register.AddCommand(WebDAVCommand)
+	register.AddHandler(WebDAVHandler)
+}
