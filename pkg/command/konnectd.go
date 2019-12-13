@@ -73,7 +73,7 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Pretty = cfg.Log.Pretty
 	cfg.Konnectd.Log.Color = cfg.Log.Color
 	cfg.Konnectd.Tracing.Enabled = false
-	cfg.Konnectd.HTTP.Addr = "localhost:9011"
+	cfg.Konnectd.HTTP.Addr = "localhost:9130"
 	cfg.Konnectd.HTTP.Root = "/"
 
 	return cfg.Konnectd
