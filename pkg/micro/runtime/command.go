@@ -9,9 +9,9 @@ import (
 // Command adds micro runtime commands to the cli app
 func Command(app *cli.App) cli.Command {
 	command := cli.Command{
-		Name:        "micro-runtime",
-		Description: "starts the go-micro runtime and its services",
-		Category:    "Base",
+		Name:        "micro",
+		Description: "starts the go-micro runtime services",
+		Category:    "Micro",
 		Action: func(c *cli.Context) error {
 			runtime := Runtime{
 				Services: RuntimeServices,
