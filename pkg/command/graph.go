@@ -17,9 +17,10 @@ import (
 // GraphCommand is the entrypoint for the graph command.
 func GraphCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "graph",
-		Usage: "Start graph server",
-		Flags: flagset.ServerWithConfig(cfg.Graph),
+		Name:     "graph",
+		Usage:    "Start graph server",
+		Flags:    flagset.ServerWithConfig(cfg.Graph),
+		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			scfg := configureGraph(cfg)
 

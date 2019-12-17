@@ -18,9 +18,10 @@ import (
 // HelloCommand is the entrypoint for the hello command.
 func HelloCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "hello",
-		Usage: "Start hello server",
-		Flags: flagset.ServerWithConfig(cfg.Hello),
+		Name:     "hello",
+		Usage:    "Start hello server",
+		Flags:    flagset.ServerWithConfig(cfg.Hello),
+		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			scfg := configureHello(cfg)
 

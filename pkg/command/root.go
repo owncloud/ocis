@@ -99,34 +99,15 @@ func Execute() error {
 		},
 	}
 
-	// register micro runtime services.
-	// TODO(refs) use the registry? Some interfaces would need to be tweaked
-	app.Commands = append(app.Commands, api.Commands()...)
-	app.Commands = append(app.Commands, bot.Commands()...)
-	app.Commands = append(app.Commands, broker.Commands()...)
-	app.Commands = append(app.Commands, health.Commands()...)
-	app.Commands = append(app.Commands, proxy.Commands()...)
-	app.Commands = append(app.Commands, monitor.Commands()...)
-	app.Commands = append(app.Commands, router.Commands()...)
-	app.Commands = append(app.Commands, tunnel.Commands()...)
-	app.Commands = append(app.Commands, network.Commands()...)
-	app.Commands = append(app.Commands, registry.Commands()...)
-	app.Commands = append(app.Commands, runtime.Commands()...)
-	app.Commands = append(app.Commands, debug.Commands()...)
-	app.Commands = append(app.Commands, server.Commands()...)
-	app.Commands = append(app.Commands, service.Commands()...)
-	app.Commands = append(app.Commands, store.Commands()...)
-	app.Commands = append(app.Commands, token.Commands()...)
-	app.Commands = append(app.Commands, new.Commands()...)
-	app.Commands = append(app.Commands, build.Commands()...)
-	app.Commands = append(app.Commands, web.Commands()...)
-
 	for _, fn := range register.Commands {
 		app.Commands = append(
 			app.Commands,
 			fn(cfg),
 		)
 	}
+
+	// adds micro runtime specific set of commands
+	addRuntime(app)
 
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
@@ -149,4 +130,26 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
 	)
+}
+
+func addRuntime(app *cli.App) {
+	app.Commands = append(app.Commands, api.Commands()...)
+	app.Commands = append(app.Commands, bot.Commands()...)
+	app.Commands = append(app.Commands, broker.Commands()...)
+	app.Commands = append(app.Commands, health.Commands()...)
+	app.Commands = append(app.Commands, proxy.Commands()...)
+	app.Commands = append(app.Commands, monitor.Commands()...)
+	app.Commands = append(app.Commands, router.Commands()...)
+	app.Commands = append(app.Commands, tunnel.Commands()...)
+	app.Commands = append(app.Commands, network.Commands()...)
+	app.Commands = append(app.Commands, registry.Commands()...)
+	app.Commands = append(app.Commands, runtime.Commands()...)
+	app.Commands = append(app.Commands, debug.Commands()...)
+	app.Commands = append(app.Commands, server.Commands()...)
+	app.Commands = append(app.Commands, service.Commands()...)
+	app.Commands = append(app.Commands, store.Commands()...)
+	app.Commands = append(app.Commands, token.Commands()...)
+	app.Commands = append(app.Commands, new.Commands()...)
+	app.Commands = append(app.Commands, build.Commands()...)
+	app.Commands = append(app.Commands, web.Commands()...)
 }

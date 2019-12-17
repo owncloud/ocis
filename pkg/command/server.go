@@ -15,18 +15,44 @@ import (
 	gorun "github.com/micro/go-micro/runtime"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
 
+// Services to start as part of the fullstack option
+var services = []string{
+	"network",  // :8085
+	"runtime",  // :8088
+	"registry", // :8000
+	"broker",   // :8001
+	"store",    // :8002
+	"tunnel",   // :8083
+	"router",   // :8084
+	"monitor",  // :????
+	"debug",    // :????
+	"proxy",    // :8081
+	"api",      // :8080
+	"web",      // :8082
+	"bot",      // :????
+
+	// extensions
+	"hello",
+	"phoenix",
+	"graph",
+	"ocs",
+	"webdav",
+}
+
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) cli.Command {
 	app := cli.Command{
-		Name:  "server",
-		Usage: "Start fullstack server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Name:     "server",
+		Usage:    "Start fullstack server",
+		Category: "Fullstack",
+		Flags:    flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
@@ -121,77 +147,59 @@ func Server(cfg *config.Config) cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
-			// by the time we reach this point, all micro runtime services subcommands
-			// should be available for being initialized
-			muRuntime := cmd.DefaultCmd.Options().Runtime
-			env := os.Environ()
+			mruntime := cmd.DefaultCmd.Options().Runtime
 
-			services := []string{
-				"network",  // :8085
-				"runtime",  // :8088
-				"registry", // :8000
-				"broker",   // :8001
-				"store",    // :8002
-				"tunnel",   // :8083
-				"router",   // :8084
-				"monitor",  // :????
-				"debug",    // :????
-				"proxy",    // :8081
-				"api",      // :8080
-				"web",      // :8082
-				"bot",      // :????
+			// fork uses the micro runtime to fork go-micro services
+			forkServices(logger, mruntime)
 
-				// ocis extensions
-				"hello",
-				"phoenix",
-				"graph",
-				"ocs",
-				"webdav",
-			}
-
-			for _, service := range services {
-				args := []gorun.CreateOption{
-					gorun.WithCommand(os.Args[0], service),
-					gorun.WithEnv(env),
-					gorun.WithOutput(os.Stdout),
-				}
-
-				muService := &gorun.Service{Name: service}
-				if err := (*muRuntime).Create(muService, args...); err != nil {
-					logger.Error().Msgf("Failed to create runtime enviroment: %v", err)
-				}
-			}
-
-			shutdown := make(chan os.Signal, 1)
-			signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
-
-			logger.Info().Msg("Starting service runtime")
-
-			// start the runtime
-			if err := (*muRuntime).Start(); err != nil {
-				os.Exit(1)
-			}
-
-			logger.Info().Msgf("Service runtime started")
-
-			select {
-			case <-shutdown:
-				logger.Info().Msg("shutdown signal received")
-				logger.Info().Msg("stopping service runtime")
-			}
-
-			// stop all the things
-			if err := (*muRuntime).Stop(); err != nil {
-				logger.Err(err)
-			}
-
-			logger.Info().Msgf("Service runtime shutdown")
-
-			// exit success
-			os.Exit(0)
-
+			// trap blocks until a kill signal is sent
+			trap(logger, mruntime)
 			return nil
 		},
 	}
 	return app
+}
+
+func trap(logger log.Logger, runtime *gorun.Runtime) {
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+
+	logger.Info().Msg("Starting service runtime")
+	if err := (*runtime).Start(); err != nil {
+		os.Exit(1)
+	}
+
+	logger.Info().Msgf("Service runtime started")
+
+	select {
+	case <-shutdown:
+		logger.Info().Msg("shutdown signal received")
+		logger.Info().Msg("stopping service runtime")
+	}
+
+	if err := (*runtime).Stop(); err != nil {
+		logger.Err(err)
+	}
+
+	logger.Info().Msgf("Service runtime shutdown")
+	os.Exit(0)
+}
+
+func forkServices(logger log.Logger, runtime *gorun.Runtime) {
+	env := os.Environ()
+
+	for _, service := range services {
+		args := []gorun.CreateOption{
+			// the binary calls itself with the micro service as a subcommand as first argument
+			gorun.WithCommand(os.Args[0], service),
+			gorun.WithEnv(env),
+			// and logs to STDOUT. Perhaps this can be overridden to use a log.Logger
+			gorun.WithOutput(os.Stdout),
+		}
+
+		muService := &gorun.Service{Name: service}
+		if err := (*runtime).Create(muService, args...); err != nil {
+			logger.Error().Msgf("Failed to create runtime enviroment: %v", err)
+		}
+	}
 }

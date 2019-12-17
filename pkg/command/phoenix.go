@@ -17,9 +17,10 @@ import (
 // PhoenixCommand is the entrypoint for the phoenix command.
 func PhoenixCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "phoenix",
-		Usage: "Start phoenix server",
-		Flags: flagset.ServerWithConfig(cfg.Phoenix),
+		Name:     "phoenix",
+		Usage:    "Start phoenix server",
+		Flags:    flagset.ServerWithConfig(cfg.Phoenix),
+		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			scfg := configurePhoenix(cfg)
 

@@ -17,9 +17,10 @@ import (
 // KonnectdCommand is the entrypoint for the konnectd command.
 func KonnectdCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "konnectd",
-		Usage: "Start konnectd server",
-		Flags: flagset.ServerWithConfig(cfg.Konnectd),
+		Name:     "konnectd",
+		Usage:    "Start konnectd server",
+		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.Konnectd),
 		Action: func(c *cli.Context) error {
 			scfg := configureKonnectd(cfg)
 

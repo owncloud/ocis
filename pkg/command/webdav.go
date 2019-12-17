@@ -17,9 +17,10 @@ import (
 // WebDAVCommand is the entrypoint for the webdav command.
 func WebDAVCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "webdav",
-		Usage: "Start webdav server",
-		Flags: flagset.ServerWithConfig(cfg.WebDAV),
+		Name:     "webdav",
+		Usage:    "Start webdav server",
+		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.WebDAV),
 		Action: func(c *cli.Context) error {
 			scfg := configureWebDAV(cfg)
 
