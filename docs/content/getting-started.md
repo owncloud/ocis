@@ -21,13 +21,13 @@ TBD
 
 Included with the ocis binary is embedded a go-micro runtime that is in charge of starting services as a fork of the master process. This provides complete control over the services. Ocis extensions can be added as part of this runtime.
 
-```sh
-> ./bin/ocis micro
+```console
+./bin/ocis micro
 ```
 
 This will currently boot:
 
-```sh
+```console
 go.micro
 go.micro.api
 go.micro.bot
@@ -47,13 +47,13 @@ go.micro.web
 
 Further ocis extensions can be added to the runtime via the ocis command like:
 
-```sh
+```console
 ./bin/ocis hello
 ```
 
 Which whill register:
 
-```sh
+```console
 go.micro.web.hello
 go.micro.api.hello
 ```
