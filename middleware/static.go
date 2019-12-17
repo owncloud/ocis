@@ -8,8 +8,12 @@ import (
 
 // Static is a middleware that serves static assets.
 func Static(root string, fs http.FileSystem) func(http.Handler) http.Handler {
+	if !strings.HasSuffix(root, "/") {
+		root = root + "/"
+	}
+
 	static := http.StripPrefix(
-		root+"/",
+		root,
 		http.FileServer(
 			fs,
 		),
