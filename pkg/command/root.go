@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/micro/cli"
+	"github.com/micro/micro/api"
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
@@ -79,6 +80,10 @@ func Execute() error {
 			Health(cfg),
 		},
 	}
+
+	// register micro runtime services.
+	// TODO(refs) use the registry? Some interfaces would need to be tweaked
+	app.Commands = append(app.Commands, api.Commands()...)
 
 	for _, fn := range register.Commands {
 		app.Commands = append(

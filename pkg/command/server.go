@@ -1,29 +1,29 @@
 package command
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli"
-	"github.com/oklog/run"
+	"github.com/micro/go-micro/config/cmd"
+	gorun "github.com/micro/go-micro/runtime"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
-	"github.com/owncloud/ocis/pkg/register"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
 
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) cli.Command {
-	return cli.Command{
+	app := cli.Command{
 		Name:  "server",
 		Usage: "Start fullstack server",
 		Flags: flagset.ServerWithConfig(cfg),
@@ -121,33 +121,59 @@ func Server(cfg *config.Config) cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-			)
+			// by the time we reach this point, all micro runtime services subcommands
+			// should be available for being initialized
+			muRuntime := cmd.DefaultCmd.Options().Runtime
+			env := os.Environ()
 
-			defer cancel()
-
-			for _, fn := range register.Handlers {
-				fn(ctx, cancel, &gr, cfg)
+			services := []string{
+				"api",
+				"hello",
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
+			for _, service := range services {
+				args := []gorun.CreateOption{
+					gorun.WithCommand(os.Args[0], service),
+					gorun.WithEnv(env),
+					gorun.WithOutput(os.Stdout),
+				}
 
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+				muService := &gorun.Service{Name: service}
+				if err := (*muRuntime).Create(muService, args...); err != nil {
+					logger.Error().Msgf("Failed to create runtime enviroment: %v", err)
+				}
 			}
 
-			return gr.Run()
+			shutdown := make(chan os.Signal, 1)
+			signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+
+			logger.Info().Msg("Starting service runtime")
+
+			// start the runtime
+			if err := (*muRuntime).Start(); err != nil {
+				os.Exit(1)
+			}
+
+			logger.Info().Msgf("Service runtime started")
+
+			select {
+			case <-shutdown:
+				logger.Info().Msg("shutdown signal received")
+				logger.Info().Msg("stopping service runtime")
+			}
+
+			// stop all the things
+			if err := (*muRuntime).Stop(); err != nil {
+				logger.Err(err)
+			}
+
+			logger.Info().Msgf("Service runtime shutdown")
+
+			// exit success
+			os.Exit(0)
+
+			return nil
 		},
 	}
+	return app
 }

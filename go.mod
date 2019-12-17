@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/micro/cli v0.2.0
 	github.com/micro/go-micro v1.17.1
+	github.com/micro/micro v1.16.0
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-graph v0.0.0-20191211134602-307fdc810c1c
@@ -21,4 +22,5 @@ require (
 	github.com/rs/zerolog v1.17.2
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
+	google.golang.org/appengine v1.6.1
 )
