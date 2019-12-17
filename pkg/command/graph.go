@@ -19,8 +19,8 @@ func GraphCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
 		Name:     "graph",
 		Usage:    "Start graph server",
-		Flags:    flagset.ServerWithConfig(cfg.Graph),
 		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.Graph),
 		Action: func(c *cli.Context) error {
 			scfg := configureGraph(cfg)
 

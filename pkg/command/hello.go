@@ -20,8 +20,8 @@ func HelloCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
 		Name:     "hello",
 		Usage:    "Start hello server",
-		Flags:    flagset.ServerWithConfig(cfg.Hello),
 		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.Hello),
 		Action: func(c *cli.Context) error {
 			scfg := configureHello(cfg)
 

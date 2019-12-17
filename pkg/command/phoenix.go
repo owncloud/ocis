@@ -19,8 +19,8 @@ func PhoenixCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
 		Name:     "phoenix",
 		Usage:    "Start phoenix server",
-		Flags:    flagset.ServerWithConfig(cfg.Phoenix),
 		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.Phoenix),
 		Action: func(c *cli.Context) error {
 			scfg := configurePhoenix(cfg)
 
