@@ -171,10 +171,11 @@ func trap(logger log.Logger, runtime *gorun.Runtime) {
 
 	logger.Info().Msgf("Service runtime started")
 
-	select {
-	case <-shutdown:
+	// block until there is a value
+	for range shutdown {
 		logger.Info().Msg("shutdown signal received")
 		logger.Info().Msg("stopping service runtime")
+		close(shutdown)
 	}
 
 	if err := (*runtime).Stop(); err != nil {
