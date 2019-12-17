@@ -13,11 +13,11 @@ func Command(app *cli.App) cli.Command {
 		Description: "starts the go-micro runtime services",
 		Category:    "Micro",
 		Action: func(c *cli.Context) error {
-			runtime := Runtime{
-				Services: RuntimeServices,
-				R:        cmd.DefaultCmd.Options().Runtime,
-				Logger:   log.NewLogger(),
-			}
+			runtime := New(
+				Services(RuntimeServices),
+				Logger(log.NewLogger()),
+				MicroRuntime(cmd.DefaultCmd.Options().Runtime),
+			)
 
 			{
 				runtime.Start()
