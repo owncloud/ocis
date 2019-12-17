@@ -5,28 +5,10 @@ import (
 	"strings"
 
 	"github.com/micro/cli"
-	"github.com/micro/micro/api"
-	"github.com/micro/micro/bot"
-	"github.com/micro/micro/broker"
-	"github.com/micro/micro/debug"
-	"github.com/micro/micro/health"
-	"github.com/micro/micro/monitor"
-	"github.com/micro/micro/network"
-	"github.com/micro/micro/new"
-	"github.com/micro/micro/plugin/build"
-	"github.com/micro/micro/proxy"
-	"github.com/micro/micro/registry"
-	"github.com/micro/micro/router"
-	"github.com/micro/micro/runtime"
-	"github.com/micro/micro/server"
-	"github.com/micro/micro/service"
-	"github.com/micro/micro/store"
-	"github.com/micro/micro/token"
-	"github.com/micro/micro/tunnel"
-	"github.com/micro/micro/web"
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
+	"github.com/owncloud/ocis/pkg/micro/runtime"
 	"github.com/owncloud/ocis/pkg/register"
 	"github.com/owncloud/ocis/pkg/version"
 	"github.com/spf13/viper"
@@ -99,6 +81,8 @@ func Execute() error {
 		},
 	}
 
+	// TODO(refs) fix this interface and make it play nice with cli.Command to reuse and skip
+	// doing runtime.AddRuntime(app)
 	for _, fn := range register.Commands {
 		app.Commands = append(
 			app.Commands,
@@ -106,8 +90,14 @@ func Execute() error {
 		)
 	}
 
-	// adds micro runtime specific set of commands
-	addRuntime(app)
+	// add runtime commands to the binary
+	runtime.AddRuntime(app)
+
+	// add the runtime.Run command to the binary
+	app.Commands = append(
+		app.Commands,
+		runtime.Command(app),
+	)
 
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
@@ -130,26 +120,4 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
 	)
-}
-
-func addRuntime(app *cli.App) {
-	app.Commands = append(app.Commands, api.Commands()...)
-	app.Commands = append(app.Commands, bot.Commands()...)
-	app.Commands = append(app.Commands, broker.Commands()...)
-	app.Commands = append(app.Commands, health.Commands()...)
-	app.Commands = append(app.Commands, proxy.Commands()...)
-	app.Commands = append(app.Commands, monitor.Commands()...)
-	app.Commands = append(app.Commands, router.Commands()...)
-	app.Commands = append(app.Commands, tunnel.Commands()...)
-	app.Commands = append(app.Commands, network.Commands()...)
-	app.Commands = append(app.Commands, registry.Commands()...)
-	app.Commands = append(app.Commands, runtime.Commands()...)
-	app.Commands = append(app.Commands, debug.Commands()...)
-	app.Commands = append(app.Commands, server.Commands()...)
-	app.Commands = append(app.Commands, service.Commands()...)
-	app.Commands = append(app.Commands, store.Commands()...)
-	app.Commands = append(app.Commands, token.Commands()...)
-	app.Commands = append(app.Commands, new.Commands()...)
-	app.Commands = append(app.Commands, build.Commands()...)
-	app.Commands = append(app.Commands, web.Commands()...)
 }
