@@ -78,17 +78,13 @@ func (r *Runtime) Trap() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
-	r.Logger.Info().Msg("Starting service runtime")
 	if err := (*r.R).Start(); err != nil {
 		os.Exit(1)
 	}
 
-	r.Logger.Info().Msgf("Service runtime started")
-
 	// block until there is a value
 	for range shutdown {
 		r.Logger.Info().Msg("shutdown signal received")
-		r.Logger.Info().Msg("stopping service runtime")
 		close(shutdown)
 	}
 
