@@ -143,6 +143,10 @@ func Server(cfg *config.Config) cli.Command {
 
 				// ocis extensions
 				"hello",
+				"phoenix",
+				"graph",
+				"ocs",
+				"webdav",
 			}
 
 			for _, service := range services {
