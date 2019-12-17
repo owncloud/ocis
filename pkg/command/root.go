@@ -6,6 +6,24 @@ import (
 
 	"github.com/micro/cli"
 	"github.com/micro/micro/api"
+	"github.com/micro/micro/bot"
+	"github.com/micro/micro/broker"
+	"github.com/micro/micro/debug"
+	"github.com/micro/micro/health"
+	"github.com/micro/micro/monitor"
+	"github.com/micro/micro/network"
+	"github.com/micro/micro/new"
+	"github.com/micro/micro/plugin/build"
+	"github.com/micro/micro/proxy"
+	"github.com/micro/micro/registry"
+	"github.com/micro/micro/router"
+	"github.com/micro/micro/runtime"
+	"github.com/micro/micro/server"
+	"github.com/micro/micro/service"
+	"github.com/micro/micro/store"
+	"github.com/micro/micro/token"
+	"github.com/micro/micro/tunnel"
+	"github.com/micro/micro/web"
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
@@ -84,6 +102,24 @@ func Execute() error {
 	// register micro runtime services.
 	// TODO(refs) use the registry? Some interfaces would need to be tweaked
 	app.Commands = append(app.Commands, api.Commands()...)
+	app.Commands = append(app.Commands, bot.Commands()...)
+	app.Commands = append(app.Commands, broker.Commands()...)
+	app.Commands = append(app.Commands, health.Commands()...)
+	app.Commands = append(app.Commands, proxy.Commands()...)
+	app.Commands = append(app.Commands, monitor.Commands()...)
+	app.Commands = append(app.Commands, router.Commands()...)
+	app.Commands = append(app.Commands, tunnel.Commands()...)
+	app.Commands = append(app.Commands, network.Commands()...)
+	app.Commands = append(app.Commands, registry.Commands()...)
+	app.Commands = append(app.Commands, runtime.Commands()...)
+	app.Commands = append(app.Commands, debug.Commands()...)
+	app.Commands = append(app.Commands, server.Commands()...)
+	app.Commands = append(app.Commands, service.Commands()...)
+	app.Commands = append(app.Commands, store.Commands()...)
+	app.Commands = append(app.Commands, token.Commands()...)
+	app.Commands = append(app.Commands, new.Commands()...)
+	app.Commands = append(app.Commands, build.Commands()...)
+	app.Commands = append(app.Commands, web.Commands()...)
 
 	for _, fn := range register.Commands {
 		app.Commands = append(

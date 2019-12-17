@@ -127,7 +127,21 @@ func Server(cfg *config.Config) cli.Command {
 			env := os.Environ()
 
 			services := []string{
-				"api",
+				"network",  // :8085
+				"runtime",  // :8088
+				"registry", // :8000
+				"broker",   // :8001
+				"store",    // :8002
+				"tunnel",   // :8083
+				"router",   // :8084
+				"monitor",  // :????
+				"debug",    // :????
+				"proxy",    // :8081
+				"api",      // :8080
+				"web",      // :8082
+				"bot",      // :????
+
+				// ocis extensions
 				"hello",
 			}
 
