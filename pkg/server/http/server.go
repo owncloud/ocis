@@ -14,7 +14,7 @@ func Server(opts ...Option) (http.Service, error) {
 	service := http.NewService(
 		http.Logger(options.Logger),
 		http.Namespace(options.Namespace),
-		http.Name("web.phoenix"),
+		http.Name("phoenix"),
 		http.Version(version.String),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
