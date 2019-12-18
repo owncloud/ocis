@@ -1,15 +1,10 @@
 package command
 
 import (
-	"context"
-
 	"github.com/micro/cli"
-	"github.com/oklog/run"
 	"github.com/owncloud/ocis-ocs/pkg/command"
 	svcconfig "github.com/owncloud/ocis-ocs/pkg/config"
 	"github.com/owncloud/ocis-ocs/pkg/flagset"
-	"github.com/owncloud/ocis-ocs/pkg/metrics"
-	"github.com/owncloud/ocis-ocs/pkg/server/http"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/register"
 )
@@ -17,9 +12,10 @@ import (
 // OCSCommand is the entrypoint for the ocs command.
 func OCSCommand(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "ocs",
-		Usage: "Start ocs server",
-		Flags: flagset.ServerWithConfig(cfg.OCS),
+		Name:     "ocs",
+		Usage:    "Start ocs server",
+		Category: "Extensions",
+		Flags:    flagset.ServerWithConfig(cfg.OCS),
 		Action: func(c *cli.Context) error {
 			scfg := configureOCS(cfg)
 
@@ -29,43 +25,6 @@ func OCSCommand(cfg *config.Config) cli.Command {
 			)
 		},
 	}
-}
-
-// OCSHandler defines the direct server handler.
-func OCSHandler(ctx context.Context, cancel context.CancelFunc, gr *run.Group, cfg *config.Config) error {
-	scfg := configureOCS(cfg)
-	logger := command.NewLogger(scfg)
-	m := metrics.New()
-
-	{
-		server, err := http.Server(
-			http.Logger(logger),
-			http.Context(ctx),
-			http.Config(scfg),
-			http.Metrics(m),
-		)
-
-		if err != nil {
-			logger.Info().
-				Err(err).
-				Str("transport", "http").
-				Msg("Failed to initialize server")
-
-			return err
-		}
-
-		gr.Add(func() error {
-			return server.Run()
-		}, func(_ error) {
-			logger.Info().
-				Str("transport", "http").
-				Msg("Shutting down server")
-
-			cancel()
-		})
-	}
-
-	return nil
 }
 
 func configureOCS(cfg *config.Config) *svcconfig.Config {
@@ -81,5 +40,4 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 
 func init() {
 	register.AddCommand(OCSCommand)
-	register.AddHandler(OCSHandler)
 }

@@ -1,9 +1,6 @@
 package command
 
 import (
-	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
 
@@ -11,12 +8,12 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli"
-	"github.com/oklog/run"
+	"github.com/micro/go-micro/config/cmd"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
-	"github.com/owncloud/ocis/pkg/register"
+	"github.com/owncloud/ocis/pkg/micro/runtime"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -24,9 +21,10 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "server",
-		Usage: "Start fullstack server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Name:     "server",
+		Usage:    "Start fullstack server",
+		Category: "Fullstack",
+		Flags:    flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
@@ -121,36 +119,19 @@ func Server(cfg *config.Config) cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
+			runtime := runtime.New(
+				runtime.Services(append(runtime.RuntimeServices, runtime.Extensions...)),
+				runtime.Logger(logger),
+				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 			)
 
-			defer cancel()
+			// fork uses the micro runtime to fork go-micro services
+			runtime.Start()
 
-			// register a micro gateway
-			// mapi.MicroGateway(ctx, cancel, &gr, cfg)
+			// trap blocks until a kill signal is sent
+			runtime.Trap()
 
-			for _, fn := range register.Handlers {
-				fn(ctx, cancel, &gr, cfg)
-			}
-
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
-			}
-
-			return gr.Run()
+			return nil
 		},
 	}
 }

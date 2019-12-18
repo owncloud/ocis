@@ -17,6 +17,49 @@ TBD
 
 TBD
 
+## Runtime
+
+Included with the ocis binary is embedded a go-micro runtime that is in charge of starting services as a fork of the master process. This provides complete control over the services. Ocis extensions can be added as part of this runtime.
+
+```console
+./bin/ocis micro
+```
+
+This will currently boot:
+
+```console
+go.micro
+go.micro.api
+go.micro.bot
+go.micro.broker
+go.micro.debug
+go.micro.http.broker
+go.micro.monitor
+go.micro.network
+go.micro.proxy
+go.micro.registry
+go.micro.router
+go.micro.runtime
+go.micro.store
+go.micro.tunnel
+go.micro.web
+```
+
+Further ocis extensions can be added to the runtime via the ocis command like:
+
+```console
+./bin/ocis hello
+```
+
+Which whill register:
+
+```console
+go.micro.web.hello
+go.micro.api.hello
+```
+
+To the list of available services.
+
 ## Configuration
 
 We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.

@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
+	"github.com/owncloud/ocis/pkg/micro/runtime"
 	"github.com/owncloud/ocis/pkg/register"
 	"github.com/owncloud/ocis/pkg/version"
 	"github.com/spf13/viper"
@@ -80,12 +81,23 @@ func Execute() error {
 		},
 	}
 
+	// TODO(refs) fix this interface and make it play nice with cli.Command to reuse and skip
+	// doing runtime.AddRuntime(app)
 	for _, fn := range register.Commands {
 		app.Commands = append(
 			app.Commands,
 			fn(cfg),
 		)
 	}
+
+	// add runtime commands to the binary
+	runtime.AddRuntime(app)
+
+	// add the runtime.Run command to the binary
+	app.Commands = append(
+		app.Commands,
+		runtime.Command(app),
+	)
 
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
