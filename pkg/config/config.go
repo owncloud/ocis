@@ -37,7 +37,8 @@ type Asset struct {
 
 // Phoenix defines the available phoenic configuration.
 type Phoenix struct {
-	Path string
+	Path      string
+	Namespace string
 }
 
 // Config combines all available configuration parts.
