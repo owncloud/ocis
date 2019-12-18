@@ -23,4 +23,5 @@ require (
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
 	google.golang.org/appengine v1.6.1
+	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 )
