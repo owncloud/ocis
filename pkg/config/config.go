@@ -6,6 +6,7 @@ import (
 	konnectd "github.com/owncloud/ocis-konnectd/pkg/config"
 	ocs "github.com/owncloud/ocis-ocs/pkg/config"
 	phoenix "github.com/owncloud/ocis-phoenix/pkg/config"
+	reva "github.com/owncloud/ocis-reva/pkg/config"
 	webdav "github.com/owncloud/ocis-webdav/pkg/config"
 )
 
@@ -59,6 +60,7 @@ type Config struct {
 	OCS      *ocs.Config
 	Phoenix  *phoenix.Config
 	WebDAV   *webdav.Config
+	Reva     *reva.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -70,5 +72,6 @@ func New() *Config {
 		OCS:      ocs.New(),
 		Phoenix:  phoenix.New(),
 		WebDAV:   webdav.New(),
+		Reva:     reva.New(),
 	}
 }

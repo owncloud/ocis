@@ -53,6 +53,7 @@ var Extensions = []string{
 	"graph",
 	"ocs",
 	"webdav",
+	"reva",
 }
 
 // Runtime is a micro' runtime
