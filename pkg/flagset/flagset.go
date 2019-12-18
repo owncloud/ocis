@@ -143,7 +143,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-namespace",
-			Value:       "com.owncloud",
+			Value:       "com.owncloud.web",
 			Usage:       "Set the base namespace for the http namespace",
 			EnvVar:      "PHOENIX_NAMESPACE",
 			Destination: &cfg.Phoenix.Namespace,
