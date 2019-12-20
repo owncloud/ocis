@@ -34,6 +34,8 @@ type Reva struct {
 	HTTP      HTTP
 	GRPC      GRPC
 	JWTSecret string
+	// Used to pass in configs from the ocis repo, multiple reva instances can be started with this
+	Configs map[string]interface{}
 }
 
 // AuthProvider defines the available authprovider configuration.

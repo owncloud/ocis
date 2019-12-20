@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -63,187 +64,202 @@ func Server(cfg *config.Config) cli.Command {
 			// Flags have to be injected all the way down to the go-micro service
 			{
 
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+uuid.String()+".pid")
-
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": cfg.Tracing.Service,
-					},
-					"log": map[string]interface{}{
-						"level": cfg.Reva.LogLevel,
-						//TODO mode = "console" # "console" or "json"
-						//TODO output = "./standalone.log"
-					},
-					"http": map[string]interface{}{
-						"network": cfg.Reva.HTTP.Network,
-						"address": cfg.Reva.HTTP.Addr,
-						"enabled_services": []string{
-							"dataprovider",
-							"prometheus",
-						},
-						"enabled_middlewares": []string{
-							//"cors",
-							"auth",
-						},
-						"middlewares": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"gateway":             cfg.Reva.GRPC.Addr,
-								"auth_type":           "oidc",
-								"credential_strategy": "oidc",
-								"token_strategy":      "header",
-								"token_writer":        "header",
-								"token_manager":       "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
+				if len(cfg.Reva.Configs) < 1 {
+					cfg.Reva.Configs = map[string]interface{}{
+						"default": map[string]interface{}{
+							"core": map[string]interface{}{
+								"max_cpus":             cfg.Reva.MaxCPUs,
+								"tracing_enabled":      cfg.Tracing.Enabled,
+								"tracing_endpoint":     cfg.Tracing.Endpoint,
+								"tracing_collector":    cfg.Tracing.Collector,
+								"tracing_service_name": cfg.Tracing.Service,
+							},
+							"log": map[string]interface{}{
+								"level": cfg.Reva.LogLevel,
+								//TODO mode = "console" # "console" or "json"
+								//TODO output = "./standalone.log"
+							},
+							"http": map[string]interface{}{
+								"network": cfg.Reva.HTTP.Network,
+								"address": cfg.Reva.HTTP.Addr,
+								"enabled_services": []string{
+									"dataprovider",
+									"prometheus",
+								},
+								"enabled_middlewares": []string{
+									//"cors",
+									"auth",
+								},
+								"middlewares": map[string]interface{}{
+									"auth": map[string]interface{}{
+										"gateway":             cfg.Reva.GRPC.Addr,
+										"auth_type":           "oidc",
+										"credential_strategy": "oidc",
+										"token_strategy":      "header",
+										"token_writer":        "header",
+										"token_manager":       "jwt",
+										"token_managers": map[string]interface{}{
+											"jwt": map[string]interface{}{
+												"secret": cfg.Reva.JWTSecret,
+											},
+										},
+										"skip_methods": []string{
+											"/metrics", // for prometheus metrics
+										},
 									},
 								},
-								"skip_methods": []string{
-									"/metrics", // for prometheus metrics
-								},
-							},
-						},
-						"services": map[string]interface{}{
-							"dataprovider": map[string]interface{}{
-								"driver":     "local",
-								"prefix":     "data",
-								"tmp_folder": "/var/tmp/",
-								"drivers": map[string]interface{}{
-									"local": map[string]interface{}{
-										"root": "/var/tmp/reva/data",
-									},
-								},
-							},
-						},
-					},
-					"grpc": map[string]interface{}{
-						"network": cfg.Reva.GRPC.Network,
-						"address": cfg.Reva.GRPC.Addr,
-						"enabled_services": []string{
-							"authprovider",      // provides basic auth
-							"storageprovider",   // handles storage metadata
-							"usershareprovider", // provides user shares
-							"userprovider",      // provides user matadata (used to look up email, displayname etc after a login)
-							"preferences",       // provides user preferences
-							"gateway",           // to lookup services and authenticate requests
-							"authregistry",      // used by the gateway to look up auth providers
-							"storageregistry",   // used by the gateway to look up storage providers
-						},
-						"interceptors": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"token_manager": "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-								"skip_methods": []string{
-									// we need to allow calls that happen during authentication
-									"/cs3.gatewayv0alpha.GatewayService/Authenticate",
-									"/cs3.gatewayv0alpha.GatewayService/WhoAmI",
-									"/cs3.gatewayv0alpha.GatewayService/GetUser",
-									"/cs3.gatewayv0alpha.GatewayService/ListAuthProviders",
-									"/cs3.authregistryv0alpha.AuthRegistryService/ListAuthProviders",
-									"/cs3.authregistryv0alpha.AuthRegistryService/GetAuthProvider",
-									"/cs3.authproviderv0alpha.AuthProviderService/Authenticate",
-									"/cs3.userproviderv0alpha.UserProviderService/GetUser",
-								},
-							},
-						},
-						"services": map[string]interface{}{
-							"gateway": map[string]interface{}{
-								"authregistrysvc":               cfg.Reva.GRPC.Addr,
-								"storageregistrysvc":            cfg.Reva.GRPC.Addr,
-								"appregistrysvc":                cfg.Reva.GRPC.Addr,
-								"preferencessvc":                cfg.Reva.GRPC.Addr,
-								"usershareprovidersvc":          cfg.Reva.GRPC.Addr,
-								"publicshareprovidersvc":        cfg.Reva.GRPC.Addr,
-								"ocmshareprovidersvc":           cfg.Reva.GRPC.Addr,
-								"userprovidersvc":               cfg.Reva.GRPC.Addr,
-								"commit_share_to_storage_grant": true,
-								"datagateway":                   "http://" + cfg.Reva.HTTP.Addr + "/data",
-								"transfer_shared_secret":        "replace-me-with-a-transfer-secret",
-								"transfer_expires":              6, // give it a moment
-								"token_manager":                 "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-							"authregistry": map[string]interface{}{
-								"driver": "static",
-								"drivers": map[string]interface{}{
-									"static": map[string]interface{}{
-										"rules": map[string]interface{}{
-											//"basic": "localhost:9999",
-											"oidc": cfg.Reva.GRPC.Addr,
+								"services": map[string]interface{}{
+									"dataprovider": map[string]interface{}{
+										"driver":     "local",
+										"prefix":     "data",
+										"tmp_folder": "/var/tmp/",
+										"drivers": map[string]interface{}{
+											"local": map[string]interface{}{
+												"root": "/var/tmp/reva/data",
+											},
 										},
 									},
 								},
 							},
-							"storageregistry": map[string]interface{}{
-								"driver": "static",
-								"drivers": map[string]interface{}{
-									"static": map[string]interface{}{
-										"rules": map[string]interface{}{
-											"/":                                    cfg.Reva.GRPC.Addr,
-											"123e4567-e89b-12d3-a456-426655440000": cfg.Reva.GRPC.Addr,
+							"grpc": map[string]interface{}{
+								"network": cfg.Reva.GRPC.Network,
+								"address": cfg.Reva.GRPC.Addr,
+								"enabled_services": []string{
+									"authprovider",      // provides basic auth
+									"storageprovider",   // handles storage metadata
+									"usershareprovider", // provides user shares
+									"userprovider",      // provides user matadata (used to look up email, displayname etc after a login)
+									"preferences",       // provides user preferences
+									"gateway",           // to lookup services and authenticate requests
+									"authregistry",      // used by the gateway to look up auth providers
+									"storageregistry",   // used by the gateway to look up storage providers
+								},
+								"interceptors": map[string]interface{}{
+									"auth": map[string]interface{}{
+										"token_manager": "jwt",
+										"token_managers": map[string]interface{}{
+											"jwt": map[string]interface{}{
+												"secret": cfg.Reva.JWTSecret,
+											},
+										},
+										"skip_methods": []string{
+											// we need to allow calls that happen during authentication
+											"/cs3.gatewayv0alpha.GatewayService/Authenticate",
+											"/cs3.gatewayv0alpha.GatewayService/WhoAmI",
+											"/cs3.gatewayv0alpha.GatewayService/GetUser",
+											"/cs3.gatewayv0alpha.GatewayService/ListAuthProviders",
+											"/cs3.authregistryv0alpha.AuthRegistryService/ListAuthProviders",
+											"/cs3.authregistryv0alpha.AuthRegistryService/GetAuthProvider",
+											"/cs3.authproviderv0alpha.AuthProviderService/Authenticate",
+											"/cs3.userproviderv0alpha.UserProviderService/GetUser",
 										},
 									},
 								},
-							},
-							"authprovider": map[string]interface{}{
-								"auth_manager": "oidc",
-								"auth_managers": map[string]interface{}{
-									"oidc": map[string]interface{}{
-										"provider": cfg.AuthProvider.Provider,
-										"insecure": cfg.AuthProvider.Insecure,
-									},
-								},
-								"userprovidersvc": cfg.Reva.GRPC.Addr,
-							},
-							"userprovider": map[string]interface{}{
-								"driver": "demo", // TODO use graph api
-								/*
-									"drivers": map[string]interface{}{
-										"graph": map[string]interface{}{
-											"provider": cfg.AuthProvider.Provider,
-											"insecure": cfg.AuthProvider.Insecure,
+								"services": map[string]interface{}{
+									"gateway": map[string]interface{}{
+										"authregistrysvc":               cfg.Reva.GRPC.Addr,
+										"storageregistrysvc":            cfg.Reva.GRPC.Addr,
+										"appregistrysvc":                cfg.Reva.GRPC.Addr,
+										"preferencessvc":                cfg.Reva.GRPC.Addr,
+										"usershareprovidersvc":          cfg.Reva.GRPC.Addr,
+										"publicshareprovidersvc":        cfg.Reva.GRPC.Addr,
+										"ocmshareprovidersvc":           cfg.Reva.GRPC.Addr,
+										"userprovidersvc":               cfg.Reva.GRPC.Addr,
+										"commit_share_to_storage_grant": true,
+										"datagateway":                   "http://" + cfg.Reva.HTTP.Addr + "/data",
+										"transfer_shared_secret":        "replace-me-with-a-transfer-secret",
+										"transfer_expires":              6, // give it a moment
+										"token_manager":                 "jwt",
+										"token_managers": map[string]interface{}{
+											"jwt": map[string]interface{}{
+												"secret": cfg.Reva.JWTSecret,
+											},
 										},
 									},
-								*/
-							},
-							"usershareprovider": map[string]interface{}{
-								"driver": "memory",
-							},
-							"storageprovider": map[string]interface{}{
-								"mount_path":         "/",
-								"mount_id":           "123e4567-e89b-12d3-a456-426655440000",
-								"data_server_url":    "http://" + cfg.Reva.HTTP.Addr + "/data",
-								"expose_data_server": true,
-								"available_checksums": map[string]interface{}{
-									"md5":   100,
-									"unset": 1000,
-								},
-								"driver": "local",
-								"drivers": map[string]interface{}{
-									"local": map[string]interface{}{
-										"root": "/var/tmp/reva/data",
+									"authregistry": map[string]interface{}{
+										"driver": "static",
+										"drivers": map[string]interface{}{
+											"static": map[string]interface{}{
+												"rules": map[string]interface{}{
+													//"basic": "localhost:9999",
+													"oidc": cfg.Reva.GRPC.Addr,
+												},
+											},
+										},
+									},
+									"storageregistry": map[string]interface{}{
+										"driver": "static",
+										"drivers": map[string]interface{}{
+											"static": map[string]interface{}{
+												"rules": map[string]interface{}{
+													"/":                                    cfg.Reva.GRPC.Addr,
+													"123e4567-e89b-12d3-a456-426655440000": cfg.Reva.GRPC.Addr,
+												},
+											},
+										},
+									},
+									"authprovider": map[string]interface{}{
+										"auth_manager": "oidc",
+										"auth_managers": map[string]interface{}{
+											"oidc": map[string]interface{}{
+												"provider": cfg.AuthProvider.Provider,
+												"insecure": cfg.AuthProvider.Insecure,
+											},
+										},
+										"userprovidersvc": cfg.Reva.GRPC.Addr,
+									},
+									"userprovider": map[string]interface{}{
+										"driver": "demo", // TODO use graph api
+										/*
+											"drivers": map[string]interface{}{
+												"graph": map[string]interface{}{
+													"provider": cfg.AuthProvider.Provider,
+													"insecure": cfg.AuthProvider.Insecure,
+												},
+											},
+										*/
+									},
+									"usershareprovider": map[string]interface{}{
+										"driver": "memory",
+									},
+									"storageprovider": map[string]interface{}{
+										"mount_path":         "/",
+										"mount_id":           "123e4567-e89b-12d3-a456-426655440000",
+										"data_server_url":    "http://" + cfg.Reva.HTTP.Addr + "/data",
+										"expose_data_server": true,
+										"available_checksums": map[string]interface{}{
+											"md5":   100,
+											"unset": 1000,
+										},
+										"driver": "local",
+										"drivers": map[string]interface{}{
+											"local": map[string]interface{}{
+												"root": "/var/tmp/reva/data",
+											},
+										},
 									},
 								},
 							},
 						},
-					},
+					}
 				}
 				gr.Add(func() error {
-					// TODO micro knows nothing about reva
-					runtime.Run(rcfg, pidFile)
+					var wg sync.WaitGroup
+					for k, conf := range cfg.Reva.Configs {
+						wg.Add(1)
+						go func(wg *sync.WaitGroup, config string, c map[string]interface{}) {
+							uuid := uuid.Must(uuid.NewV4())
+							pidFile := path.Join(os.TempDir(), "revad-"+uuid.String()+".pid")
+							logger.Info().
+								Str("config", config).
+								Str("server", "reva").
+								Msg("Starting server")
+							// TODO register reva as a service in micro
+							runtime.Run(c, pidFile)
+							wg.Done()
+						}(&wg, k, conf.(map[string]interface{}))
+					}
+					wg.Wait()
 					return nil
 				}, func(_ error) {
 					logger.Info().
