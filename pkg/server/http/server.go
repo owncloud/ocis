@@ -13,7 +13,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	service := http.NewService(
 		http.Logger(options.Logger),
-		http.Namespace("go.micro.web"),
+		http.Namespace(options.Namespace),
 		http.Name("ocs"),
 		http.Version(version.String),
 		http.Address(options.Config.HTTP.Addr),
