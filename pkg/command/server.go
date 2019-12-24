@@ -135,7 +135,7 @@ func Server(cfg *config.Config) cli.Command {
 				server, err := http.Server(
 					http.Logger(logger),
 					http.Context(ctx),
-					http.Namespace(cfg.Phoenix.Namespace),
+					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
 					http.Metrics(metrics),
 					http.Flags(flagset.RootWithConfig(cfg)),
