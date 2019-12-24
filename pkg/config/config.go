@@ -17,8 +17,9 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string
-	Root string
+	Addr      string
+	Root      string
+	Namespace string
 }
 
 // Tracing defines the available tracing configuration.
@@ -37,8 +38,7 @@ type Asset struct {
 
 // Phoenix defines the available phoenic configuration.
 type Phoenix struct {
-	Path      string
-	Namespace string
+	Path string
 }
 
 // Config combines all available configuration parts.

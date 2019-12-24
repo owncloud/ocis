@@ -128,6 +128,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
+			Name:        "http-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for the http namespace",
+			EnvVar:      "PHOENIX_NAMESPACE",
+			Destination: &cfg.HTTP.Namespace,
+		},
+		&cli.StringFlag{
 			Name:        "asset-path",
 			Value:       "",
 			Usage:       "Path to custom assets",
@@ -140,13 +147,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Path to phoenix config",
 			EnvVar:      "PHOENIX_WEB_CONFIG",
 			Destination: &cfg.Phoenix.Path,
-		},
-		&cli.StringFlag{
-			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
-			Usage:       "Set the base namespace for the http namespace",
-			EnvVar:      "PHOENIX_NAMESPACE",
-			Destination: &cfg.Phoenix.Namespace,
 		},
 	}
 }
