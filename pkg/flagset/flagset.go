@@ -121,6 +121,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
+			Name:        "http-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for the http namespace",
+			EnvVar:      "OCS_NAMESPACE",
+			Destination: &cfg.HTTP.Namespace,
+		},
+		&cli.StringFlag{
 			Name:        "http-root",
 			Value:       "/",
 			Usage:       "Root path of http server",
