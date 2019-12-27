@@ -129,6 +129,9 @@ If you prefer to configure the service with commandline flags you can see the av
 --http-addr
 : Address to bind http server, defaults to `0.0.0.0:9115`
 
+--http-namespace
+: Namespace for internal services communication, defaults to `com.owncloud.web`
+
 --http-root
 : Root path of http server, defaults to `/`
 
