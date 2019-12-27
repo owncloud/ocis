@@ -17,8 +17,9 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string
-	Root string
+	Addr      string
+	Namespace string
+	Root      string
 }
 
 // Tracing defines the available tracing configuration.

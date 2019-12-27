@@ -127,5 +127,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "KONNECTD_HTTP_ROOT",
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name:        "http-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for service discovery",
+			EnvVar:      "KONNECTD_HTTP_NAMESPACE",
+			Destination: &cfg.HTTP.Namespace,
+		},
 	}
 }
