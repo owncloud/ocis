@@ -52,6 +52,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
+	apps := cli.StringSlice(cfg.Phoenix.Config.Apps)
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
@@ -147,6 +148,69 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Path to phoenix config",
 			EnvVar:      "PHOENIX_WEB_CONFIG",
 			Destination: &cfg.Phoenix.Path,
+		},
+		&cli.StringFlag{
+			Name:        "web-config-server",
+			Value:       "http://localhost:9135",
+			Usage:       "Server URL",
+			EnvVar:      "PHOENIX_WEB_CONFIG_SERVER",
+			Destination: &cfg.Phoenix.Config.Server,
+		},
+		&cli.StringFlag{
+			Name:        "web-config-theme",
+			Value:       "owncloud",
+			Usage:       "Theme",
+			EnvVar:      "PHOENIX_WEB_CONFIG_THEME",
+			Destination: &cfg.Phoenix.Config.Theme,
+		},
+		&cli.StringFlag{
+			Name:        "web-config-version",
+			Value:       "0.1.0",
+			Usage:       "Version",
+			EnvVar:      "PHOENIX_WEB_CONFIG_VERSION",
+			Destination: &cfg.Phoenix.Config.Version,
+		},
+		&cli.StringSliceFlag{
+			Name:   "web-config-apps",
+			Value:  &apps,
+			Usage:  "Use multiple times to provide multiple apps",
+			EnvVar: "PHOENIX_APPS",
+		},
+		// TODO EXTERNAL APPS?
+		&cli.StringFlag{
+			Name:        "oidc-metadata-url",
+			Value:       "http://localhost:9130/.well-known/openid-configuration",
+			Usage:       "OpenID Connect metadata URL",
+			EnvVar:      "PHOENIX_OIDC_METADATA_URL",
+			Destination: &cfg.Phoenix.Config.OpenIDConnect.MetadataURL,
+		},
+		&cli.StringFlag{
+			Name:        "oidc-authority",
+			Value:       "http://localhost:9130",
+			Usage:       "OpenID Connect authority", // TODO rename to Issuer
+			EnvVar:      "PHOENIX_OIDC_AUTHORITY",
+			Destination: &cfg.Phoenix.Config.OpenIDConnect.Authority,
+		},
+		&cli.StringFlag{
+			Name:        "oidc-client-id",
+			Value:       "phoenix",
+			Usage:       "OpenID Connect client ID",
+			EnvVar:      "PHOENIX_OIDC_CLIENT_ID",
+			Destination: &cfg.Phoenix.Config.OpenIDConnect.ClientID,
+		},
+		&cli.StringFlag{
+			Name:        "oidc-response-type",
+			Value:       "code",
+			Usage:       "OpenID Connect response type",
+			EnvVar:      "PHOENIX_OIDC_RESPONSE_TYPE",
+			Destination: &cfg.Phoenix.Config.OpenIDConnect.ResponseType,
+		},
+		&cli.StringFlag{
+			Name:        "oidc-scope",
+			Value:       "openid profile email",
+			Usage:       "OpenID Connect scope",
+			EnvVar:      "PHOENIX_OIDC_SCOPE",
+			Destination: &cfg.Phoenix.Config.OpenIDConnect.Scope,
 		},
 	}
 }
