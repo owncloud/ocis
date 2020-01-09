@@ -7,6 +7,7 @@ import (
 	"github.com/micro/cli"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
+	"github.com/owncloud/ocis/pkg/register"
 )
 
 // Health is the entrypoint for the health command.
@@ -46,4 +47,8 @@ func Health(cfg *config.Config) cli.Command {
 			return nil
 		},
 	}
+}
+
+func init() {
+	register.AddCommand(Health)
 }
