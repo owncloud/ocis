@@ -1,3 +1,5 @@
+// +build !simple
+
 package command
 
 import (
@@ -14,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/pkg/micro/runtime"
+	"github.com/owncloud/ocis/pkg/register"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -134,4 +137,8 @@ func Server(cfg *config.Config) cli.Command {
 			return nil
 		},
 	}
+}
+
+func init() {
+	register.AddCommand(Server)
 }
