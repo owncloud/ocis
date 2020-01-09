@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -56,19 +57,30 @@ func (p Phoenix) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p.mux.ServeHTTP(w, r)
 }
 
-// Config implements the Service interface.
-func (p Phoenix) Config(w http.ResponseWriter, r *http.Request) {
-	if _, err := os.Stat(p.config.Phoenix.Path); os.IsNotExist(err) {
+func (p Phoenix) getPayload() (payload []byte, err error) {
+
+	if p.config.Phoenix.Path == "" {
+		// render dynamically using config
+
+		// make apps render as empty array if it is empty
+		// TODO remove once https://github.com/golang/go/issues/27589 is fixed
+		if len(p.config.Phoenix.Config.Apps) == 0 {
+			p.config.Phoenix.Config.Apps = make([]string, 0)
+		}
+
+		return json.Marshal(p.config.Phoenix.Config)
+	}
+
+	// try loading from file
+	if _, err = os.Stat(p.config.Phoenix.Path); os.IsNotExist(err) {
 		p.logger.Error().
 			Err(err).
 			Str("config", p.config.Phoenix.Path).
 			Msg("Phoenix config doesn't exist")
-
-		http.Error(w, ErrConfigInvalid, http.StatusUnprocessableEntity)
 		return
 	}
 
-	payload, err := ioutil.ReadFile(p.config.Phoenix.Path)
+	payload, err = ioutil.ReadFile(p.config.Phoenix.Path)
 
 	if err != nil {
 		p.logger.Error().
@@ -76,6 +88,15 @@ func (p Phoenix) Config(w http.ResponseWriter, r *http.Request) {
 			Str("config", p.config.Phoenix.Path).
 			Msg("Failed to read custom config")
 
+	}
+	return
+}
+
+// Config implements the Service interface.
+func (p Phoenix) Config(w http.ResponseWriter, r *http.Request) {
+
+	payload, err := p.getPayload()
+	if err != nil {
 		http.Error(w, ErrConfigInvalid, http.StatusUnprocessableEntity)
 		return
 	}

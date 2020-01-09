@@ -80,6 +80,38 @@ PHOENIX_ASSET_PATH
 PHOENIX_WEB_CONFIG
 : Path to phoenix config, empty default value
 
+PHOENIX_WEB_CONFIG_SERVER
+: Server URL, defaults to `http://localhost:9135`
+
+PHOENIX_WEB_CONFIG_THEME
+: Theme, defaults to `owncloud`
+
+PHOENIX_WEB_CONFIG_VERSION
+: Version, defaults to `0.1.0`
+
+PHOENIX_APPS
+: Use multiple times to provide multiple apps
+
+PHOENIX_EXTERNAL_APPS
+: Not supported yet, specify a config.json file via `PHOENIX_WEB_CONFIG`
+
+PHOENIX_OIDC_METADATA_URL
+: OpenID Connect metadata URL, defaults to `http://localhost:9130/.well-known/openid-configuration`
+
+PHOENIX_OIDC_AUTHORITY
+: OpenID Connect authority, defaults to `http://localhost:9130`
+
+PHOENIX_OIDC_CLIENT_ID
+: OpenID Connect client ID, defaults to `phoenix`
+
+PHOENIX_OIDC_RESPONSE_TYPE
+: OpenID Connect response type, defaults to `code`
+
+PHOENIX_OIDC_SCOPE
+: OpenID Connect scope, defaults to `openid profile email`
+
+In case you want to render any additional properties in the config.json you can provide a custom config.json using eg. `PHOENIX_WEB_CONFIG=/path/to/config.json ocis-phoenix server`
+
 ##### Health
 
 PHOENIX_DEBUG_ADDR
@@ -143,6 +175,35 @@ If you prefer to configure the service with commandline flags you can see the av
 
 --web-config
 : Path to phoenix config, empty default value
+
+--web-config-server
+: Server URL, defaults to `http://localhost:9135`
+
+--web-config-theme
+: Theme, defaults to `owncloud`
+
+--web-config-version
+: Version, defaults to `0.1.0`
+
+--web-config-apps
+: Use multiple times to provide multiple apps
+
+--oidc-metadata-url
+: OpenID Connect metadata URL, defaults to `http://localhost:9130/.well-known/openid-configuration`
+
+--oidc-authority
+: OpenID Connect authority, defaults to `http://localhost:9130`
+
+--oidc-client-id
+: OpenID Connect client ID, defaults to `phoenix`
+
+--oidc-response-type
+: OpenID Connect response type, defaults to `code`
+
+--oidc-scope
+: OpenID Connect scope, defaults to `openid profile email`
+
+In case you want to render any additional properties in the config.json you can provide a custom config.json using  eg. `ocis-phoenix server --web-config=/path/to/config.json`
 
 ##### Health
 
