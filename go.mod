@@ -14,7 +14,7 @@ require (
 	github.com/owncloud/ocis-hello v0.0.0-20200104020928-c9b97a86a3e9
 	github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337
 	github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013
-	github.com/owncloud/ocis-phoenix v0.0.0-20191224105637-984f99d54c4c
+	github.com/owncloud/ocis-phoenix v0.0.0-20200109152733-819c7bec7b70
 	github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596
 	github.com/owncloud/ocis-reva v0.0.0-20191220070520-aabd71f6d16b
 	github.com/owncloud/ocis-webdav v0.0.0-20191227185841-c5c77e241249

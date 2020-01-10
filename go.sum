@@ -606,6 +606,8 @@ github.com/onsi/ginkgo v1.10.3/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+
 github.com/onsi/gomega v0.0.0-20170829124025-dcabb60a477c/go.mod h1:C1qb7wdrVGGVU+Z6iS04AVkA3Q65CEZX59MT0QO5uiA=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.7.0/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
+github.com/onsi/gomega v1.7.1 h1:K0jcRCwNQM3vFGh1ppMtDh/+7ApJrjldlX8fA0jDTLQ=
+github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/op/go-logging v0.0.0-20160315200505-970db520ece7/go.mod h1:HzydrMdWErDVzsI23lYNej1Htcns9BCg93Dk0bBINWk=
 github.com/opencontainers/go-digest v0.0.0-20180430190053-c9281466c8b2/go.mod h1:cMLVZDEM3+U2I4VmLI6N8jQYUd2OVphdqWwCJHrFt2s=
 github.com/opencontainers/go-digest v1.0.0-rc1/go.mod h1:cMLVZDEM3+U2I4VmLI6N8jQYUd2OVphdqWwCJHrFt2s=
@@ -634,8 +636,8 @@ github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337 h1:ZGqMcrWZ
 github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337/go.mod h1:b9DxRrJvAsmFzoB/ETqNPAaRIGlkUwXSCM0Z7rF84m4=
 github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013 h1:NZnmuAzcXmOM7AXgFVjdWFBQHzM1LpjXxaZOTriTe6U=
 github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013/go.mod h1:uxMnXanRGabyExSbqGTkMTWVriv3HrdSivUfh2lxozE=
-github.com/owncloud/ocis-phoenix v0.0.0-20191224105637-984f99d54c4c h1:RPx923DaRpgwsz2fXeSgnI1/GojAdybpE/sDczQf+5A=
-github.com/owncloud/ocis-phoenix v0.0.0-20191224105637-984f99d54c4c/go.mod h1:xPa4BmtS+Hcsgx5veyfNxeLnjqitXJ7YRWLR2ZJg91A=
+github.com/owncloud/ocis-phoenix v0.0.0-20200109152733-819c7bec7b70 h1:ARqN9hmp/2EojDgWXqAY+k7oDizJ9PzlKUczrCtTdkU=
+github.com/owncloud/ocis-phoenix v0.0.0-20200109152733-819c7bec7b70/go.mod h1:xPa4BmtS+Hcsgx5veyfNxeLnjqitXJ7YRWLR2ZJg91A=
 github.com/owncloud/ocis-pkg v1.1.0/go.mod h1:EfbeXoe60Me2lB/AWjYl8UFNv4isqCPP6lokd5R7nyM=
 github.com/owncloud/ocis-pkg v1.2.0 h1:eP0AOSEXAgiblL2yOpNOmriKhDXN+mai+4belBJRkWU=
 github.com/owncloud/ocis-pkg v1.2.0/go.mod h1:EfbeXoe60Me2lB/AWjYl8UFNv4isqCPP6lokd5R7nyM=
@@ -1118,6 +1120,7 @@ gopkg.in/square/go-jose.v2 v2.1.9/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76
 gopkg.in/square/go-jose.v2 v2.2.2/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
 gopkg.in/square/go-jose.v2 v2.3.1 h1:SK5KegNXmKmqE342YYN2qPHEnUYeoMiXXl1poUlI+o4=
 gopkg.in/square/go-jose.v2 v2.3.1/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
+gopkg.in/square/go-jose.v2 v2.4.0/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
 gopkg.in/src-d/go-billy.v4 v4.3.2/go.mod h1:nDjArDMp+XMs1aFAESLRjfGSgfvoYN0hDfzEk0GjC98=
 gopkg.in/src-d/go-git-fixtures.v3 v3.5.0/go.mod h1:dLBcvytrw/TYZsNTWCnkNF2DSIlzWYqTe3rJR56Ac7g=
 gopkg.in/src-d/go-git.v4 v4.13.1/go.mod h1:nx5NYcxdKxq5fpltdHnPa2Exj4Sx0EclMWZQbYDu2z8=
