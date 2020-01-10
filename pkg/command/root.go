@@ -74,15 +74,8 @@ func Execute() error {
 
 			return nil
 		},
-
-		Commands: []cli.Command{
-			Server(cfg),
-			Health(cfg),
-		},
 	}
 
-	// TODO(refs) fix this interface and make it play nice with cli.Command to reuse and skip
-	// doing runtime.AddRuntime(app)
 	for _, fn := range register.Commands {
 		app.Commands = append(
 			app.Commands,
@@ -90,10 +83,7 @@ func Execute() error {
 		)
 	}
 
-	// add runtime commands to the binary
 	runtime.AddRuntime(app)
-
-	// add the runtime.Run command to the binary
 	app.Commands = append(
 		app.Commands,
 		runtime.Command(app),

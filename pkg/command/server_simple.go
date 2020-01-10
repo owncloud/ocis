@@ -1,4 +1,4 @@
-// +build !simple
+// +build simple
 
 package command
 
@@ -14,8 +14,13 @@ import (
 	"github.com/owncloud/ocis/pkg/tracing"
 )
 
-// Server is the entrypoint for the server command.
-func Server(cfg *config.Config) cli.Command {
+var (
+	// SimpleRuntimeServices declares which services will be started for the fullstack server
+	SimpleRuntimeServices = []string{"hello", "konnectd", "phoenix"}
+)
+
+// Simple is the entrypoint for the server command. It is the `ocis server` subcommand overloaded with a different set of services
+func Simple(cfg *config.Config) cli.Command {
 	return cli.Command{
 		Name:     "server",
 		Usage:    "Start fullstack server",
@@ -36,16 +41,15 @@ func Server(cfg *config.Config) cli.Command {
 			}
 
 			runtime := runtime.New(
-				runtime.Services(append(runtime.RuntimeServices, runtime.Extensions...)),
 				runtime.Logger(logger),
+				runtime.Services(append(runtime.RuntimeServices, SimpleRuntimeServices...)),
 				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 			)
 
-			// fork uses the micro runtime to fork go-micro services
-			runtime.Start()
-
-			// trap blocks until a kill signal is sent
-			runtime.Trap()
+			{
+				runtime.Start()
+				runtime.Trap()
+			}
 
 			return nil
 		},
@@ -53,5 +57,5 @@ func Server(cfg *config.Config) cli.Command {
 }
 
 func init() {
-	register.AddCommand(Server)
+	register.AddCommand(Simple)
 }
