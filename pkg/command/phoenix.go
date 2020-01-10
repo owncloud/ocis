@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/micro/cli"
 	"github.com/owncloud/ocis-phoenix/pkg/command"
-	svcconfig "github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-phoenix/pkg/flagset"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/register"
@@ -25,17 +24,6 @@ func PhoenixCommand(cfg *config.Config) cli.Command {
 			)
 		},
 	}
-}
-
-func configurePhoenix(cfg *config.Config) *svcconfig.Config {
-	cfg.Phoenix.Log.Level = cfg.Log.Level
-	cfg.Phoenix.Log.Pretty = cfg.Log.Pretty
-	cfg.Phoenix.Log.Color = cfg.Log.Color
-	cfg.Phoenix.Tracing.Enabled = false
-	cfg.Phoenix.HTTP.Addr = "localhost:9100"
-	cfg.Phoenix.HTTP.Root = "/"
-
-	return cfg.Phoenix
 }
 
 func init() {
