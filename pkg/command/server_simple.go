@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// SimpleRuntimeServices declares which services will be started for the fullstack server
 	SimpleRuntimeServices = []string{"hello", "konnectd", "phoenix"}
 )
 
