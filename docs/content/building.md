@@ -14,6 +14,27 @@ cd ocis
 
 All required tool besides Go itself and make are bundled or getting automatically installed within the `GOPATH`. All commands to build this project are part of our `Makefile`.
 
+### Simple Ocis
+
+Building the simple ocis binary:
+
+```console
+TAGS=simple make build
+```
+
+The artifact lives in `/bin/ocis`
+
+The generated simple ocis binary is a subset of the ocis command with a restricted set of services meant for ease up development. The services included are
+
+
+```
+ocis-hello
+phoenix
+konnectd
+devldap
+micro's own services
+```
+
 ### Backend
 
 {{< highlight txt >}}
