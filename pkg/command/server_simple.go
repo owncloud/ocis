@@ -31,7 +31,7 @@ func Simple(cfg *config.Config) cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.WithTracing(cfg); err != nil {
+			if err := tracing.Start(cfg); err != nil {
 				return err
 			}
 

@@ -14,8 +14,8 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// WithTracing undocumented
-func WithTracing(cfg *config.Config) error {
+// Start undocumented
+func Start(cfg *config.Config) error {
 	logger := NewLogger(cfg)
 
 	if cfg.Tracing.Enabled {
