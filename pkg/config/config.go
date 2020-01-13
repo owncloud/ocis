@@ -65,7 +65,7 @@ type OIDC struct {
 //	  }
 //  }
 type ExternalApp struct {
-	Name string `json:"name,omitempty"`
+	ID   string `json:"id,omitempty"`
 	Path string `json:"path,omitempty"`
 	// Config is completely dynamic, because it depends on the extension
 	Config map[string]interface{} `json:"config,omitempty"`
