@@ -1,5 +1,3 @@
-// +build !simple
-
 package command
 
 import (
@@ -18,8 +16,10 @@ func RevaCommand(cfg *config.Config) cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Reva),
 		Action: func(c *cli.Context) error {
+			scfg := configureReva(cfg)
+
 			return cli.HandleAction(
-				command.Server(cfg.Reva).Action,
+				command.Server(scfg).Action,
 				c,
 			)
 		},

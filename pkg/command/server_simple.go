@@ -16,7 +16,7 @@ import (
 
 var (
 	// SimpleRuntimeServices declares which services will be started for the fullstack server
-	SimpleRuntimeServices = []string{"hello", "konnectd", "phoenix"}
+	SimpleRuntimeServices = []string{"hello", "phoenix", "reva"}
 )
 
 // Simple is the entrypoint for the server command. It is the `ocis server` subcommand overloaded with a different set of services
