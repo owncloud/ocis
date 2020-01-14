@@ -629,6 +629,8 @@ github.com/owncloud/ocis-hello v0.0.0-20200104020928-c9b97a86a3e9 h1:BAQw8hKbjgh
 github.com/owncloud/ocis-hello v0.0.0-20200104020928-c9b97a86a3e9/go.mod h1:hrXqmloO2NHbdkDTPSNneobwzQgki8CUuQD8fqjkPv8=
 github.com/owncloud/ocis-hello v0.0.0-20200114071351-901a0c06b94d h1:PJGhG1ZOw0DKQPZc5DO0C8xz3Y7VRxiTELJZlYBRMsE=
 github.com/owncloud/ocis-hello v0.0.0-20200114071351-901a0c06b94d/go.mod h1:hrXqmloO2NHbdkDTPSNneobwzQgki8CUuQD8fqjkPv8=
+github.com/owncloud/ocis-hello v0.0.0-20200114093148-2205c2745838 h1:kG/H/Ey6sqU6xIzsDtZEpR321NlyPrsxPKrDAe9sbY0=
+github.com/owncloud/ocis-hello v0.0.0-20200114093148-2205c2745838/go.mod h1:hrXqmloO2NHbdkDTPSNneobwzQgki8CUuQD8fqjkPv8=
 github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337 h1:ZGqMcrWZgGoH+jztjSFvzAJGw3lsG2/jjZQioV4ZcDY=
 github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337/go.mod h1:b9DxRrJvAsmFzoB/ETqNPAaRIGlkUwXSCM0Z7rF84m4=
 github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013 h1:NZnmuAzcXmOM7AXgFVjdWFBQHzM1LpjXxaZOTriTe6U=
