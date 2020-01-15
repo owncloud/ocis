@@ -23,13 +23,6 @@ func configurePhoenix(cfg *config.Config) *svcconfig.Config {
 	if len(os.Getenv("PHOENIX_WEB_CONFIG_SERVER")) == 0 {
 		os.Setenv("PHOENIX_WEB_CONFIG_SERVER", "http://localhost:20080")
 	}
-	cfg.Phoenix.Phoenix.Config.Apps = []string{
-		//"draw-io",
-		"files",
-		"markdown-editor",
-		//"media-viewer",
-		"pdf-viewer",
-	}
 
 	return cfg.Phoenix
 }
