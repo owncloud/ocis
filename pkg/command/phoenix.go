@@ -4,6 +4,7 @@ import (
 	"github.com/micro/cli"
 	"github.com/owncloud/ocis-phoenix/pkg/command"
 	"github.com/owncloud/ocis-phoenix/pkg/flagset"
+	"github.com/owncloud/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/register"
 )
@@ -17,7 +18,7 @@ func PhoenixCommand(cfg *config.Config) cli.Command {
 		Flags:    flagset.ServerWithConfig(cfg.Phoenix),
 		Action: func(c *cli.Context) error {
 			if c.String("web-config-apps") != "" {
-				cfg.Phoenix.Phoenix.Config.Apps = flagset.ParseAppsFlag(c.String("web-config-apps"))
+				cfg.Phoenix.Phoenix.Config.Apps = conversions.StringToSliceString(c.String("web-config-apps"), ",")
 			}
 
 			scfg := configurePhoenix(cfg)
