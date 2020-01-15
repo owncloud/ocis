@@ -52,7 +52,6 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
-	apps := cli.StringSlice(cfg.Phoenix.Config.Apps)
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
