@@ -170,11 +170,11 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "PHOENIX_WEB_CONFIG_VERSION",
 			Destination: &cfg.Phoenix.Config.Version,
 		},
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:   "web-config-apps",
-			Value:  &apps,
+			Value:  "",
 			Usage:  "Use multiple times to provide multiple apps",
-			EnvVar: "PHOENIX_APPS",
+			EnvVar: "PHOENIX_WEB_CONFIG_APPS",
 		},
 		// TODO EXTERNAL APPS?
 		&cli.StringFlag{
