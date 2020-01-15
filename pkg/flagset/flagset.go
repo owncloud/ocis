@@ -172,7 +172,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:   "web-config-apps",
 			Value:  "",
-			Usage:  "Use multiple times to provide multiple apps",
+			Usage:  `String with comma separated values. --web-config-apps "pdf-viewer, files, draw-io"`,
 			EnvVar: "PHOENIX_WEB_CONFIG_APPS",
 		},
 		// TODO EXTERNAL APPS?
