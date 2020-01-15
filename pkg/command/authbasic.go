@@ -16,12 +16,12 @@ import (
 	"github.com/owncloud/ocis-reva/pkg/server/debug"
 )
 
-// AuthProvider is the entrypoint for the authprovider command.
-func AuthProvider(cfg *config.Config) cli.Command {
+// AuthBasic is the entrypoint for the auth-basic command.
+func AuthBasic(cfg *config.Config) cli.Command {
 	return cli.Command{
-		Name:  "authprovider",
-		Usage: "Start authprovider server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Name:  "auth-basic",
+		Usage: "Start reva authprovider for basic auth",
+		Flags: flagset.AuthBasicWithConfig(cfg),
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
@@ -61,20 +61,19 @@ func AuthProvider(cfg *config.Config) cli.Command {
 
 			defer cancel()
 
-			// TODO Flags have to be injected all the way down to the go-micro service
 			{
 
 				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+uuid.String()+".pid")
+				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus": cfg.Reva.MaxCPUs,
+						"max_cpus": cfg.Reva.AuthBasic.MaxCPUs,
 					},
 					"grpc": map[string]interface{}{
-						"network":          cfg.Reva.GRPC.Network,
-						"address":          cfg.Reva.GRPC.Addr,
-						"enabled_services": []string{"authprovider"},
+						"network": cfg.Reva.AuthBasic.Network,
+						"address": cfg.Reva.AuthBasic.Addr,
+						// TODO extract interceptor config, which is the same for all grpc services
 						"interceptors": map[string]interface{}{
 							"auth": map[string]interface{}{
 								"token_manager": "jwt",
@@ -83,34 +82,45 @@ func AuthProvider(cfg *config.Config) cli.Command {
 										"secret": cfg.Reva.JWTSecret,
 									},
 								},
-								"skip_methods": []string{
-									// we need to allow calls that happen during authentication
-									"/cs3.authproviderv0alpha.AuthProviderService/Authenticate",
-									"/cs3.userproviderv0alpha.UserProviderService/GetUser",
-								},
 							},
 						},
+						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"authprovider": map[string]interface{}{
-								"auth_manager": "oidc",
+								"auth_manager": cfg.Reva.Users.Driver,
 								"auth_managers": map[string]interface{}{
-									"oidc": map[string]interface{}{
-										"provider": cfg.AuthProvider.Provider,
-										"insecure": cfg.AuthProvider.Insecure,
+									"json": map[string]interface{}{
+										"users": cfg.Reva.Users.JSON,
+									},
+									"ldap": map[string]interface{}{
+										"hostname":      cfg.Reva.LDAP.Hostname,
+										"port":          cfg.Reva.LDAP.Port,
+										"base_dn":       cfg.Reva.LDAP.BaseDN,
+										"userfilter":    cfg.Reva.LDAP.UserFilter,
+										"groupfilter":   cfg.Reva.LDAP.GroupFilter,
+										"bind_username": cfg.Reva.LDAP.BindDN,
+										"bind_password": cfg.Reva.LDAP.BindPassword,
+										"idp":           cfg.Reva.LDAP.IDP,
+										"schema": map[string]interface{}{
+											"dn":          "dn",
+											"uid":         cfg.Reva.LDAP.Schema.UID,
+											"mail":        cfg.Reva.LDAP.Schema.Mail,
+											"displayName": cfg.Reva.LDAP.Schema.DisplayName,
+											"cn":          cfg.Reva.LDAP.Schema.CN,
+										},
 									},
 								},
 							},
 						},
 					},
 				}
-				// TODO merge configs for the same address
 
 				gr.Add(func() error {
 					runtime.Run(rcfg, pidFile)
 					return nil
 				}, func(_ error) {
 					logger.Info().
-						Str("server", "authprovider").
+						Str("server", c.Command.Name).
 						Msg("Shutting down server")
 
 					cancel()
@@ -119,6 +129,8 @@ func AuthProvider(cfg *config.Config) cli.Command {
 
 			{
 				server, err := debug.Server(
+					debug.Name(c.Command.Name+"-debug"),
+					debug.Addr(cfg.Reva.AuthBasic.DebugAddr),
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),

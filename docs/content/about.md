@@ -5,4 +5,4 @@ anchor: "about"
 weight: 10
 ---
 
-This service provides a simple hello world example API to show the integration of custom plugins within [Phoenix](https://github.com/owncloud/phoenix).
+This service provides an ocis extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
