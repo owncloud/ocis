@@ -52,7 +52,6 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
-	apps := cli.StringSlice(cfg.Phoenix.Config.Apps)
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
@@ -170,11 +169,11 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "PHOENIX_WEB_CONFIG_VERSION",
 			Destination: &cfg.Phoenix.Config.Version,
 		},
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:   "web-config-apps",
-			Value:  &apps,
-			Usage:  "Use multiple times to provide multiple apps",
-			EnvVar: "PHOENIX_APPS",
+			Value:  "",
+			Usage:  `String with comma separated values. --web-config-apps "pdf-viewer, files, draw-io"`,
+			EnvVar: "PHOENIX_WEB_CONFIG_APPS",
 		},
 		// TODO EXTERNAL APPS?
 		&cli.StringFlag{

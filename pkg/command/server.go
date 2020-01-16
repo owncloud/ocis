@@ -19,6 +19,7 @@ import (
 	"github.com/owncloud/ocis-phoenix/pkg/metrics"
 	"github.com/owncloud/ocis-phoenix/pkg/server/debug"
 	"github.com/owncloud/ocis-phoenix/pkg/server/http"
+	"github.com/owncloud/ocis-pkg/conversions"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -38,6 +39,10 @@ func Server(cfg *config.Config) cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
+
+			if c.String("web-config-apps") != "" {
+				cfg.Phoenix.Config.Apps = conversions.StringToSliceString(c.String("web-config-apps"), ",")
+			}
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
