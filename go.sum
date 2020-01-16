@@ -645,6 +645,8 @@ github.com/owncloud/ocis-pkg v1.2.0/go.mod h1:EfbeXoe60Me2lB/AWjYl8UFNv4isqCPP6l
 github.com/owncloud/ocis-pkg v1.2.1-0.20191216110718-ef1320072cd7/go.mod h1:YbsEi4rWRqnDpN1U8MDJ6Ys+cWn2lskTYgyKgOmCrFk=
 github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596 h1:3aMNmuDCIdKsaa4YdVTQEBJMjGz8KiuIB/+xlJUCT3k=
 github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596/go.mod h1:Wo0QfOmhadh2vNcUoQIsw2yaOT3zeftk+xaOOwP3y88=
+github.com/owncloud/ocis-pkg v1.2.1-0.20200115112437-3dd614fdcd51 h1:K720zP/n/8Y451mz3tSUAz4JkarK0GBqbF1A3i3294M=
+github.com/owncloud/ocis-pkg v1.2.1-0.20200115112437-3dd614fdcd51/go.mod h1:Wo0QfOmhadh2vNcUoQIsw2yaOT3zeftk+xaOOwP3y88=
 github.com/owncloud/ocis-reva v0.0.0-20200107084202-6cc46af428bf h1:JRJsRWRvLmxxR5f8I4tlkLlN1ALWY7Db9LoBndlR/cc=
 github.com/owncloud/ocis-reva v0.0.0-20200107084202-6cc46af428bf/go.mod h1:wCErA+9UG1jHQa6EnS3gHY+5FGpTiUwfFfQzY+xZtpM=
 github.com/owncloud/ocis-webdav v0.0.0-20191227185841-c5c77e241249 h1:CuQ+tn5yTZHs2GgAI/VxgbuEnMtSuCPyuJucQB9usiI=
@@ -888,6 +890,7 @@ golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3/go.mod h1:6SW0HCj/g11FgYtHl
 golang.org/x/lint v0.0.0-20190409202823-959b441ac422/go.mod h1:6SW0HCj/g11FgYtHlgUYUwCkIfeOF89ocIRzGO/8vkc=
 golang.org/x/lint v0.0.0-20190930215403-16217165b5de h1:5hukYrvBGR8/eNkX5mdUezrA6JiaEZDtJb9Ei+1LlBs=
 golang.org/x/lint v0.0.0-20190930215403-16217165b5de/go.mod h1:6SW0HCj/g11FgYtHlgUYUwCkIfeOF89ocIRzGO/8vkc=
+golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f h1:J5lckAjkw6qYlOZNj90mLYNTEKDvWeuc1yieZ8qUzUE=
 golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f/go.mod h1:5qLYkcX4OjUUV8bRuDixDT3tpyyb+LUpUlRWLxfhWrs=
 golang.org/x/mobile v0.0.0-20190312151609-d3739f865fa6/go.mod h1:z+o9i4GpDbdi3rU15maQ/Ox0txvL9dWGYEHz965HBQE=
 golang.org/x/mod v0.0.0-20190513183733-4bf6d317e70e/go.mod h1:mXi4GBBbnImb6dmsKGUJ2LatrhH/nqhxcFungHvyanc=
@@ -1026,6 +1029,7 @@ golang.org/x/tools v0.0.0-20191029041327-9cc4af7d6b2c/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5 h1:hKsoRgsbwY1NafxrwTs+k64bikrLBkAgPir1TNCj3Zs=
 golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20191125144606-a911d9008d1f/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
+golang.org/x/tools v0.0.0-20191205225056-3393d29bb9fe h1:BEVcKURC7E0EF+vD1l52Jb3LOM5Iwu7OI5FpdPuU50o=
 golang.org/x/tools v0.0.0-20191205225056-3393d29bb9fe/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/api v0.3.1/go.mod h1:6wY9I6uQWHQ8EM57III9mq/AjF+i8G65rmVagqKMtkk=

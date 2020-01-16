@@ -21,7 +21,7 @@ require (
 	github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337
 	github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013
 	github.com/owncloud/ocis-phoenix v0.0.0-20200114152828-8b3ea4082472
-	github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596
+	github.com/owncloud/ocis-pkg v1.2.1-0.20200115112437-3dd614fdcd51
 	github.com/owncloud/ocis-reva v0.0.0-20200107084202-6cc46af428bf
 	github.com/owncloud/ocis-webdav v0.0.0-20191227185841-c5c77e241249
 	github.com/spf13/viper v1.6.1
