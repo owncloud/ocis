@@ -16,7 +16,15 @@ import (
 
 var (
 	// SimpleRuntimeServices declares which services will be started for the fullstack server
-	SimpleRuntimeServices = []string{"hello", "phoenix", "reva"}
+	SimpleRuntimeServices = []string{
+		"hello",
+		"phoenix",
+		"reva-frontend",
+		"reva-gateway",
+		"reva-users",
+		"reva-auth-basic",
+		"reva-auth-bearer",
+	}
 )
 
 // Simple is the entrypoint for the server command. It is the `ocis server` subcommand overloaded with a different set of services
