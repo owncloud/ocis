@@ -36,8 +36,8 @@ If the below defaults don't match your environment change them accordingly:
 export REVA_LDAP_HOSTNAME=localhost
 export REVA_LDAP_PORT=389
 export REVA_LDAP_BASE_DN='dc=owncloud,dc=com'
-export REVA_LDAP_USERFILTER='(objectclass=posixAccount)'
-export REVA_LDAP_GROUPFILTER='(objectclass=posixGroup)'
+export REVA_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
+export REVA_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
 export REVA_LDAP_BIND_DN='cn=admin,dc=owncloud,dc=com'
 export REVA_LDAP_BIND_PASSWORD=admin
 export REVA_LDAP_SCHEMA_UID=uid
