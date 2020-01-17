@@ -5,14 +5,14 @@ go 1.13
 require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cs3org/go-cs3apis v0.0.0-20191218073906-e3405ff6775e // indirect
-	github.com/cs3org/reva v0.0.2-0.20191217083445-dee8d1c71f95
+	github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/micro/cli v0.2.0
 	github.com/micro/go-micro v1.18.0 // indirect
 	github.com/oklog/run v1.0.0
-	github.com/owncloud/ocis-pkg v1.2.0
+	github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/prometheus/client_model v0.0.0-20191202183732-d1d2010b5bee // indirect
 	github.com/prometheus/procfs v0.0.8 // indirect

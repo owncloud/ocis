@@ -74,9 +74,17 @@ func Execute() error {
 		},
 
 		Commands: []cli.Command{
-			Server(cfg),
-			Legacy(cfg),
-			AuthProvider(cfg),
+			Frontend(cfg),
+			Gateway(cfg),
+			Users(cfg),
+			AuthBasic(cfg),
+			AuthBearer(cfg),
+			Sharing(cfg),
+			StorageRoot(cfg),
+			StorageHome(cfg),
+			StorageHomeData(cfg),
+			StorageOC(cfg),
+			StorageOCData(cfg),
 			Health(cfg),
 		},
 	}
