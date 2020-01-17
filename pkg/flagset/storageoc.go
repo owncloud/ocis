@@ -167,7 +167,7 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "data-server-url",
-			Value:       "",
+			Value:       "http://localhost:9164/data",
 			Usage:       "data server url",
 			EnvVar:      "REVA_STORAGE_OC_DATA_SERVER_URL",
 			Destination: &cfg.Reva.StorageOC.DataServerURL,
