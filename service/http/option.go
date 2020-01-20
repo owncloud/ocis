@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"crypto/tls"
 
 	"github.com/micro/cli"
 	"github.com/owncloud/ocis-pkg/log"
@@ -13,6 +14,7 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 	Logger    log.Logger
+	TLSConfig *tls.Config
 	Namespace string
 	Name      string
 	Version   string
@@ -80,5 +82,12 @@ func Context(ctx context.Context) Option {
 func Flags(flags ...cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, flags...)
+	}
+}
+
+// TLSConfig provides a function to set the TLSConfig option.
+func TLSConfig(config *tls.Config) Option {
+	return func(o *Options) {
+		o.TLSConfig = config
 	}
 }
