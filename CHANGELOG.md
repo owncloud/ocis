@@ -1,12 +1,29 @@
-# Changelog for unreleased
+# Changelog for 1.3.0
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.3.0.
 
 ## Summary
 
+ * Fix #14: Fix serving static assets
+ * Chg #19: Add TLS support for http services
  * Enh #8: Introduce OpenID Connect middleware
 
 ## Details
+
+ * Bugfix #14: Fix serving static assets
+
+   Ocis-hello used "/" as root. adding another / caused the static middleware to always fail
+   stripping that prefix. All requests will return 404. setting root to "" in the `ocis-hello`
+   flag does not work because chi reports that routes need to start with a /.
+   `path.Clean(root+"/")` would yield "" for root="/"
+
+   https://github.com/owncloud/ocis-pkg/pull/14
+
+ * Change #19: Add TLS support for http services
+
+   `ocis-pkg` http services support TLS.
+
+   https://github.com/owncloud/ocis-pkg/issues/19
 
  * Enhancement #8: Introduce OpenID Connect middleware
 
