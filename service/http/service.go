@@ -15,9 +15,8 @@ type Service struct {
 // NewService initializes a new http service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
-
 	sopts.Logger.Info().
-		Str("transport", "http").
+		Str("transport", transport(sopts.Secure)).
 		Str("addr", sopts.Address).
 		Msg("Starting server")
 
@@ -46,4 +45,12 @@ func NewService(opts ...Option) Service {
 			wopts...,
 		),
 	}
+}
+
+func transport(secure bool) string {
+	if secure {
+		return "https"
+	}
+
+	return "http"
 }
