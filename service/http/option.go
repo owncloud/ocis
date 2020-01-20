@@ -14,7 +14,6 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 	Logger    log.Logger
-	Secure    bool
 	TLSConfig *tls.Config
 	Namespace string
 	Name      string
@@ -83,13 +82,6 @@ func Context(ctx context.Context) Option {
 func Flags(flags ...cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, flags...)
-	}
-}
-
-// Secure provides a function to set the secure option.
-func Secure(secure bool) Option {
-	return func(o *Options) {
-		o.Secure = secure
 	}
 }
 

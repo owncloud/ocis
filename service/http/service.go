@@ -1,6 +1,7 @@
 package http
 
 import (
+	"crypto/tls"
 	"strings"
 	"time"
 
@@ -16,7 +17,7 @@ type Service struct {
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
 	sopts.Logger.Info().
-		Str("transport", transport(sopts.Secure)).
+		Str("transport", transport(sopts.TLSConfig)).
 		Str("addr", sopts.Address).
 		Msg("Starting server")
 
@@ -35,7 +36,6 @@ func NewService(opts ...Option) Service {
 		web.RegisterTTL(time.Second * 30),
 		web.RegisterInterval(time.Second * 10),
 		web.Context(sopts.Context),
-		web.Secure(sopts.Secure),
 		web.TLSConfig(sopts.TLSConfig),
 		web.Flags(sopts.Flags...),
 	}
@@ -47,8 +47,8 @@ func NewService(opts ...Option) Service {
 	}
 }
 
-func transport(secure bool) string {
-	if secure {
+func transport(secure *tls.Config) string {
+	if secure != nil {
 		return "https"
 	}
 
