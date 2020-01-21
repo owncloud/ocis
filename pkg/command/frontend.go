@@ -70,7 +70,7 @@ func Frontend(cfg *config.Config) cli.Command {
 				// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
 				var desktopRedirectURIs [65535 - 1024]string
 				for port := 0; port < len(desktopRedirectURIs); port++ {
-					desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d/callback", (port + 1024))
+					desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 				}
 
 				rcfg := map[string]interface{}{
@@ -156,7 +156,8 @@ func Frontend(cfg *config.Config) cli.Command {
 										"scopes":         []string{"openid", "profile", "email", "offline"},
 										"public":         true, // force PKCS for public clients
 									},
-									"desktop": map[string]interface{}{
+									// desktop
+									"xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69": map[string]interface{}{
 										"id":            "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
 										"client_secret": "$2y$12$pKsCQPp8e/UOL1QDQhT3g.1J.KK8oMJACbEXIqRD0LiOxvgey.TtS",
 										// preregister localhost ports for the desktop
