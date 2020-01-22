@@ -45,6 +45,16 @@ type Tracing struct {
 	Service   string
 }
 
+// OIDC defines the available oidc configuration.
+type OIDC struct {
+	ClientID      string
+	ClientSecret  string
+	CallbackAddr  string
+	CallbackURL   string
+	AuthEndpoint  string
+	TokenEndpoint string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
@@ -52,6 +62,7 @@ type Config struct {
 	Debug   Debug
 	HTTP    HTTP
 	GRPC    GRPC
+	OIDC    OIDC
 	Tracing Tracing
 
 	Graph    *graph.Config
