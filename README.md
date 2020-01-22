@@ -35,11 +35,13 @@ bin/ocis-reva auth-basic & \
 bin/ocis-reva auth-bearer & \
 bin/ocis-reva sharing & \
 bin/ocis-reva storage-root & \
-bin/ocis-reva storage-home & \
+REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-home & \
 bin/ocis-reva storage-home-data & \
-bin/ocis-reva storage-oc & \
+REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-oc & \
 bin/ocis-reva storage-oc-data
 ```
+
+The two env vars are needed to tell the reva gateway to use the dedicated data services when uploading files.
 
 The root storage serves the available namespaces from disk using the local storage driver. In order to be able to navigate into the `/home` and `/oc` storage providers you have to create these directories:
 ```
