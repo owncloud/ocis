@@ -41,6 +41,7 @@ var Extensions = []string{
 	"hello",
 	"phoenix",
 	"graph",
+	"graph-explorer",
 	"ocs",
 	"webdav",
 	"reva-frontend",
