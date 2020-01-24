@@ -1,5 +1,3 @@
-// +build simple
-
 package command
 
 import (

@@ -17,9 +17,11 @@ require (
 	github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337
 	github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013
 	github.com/owncloud/ocis-phoenix v0.0.0-20200117144648-bebce0e7bbdb
-	github.com/owncloud/ocis-pkg v1.2.1-0.20200115112437-3dd614fdcd51
+	github.com/owncloud/ocis-pkg v1.3.0
 	github.com/owncloud/ocis-reva v0.0.0-20200117123740-1df7dd421513
 	github.com/owncloud/ocis-webdav v0.0.0-20191227185841-c5c77e241249
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
 )
+
+replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha
