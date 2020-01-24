@@ -35,7 +35,7 @@ type Tracing struct {
 type GraphExplorer struct {
 	ClientID string
 	Issuer   string
-	GraphUrl string
+	GraphURL string
 }
 
 // Config combines all available configuration parts.

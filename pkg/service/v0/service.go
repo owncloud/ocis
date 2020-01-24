@@ -62,7 +62,7 @@ func (p GraphExplorer) ConfigJs(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, fmt.Sprintf("window.ClientId = \"%v\";", p.config.GraphExplorer.ClientID))
 	io.WriteString(w, fmt.Sprintf("window.Iss = \"%v\";", p.config.GraphExplorer.Issuer))
-	io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphUrl))
+	io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphURL))
 }
 
 // Static simply serves all static files.
