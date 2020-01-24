@@ -135,11 +135,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.GraphExplorer.Issuer,
 		},
 		&cli.StringFlag{
+			Name:        "client-id",
+			Value:       "graph_explorer",
+			Usage:       "Set the OpenID Client ID to send to the issuer",
+			EnvVar:      "GRAPH_EXPLORER_CLIENT_ID",
+			Destination: &cfg.GraphExplorer.ClientID,
+		},
+		&cli.StringFlag{
 			Name:        "graph-url",
 			Value:       "http://localhost:9120",
 			Usage:       "Set the url to the graph api service",
 			EnvVar:      "GRAPH_EXPLORER_GRAPH_URL",
-			Destination: &cfg.GraphExplorer.GraphUrl,
+			Destination: &cfg.GraphExplorer.GraphURL,
 		},
 	}
 }
