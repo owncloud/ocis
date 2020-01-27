@@ -34,7 +34,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			cfg.Phoenix.Config.Apps = c.StringSlice("web-config-apps")
+			cfg.Phoenix.Config.Apps = c.StringSlice("web-config-app")
 
 			return nil
 		},

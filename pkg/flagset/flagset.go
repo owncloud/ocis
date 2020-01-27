@@ -172,9 +172,9 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Phoenix.Config.Version,
 		},
 		&cli.StringSliceFlag{
-			Name:    "web-config-apps",
+			Name:    "web-config-app",
 			Value:   cli.NewStringSlice("files", "draw-io", "pdf-viewer", "markdown-editor", "media-viewer"),
-			Usage:   `--web-config-apps files [--web-config-apps draw-io]`,
+			Usage:   `--web-config-app files [--web-config-app draw-io]`,
 			EnvVars: []string{"PHOENIX_WEB_CONFIG_APPS"},
 		},
 		&cli.StringFlag{
