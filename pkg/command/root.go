@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-phoenix/pkg/config"
 	"github.com/owncloud/ocis-phoenix/pkg/flagset"
 	"github.com/owncloud/ocis-phoenix/pkg/version"
@@ -22,7 +22,7 @@ func Execute() error {
 		Usage:    "Serve Phoenix for oCIS",
 		Compiled: version.Compiled(),
 
-		Authors: []cli.Author{
+		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
@@ -73,7 +73,7 @@ func Execute() error {
 			return nil
 		},
 
-		Commands: []cli.Command{
+		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
 		},

@@ -10,7 +10,7 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -19,14 +19,13 @@ import (
 	"github.com/owncloud/ocis-phoenix/pkg/metrics"
 	"github.com/owncloud/ocis-phoenix/pkg/server/debug"
 	"github.com/owncloud/ocis-phoenix/pkg/server/http"
-	"github.com/owncloud/ocis-pkg/conversions"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Server(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
@@ -35,14 +34,12 @@ func Server(cfg *config.Config) cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
+			cfg.Phoenix.Config.Apps = c.StringSlice("web-config-apps")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-
-			if c.String("web-config-apps") != "" {
-				cfg.Phoenix.Config.Apps = conversions.StringToSliceString(c.String("web-config-apps"), ",")
-			}
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
