@@ -178,4 +178,4 @@ watch:
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
 
 assets:
-	mkdir assets/ && curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.1/release.tar.gz | tar xvzf - -C assets/
+	mkdir assets/ && curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.2/release.tar.gz | tar xvzf - -C assets/

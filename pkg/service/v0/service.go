@@ -12,11 +12,6 @@ import (
 	"github.com/owncloud/ocis-pkg/log"
 )
 
-var (
-	// ErrConfigInvalid is returned when the config parse is invalid.
-	ErrConfigInvalid = `Invalid or missing config`
-)
-
 // Service defines the extension handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
