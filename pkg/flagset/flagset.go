@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9134",
+			Value:       "0.0.0.0:9136",
 			Usage:       "Address to debug endpoint",
 			EnvVar:      "GRAPH_EXPLORER_DEBUG_ADDR",
 			Destination: &cfg.Debug.Addr,
@@ -82,7 +82,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9134",
+			Value:       "0.0.0.0:9136",
 			Usage:       "Address to bind debug server",
 			EnvVar:      "GRAPH_EXPLORER_DEBUG_ADDR",
 			Destination: &cfg.Debug.Addr,
@@ -129,14 +129,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "issuer",
-			Value:       "http://localhost:9130",
+			Value:       "https://localhost:9130",
 			Usage:       "Set the OpenID Connect Provider",
 			EnvVar:      "GRAPH_EXPLORER_ISSUER",
 			Destination: &cfg.GraphExplorer.Issuer,
 		},
 		&cli.StringFlag{
 			Name:        "client-id",
-			Value:       "graph_explorer",
+			Value:       "ocis-explorer.js",
 			Usage:       "Set the OpenID Client ID to send to the issuer",
 			EnvVar:      "GRAPH_EXPLORER_CLIENT_ID",
 			Destination: &cfg.GraphExplorer.ClientID,
