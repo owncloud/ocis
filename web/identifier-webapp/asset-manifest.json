@@ -1,0 +1,22 @@
+{
+  "identifier-app.js": "./static/js/identifier-app.b36b0d07.chunk.js",
+  "identifier-app.js.map": "./static/js/identifier-app.b36b0d07.chunk.js.map",
+  "identifier-container.js": "./static/js/identifier-container.569688ae.chunk.js",
+  "identifier-container.js.map": "./static/js/identifier-container.569688ae.chunk.js.map",
+  "main.css": "./static/css/main.ed0ebb7d.chunk.css",
+  "main.js": "./static/js/main.c5511071.chunk.js",
+  "main.js.map": "./static/js/main.c5511071.chunk.js.map",
+  "runtime~main.js": "./static/js/runtime~main.766bf48a.js",
+  "runtime~main.js.map": "./static/js/runtime~main.766bf48a.js.map",
+  "static/js/4.f92d7884.chunk.js": "./static/js/4.f92d7884.chunk.js",
+  "static/js/4.f92d7884.chunk.js.map": "./static/js/4.f92d7884.chunk.js.map",
+  "static/js/5.b1222fed.chunk.js": "./static/js/5.b1222fed.chunk.js",
+  "static/js/5.b1222fed.chunk.js.map": "./static/js/5.b1222fed.chunk.js.map",
+  "index.html": "./index.html",
+  "precache-manifest.ea8b619599c55ba5f128f51d796152cd.js": "./precache-manifest.ea8b619599c55ba5f128f51d796152cd.js",
+  "service-worker.js": "./service-worker.js",
+  "static/css/main.ed0ebb7d.chunk.css.map": "./static/css/main.ed0ebb7d.chunk.css.map",
+  "static/media/kopano-logo.svg": "./static/media/kopano-logo.10e256c7.svg",
+  "static/media/fancy-background.css": "./static/media/loginscreen-bg.cc3ef0e4.jpg",
+  "static/media/index.css": "./static/media/roboto-latin-900italic.bc833e72.woff"
+}
