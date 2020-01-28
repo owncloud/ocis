@@ -152,7 +152,14 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(func() error {
-					return server.Run()
+					err := server.Run()
+					if err != nil {
+						logger.Error().
+							Err(err).
+							Str("transport", "http").
+							Msg("Failed to start server")
+					}
+					return err
 				}, func(_ error) {
 					logger.Info().
 						Str("transport", "http").
