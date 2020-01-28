@@ -35,9 +35,7 @@ type Port struct {
 	// DebugAddr for the debug endpoint to bind to
 	DebugAddr string
 	// Services can be used to give a list of services that should be started on this port
-	Services string
-	// used to store the parsed services
-	servicesList []string
+	Services []string
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}

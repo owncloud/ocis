@@ -1,7 +1,7 @@
 package flagset
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/config"
 )
 
@@ -12,26 +12,26 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "config-file",
 			Value:       "",
 			Usage:       "Path to config file",
-			EnvVar:      "REVA_CONFIG_FILE",
+			EnvVars:     []string{"REVA_CONFIG_FILE"},
 			Destination: &cfg.File,
 		},
 		&cli.StringFlag{
 			Name:        "log-level",
 			Value:       "info",
 			Usage:       "Set logging level",
-			EnvVar:      "REVA_LOG_LEVEL",
+			EnvVars:     []string{"REVA_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
-		&cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:        "log-pretty",
 			Usage:       "Enable pretty logging",
-			EnvVar:      "REVA_LOG_PRETTY",
+			EnvVars:     []string{"REVA_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
-		&cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:        "log-color",
 			Usage:       "Enable colored logging",
-			EnvVar:      "REVA_LOG_COLOR",
+			EnvVars:     []string{"REVA_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 	}

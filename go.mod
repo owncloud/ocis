@@ -9,7 +9,7 @@ require (
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
-	github.com/micro/cli v0.2.0
+	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro v1.18.0 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596
@@ -21,7 +21,7 @@ require (
 	github.com/spf13/viper v1.6.1
 	github.com/uber/jaeger-client-go v2.20.1+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876 // indirect
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sys v0.0.0-20200103143344-a1369afcdac7 // indirect
 	google.golang.org/api v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb // indirect

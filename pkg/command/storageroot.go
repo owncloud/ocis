@@ -9,7 +9,7 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -17,11 +17,16 @@ import (
 )
 
 // StorageRoot is the entrypoint for the storage-root command.
-func StorageRoot(cfg *config.Config) cli.Command {
-	return cli.Command{
+func StorageRoot(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "storage-root",
 		Usage: "Start reva storage-root service",
 		Flags: flagset.StorageRootWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			cfg.Reva.StorageRoot.Services = c.StringSlice("service")
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
