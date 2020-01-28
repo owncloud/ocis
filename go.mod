@@ -17,6 +17,7 @@ require (
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-graph v0.0.0-20191227120927-91e17d0cdeb1
+	github.com/owncloud/ocis-graph-explorer v0.0.0-20200128104949-78e556279eab
 	github.com/owncloud/ocis-hello v0.0.0-20200114093148-2205c2745838
 	github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337
 	github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013

@@ -621,6 +621,12 @@ github.com/ory/go-convenience v0.1.0/go.mod h1:uEY/a60PL5c12nYz4V5cHY03IBmwIAEm8
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/ocis-graph v0.0.0-20191227120927-91e17d0cdeb1 h1:Zamh3nQI2moI/rfbuNHwog0KXU9osNLVkUM2BfcHA0g=
 github.com/owncloud/ocis-graph v0.0.0-20191227120927-91e17d0cdeb1/go.mod h1:7fIggCksf10Nlu0KhU9U9KeY+v7n47OHLjWMRrNxlg8=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200123111637-3b2e1da63f17 h1:avZsUazewQurfNZTf091PeYw7v8GvfpFO5pbA0MDo3I=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200123111637-3b2e1da63f17/go.mod h1:MtgUsjJfUpeDvxDCmMhUjqnzrjg8qjjP4HhlLKufDdc=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200128090021-bf345cff039a h1:h3T35ffMZ0BTfENw3ErNei8sCRy6D6fTdeGqQKNTpsU=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200128090021-bf345cff039a/go.mod h1:MtgUsjJfUpeDvxDCmMhUjqnzrjg8qjjP4HhlLKufDdc=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200128104949-78e556279eab h1:yvWqFZNPKQbtuSzzlS5+F9qBX2R8YX0EH7swdQeUvm0=
+github.com/owncloud/ocis-graph-explorer v0.0.0-20200128104949-78e556279eab/go.mod h1:MtgUsjJfUpeDvxDCmMhUjqnzrjg8qjjP4HhlLKufDdc=
 github.com/owncloud/ocis-hello v0.0.0-20200114093148-2205c2745838 h1:kG/H/Ey6sqU6xIzsDtZEpR321NlyPrsxPKrDAe9sbY0=
 github.com/owncloud/ocis-hello v0.0.0-20200114093148-2205c2745838/go.mod h1:hrXqmloO2NHbdkDTPSNneobwzQgki8CUuQD8fqjkPv8=
 github.com/owncloud/ocis-konnectd v0.0.0-20191227185917-046fec203337 h1:ZGqMcrWZgGoH+jztjSFvzAJGw3lsG2/jjZQioV4ZcDY=
