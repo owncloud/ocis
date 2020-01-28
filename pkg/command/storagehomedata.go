@@ -9,7 +9,7 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -17,11 +17,16 @@ import (
 )
 
 // StorageHomeData is the entrypoint for the storage-home-data command.
-func StorageHomeData(cfg *config.Config) cli.Command {
-	return cli.Command{
+func StorageHomeData(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "storage-home-data",
 		Usage: "Start reva storage-home-data service",
 		Flags: flagset.StorageHomeDataWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			cfg.Reva.StorageHomeData.Services = c.StringSlice("service")
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

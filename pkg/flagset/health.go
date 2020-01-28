@@ -1,7 +1,7 @@
 package flagset
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/config"
 )
 
@@ -12,7 +12,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "debug-addr",
 			Value:       "0.0.0.0:9109",
 			Usage:       "Address to debug endpoint",
-			EnvVar:      "REVA_DEBUG_ADDR",
+			EnvVars:     []string{"REVA_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 	}

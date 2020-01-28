@@ -9,7 +9,7 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -17,11 +17,16 @@ import (
 )
 
 // StorageOCData is the entrypoint for the storage-oc-data command.
-func StorageOCData(cfg *config.Config) cli.Command {
-	return cli.Command{
+func StorageOCData(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "storage-oc-data",
 		Usage: "Start reva storage-oc-data service",
 		Flags: flagset.StorageOCDataWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			cfg.Reva.StorageOCData.Services = c.StringSlice("service")
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

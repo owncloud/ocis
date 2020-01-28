@@ -9,7 +9,7 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -17,11 +17,16 @@ import (
 )
 
 // Users is the entrypoint for the sharing command.
-func Users(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Users(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "users",
 		Usage: "Start reva users service",
 		Flags: flagset.UsersWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			cfg.Reva.Users.Services = c.StringSlice("service")
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

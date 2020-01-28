@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -22,7 +22,7 @@ func Execute() error {
 		Usage:    "Example service for Reva/oCIS",
 		Compiled: version.Compiled(),
 
-		Authors: []cli.Author{
+		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
@@ -73,7 +73,7 @@ func Execute() error {
 			return nil
 		},
 
-		Commands: []cli.Command{
+		Commands: []*cli.Command{
 			Frontend(cfg),
 			Gateway(cfg),
 			Users(cfg),

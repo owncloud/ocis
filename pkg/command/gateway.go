@@ -9,7 +9,7 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -17,11 +17,16 @@ import (
 )
 
 // Gateway is the entrypoint for the gateway command.
-func Gateway(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Gateway(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "gateway",
 		Usage: "Start reva gateway",
 		Flags: flagset.GatewayWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			cfg.Reva.Gateway.Services = c.StringSlice("service")
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
