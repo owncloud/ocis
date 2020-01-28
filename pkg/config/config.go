@@ -15,11 +15,13 @@ type Debug struct {
 	Zpages bool
 }
 
+// Gateway defines the available gateway configuration.
 type Gateway struct {
 	Port
 	CommitShareToStorageGrant bool
 }
 
+// Port defines the available port configuration.
 type Port struct {
 	// MaxCPUs can be a number or a percentage
 	MaxCPUs  string
@@ -40,14 +42,20 @@ type Port struct {
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}
 }
+
+// Users defines the available users configuration.
 type Users struct {
 	Port
 	Driver string
 	JSON   string
 }
+
+// PathWrapperContext defines the available PathWrapperContext configuration.
 type PathWrapperContext struct {
 	Prefix string
 }
+
+// StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
 	Driver             string
@@ -63,6 +71,8 @@ type StoragePort struct {
 	Prefix     string
 	TempFolder string
 }
+
+// StorageConfig combines all available storage configuration parts.
 type StorageConfig struct {
 	EOS      StorageEOS
 	Local    StorageLocal
@@ -70,6 +80,8 @@ type StorageConfig struct {
 	S3       StorageS3
 	// TODO checksums ... figure out what that is supposed to do
 }
+
+// StorageEOS defines the available EOS storage configuration.
 type StorageEOS struct {
 	// Namespace for metadata operations
 	Namespace string
@@ -117,12 +129,18 @@ type StorageEOS struct {
 	// SingleUsername is the username to use when SingleUserMode is enabled
 	SingleUsername string
 }
+
+// StorageLocal defines the available local storage configuration.
 type StorageLocal struct {
 	Root string
 }
+
+// StorageOwnCloud defines the available ownCloud storage configuration.
 type StorageOwnCloud struct {
 	Datadirectory string
 }
+
+// StorageS3 defines the available S3 storage configuration.
 type StorageS3 struct {
 	Region    string
 	AccessKey string
@@ -131,11 +149,15 @@ type StorageS3 struct {
 	Bucket    string
 	Prefix    string
 }
+
+// OIDC defines the available OpenID Connect configuration.
 type OIDC struct {
 	Issuer   string
 	Insecure bool
 	IDClaim  string
 }
+
+// LDAP defines the available ldap configuration.
 type LDAP struct {
 	Hostname     string
 	Port         int
@@ -147,6 +169,8 @@ type LDAP struct {
 	IDP          string
 	Schema       LDAPSchema
 }
+
+// LDAPSchema defines the available ldap schema configuration.
 type LDAPSchema struct {
 	UID         string
 	Mail        string
