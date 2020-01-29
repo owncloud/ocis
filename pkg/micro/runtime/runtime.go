@@ -55,6 +55,7 @@ var Extensions = []string{
 	"reva-storage-home-data",
 	"reva-storage-oc",
 	"reva-storage-oc-data",
+	"devldap",
 }
 
 // Runtime is a micro' runtime
