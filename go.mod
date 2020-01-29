@@ -7,7 +7,7 @@ require (
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/justinas/alice v1.2.0
-	github.com/micro/cli v0.2.0
+	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro v1.17.1
 	github.com/micro/go-plugins v1.5.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
