@@ -187,8 +187,8 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"prefix":           "",
 								"chunk_folder":     "/var/tmp/revad/chunks",
 								"gateway":          cfg.Reva.Gateway.URL,
-								"files_namespace":  "/",
-								"webdav_namespace": "/",
+								"files_namespace":  cfg.Reva.OCDav.NamespaceJail,
+								"webdav_namespace": cfg.Reva.OCDav.NamespaceJail,
 							},
 							"ocs": map[string]interface{}{
 								"gateway": cfg.Reva.Gateway.URL,
