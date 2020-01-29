@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	gorun "github.com/micro/go-micro/runtime"
 	"github.com/micro/micro/api"
 	"github.com/micro/micro/broker"

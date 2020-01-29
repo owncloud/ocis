@@ -1,7 +1,7 @@
 package register
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/pkg/config"
 )
 

@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-graph-explorer/pkg/command"
 	svcconfig "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	"github.com/owncloud/ocis-graph-explorer/pkg/flagset"

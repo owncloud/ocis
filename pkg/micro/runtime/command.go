@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/config/cmd"
 	"github.com/owncloud/ocis-pkg/log"
 )

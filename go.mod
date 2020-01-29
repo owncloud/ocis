@@ -11,6 +11,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/lucas-clemente/quic-go v0.14.0 // indirect
 	github.com/micro/cli v0.2.0
+	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/micro v1.18.0
 	github.com/nats-io/jwt v0.3.2 // indirect

@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-konnectd/pkg/command"
 	svcconfig "github.com/owncloud/ocis-konnectd/pkg/config"
 	"github.com/owncloud/ocis-konnectd/pkg/flagset"

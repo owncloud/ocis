@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-phoenix/pkg/command"
 	"github.com/owncloud/ocis-phoenix/pkg/flagset"
 	"github.com/owncloud/ocis-pkg/conversions"
