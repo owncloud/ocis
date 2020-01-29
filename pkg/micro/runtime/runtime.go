@@ -158,6 +158,7 @@ func setDefaults() {
 
 	// runtime
 	runtime.Name = OwncloudNamespace + "runtime"
+	gorun.DefaultName = OwncloudNamespace + "runtime"
 
 	// server
 	server.Name = OwncloudNamespace + "server"
