@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "proto";
+
+service SettingsService {
+    rpc Set(SettingsRequest) returns (SettingsResponse);
+    rpc Get(AccountQueryRequest) returns (SettingsResponse);
+}
+
+message SettingsRequest {
+    AccountSettings request = 1;
+}
+
+message SettingsResponse {
+    AccountSettings response = 1;
+}
+
+message AccountSettings {
+    string name = 1;
+}
+
+message AccountQueryRequest {
+    string name = 1;
+    int32 uid = 2;
+}
