@@ -196,5 +196,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVar:      "GRAPH_OIDC_REALM",
 			Destination: &cfg.OpenIDConnect.Realm,
 		},
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       "127.0.0.1:9142",
+			Usage:       "REVA Gateway Endpoint",
+			EnvVar:      "REVA_GATEWAY_ADDR",
+			Destination: &cfg.Reva.Address,
+		},
 	}
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis-pkg/log"
 	"github.com/owncloud/ocis-pkg/oidc"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
-	ldap "gopkg.in/ldap.v3"
+	"gopkg.in/ldap.v3"
 )
 
 // Graph defines implements the business logic for Service.
@@ -193,7 +193,7 @@ func (g Graph) ldapGetSingleEntry(baseDn string, filter string) (*ldap.Entry, er
 }
 
 func (g Graph) initLdap() (*ldap.Conn, error) {
-	g.logger.Info().Msgf("Dailing ldap %s://%s", g.config.Ldap.Network, g.config.Ldap.Address)
+	g.logger.Info().Msgf("Dialing ldap %s://%s", g.config.Ldap.Network, g.config.Ldap.Address)
 	con, err := ldap.Dial(g.config.Ldap.Network, g.config.Ldap.Address)
 
 	if err != nil {

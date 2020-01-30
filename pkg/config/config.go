@@ -31,7 +31,7 @@ type Tracing struct {
 	Service   string
 }
 
-// Ldap defined the avialable LDAP configuration.
+// Ldap defined the available LDAP configuration.
 type Ldap struct {
 	Network      string
 	Address      string
@@ -41,12 +41,17 @@ type Ldap struct {
 	BaseDNGroups string
 }
 
-// OpenIDConnect defined the avialable OpenID Connect configuration.
+// OpenIDConnect defined the available OpenID Connect configuration.
 type OpenIDConnect struct {
 	Endpoint    string
 	Realm       string
 	SigningAlgs []string
 	Insecure    bool
+}
+
+// Reva defines all available REVA configuration.
+type Reva struct {
+	Address string
 }
 
 // Config combines all available configuration parts.
@@ -58,6 +63,7 @@ type Config struct {
 	Tracing       Tracing
 	Ldap          Ldap
 	OpenIDConnect OpenIDConnect
+	Reva          Reva
 }
 
 // New initializes a new configuration with or without defaults.
