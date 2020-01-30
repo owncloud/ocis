@@ -3,23 +3,15 @@ syntax = "proto3";
 option go_package = "proto";
 
 service SettingsService {
-    rpc Set(SettingsRequest) returns (SettingsResponse);
-    rpc Get(AccountQueryRequest) returns (SettingsResponse);
+    rpc Set(Record) returns (Record);
+    rpc Get(Query) returns (Record);
 }
 
-message SettingsRequest {
-    AccountSettings request = 1;
+message Record {
+    string id = 1;
+    string theme = 2;
 }
 
-message SettingsResponse {
-    AccountSettings response = 1;
-}
-
-message AccountSettings {
-    string name = 1;
-}
-
-message AccountQueryRequest {
-    string name = 1;
-    int32 uid = 2;
+message Query {
+    string id = 1;
 }

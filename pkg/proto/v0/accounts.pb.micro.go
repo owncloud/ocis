@@ -5,14 +5,13 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
+import (
 	context "context"
-
 	client "github.com/micro/go-micro/client"
-
 	server "github.com/micro/go-micro/server"
 )
 
@@ -35,8 +34,8 @@ var _ server.Option
 // Client API for SettingsService service
 
 type SettingsService interface {
-	Set(ctx context.Context, in *SettingsRequest, opts ...client.CallOption) (*SettingsResponse, error)
-	Get(ctx context.Context, in *AccountQueryRequest, opts ...client.CallOption) (*SettingsResponse, error)
+	Set(ctx context.Context, in *Record, opts ...client.CallOption) (*Record, error)
+	Get(ctx context.Context, in *Query, opts ...client.CallOption) (*Record, error)
 }
 
 type settingsService struct {
@@ -57,9 +56,9 @@ func NewSettingsService(name string, c client.Client) SettingsService {
 	}
 }
 
-func (c *settingsService) Set(ctx context.Context, in *SettingsRequest, opts ...client.CallOption) (*SettingsResponse, error) {
+func (c *settingsService) Set(ctx context.Context, in *Record, opts ...client.CallOption) (*Record, error) {
 	req := c.c.NewRequest(c.name, "SettingsService.Set", in)
-	out := new(SettingsResponse)
+	out := new(Record)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,9 +66,9 @@ func (c *settingsService) Set(ctx context.Context, in *SettingsRequest, opts ...
 	return out, nil
 }
 
-func (c *settingsService) Get(ctx context.Context, in *AccountQueryRequest, opts ...client.CallOption) (*SettingsResponse, error) {
+func (c *settingsService) Get(ctx context.Context, in *Query, opts ...client.CallOption) (*Record, error) {
 	req := c.c.NewRequest(c.name, "SettingsService.Get", in)
-	out := new(SettingsResponse)
+	out := new(Record)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -80,14 +79,14 @@ func (c *settingsService) Get(ctx context.Context, in *AccountQueryRequest, opts
 // Server API for SettingsService service
 
 type SettingsServiceHandler interface {
-	Set(context.Context, *SettingsRequest, *SettingsResponse) error
-	Get(context.Context, *AccountQueryRequest, *SettingsResponse) error
+	Set(context.Context, *Record, *Record) error
+	Get(context.Context, *Query, *Record) error
 }
 
 func RegisterSettingsServiceHandler(s server.Server, hdlr SettingsServiceHandler, opts ...server.HandlerOption) error {
 	type settingsService interface {
-		Set(ctx context.Context, in *SettingsRequest, out *SettingsResponse) error
-		Get(ctx context.Context, in *AccountQueryRequest, out *SettingsResponse) error
+		Set(ctx context.Context, in *Record, out *Record) error
+		Get(ctx context.Context, in *Query, out *Record) error
 	}
 	type SettingsService struct {
 		settingsService
@@ -100,10 +99,10 @@ type settingsServiceHandler struct {
 	SettingsServiceHandler
 }
 
-func (h *settingsServiceHandler) Set(ctx context.Context, in *SettingsRequest, out *SettingsResponse) error {
+func (h *settingsServiceHandler) Set(ctx context.Context, in *Record, out *Record) error {
 	return h.SettingsServiceHandler.Set(ctx, in, out)
 }
 
-func (h *settingsServiceHandler) Get(ctx context.Context, in *AccountQueryRequest, out *SettingsResponse) error {
+func (h *settingsServiceHandler) Get(ctx context.Context, in *Query, out *Record) error {
 	return h.SettingsServiceHandler.Get(ctx, in, out)
 }

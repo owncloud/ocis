@@ -20,193 +20,109 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type SettingsRequest struct {
-	Request              *AccountSettings `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+type Record struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Theme                string   `protobuf:"bytes,2,opt,name=theme,proto3" json:"theme,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SettingsRequest) Reset()         { *m = SettingsRequest{} }
-func (m *SettingsRequest) String() string { return proto.CompactTextString(m) }
-func (*SettingsRequest) ProtoMessage()    {}
-func (*SettingsRequest) Descriptor() ([]byte, []int) {
+func (m *Record) Reset()         { *m = Record{} }
+func (m *Record) String() string { return proto.CompactTextString(m) }
+func (*Record) ProtoMessage()    {}
+func (*Record) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3c84319968a576b, []int{0}
 }
 
-func (m *SettingsRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SettingsRequest.Unmarshal(m, b)
+func (m *Record) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Record.Unmarshal(m, b)
 }
-func (m *SettingsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SettingsRequest.Marshal(b, m, deterministic)
+func (m *Record) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Record.Marshal(b, m, deterministic)
 }
-func (m *SettingsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SettingsRequest.Merge(m, src)
+func (m *Record) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Record.Merge(m, src)
 }
-func (m *SettingsRequest) XXX_Size() int {
-	return xxx_messageInfo_SettingsRequest.Size(m)
+func (m *Record) XXX_Size() int {
+	return xxx_messageInfo_Record.Size(m)
 }
-func (m *SettingsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SettingsRequest.DiscardUnknown(m)
+func (m *Record) XXX_DiscardUnknown() {
+	xxx_messageInfo_Record.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SettingsRequest proto.InternalMessageInfo
+var xxx_messageInfo_Record proto.InternalMessageInfo
 
-func (m *SettingsRequest) GetRequest() *AccountSettings {
+func (m *Record) GetId() string {
 	if m != nil {
-		return m.Request
+		return m.Id
 	}
-	return nil
+	return ""
 }
 
-type SettingsResponse struct {
-	Response             *AccountSettings `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+func (m *Record) GetTheme() string {
+	if m != nil {
+		return m.Theme
+	}
+	return ""
 }
 
-func (m *SettingsResponse) Reset()         { *m = SettingsResponse{} }
-func (m *SettingsResponse) String() string { return proto.CompactTextString(m) }
-func (*SettingsResponse) ProtoMessage()    {}
-func (*SettingsResponse) Descriptor() ([]byte, []int) {
+type Query struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Query) Reset()         { *m = Query{} }
+func (m *Query) String() string { return proto.CompactTextString(m) }
+func (*Query) ProtoMessage()    {}
+func (*Query) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3c84319968a576b, []int{1}
 }
 
-func (m *SettingsResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SettingsResponse.Unmarshal(m, b)
+func (m *Query) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Query.Unmarshal(m, b)
 }
-func (m *SettingsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SettingsResponse.Marshal(b, m, deterministic)
+func (m *Query) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Query.Marshal(b, m, deterministic)
 }
-func (m *SettingsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SettingsResponse.Merge(m, src)
+func (m *Query) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Query.Merge(m, src)
 }
-func (m *SettingsResponse) XXX_Size() int {
-	return xxx_messageInfo_SettingsResponse.Size(m)
+func (m *Query) XXX_Size() int {
+	return xxx_messageInfo_Query.Size(m)
 }
-func (m *SettingsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_SettingsResponse.DiscardUnknown(m)
+func (m *Query) XXX_DiscardUnknown() {
+	xxx_messageInfo_Query.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SettingsResponse proto.InternalMessageInfo
+var xxx_messageInfo_Query proto.InternalMessageInfo
 
-func (m *SettingsResponse) GetResponse() *AccountSettings {
+func (m *Query) GetId() string {
 	if m != nil {
-		return m.Response
-	}
-	return nil
-}
-
-type AccountSettings struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *AccountSettings) Reset()         { *m = AccountSettings{} }
-func (m *AccountSettings) String() string { return proto.CompactTextString(m) }
-func (*AccountSettings) ProtoMessage()    {}
-func (*AccountSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e3c84319968a576b, []int{2}
-}
-
-func (m *AccountSettings) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AccountSettings.Unmarshal(m, b)
-}
-func (m *AccountSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AccountSettings.Marshal(b, m, deterministic)
-}
-func (m *AccountSettings) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AccountSettings.Merge(m, src)
-}
-func (m *AccountSettings) XXX_Size() int {
-	return xxx_messageInfo_AccountSettings.Size(m)
-}
-func (m *AccountSettings) XXX_DiscardUnknown() {
-	xxx_messageInfo_AccountSettings.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AccountSettings proto.InternalMessageInfo
-
-func (m *AccountSettings) GetName() string {
-	if m != nil {
-		return m.Name
+		return m.Id
 	}
 	return ""
-}
-
-type AccountQueryRequest struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Uid                  int32    `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *AccountQueryRequest) Reset()         { *m = AccountQueryRequest{} }
-func (m *AccountQueryRequest) String() string { return proto.CompactTextString(m) }
-func (*AccountQueryRequest) ProtoMessage()    {}
-func (*AccountQueryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e3c84319968a576b, []int{3}
-}
-
-func (m *AccountQueryRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AccountQueryRequest.Unmarshal(m, b)
-}
-func (m *AccountQueryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AccountQueryRequest.Marshal(b, m, deterministic)
-}
-func (m *AccountQueryRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AccountQueryRequest.Merge(m, src)
-}
-func (m *AccountQueryRequest) XXX_Size() int {
-	return xxx_messageInfo_AccountQueryRequest.Size(m)
-}
-func (m *AccountQueryRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AccountQueryRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AccountQueryRequest proto.InternalMessageInfo
-
-func (m *AccountQueryRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *AccountQueryRequest) GetUid() int32 {
-	if m != nil {
-		return m.Uid
-	}
-	return 0
 }
 
 func init() {
-	proto.RegisterType((*SettingsRequest)(nil), "SettingsRequest")
-	proto.RegisterType((*SettingsResponse)(nil), "SettingsResponse")
-	proto.RegisterType((*AccountSettings)(nil), "AccountSettings")
-	proto.RegisterType((*AccountQueryRequest)(nil), "AccountQueryRequest")
+	proto.RegisterType((*Record)(nil), "Record")
+	proto.RegisterType((*Query)(nil), "Query")
 }
 
 func init() { proto.RegisterFile("pkg/proto/v0/accounts.proto", fileDescriptor_e3c84319968a576b) }
 
 var fileDescriptor_e3c84319968a576b = []byte{
-	// 219 bytes of a gzipped FileDescriptorProto
+	// 160 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2e, 0xc8, 0x4e, 0xd7,
 	0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x2f, 0x33, 0xd0, 0x4f, 0x4c, 0x4e, 0xce, 0x2f, 0xcd, 0x2b,
-	0x29, 0xd6, 0x03, 0x8b, 0x28, 0xd9, 0x72, 0xf1, 0x07, 0xa7, 0x96, 0x94, 0x64, 0xe6, 0xa5, 0x17,
-	0x07, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x69, 0x71, 0xb1, 0x17, 0x41, 0x98, 0x12, 0x8c,
-	0x0a, 0x8c, 0x1a, 0xdc, 0x46, 0x02, 0x7a, 0x8e, 0x10, 0x4d, 0x70, 0x95, 0x30, 0x05, 0x4a, 0x0e,
-	0x5c, 0x02, 0x08, 0xed, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9, 0x42, 0x3a, 0x5c, 0x1c, 0x45, 0x50,
-	0x36, 0x4e, 0x03, 0xe0, 0x2a, 0x94, 0x54, 0xb9, 0xf8, 0xd1, 0x24, 0x85, 0x84, 0xb8, 0x58, 0xf2,
-	0x12, 0x73, 0x21, 0x9a, 0x39, 0x83, 0xc0, 0x6c, 0x25, 0x6b, 0x2e, 0x61, 0xa8, 0xb2, 0xc0, 0xd2,
-	0xd4, 0xa2, 0x4a, 0x98, 0x5b, 0xb1, 0x28, 0x15, 0x12, 0xe0, 0x62, 0x2e, 0xcd, 0x4c, 0x91, 0x60,
-	0x52, 0x60, 0xd4, 0x60, 0x0d, 0x02, 0x31, 0x8d, 0x72, 0x11, 0x9e, 0x0c, 0x4e, 0x2d, 0x2a, 0xcb,
-	0x4c, 0x4e, 0x15, 0xd2, 0xe2, 0x62, 0x0e, 0x4e, 0x2d, 0x11, 0x12, 0xd0, 0x43, 0xf3, 0xbd, 0x94,
-	0xa0, 0x1e, 0x86, 0x87, 0xf4, 0xb8, 0x98, 0xdd, 0x53, 0x4b, 0x84, 0x44, 0xf4, 0xb0, 0xb8, 0x00,
-	0x8b, 0x7a, 0x27, 0xf6, 0x28, 0x56, 0x70, 0xe0, 0x26, 0xb1, 0x81, 0x29, 0x63, 0x40, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0xc9, 0x14, 0x7d, 0xf0, 0x82, 0x01, 0x00, 0x00,
+	0x29, 0xd6, 0x03, 0x8b, 0x28, 0xe9, 0x71, 0xb1, 0x05, 0xa5, 0x26, 0xe7, 0x17, 0xa5, 0x08, 0xf1,
+	0x71, 0x31, 0x65, 0xa6, 0x48, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0x31, 0x65, 0xa6, 0x08, 0x89,
+	0x70, 0xb1, 0x96, 0x64, 0xa4, 0xe6, 0xa6, 0x4a, 0x30, 0x81, 0x85, 0x20, 0x1c, 0x25, 0x71, 0x2e,
+	0xd6, 0xc0, 0xd2, 0xd4, 0xa2, 0x4a, 0x74, 0xe5, 0x46, 0x4e, 0x5c, 0xfc, 0xc1, 0xa9, 0x25, 0x25,
+	0x99, 0x79, 0xe9, 0xc5, 0xc1, 0xa9, 0x45, 0x65, 0x99, 0xc9, 0xa9, 0x42, 0xe2, 0x5c, 0xcc, 0xc1,
+	0xa9, 0x25, 0x42, 0xec, 0x7a, 0x10, 0x1b, 0xa4, 0x60, 0x0c, 0x21, 0x31, 0x2e, 0x66, 0xf7, 0xd4,
+	0x12, 0x21, 0x36, 0x3d, 0xb0, 0x51, 0x70, 0x71, 0x27, 0xf6, 0x28, 0x56, 0xb0, 0xab, 0x92, 0xd8,
+	0xc0, 0x94, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x77, 0x5d, 0x07, 0xb2, 0xbb, 0x00, 0x00, 0x00,
 }
