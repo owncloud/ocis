@@ -126,6 +126,80 @@ def testing(ctx):
           },
         },
       },
+      {
+        'name': 'ldap',
+        'image': 'osixia/openldap',
+        'pull': 'always',
+        'detach': True,
+        'environment': {
+          'LDAP_DOMAIN': 'owncloud.com',
+          'LDAP_ORGANISATION': 'owncloud',
+          'LDAP_ADMIN_PASSWORD': 'admin',
+          'LDAP_TLS_VERIFY_CLIENT': 'never',
+          'HOSTNAME': 'ldap'
+         },
+      },
+      {
+        'name': 'reva-server',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'detach': True,
+        'environment' : {
+          'REVA_USERS_DRIVER': 'ldap',
+          'REVA_STORAGE_HOME_EXPOSE_DATA_SERVER': 1,
+          'REVA_STORAGE_OC_EXPOSE_DATA_SERVER': 1,
+          'REVA_LDAP_HOSTNAME': 'ldap',
+          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
+          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
+          'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'WEBDAV_NAMESPACE_JAIL': '/'
+        },
+        'commands': [
+          'mkdir -p /srv/app/tmp/reva',
+          'bin/ocis-reva gateway &',
+          'bin/ocis-reva users &',
+          'bin/ocis-reva auth-basic &',
+          'bin/ocis-reva auth-bearer &',
+          'bin/ocis-reva sharing &',
+          'bin/ocis-reva storage-root &',
+          'bin/ocis-reva storage-home &',
+          'bin/ocis-reva storage-home-data &',
+          'bin/ocis-reva storage-oc &',
+          'bin/ocis-reva storage-oc-data &',
+          'bin/ocis-reva frontend'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
+        'name': 'acceptance-tests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://reva-server:9140',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'TEST_OCIS':'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/'
+         },
+         'commands': [
+           'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+           'cd /srv/app/testrunner',
+           'make test-acceptance-api'
+          ],
+          'volumes': [
+            {
+              'name': 'gopath',
+              'path': '/srv/app',
+            },
+          ]
+      },
     ],
     'volumes': [
       {
