@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 )
 
@@ -15,17 +16,13 @@ func New() Service {
 type Service struct{}
 
 // Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
-func (s Service) Set(c context.Context, req *proto.SettingsRequest, res *proto.SettingsResponse) error {
-	res.Response = &proto.AccountSettings{
-		Name: req.Request.Name,
-	}
+func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
+	res.Id = uuid.New().String()
+	res.Theme = "dark"
 	return nil
 }
 
 // Get implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
-func (s Service) Get(c context.Context, req *proto.AccountQueryRequest, res *proto.SettingsResponse) error {
-	res.Response = &proto.AccountSettings{
-		Name: "hej",
-	}
+func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
 	return nil
 }
