@@ -92,13 +92,17 @@ install: $(SOURCES)
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)
 
 .PHONY: build
-build: $(BIN)/$(EXECUTABLE) $(BIN)/$(EXECUTABLE)-debug
+build: $(BIN)/$(EXECUTABLE) $(BIN)/$(EXECUTABLE)-debug asset-copy
 
 $(BIN)/$(EXECUTABLE): $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+
+.PHONY: asset-copy
+asset-copy:
+	cp -r ./web/identifier-webapp $(BIN)/ && cp ./config/identifier-registration.yaml $(BIN)/
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
