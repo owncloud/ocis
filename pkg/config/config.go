@@ -178,6 +178,11 @@ type LDAPSchema struct {
 	CN          string
 }
 
+// OCDav defines the available ocdav configuration.
+type OCDav struct {
+	NamespaceJail string
+}
+
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
@@ -186,6 +191,7 @@ type Reva struct {
 	TransferExpires int
 	OIDC            OIDC
 	LDAP            LDAP
+	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used configure which services to start on which port
 	Frontend          Port

@@ -89,6 +89,16 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.TransferSecret,
 		},
 
+		// OCDav
+
+		&cli.StringFlag{
+			Name:        "webdav-namespace-jail",
+			Value:       "/home/",
+			Usage:       "Namespace prefix for the webdav endpoints /dav/files and /webdav",
+			EnvVars:     []string{"WEBDAV_NAMESPACE_JAIL"},
+			Destination: &cfg.Reva.OCDav.NamespaceJail,
+		},
+
 		// OIDC
 
 		&cli.StringFlag{
