@@ -4,7 +4,6 @@ package store
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 
 	mstore "github.com/micro/go-micro/v2/store"
 )
@@ -42,7 +41,7 @@ func (s *Store) Write(rec *mstore.Record) error {
 	}
 
 	if err := ioutil.WriteFile(s.mountPath+"/"+rec.Key, rec.Value, 0644); err != nil {
-		log.Panic(err)
+		// TODO handle error
 	}
 	return nil
 }
