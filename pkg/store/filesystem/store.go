@@ -5,39 +5,47 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 
 	mstore "github.com/micro/go-micro/v2/store"
 	olog "github.com/owncloud/ocis-pkg/log"
 )
 
-// Logger is a global logger
-var Logger olog.Logger
+// StoreName is the default name for the store container
+var StoreName string = "ocis-store"
 
 // Store interacts with the filesystem to manage account information
 type Store struct {
-	logger    olog.Logger
 	mountPath string
+	logger    olog.Logger
 }
 
 // New returns a new file system store manager
 // TODO add mountPath as a flag. Accept a *config argument
 func New() Store {
-	store := Store{
+	s := Store{
 		logger: olog.NewLogger(),
 	}
 
 	// default to the current working directory if not configured
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		store.logger.Err(err).Msg("initializing the accounts store")
+		s.logger.Err(err).Msg("initializing accounts store")
 	}
-	store.mountPath = dir
 
-	return store
+	dest := filepath.Join(dir, StoreName)
+	if _, err := os.Stat(dest); err != nil {
+		s.logger.Info().Msgf("creating container on %v", dest)
+		os.Mkdir(dest, 0700)
+	}
+
+	s.mountPath = dest
+	return s
 }
 
 // Init implements the store interface
+// TODO it could prepare the destination path, for instance
 func (s *Store) Init(...mstore.Options) {}
 
 // List implements the store interface
@@ -46,8 +54,20 @@ func (s *Store) List() ([]*mstore.Record, error) {
 }
 
 // Read implements the store interface
+// this implementation only reads by id.
 func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
-	return nil, nil
+	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
+	if err != nil {
+		s.logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
+		return []*mstore.Record{}, err
+	}
+
+	return []*mstore.Record{
+		&mstore.Record{
+			Key:   key,
+			Value: contents,
+		},
+	}, nil
 }
 
 // Write implements the store interface
@@ -75,4 +95,9 @@ func (s *Store) Delete(key string) error {
 // String implements the store interface, and the stringer interface
 func (s *Store) String() string {
 	return "store"
+}
+
+// creates the default container for the ocis-store if it doesn't exist
+func init() {
+
 }

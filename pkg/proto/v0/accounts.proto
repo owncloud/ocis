@@ -28,5 +28,5 @@ message Phoenix {
 }
 
 message Query {
-    string id = 1;
+    string key = 1;
 }

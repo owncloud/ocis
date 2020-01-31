@@ -36,10 +36,15 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 
 // Get implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	res.Payload = &proto.Payload{
-		Phoenix: &proto.Phoenix{
-			Theme: "light",
-		},
+	st := store.New()
+	contents, err := st.Read(req.Key)
+	if err != nil {
+		// TODO deal with this
 	}
+
+	r := &proto.Payload{}
+	json.Unmarshal(contents[0].Value, r)
+
+	res.Payload = r
 	return nil
 }
