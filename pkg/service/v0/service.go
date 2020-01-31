@@ -42,9 +42,11 @@ func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) err
 		// TODO deal with this
 	}
 
-	r := &proto.Payload{}
-	json.Unmarshal(contents[0].Value, r)
+	if len(contents) > 0 {
+		r := &proto.Payload{}
+		json.Unmarshal(contents[0].Value, r)
+		res.Payload = r
+	}
 
-	res.Payload = r
 	return nil
 }
