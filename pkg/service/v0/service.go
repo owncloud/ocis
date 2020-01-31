@@ -6,7 +6,8 @@ import (
 
 	mstore "github.com/micro/go-micro/v2/store"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	store "github.com/owncloud/ocis-accounts/pkg/store/filesystem"
+
+	"github.com/owncloud/ocis-accounts/pkg/registry"
 )
 
 // New returns a new instance of Service
@@ -19,8 +20,6 @@ type Service struct{}
 
 // Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	st := store.New()
-
 	settingsJSON, err := json.Marshal(req.Payload)
 	if err != nil {
 		return err
@@ -31,13 +30,12 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 		Value: settingsJSON,
 	}
 
-	return st.Write(&record)
+	return registry.Store.Write(&record)
 }
 
 // Get implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	st := store.New()
-	contents, _ := st.Read(req.Key)
+	contents, _ := registry.Store.Read(req.Key)
 
 	if len(contents) > 0 {
 		r := &proto.Payload{}

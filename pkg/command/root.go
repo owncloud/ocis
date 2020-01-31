@@ -4,12 +4,12 @@ import (
 	"os"
 
 	"github.com/micro/cli"
+	_ "github.com/owncloud/ocis-accounts/pkg/registry"
 	"github.com/owncloud/ocis-hello/pkg/version"
 )
 
 // Execute is the entry point for the ocis-accounts command.
 func Execute() error {
-
 	app := &cli.App{
 		Name:    "ocis-accounts",
 		Version: version.String,

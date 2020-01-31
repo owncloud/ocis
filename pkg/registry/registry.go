@@ -2,9 +2,20 @@
 package registry
 
 import (
-	"github.com/micro/go-micro/v2/store"
+	"sync"
+
+	mstore "github.com/micro/go-micro/v2/store"
+	store "github.com/owncloud/ocis-accounts/pkg/store/filesystem"
 )
 
-type Registry {
-	Store store.Store
+var (
+	once *sync.Once = &sync.Once{}
+	// Store is a micro store implementation
+	Store mstore.Store
+)
+
+func init() {
+	once.Do(func() {
+		Store = store.New()
+	})
 }

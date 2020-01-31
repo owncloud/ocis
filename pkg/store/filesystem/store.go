@@ -21,9 +21,8 @@ type Store struct {
 	Logger    olog.Logger
 }
 
-// New returns a new file system store manager
 // TODO add mountPath as a flag. Accept a *config argument
-func New() Store {
+func New() *Store {
 	s := Store{
 		Logger: olog.NewLogger(),
 	}
@@ -41,21 +40,23 @@ func New() Store {
 	}
 
 	s.mountPath = dest
-	return s
+	return &s
 }
 
 // Init implements the store interface
 // TODO it could prepare the destination path, for instance
-func (s *Store) Init(...mstore.Options) {}
+func (s Store) Init(...mstore.Option) error {
+	return nil
+}
 
 // List implements the store interface
-func (s *Store) List() ([]*mstore.Record, error) {
+func (s Store) List() ([]*mstore.Record, error) {
 	return nil, nil
 }
 
 // Read implements the store interface
 // this implementation only reads by id.
-func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
+func (s Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
@@ -71,7 +72,7 @@ func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, e
 }
 
 // Write implements the store interface
-func (s *Store) Write(rec *mstore.Record) error {
+func (s Store) Write(rec *mstore.Record) error {
 	path := filepath.Join(s.mountPath, rec.Key)
 
 	if len(rec.Key) < 1 {
@@ -88,16 +89,11 @@ func (s *Store) Write(rec *mstore.Record) error {
 }
 
 // Delete implements the store interface
-func (s *Store) Delete(key string) error {
+func (s Store) Delete(key string) error {
 	return nil
 }
 
 // String implements the store interface, and the stringer interface
-func (s *Store) String() string {
+func (s Store) String() string {
 	return "store"
-}
-
-// creates the default container for the ocis-store if it doesn't exist
-func init() {
-
 }
