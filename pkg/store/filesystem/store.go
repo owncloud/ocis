@@ -18,25 +18,25 @@ var StoreName string = "ocis-store"
 // Store interacts with the filesystem to manage account information
 type Store struct {
 	mountPath string
-	logger    olog.Logger
+	Logger    olog.Logger
 }
 
 // New returns a new file system store manager
 // TODO add mountPath as a flag. Accept a *config argument
 func New() Store {
 	s := Store{
-		logger: olog.NewLogger(),
+		Logger: olog.NewLogger(),
 	}
 
 	// default to the current working directory if not configured
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		s.logger.Err(err).Msg("initializing accounts store")
+		s.Logger.Err(err).Msg("initializing accounts store")
 	}
 
 	dest := filepath.Join(dir, StoreName)
 	if _, err := os.Stat(dest); err != nil {
-		s.logger.Info().Msgf("creating container on %v", dest)
+		s.Logger.Info().Msgf("creating container on %v", dest)
 		os.Mkdir(dest, 0700)
 	}
 
@@ -58,7 +58,7 @@ func (s *Store) List() ([]*mstore.Record, error) {
 func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
 	if err != nil {
-		s.logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
+		s.Logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
 		return []*mstore.Record{}, err
 	}
 
@@ -83,7 +83,7 @@ func (s *Store) Write(rec *mstore.Record) error {
 		return err
 	}
 
-	s.logger.Info().Msgf("%v bytes written to %v", len(rec.Value), path)
+	s.Logger.Info().Msgf("%v bytes written to %v", len(rec.Value), path)
 	return nil
 }
 
