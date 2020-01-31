@@ -48,7 +48,7 @@ func NewSettingsService(name string, c client.Client) SettingsService {
 		c = client.NewClient()
 	}
 	if len(name) == 0 {
-		name = "settingsservice"
+		name = "settings"
 	}
 	return &settingsService{
 		c:    c,

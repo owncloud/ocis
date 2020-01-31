@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+package settings;
 option go_package = "proto";
 
 service SettingsService {
@@ -8,10 +9,14 @@ service SettingsService {
 }
 
 message Record {
-    string id = 1;
-    string theme = 2;
+    string key = 1;
+    Settings payload = 2;
 }
 
 message Query {
     string id = 1;
+}
+
+message Settings {
+    string theme = 2;
 }

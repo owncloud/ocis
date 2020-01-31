@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"log"
 
 	mstore "github.com/micro/go-micro/v2/store"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
@@ -20,17 +19,16 @@ type Service struct{}
 
 // Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	// uses a store manager to persist account information
 	st := store.New()
 
-	data, err := json.Marshal([]byte(`{"theme": "dark"}`))
+	settingsJSON, err := json.Marshal(req.Payload)
 	if err != nil {
-		// deal with this accordingly and not panicking
-		log.Panic(err)
+		// TODO deal with this
 	}
+
 	record := mstore.Record{
-		Key:   req.Id,
-		Value: data,
+		Key:   req.Key,
+		Value: settingsJSON,
 	}
 
 	return st.Write(&record)

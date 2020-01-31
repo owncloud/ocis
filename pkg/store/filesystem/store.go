@@ -37,7 +37,7 @@ func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, e
 
 // Write implements the store interface
 func (s *Store) Write(rec *mstore.Record) error {
-	if rec.Key == "" {
+	if len(rec.Key) < 1 {
 		return fmt.Errorf("%v", "key is empty")
 	}
 
