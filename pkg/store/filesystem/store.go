@@ -23,16 +23,18 @@ type Store struct {
 // New returns a new file system store manager
 // TODO add mountPath as a flag. Accept a *config argument
 func New() Store {
+	store := Store{
+		logger: olog.NewLogger(),
+	}
+
 	// default to the current working directory if not configured
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		// TODO log error
-		// TODO deal with this
+		store.logger.Err(err).Msg("initializing the accounts store")
 	}
-	return Store{
-		mountPath: dir,
-		logger:    olog.NewLogger(),
-	}
+	store.mountPath = dir
+
+	return store
 }
 
 // Init implements the store interface

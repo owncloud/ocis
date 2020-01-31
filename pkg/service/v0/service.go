@@ -19,7 +19,6 @@ type Service struct{}
 
 // Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	// TODO this should be a globally initialized struct
 	st := store.New()
 
 	settingsJSON, err := json.Marshal(req.Payload)
