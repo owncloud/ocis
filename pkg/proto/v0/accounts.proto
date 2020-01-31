@@ -13,10 +13,10 @@ message Record {
     Settings payload = 2;
 }
 
-message Query {
-    string id = 1;
-}
-
 message Settings {
     string theme = 2;
+}
+
+message Query {
+    string id = 1;
 }
