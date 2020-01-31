@@ -24,7 +24,6 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 
 	settingsJSON, err := json.Marshal(req.Payload)
 	if err != nil {
-		// TODO log the error
 		return err
 	}
 
