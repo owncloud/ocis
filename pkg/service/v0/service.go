@@ -23,7 +23,8 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 
 	settingsJSON, err := json.Marshal(req.Payload)
 	if err != nil {
-		// TODO deal with this
+		// TODO log the error
+		return err
 	}
 
 	record := mstore.Record{

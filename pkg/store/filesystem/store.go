@@ -4,9 +4,13 @@ package store
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 
 	mstore "github.com/micro/go-micro/v2/store"
 )
+
+// DefaultPath assumes UNIX
+var DefaultPath string = "/var/tmp/ocis-store"
 
 // Store interacts with the filesystem to manage account information
 type Store struct {
@@ -14,10 +18,10 @@ type Store struct {
 }
 
 // New returns a new file system store manager
-// TODO add mountPath as an option argument
+// TODO add mountPath as a flag
 func New() Store {
 	return Store{
-		mountPath: "/var/tmp/ocis-store",
+		mountPath: DefaultPath,
 	}
 }
 
@@ -36,14 +40,18 @@ func (s *Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, e
 
 // Write implements the store interface
 func (s *Store) Write(rec *mstore.Record) error {
+	path := filepath.Join(s.mountPath, rec.Key)
+
+	if filepath.IsAbs(path) {
+		// TODO WARN, storage is relative to the service directory
+	}
+
 	if len(rec.Key) < 1 {
+		// TODO log error: empty key
 		return fmt.Errorf("%v", "key is empty")
 	}
 
-	if err := ioutil.WriteFile(s.mountPath+"/"+rec.Key, rec.Value, 0644); err != nil {
-		// TODO handle error
-	}
-	return nil
+	return ioutil.WriteFile(path, rec.Value, 0644)
 }
 
 // Delete implements the store interface

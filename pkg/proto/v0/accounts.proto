@@ -10,11 +10,21 @@ service SettingsService {
 
 message Record {
     string key = 1;
-    Settings payload = 2;
+    Payload payload = 2;
 }
 
-message Settings {
-    string theme = 2;
+message Payload {
+    Phoenix phoenix = 1;
+    Account account = 2;
+}
+
+message Account {
+    string name = 1;
+    string dateOfBirth = 2;
+}
+
+message Phoenix {
+    string theme = 1;
 }
 
 message Query {

@@ -5,9 +5,8 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -22,11 +21,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Record struct {
-	Key                  string    `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Payload              *Settings `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Payload              *Payload `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Record) Reset()         { *m = Record{} }
@@ -61,11 +60,144 @@ func (m *Record) GetKey() string {
 	return ""
 }
 
-func (m *Record) GetPayload() *Settings {
+func (m *Record) GetPayload() *Payload {
 	if m != nil {
 		return m.Payload
 	}
 	return nil
+}
+
+type Payload struct {
+	Phoenix              *Phoenix `protobuf:"bytes,1,opt,name=phoenix,proto3" json:"phoenix,omitempty"`
+	Account              *Account `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Payload) Reset()         { *m = Payload{} }
+func (m *Payload) String() string { return proto.CompactTextString(m) }
+func (*Payload) ProtoMessage()    {}
+func (*Payload) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e3c84319968a576b, []int{1}
+}
+
+func (m *Payload) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Payload.Unmarshal(m, b)
+}
+func (m *Payload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Payload.Marshal(b, m, deterministic)
+}
+func (m *Payload) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Payload.Merge(m, src)
+}
+func (m *Payload) XXX_Size() int {
+	return xxx_messageInfo_Payload.Size(m)
+}
+func (m *Payload) XXX_DiscardUnknown() {
+	xxx_messageInfo_Payload.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Payload proto.InternalMessageInfo
+
+func (m *Payload) GetPhoenix() *Phoenix {
+	if m != nil {
+		return m.Phoenix
+	}
+	return nil
+}
+
+func (m *Payload) GetAccount() *Account {
+	if m != nil {
+		return m.Account
+	}
+	return nil
+}
+
+type Account struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DateOfBirth          string   `protobuf:"bytes,2,opt,name=dateOfBirth,proto3" json:"dateOfBirth,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Account) Reset()         { *m = Account{} }
+func (m *Account) String() string { return proto.CompactTextString(m) }
+func (*Account) ProtoMessage()    {}
+func (*Account) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e3c84319968a576b, []int{2}
+}
+
+func (m *Account) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Account.Unmarshal(m, b)
+}
+func (m *Account) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Account.Marshal(b, m, deterministic)
+}
+func (m *Account) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Account.Merge(m, src)
+}
+func (m *Account) XXX_Size() int {
+	return xxx_messageInfo_Account.Size(m)
+}
+func (m *Account) XXX_DiscardUnknown() {
+	xxx_messageInfo_Account.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Account proto.InternalMessageInfo
+
+func (m *Account) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Account) GetDateOfBirth() string {
+	if m != nil {
+		return m.DateOfBirth
+	}
+	return ""
+}
+
+type Phoenix struct {
+	Theme                string   `protobuf:"bytes,1,opt,name=theme,proto3" json:"theme,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Phoenix) Reset()         { *m = Phoenix{} }
+func (m *Phoenix) String() string { return proto.CompactTextString(m) }
+func (*Phoenix) ProtoMessage()    {}
+func (*Phoenix) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e3c84319968a576b, []int{3}
+}
+
+func (m *Phoenix) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Phoenix.Unmarshal(m, b)
+}
+func (m *Phoenix) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Phoenix.Marshal(b, m, deterministic)
+}
+func (m *Phoenix) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Phoenix.Merge(m, src)
+}
+func (m *Phoenix) XXX_Size() int {
+	return xxx_messageInfo_Phoenix.Size(m)
+}
+func (m *Phoenix) XXX_DiscardUnknown() {
+	xxx_messageInfo_Phoenix.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Phoenix proto.InternalMessageInfo
+
+func (m *Phoenix) GetTheme() string {
+	if m != nil {
+		return m.Theme
+	}
+	return ""
 }
 
 type Query struct {
@@ -79,7 +211,7 @@ func (m *Query) Reset()         { *m = Query{} }
 func (m *Query) String() string { return proto.CompactTextString(m) }
 func (*Query) ProtoMessage()    {}
 func (*Query) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e3c84319968a576b, []int{1}
+	return fileDescriptor_e3c84319968a576b, []int{4}
 }
 
 func (m *Query) XXX_Unmarshal(b []byte) error {
@@ -107,67 +239,33 @@ func (m *Query) GetId() string {
 	return ""
 }
 
-type Settings struct {
-	Theme                string   `protobuf:"bytes,2,opt,name=theme,proto3" json:"theme,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Settings) Reset()         { *m = Settings{} }
-func (m *Settings) String() string { return proto.CompactTextString(m) }
-func (*Settings) ProtoMessage()    {}
-func (*Settings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e3c84319968a576b, []int{2}
-}
-
-func (m *Settings) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Settings.Unmarshal(m, b)
-}
-func (m *Settings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Settings.Marshal(b, m, deterministic)
-}
-func (m *Settings) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Settings.Merge(m, src)
-}
-func (m *Settings) XXX_Size() int {
-	return xxx_messageInfo_Settings.Size(m)
-}
-func (m *Settings) XXX_DiscardUnknown() {
-	xxx_messageInfo_Settings.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Settings proto.InternalMessageInfo
-
-func (m *Settings) GetTheme() string {
-	if m != nil {
-		return m.Theme
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterType((*Record)(nil), "settings.Record")
+	proto.RegisterType((*Payload)(nil), "settings.Payload")
+	proto.RegisterType((*Account)(nil), "settings.Account")
+	proto.RegisterType((*Phoenix)(nil), "settings.Phoenix")
 	proto.RegisterType((*Query)(nil), "settings.Query")
-	proto.RegisterType((*Settings)(nil), "settings.Settings")
 }
 
 func init() { proto.RegisterFile("pkg/proto/v0/accounts.proto", fileDescriptor_e3c84319968a576b) }
 
 var fileDescriptor_e3c84319968a576b = []byte{
-	// 211 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2e, 0xc8, 0x4e, 0xd7,
-	0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x2f, 0x33, 0xd0, 0x4f, 0x4c, 0x4e, 0xce, 0x2f, 0xcd, 0x2b,
-	0x29, 0xd6, 0x03, 0x8b, 0x08, 0x71, 0x14, 0xa7, 0x96, 0x94, 0x64, 0xe6, 0xa5, 0x17, 0x2b, 0x79,
-	0x70, 0xb1, 0x05, 0xa5, 0x26, 0xe7, 0x17, 0xa5, 0x08, 0x09, 0x70, 0x31, 0x67, 0xa7, 0x56, 0x4a,
-	0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0x81, 0x98, 0x42, 0x3a, 0x5c, 0xec, 0x05, 0x89, 0x95, 0x39,
-	0xf9, 0x89, 0x29, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xdc, 0x46, 0x42, 0x7a, 0x30, 0x7d, 0x7a, 0xc1,
-	0x50, 0x46, 0x10, 0x4c, 0x89, 0x92, 0x38, 0x17, 0x6b, 0x60, 0x69, 0x6a, 0x51, 0xa5, 0x10, 0x1f,
-	0x17, 0x53, 0x66, 0x0a, 0xd4, 0x1c, 0xa6, 0xcc, 0x14, 0x25, 0x05, 0x2e, 0x0e, 0x98, 0x6a, 0x21,
-	0x11, 0x2e, 0xd6, 0x92, 0x8c, 0xd4, 0xdc, 0x54, 0xb0, 0x81, 0x9c, 0x41, 0x10, 0x8e, 0x51, 0x1a,
-	0x17, 0x3f, 0x4c, 0x45, 0x70, 0x6a, 0x51, 0x59, 0x66, 0x72, 0xaa, 0x90, 0x26, 0x17, 0x73, 0x70,
-	0x6a, 0x89, 0x90, 0x00, 0xc2, 0x46, 0x88, 0x33, 0xa5, 0x30, 0x44, 0x84, 0x34, 0xb8, 0x98, 0xdd,
-	0x53, 0x4b, 0x84, 0xf8, 0x11, 0x12, 0x60, 0x77, 0x60, 0xaa, 0x74, 0x62, 0x8f, 0x62, 0x05, 0xfb,
-	0x3f, 0x89, 0x0d, 0x4c, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x28, 0x61, 0x84, 0x13, 0x25,
-	0x01, 0x00, 0x00,
+	// 271 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x51, 0x4f, 0x4f, 0x83, 0x30,
+	0x14, 0x0f, 0x20, 0xc3, 0xbd, 0x25, 0x6e, 0xbe, 0x98, 0xb8, 0xe8, 0x41, 0xc2, 0x09, 0x63, 0x02,
+	0x66, 0x7e, 0x00, 0xe3, 0x2e, 0x3b, 0xaa, 0xe5, 0xe6, 0x0d, 0xe1, 0x6d, 0x34, 0x53, 0x4a, 0x4a,
+	0xb7, 0xc8, 0xb7, 0x37, 0x6b, 0x8b, 0x73, 0xe1, 0xd4, 0xd7, 0xdf, 0xbf, 0xf7, 0x4b, 0x0b, 0xb7,
+	0xcd, 0x76, 0x93, 0x36, 0x52, 0x28, 0x91, 0xee, 0x1f, 0xd3, 0xbc, 0x28, 0xc4, 0xae, 0x56, 0x6d,
+	0xa2, 0x11, 0x3c, 0x6f, 0x49, 0x29, 0x5e, 0x6f, 0xda, 0x68, 0x05, 0x23, 0x46, 0x85, 0x90, 0x25,
+	0xce, 0xc0, 0xdb, 0x52, 0x37, 0x77, 0x42, 0x27, 0x1e, 0xb3, 0xc3, 0x88, 0x0f, 0x10, 0x34, 0x79,
+	0xf7, 0x25, 0xf2, 0x72, 0xee, 0x86, 0x4e, 0x3c, 0x59, 0x5c, 0x26, 0xbd, 0x2f, 0x79, 0x33, 0x04,
+	0xeb, 0x15, 0x51, 0x01, 0x81, 0xc5, 0xb4, 0xaf, 0x12, 0x54, 0xf3, 0x1f, 0x9d, 0x76, 0xea, 0x33,
+	0x04, 0xeb, 0x15, 0x07, 0xb1, 0x2d, 0x37, 0x5c, 0xf2, 0x62, 0x08, 0xd6, 0x2b, 0xa2, 0x67, 0x08,
+	0x2c, 0x86, 0x08, 0x67, 0x75, 0xfe, 0x4d, 0xb6, 0xaf, 0x9e, 0x31, 0x84, 0x49, 0x99, 0x2b, 0x7a,
+	0x5d, 0x2f, 0xb9, 0x54, 0x95, 0xce, 0x1b, 0xb3, 0xff, 0x50, 0x74, 0x07, 0x81, 0x6d, 0x80, 0x57,
+	0xe0, 0xab, 0x8a, 0xfe, 0x12, 0xcc, 0x25, 0xba, 0x06, 0xff, 0x7d, 0x47, 0xb2, 0xc3, 0x0b, 0x70,
+	0x79, 0x69, 0x39, 0x97, 0x97, 0x8b, 0x35, 0x4c, 0x33, 0xdb, 0x2b, 0x23, 0xb9, 0xe7, 0x05, 0xe1,
+	0x3d, 0x78, 0x19, 0x29, 0x9c, 0x1d, 0x0b, 0x9b, 0xa7, 0xbc, 0x19, 0x20, 0x18, 0x83, 0xb7, 0x22,
+	0x85, 0xd3, 0x23, 0xa1, 0xb7, 0x0c, 0x95, 0xcb, 0xe0, 0xc3, 0xd7, 0x7f, 0xf4, 0x39, 0xd2, 0xc7,
+	0xd3, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x66, 0x19, 0xd7, 0xce, 0xc9, 0x01, 0x00, 0x00,
 }
