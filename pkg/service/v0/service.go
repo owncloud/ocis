@@ -3,23 +3,30 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	mstore "github.com/micro/go-micro/v2/store"
+	"github.com/owncloud/ocis-accounts/pkg/account"
+	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-
-	"github.com/owncloud/ocis-accounts/pkg/registry"
 )
 
 // New returns a new instance of Service
-func New() Service {
-	return Service{}
+func New(cfg *config.Config) Service {
+	fmt.Printf("config type: %T", account.Registry["filesystem"])
+	return Service{
+		Config:  cfg,
+		Manager: account.Registry["filesystem"](cfg), // TODO read this from config
+	}
 }
 
-// Service implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
-type Service struct{}
+// Service implements the SettingsServiceHandler interface
+type Service struct {
+	Config  *config.Config
+	Manager account.Manager
+}
 
-// Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
+// Set implements the SettingsServiceHandler interface
 // This implementation replaces the existent data with the requested. It does not calculate diff
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
 	settingsJSON, err := json.Marshal(req.Payload)
@@ -27,45 +34,41 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 		return err
 	}
 
-	record := mstore.Record{
+	s.Manager.Write(&account.Record{
 		Key:   req.Key,
 		Value: settingsJSON,
-	}
-
-	return registry.Store.Write(&record)
-}
-
-// Get implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
-func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	contents, err := registry.Store.Read(req.Key)
-	if err != nil {
-		return err
-	}
-
-	if len(contents) > 0 {
-		r := &proto.Payload{}
-		json.Unmarshal(contents[0].Value, r)
-		res.Payload = r
-	}
+	})
 
 	return nil
 }
 
-// List implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
+// Get implements the SettingsServiceHandler interface
+func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
+	// contents, err := registry.Store.Read(req.Key)
+	contents := s.Manager.Read(req.Key)
+
+	r := &proto.Payload{}
+	json.Unmarshal(contents.Value, r)
+	res.Payload = r
+
+	return nil
+}
+
+// List implements the SettingsServiceHandler interface
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
-	r := &proto.Records{}
-	contents, err := registry.Store.List()
-	if err != nil {
-		return err
-	}
+	// r := &proto.Records{}
+	// contents, err := registry.Store.List()
+	// if err != nil {
+	// 	return err
+	// }
 
-	for _, v := range contents {
-		r.Records = append(r.Records, &proto.Record{
-			Key: v.Key,
-		})
-	}
+	// for _, v := range contents {
+	// 	r.Records = append(r.Records, &proto.Record{
+	// 		Key: v.Key,
+	// 	})
+	// }
 
-	res.Records = r.Records
+	// res.Records = r.Records
 
 	return nil
 }

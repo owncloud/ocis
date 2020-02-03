@@ -25,7 +25,6 @@ func Server() cli.Command {
 			gr.Add(func() error {
 				return service.Run()
 			}, func(_ error) {
-
 				fmt.Println("shutting down grpc server")
 				cancel()
 			})

@@ -4,7 +4,8 @@ import (
 	"os"
 
 	"github.com/micro/cli"
-	_ "github.com/owncloud/ocis-accounts/pkg/registry"
+	// init store manager
+	_ "github.com/owncloud/ocis-accounts/pkg/store"
 	"github.com/owncloud/ocis-hello/pkg/version"
 )
 

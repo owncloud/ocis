@@ -1,15 +1,15 @@
 package grpc
 
-// package grpc uses `ocis-pkg` to start a go-micro service
 import (
 	"context"
 
+	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
 	"github.com/owncloud/ocis-pkg/service/grpc"
 )
 
-// NewService initializes a new go-micro service ready to run
+// NewService creates a grpc service
 func NewService(c context.Context) grpc.Service {
 	service := grpc.NewService(
 		grpc.Name("accounts"),
@@ -18,8 +18,7 @@ func NewService(c context.Context) grpc.Service {
 		grpc.Context(c),
 	)
 
-	// add a handler to the service
-	hdlr := svc.New()
+	hdlr := svc.New(config.New())
 	proto.RegisterSettingsServiceHandler(service.Server(), hdlr)
 
 	service.Init()
