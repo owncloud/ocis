@@ -127,19 +127,6 @@ def testing(ctx):
         },
       },
       {
-        'name': 'ldap',
-        'image': 'osixia/openldap',
-        'pull': 'always',
-        'detach': True,
-        'environment': {
-          'LDAP_DOMAIN': 'owncloud.com',
-          'LDAP_ORGANISATION': 'owncloud',
-          'LDAP_ADMIN_PASSWORD': 'admin',
-          'LDAP_TLS_VERIFY_CLIENT': 'never',
-          'HOSTNAME': 'ldap'
-         },
-      },
-      {
         'name': 'reva-server',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
@@ -199,6 +186,20 @@ def testing(ctx):
               'path': '/srv/app',
             },
           ]
+      },
+    ],
+    'services': [
+      {
+        'name': 'ldap',
+        'image': 'osixia/openldap',
+        'pull': 'always',
+        'environment': {
+          'LDAP_DOMAIN': 'owncloud.com',
+          'LDAP_ORGANISATION': 'owncloud',
+          'LDAP_ADMIN_PASSWORD': 'admin',
+          'LDAP_TLS_VERIFY_CLIENT': 'never',
+          'HOSTNAME': 'ldap'
+         },
       },
     ],
     'volumes': [
