@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro"
-	"github.com/micro/go-plugins/wrapper/trace/opencensus"
+	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis-pkg/wrapper/prometheus"
 )
 
