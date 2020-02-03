@@ -126,6 +126,7 @@ func (mz microZerolog) Read(opts ...mdlog.ReadOption) ([]mdlog.Record, error) {
 func (mz microZerolog) Write(record mdlog.Record) error {
 	level := record.Metadata["level"]
 	mz.log(level, fmt.Sprint(record.Message))
+	mz.buffer.Put(record.Message)
 	return nil
 }
 
