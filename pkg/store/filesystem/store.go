@@ -21,7 +21,7 @@ type Store struct {
 	Logger    olog.Logger
 }
 
-// TODO add mountPath as a flag. Accept a *config argument
+// New returns a new stor. TODO add mountPath as a flag. Accept a *config argument
 func New() *Store {
 	s := Store{
 		Logger: olog.NewLogger(),
