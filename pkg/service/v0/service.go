@@ -20,6 +20,7 @@ func New() Service {
 type Service struct{}
 
 // Set implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
+// This implementation replaces the existent data with the requested. It does not calculate diff
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
 	settingsJSON, err := json.Marshal(req.Payload)
 	if err != nil {
@@ -52,12 +53,11 @@ func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) err
 
 // List implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
+	records := &proto.Records{}
 	contents, err := registry.Store.List()
 	if err != nil {
 		return err
 	}
-
-	records := &proto.Records{}
 
 	for _, v := range contents {
 		records.Records = append(records.Records, &proto.Record{
