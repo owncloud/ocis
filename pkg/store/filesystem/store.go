@@ -76,7 +76,7 @@ func (s Store) Write(rec *mstore.Record) error {
 	path := filepath.Join(s.mountPath, rec.Key)
 
 	if len(rec.Key) < 1 {
-		// TODO log error: empty key
+		s.Logger.Error().Msg("key cannot be empty")
 		return fmt.Errorf("%v", "key is empty")
 	}
 
