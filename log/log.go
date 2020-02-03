@@ -3,7 +3,6 @@ package log
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
@@ -169,16 +168,4 @@ func (mz microZerolog) log(level string, msg string) {
 	if l == zerolog.FatalLevel {
 		os.Exit(1)
 	}
-}
-
-// parentCaller tries to detect which log method had been invoked.
-func parentCaller() string {
-	pc, _, _, ok := runtime.Caller(4)
-	fn := runtime.FuncForPC(pc)
-
-	if ok && fn != nil {
-		return fn.Name()
-	}
-
-	return ""
 }
