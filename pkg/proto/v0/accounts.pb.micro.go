@@ -5,13 +5,15 @@ package proto
 
 import (
 	fmt "fmt"
-	proto "github.com/golang/protobuf/proto"
 	math "math"
-)
 
-import (
+	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
+
 	context "context"
+
 	client "github.com/micro/go-micro/client"
+
 	server "github.com/micro/go-micro/server"
 )
 
@@ -36,6 +38,7 @@ var _ server.Option
 type SettingsService interface {
 	Set(ctx context.Context, in *Record, opts ...client.CallOption) (*Record, error)
 	Get(ctx context.Context, in *Query, opts ...client.CallOption) (*Record, error)
+	List(ctx context.Context, in *empty.Empty, opts ...client.CallOption) (*Records, error)
 }
 
 type settingsService struct {
@@ -76,17 +79,29 @@ func (c *settingsService) Get(ctx context.Context, in *Query, opts ...client.Cal
 	return out, nil
 }
 
+func (c *settingsService) List(ctx context.Context, in *empty.Empty, opts ...client.CallOption) (*Records, error) {
+	req := c.c.NewRequest(c.name, "SettingsService.List", in)
+	out := new(Records)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for SettingsService service
 
 type SettingsServiceHandler interface {
 	Set(context.Context, *Record, *Record) error
 	Get(context.Context, *Query, *Record) error
+	List(context.Context, *empty.Empty, *Records) error
 }
 
 func RegisterSettingsServiceHandler(s server.Server, hdlr SettingsServiceHandler, opts ...server.HandlerOption) error {
 	type settingsService interface {
 		Set(ctx context.Context, in *Record, out *Record) error
 		Get(ctx context.Context, in *Query, out *Record) error
+		List(ctx context.Context, in *empty.Empty, out *Records) error
 	}
 	type SettingsService struct {
 		settingsService
@@ -105,4 +120,8 @@ func (h *settingsServiceHandler) Set(ctx context.Context, in *Record, out *Recor
 
 func (h *settingsServiceHandler) Get(ctx context.Context, in *Query, out *Record) error {
 	return h.SettingsServiceHandler.Get(ctx, in, out)
+}
+
+func (h *settingsServiceHandler) List(ctx context.Context, in *empty.Empty, out *Records) error {
+	return h.SettingsServiceHandler.List(ctx, in, out)
 }

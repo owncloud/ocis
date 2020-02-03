@@ -44,14 +44,26 @@ func New() *Store {
 }
 
 // Init implements the store interface
-// TODO it could prepare the destination path, for instance
 func (s Store) Init(...mstore.Option) error {
 	return nil
 }
 
-// List implements the store interface
+// List returns all the identities in the mountPath folder
 func (s Store) List() ([]*mstore.Record, error) {
-	return nil, nil
+	records := []*mstore.Record{}
+	identities, err := ioutil.ReadDir(s.mountPath)
+	if err != nil {
+		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
+	}
+
+	s.Logger.Info().Msg("listing identities")
+	for _, v := range identities {
+		records = append(records, &mstore.Record{
+			Key: v.Name(),
+		})
+	}
+
+	return records, nil
 }
 
 // Read implements the store interface

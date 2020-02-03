@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package settings;
 option go_package = "proto";
+import "google/protobuf/empty.proto";
 
 service SettingsService {
     rpc Set(Record) returns (Record);
     rpc Get(Query) returns (Record);
+    rpc List(google.protobuf.Empty) returns(Records);
 }
 
 message Record {
@@ -29,4 +31,8 @@ message Phoenix {
 
 message Query {
     string key = 1;
+}
+
+message Records {
+    repeated Record records = 1;
 }

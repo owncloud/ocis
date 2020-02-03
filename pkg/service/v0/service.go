@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	mstore "github.com/micro/go-micro/v2/store"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 
@@ -35,13 +36,36 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 
 // Get implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	contents, _ := registry.Store.Read(req.Key)
+	contents, err := registry.Store.Read(req.Key)
+	if err != nil {
+		return err
+	}
 
 	if len(contents) > 0 {
 		r := &proto.Payload{}
 		json.Unmarshal(contents[0].Value, r)
 		res.Payload = r
 	}
+
+	return nil
+}
+
+// List implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
+func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
+	contents, err := registry.Store.List()
+	if err != nil {
+		return err
+	}
+
+	records := &proto.Records{}
+
+	for _, v := range contents {
+		records.Records = append(records.Records, &proto.Record{
+			Key: v.Key,
+		})
+	}
+
+	res.Records = records.Records
 
 	return nil
 }
