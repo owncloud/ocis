@@ -66,8 +66,7 @@ func (s Store) List() ([]*mstore.Record, error) {
 	return records, nil
 }
 
-// Read implements the store interface
-// this implementation only reads by id.
+// Read implements the store interface. This implementation only reads by id.
 func (s Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
 	if err != nil {
