@@ -1,4 +1,4 @@
-package accounts
+package account
 
 // Account is an accounts service interface
 type Account interface {
