@@ -53,19 +53,19 @@ func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) err
 
 // List implements the SettingsServiceHandler interface generated on accounts.pb.micro.go
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
-	records := &proto.Records{}
+	r := &proto.Records{}
 	contents, err := registry.Store.List()
 	if err != nil {
 		return err
 	}
 
 	for _, v := range contents {
-		records.Records = append(records.Records, &proto.Record{
+		r.Records = append(r.Records, &proto.Record{
 			Key: v.Key,
 		})
 	}
 
-	res.Records = records.Records
+	res.Records = r.Records
 
 	return nil
 }
