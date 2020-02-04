@@ -19,11 +19,11 @@ type RegisterFunc func(*config.Config) Manager
 // Manager is an accounts service interface
 type Manager interface {
 	// Read a record
-	Read(key string) *proto.Record
+	Read(key string) (*proto.Record, error)
 	// Write a record
-	Write(*proto.Record) *proto.Record
+	Write(*proto.Record) (*proto.Record, error)
 	// List all records
-	List() []*proto.Record
+	List() ([]*proto.Record, error)
 }
 
 // Record is an entry in the account storage
