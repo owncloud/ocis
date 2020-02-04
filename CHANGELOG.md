@@ -1,3 +1,20 @@
+# Changelog for unreleased
+
+The following sections list the changes for unreleased.
+
+## Summary
+
+ * Chg #22: Upgrade the micro libraries
+
+## Details
+
+ * Change #22: Upgrade the micro libraries
+
+   Upgraded the go-micro libraries to v2.
+
+   https://github.com/owncloud/ocis-pkg/pull/22
+
+
 # Changelog for 1.3.0
 
 The following sections list the changes for 1.3.0.
