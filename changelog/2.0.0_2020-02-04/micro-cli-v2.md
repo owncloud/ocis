@@ -1,4 +1,4 @@
-Change: upgrade the micro libraries 
+Change: upgrade the micro libraries
 
 Upgraded the go-micro libraries to v2.
 
