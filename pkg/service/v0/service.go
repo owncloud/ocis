@@ -8,14 +8,23 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	olog "github.com/owncloud/ocis-pkg/log"
 )
 
 // New returns a new instance of Service
 func New(cfg *config.Config) Service {
-	return Service{
-		Config:  cfg,
-		Manager: account.Registry[cfg.Manager](cfg),
+	s := Service{
+		Config: cfg,
 	}
+
+	if newReg, ok := account.Registry[cfg.Manager]; ok {
+		s.Manager = newReg(cfg)
+	} else {
+		l := olog.NewLogger(olog.Name("ocis-accounts"))
+		l.Fatal().Msgf("driver does not exist: %v", cfg.Manager)
+	}
+
+	return s
 }
 
 // Service implements the SettingsServiceHandler interface

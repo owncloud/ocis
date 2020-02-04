@@ -14,10 +14,8 @@ import (
 
 var (
 	// StoreName is the default name for the accounts store
-	StoreName string = "ocis-store"
-
-	// managerName
-	managerName = "filesystem"
+	StoreName   string = "ocis-store"
+	managerName        = "filesystem"
 )
 
 // StoreName is the default name for the store container
@@ -31,7 +29,7 @@ type Store struct {
 // New creates a new store
 func New(cfg *config.Config) account.Manager {
 	s := Store{
-		Logger: olog.NewLogger(),
+		Logger: olog.NewLogger(olog.Name("ocis-accounts")),
 	}
 
 	dest := filepath.Join(cfg.MountPath, StoreName)
@@ -96,6 +94,7 @@ func (s Store) Write(rec *account.Record) *account.Record {
 	s.Logger.Info().Msgf("%v bytes written to %v", len(rec.Value), path)
 	return rec
 }
+
 func init() {
 	account.Registry[managerName] = New
 }
