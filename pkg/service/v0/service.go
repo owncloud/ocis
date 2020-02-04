@@ -21,7 +21,7 @@ func New(cfg *config.Config) Service {
 		s.Manager = newReg(cfg)
 	} else {
 		l := olog.NewLogger(olog.Name("ocis-accounts"))
-		l.Fatal().Msgf("driver does not exist: %v", cfg.Manager)
+		l.Fatal().Msgf("unknown manager: %v", cfg.Manager)
 	}
 
 	return s
