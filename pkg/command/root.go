@@ -3,7 +3,7 @@ package command
 import (
 	"os"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	// init store manager
 	_ "github.com/owncloud/ocis-accounts/pkg/store"
 	"github.com/owncloud/ocis-hello/pkg/version"
@@ -16,14 +16,14 @@ func Execute() error {
 		Version: version.String,
 		Usage:   "Example service for Reva/oCIS",
 
-		Authors: []cli.Author{
+		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
 
-		Commands: []cli.Command{
+		Commands: []*cli.Command{
 			Server(),
 		},
 	}

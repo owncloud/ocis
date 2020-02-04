@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-accounts/pkg/micro/grpc"
 )
 
 // Server is the entry point for the server command.
-func Server() cli.Command {
-	return cli.Command{
+func Server() *cli.Command {
+	return &cli.Command{
 		Name:  "server",
 		Usage: "Start accounts service",
 		Action: func(c *cli.Context) error {

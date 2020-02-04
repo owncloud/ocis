@@ -16,7 +16,7 @@ func New(cfg *config.Config) Service {
 	fmt.Printf("config type: %T", account.Registry["filesystem"])
 	return Service{
 		Config:  cfg,
-		Manager: account.Registry["filesystem"](cfg), // TODO read this from config
+		Manager: account.Registry["filesystem"](cfg), // TODO read manager from config
 	}
 }
 
