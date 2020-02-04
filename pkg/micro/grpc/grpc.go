@@ -1,25 +1,23 @@
 package grpc
 
 import (
-	"context"
-
-	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
 	"github.com/owncloud/ocis-pkg/service/grpc"
 )
 
-// NewService creates a grpc service
-func NewService(c context.Context, cfg *config.Config) grpc.Service {
+// NewService initializes a new go-micro service ready to run
+func NewService(opts ...Option) grpc.Service {
+	options := newOptions(opts...)
+
 	service := grpc.NewService(
-		// TODO options come from configuration
-		grpc.Name("accounts"),
-		grpc.Namespace("com.owncloud"),
-		grpc.Address("localhost:9999"),
-		grpc.Context(c),
+		grpc.Name(options.Name),
+		grpc.Context(options.Context),
+		grpc.Address(options.Address),
+		grpc.Namespace(options.Namespace),
 	)
 
-	hdlr := svc.New(cfg)
+	hdlr := svc.New(options.Config)
 	proto.RegisterSettingsServiceHandler(service.Server(), hdlr)
 
 	service.Init()

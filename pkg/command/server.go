@@ -43,7 +43,14 @@ func Server(cfg *config.Config) *cli.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 
 			defer cancel()
-			service := grpc.NewService(ctx, cfg)
+			service := grpc.NewService(
+				// TODO read all this from cfg
+				grpc.Context(ctx),
+				grpc.Config(cfg),
+				grpc.Name("accounts"),
+				grpc.Namespace("com.owncloud"),
+				grpc.Address("localhost:9999"),
+			)
 
 			gr.Add(func() error {
 				return service.Run()
