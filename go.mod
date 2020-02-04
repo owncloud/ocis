@@ -10,7 +10,6 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro/v2 v2.0.0
-	github.com/micro/go-plugins v1.5.1
 	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.0.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/prometheus/client_golang v1.2.1

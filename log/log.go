@@ -73,7 +73,7 @@ func NewLogger(opts ...Option) Logger {
 	mlog.SetLogger(
 		microZerolog{
 			logger: logger,
-			buffer: ring.New(1024), // TODO make configurable?
+			buffer: ring.New(mdlog.DefaultSize),
 		},
 	)
 
