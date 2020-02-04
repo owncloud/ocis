@@ -6,7 +6,7 @@ import (
 
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
-	"github.com/owncloud/ocis-pkg/wrapper/prometheus"
+	"github.com/owncloud/ocis-pkg/v2/wrapper/prometheus"
 )
 
 // Service simply wraps the go-micro grpc service.
