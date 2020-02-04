@@ -47,6 +47,6 @@ func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) err
 
 // List implements the SettingsServiceHandler interface
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
-	// res = s.Manager.List()
+	res.Records = s.Manager.List()
 	return nil
 }
