@@ -41,16 +41,19 @@ func Server(cfg *config.Config) *cli.Command {
 				Name:        "name",
 				Value:       "accounts",
 				Destination: &cfg.Server.Name,
+				EnvVars:     []string{"OCIS_ACCOUNTS_NAME"},
 			},
 			&cli.StringFlag{
 				Name:        "namespace",
 				Value:       "com.owncloud",
 				Destination: &cfg.Server.Namespace,
+				EnvVars:     []string{"OCIS_ACCOUNTS_NAMESPACE"},
 			},
 			&cli.StringFlag{
 				Name:        "address",
 				Value:       "localhost:9999",
 				Destination: &cfg.Server.Address,
+				EnvVars:     []string{"OCIS_ACCOUNTS_ADDRESS"},
 			},
 		},
 		Action: func(c *cli.Context) error {
