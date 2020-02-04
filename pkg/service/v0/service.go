@@ -44,7 +44,6 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 
 // Get implements the SettingsServiceHandler interface
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	// contents, err := registry.Store.Read(req.Key)
 	contents := s.Manager.Read(req.Key)
 
 	r := &proto.Payload{}
