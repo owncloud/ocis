@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis-accounts/pkg/account"
@@ -13,7 +12,6 @@ import (
 
 // New returns a new instance of Service
 func New(cfg *config.Config) Service {
-	fmt.Printf("config type: %T", account.Registry["filesystem"])
 	return Service{
 		Config:  cfg,
 		Manager: account.Registry[cfg.Manager](cfg),
