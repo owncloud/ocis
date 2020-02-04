@@ -37,6 +37,21 @@ func Server(cfg *config.Config) *cli.Command {
 				EnvVars:     []string{"OCIS_ACCOUNTS_MOUNT_PATH"},
 				Destination: &cfg.MountPath,
 			},
+			&cli.StringFlag{
+				Name:        "name",
+				Value:       "accounts",
+				Destination: &cfg.Server.Name,
+			},
+			&cli.StringFlag{
+				Name:        "namespace",
+				Value:       "com.owncloud",
+				Destination: &cfg.Server.Namespace,
+			},
+			&cli.StringFlag{
+				Name:        "address",
+				Value:       "localhost:9999",
+				Destination: &cfg.Server.Address,
+			},
 		},
 		Action: func(c *cli.Context) error {
 			gr := run.Group{}
@@ -44,12 +59,11 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 			service := grpc.NewService(
-				// TODO read all this from cfg
 				grpc.Context(ctx),
 				grpc.Config(cfg),
-				grpc.Name("accounts"),
-				grpc.Namespace("com.owncloud"),
-				grpc.Address("localhost:9999"),
+				grpc.Name(cfg.Server.Name),
+				grpc.Namespace(cfg.Server.Namespace),
+				grpc.Address(cfg.Server.Address),
 			)
 
 			gr.Add(func() error {
