@@ -2,18 +2,23 @@
 package store
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 
-	mstore "github.com/micro/go-micro/v2/store"
+	"github.com/owncloud/ocis-accounts/pkg/account"
+	"github.com/owncloud/ocis-accounts/pkg/config"
 	olog "github.com/owncloud/ocis-pkg/log"
 )
 
+var (
+	// StoreName is the default name for the accounts store
+	StoreName   string = "ocis-store"
+	managerName        = "filesystem"
+)
+
 // StoreName is the default name for the store container
-var StoreName string = "ocis-store"
 
 // Store interacts with the filesystem to manage account information
 type Store struct {
@@ -21,90 +26,75 @@ type Store struct {
 	Logger    olog.Logger
 }
 
-// New returns a new stor. TODO add mountPath as a flag. Accept a *config argument
-func New() *Store {
+// New creates a new store
+func New(cfg *config.Config) account.Manager {
 	s := Store{
-		Logger: olog.NewLogger(),
+		Logger: olog.NewLogger(olog.Name("ocis-accounts")),
 	}
 
-	// default to the current working directory if not configured
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		s.Logger.Err(err).Msg("initializing accounts store")
-	}
-
-	dest := filepath.Join(dir, StoreName)
+	dest := filepath.Join(cfg.MountPath, StoreName)
 	if _, err := os.Stat(dest); err != nil {
 		s.Logger.Info().Msgf("creating container on %v", dest)
-		os.Mkdir(dest, 0700)
+		err := os.MkdirAll(dest, 0700)
+		if err != nil {
+			s.Logger.Err(err).Msgf("providing container on %v", dest)
+		}
 	}
 
 	s.mountPath = dest
 	return &s
 }
 
-// Init implements the store interface
-func (s Store) Init(...mstore.Option) error {
-	return nil
-}
-
 // List returns all the identities in the mountPath folder
-func (s Store) List() ([]*mstore.Record, error) {
-	records := []*mstore.Record{}
+func (s Store) List() []*account.Record {
+	records := []*account.Record{}
 	identities, err := ioutil.ReadDir(s.mountPath)
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
+		return records
 	}
 
 	s.Logger.Info().Msg("listing identities")
 	for _, v := range identities {
-		records = append(records, &mstore.Record{
+		records = append(records, &account.Record{
 			Key: v.Name(),
 		})
 	}
 
-	return records, nil
+	return records
 }
 
 // Read implements the store interface. This implementation only reads by id.
-func (s Store) Read(key string, opts ...mstore.ReadOption) ([]*mstore.Record, error) {
+func (s Store) Read(key string) *account.Record {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
-		return []*mstore.Record{}, err
+		return &account.Record{}
 	}
 
-	return []*mstore.Record{
-		&mstore.Record{
-			Key:   key,
-			Value: contents,
-		},
-	}, nil
+	return &account.Record{
+		Key:   key,
+		Value: contents,
+	}
 }
 
 // Write implements the store interface
-func (s Store) Write(rec *mstore.Record) error {
+func (s Store) Write(rec *account.Record) *account.Record {
 	path := filepath.Join(s.mountPath, rec.Key)
 
 	if len(rec.Key) < 1 {
 		s.Logger.Error().Msg("key cannot be empty")
-		return fmt.Errorf("%v", "key is empty")
+		return &account.Record{}
 	}
 
 	if err := ioutil.WriteFile(path, rec.Value, 0644); err != nil {
-		return err
+		return &account.Record{}
 	}
 
 	s.Logger.Info().Msgf("%v bytes written to %v", len(rec.Value), path)
-	return nil
+	return rec
 }
 
-// Delete implements the store interface
-func (s Store) Delete(key string) error {
-	return nil
-}
-
-// String implements the store interface, and the stringer interface
-func (s Store) String() string {
-	return "store"
+func init() {
+	account.Registry[managerName] = New
 }
