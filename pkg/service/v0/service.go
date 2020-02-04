@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis-accounts/pkg/account"
@@ -36,45 +35,18 @@ type Service struct {
 // Set implements the SettingsServiceHandler interface
 // This implementation replaces the existent data with the requested. It does not calculate diff
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	settingsJSON, err := json.Marshal(req.Payload)
-	if err != nil {
-		return err
-	}
-
-	s.Manager.Write(&account.Record{
-		Key:   req.Key,
-		Value: settingsJSON,
-	})
-
+	s.Manager.Write(req)
 	return nil
 }
 
 // Get implements the SettingsServiceHandler interface
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	contents := s.Manager.Read(req.Key)
-
-	r := &proto.Payload{}
-	json.Unmarshal(contents.Value, r)
-	res.Payload = r
-
+	res.Payload = s.Manager.Read(req.Key).Payload
 	return nil
 }
 
 // List implements the SettingsServiceHandler interface
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
-	// r := &proto.Records{}
-	// contents, err := registry.Store.List()
-	// if err != nil {
-	// 	return err
-	// }
-
-	// for _, v := range contents {
-	// 	r.Records = append(r.Records, &proto.Record{
-	// 		Key: v.Key,
-	// 	})
-	// }
-
-	// res.Records = r.Records
-
+	// res = s.Manager.List()
 	return nil
 }

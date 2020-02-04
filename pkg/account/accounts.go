@@ -1,6 +1,9 @@
 package account
 
-import "github.com/owncloud/ocis-accounts/pkg/config"
+import (
+	"github.com/owncloud/ocis-accounts/pkg/config"
+	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
+)
 
 var (
 	// Registry uses the strategy pattern as a registry
@@ -16,11 +19,11 @@ type RegisterFunc func(*config.Config) Manager
 // Manager is an accounts service interface
 type Manager interface {
 	// Read a record
-	Read(key string) *Record
+	Read(key string) *proto.Record
 	// Write a record
-	Write(*Record) *Record
+	Write(*proto.Record) *proto.Record
 	// List all records
-	List() []*Record
+	List() []*proto.Record
 }
 
 // Record is an entry in the account storage

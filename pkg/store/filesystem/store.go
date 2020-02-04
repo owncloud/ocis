@@ -2,13 +2,16 @@
 package store
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 
+	// gproto "github.com/golang/protobuf/proto"
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
+	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis-pkg/log"
 )
 
@@ -46,8 +49,8 @@ func New(cfg *config.Config) account.Manager {
 }
 
 // List returns all the identities in the mountPath folder
-func (s Store) List() []*account.Record {
-	records := []*account.Record{}
+func (s Store) List() []*proto.Record {
+	records := []*proto.Record{}
 	identities, err := ioutil.ReadDir(s.mountPath)
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
@@ -56,7 +59,7 @@ func (s Store) List() []*account.Record {
 
 	s.Logger.Info().Msg("listing identities")
 	for _, v := range identities {
-		records = append(records, &account.Record{
+		records = append(records, &proto.Record{
 			Key: v.Name(),
 		})
 	}
@@ -65,33 +68,42 @@ func (s Store) List() []*account.Record {
 }
 
 // Read implements the store interface. This implementation only reads by id.
-func (s Store) Read(key string) *account.Record {
+func (s Store) Read(key string) *proto.Record {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
-		return &account.Record{}
+		return &proto.Record{}
 	}
 
-	return &account.Record{
-		Key:   key,
-		Value: contents,
+	record := proto.Record{}
+	if err = json.Unmarshal(contents, &record); err != nil {
+		s.Logger.Err(err).Msg("error unmarshaling record")
+		return &proto.Record{}
 	}
+
+	return &record
 }
 
 // Write implements the store interface
-func (s Store) Write(rec *account.Record) *account.Record {
+func (s Store) Write(rec *proto.Record) *proto.Record {
 	path := filepath.Join(s.mountPath, rec.Key)
 
 	if len(rec.Key) < 1 {
 		s.Logger.Error().Msg("key cannot be empty")
-		return &account.Record{}
+		return &proto.Record{}
 	}
 
-	if err := ioutil.WriteFile(path, rec.Value, 0644); err != nil {
-		return &account.Record{}
+	contents, err := json.Marshal(rec)
+	if err != nil {
+		s.Logger.Err(err).Msg("record could not be marshaled")
+		return &proto.Record{}
 	}
 
-	s.Logger.Info().Msgf("%v bytes written to %v", len(rec.Value), path)
+	if err := ioutil.WriteFile(path, contents, 0644); err != nil {
+		return &proto.Record{}
+	}
+
+	s.Logger.Info().Msgf("%v bytes written to %v", len(contents), path)
 	return rec
 }
 
