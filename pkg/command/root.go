@@ -4,9 +4,11 @@ import (
 	"os"
 
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-accounts/pkg/config"
+	"github.com/owncloud/ocis-hello/pkg/version"
+
 	// init store manager
 	_ "github.com/owncloud/ocis-accounts/pkg/store"
-	"github.com/owncloud/ocis-hello/pkg/version"
 )
 
 // Execute is the entry point for the ocis-accounts command.
@@ -24,7 +26,7 @@ func Execute() error {
 		},
 
 		Commands: []*cli.Command{
-			Server(),
+			Server(config.New()),
 		},
 	}
 

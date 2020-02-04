@@ -12,6 +12,7 @@ import (
 // NewService creates a grpc service
 func NewService(c context.Context) grpc.Service {
 	service := grpc.NewService(
+		// TODO options come from configuration
 		grpc.Name("accounts"),
 		grpc.Namespace("com.owncloud"),
 		grpc.Address("localhost:9999"),

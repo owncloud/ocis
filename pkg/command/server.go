@@ -7,11 +7,12 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/micro/grpc"
 )
 
 // Server is the entry point for the server command.
-func Server() *cli.Command {
+func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start accounts service",
