@@ -10,7 +10,7 @@ import (
 )
 
 // NewService creates a grpc service
-func NewService(c context.Context) grpc.Service {
+func NewService(c context.Context, cfg *config.Config) grpc.Service {
 	service := grpc.NewService(
 		// TODO options come from configuration
 		grpc.Name("accounts"),
@@ -19,7 +19,7 @@ func NewService(c context.Context) grpc.Service {
 		grpc.Context(c),
 	)
 
-	hdlr := svc.New(config.New())
+	hdlr := svc.New(cfg)
 	proto.RegisterSettingsServiceHandler(service.Server(), hdlr)
 
 	service.Init()
