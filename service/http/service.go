@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/web"
+	"github.com/micro/go-micro/v2/web"
 )
 
 // Service simply wraps the go-micro web service.

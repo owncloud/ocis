@@ -3,11 +3,12 @@ package log
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
-	mlog "github.com/micro/go-micro/util/log"
+	mdlog "github.com/micro/go-micro/v2/debug/log"
+	mlog "github.com/micro/go-micro/v2/util/log"
+	"github.com/micro/go-micro/v2/util/ring"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -72,6 +73,7 @@ func NewLogger(opts ...Option) Logger {
 	mlog.SetLogger(
 		microZerolog{
 			logger: logger,
+			buffer: ring.New(mdlog.DefaultSize),
 		},
 	)
 
@@ -83,62 +85,88 @@ func NewLogger(opts ...Option) Logger {
 // microZerolog implements the required interface for the go-micro logger.
 type microZerolog struct {
 	logger zerolog.Logger
+	buffer *ring.Buffer
 }
 
-// Log makes use of github.com/go-log/log.Log.
-func (mz microZerolog) Log(v ...interface{}) {
-	pc := parentCaller()
-	msg := fmt.Sprint(v...)
-
-	switch {
-	case strings.HasSuffix(pc, "Fatal"):
-		mz.logger.Fatal().Msg(msg)
-	case strings.HasSuffix(pc, "Error"):
-		mz.logger.Error().Msg(msg)
-	case strings.HasSuffix(pc, "Info"):
-		mz.logger.Info().Msg(msg)
-	case strings.HasSuffix(pc, "Warn"):
-		mz.logger.Warn().Msg(msg)
-	case strings.HasSuffix(pc, "Debug"):
-		mz.logger.Debug().Msg(msg)
-	case strings.HasSuffix(pc, "Trace"):
-		mz.logger.Debug().Msg(msg)
-	default:
-		mz.logger.Info().Msg(msg)
+func (mz microZerolog) Read(opts ...mdlog.ReadOption) ([]mdlog.Record, error) {
+	options := mdlog.ReadOptions{}
+	for _, o := range opts {
+		o(&options)
 	}
+
+	var entries []*ring.Entry
+
+	if !options.Since.IsZero() {
+		entries = mz.buffer.Since(options.Since)
+	}
+
+	if options.Count > 0 {
+		switch len(entries) > 0 {
+		case true:
+			if options.Count > len(entries) {
+				entries = entries[0:options.Count]
+			}
+		default:
+			entries = mz.buffer.Get(options.Count)
+		}
+	}
+
+	records := make([]mdlog.Record, 0, len(entries))
+	for _, entry := range entries {
+		record := mdlog.Record{
+			Timestamp: entry.Timestamp,
+			Message:   entry.Value,
+		}
+		records = append(records, record)
+	}
+
+	return records, nil
 }
 
-// Logf makes use of github.com/go-log/log.Logf.
-func (mz microZerolog) Logf(format string, v ...interface{}) {
-	pc := parentCaller()
-	msg := fmt.Sprintf(strings.TrimRight(format, "\n"), v...)
-
-	switch {
-	case strings.HasSuffix(pc, "Fatalf"):
-		mz.logger.Fatal().Msg(msg)
-	case strings.HasSuffix(pc, "Errorf"):
-		mz.logger.Error().Msg(msg)
-	case strings.HasSuffix(pc, "Infof"):
-		mz.logger.Info().Msg(msg)
-	case strings.HasSuffix(pc, "Warnf"):
-		mz.logger.Warn().Msg(msg)
-	case strings.HasSuffix(pc, "Debugf"):
-		mz.logger.Debug().Msg(msg)
-	case strings.HasSuffix(pc, "Tracef"):
-		mz.logger.Debug().Msg(msg)
-	default:
-		mz.logger.Info().Msg(msg)
-	}
+func (mz microZerolog) Write(record mdlog.Record) error {
+	level := record.Metadata["level"]
+	mz.log(level, fmt.Sprint(record.Message))
+	mz.buffer.Put(record.Message)
+	return nil
 }
 
-// parentCaller tries to detect which log method had been invoked.
-func parentCaller() string {
-	pc, _, _, ok := runtime.Caller(4)
-	fn := runtime.FuncForPC(pc)
+func (mz microZerolog) Stream() (mdlog.Stream, error) {
+	stream, stop := mz.buffer.Stream()
+	records := make(chan mdlog.Record, 128)
+	last10 := mz.buffer.Get(10)
 
-	if ok && fn != nil {
-		return fn.Name()
+	go func() {
+		for _, entry := range last10 {
+			records <- mdlog.Record{
+				Timestamp: entry.Timestamp,
+				Message:   entry.Value,
+				Metadata:  make(map[string]string),
+			}
+		}
+		for entry := range stream {
+			records <- mdlog.Record{
+				Timestamp: entry.Timestamp,
+				Message:   entry.Value,
+				Metadata:  make(map[string]string),
+			}
+		}
+	}()
+	return &logStream{
+		stream: records,
+		stop:   stop,
+	}, nil
+}
+
+func (mz microZerolog) log(level string, msg string) {
+	l, err := zerolog.ParseLevel(level)
+	if err != nil {
+		l = zerolog.InfoLevel
 	}
 
-	return ""
+	mz.logger.WithLevel(l).Msg(msg)
+
+	// Invoke os.Exit because unlike zerolog.Logger.Fatal zerolog.Logger.WithLevel won't stop the execution.
+	if l == zerolog.FatalLevel {
+		os.Exit(1)
+	}
 }
