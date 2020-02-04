@@ -34,16 +34,13 @@ func New(cfg *config.Config) account.Manager {
 		Logger: olog.NewLogger(),
 	}
 
-	// default to the current working directory if not configured
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		s.Logger.Err(err).Msg("initializing accounts store")
-	}
-
-	dest := filepath.Join(dir, StoreName)
+	dest := filepath.Join(cfg.MountPath, StoreName)
 	if _, err := os.Stat(dest); err != nil {
 		s.Logger.Info().Msgf("creating container on %v", dest)
-		os.Mkdir(dest, 0700)
+		err := os.MkdirAll(dest, 0700)
+		if err != nil {
+			s.Logger.Err(err).Msgf("providing container on %v", dest)
+		}
 	}
 
 	s.mountPath = dest
