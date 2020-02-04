@@ -35,18 +35,33 @@ type Service struct {
 // Set implements the SettingsServiceHandler interface
 // This implementation replaces the existent data with the requested. It does not calculate diff
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	s.Manager.Write(req)
+	r, err := s.Manager.Write(req)
+	if err != nil {
+		return err
+	}
+
+	res.Payload = r.GetPayload()
 	return nil
 }
 
 // Get implements the SettingsServiceHandler interface
 func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	res.Payload = s.Manager.Read(req.Key).Payload
+	r, err := s.Manager.Read(req.GetKey())
+	if err != nil {
+		return err
+	}
+
+	res.Payload = r.GetPayload()
 	return nil
 }
 
 // List implements the SettingsServiceHandler interface
 func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
-	res.Records = s.Manager.List()
+	r, err := s.Manager.List()
+	if err != nil {
+		return err
+	}
+
+	res.Records = r
 	return nil
 }
