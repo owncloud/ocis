@@ -180,7 +180,8 @@ type LDAPSchema struct {
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
-	NamespaceJail string
+	WebdavNamespace   string
+	DavFilesNamespace string
 }
 
 // Reva defines the available reva configuration.

@@ -140,7 +140,6 @@ def testing(ctx):
           'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-          'WEBDAV_NAMESPACE_JAIL': '/'
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',

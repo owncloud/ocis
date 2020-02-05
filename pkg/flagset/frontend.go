@@ -92,11 +92,21 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		// OCDav
 
 		&cli.StringFlag{
-			Name:        "webdav-namespace-jail",
+			Name:        "webdav-namespace",
 			Value:       "/home/",
-			Usage:       "Namespace prefix for the webdav endpoints /dav/files and /webdav",
-			EnvVars:     []string{"WEBDAV_NAMESPACE_JAIL"},
-			Destination: &cfg.Reva.OCDav.NamespaceJail,
+			Usage:       "Namespace prefix for the /webdav endpoint",
+			EnvVars:     []string{"WEBDAV_NAMESPACE"},
+			Destination: &cfg.Reva.OCDav.WebdavNamespace,
+		},
+
+		// the /dav/files endpoint expects a username as the first path segment
+		// this can eg. be set to /eos/users
+		&cli.StringFlag{
+			Name:        "dav-files-namespace",
+			Value:       "/oc/",
+			Usage:       "Namespace prefix for the webdav /dav/files endpoint",
+			EnvVars:     []string{"DAV_FILES_NAMESPACE"},
+			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
 		},
 
 		// OIDC
