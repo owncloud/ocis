@@ -6,7 +6,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/owncloud/ocis-konnectd/pkg/config"
 	"github.com/owncloud/ocis-konnectd/pkg/log"
+	"github.com/rs/zerolog"
 	"net/http"
+	"os"
 	"stash.kopano.io/kc/konnect/bootstrap"
 	kcconfig "stash.kopano.io/kc/konnect/config"
 	"stash.kopano.io/kc/konnect/server"
@@ -29,6 +31,7 @@ func NewService(opts ...Option) Service {
 	ctx := context.Background()
 	options := newOptions(opts...)
 	logger := options.Logger.Logger
+	initKonnectInternalEnvVars(logger)
 
 	bs, err := bootstrap.Boot(ctx, &options.Config.Konnectd, &kcconfig.Config{
 		Logger: log.Wrap(logger),
@@ -44,6 +47,31 @@ func NewService(opts ...Option) Service {
 	return Konnectd{
 		config: options.Config,
 		mux:    newMux(ctx, routes, handlers, options.Middleware),
+	}
+}
+
+// Init vars which are currently not accessible via konnectd api
+func initKonnectInternalEnvVars(l zerolog.Logger) {
+	var defaults = map[string]string{
+		"LDAP_URI":                 "ldap://localhost:9125",
+		"LDAP_BINDDN":              "cn=admin,dc=example,dc=org",
+		"LDAP_BINDPW":              "admin",
+		"LDAP_BASEDN":              "ou=users,dc=example,dc=org",
+		"LDAP_SCOPE":               "sub",
+		"LDAP_LOGIN_ATTRIBUTE":     "uid",
+		"LDAP_EMAIL_ATTRIBUTE":     "mail",
+		"LDAP_NAME_ATTRIBUTE":      "cn",
+		"LDAP_UUID_ATTRIBUTE":      "customuid",
+		"LDAP_UUID_ATTRIBUTE_TYPE": "text",
+		"LDAP_FILTER":              "(objectClass=person)",
+	}
+
+	for k, v := range defaults {
+		if _, exists := os.LookupEnv(k); !exists {
+			if err := os.Setenv(k, v); err != nil {
+				l.Fatal().Err(err).Msgf("Could not set env var %s=%s", k, v)
+			}
+		}
 	}
 }
 

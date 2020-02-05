@@ -2,6 +2,7 @@ package http
 
 import (
 	"crypto/tls"
+	"github.com/owncloud/ocis-konnectd/pkg/crypto"
 	svc "github.com/owncloud/ocis-konnectd/pkg/service/v0"
 	"github.com/owncloud/ocis-konnectd/pkg/version"
 	"github.com/owncloud/ocis-pkg/middleware"
@@ -12,6 +13,22 @@ import (
 // Server initializes the http service and server.
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
+
+	if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
+		_, certErr := os.Stat("server.crt")
+		_, keyErr := os.Stat("server.key")
+
+		if !os.IsExist(certErr) || !os.IsExist(keyErr) {
+			options.Logger.Info().Msgf("Generating certs")
+			if err := crypto.GenCert(options.Logger); err != nil {
+				options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
+				os.Exit(1)
+			}
+		}
+
+		options.Config.HTTP.TLSCert = "server.crt"
+		options.Config.HTTP.TLSKey = "server.key"
+	}
 
 	cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)
 	if err != nil {
