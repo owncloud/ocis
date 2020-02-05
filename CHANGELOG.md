@@ -5,6 +5,7 @@ The following sections list the changes for 2.0.0.
 ## Summary
 
  * Fix #25: Fix Module Path
+ * Fix #27: Change import paths to ocis-pkg/v2
  * Chg #22: Upgrade the micro libraries
 
 ## Details
@@ -22,6 +23,12 @@ The following sections list the changes for 2.0.0.
    /v2 whenever you are using the module name).
 
    https://github.com/owncloud/ocis-pkg/pull/25
+
+ * Bugfix #27: Change import paths to ocis-pkg/v2
+
+   Changed the import paths to the current version
+
+   https://github.com/owncloud/ocis-pkg/pull/27
 
  * Change #22: Upgrade the micro libraries
 
@@ -37,6 +44,7 @@ The following sections list the changes for 2.0.0.
 ## Summary
 
  * Fix #25: Fix Module Path
+ * Fix #27: Change import paths to ocis-pkg/v2
  * Chg #22: Upgrade the micro libraries
 
 ## Details
@@ -54,6 +62,12 @@ The following sections list the changes for 2.0.0.
    /v2 whenever you are using the module name).
 
    https://github.com/owncloud/ocis-pkg/pull/25
+
+ * Bugfix #27: Change import paths to ocis-pkg/v2
+
+   Changed the import paths to the current version
+
+   https://github.com/owncloud/ocis-pkg/pull/27
 
  * Change #22: Upgrade the micro libraries
 
