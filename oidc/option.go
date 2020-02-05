@@ -1,7 +1,7 @@
 package oidc
 
 import (
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
 // Option defines a single option function.
