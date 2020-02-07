@@ -52,8 +52,8 @@ func Server(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:        "address",
 				Aliases:     []string{"addr"},
-				Value:       "localhost:9999",
-				DefaultText: "localhost:9999",
+				Value:       "localhost:9180",
+				DefaultText: "localhost:9180",
 				Usage:       "service endpoint",
 				EnvVars:     []string{"OCIS_ACCOUNTS_ADDRESS"},
 				Destination: &cfg.Server.Address,
