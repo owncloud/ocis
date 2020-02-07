@@ -1,7 +1,7 @@
 ---
 repository:
   name: ocis-accounts
-  description: ':atom_symbol: :busts_in_silhouette: Serve Accounts for oCIS'
+  description: ':busts_in_silhouette: Serve Accounts for oCIS'
   homepage: https://owncloud.github.io/ocis-accounts/
   topics: reva, ocis
 
