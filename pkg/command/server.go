@@ -3,8 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"syscall"
 
 	"github.com/micro/cli/v2"
@@ -15,45 +13,50 @@ import (
 
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start accounts service",
+		Name:        "server",
+		Usage:       "Start ocis accounts service",
+		Description: "an accounts backend manager (driver) needs to be specified. By default the service uses the filesystem as storage",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "manager",
 				DefaultText: "filesystem",
-				Usage:       "store controller driver. eg: filesystem",
+				Usage:       "accounts backend manager",
 				Value:       "filesystem",
 				EnvVars:     []string{"OCIS_ACCOUNTS_MANAGER"},
 				Destination: &cfg.Manager,
 			},
 			&cli.StringFlag{
 				Name:        "mount-path",
-				DefaultText: "binary default running location",
-				Usage:       "where to mount the ocis accounts store",
-				Value:       baseDir,
+				Usage:       "mounting point (necessary when manager=filesystem)",
 				EnvVars:     []string{"OCIS_ACCOUNTS_MOUNT_PATH"},
 				Destination: &cfg.MountPath,
 			},
 			&cli.StringFlag{
 				Name:        "name",
 				Value:       "accounts",
-				Destination: &cfg.Server.Name,
+				DefaultText: "accounts",
+				Usage:       "service name",
 				EnvVars:     []string{"OCIS_ACCOUNTS_NAME"},
+				Destination: &cfg.Server.Name,
 			},
 			&cli.StringFlag{
 				Name:        "namespace",
+				Aliases:     []string{"ns"},
 				Value:       "com.owncloud",
-				Destination: &cfg.Server.Namespace,
+				DefaultText: "com.owncloud",
+				Usage:       "namespace",
 				EnvVars:     []string{"OCIS_ACCOUNTS_NAMESPACE"},
+				Destination: &cfg.Server.Namespace,
 			},
 			&cli.StringFlag{
 				Name:        "address",
+				Aliases:     []string{"addr"},
 				Value:       "localhost:9999",
-				Destination: &cfg.Server.Address,
+				DefaultText: "localhost:9999",
+				Usage:       "service endpoint",
 				EnvVars:     []string{"OCIS_ACCOUNTS_ADDRESS"},
+				Destination: &cfg.Server.Address,
 			},
 		},
 		Action: func(c *cli.Context) error {
