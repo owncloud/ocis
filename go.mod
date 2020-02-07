@@ -14,6 +14,7 @@ require (
 	github.com/owncloud/ocis-hello v0.0.0-20200114105804-61741477dcec
 	github.com/owncloud/ocis-ocs v0.0.0-20191224113758-20455a2e9013
 	github.com/owncloud/ocis-pkg v1.3.0
+	github.com/restic/calens v0.2.0 // indirect
 	github.com/spf13/viper v1.6.1
 	honnef.co/go/tools v0.0.1-2019.2.3
 )

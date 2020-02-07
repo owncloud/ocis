@@ -368,9 +368,10 @@ def binary(ctx, name):
           'files': [
             'dist/release/*',
           ],
-          'title': ctx.build.ref.replace("refs/tags/", ""),
+          'title': ctx.build.ref.replace("refs/tags/v", ""),
           'note': 'dist/CHANGELOG.md',
           'overwrite': True,
+          'prerelease': len(ctx.build.ref.split("-")) > 1,
         },
         'when': {
           'ref': [
@@ -441,6 +442,7 @@ def manifest(ctx):
   }
 
 def changelog(ctx):
+  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -461,7 +463,7 @@ def changelog(ctx):
           'actions': [
             'clone',
           ],
-          'remote': 'https://github.com/%s' % (ctx.repo.slug),
+          'remote': 'https://github.com/%s' % (repo_slug),
           'branch': ctx.build.branch if ctx.build.event == 'pull_request' else 'master',
           'path': '/drone/src',
           'netrc_machine': 'github.com',
@@ -481,6 +483,14 @@ def changelog(ctx):
           'make changelog',
         ],
       },
+      {
+				'name': 'diff',
+				'image': 'owncloud/alpine:latest',
+				'pull': 'always',
+				'commands': [
+					'git diff',
+				],
+			},
       {
         'name': 'output',
         'image': 'webhippie/golang:1.13',
@@ -525,7 +535,7 @@ def changelog(ctx):
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/pull/**',
       ],
     },
   }
