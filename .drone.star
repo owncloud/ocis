@@ -484,13 +484,13 @@ def changelog(ctx):
         ],
       },
       {
-				'name': 'diff',
-				'image': 'owncloud/alpine:latest',
-				'pull': 'always',
-				'commands': [
-					'git diff',
-				],
-			},
+        'name': 'diff',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'commands': [
+          'git diff',
+        ],
+      },
       {
         'name': 'output',
         'image': 'webhippie/golang:1.13',
@@ -622,26 +622,78 @@ def website(ctx):
     },
     'steps': [
       {
-        'name': 'generate',
-        'image': 'webhippie/hugo:latest',
+        'name': 'clone-downstream',
+        'image': 'plugins/git-action:1',
+        'pull': 'always',
+        'settings': {
+          'actions': [
+            'clone',
+          ],
+          'remote': 'https://github.com/owncloud/owncloud.github.io',
+          'branch': 'source',
+          'path': '/drone/src/downstream/',
+          'netrc_machine': 'github.com',
+          'netrc_username': {
+            'from_secret': 'github_username',
+          },
+          'netrc_password': {
+            'from_secret': 'github_token',
+          },
+        },
+        'when': {
+          'ref': {
+            'exclude': [
+              'refs/heads/master',
+            ],
+          },
+        },
+      },
+      {
+        'name': 'copy-current-docs',
+        'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
-          'make docs',
+          'cd downstream',
+          'mkdir -p content/extensions/ocis-accounts',
+          'rsync -aX ../docs/* content/extensions/ocis-accounts',
         ],
       },
       {
-        'name': 'publish',
-        'image': 'plugins/gh-pages:1',
-        'pull': 'always',
+        'name': 'assets',
+        'image': 'byrnedo/alpine-curl',
+        'commands': [
+          'cd downstream',
+          'mkdir -p themes/hugo-geekdoc/',
+          'curl -L https://github.com/xoxys/hugo-geekdoc/releases/download/v0.1.7/hugo-geekdoc.tar.gz | tar -xz -C themes/hugo-geekdoc/ --strip-components=1'
+        ],
+      },
+      {
+        'name': 'build-docs',
+        'image': 'klakegg/hugo:0.59.1-ext-alpine',
+        'commands': [
+          'cd downstream',
+          'hugo-official',
+        ],
+      },
+      {
+        'name': 'list-docs',
+        'image': 'iankoulski/tree',
+        'commands': [
+          'cd downstream',
+          'tree public',
+        ],
+      },
+      {
+        'name': 'downstream',
+        'image': 'plugins/downstream',
         'settings': {
-          'username': {
-            'from_secret': 'github_username',
+          'server': 'https://cloud.drone.io/',
+          'token': {
+            'from_secret': 'drone_token',
           },
-          'password': {
-            'from_secret': 'github_token',
-          },
-          'pages_directory': 'docs/public/',
-          'temporary_base': 'tmp/',
+          'repositories': [
+            'owncloud/owncloud.github.io@source',
+          ],
         },
         'when': {
           'ref': {

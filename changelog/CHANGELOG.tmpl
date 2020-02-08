@@ -27,12 +27,12 @@ The following sections list the changes for {{ .Version }}.
 
 ## Summary
 {{ range $entry := .Entries }}{{ with $entry }}
- * {{ .TypeShort }} #{{ .PrimaryID }}: {{ .Title }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
 {{- end }}{{ end }}
 
 ## Details
 {{ range $entry := .Entries }}{{ with $entry }}
- * {{ .Type }} #{{ .PrimaryID }}: {{ .Title }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
 {{ range $par := .Paragraphs }}
    {{ wrapIndent $par 80 3 }}
 {{ end -}}
