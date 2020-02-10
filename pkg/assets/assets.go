@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis-graph-explorer/pkg/config"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
 //go:generate go run github.com/UnnoTed/fileb0x embed.yml
