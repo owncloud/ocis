@@ -17,6 +17,25 @@ TBD
 
 TBD
 
+## Quickstart
+
+Following https://github.com/owncloud/ocis#development
+
+```console
+git clone https://github.com/owncloud/ocis.git
+cd ocis
+make build
+mkdir /var/tmp/reva/root/{home,oc}
+```
+
+Open http://localhost:9100 and login using one of the demo accounts:
+
+```console
+einstein:relativity
+marie:radioactivty
+richard:superfluidity
+```
+
 ## Runtime
 
 Included with the ocis binary is embedded a go-micro runtime that is in charge of starting services as a fork of the master process. This provides complete control over the services. Ocis extensions can be added as part of this runtime.
@@ -28,21 +47,14 @@ Included with the ocis binary is embedded a go-micro runtime that is in charge o
 This will currently boot:
 
 ```console
-go.micro
-go.micro.api
-go.micro.bot
-go.micro.broker
-go.micro.debug
+com.owncloud.api
+com.owncloud.http.broker
+com.owncloud.proxy
+com.owncloud.registry
+com.owncloud.router
+com.owncloud.runtime
+com.owncloud.web
 go.micro.http.broker
-go.micro.monitor
-go.micro.network
-go.micro.proxy
-go.micro.registry
-go.micro.router
-go.micro.runtime
-go.micro.store
-go.micro.tunnel
-go.micro.web
 ```
 
 Further ocis extensions can be added to the runtime via the ocis command like:
@@ -51,11 +63,11 @@ Further ocis extensions can be added to the runtime via the ocis command like:
 ./bin/ocis hello
 ```
 
-Which whill register:
+Which will register:
 
 ```console
-go.micro.web.hello
-go.micro.api.hello
+com.owncloud.web.hello
+com.owncloud.api.hello
 ```
 
 To the list of available services.
@@ -143,7 +155,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Address to bind grpc server, defaults to `0.0.0.0:9001`
 
 --services-enabled
-: List of enabled services, defaults to `phoenix,konnectd,graph,ocs,webdav,hello`
+: List of enabled services, defaults to `hello,phoenix,graph,graph-explorer,ocs,webdav,reva-frontend,reva-gateway,reva-users,reva-auth-basic,reva-auth-bearer,reva-sharing,reva-storage-root,reva-storage-home,reva-storage-home-data,reva-storage-oc,reva-storage-oc-data,devldap`
 
 #### Health
 
