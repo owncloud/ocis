@@ -3,9 +3,9 @@ package http
 import (
 	svc "github.com/owncloud/ocis-graph/pkg/service/v0"
 	"github.com/owncloud/ocis-graph/pkg/version"
-	"github.com/owncloud/ocis-pkg/middleware"
-	"github.com/owncloud/ocis-pkg/oidc"
-	"github.com/owncloud/ocis-pkg/service/http"
+	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-pkg/v2/service/http"
 )
 
 // Server initializes the http service and server.

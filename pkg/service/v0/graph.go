@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis-graph/pkg/config"
-	"github.com/owncloud/ocis-pkg/log"
-	"github.com/owncloud/ocis-pkg/oidc"
+	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 	"gopkg.in/ldap.v3"
 )
