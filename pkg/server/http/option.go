@@ -3,8 +3,8 @@ package http
 import (
 	"context"
 
-	"github.com/micro/cli"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-webdav/pkg/config"
 	"github.com/owncloud/ocis-webdav/pkg/metrics"
 )

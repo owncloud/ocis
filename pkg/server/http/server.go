@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/owncloud/ocis-pkg/middleware"
-	"github.com/owncloud/ocis-pkg/service/http"
+	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis-pkg/v2/service/http"
 	svc "github.com/owncloud/ocis-webdav/pkg/service/v0"
 	"github.com/owncloud/ocis-webdav/pkg/version"
 )

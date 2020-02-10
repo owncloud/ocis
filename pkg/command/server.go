@@ -10,7 +10,7 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -24,8 +24,8 @@ import (
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Server(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
