@@ -5,8 +5,8 @@ package command
 import (
 	"strings"
 
-	"github.com/micro/cli"
-	"github.com/micro/go-micro/config/cmd"
+	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2/config/cmd"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/pkg/micro/runtime"
@@ -15,8 +15,8 @@ import (
 )
 
 // Server is the entrypoint for the server command.
-func Server(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Server(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "server",
 		Usage:    "Start fullstack server",
 		Category: "Fullstack",

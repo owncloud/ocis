@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/cli"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/pkg/micro/runtime"
@@ -24,7 +24,7 @@ func Execute() error {
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
 
-		Authors: []cli.Author{
+		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",

@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-hello/pkg/command"
 	svcconfig "github.com/owncloud/ocis-hello/pkg/config"
 	"github.com/owncloud/ocis-hello/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // HelloCommand is the entrypoint for the hello command.
-func HelloCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func HelloCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "hello",
 		Usage:    "Start hello server",
 		Category: "Extensions",

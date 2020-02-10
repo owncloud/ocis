@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-devldap/pkg/command"
 	svcconfig "github.com/owncloud/ocis-devldap/pkg/config"
 	"github.com/owncloud/ocis-devldap/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // DevLDAPCommand is the entrypoint for the devldap command.
-func DevLDAPCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func DevLDAPCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "devldap",
 		Usage:    "Start devldap server",
 		Category: "Extensions",

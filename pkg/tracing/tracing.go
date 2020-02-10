@@ -8,7 +8,7 @@ import (
 	"contrib.go.opencensus.io/exporter/zipkin"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"

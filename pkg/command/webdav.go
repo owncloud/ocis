@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-webdav/pkg/command"
 	svcconfig "github.com/owncloud/ocis-webdav/pkg/config"
 	"github.com/owncloud/ocis-webdav/pkg/flagset"
@@ -12,8 +12,8 @@ import (
 )
 
 // WebDAVCommand is the entrypoint for the webdav command.
-func WebDAVCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func WebDAVCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "webdav",
 		Usage:    "Start webdav server",
 		Category: "Extensions",

@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-graph/pkg/command"
 	svcconfig "github.com/owncloud/ocis-graph/pkg/config"
 	"github.com/owncloud/ocis-graph/pkg/flagset"
@@ -12,8 +12,8 @@ import (
 )
 
 // GraphCommand is the entrypoint for the graph command.
-func GraphCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func GraphCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "graph",
 		Usage:    "Start graph server",
 		Category: "Extensions",

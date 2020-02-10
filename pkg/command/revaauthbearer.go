@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaAuthBearerCommand is the entrypoint for the reva-auth-bearer command.
-func RevaAuthBearerCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaAuthBearerCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-auth-bearer",
 		Usage:    "Start reva auth-bearer service",
 		Category: "Extensions",

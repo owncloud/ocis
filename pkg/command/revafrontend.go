@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaFrontendCommand is the entrypoint for the reva-frontend command.
-func RevaFrontendCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaFrontendCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-frontend",
 		Usage:    "Start reva frontend",
 		Category: "Extensions",

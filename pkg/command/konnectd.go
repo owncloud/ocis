@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-konnectd/pkg/command"
 	svcconfig "github.com/owncloud/ocis-konnectd/pkg/config"
 	"github.com/owncloud/ocis-konnectd/pkg/flagset"
@@ -12,8 +12,8 @@ import (
 )
 
 // KonnectdCommand is the entrypoint for the konnectd command.
-func KonnectdCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func KonnectdCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "konnectd",
 		Usage:    "Start konnectd server",
 		Category: "Extensions",

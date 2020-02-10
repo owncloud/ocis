@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaStorageOCDataCommand is the entrypoint for the reva-storage-oc-data command.
-func RevaStorageOCDataCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaStorageOCDataCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-storage-oc-data",
 		Usage:    "Start reva oc storage dataprovider",
 		Category: "Extensions",

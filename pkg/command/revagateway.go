@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaGatewayCommand is the entrypoint for the reva-gateway command.
-func RevaGatewayCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaGatewayCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-gateway",
 		Usage:    "Start reva gateway",
 		Category: "Extensions",
