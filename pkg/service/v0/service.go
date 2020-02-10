@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis-phoenix/pkg/assets"
 	"github.com/owncloud/ocis-phoenix/pkg/config"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/log"
 )
 
 var (

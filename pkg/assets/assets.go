@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis-phoenix/pkg/config"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/log"
 )
 
 //go:generate go run github.com/UnnoTed/fileb0x embed.yml

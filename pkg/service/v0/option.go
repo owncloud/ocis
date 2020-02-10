@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis-phoenix/pkg/config"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/log"
 )
 
 // Option defines a single option function.
