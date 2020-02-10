@@ -7,11 +7,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/owncloud/ocis-pkg/log"
 	"math/big"
 	"net"
 	"os"
 	"time"
+
+	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
 func publicKey(priv interface{}) interface{} {
