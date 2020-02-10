@@ -4,11 +4,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-graph-explorer/pkg/config"
 	"github.com/owncloud/ocis-graph-explorer/pkg/flagset"
 	"github.com/owncloud/ocis-graph-explorer/pkg/version"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/spf13/viper"
 )
 
@@ -22,7 +22,7 @@ func Execute() error {
 		Usage:    "Serve Graph-Explorer for oCIS",
 		Compiled: version.Compiled(),
 
-		Authors: []cli.Author{
+		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
@@ -73,7 +73,7 @@ func Execute() error {
 			return nil
 		},
 
-		Commands: []cli.Command{
+		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
 		},
