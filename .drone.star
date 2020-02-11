@@ -622,65 +622,26 @@ def website(ctx):
     },
     'steps': [
       {
-        'name': 'clone-downstream',
-        'image': 'plugins/git-action:1',
-        'pull': 'always',
-        'settings': {
-          'actions': [
-            'clone',
-          ],
-          'remote': 'https://github.com/owncloud/owncloud.github.io',
-          'branch': 'source',
-          'path': '/drone/src/downstream/',
-          'netrc_machine': 'github.com',
-          'netrc_username': {
-            'from_secret': 'github_username',
-          },
-          'netrc_password': {
-            'from_secret': 'github_token',
-          },
-        },
-        'when': {
-          'ref': {
-            'exclude': [
-              'refs/heads/master',
-            ],
-          },
-        },
-      },
-      {
-        'name': 'copy-current-docs',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
+        'name': 'prepare',
+        'image': 'alpine',
         'commands': [
-          'cd downstream',
-          'mkdir -p content/extensions/ocis-accounts',
-          'rsync -aX ../docs/* content/extensions/ocis-accounts',
+          'apk add make',
+          'make docs-copy'
         ],
       },
       {
-        'name': 'assets',
-        'image': 'byrnedo/alpine-curl',
-        'commands': [
-          'cd downstream',
-          'mkdir -p themes/hugo-geekdoc/',
-          'curl -L https://github.com/xoxys/hugo-geekdoc/releases/download/v0.1.7/hugo-geekdoc.tar.gz | tar -xz -C themes/hugo-geekdoc/ --strip-components=1'
-        ],
-      },
-      {
-        'name': 'build-docs',
+        'name': 'test',
         'image': 'klakegg/hugo:0.59.1-ext-alpine',
         'commands': [
-          'cd downstream',
+          'cd hugo',
           'hugo-official',
         ],
       },
       {
-        'name': 'list-docs',
+        'name': 'list',
         'image': 'iankoulski/tree',
         'commands': [
-          'cd downstream',
-          'tree public',
+          'tree hugo/public',
         ],
       },
       {
