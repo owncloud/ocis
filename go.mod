@@ -22,4 +22,4 @@ require (
 	stash.kopano.io/kc/konnect v0.28.0
 )
 
-replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha
+replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha2

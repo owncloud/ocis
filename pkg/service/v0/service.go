@@ -41,8 +41,9 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("Could not bootstrap konnectd")
 	}
 
-	routes := []server.WithRoutes{bs.Managers.Must("identity").(server.WithRoutes)}
-	handlers := bs.Managers.Must("handler").(http.Handler)
+	managers := bs.Managers()
+	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
+	handlers := managers.Must("handler").(http.Handler)
 
 	return Konnectd{
 		config: options.Config,
