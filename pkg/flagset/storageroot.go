@@ -116,9 +116,9 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_ROOT_URL"},
 			Destination: &cfg.Reva.StorageRoot.URL,
 		},
-		&cli.StringFlag{
+		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   "storageprovider",
+			Value:   cli.NewStringSlice("storageprovider"),
 			Usage:   "--service storageprovider [--service otherservice]",
 			EnvVars: []string{"REVA_STORAGE_ROOT_SERVICES"},
 		},
