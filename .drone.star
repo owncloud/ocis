@@ -623,9 +623,9 @@ def website(ctx):
     'steps': [
       {
         'name': 'prepare',
-        'image': 'webhippie/alpine',
+        'image': 'owncloud/alpine:latest',
         'commands': [
-          'apk add make git',
+          'apk add make',
           'make docs-copy'
         ],
       },
