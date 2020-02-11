@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaUsersCommand is the entrypoint for the reva-users command.
-func RevaUsersCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaUsersCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-users",
 		Usage:    "Start reva users service",
 		Category: "Extensions",

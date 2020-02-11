@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/pkg/register"
 )
 
 // Health is the entrypoint for the health command.
-func Health(cfg *config.Config) cli.Command {
-	return cli.Command{
+func Health(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:  "health",
 		Usage: "Check health status",
 		Flags: flagset.HealthWithConfig(cfg),

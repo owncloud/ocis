@@ -1,7 +1,7 @@
 package register
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/pkg/config"
 )
 
@@ -11,7 +11,7 @@ var (
 )
 
 // Command defines the register command.
-type Command func(*config.Config) cli.Command
+type Command func(*config.Config) *cli.Command
 
 // AddCommand appends a command to Commands.
 func AddCommand(cmd Command) {

@@ -1,13 +1,13 @@
 package runtime
 
 import (
-	"github.com/micro/cli"
-	"github.com/micro/go-micro/config/cmd"
-	"github.com/owncloud/ocis-pkg/log"
+	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2/config/cmd"
+	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
 // Command adds micro runtime commands to the cli app
-func Command(app *cli.App) cli.Command {
+func Command(app *cli.App) *cli.Command {
 	command := cli.Command{
 		Name:        "micro",
 		Description: "starts the go-micro runtime services",
@@ -27,5 +27,5 @@ func Command(app *cli.App) cli.Command {
 			return nil
 		},
 	}
-	return command
+	return &command
 }

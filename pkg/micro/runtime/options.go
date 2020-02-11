@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	gorun "github.com/micro/go-micro/runtime"
-	"github.com/owncloud/ocis-pkg/log"
+	gorun "github.com/micro/go-micro/v2/runtime"
+	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
 // Options is a runtime option

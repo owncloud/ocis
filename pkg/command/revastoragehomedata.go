@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/command"
 	svcconfig "github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
@@ -10,8 +10,8 @@ import (
 )
 
 // RevaStorageHomeDataCommand is the entrypoint for the reva-storage-home-data command.
-func RevaStorageHomeDataCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func RevaStorageHomeDataCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "reva-storage-home-data",
 		Usage:    "Start reva home storage dataprovider",
 		Category: "Extensions",

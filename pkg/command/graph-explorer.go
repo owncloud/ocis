@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-graph-explorer/pkg/command"
 	svcconfig "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	"github.com/owncloud/ocis-graph-explorer/pkg/flagset"
@@ -12,8 +12,8 @@ import (
 )
 
 // GraphExplorerCommand is the entry point for the graph command.
-func GraphExplorerCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func GraphExplorerCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "graph-explorer",
 		Usage:    "Start graph explorer",
 		Category: "Extensions",

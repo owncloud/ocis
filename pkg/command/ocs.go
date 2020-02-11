@@ -3,7 +3,7 @@
 package command
 
 import (
-	"github.com/micro/cli"
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-ocs/pkg/command"
 	svcconfig "github.com/owncloud/ocis-ocs/pkg/config"
 	"github.com/owncloud/ocis-ocs/pkg/flagset"
@@ -12,8 +12,8 @@ import (
 )
 
 // OCSCommand is the entrypoint for the ocs command.
-func OCSCommand(cfg *config.Config) cli.Command {
-	return cli.Command{
+func OCSCommand(cfg *config.Config) *cli.Command {
+	return &cli.Command{
 		Name:     "ocs",
 		Usage:    "Start ocs server",
 		Category: "Extensions",
