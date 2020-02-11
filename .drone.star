@@ -623,7 +623,7 @@ def website(ctx):
     'steps': [
       {
         'name': 'prepare',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'commands': [
           'apk add make',
           'make docs-copy'
@@ -631,15 +631,15 @@ def website(ctx):
       },
       {
         'name': 'test',
-        'image': 'klakegg/hugo:0.59.1-ext-alpine',
+        'image': 'webhippie/hugo:latest',
         'commands': [
           'cd hugo',
-          'hugo-official',
+          'hugo',
         ],
       },
       {
         'name': 'list',
-        'image': 'iankoulski/tree',
+        'image': 'owncloudci/alpine:latest',
         'commands': [
           'tree hugo/public',
         ],
