@@ -644,6 +644,28 @@ def website(ctx):
         ],
       },
       {
+        'name': 'publish',
+        'image': 'plugins/gh-pages:1',
+        'pull': 'always',
+        'settings': {
+          'username': {
+            'from_secret': 'github_username',
+          },
+          'password': {
+            'from_secret': 'github_token',
+          },
+          'pages_directory': 'docs/',
+          'target_branch': 'docs',
+        },
+        'when': {
+          'ref': {
+            'exclude': [
+              'refs/pull/**',
+            ],
+          },
+        },
+      },
+      {
         'name': 'downstream',
         'image': 'plugins/downstream',
         'settings': {
