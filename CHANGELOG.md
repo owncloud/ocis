@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
  * Chg #68: Use /home as default namespace
  * Chg #1: Initial release of basic version
  * Chg #6: Start multiple services with dedicated commands
+ * Enh #87: Expose owncloud storage driver config in flagset
 
 ## Details
 
@@ -75,5 +76,20 @@ The following sections list the changes for unreleased.
    on the cli.
 
    https://github.com/owncloud/ocis-reva/issues/6
+
+ * Enhancement #87: Expose owncloud storage driver config in flagset
+
+   Three new flags are now available:
+
+   - scan files on startup to generate missing fileids default: `true` env var:
+   `REVA_STORAGE_OWNCLOUD_SCAN` cli option: `--storage-owncloud-scan`
+
+   - autocreate home path for new users default: `true` env var:
+   `REVA_STORAGE_OWNCLOUD_AUTOCREATE` cli option: `--storage-owncloud-autocreate`
+
+   - the address of the redis server default: `:6379` env var:
+   `REVA_STORAGE_OWNCLOUD_REDIS_ADDR` cli option: `--storage-owncloud-redis`
+
+   https://github.com/owncloud/ocis-reva/issues/87
 
 
