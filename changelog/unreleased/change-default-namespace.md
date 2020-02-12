@@ -7,3 +7,5 @@ This change jails users into the `/home` namespace, and allows configuring the n
 This will allow us to focus on getting a single storage driver like eos or owncloud tested and better resembles what owncloud 10 does.
 
 To get back the global namespace, which ultimately is the goal, just set the above environment variable to `/`.
+
+https://github.com/owncloud/ocis-reva/pull/68
