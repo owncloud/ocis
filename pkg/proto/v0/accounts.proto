@@ -21,8 +21,31 @@ message Payload {
 }
 
 message Account {
-    string name = 1;
-    string dateOfBirth = 2;
+    StandardClaims standard_claims = 1;
+}
+
+// OIDC standard claims https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+message StandardClaims {
+    string sub = 1;
+    string name = 2;
+    string given_name = 3;
+    string family_name = 4;
+    string middle_name = 5;
+    string nickname = 6;
+    string preferred_username = 7;
+    string profile = 8;
+    string picture = 9;
+    string website = 10;
+    string email = 11;
+    boolean email_verified = 12;
+    string gender = 13;
+    string birthdate = 14;
+    string zoneinfo = 15;
+    string locale = 16;
+    string phone_number = 17;
+    boolean phone_number_verified = 18;
+    int32 updated_at = 19;
+    // JSON: address -> Message Address {}
 }
 
 message Phoenix {
