@@ -35,9 +35,9 @@ bin/ocis-reva auth-basic & \
 bin/ocis-reva auth-bearer & \
 bin/ocis-reva sharing & \
 bin/ocis-reva storage-root & \
-REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-home & \
+bin/ocis-reva storage-home & \
 bin/ocis-reva storage-home-data & \
-REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-oc & \
+bin/ocis-reva storage-oc & \
 bin/ocis-reva storage-oc-data
 ```
 
@@ -90,9 +90,9 @@ For details on the `json` and `ldap` backends see the [documentation](https://ow
     bin/ocis-reva auth-bearer & \
     bin/ocis-reva sharing & \
     bin/ocis-reva storage-root & \
-    REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-home & \
+    bin/ocis-reva storage-home & \
     bin/ocis-reva storage-home-data & \
-    REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1 bin/ocis-reva storage-oc & \
+    bin/ocis-reva storage-oc & \
     bin/ocis-reva storage-oc-data & \
     bin/ocis-reva frontend
     ```

@@ -133,8 +133,6 @@ def testing(ctx):
         'detach': True,
         'environment' : {
           'REVA_USERS_DRIVER': 'ldap',
-          'REVA_STORAGE_HOME_EXPOSE_DATA_SERVER': 1,
-          'REVA_STORAGE_OC_EXPOSE_DATA_SERVER': 1,
           'REVA_LDAP_HOSTNAME': 'ldap',
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
