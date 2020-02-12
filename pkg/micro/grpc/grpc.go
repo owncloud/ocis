@@ -15,6 +15,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Context(options.Context),
 		grpc.Address(options.Address),
 		grpc.Namespace(options.Namespace),
+		grpc.Logger(options.Logger),
 	)
 
 	hdlr := svc.New(options.Config)
