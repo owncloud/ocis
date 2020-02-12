@@ -4,6 +4,9 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
+PROTO_VERSION := v0
+PROTO_OUT := pkg/proto/$(PROTO_VERSION)
+PROTOCFLAGS := --go_out=. --micro_out=.
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -153,3 +156,7 @@ docs: docs-copy docs-build
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
+
+.PHONY: pb
+pb:
+	protoc $(PROTOCFLAGS) pkg/proto/$(PROTO_VERSION)/*.proto
