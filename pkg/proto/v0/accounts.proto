@@ -37,13 +37,13 @@ message StandardClaims {
     string picture = 9;
     string website = 10;
     string email = 11;
-    boolean email_verified = 12;
+    bool email_verified = 12;
     string gender = 13;
     string birthdate = 14;
     string zoneinfo = 15;
     string locale = 16;
     string phone_number = 17;
-    boolean phone_number_verified = 18;
+    bool phone_number_verified = 18;
     int32 updated_at = 19;
     // JSON: address -> Message Address {}
 }
