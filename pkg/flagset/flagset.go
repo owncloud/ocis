@@ -162,7 +162,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "OIDC issuer URL",
 			EnvVars:     []string{"KONNECTD_ISS"},
 			Value:       "https://127.0.0.1:9130",
-			Destination: &cfg.Konnectd.ISS,
+			Destination: &cfg.Konnectd.Iss,
 		},
 		&cli.StringSliceFlag{
 			Name:    "signing-private-key",
@@ -210,14 +210,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Custom redirection URI to sign-in form",
 			EnvVars:     []string{"KONNECTD_SIGN_IN_URI"},
 			Value:       "",
-			Destination: &cfg.Konnectd.SignInUri,
+			Destination: &cfg.Konnectd.SignInURI,
 		},
 		&cli.StringFlag{
 			Name:        "signed-out-uri",
 			Usage:       "Custom redirection URI to signed-out goodbye page",
 			EnvVars:     []string{"KONNECTD_SIGN_OUT_URI"},
 			Value:       "",
-			Destination: &cfg.Konnectd.SignedOutUri,
+			Destination: &cfg.Konnectd.SignedOutURI,
 		},
 		&cli.StringFlag{
 			Name:        "authorization-endpoint-uri",
