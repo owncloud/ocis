@@ -5,15 +5,14 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	math "math"
+)
 
+import (
 	context "context"
-
 	client "github.com/micro/go-micro/client"
-
 	server "github.com/micro/go-micro/server"
 )
 
