@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
  * Chg #68: Use /home as default namespace
  * Chg #1: Initial release of basic version
  * Chg #6: Start multiple services with dedicated commands
+ * Chg #89: Storage providers now default to exposing data servers
  * Enh #87: Expose owncloud storage driver config in flagset
 
 ## Details
@@ -76,6 +77,15 @@ The following sections list the changes for unreleased.
    on the cli.
 
    https://github.com/owncloud/ocis-reva/issues/6
+
+ * Change #89: Storage providers now default to exposing data servers
+
+   The flags that let reva storage providers announce that they expose a data server now defaults
+   to true:
+
+   `REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1` `REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1`
+
+   https://github.com/owncloud/ocis-reva/issues/89
 
  * Enhancement #87: Expose owncloud storage driver config in flagset
 
