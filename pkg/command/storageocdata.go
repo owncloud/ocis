@@ -117,6 +117,9 @@ func StorageOCData(cfg *config.Config) *cli.Command {
 									},
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
+										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
+										"autocreate":    cfg.Reva.Storages.OwnCloud.Autocreate,
+										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
 									},
 									"s3": map[string]interface{}{
 										"region":     cfg.Reva.Storages.S3.Region,
