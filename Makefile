@@ -140,7 +140,7 @@ docs-copy:
   git remote add origin https://github.com/owncloud/owncloud.github.io; \
   git fetch; \
   git checkout origin/source -f; \
-  rsync -aX ../docs/ content/extensions/ocis-accounts
+  rsync --delete -aX ../docs/ content/extensions/ocis-accounts
 
 .PHONY: docs-build
 docs-build:
