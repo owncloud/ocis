@@ -625,7 +625,6 @@ def website(ctx):
         'name': 'prepare',
         'image': 'owncloudci/alpine:latest',
         'commands': [
-          'apk add make',
           'make docs-copy'
         ],
       },
