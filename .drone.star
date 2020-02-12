@@ -484,13 +484,13 @@ def changelog(ctx):
         ],
       },
       {
-				'name': 'diff',
-				'image': 'owncloud/alpine:latest',
-				'pull': 'always',
-				'commands': [
-					'git diff',
-				],
-			},
+        'name': 'diff',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'commands': [
+          'git diff',
+        ],
+      },
       {
         'name': 'output',
         'image': 'webhippie/golang:1.13',
@@ -622,26 +622,38 @@ def website(ctx):
     },
     'steps': [
       {
-        'name': 'generate',
-        'image': 'webhippie/hugo:latest',
-        'pull': 'always',
+        'name': 'prepare',
+        'image': 'owncloudci/alpine:latest',
         'commands': [
-          'make docs',
+          'make docs-copy'
         ],
       },
       {
-        'name': 'publish',
-        'image': 'plugins/gh-pages:1',
-        'pull': 'always',
+        'name': 'test',
+        'image': 'webhippie/hugo:latest',
+        'commands': [
+          'cd hugo',
+          'hugo',
+        ],
+      },
+      {
+        'name': 'list',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'tree hugo/public',
+        ],
+      },
+      {
+        'name': 'downstream',
+        'image': 'plugins/downstream',
         'settings': {
-          'username': {
-            'from_secret': 'github_username',
+          'server': 'https://cloud.drone.io/',
+          'token': {
+            'from_secret': 'drone_token',
           },
-          'password': {
-            'from_secret': 'github_token',
-          },
-          'pages_directory': 'docs/public/',
-          'temporary_base': 'tmp/',
+          'repositories': [
+            'owncloud/owncloud.github.io@source',
+          ],
         },
         'when': {
           'ref': {
