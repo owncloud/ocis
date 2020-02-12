@@ -9,7 +9,11 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/micro/grpc"
-	olog "github.com/owncloud/ocis-pkg/v2/log"
+	oclog "github.com/owncloud/ocis-pkg/v2/log"
+)
+
+var (
+	logger oclog.Logger
 )
 
 // Server is the entry point for the server command.
@@ -60,16 +64,17 @@ func Server(cfg *config.Config) *cli.Command {
 				Destination: &cfg.Server.Address,
 			},
 		},
+		Before: func(c *cli.Context) error {
+			logger = oclog.NewLogger(oclog.Name(cfg.Server.Name))
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
-			l := olog.NewLogger(
-				olog.Name(cfg.Server.Name),
-			)
 
 			defer cancel()
 			service := grpc.NewService(
-				grpc.Logger(l),
+				grpc.Logger(logger),
 				grpc.Context(ctx),
 				grpc.Config(cfg),
 				grpc.Name(cfg.Server.Name),
