@@ -45,7 +45,16 @@ message StandardClaims {
     string phone_number = 17;
     bool phone_number_verified = 18;
     int32 updated_at = 19;
-    // JSON: address -> Message Address {}
+    Address address = 20;
+}
+
+message Address {
+    string formatted = 1;
+    string street_address = 2;
+    string locality = 3;
+    string region = 4;
+    string postal_code = 5;
+    string country = 6;
 }
 
 message Phoenix {
