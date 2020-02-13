@@ -179,7 +179,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-metadata-url",
-			Value:       "https://localost:9130/.well-known/openid-configuration",
+			Value:       "https://localhost:9130/.well-known/openid-configuration",
 			Usage:       "OpenID Connect metadata URL",
 			EnvVars:     []string{"PHOENIX_OIDC_METADATA_URL"},
 			Destination: &cfg.Phoenix.Config.OpenIDConnect.MetadataURL,
