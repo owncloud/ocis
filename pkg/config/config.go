@@ -35,6 +35,11 @@ type Tracing struct {
 	Service   string
 }
 
+// Asset defines the available asset configuration.
+type Asset struct {
+	Path string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File     string
@@ -42,6 +47,7 @@ type Config struct {
 	Debug    Debug
 	HTTP     HTTP
 	Tracing  Tracing
+	Asset    Asset
 	Konnectd bootstrap.Config
 }
 

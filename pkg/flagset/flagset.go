@@ -161,7 +161,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "iss",
 			Usage:       "OIDC issuer URL",
 			EnvVars:     []string{"KONNECTD_ISS"},
-			Value:       "https://127.0.0.1:9130",
+			Value:       "https://localhost:9130",
 			Destination: &cfg.Konnectd.Iss,
 		},
 		&cli.StringSliceFlag{
@@ -234,17 +234,24 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Konnectd.EndsessionEndpointURI,
 		},
 		&cli.StringFlag{
+			Name:        "asset-path",
+			Value:       "",
+			Usage:       "Path to custom assets",
+			EnvVars:     []string{"KONNECTD_ASSET_PATH"},
+			Destination: &cfg.Asset.Path,
+		},
+		&cli.StringFlag{
 			Name:        "identifier-client-path",
 			Usage:       "Path to the identifier web client base folder",
 			EnvVars:     []string{"KONNECTD_IDENTIFIER_CLIENT_PATH"},
-			Value:       "./identifier-webapp",
+			Value:       "/var/tmp/konnectd",
 			Destination: &cfg.Konnectd.IdentifierClientPath,
 		},
 		&cli.StringFlag{
 			Name:        "identifier-registration-conf",
 			Usage:       "Path to a identifier-registration.yaml configuration file",
 			EnvVars:     []string{"KONNECTD_IDENTIFIER_REGISTRATION_CONF"},
-			Value:       "./identifier-registration.yaml",
+			Value:       "./config/identifier-registration.yaml",
 			Destination: &cfg.Konnectd.IdentifierRegistrationConf,
 		},
 		&cli.StringFlag{
