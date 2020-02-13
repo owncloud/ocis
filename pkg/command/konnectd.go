@@ -1,4 +1,3 @@
-// +build simple
 
 package command
 
