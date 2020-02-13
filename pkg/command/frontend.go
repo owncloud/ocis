@@ -138,51 +138,6 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"gateway":                "", // TODO not needed?
 								"transfer_shared_secret": cfg.Reva.TransferSecret,
 							},
-							"wellknown": map[string]interface{}{
-								"issuer":                 cfg.Reva.OIDC.Issuer,
-								"authorization_endpoint": cfg.Reva.OIDC.Issuer + "/oauth2/auth",
-								"token_endpoint":         cfg.Reva.OIDC.Issuer + "/oauth2/token",
-								"revocation_endpoint":    cfg.Reva.OIDC.Issuer + "/oauth2/auth",
-								"introspection_endpoint": cfg.Reva.OIDC.Issuer + "/oauth2/introspect",
-								"userinfo_endpoint":      cfg.Reva.OIDC.Issuer + "/oauth2/userinfo",
-							},
-							"oidcprovider": map[string]interface{}{
-								"prefix":  "oauth2",
-								"gateway": cfg.Reva.Gateway.URL,
-								"issuer":  cfg.Reva.OIDC.Issuer,
-								"clients": map[string]interface{}{
-									// TODO make these configurable
-									// note: always use authorization code flow, see https://developer.okta.com/blog/2019/05/01/is-the-oauth-implicit-flow-dead for details
-									"phoenix": map[string]interface{}{
-										"id":             "phoenix",
-										"redirect_uris":  []string{"http://localhost:9100/oidc-callback.html", "http://localhost:9100/"},
-										"grant_types":    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-										"response_types": []string{"code"},
-										"scopes":         []string{"openid", "profile", "email", "offline"},
-										"public":         true, // force PKCS for public clients
-									},
-									// desktop
-									"xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69": map[string]interface{}{
-										"id":            "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
-										"client_secret": "$2y$12$pKsCQPp8e/UOL1QDQhT3g.1J.KK8oMJACbEXIqRD0LiOxvgey.TtS",
-										// preregister localhost ports for the desktop
-										"redirect_uris":  desktopRedirectURIs,
-										"grant_types":    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-										"response_types": []string{"code"},
-										"scopes":         []string{"openid", "profile", "email", "offline", "offline_access"},
-									},
-									// TODO add cli command for token fetching
-									"cli": map[string]interface{}{
-										"id":            "cli",
-										"client_secret": "$2a$10$IxMdI6d.LIRZPpSfEwNoeu4rY3FhDREsxFJXikcgdRRAStxUlsuEO", // = "foobar"
-										// use hardcoded port credentials for cli
-										"redirect_uris":  []string{"http://localhost:18080/callback"},
-										"grant_types":    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-										"response_types": []string{"code"},
-										"scopes":         []string{"openid", "profile", "email", "offline"},
-									},
-								},
-							},
 							"ocdav": map[string]interface{}{
 								"prefix":           "",
 								"chunk_folder":     "/var/tmp/revad/chunks",
