@@ -138,6 +138,7 @@ def testing(ctx):
           'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379'
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
@@ -196,6 +197,14 @@ def testing(ctx):
           'LDAP_ADMIN_PASSWORD': 'admin',
           'LDAP_TLS_VERIFY_CLIENT': 'never',
           'HOSTNAME': 'ldap'
+         },
+      },
+      {
+        'name': 'redis',
+        'image': 'webhippie/redis',
+        'pull': 'always',
+        'environment': {
+          'REDIS_DATABASES': 1
          },
       },
     ],

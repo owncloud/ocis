@@ -15,7 +15,7 @@ You can download prebuilt binaries from the GitHub releases or from our [downloa
 
 ## Development
 
-Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). 
+Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html).
 
 ```console
 git clone https://github.com/owncloud/ocis-reva.git
@@ -77,10 +77,12 @@ For details on the `json` and `ldap` backends see the [documentation](https://ow
         -p 127.0.0.1:389:389 \
         -p 636:636 -d osixia/openldap
     ```
+2.  start a Redis server e.g. with docker:
+    `docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
 
-2.  clone oC10 code: `git clone https://github.com/owncloud/core.git`
+3.  clone oC10 code: `git clone https://github.com/owncloud/core.git`
 
-3.  start reva with `REVA_USERS_DRIVER=ldap`:
+4.  start reva with `REVA_USERS_DRIVER=ldap`:
     ```
     bin/ocis-reva gateway & \
     REVA_USERS_DRIVER=ldap bin/ocis-reva users & \
@@ -95,7 +97,7 @@ For details on the `json` and `ldap` backends see the [documentation](https://ow
     bin/ocis-reva frontend
     ```
 
-4.  from inside the oC10 repo run the tests:
+5.  from inside the oC10 repo run the tests:
     ```
     make test-acceptance-api \
         TEST_SERVER_URL=http://localhost:9140 \
