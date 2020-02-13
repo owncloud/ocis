@@ -26,4 +26,4 @@ require (
 	go.opencensus.io v0.22.2
 )
 
-replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha
+replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha2
