@@ -41,8 +41,6 @@ bin/ocis-reva storage-oc & \
 bin/ocis-reva storage-oc-data
 ```
 
-The two env vars are needed to tell the reva gateway to use the dedicated data services when uploading files.
-
 The root storage serves the available namespaces from disk using the local storage driver. In order to be able to navigate into the `/home` and `/oc` storage providers you have to create these directories:
 ```
 mkdir /var/tmp/reva/root/home
