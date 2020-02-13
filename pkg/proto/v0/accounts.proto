@@ -22,6 +22,7 @@ message Payload {
 
 message Account {
     StandardClaims standard_claims = 1;
+    repeated IdHistory identities = 2; // keep track of every identity of a given user
 }
 
 // OIDC standard claims https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
@@ -55,6 +56,11 @@ message Address {
     string region = 4;
     string postal_code = 5;
     string country = 6;
+}
+
+message IdHistory {
+    string sub = 1;
+    string iss = 2;
 }
 
 message Phoenix {
