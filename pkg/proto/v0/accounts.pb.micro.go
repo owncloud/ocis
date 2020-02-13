@@ -5,16 +5,15 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	math "math"
+)
 
+import (
 	context "context"
-
-	client "github.com/micro/go-micro/client"
-
-	server "github.com/micro/go-micro/server"
+	client "github.com/micro/go-micro/v2/client"
+	server "github.com/micro/go-micro/v2/server"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -47,12 +46,6 @@ type settingsService struct {
 }
 
 func NewSettingsService(name string, c client.Client) SettingsService {
-	if c == nil {
-		c = client.NewClient()
-	}
-	if len(name) == 0 {
-		name = "settings"
-	}
 	return &settingsService{
 		c:    c,
 		name: name,

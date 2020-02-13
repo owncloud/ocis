@@ -7,7 +7,7 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	olog "github.com/owncloud/ocis-pkg/log"
+	olog "github.com/owncloud/ocis-pkg/v2/log"
 )
 
 // New returns a new instance of Service

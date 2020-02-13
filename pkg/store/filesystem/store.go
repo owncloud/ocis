@@ -13,7 +13,7 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	olog "github.com/owncloud/ocis-pkg/log"
+	olog "github.com/owncloud/ocis-pkg/v2/log"
 )
 
 var (
@@ -34,7 +34,7 @@ type Store struct {
 // New creates a new store
 func New(cfg *config.Config) account.Manager {
 	s := Store{
-		Logger: olog.NewLogger(olog.Name("ocis-accounts")),
+		Logger: olog.NewLogger(olog.Name(cfg.Server.Name)),
 	}
 
 	dest := filepath.Join(cfg.MountPath, StoreName)
