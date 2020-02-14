@@ -16,10 +16,10 @@ func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
 	if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
-		_, certErr := os.Stat("server.crt")
-		_, keyErr := os.Stat("server.key")
+		_, certErr := os.Stat("./server.crt")
+		_, keyErr := os.Stat("./server.key")
 
-		if !os.IsExist(certErr) || !os.IsExist(keyErr) {
+		if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 			options.Logger.Info().Msgf("Generating certs")
 			if err := crypto.GenCert(options.Logger); err != nil {
 				options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
