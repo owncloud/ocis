@@ -50,12 +50,12 @@ var Extensions = []string{
 	"konnectd",
 }
 
-var _services []*gorun.Service
-
 // Runtime is a wrapper around micro's own runtime
 type Runtime struct {
 	Logger log.Logger
 	R      *gorun.Runtime
+
+	services []*gorun.Service
 }
 
 // New creates a new ocis + micro runtime
@@ -68,7 +68,7 @@ func New(opts ...Option) Runtime {
 	}
 
 	for _, v := range append(RuntimeServices, Extensions...) {
-		_services = append(_services, &gorun.Service{Name: v})
+		r.services = append(r.services, &gorun.Service{Name: v})
 	}
 
 	return r
@@ -93,7 +93,7 @@ func (r *Runtime) Trap() {
 		r.Logger.Err(err)
 	}
 
-	for _, v := range _services {
+	for _, v := range r.services {
 		r.Logger.Info().Msgf("gracefully stopping service %v", v.Name)
 		(*r.R).Delete(v)
 	}
@@ -105,7 +105,7 @@ func (r *Runtime) Trap() {
 func (r *Runtime) Start() {
 	env := os.Environ()
 
-	for _, service := range _services {
+	for _, service := range r.services {
 		r.Logger.Info().Msgf("args: %v %v", os.Args[0], service.Name) // TODO uncommenting this line causes some issues where the binary calls itself with the `server` as argument
 		args := []gorun.CreateOption{
 			gorun.WithCommand(os.Args[0], service.Name),
