@@ -180,7 +180,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-endpoint",
-			Value:       "",
+			Value:       "https://localhost:9130",
 			Usage:       "OpenIDConnect endpoint",
 			EnvVars:     []string{"GRAPH_OIDC_ENDPOINT"},
 			Destination: &cfg.OpenIDConnect.Endpoint,
