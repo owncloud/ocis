@@ -13,7 +13,7 @@ require (
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-devldap v0.0.0-20200210154914-6c796445c1bf
-	github.com/owncloud/ocis-graph v0.0.0-20200210110652-53765102295d
+	github.com/owncloud/ocis-graph v0.0.0-20200217115956-172417259283
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
 	github.com/owncloud/ocis-konnectd v0.0.0-20200218084322-104a3fcf99c7

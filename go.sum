@@ -736,6 +736,8 @@ github.com/owncloud/ocis-devldap v0.0.0-20200210154914-6c796445c1bf h1:ZdCDytO0z
 github.com/owncloud/ocis-devldap v0.0.0-20200210154914-6c796445c1bf/go.mod h1:GfyrvcvCcwqp+L7xR3ru5c3QORK9ANC9CqOr83mZFDE=
 github.com/owncloud/ocis-graph v0.0.0-20200210110652-53765102295d h1:ltTbvLZphRyu54rhEt3T/7XD+KLhxbWWVh27DaqcARI=
 github.com/owncloud/ocis-graph v0.0.0-20200210110652-53765102295d/go.mod h1:IRm6BBJqyPhYI+3fm5bWkhgFL/yh63ASUznFqN4yXgs=
+github.com/owncloud/ocis-graph v0.0.0-20200217115956-172417259283 h1:o0d3VMW/p3Ztfznrc5QQCLeQ8exbL2vVeXm+sZKxrPI=
+github.com/owncloud/ocis-graph v0.0.0-20200217115956-172417259283/go.mod h1:IRm6BBJqyPhYI+3fm5bWkhgFL/yh63ASUznFqN4yXgs=
 github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c h1:8g3u2JwOMP/UE+0B+YjV7UWEQzyCPbnZzwIto6lNc0I=
 github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c/go.mod h1:zspcodmHIzGmB6Py8Ve+oO6wXFKRra5bEx1Q9HdJlrY=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5 h1:s4Cz5Mj08JS7yCpwcT5MXvGsDjL1cUC2sKocHhXJejo=
