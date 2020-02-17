@@ -108,18 +108,14 @@ func (r Runtime) Trap() {
 func (r *Runtime) Start() {
 	env := os.Environ()
 
-	for _, service := range r.services {
-		// TODO uncommenting this line causes some issues where the binary calls itself with the `server` as argument
-		r.Logger.Info().Msgf("args: %v %v", os.Args[0], service.Name)
+	for i := range r.services {
 		args := []gorun.CreateOption{
-			gorun.WithCommand(os.Args[0], service.Name),
+			gorun.WithCommand(os.Args[0], r.services[i].Name),
 			gorun.WithEnv(env),
 			gorun.WithOutput(os.Stdout),
 		}
 
-		if err := (*r.R).Create(service, args...); err != nil {
-			r.Logger.Error().Msgf("Failed to create runtime enviroment: %v", err)
-		}
+		go (*r.R).Create(r.services[i], args...)
 	}
 }
 
