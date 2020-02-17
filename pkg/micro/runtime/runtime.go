@@ -8,16 +8,9 @@ import (
 	"github.com/micro/cli/v2"
 	gorun "github.com/micro/go-micro/v2/runtime"
 	"github.com/micro/micro/v2/api"
-	"github.com/micro/micro/v2/broker"
-	"github.com/micro/micro/v2/health"
-	"github.com/micro/micro/v2/monitor"
 	"github.com/micro/micro/v2/proxy"
 	"github.com/micro/micro/v2/registry"
-	"github.com/micro/micro/v2/router"
 	"github.com/micro/micro/v2/runtime"
-	"github.com/micro/micro/v2/server"
-	"github.com/micro/micro/v2/store"
-	"github.com/micro/micro/v2/tunnel"
 	"github.com/micro/micro/v2/web"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
@@ -27,13 +20,11 @@ var OwncloudNamespace = "com.owncloud."
 
 // RuntimeServices to start as part of the fullstack option
 var RuntimeServices = []string{
-	"runtime",  // :8088
-	"registry", // :8000
-	"broker",   // :8001
-	"router",   // :8084
-	"proxy",    // :8081
 	"api",      // :8080
+	"proxy",    // :8081
 	"web",      // :8082
+	"registry", // :8000
+	"runtime",  // :8088 (future proof. We want to be able to control extensions through a runtime)
 }
 
 // Extensions are ocis extension services
@@ -59,22 +50,28 @@ var Extensions = []string{
 	"konnectd",
 }
 
-// Runtime is a micro' runtime
+var _services []*gorun.Service
+
+// Runtime is a wrapper around micro's own runtime
 type Runtime struct {
-	Services []string
-	Logger   log.Logger
-	R        *gorun.Runtime
+	Logger log.Logger
+	R      *gorun.Runtime
 }
 
 // New creates a new ocis + micro runtime
 func New(opts ...Option) Runtime {
 	options := newOptions(opts...)
 
-	return Runtime{
-		Services: options.Services,
-		Logger:   options.Logger,
-		R:        options.MicroRuntime,
+	r := Runtime{
+		Logger: options.Logger,
+		R:      options.MicroRuntime,
 	}
+
+	for _, v := range append(RuntimeServices, Extensions...) {
+		_services = append(_services, &gorun.Service{Name: v})
+	}
+
+	return r
 }
 
 // Trap waits for a sigkill to stop the runtime
@@ -96,7 +93,11 @@ func (r *Runtime) Trap() {
 		r.Logger.Err(err)
 	}
 
-	r.Logger.Info().Msgf("Service runtime shutdown")
+	for _, v := range _services {
+		r.Logger.Info().Msgf("gracefully stopping service %v", v.Name)
+		(*r.R).Delete(v)
+	}
+
 	os.Exit(0)
 }
 
@@ -104,16 +105,15 @@ func (r *Runtime) Trap() {
 func (r *Runtime) Start() {
 	env := os.Environ()
 
-	for _, service := range r.Services {
+	for _, service := range _services {
+		r.Logger.Info().Msgf("args: %v %v", os.Args[0], service.Name) // TODO uncommenting this line causes some issues where the binary calls itself with the `server` as argument
 		args := []gorun.CreateOption{
-			// the binary calls itself with the micro service as a subcommand as first argument
-			gorun.WithCommand(os.Args[0], service),
+			gorun.WithCommand(os.Args[0], service.Name),
 			gorun.WithEnv(env),
 			gorun.WithOutput(os.Stdout),
 		}
 
-		muService := &gorun.Service{Name: service}
-		if err := (*r.R).Create(muService, args...); err != nil {
+		if err := (*r.R).Create(service, args...); err != nil {
 			r.Logger.Error().Msgf("Failed to create runtime enviroment: %v", err)
 		}
 	}
@@ -124,13 +124,10 @@ func AddRuntime(app *cli.App) {
 	setDefaults()
 
 	app.Commands = append(app.Commands, api.Commands()...)
-	app.Commands = append(app.Commands, broker.Commands()...)
-	app.Commands = append(app.Commands, health.Commands()...)
 	app.Commands = append(app.Commands, proxy.Commands()...)
-	app.Commands = append(app.Commands, router.Commands()...)
+	app.Commands = append(app.Commands, web.Commands()...)
 	app.Commands = append(app.Commands, registry.Commands()...)
 	app.Commands = append(app.Commands, runtime.Commands()...)
-	app.Commands = append(app.Commands, web.Commands()...)
 }
 
 // provide a config.Config with default values?
@@ -140,34 +137,16 @@ func setDefaults() {
 	api.Namespace = OwncloudNamespace + "api"
 	api.HeaderPrefix = "X-Micro-Owncloud-"
 
-	// broker
-	broker.Name = OwncloudNamespace + "http.broker"
-
 	// proxy
 	proxy.Name = OwncloudNamespace + "proxy"
 
-	// monitor
-	monitor.Name = OwncloudNamespace + "monitor"
-
-	// router
-	router.Name = OwncloudNamespace + "router"
-
-	// tunnel
-	tunnel.Name = OwncloudNamespace + "tunnel"
+	// web
+	web.Name = OwncloudNamespace + "web"
+	web.Namespace = OwncloudNamespace + "web"
 
 	// registry
 	registry.Name = OwncloudNamespace + "registry"
 
 	// runtime
 	runtime.Name = OwncloudNamespace + "runtime"
-
-	// server
-	server.Name = OwncloudNamespace + "server"
-
-	// store
-	store.Name = OwncloudNamespace + "store"
-
-	// web
-	web.Name = OwncloudNamespace + "web"
-	web.Namespace = OwncloudNamespace + "web"
 }
