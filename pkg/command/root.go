@@ -76,6 +76,7 @@ func Execute() error {
 		},
 	}
 
+	// Load commands from the registry
 	for _, fn := range register.Commands {
 		app.Commands = append(
 			app.Commands,
@@ -83,11 +84,7 @@ func Execute() error {
 		)
 	}
 
-	runtime.AddRuntime(app)
-	app.Commands = append(
-		app.Commands,
-		runtime.Command(app),
-	)
+	runtime.AddMicroPlatform(app)
 
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
@@ -102,7 +99,7 @@ func Execute() error {
 	return app.Run(os.Args)
 }
 
-// NewLogger initializes a service-specific logger instance.
+// NewLogger initializes a service-specific logger instance
 func NewLogger(cfg *config.Config) log.Logger {
 	return log.NewLogger(
 		log.Name("ocis"),
