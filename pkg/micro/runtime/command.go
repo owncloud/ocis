@@ -14,7 +14,7 @@ func Command(app *cli.App) *cli.Command {
 		Category:    "Micro",
 		Action: func(c *cli.Context) error {
 			runtime := New(
-				Services(RuntimeServices),
+				Services(MicroServices),
 				Logger(log.NewLogger()),
 				MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 			)

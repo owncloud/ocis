@@ -36,15 +36,12 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			runtime := runtime.New(
-				runtime.Services(append(runtime.RuntimeServices, runtime.Extensions...)),
+				runtime.Services(append(runtime.MicroServices, runtime.Extensions...)),
 				runtime.Logger(logger),
 				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 			)
 
-			// fork uses the micro runtime to fork go-micro services
 			runtime.Start()
-
-			// trap blocks until a kill signal is sent
 			runtime.Trap()
 
 			return nil
