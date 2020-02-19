@@ -153,6 +153,9 @@ KONNECTD_ALLOW_CLIENT_GUESTS
 KONNECTD_ALLOW_DYNAMIC_CLIENT_REGISTRATION
 : Allow dynamic OAuth2 client registration
 
+KONNECTD_DISABLE_IDENTIFIER_WEBAPP
+: Disable built-in identifier-webapp to use a frontend hosted elsewhere. Per default we use the built-in webapp. If set to false --identifier-client-path must be provided, defaults to `true`
+
 
 #### Health
 
@@ -286,6 +289,9 @@ If you prefer to configure the service with commandline flags you can see the av
 
 --allow-dynamic-client-registration
 : Allow dynamic OAuth2 client registration
+
+--disable-identifier-webapp
+:  Disable built-in identifier-webapp to use a frontend hosted elsewhere. Per default we use the built-in webapp. If set to false --identifier-client-path must be provided, defaults to `true`
 
 
 #### Health

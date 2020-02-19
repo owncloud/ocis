@@ -298,5 +298,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"KONNECTD_ALLOW_DYNAMIC_CLIENT_REGISTRATION"},
 			Destination: &cfg.Konnectd.AllowDynamicClientRegistration,
 		},
+		&cli.BoolFlag{
+			Name:        "disable-identifier-webapp",
+			Usage:       "Disable built-in identifier-webapp to use a frontend hosted elsewhere.",
+			EnvVars:     []string{"KONNECTD_DISABLE_IDENTIFIER_WEBAPP"},
+			Value:       true,
+			Destination: &cfg.Konnectd.IdentifierWebAppDisabled,
+		},
 	}
 }

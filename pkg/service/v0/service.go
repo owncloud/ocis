@@ -70,20 +70,6 @@ func NewService(opts ...Option) Service {
 }
 
 func createConfigsIfNotExist(assets http.FileSystem) error {
-	err := os.MkdirAll("/var/tmp/konnectd", 0700)
-	if err != nil {
-		return err
-	}
-
-	// This empty file is currently required to start konnect
-	// See: https://github.com/Kopano-dev/konnect/issues/25
-	index, err := os.Create("/var/tmp/konnectd/index.html")
-	if err != nil {
-		return err
-	}
-
-	index.Close()
-
 	if _, err := os.Stat("./config"); os.IsNotExist(err) {
 		if err := os.Mkdir("./config", 0700); err != nil {
 			return err
