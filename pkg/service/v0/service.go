@@ -18,6 +18,7 @@ import (
 	"stash.kopano.io/kc/konnect/bootstrap"
 	kcconfig "stash.kopano.io/kc/konnect/config"
 	"stash.kopano.io/kc/konnect/server"
+	"stash.kopano.io/kgol/rndm"
 )
 
 // Service defines the extension handlers.
@@ -212,8 +213,10 @@ func (k Konnectd) Index() http.HandlerFunc {
 
 	// TODO add environment variable to make the path prefix configurable
 	pp := "/signin/v1"
-
 	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
+
+	nonce := rndm.GenerateRandomString(32)
+	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

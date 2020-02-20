@@ -19,7 +19,8 @@ require (
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
-	stash.kopano.io/kc/konnect v0.28.0
+	stash.kopano.io/kc/konnect v0.28.1
+	stash.kopano.io/kgol/rndm v1.1.0
 )
 
 replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha2
