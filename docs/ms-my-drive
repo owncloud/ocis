@@ -1,0 +1,166 @@
+
+{
+    "@odata.context": "https://glauth.microsoft.com/v1.0/$metadata#users('thomas.mueller%40tmit.eu')/drive/root/children",
+    "@odata.count": 4,
+    "value": [
+        {
+            "createdDateTime": "2020-01-30T11:03:23.367Z",
+            "cTag": "adDo0NEZFQUIxMEQ1NUU5ODcxITEwNC42MzcxNTk3OTYyODE0MDAwMDA",
+            "eTag": "aNDRGRUFCMTBENTVFOTg3MSExMDQuMA",
+            "id": "44FEAB10D55E9871!104",
+            "lastModifiedDateTime": "2020-01-30T11:13:48.14Z",
+            "name": "Documents",
+            "size": 700797,
+            "webUrl": "https://1drv.ms/f/s!AHGYXtUQq_5EaA",
+            "createdBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "lastModifiedBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "parentReference": {
+                "driveId": "44feab10d55e9871",
+                "driveType": "personal",
+                "id": "44FEAB10D55E9871!103",
+                "path": "/drive/root:"
+            },
+            "fileSystemInfo": {
+                "createdDateTime": "2020-01-30T11:03:23.366Z",
+                "lastModifiedDateTime": "2020-01-30T11:03:23.366Z"
+            },
+            "folder": {
+                "childCount": 1,
+                "view": {
+                    "viewType": "thumbnails",
+                    "sortBy": "name",
+                    "sortOrder": "ascending"
+                }
+            },
+            "specialFolder": {
+                "name": "documents"
+            }
+        },
+        {
+            "createdDateTime": "2020-01-30T11:03:23.443Z",
+            "cTag": "adDo0NEZFQUIxMEQ1NUU5ODcxITEwNS42MzcxNTk3OTAwMzQ0MzAwMDA",
+            "eTag": "aNDRGRUFCMTBENTVFOTg3MSExMDUuMA",
+            "id": "44FEAB10D55E9871!105",
+            "lastModifiedDateTime": "2020-01-30T11:03:23.443Z",
+            "name": "Pictures",
+            "size": 0,
+            "webUrl": "https://1drv.ms/f/s!AHGYXtUQq_5EaQ",
+            "createdBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "lastModifiedBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "parentReference": {
+                "driveId": "44feab10d55e9871",
+                "driveType": "personal",
+                "id": "44FEAB10D55E9871!103",
+                "path": "/drive/root:"
+            },
+            "fileSystemInfo": {
+                "createdDateTime": "2020-01-30T11:03:23.443Z",
+                "lastModifiedDateTime": "2020-01-30T11:03:23.443Z"
+            },
+            "folder": {
+                "childCount": 0,
+                "view": {
+                    "viewType": "thumbnails",
+                    "sortBy": "takenOrCreatedDateTime",
+                    "sortOrder": "ascending"
+                }
+            },
+            "specialFolder": {
+                "name": "photos"
+            }
+        },
+        {
+            "@microsoft.glauth.downloadUrl": "https://public.bn.files.1drv.com/y4mt8DTYR5PBpHw3Aup2ICVwJDIykOqHTgNy58GDFTGJxBWohlvbEJMVYq1c6q66RgAlsqEY52df0EpIyqpWvF0IgTAZuG2iHucUz-DCiqADN53txSxX3ZGUyLNgfsBCUEZSaKpHqkytVAZfoOQuuBIl-UKG6vt4To5MbHsd5rUwxJoWFIgum9HV07kMbpoUz3KWPSbpf1mUsran0EFJUjlgwPySGWAorqWLRU2GZePEQtb3-lREnmll70L3fM68czq",
+            "createdDateTime": "2020-01-30T11:06:40.027Z",
+            "cTag": "aYzo0NEZFQUIxMEQ1NUU5ODcxITEwNy4yNTk",
+            "eTag": "aNDRGRUFCMTBENTVFOTg3MSExMDcuNg",
+            "id": "44FEAB10D55E9871!107",
+            "lastModifiedDateTime": "2020-01-30T11:10:45.227Z",
+            "name": "test.txt",
+            "size": 48,
+            "webUrl": "https://1drv.ms/t/s!AHGYXtUQq_5Eaw",
+            "createdBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "lastModifiedBy": {
+                "application": {
+                    "displayName": "OneDrive",
+                    "id": "481710a4"
+                },
+                "user": {
+                    "displayName": "Thomas Müller",
+                    "id": "44feab10d55e9871"
+                }
+            },
+            "parentReference": {
+                "driveId": "44feab10d55e9871",
+                "driveType": "personal",
+                "id": "44FEAB10D55E9871!103",
+                "path": "/drive/root:"
+            },
+            "file": {
+                "mimeType": "text/plain",
+                "hashes": {
+                    "quickXorHash": "py66H9Juj4r+scDANKkGcpyXYII=",
+                    "sha1Hash": "8338DB81A2501CD814851F2ACB789D51FCCAB72D"
+                }
+            },
+            "fileSystemInfo": {
+                "createdDateTime": "2020-01-30T11:06:40.026Z",
+                "lastModifiedDateTime": "2020-01-30T11:07:01.47Z"
+            },
+            "shared": {
+                "scope": "users",
+                "owner": {
+                    "user": {
+                        "displayName": "Thomas Müller",
+                        "id": "44feab10d55e9871"
+                    }
+                }
+            }
+        }
+    ]
+}
