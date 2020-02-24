@@ -158,7 +158,6 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			// Flags have to be injected all the way down to the go-micro service
 			{
 				server, err := http.Server(
 					http.Logger(logger),

@@ -50,7 +50,7 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Asset   Asset
-	Routes  []Route
+	Routes  []Route `json:"routes"`
 }
 
 // New initializes a new configuration with or without defaults.
