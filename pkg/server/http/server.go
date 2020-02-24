@@ -2,9 +2,6 @@ package http
 
 import (
 	"crypto/tls"
-	"log"
-	"net/http/httputil"
-	"net/url"
 	"os"
 
 	occrypto "github.com/owncloud/ocis-konnectd/pkg/crypto"
@@ -29,36 +26,15 @@ func Server(opts ...Option) (svc.Service, error) {
 	config := &tls.Config{Certificates: []tls.Certificate{cer}}
 
 	service := svc.NewService(
+		svc.Name("web.proxy"),
+		svc.TLSConfig(config),
 		svc.Logger(options.Logger),
 		svc.Namespace(options.Namespace),
-		svc.Name("web.proxy"),
 		svc.Version(version.String),
 		svc.Address(options.Config.HTTP.Addr),
 		svc.Context(options.Context),
-		svc.TLSConfig(config),
 		svc.Flags(options.Flags...),
 	)
-
-	phoenixURL, err := url.Parse("http://localhost:9100")
-	if err != nil {
-		log.Fatal(err)
-	}
-	konnectdURL, err := url.Parse("http://localhost:9130")
-	if err != nil {
-		log.Fatal(err)
-	}
-	revaURL, err := url.Parse("http://localhost:9140")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	service.Handle("/", httputil.NewSingleHostReverseProxy(phoenixURL))
-	service.Handle("/.well-known/openid-configuration", httputil.NewSingleHostReverseProxy(konnectdURL))
-	service.Handle("/konnect/v1/jwks.json/", httputil.NewSingleHostReverseProxy(konnectdURL))
-	service.Handle("/signin/", httputil.NewSingleHostReverseProxy(konnectdURL))
-	service.Handle("/konnect/", httputil.NewSingleHostReverseProxy(konnectdURL))
-	service.Handle("/ocs/v1.php/", httputil.NewSingleHostReverseProxy(revaURL))
-	service.Handle("/remote.php/webdav/", httputil.NewSingleHostReverseProxy(revaURL))
 
 	service.Init()
 
