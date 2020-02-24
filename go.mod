@@ -16,6 +16,7 @@ require (
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-pkg/v2 v2.0.1
+	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.17.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
