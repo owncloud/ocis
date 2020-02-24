@@ -18,11 +18,11 @@
 		},
 		{
 			"endpoint": "/ocs/v1.php/",
-			"location": "http://localhost:8080"
+			"location": "http://localhost:9140"
 		},
 		{
 			"endpoint": "/remote.php/webdav/",
-			"location": "http://localhost:8080"
+			"location": "http://localhost:9140"
 		}
 	]
 }
