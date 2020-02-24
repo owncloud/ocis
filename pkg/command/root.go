@@ -32,7 +32,7 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.NewLogger()
 
 			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 			viper.SetEnvPrefix("PROXY")
@@ -90,14 +90,4 @@ func Execute() error {
 	}
 
 	return app.Run(os.Args)
-}
-
-// NewLogger initializes a service-specific logger instance.
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("proxy"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-	)
 }

@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -14,6 +16,7 @@ import (
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
@@ -34,10 +37,33 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
+			// // Default routes
+			// cfg.Routes = []config.Route{
+			// 	{
+			// 		Endpoint: "/",
+			// 		Location: "http://localhost:9100",
+			// 	}, {
+			// 		Endpoint: "/.well-known/openid-configuration",
+			// 		Location: "http://localhost:9130",
+			// 	}, {
+			// 		Endpoint: "/konnect/",
+			// 		Location: "http://localhost:9130",
+			// 	}, {
+			// 		Endpoint: "/signin/",
+			// 		Location: "http://localhost:9130",
+			// 	}, {
+			// 		Endpoint: "/ocs/v1.php/",
+			// 		Location: "http://localhost:9140",
+			// 	}, {
+			// 		Endpoint: "/remote.php/webdav/",
+			// 		Location: "http://localhost:9140",
+			// 	},
+			// }
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.NewLogger()
 			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
@@ -143,6 +169,17 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Flags(flagset.RootWithConfig(cfg)),
 					http.Flags(flagset.ServerWithConfig(cfg)),
 				)
+
+				for _, ep := range cfg.Routes {
+					uri, err := url.Parse(ep.Location)
+					if err != nil {
+						logger.Info().
+							Str("server", "http").
+							Msg("parsing uri")
+					}
+
+					server.Handle(ep.Endpoint, httputil.NewSingleHostReverseProxy(uri))
+				}
 
 				if err != nil {
 					logger.Error().
