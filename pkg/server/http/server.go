@@ -5,7 +5,6 @@ import (
 	"os"
 
 	occrypto "github.com/owncloud/ocis-konnectd/pkg/crypto"
-	logger "github.com/owncloud/ocis-pkg/v2/log"
 	svc "github.com/owncloud/ocis-pkg/v2/service/http"
 	"github.com/owncloud/ocis-proxy/pkg/version"
 )
@@ -15,7 +14,7 @@ func Server(opts ...Option) (svc.Service, error) {
 	options := newOptions(opts...)
 
 	// GenCert has side effects as it writes 2 files to the binary running location
-	occrypto.GenCert(logger.NewLogger())
+	occrypto.GenCert(options.Logger)
 
 	cer, err := tls.LoadX509KeyPair("server.crt", "server.key")
 	if err != nil {
