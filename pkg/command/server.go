@@ -37,29 +37,6 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			// // Default routes
-			// cfg.Routes = []config.Route{
-			// 	{
-			// 		Endpoint: "/",
-			// 		Location: "http://localhost:9100",
-			// 	}, {
-			// 		Endpoint: "/.well-known/openid-configuration",
-			// 		Location: "http://localhost:9130",
-			// 	}, {
-			// 		Endpoint: "/konnect/",
-			// 		Location: "http://localhost:9130",
-			// 	}, {
-			// 		Endpoint: "/signin/",
-			// 		Location: "http://localhost:9130",
-			// 	}, {
-			// 		Endpoint: "/ocs/v1.php/",
-			// 		Location: "http://localhost:9140",
-			// 	}, {
-			// 		Endpoint: "/remote.php/webdav/",
-			// 		Location: "http://localhost:9140",
-			// 	},
-			// }
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
