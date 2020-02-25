@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"errors"
 	"os"
 	"os/signal"
 	"strings"
@@ -11,8 +10,11 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
+	glauthcfg "github.com/glauth/glauth/pkg/config"
+	glauth "github.com/glauth/glauth/pkg/server"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	glauthlog "github.com/op/go-logging"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-glauth/pkg/config"
@@ -32,6 +34,8 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
+
+			cfg.Backend.Servers = c.StringSlice("backend-server")
 
 			return nil
 		},
@@ -131,8 +135,30 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
+				log := glauthlog.MustGetLogger("ocis-glauth")
+				cfg := glauthcfg.Config{
+					LDAP: glauthcfg.LDAP{
+						Enabled: cfg.Ldap.Enabled,
+						Listen:  cfg.Ldap.Address,
+					},
+					LDAPS: glauthcfg.LDAPS{
+						Enabled: cfg.Ldaps.Enabled,
+						Listen:  cfg.Ldaps.Address,
+					},
+					Backend: glauthcfg.Backend{
+						Datastore:   cfg.Backend.Datastore,
+						BaseDN:      cfg.Backend.BaseDN,
+						Insecure:    cfg.Backend.Insecure,
+						NameFormat:  cfg.Backend.NameFormat,
+						GroupFormat: cfg.Backend.GroupFormat,
+						Servers:     cfg.Backend.Servers,
+						SSHKeyAttr:  cfg.Backend.SSHKeyAttr,
+						UseGraphAPI: cfg.Backend.UseGraphAPI,
+					},
+				}
+				server, err := glauth.NewServer(log, &cfg)
 				//XXX(deepdiver) start ldap server
-				err := errors.New("not implemented yet")
+				//err := errors.New("not implemented yet")
 
 				if err != nil {
 					logger.Info().
@@ -144,7 +170,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(func() error {
-					//return server.Run()
+					server.ListenAndServe()
 					return nil
 				}, func(_ error) {
 					logger.Info().
