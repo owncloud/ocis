@@ -1,20 +1,20 @@
-# Changelog for unreleased
+# Changelog for [unreleased] (UNRELEASED)
 
 The following sections list the changes for unreleased.
 
 ## Summary
 
- * Fix #75: Set correct flag type in the flagsets
- * Fix #68: Allow different namespaces for /webdav and /dav/files
- * Chg #68: Use /home as default namespace
- * Chg #1: Initial release of basic version
- * Chg #6: Start multiple services with dedicated commands
- * Chg #89: Storage providers now default to exposing data servers
- * Enh #87: Expose owncloud storage driver config in flagset
+* Bugfix #75: Set correct flag type in the flagsets
+* Bugfix #68: Allow different namespaces for /webdav and /dav/files
+* Change #68: Use /home as default namespace
+* Change #1: Initial release of basic version
+* Change #6: Start multiple services with dedicated commands
+* Change #89: Storage providers now default to exposing data servers
+* Enhancement #87: Expose owncloud storage driver config in flagset
 
 ## Details
 
- * Bugfix #75: Set correct flag type in the flagsets
+* Bugfix #75: Set correct flag type in the flagsets
 
    While upgrading to the micro/cli version 2 there where two instances of `StringFlag` which had
    not been changed to `StringSliceFlag`. This caused `ocis-reva users` and `ocis-reva
@@ -23,7 +23,8 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis-reva/issues/75
    https://github.com/owncloud/ocis-reva/pull/76
 
- * Bugfix #68: Allow different namespaces for /webdav and /dav/files
+
+* Bugfix #68: Allow different namespaces for /webdav and /dav/files
 
    After fbf131c the path for the "new" webdav path does not contain a username
    `/remote.php/dav/files/textfile0.txt`. It used to be
@@ -43,7 +44,8 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis-reva/pull/68
    related:
 
- * Change #68: Use /home as default namespace
+
+* Change #68: Use /home as default namespace
 
    Currently, cross storage etag propagation is not yet implemented, which prevents the desktop
    client from detecting changes via the PROPFIND to /. / is managed by the root storage provider
@@ -62,14 +64,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis-reva/pull/68
 
- * Change #1: Initial release of basic version
+
+* Change #1: Initial release of basic version
 
    Just prepared an initial basic version to start a reva server and start integrating with the
    go-micro base dextension framework of ownCloud Infinite Scale.
 
    https://github.com/owncloud/ocis-reva/issues/1
 
- * Change #6: Start multiple services with dedicated commands
+
+* Change #6: Start multiple services with dedicated commands
 
    The initial version would only allow us to use a set of reva configurations to start multiple
    services. We use a more opinionated set of commands to start dedicated services that allows us
@@ -78,7 +82,8 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis-reva/issues/6
 
- * Change #89: Storage providers now default to exposing data servers
+
+* Change #89: Storage providers now default to exposing data servers
 
    The flags that let reva storage providers announce that they expose a data server now defaults
    to true:
@@ -87,7 +92,8 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis-reva/issues/89
 
- * Enhancement #87: Expose owncloud storage driver config in flagset
+
+* Enhancement #87: Expose owncloud storage driver config in flagset
 
    Three new flags are now available:
 
@@ -101,5 +107,4 @@ The following sections list the changes for unreleased.
    `REVA_STORAGE_OWNCLOUD_REDIS_ADDR` cli option: `--storage-owncloud-redis`
 
    https://github.com/owncloud/ocis-reva/issues/87
-
 
