@@ -18,12 +18,14 @@ func KonnectdCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Konnectd),
 		Action: func(c *cli.Context) error {
-			scfg := configureKonnectd(cfg)
+			serverConfig := configureKonnectd(cfg)
+			serverCommand := command.Server(serverConfig)
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			if err := serverCommand.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(serverCommand.Action, c)
 		},
 	}
 }
