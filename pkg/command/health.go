@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 )
@@ -16,7 +17,7 @@ func Health(cfg *config.Config) *cli.Command {
 		Usage: "Check health status",
 		Flags: flagset.HealthWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.NewLogger()
 
 			resp, err := http.Get(
 				fmt.Sprintf(

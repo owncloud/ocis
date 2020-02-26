@@ -36,6 +36,12 @@ type Asset struct {
 	Path string
 }
 
+// Route define forwarding routes
+type Route struct {
+	Endpoint string `json:"endpoint"`
+	Backend  string `json:"backend"`
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
@@ -44,6 +50,7 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Asset   Asset
+	Routes  []Route `json:"routes"`
 }
 
 // New initializes a new configuration with or without defaults.

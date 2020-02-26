@@ -1,0 +1,28 @@
+{
+	"routes": [
+		{
+			"endpoint": "/",
+			"backend": "http://localhost:9100"
+		},
+		{
+			"endpoint": "/.well-known/openid-configuration",
+			"backend": "http://localhost:9130"
+		},
+		{
+			"endpoint": "/konnect/",
+			"backend": "http://localhost:9130"
+		},
+		{
+			"endpoint": "/signin/",
+			"backend": "http://localhost:9130"
+		},
+		{
+			"endpoint": "/ocs/v1.php/",
+			"backend": "http://localhost:4444"
+		},
+		{
+			"endpoint": "/remote.php/webdav/",
+			"backend": "http://localhost:4444"
+		}
+	]
+}

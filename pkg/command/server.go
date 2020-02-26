@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -14,6 +16,7 @@ import (
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
@@ -37,7 +40,7 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.NewLogger()
 			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
@@ -132,7 +135,6 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			// Flags have to be injected all the way down to the go-micro service
 			{
 				server, err := http.Server(
 					http.Logger(logger),
@@ -143,6 +145,17 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Flags(flagset.RootWithConfig(cfg)),
 					http.Flags(flagset.ServerWithConfig(cfg)),
 				)
+
+				for _, ep := range cfg.Routes {
+					uri, err := url.Parse(ep.Backend)
+					if err != nil {
+						logger.Info().
+							Str("server", "http").
+							Msg("parsing uri")
+					}
+
+					server.Handle(ep.Endpoint, httputil.NewSingleHostReverseProxy(uri))
+				}
 
 				if err != nil {
 					logger.Error().
