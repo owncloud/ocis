@@ -7,7 +7,8 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/glauth/glauth v1.1.3-0.20200226140131-592fdf4e7938
+	github.com/coreos/etcd v3.3.18+incompatible
+	github.com/glauth/glauth v1.1.3-0.20200226203055-887c62684200
 	github.com/go-logr/logr v0.1.0
 	github.com/micro/cli/v2 v2.1.1
 	github.com/oklog/run v1.0.0
@@ -20,3 +21,5 @@ require (
 	github.com/spf13/viper v1.5.0
 	go.opencensus.io v0.22.2
 )
+
+replace github.com/glauth/glauth => ../glauth

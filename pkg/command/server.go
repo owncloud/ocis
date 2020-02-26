@@ -164,22 +164,29 @@ func Server(cfg *config.Config) *cli.Command {
 				if err != nil {
 					logger.Info().
 						Err(err).
-						Str("transport", "http").
+						Str("transport", "ldap").
 						Msg("Failed to initialize server")
 
 					return err
 				}
 
 				gr.Add(func() error {
-					server.ListenAndServe()
-					return nil
+					err := make(chan error)
+					select {
+					case <-ctx.Done():
+						return nil
+					case err <- server.ListenAndServe():
+						return <-err
+					}
 				}, func(_ error) {
 					logger.Info().
-						Str("transport", "http").
+						Str("transport", "ldap").
 						Msg("Shutting down server")
 
+					server.Shutdown()
 					cancel()
 				})
+
 			}
 
 			{
