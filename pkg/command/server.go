@@ -147,7 +147,7 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				for _, ep := range cfg.Routes {
-					uri, err := url.Parse(ep.Location)
+					uri, err := url.Parse(ep.Backend)
 					if err != nil {
 						logger.Info().
 							Str("server", "http").

@@ -2,27 +2,27 @@
 	"routes": [
 		{
 			"endpoint": "/",
-			"location": "http://localhost:9100"
+			"backend": "http://localhost:9100"
 		},
 		{
 			"endpoint": "/.well-known/openid-configuration",
-			"location": "http://localhost:9130"
+			"backend": "http://localhost:9130"
 		},
 		{
 			"endpoint": "/konnect/",
-			"location": "http://localhost:9130"
+			"backend": "http://localhost:9130"
 		},
 		{
 			"endpoint": "/signin/",
-			"location": "http://localhost:9130"
+			"backend": "http://localhost:9130"
 		},
 		{
 			"endpoint": "/ocs/v1.php/",
-			"location": "http://localhost:9140"
+			"backend": "http://localhost:4444"
 		},
 		{
 			"endpoint": "/remote.php/webdav/",
-			"location": "http://localhost:9140"
+			"backend": "http://localhost:4444"
 		}
 	]
 }

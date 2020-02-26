@@ -39,7 +39,7 @@ type Asset struct {
 // Route define forwarding routes
 type Route struct {
 	Endpoint string `json:"endpoint"`
-	Location string `json:"location"`
+	Backend  string `json:"backend"`
 }
 
 // Config combines all available configuration parts.
