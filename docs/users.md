@@ -1,8 +1,10 @@
 ---
 title: "Users"
 date: 2020-01-16T00:00:00+00:00
-anchor: "users"
 weight: 35
+geekdocRepo: https://github.com/owncloud/ocis-reva
+geekdocEditPath: edit/master/docs
+geekdocFilePath: users.md
 ---
 
 ### Demo driver

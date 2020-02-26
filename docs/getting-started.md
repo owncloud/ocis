@@ -1,8 +1,10 @@
 ---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
-anchor: "getting-started"
 weight: 20
+geekdocRepo: https://github.com/owncloud/ocis-reva
+geekdocEditPath: edit/master/docs
+geekdocFilePath: getting-started.md
 ---
 
 ### Installation
