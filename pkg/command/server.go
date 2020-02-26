@@ -14,11 +14,11 @@ import (
 	glauth "github.com/glauth/glauth/pkg/server"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	glauthlog "github.com/op/go-logging"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-glauth/pkg/config"
 	"github.com/owncloud/ocis-glauth/pkg/flagset"
+	"github.com/owncloud/ocis-glauth/pkg/mlogr"
 	"github.com/owncloud/ocis-glauth/pkg/server/debug"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -135,7 +135,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				log := glauthlog.MustGetLogger("ocis-glauth")
+				log := mlogr.New(&logger)
 				cfg := glauthcfg.Config{
 					LDAP: glauthcfg.LDAP{
 						Enabled: cfg.Ldap.Enabled,
@@ -156,9 +156,10 @@ func Server(cfg *config.Config) *cli.Command {
 						UseGraphAPI: cfg.Backend.UseGraphAPI,
 					},
 				}
-				server, err := glauth.NewServer(log, &cfg)
-				//XXX(deepdiver) start ldap server
-				//err := errors.New("not implemented yet")
+				server, err := glauth.NewServer(
+					glauth.Logger(log),
+					glauth.Config(&cfg),
+				)
 
 				if err != nil {
 					logger.Info().
