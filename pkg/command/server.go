@@ -144,6 +144,8 @@ func Server(cfg *config.Config) *cli.Command {
 					LDAPS: glauthcfg.LDAPS{
 						Enabled: cfg.Ldaps.Enabled,
 						Listen:  cfg.Ldaps.Address,
+						Cert:    cfg.Ldaps.Cert,
+						Key:     cfg.Ldaps.Key,
 					},
 					Backend: glauthcfg.Backend{
 						Datastore:   cfg.Backend.Datastore,

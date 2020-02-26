@@ -145,6 +145,20 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_LDAPS_ENABLED"},
 			Destination: &cfg.Ldaps.Enabled,
 		},
+		&cli.StringFlag{
+			Name:        "ldaps-cert",
+			Value:       "certs/server.crt",
+			Usage:       "path to ldaps certificate in PEM format",
+			EnvVars:     []string{"GLAUTH_LDAPS_CERT"},
+			Destination: &cfg.Ldaps.Cert,
+		},
+		&cli.StringFlag{
+			Name:        "ldaps-key",
+			Value:       "certs/server.key",
+			Usage:       "path to ldaps key in PEM format",
+			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
+			Destination: &cfg.Ldaps.Key,
+		},
 
 		&cli.StringFlag{
 			Name:        "backend-datastore",

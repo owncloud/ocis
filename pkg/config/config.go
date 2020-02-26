@@ -37,6 +37,13 @@ type Ldap struct {
 	Enabled bool
 }
 
+// Ldaps defined the available LDAPS configuration.
+type Ldaps struct {
+	Ldap
+	Cert string
+	Key  string
+}
+
 // Backend defined the available backend configuration.
 type Backend struct {
 	Datastore   string
@@ -57,7 +64,7 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Ldap    Ldap
-	Ldaps   Ldap
+	Ldaps   Ldaps
 	Backend Backend
 }
 
