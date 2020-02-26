@@ -15,29 +15,32 @@ import (
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
-	if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
-		_, certErr := os.Stat("./server.crt")
-		_, keyErr := os.Stat("./server.key")
+	var tlsConfig *tls.Config
+	if options.Config.HTTP.TLS {
+		if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
+			_, certErr := os.Stat("./server.crt")
+			_, keyErr := os.Stat("./server.key")
 
-		if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
-			options.Logger.Info().Msgf("Generating certs")
-			if err := crypto.GenCert(options.Logger); err != nil {
-				options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
-				os.Exit(1)
+			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
+				options.Logger.Info().Msgf("Generating certs")
+				if err := crypto.GenCert(options.Logger); err != nil {
+					options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
+					os.Exit(1)
+				}
 			}
+
+			options.Config.HTTP.TLSCert = "server.crt"
+			options.Config.HTTP.TLSKey = "server.key"
 		}
 
-		options.Config.HTTP.TLSCert = "server.crt"
-		options.Config.HTTP.TLSKey = "server.key"
-	}
+		cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)
+		if err != nil {
+			options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
+			os.Exit(1)
+		}
 
-	cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)
-	if err != nil {
-		options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
-		os.Exit(1)
+		tlsConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
 	}
-
-	config := &tls.Config{Certificates: []tls.Certificate{cer}}
 
 	service := http.NewService(
 		http.Logger(options.Logger),
@@ -47,7 +50,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
-		http.TLSConfig(config),
+		http.TLSConfig(tlsConfig),
 	)
 
 	options.Config.Konnectd.Listen = options.Config.HTTP.Addr

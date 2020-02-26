@@ -1,6 +1,8 @@
 package config
 
-import "stash.kopano.io/kc/konnect/bootstrap"
+import (
+	"stash.kopano.io/kc/konnect/bootstrap"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -24,6 +26,7 @@ type HTTP struct {
 	Root      string
 	TLSCert   string
 	TLSKey    string
+	TLS       bool
 }
 
 // Tracing defines the available tracing configuration.

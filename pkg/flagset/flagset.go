@@ -267,6 +267,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"KONNECTD_INSECURE"},
 			Destination: &cfg.Konnectd.Insecure,
 		},
+		&cli.BoolFlag{
+			Name:        "tls",
+			Usage:       "Use TLS (disable only if konnectd is behind a TLS-terminating reverse-proxy).",
+			EnvVars:     []string{"KONNECTD_TLS"},
+			Value:       true,
+			Destination: &cfg.HTTP.TLS,
+		},
 		&cli.StringSliceFlag{
 			Name:    "trusted-proxy",
 			Usage:   "Trusted proxy IP or IP network (can be used multiple times)",
