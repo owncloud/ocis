@@ -11,7 +11,7 @@
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/glauth/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis-glauth/)
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/glauth/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/extensions/ocis_glauth/)
 
 ## Development
 

@@ -1,31 +1,35 @@
 ---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
-anchor: "getting-started"
 weight: 20
+geekdocRepo: https://github.com/owncloud/ocis-glauth
+geekdocEditPath: edit/master/docs
+geekdocFilePath: getting-started.md
 ---
 
-### Installation
+{{< toc >}}
+
+## Installation
 
 So far we are offering two different variants for the installation. You can choose between [Docker](https://www.docker.com/) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.
 
-#### Docker
+### Docker
 
 TBD
 
-#### Binaries
+### Binaries
 
 TBD
 
-### Configuration
+## Configuration
 
 We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.
 
-#### Envrionment variables
+### Envrionment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
-##### Global
+#### Global
 
 GLAUTH_CONFIG_FILE
 : Path to config file, empty default value
@@ -39,7 +43,7 @@ GLAUTH_LOG_COLOR
 GLAUTH_LOG_PRETTY
 : Enable pretty logging, defaults to `true`
 
-##### Server
+#### Server
 
 GLAUTH_TRACING_ENABLED
 : Enable sending traces, defaults to `false`
@@ -71,19 +75,22 @@ GLAUTH_DEBUG_ZPAGES
 GLAUTH_HTTP_ADDR
 : Address to bind http server, defaults to `0.0.0.0:9120`
 
+GLAUTH_HTTP_NAMESPACE
+: The http namespace
+
 GLAUTH_HTTP_ROOT
 : Root path of http server, defaults to `/`
 
-##### Health
+#### Health
 
 GLAUTH_DEBUG_ADDR
 : Address to debug endpoint, defaults to `0.0.0.0:9124`
 
-#### Commandline flags
+### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below.
 
-##### Global
+#### Global
 
 --config-file
 : Path to config file, empty default value
@@ -97,7 +104,7 @@ If you prefer to configure the service with commandline flags you can see the av
 --log-pretty
 : Enable pretty logging, defaults to `true`
 
-##### Server
+#### Server
 
 --tracing-enabled
 : Enable sending traces, defaults to `false`
@@ -135,20 +142,20 @@ If you prefer to configure the service with commandline flags you can see the av
 --http-root
 : Root path of http server, defaults to `/`
 
-##### Health
+#### Health
 
 --debug-addr
 : Address to debug endpoint, defaults to `0.0.0.0:9124`
 
-#### Configuration file
+### Configuration file
 
 So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-glauth/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/glauth.yml`, `${HOME}/.ocis/glauth.yml` or `$(pwd)/config/glauth.yml`.
 
-### Usage
+## Usage
 
 The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formated help output if you execute the binary via `ocis-glauth --help`.
 
-#### Server
+### Server
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
@@ -156,7 +163,7 @@ The server command is used to start the http and debug server on two addresses w
 ocis-glauth server --help
 {{< / highlight >}}
 
-#### Health
+### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
@@ -164,7 +171,7 @@ The health command is used to execute a health check, if the exit code equals ze
 ocis-glauth health --help
 {{< / highlight >}}
 
-### Metrics
+## Metrics
 
 This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `GLAUTH_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9124/metrics`.
 
