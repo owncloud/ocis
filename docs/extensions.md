@@ -1,8 +1,10 @@
 ---
 title: "Extensions"
-date: 2020-01-31T17:20:00+00:00
-anchor: "extensions"
-weight: 25
+date: 2020-02-27T20:35:00+01:00
+weight: 40
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs
+geekdocFilePath: extensions.md
 ---
 
 ## How to build and run ocis-simple
