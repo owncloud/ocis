@@ -29,7 +29,7 @@ $ composer install
 No configuration necessary. You can test with `curl`:
 ```console
 $ curl https://cloud.example.com/index.php/apps/graphapi/v1.0/users -u admin | jq
-Enter host password for user 'jfd':
+Enter host password for user 'admin':
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   694  100   694    0     0   4283      0 --:--:-- --:--:-- --:--:--  4283
@@ -56,7 +56,9 @@ Enter host password for user 'jfd':
 
 ### Start ocis-glauth
 
-We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy. Grab it while it is hot:
+We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy. 
+
+#### Grab it!
 
 In an `ocis` folder
 ```
@@ -65,8 +67,11 @@ $ cd ocis-glauth
 $ git checkout start-glauth
 $ make
 ```
+This should give you a `bin/ocis-glauth` binary. Try listing the help with `bin/ocis-glauth --help`.
 
 TODO merge glauth PR https://github.com/owncloud/ocis-glauth/pull/1
+
+#### Run it!
 
 You need to point `ocis-glauth` to your owncloud domain:
 ```console
@@ -76,6 +81,8 @@ $ bin/ocis-glauth --log-level debug server --backend-server https://cloud.exampl
 `--log-level debug` is only used to generate more verbose output
 `--backend-server https://cloud.example.com` is the url to an ownCloud instance with an enabled graphapi app
 `--backend-basedn dc=example,dc=com` is used to construct the LDAP dn. The user `admin` will become `cn=admin,dc=example,dc=com`.
+
+#### Check it is up and running
 
 You should now be able to list accounts from your ownCloud 10 oc_accounts table using:
 ```console
@@ -89,9 +96,34 @@ $ ldapsearch -x -H ldap://localhost:9125 -b dc=example,dc=com -D "cn=admin,dc=ex
 
 > Note: This is currently a readonly implementation and minimal to the usecase of authenticating users with konnectd.
 
+### Start ocis-phoenix
+
+#### Get it!
+
+In an `ocis` folder
+```
+$ git clone git@github.com:owncloud/ocis-phoenix.git
+$ cd ocis-phoenix
+$ make
+```
+This should give you a `bin/ocis-phoenix` binary. Try listing the help with `bin/ocis-phoenix --help`.
+
+#### Run it!
+
+Point `ocis-phoenix` to your owncloud domain and tell it where to find the openid connect issuing authority:
+```console
+$ bin/ocis-phoenix server --web-config-server https://cloud.example.com --oidc-authority https://192.168.1.100:9130 --oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration --oidc-client-id ocis
+```
+
+`ocis-phoenix` needs to know
+- `--web-config-server https://cloud.example.com` is ownCloud url with webdav and ocs endpoints (oc10 or ocis)
+- `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-konnectd`, running on port 9130
+- `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, eg. ping identity provides multiple endpoints to separate domains
+- `--oidc-client-id ocis` the client id we will register later with `ocis-konnectd` in the `identifier-registration.yaml`
+
 ### Start ocis-konnectd
 
-#### Get it
+#### Get it!
 
 In an `ocis` folder
 ```
@@ -99,12 +131,13 @@ $ git clone git@github.com:owncloud/ocis-konnectd.git
 $ cd ocis-konnectd
 $ make
 ```
+This should give you a `bin/ocis-konnectd` binary. Try listing the help with `bin/ocis-konnectd --help`.
 
-#### Environment variables
+#### Set environment variables
 
 Konnectd needs environment variables to configure the LDAP server:
 ```console
-export LDAP_URI=ldap://192.168.1.173:9125
+export LDAP_URI=ldap://192.168.1.100:9125
 export LDAP_BINDDN="cn=admin,dc=example,dc=com"
 export LDAP_BINDPW="its-a-secret"
 export LDAP_BASEDN="dc=example,dc=com"
@@ -126,28 +159,33 @@ Now we need to configure a client we can later use to configure the ownCloud 10 
 
 # OpenID Connect client registry.
 clients:
-  - id: oc10-openidconnect-app
-    name: openidconnect ownCloud app
+  - id: ocis
+    name: ownCloud Infinite Scale
     insecure: yes
     application_type: web
     redirect_uris:
       - https://cloud.example.com/apps/openidconnect/redirect
+      - http://localhost:9100/oidc-callback.html
+      - http://localhost:9100
+      - http://localhost:9100/
 ```
 You will need the `insecure: yes` if you are using self signed certificates.
 
-Replace the host in the redirect URI with your ownCloud 10 host and port.
+Replace `cloud.example.com` in the redirect URI with your ownCloud 10 host and port.
+Replace `localhost:9100` in the redirect URIs with your the `ocis-phoenix` host and port.
 
 #### Run it!
 
-`ocis-konnectd` needs to know
-- the issuer, which must be a reachable https endpoint. For testing an ip works. HTTPS is NOT optional.
-- the identifier-registration.yaml you created
-- a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
-
-On the cli it looks like this
+You can now bring up `ocis-connectd` with:
 ```console
-$ bin/ocis-konnectd server -iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
+$ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
 ```
+
+`ocis-konnectd` needs to know
+- `--iss https://192.168.1.100:9130` the issuer, which must be a reachable https endpoint. For testing an ip works. HTTPS is NOT optional. This url is exposed in the `https://192.168.1.100:9130/.well-known/openid-configuration` endpoint and clients need to be able to connect to it
+- `--identifier-registration-conf assets/identifier-registration.yaml` the identifier-registration.yaml you created
+- `--signing-kid gen1-2020-02-27` a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
+
 
 #### Check it is up and running
 
@@ -183,21 +221,27 @@ After enabling the app configure it in `config/oidc.config.php`
 $CONFIG = [
   'openid-connect' => [
     'provider-url' => 'https://192.168.1.100:9130',
-    'client-id' => 'oc10-openidconnect-app',
+    'client-id' => 'ocis',
     'loginButtonName' => 'OpenId Connect @ Konnectd',
   ],
-  'debug' => true // if using self signed certificates
+  'debug' => true, // if using self signed certificates
+  // allow the different domains access to the ocs and wabdav endpoints:
+  'cors.allowed-domains' => [
+    'https://cloud.example.com',
+    'http://localhost:9100',
+  ],
 ];
 ```
 
 In the above configuration replace
-- `provider-url` with the url to your `ocis-konnectd` issuer
+- `provider-url` with the URL to your `ocis-konnectd` issuer
+- `https://cloud.example.com` with the URL to your ownCloud 10 instance
+- `http://localhost:9100` with the URL to your phoenix instance
 
 > Note: By default the openidconnect app will use the email of the user to match the user from the oidc userinfo endpoint with the ownCloud account. So make sure your users have a unique primary email.
 
 ## Next steps
 
 Aside from the above todos these are the next stepo
-- get `ocis-phoenix` configured to authenticate against `ocis-konnectd` and use the webdav endpoint from owncloud 10.
 - tie it all together behind `ocis-proxy` 
 - create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `phoenix` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
