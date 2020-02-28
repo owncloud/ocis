@@ -6,11 +6,11 @@
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-pkg?status.svg)](http://godoc.org/github.com/owncloud/ocis-pkg)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-pkg)](http://goreportcard.com/report/github.com/owncloud/ocis-pkg)
 
-This package defines some boilerplate code that reduces the code duplication within our ownCloud Infinite Scale microservice architecture. It can't be used standalone as the is a pure library. For further information about the available packages please read the source code or take a loog at [GoDoc](http://godoc.org/github.com/owncloud/ocis-pkg).
+This package defines some boilerplate code that reduces the code duplication within the ownCloud Infinite Scale microservice architecture. It can't be used standalone as the is a pure library. For further information about the available packages please read the source code or take a loog at [GoDoc](http://godoc.org/github.com/owncloud/ocis-pkg).
 
 ## Install
 
-Just import the required packages within your ownCloud Infinite Scale extensions, nothing else should be required to do.
+Import the required packages within your ownCloud Infinite Scale extensions and you are good to go.
 
 ## Development
 
