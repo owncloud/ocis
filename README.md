@@ -11,7 +11,7 @@
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/konnectd/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis-konnectd/)
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/konnectd/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/extensions/ocis_konnectd/)
 
 ## Development
 
@@ -41,5 +41,5 @@ Apache-2.0
 ## Copyright
 
 ```console
-Copyright (c) 2019 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
 ```

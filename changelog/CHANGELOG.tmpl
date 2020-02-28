@@ -2,7 +2,7 @@
 {{- range $index, $changes := . }}{{ with $changes -}}
 # Changelog for [{{ .Version }}] ({{ .Date }})
 
-The following sections list the changes for {{ .Version }}.
+The following sections list the changes in ocis-konnectd {{ .Version }}.
 
 {{ if gt (len $allVersions) 1 -}}
 {{/* creating version compare links */ -}}
@@ -27,12 +27,12 @@ The following sections list the changes for {{ .Version }}.
 
 ## Summary
 {{ range $entry := .Entries }}{{ with $entry }}
-* {{ .Type }} #{{ .PrimaryID }}: {{ .Title }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
 {{- end }}{{ end }}
 
 ## Details
 {{ range $entry := .Entries }}{{ with $entry }}
-* {{ .Type }} #{{ .PrimaryID }}: {{ .Title }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
 {{ range $par := .Paragraphs }}
    {{ wrapIndent $par 80 3 }}
 {{ end -}}
