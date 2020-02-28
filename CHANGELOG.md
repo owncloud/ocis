@@ -4,14 +4,13 @@ The following sections list the changes in ocis-glauth unreleased.
 
 ## Summary
 
-* Change - Initial release of basic version: [#7](https://github.com/owncloud/ocis-glauth/issues/7)
+* Enhancement - Initial release of basic version: [#1](https://github.com/owncloud/ocis-glauth/pull/1)
 
 ## Details
 
-* Change - Initial release of basic version: [#7](https://github.com/owncloud/ocis-glauth/issues/7)
+* Enhancement - Initial release of basic version: [#1](https://github.com/owncloud/ocis-glauth/pull/1)
 
-   Just prepare an initial basic version to serve a glauth world API that can be used by Phoenix or
-   other extensions.
+   Just prepare an initial basic version to provide a glauth service.
 
-   https://github.com/owncloud/ocis-glauth/issues/7
+   https://github.com/owncloud/ocis-glauth/pull/1
 
