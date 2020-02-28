@@ -1,8 +1,10 @@
 ---
 title: "Getting Started"
-date: 2018-05-02T00:00:00+00:00
-anchor: "getting-started"
+date: 2020-02-27T20:35:00+01:00
 weight: 20
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs
+geekdocFilePath: getting-started.md
 ---
 
 ## Installation
