@@ -206,7 +206,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "sshPublicKey",
 			Usage:       "ssh key attribute for entries to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_SSH_KEY_ATTR"},
-			Destination: &cfg.Backend.GroupFormat,
+			Destination: &cfg.Backend.SSHKeyAttr,
 		},
 		&cli.BoolFlag{
 			Name:        "backend-use-graphapi",
