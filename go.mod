@@ -24,6 +24,10 @@ require (
 	github.com/owncloud/ocis-webdav v0.0.0-20200210113150-6c4d498c38b0
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
+	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d // indirect
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
+	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
+	stash.kopano.io/kc/konnect v0.29.0 // indirect
 )
 
-replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.29.0-alpha2
+replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.30.0-alpha1
