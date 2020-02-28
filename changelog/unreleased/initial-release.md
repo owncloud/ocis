@@ -1,6 +1,5 @@
-Change: Initial release of basic version
+Enhancement: Initial release of basic version
 
-Just prepare an initial basic version to serve a glauth world API that can be
-used by Phoenix or other extensions.
+Just prepare an initial basic version to provide a glauth service.
 
-https://github.com/owncloud/ocis-glauth/issues/7
+https://github.com/owncloud/ocis-glauth/pull/1

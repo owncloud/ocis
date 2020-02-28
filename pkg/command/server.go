@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"errors"
 	"os"
 	"os/signal"
 	"strings"
@@ -11,12 +10,15 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
+	glauthcfg "github.com/glauth/glauth/pkg/config"
+	glauth "github.com/glauth/glauth/pkg/server"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-glauth/pkg/config"
 	"github.com/owncloud/ocis-glauth/pkg/flagset"
+	"github.com/owncloud/ocis-glauth/pkg/mlogr"
 	"github.com/owncloud/ocis-glauth/pkg/server/debug"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -32,6 +34,8 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
+
+			cfg.Backend.Servers = c.StringSlice("backend-server")
 
 			return nil
 		},
@@ -131,28 +135,60 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				//XXX(deepdiver) start ldap server
-				err := errors.New("not implemented yet")
+				log := mlogr.New(&logger)
+				cfg := glauthcfg.Config{
+					LDAP: glauthcfg.LDAP{
+						Enabled: cfg.Ldap.Enabled,
+						Listen:  cfg.Ldap.Address,
+					},
+					LDAPS: glauthcfg.LDAPS{
+						Enabled: cfg.Ldaps.Enabled,
+						Listen:  cfg.Ldaps.Address,
+						Cert:    cfg.Ldaps.Cert,
+						Key:     cfg.Ldaps.Key,
+					},
+					Backend: glauthcfg.Backend{
+						Datastore:   cfg.Backend.Datastore,
+						BaseDN:      cfg.Backend.BaseDN,
+						Insecure:    cfg.Backend.Insecure,
+						NameFormat:  cfg.Backend.NameFormat,
+						GroupFormat: cfg.Backend.GroupFormat,
+						Servers:     cfg.Backend.Servers,
+						SSHKeyAttr:  cfg.Backend.SSHKeyAttr,
+						UseGraphAPI: cfg.Backend.UseGraphAPI,
+					},
+				}
+				server, err := glauth.NewServer(
+					glauth.Logger(log),
+					glauth.Config(&cfg),
+				)
 
 				if err != nil {
 					logger.Info().
 						Err(err).
-						Str("transport", "http").
+						Str("transport", "ldap").
 						Msg("Failed to initialize server")
 
 					return err
 				}
 
 				gr.Add(func() error {
-					//return server.Run()
-					return nil
+					err := make(chan error)
+					select {
+					case <-ctx.Done():
+						return nil
+					case err <- server.ListenAndServe():
+						return <-err
+					}
 				}, func(_ error) {
 					logger.Info().
-						Str("transport", "http").
+						Str("transport", "ldap").
 						Msg("Shutting down server")
 
+					server.Shutdown()
 					cancel()
 				})
+
 			}
 
 			{
