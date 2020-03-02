@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
@@ -125,6 +127,16 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
+			// actually read the contents of the config file and override defaults
+			if cfg.File != "" {
+				contents, err := ioutil.ReadFile(cfg.File)
+				if err != nil {
+					logger.Err(err).Msg("error opening config file")
+					return err
+				}
+				json.Unmarshal(contents, &cfg.Phoenix.Config)
+			}
+
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
@@ -140,6 +152,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
 					http.Metrics(metrics),
+					http.Flags(flagset.RootWithConfig(config.New())),
 				)
 
 				if err != nil {
