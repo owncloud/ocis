@@ -2,5 +2,6 @@ coverage.out
 
 /bin
 /dist
+/hugo
 
 /assets
