@@ -26,10 +26,9 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:      "server",
-		Usage:     "Start integrated server",
-		Flags:     flagset.ServerWithConfig(cfg),
-		ArgsUsage: "identity-manger name (one of ldap, kc, dummy, cookie",
+		Name:  "server",
+		Usage: "Start integrated server",
+		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
