@@ -2,27 +2,63 @@
 	"routes": [
 		{
 			"endpoint": "/",
-			"backend": "http://localhost:9100"
+      "backend": "http://localhost:9100",
+      "policy": "reva"
 		},
 		{
-			"endpoint": "/.well-known/openid-configuration",
-			"backend": "http://localhost:9130"
+			"endpoint": "/.well-known/",
+      "backend": "http://localhost:9130",
+      "policy": "reva"
 		},
 		{
 			"endpoint": "/konnect/",
-			"backend": "http://localhost:9130"
+      "backend": "http://localhost:9130",
+      "policy": "reva"
 		},
 		{
 			"endpoint": "/signin/",
-			"backend": "http://localhost:9130"
+      "backend": "http://localhost:9130",
+      "policy": "reva"
 		},
 		{
 			"endpoint": "/ocs/v1.php/",
-			"backend": "http://localhost:4444"
+      "backend": "http://localhost:9140",
+      "policy": "reva"
 		},
 		{
 			"endpoint": "/remote.php/webdav/",
-			"backend": "http://localhost:4444"
+      "backend": "http://localhost:9140",
+      "policy": "reva"
+    },
+		{
+			"endpoint": "/",
+      "backend": "http://localhost:9100",
+      "policy": "oc10"
+		},
+		{
+			"endpoint": "/.well-known/",
+      "backend": "http://localhost:9130",
+      "policy": "oc10"
+		},
+		{
+			"endpoint": "/konnect/",
+      "backend": "http://localhost:9130",
+      "policy": "oc10"
+		},
+		{
+			"endpoint": "/signin/",
+      "backend": "http://localhost:9130",
+      "policy": "oc10"
+		},
+		{
+			"endpoint": "/ocs/v1.php/",
+      "backend": "http://localhost:9140",
+      "policy": "oc10"
+		},
+		{
+			"endpoint": "/remote.php/webdav/",
+      "backend": "http://localhost:9140",
+      "policy": "oc10"
 		}
 	]
 }
