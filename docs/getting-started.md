@@ -75,11 +75,84 @@ KONNECTD_DEBUG_ZPAGES
 KONNECTD_HTTP_ADDR
 : Address to bind http server, defaults to `0.0.0.0:9130`
 
-KONNECTD_HTTP_NAMESPACE
-: The http namespace
-
 KONNECTD_HTTP_ROOT
 : Root path of http server, defaults to `/`
+
+KONNECTD_HTTP_NAMESPACE
+: Set the base namespace for service discovery, defaults to `com.owncloud.web`
+
+KONNECTD_IDENTITY_MANAGER
+: Identity manager (one of ldap,kc,cookie,dummy), defaults to `ldap`
+
+KONNECTD_TRANSPORT_TLS_CERT
+: Certificate file for transport encryption, uses a temporary dev-cert if empty
+
+KONNECTD_TRANSPORT_TLS_KEY
+: Secret file for transport encryption, uses a temporary dev-cert if empty
+
+KONNECTD_ISS
+: OIDC issuer URL, defaults to `https://localhost:9130`
+
+KONNECTD_SIGNING_PRIVATE_KEY
+: Full path to PEM encoded private key file (must match the --signing-method algorithm)
+
+KONNECTD_SIGNING_KID
+: Value of kid field to use in created tokens (uniquely identifying the signing-private-key), empty default value
+
+KONNECTD_VALIDATION_KEYS_PATH
+: Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid), empty default value
+
+KONNECTD_ENCRYPTION_SECRET
+: Full path to a file containing a %d bytes secret key, empty default value
+
+KONNECTD_SIGNING_METHOD
+: JWT default signing method, defaults to `PS256`
+
+KONNECTD_URI_BASE_PATH
+: Custom base path for URI endpoints, empty default value
+
+KONNECTD_SIGN_IN_URI
+: Custom redirection URI to sign-in form, empty default value
+
+KONNECTD_SIGN_OUT_URI
+: Custom redirection URI to signed-out goodbye page, empty default value
+
+KONNECTD_ENDPOINT_URI
+: Custom authorization endpoint URI, empty default value
+
+KONNECTD_ENDSESSION_ENDPOINT_URI
+: Custom endsession endpoint URI, empty default value
+
+KONNECTD_ASSET_PATH
+: Path to custom assets, empty default value
+
+KONNECTD_IDENTIFIER_CLIENT_PATH
+: Path to the identifier web client base folder, defaults to `/var/tmp/konnectd`
+
+KONNECTD_IDENTIFIER_REGISTRATION_CONF
+: Path to a identifier-registration.yaml configuration file, defaults to `./config/identifier-registration.yaml`
+
+KONNECTD_IDENTIFIER_SCOPES_CONF
+: Path to a scopes.yaml configuration file, empty default value
+
+KONNECTD_INSECURE
+: Disable TLS certificate and hostname validation
+
+KONNECTD_TLS
+: Use TLS (disable only if konnectd is behind a TLS-terminating reverse-proxy), defaults to `true`
+
+KONNECTD_TRUSTED_PROXY
+: List of trusted proxy IP or IP network(s) (usage: KONNECTD_TRUSTED_PROXY=x.x.x.x y.y.y.y)
+
+KONNECTD_ALLOW_SCOPE
+: Allow OAuth 2 scope(s) (usage: KONNECTD_ALLOW_SCOPE=A B C)
+
+KONNECTD_ALLOW_CLIENT_GUESTS
+: Allow sign in of client controlled guest users
+
+KONNECTD_ALLOW_DYNAMIC_CLIENT_REGISTRATION
+: Allow dynamic OAuth2 client registration
+
 
 #### Health
 
@@ -107,7 +180,7 @@ If you prefer to configure the service with commandline flags you can see the av
 #### Server
 
 --tracing-enabled
-: Enable sending traces
+: Enable sending traces, defaults to `false`
 
 --tracing-type
 : Tracing backend type, defaults to `jaeger`
@@ -128,10 +201,10 @@ If you prefer to configure the service with commandline flags you can see the av
 : Token to grant metrics access, empty default value
 
 --debug-pprof
-: Enable pprof debugging
+: Enable pprof debugging, defaults to `false`
 
 --debug-zpages
-: Enable zpages debugging
+: Enable zpages debugging, defaults to `false`
 
 --http-addr
 : Address to bind http server, defaults to `0.0.0.0:9130`
@@ -146,10 +219,10 @@ If you prefer to configure the service with commandline flags you can see the av
 : Identity manager (one of ldap,kc,cookie,dummy), defaults to `ldap`
 
 --transport-tls-cert
-: Certificate file for transport encryption, empty default value
+: Certificate file for transport encryption, uses a temporary dev-cert if empty
 
---transport- tls-key
-: Secret file for transport encryption, empty default value
+--transport-tls-key
+: Key file for transport encryption, uses a temporary dev-cert if empty
 
 --iss
 : OIDC issuer URL, defaults to `https://localhost:9130`
@@ -164,7 +237,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid), empty default value
 
 --encryption-secret
-: Full path to a file containing a %d bytes secret key, empty default value
+: Full path to a file containing a 32 bytes secret key, empty default value
 
 --signing-method
 : JWT default signing method, defaults to `PS256`
@@ -203,10 +276,10 @@ If you prefer to configure the service with commandline flags you can see the av
 : Use TLS (disable only if konnectd is behind a TLS-terminating reverse-proxy), defaults to `true`
 
 --trusted-proxy
-: Trusted proxy IP or IP network (can be used multiple times)
+: List of trusted proxy IP or IP network (usage: --trusted-proxy x.x.x.x --trusted-proxy y.y.y.y)
 
 --allow-scope
-: Allow OAuth 2 scope (can be used multiple times, if not set default scopes are allowed)
+: Allow OAuth 2 scope (usage: --allow-scope a --allow-scope b ...)
 
 --allow-client-guests
 : Allow sign in of client controlled guest users
