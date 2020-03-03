@@ -151,7 +151,7 @@ func Server(cfg *config.Config) *cli.Command {
 					if err != nil {
 						logger.Info().
 							Str("server", "http").
-							Msg("parsing uri")
+							Msg("error while parsing URL")
 					}
 
 					server.Handle(ep.Endpoint, httputil.NewSingleHostReverseProxy(uri))
