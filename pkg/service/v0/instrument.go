@@ -25,6 +25,6 @@ func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Dummy implements the Service interface.
-func (i instrument) Dummy(w http.ResponseWriter, r *http.Request) {
-	i.next.Dummy(w, r)
+func (i instrument) Thumbnails(w http.ResponseWriter, r *http.Request) {
+	i.next.Thumbnails(w, r)
 }
