@@ -107,7 +107,7 @@ If you prefer to configure the service with commandline flags you can see the av
 #### Server
 
 --tracing-enabled
-: Enable sending traces, defaults to `false`
+: Enable sending traces
 
 --tracing-type
 : Tracing backend type, defaults to `jaeger`
@@ -128,19 +128,92 @@ If you prefer to configure the service with commandline flags you can see the av
 : Token to grant metrics access, empty default value
 
 --debug-pprof
-: Enable pprof debugging, defaults to `false`
+: Enable pprof debugging
 
 --debug-zpages
-: Enable zpages debugging, defaults to `false`
+: Enable zpages debugging
 
 --http-addr
 : Address to bind http server, defaults to `0.0.0.0:9130`
 
---http-namespace
-: Namespace for internal services communication, defaults to `com.owncloud.web`
-
 --http-root
 : Root path of http server, defaults to `/`
+
+--http-namespace
+: Set the base namespace for service discovery, defaults to `com.owncloud.web`
+
+--identity-manager
+: Identity manager (one of ldap,kc,cookie,dummy), defaults to `ldap`
+
+--transport-tls-cert
+: Certificate file for transport encryption, empty default value
+
+--transport- tls-key
+: Secret file for transport encryption, empty default value
+
+--iss
+: OIDC issuer URL, defaults to `https://localhost:9130`
+
+--signing-private-key
+: Full path to PEM encoded private key file (must match the --signing-method algorithm)
+
+--signing-kid
+: Value of kid field to use in created tokens (uniquely identifying the signing-private-key), empty default value
+
+--validation-keys-path
+: Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid), empty default value
+
+--encryption-secret
+: Full path to a file containing a %d bytes secret key, empty default value
+
+--signing-method
+: JWT default signing method, defaults to `PS256`
+
+--uri-base-path
+: Custom base path for URI endpoints, empty default value
+
+--sign-in-uri
+: Custom redirection URI to sign-in form, empty default value
+
+--signed-out-uri
+: Custom redirection URI to signed-out goodbye page, empty default value
+
+--authorization-endpoint-uri
+: Custom authorization endpoint URI, empty default value
+
+--endsession-endpoint-uri
+: Custom endsession endpoint URI, empty default value
+
+--asset-path
+: Path to custom assets, empty default value
+
+--identifier-client-path
+: Path to the identifier web client base folder, defaults to `/var/tmp/konnectd`
+
+--identifier-registration-conf
+: Path to a identifier-registration.yaml configuration file, defaults to `./config/identifier-registration.yaml`
+
+--identifier-scopes-conf
+: Path to a scopes.yaml configuration file, empty default value
+
+--insecure
+: Disable TLS certificate and hostname validation
+
+--tls
+: Use TLS (disable only if konnectd is behind a TLS-terminating reverse-proxy), defaults to `true`
+
+--trusted-proxy
+: Trusted proxy IP or IP network (can be used multiple times)
+
+--allow-scope
+: Allow OAuth 2 scope (can be used multiple times, if not set default scopes are allowed)
+
+--allow-client-guests
+: Allow sign in of client controlled guest users
+
+--allow-dynamic-client-registration
+: Allow dynamic OAuth2 client registration
+
 
 #### Health
 
