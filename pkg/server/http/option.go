@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -17,6 +18,7 @@ type Options struct {
 	Logger    log.Logger
 	Context   context.Context
 	Config    *config.Config
+	Handler   http.Handler
 	Metrics   *metrics.Metrics
 	Flags     []cli.Flag
 	Namespace string
@@ -72,5 +74,12 @@ func Flags(val []cli.Flag) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// Handler provides a function to set the Handler option.
+func Handler(h http.Handler) Option {
+	return func(o *Options) {
+		o.Handler = h
 	}
 }

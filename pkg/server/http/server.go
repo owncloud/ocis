@@ -26,6 +26,7 @@ func Server(opts ...Option) (svc.Service, error) {
 
 	service := svc.NewService(
 		svc.Name("web.proxy"),
+		svc.Handler(options.Handler),
 		svc.TLSConfig(config),
 		svc.Logger(options.Logger),
 		svc.Namespace(options.Namespace),
