@@ -1,15 +1,16 @@
-# Changelog for unreleased
+# Changelog for [unreleased] (UNRELEASED)
 
-The following sections list the changes for unreleased.
+The following sections list the changes in ocis-phoenix unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.1.0...master
 
 ## Summary
 
- * Fix #45: Config file value not being read
- * Chg #3: Initial release of basic version
+* Bugfix - Config file value not being read: [#45](https://github.com/owncloud/ocis-phoenix/pull/45)
 
 ## Details
 
- * Bugfix #45: Config file value not being read
+* Bugfix - Config file value not being read: [#45](https://github.com/owncloud/ocis-phoenix/pull/45)
 
    There was a bug in which phoenix config is always set to the default values and the contents of the
    config file were actually ignored.
@@ -18,11 +19,22 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis-phoenix/issues/47
    https://github.com/owncloud/ocis-phoenix/pull/45
 
- * Change #3: Initial release of basic version
+# Changelog for [0.1.0] (2020-02-03)
+
+The following sections list the changes in ocis-phoenix 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-phoenix/compare/432c57c406a8421a20ba596818d95f816e2ef9c7...v0.1.0
+
+## Summary
+
+* Change - Initial release of basic version: [#3](https://github.com/owncloud/ocis-phoenix/issues/3)
+
+## Details
+
+* Change - Initial release of basic version: [#3](https://github.com/owncloud/ocis-phoenix/issues/3)
 
    Just prepared an initial basic version to serve Phoenix for the ownCloud Infinite Scale
    project. It just provides a minimal viable product to demonstrate the microservice pattern.
 
    https://github.com/owncloud/ocis-phoenix/issues/3
-
 
