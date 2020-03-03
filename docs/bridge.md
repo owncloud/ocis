@@ -56,7 +56,7 @@ Enter host password for user 'admin':
 
 ### Start ocis-glauth
 
-We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy. 
+We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy.
 
 #### Grab it!
 
@@ -176,7 +176,7 @@ Replace `localhost:9100` in the redirect URIs with your the `ocis-phoenix` host 
 
 #### Run it!
 
-You can now bring up `ocis-connectd` with:
+You can now bring up `ocis-konnectd` with:
 ```console
 $ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
 ```
@@ -243,5 +243,5 @@ In the above configuration replace
 ## Next steps
 
 Aside from the above todos these are the next stepo
-- tie it all together behind `ocis-proxy` 
+- tie it all together behind `ocis-proxy`
 - create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `phoenix` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
