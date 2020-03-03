@@ -40,6 +40,7 @@ type Asset struct {
 type Route struct {
 	Endpoint string `json:"endpoint"`
 	Backend  string `json:"backend"`
+	Policy   string `json:"policy"`
 }
 
 // Config combines all available configuration parts.
