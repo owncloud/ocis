@@ -237,11 +237,13 @@ func Server(cfg *config.Config) *cli.Command {
 func NewMultiHostReverseProxy(conf *config.Config) *ReverseProxy {
 	reverseProxy := &ReverseProxy{Directors: make(map[string]map[string]func(req *gohttp.Request))}
 
-	for _, target := range conf.Routes {
-		uri, err := url.Parse(target.Backend)
-		if err != nil { /* do something with err */
+	for _, policy := range conf.Policies {
+		for _, route := range policy.Routes {
+			uri, err := url.Parse(route.Backend)
+			if err != nil { /* do something with err */
+			}
+			reverseProxy.AddHost(policy.Name, uri, route.Endpoint)
 		}
-		reverseProxy.AddHost(target.Policy, uri, target.Endpoint)
 	}
 
 	return reverseProxy
