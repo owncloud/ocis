@@ -36,22 +36,27 @@ type Asset struct {
 	Path string
 }
 
+// Policy enables us to use multiple directors.
+type Policy struct {
+	Name   string  `json:"name"`
+	Routes []Route `json:"routes"`
+}
+
 // Route define forwarding routes
 type Route struct {
 	Endpoint string `json:"endpoint"`
 	Backend  string `json:"backend"`
-	Policy   string `json:"policy"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
-	Asset   Asset
-	Routes  []Route `json:"routes"`
+	File     string
+	Log      Log
+	Debug    Debug
+	HTTP     HTTP
+	Tracing  Tracing
+	Asset    Asset
+	Policies []Policy `json:"policies"`
 }
 
 // New initializes a new configuration with or without defaults.
