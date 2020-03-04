@@ -1,3 +1,20 @@
+# Changelog for unreleased
+
+The following sections list the changes for unreleased.
+
+## Summary
+
+ * Enh #33: Allow http services to register handlers
+
+## Details
+
+ * Enhancement #33: Allow http services to register handlers
+
+   Added a handler option on http services
+
+   https://github.com/owncloud/ocis-pkg/pull/33
+
+
 # Changelog for 2.0.0
 
 The following sections list the changes for 2.0.0.
