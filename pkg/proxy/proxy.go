@@ -26,7 +26,11 @@ func NewMultiHostReverseProxy(conf *config.Config) *MultiHostReverseProxy {
 	for _, policy := range conf.Policies {
 		for _, route := range policy.Routes {
 			uri, err := url.Parse(route.Backend)
-			if err != nil { /* do something with err */
+			if err != nil {
+				logger.
+					Fatal().
+					Err(err).
+					Msgf("malformed url: %v", route.Backend)
 			}
 			reverseProxy.AddHost(policy.Name, uri, route.Endpoint)
 		}
