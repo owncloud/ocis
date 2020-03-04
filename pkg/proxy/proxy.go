@@ -6,8 +6,12 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 )
+
+// initialize a local logger instance
+var logger = log.NewLogger()
 
 // MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
 type MultiHostReverseProxy struct {
@@ -67,8 +71,14 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, endpoint
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// TODO need to fetch from the accounts service
-	policy := "reva"
 	var hit bool
+	policy := "reva"
+
+	if _, ok := p.Directors[policy]; !ok {
+		logger.
+			Error().
+			Msgf("policy %v is not configured", policy)
+	}
 
 	for k := range p.Directors[policy] {
 		if strings.HasPrefix(r.URL.Path, k) && k != "/" {
