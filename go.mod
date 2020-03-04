@@ -10,7 +10,7 @@ require (
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e // indirect
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-konnectd v0.0.0-20200221141628-e8420f55da5a
+	github.com/owncloud/ocis-konnectd v0.0.0-20200303180152-937016f63393
 	github.com/owncloud/ocis-pkg/v2 v2.0.1
 	github.com/prometheus/client_golang v1.2.1
 	github.com/restic/calens v0.2.0
