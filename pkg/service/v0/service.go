@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/cache"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
 )
 
 // Service defines the extension handlers.
@@ -29,6 +30,9 @@ func NewService(opts ...Option) Service {
 		manager: thumbnails.SimpleManager{
 			Cache: cache.NewInMemoryCache(),
 		},
+		source: imgsource.WebDav{
+			Basepath: "http://localhost:9140/remote.php/webdav/",
+		},
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -43,6 +47,7 @@ type Thumbnails struct {
 	config  *config.Config
 	mux     *chi.Mux
 	manager thumbnails.Manager
+	source  imgsource.Source
 }
 
 // ServeHTTP implements the Service interface.
@@ -53,27 +58,53 @@ func (g Thumbnails) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Thumbnails provides the endpoint to retrieve a thumbnail for an image
 func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	width, _ := strconv.Atoi(query.Get("w"))
-	height, _ := strconv.Atoi(query.Get("h"))
+	width, _ := strconv.Atoi(query.Get("width"))
+	height, _ := strconv.Atoi(query.Get("height"))
 	fileType := query.Get("type")
-	fileID := query.Get("file_id")
+	filePath := query.Get("file_path")
 
 	encoder := thumbnails.EncoderForType(fileType)
 	if encoder == nil {
 		// TODO: better error responses
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("can't encode that"))
 		return
 	}
 	ctx := thumbnails.ThumbnailContext{
 		Width:     width,
 		Height:    height,
-		ImagePath: fileID,
+		ImagePath: filePath,
 		Encoder:   encoder,
 	}
-	thumbnail, err := g.manager.Get(ctx)
-	if err != nil {
-		w.Write([]byte(err.Error()))
+
+	thumbnail := g.manager.GetCached(ctx)
+	if thumbnail != nil {
+		w.Write(thumbnail)
+		return
 	}
 
+	auth := r.Header.Get("Authorization")
+
+	sCtx := imgsource.NewContext()
+	sCtx.Set(imgsource.WebDavAuth, auth)
+	// TODO: clean up error handling
+	img, err := g.source.Get(ctx.ImagePath, sCtx)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	if img == nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("img is nil"))
+		return
+	}
+	thumbnail, err = g.manager.Get(ctx, img)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 	w.Write(thumbnail)
 }

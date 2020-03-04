@@ -3,7 +3,6 @@ package thumbnails
 import (
 	"bytes"
 	"image"
-	"os"
 	"strings"
 	"time"
 
@@ -16,14 +15,13 @@ type ThumbnailContext struct {
 	Width     int
 	Height    int
 	ImagePath string
-
-	Encoder Encoder
+	Encoder   Encoder
 }
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
 	// Get will return a thumbnail for a file
-	Get(ThumbnailContext) ([]byte, error)
+	Get(ThumbnailContext, image.Image) ([]byte, error)
 	GetCached(ThumbnailContext) []byte
 }
 
@@ -33,18 +31,14 @@ type SimpleManager struct {
 }
 
 // Get implements the Get Method of Manager
-func (s SimpleManager) Get(ctx ThumbnailContext) ([]byte, error) {
-	key := buildCacheKey(ctx)
+func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error) {
+	thumbnail := s.generate(ctx, img)
 
-	cached := s.Cache.Get(key)
-	if cached == nil {
-		thumbnail := s.generate(ctx)
-		s.Cache.Set(key, thumbnail)
-		cached = thumbnail
-	}
+	key := buildCacheKey(ctx)
+	s.Cache.Set(key, thumbnail)
 
 	buf := new(bytes.Buffer)
-	err := ctx.Encoder.Encode(buf, cached)
+	err := ctx.Encoder.Encode(buf, thumbnail)
 	if err != nil {
 		return nil, err
 	}
@@ -64,15 +58,11 @@ func (s SimpleManager) GetCached(ctx ThumbnailContext) []byte {
 	return buf.Bytes()
 }
 
-func (s SimpleManager) generate(ctx ThumbnailContext) image.Image {
+func (s SimpleManager) generate(ctx ThumbnailContext, img image.Image) image.Image {
 	// TODO: remove, just for demo purposes
 	time.Sleep(time.Second * 2)
 
-	// TODO: get file from reva
-	reader, _ := os.Open(ctx.ImagePath)
-	defer reader.Close()
-	m, _, _ := image.Decode(reader)
-	thumbnail := resize.Thumbnail(uint(ctx.Width), uint(ctx.Height), m, resize.Lanczos2)
+	thumbnail := resize.Thumbnail(uint(ctx.Width), uint(ctx.Height), img, resize.Lanczos2)
 	return thumbnail
 }
 
