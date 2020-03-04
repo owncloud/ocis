@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"net/http"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -19,6 +20,7 @@ type Options struct {
 	Name      string
 	Version   string
 	Address   string
+	Handler   http.Handler
 	Context   context.Context
 	Flags     []cli.Flag
 }
@@ -89,5 +91,12 @@ func Flags(flags ...cli.Flag) Option {
 func TLSConfig(config *tls.Config) Option {
 	return func(o *Options) {
 		o.TLSConfig = config
+	}
+}
+
+// Handler sets the http handler for the service
+func Handler(h http.Handler) Option {
+	return func(o *Options) {
+		o.Handler = h
 	}
 }

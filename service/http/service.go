@@ -37,6 +37,7 @@ func NewService(opts ...Option) Service {
 		web.RegisterInterval(time.Second * 10),
 		web.Context(sopts.Context),
 		web.TLSConfig(sopts.TLSConfig),
+		web.Handler(sopts.Handler),
 		web.Flags(sopts.Flags...),
 	}
 
