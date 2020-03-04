@@ -1,64 +1,62 @@
 {
-	"routes": [
-		{
-			"endpoint": "/",
-      "backend": "http://localhost:9100",
-      "policy": "reva"
-		},
-		{
-			"endpoint": "/.well-known/",
-      "backend": "http://localhost:9130",
-      "policy": "reva"
-		},
-		{
-			"endpoint": "/konnect/",
-      "backend": "http://localhost:9130",
-      "policy": "reva"
-		},
-		{
-			"endpoint": "/signin/",
-      "backend": "http://localhost:9130",
-      "policy": "reva"
-		},
-		{
-			"endpoint": "/ocs/v1.php/",
-      "backend": "http://localhost:9140",
-      "policy": "reva"
-		},
-		{
-			"endpoint": "/remote.php/webdav/",
-      "backend": "http://localhost:9140",
-      "policy": "reva"
+  "policies": [
+    {
+      "name": "reva",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/ocs/v1.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/remote.php/webdav/",
+          "backend": "http://localhost:9140"
+        }
+      ]
     },
-		{
-			"endpoint": "/",
-      "backend": "http://localhost:9100",
-      "policy": "oc10"
-		},
-		{
-			"endpoint": "/.well-known/",
-      "backend": "http://localhost:9130",
-      "policy": "oc10"
-		},
-		{
-			"endpoint": "/konnect/",
-      "backend": "http://localhost:9130",
-      "policy": "oc10"
-		},
-		{
-			"endpoint": "/signin/",
-      "backend": "http://localhost:9130",
-      "policy": "oc10"
-		},
-		{
-			"endpoint": "/ocs/v1.php/",
-      "backend": "http://localhost:9140",
-      "policy": "oc10"
-		},
-		{
-			"endpoint": "/remote.php/webdav/",
-      "backend": "http://localhost:9140",
-      "policy": "oc10"
-		}
-	]
+    {
+      "name": "oc10",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/ocs/v1.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/remote.php/webdav/",
+          "backend": "http://localhost:9140"
+        }
+      ]
+    }
+  ]
 }
