@@ -178,14 +178,14 @@ Replace `localhost:9100` in the redirect URIs with your the `ocis-phoenix` host 
 
 You can now bring up `ocis-konnectd` with:
 ```console
-$ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
+$ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27 --tls=false
 ```
 
 `ocis-konnectd` needs to know
 - `--iss https://192.168.1.100:9130` the issuer, which must be a reachable https endpoint. For testing an ip works. HTTPS is NOT optional. This url is exposed in the `https://192.168.1.100:9130/.well-known/openid-configuration` endpoint and clients need to be able to connect to it
 - `--identifier-registration-conf assets/identifier-registration.yaml` the identifier-registration.yaml you created
 - `--signing-kid gen1-2020-02-27` a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
-
+- `--tls false` tls will be disabled since ocis-proxy will terminate the tls-connection
 
 #### Check it is up and running
 
@@ -240,8 +240,63 @@ In the above configuration replace
 
 > Note: By default the openidconnect app will use the email of the user to match the user from the oidc userinfo endpoint with the ownCloud account. So make sure your users have a unique primary email.
 
+### Proxy
+
+The Proxy is responsible for:
+- Routing authentication request to ocis-konnectd which is the default bundled OIDC-Provider
+- Routing frontend requests to ocis-phoenix
+- Routing backend requests to owncloud 10
+
+#### Get it!
+```console
+$ git clone git@github.com:owncloud/ocis-proxy.git
+$ cd ocis-proxy
+$ make
+```
+
+### Configuration
+
+Edit ./ocis-proxy/config/.proxy-example.json
+
+```json5
+{
+	"routes": [
+		{
+			"endpoint": "/",
+			"backend": "http://localhost:9100" //Should point to phoenix
+		},
+		{
+			"endpoint": "/.well-known/openid-configuration",
+			"backend": "http://localhost:9130" // Should point to ocis-konnectd
+		},
+		{
+			"endpoint": "/konnect/",
+			"backend": "http://localhost:9130" // Should point to ocis-konnectd
+		},
+		{
+			"endpoint": "/signin/",
+			"backend": "http://localhost:9130" // Should point to ocis-konnectd
+		},
+		{
+			"endpoint": "/ocs/v1.php/",
+			"backend": "http://localhost:4444" // Your owncloud instance
+		},
+		{
+			"endpoint": "/remote.php/webdav/",
+			"backend": "http://localhost:4444"  // Your owncloud instance
+		}
+	]
+}
+```
+
+#### Run it!
+```
+$ cd ocis-proxy
+bin/ocis-proxy server --config-file $PWD/config/.proxy-example.json
+```
+
+
 ## Next steps
 
 Aside from the above todos these are the next stepo
-- tie it all together behind `ocis-proxy`
 - create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `phoenix` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
