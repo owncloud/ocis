@@ -3,7 +3,6 @@ package thumbnails
 import (
 	"bytes"
 	"image"
-	"strings"
 	"time"
 
 	"github.com/nfnt/resize"
@@ -16,6 +15,7 @@ type ThumbnailContext struct {
 	Height    int
 	ImagePath string
 	Encoder   Encoder
+	ETag      string
 }
 
 // Manager is responsible for generating thumbnails
@@ -34,28 +34,27 @@ type SimpleManager struct {
 func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error) {
 	thumbnail := s.generate(ctx, img)
 
-	key := buildKey(ctx)
-	s.Storage.Set(key, thumbnail)
+	key := s.Storage.BuildKey(mapToStorageContext(ctx))
 
 	buf := new(bytes.Buffer)
 	err := ctx.Encoder.Encode(buf, thumbnail)
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	bytes := buf.Bytes()
+	s.Storage.Set(key, bytes)
+	return bytes, nil
 }
 
 // GetStored tries to get the stored thumbnail and return it.
-// If there is no stored thumbnail it will return nil
+// If there is no cached thumbnail it will return nil
 func (s SimpleManager) GetStored(ctx ThumbnailContext) []byte {
-	key := buildKey(ctx)
+	key := s.Storage.BuildKey(mapToStorageContext(ctx))
 	stored := s.Storage.Get(key)
 	if stored == nil {
 		return nil
 	}
-	buf := new(bytes.Buffer)
-	ctx.Encoder.Encode(buf, stored)
-	return buf.Bytes()
+	return stored
 }
 
 func (s SimpleManager) generate(ctx ThumbnailContext, img image.Image) image.Image {
@@ -66,11 +65,12 @@ func (s SimpleManager) generate(ctx ThumbnailContext, img image.Image) image.Ima
 	return thumbnail
 }
 
-func buildKey(ctx ThumbnailContext) string {
-	parts := []string{
-		ctx.ImagePath,
-		string(ctx.Width) + "x" + string(ctx.Height),
-		strings.Join(ctx.Encoder.Types(), ","),
+func mapToStorageContext(ctx ThumbnailContext) storage.StorageContext {
+	sCtx := storage.StorageContext{
+		ETag:   ctx.ETag,
+		Width:  ctx.Width,
+		Height: ctx.Height,
+		Types:  ctx.Encoder.Types(),
 	}
-	return strings.Join(parts, "+")
+	return sCtx
 }

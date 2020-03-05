@@ -62,6 +62,7 @@ func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 	height, _ := strconv.Atoi(query.Get("height"))
 	fileType := query.Get("type")
 	filePath := query.Get("file_path")
+	etag := query.Get("etag")
 
 	encoder := thumbnails.EncoderForType(fileType)
 	if encoder == nil {
@@ -75,6 +76,7 @@ func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 		Height:    height,
 		ImagePath: filePath,
 		Encoder:   encoder,
+		ETag:      etag,
 	}
 
 	thumbnail := g.manager.GetStored(ctx)

@@ -1,22 +1,33 @@
 package storage
 
-import "image"
+import (
+	"strings"
+)
 
-func NewInMemoryStorage() InMemoryStorage {
-	return InMemoryStorage{
-		store: make(map[string]image.Image),
+func NewInMemoryStorage() InMemory {
+	return InMemory{
+		store: make(map[string][]byte),
 	}
 }
 
-type InMemoryStorage struct {
-	store map[string]image.Image
+type InMemory struct {
+	store map[string][]byte
 }
 
-func (fsc InMemoryStorage) Get(key string) image.Image {
-	return fsc.store[key]
+func (s InMemory) Get(key string) []byte {
+	return s.store[key]
 }
 
-func (fsc InMemoryStorage) Set(key string, thumbnail image.Image) (image.Image, error) {
-	fsc.store[key] = thumbnail
-	return thumbnail, nil
+func (s InMemory) Set(key string, thumbnail []byte) error {
+	s.store[key] = thumbnail
+	return nil
+}
+
+func (s InMemory) BuildKey(ctx StorageContext) string {
+	parts := []string{
+		ctx.ETag,
+		string(ctx.Width) + "x" + string(ctx.Height),
+		strings.Join(ctx.Types, ","),
+	}
+	return strings.Join(parts, "+")
 }
