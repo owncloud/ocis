@@ -26,6 +26,12 @@ $ cd graphapi
 $ composer install
 ```
 
+### Enable the graphapi app
+
+```
+occ a:e graphapi
+```
+
 No configuration necessary. You can test with `curl`:
 ```console
 $ curl https://cloud.example.com/index.php/apps/graphapi/v1.0/users -u admin | jq
