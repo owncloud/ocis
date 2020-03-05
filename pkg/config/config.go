@@ -38,14 +38,15 @@ type Asset struct {
 
 // Policy enables us to use multiple directors.
 type Policy struct {
-	Name   string  `json:"name"`
-	Routes []Route `json:"routes"`
+	Name   string  `mapstructure:"name"`
+	Routes []Route `mapstructure:"routes"`
 }
 
 // Route define forwarding routes
 type Route struct {
-	Endpoint string `json:"endpoint"`
-	Backend  string `json:"backend"`
+	Endpoint    string `mapstructure:"endpoint"`
+	Backend     string `mapstructure:"backend"`
+	ApacheVHost bool   `mapstructure:"apache-vhost"`
 }
 
 // Config combines all available configuration parts.
@@ -56,7 +57,7 @@ type Config struct {
 	HTTP     HTTP
 	Tracing  Tracing
 	Asset    Asset
-	Policies []Policy `json:"policies"`
+	Policies []Policy `mapstructure:"policies"`
 }
 
 // New initializes a new configuration with or without defaults.

@@ -20,11 +20,19 @@
           "backend": "http://localhost:9130"
         },
         {
-          "endpoint": "/ocs/v1.php/",
+          "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
         },
         {
-          "endpoint": "/remote.php/webdav/",
+          "endpoint": "/remote.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/webdav/",
           "backend": "http://localhost:9140"
         }
       ]
@@ -49,12 +57,24 @@
           "backend": "http://localhost:9130"
         },
         {
-          "endpoint": "/ocs/v1.php/",
-          "backend": "http://localhost:9140"
+          "endpoint": "/ocs/",
+          "backend": "https://demo.owncloud.com",
+          "apache-vhost": true
         },
         {
-          "endpoint": "/remote.php/webdav/",
-          "backend": "http://localhost:9140"
+          "endpoint": "/remote.php/",
+          "backend": "https://demo.owncloud.com",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "https://demo.owncloud.com",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/webdav/",
+          "backend": "https://demo.owncloud.com",
+          "apache-vhost": true
         }
       ]
     }

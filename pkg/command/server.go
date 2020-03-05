@@ -14,7 +14,6 @@ import (
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
-	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
@@ -39,7 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := log.NewLogger()
+			logger := NewLogger(cfg)
 			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
@@ -134,7 +133,10 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			rp := proxy.NewMultiHostReverseProxy(cfg)
+			rp := proxy.NewMultiHostReverseProxy(
+				proxy.Logger(logger),
+				proxy.Config(cfg),
+			)
 
 			{
 				server, err := http.Server(
