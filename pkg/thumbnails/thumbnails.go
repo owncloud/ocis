@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/nfnt/resize"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/cache"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
 // ThumbnailContext bundles information needed to generate a thumbnail for afile
@@ -22,20 +22,20 @@ type ThumbnailContext struct {
 type Manager interface {
 	// Get will return a thumbnail for a file
 	Get(ThumbnailContext, image.Image) ([]byte, error)
-	GetCached(ThumbnailContext) []byte
+	GetStored(ThumbnailContext) []byte
 }
 
 // SimpleManager is a simple implementation of Manager
 type SimpleManager struct {
-	Cache cache.Cache
+	Storage storage.Storage
 }
 
 // Get implements the Get Method of Manager
 func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error) {
 	thumbnail := s.generate(ctx, img)
 
-	key := buildCacheKey(ctx)
-	s.Cache.Set(key, thumbnail)
+	key := buildKey(ctx)
+	s.Storage.Set(key, thumbnail)
 
 	buf := new(bytes.Buffer)
 	err := ctx.Encoder.Encode(buf, thumbnail)
@@ -45,16 +45,16 @@ func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error
 	return buf.Bytes(), nil
 }
 
-// GetCached tries to get the cached thumbnail and return it.
-// If there is no cached thumbnail it will return nil
-func (s SimpleManager) GetCached(ctx ThumbnailContext) []byte {
-	key := buildCacheKey(ctx)
-	cached := s.Cache.Get(key)
-	if cached == nil {
+// GetStored tries to get the stored thumbnail and return it.
+// If there is no stored thumbnail it will return nil
+func (s SimpleManager) GetStored(ctx ThumbnailContext) []byte {
+	key := buildKey(ctx)
+	stored := s.Storage.Get(key)
+	if stored == nil {
 		return nil
 	}
 	buf := new(bytes.Buffer)
-	ctx.Encoder.Encode(buf, cached)
+	ctx.Encoder.Encode(buf, stored)
 	return buf.Bytes()
 }
 
@@ -66,7 +66,7 @@ func (s SimpleManager) generate(ctx ThumbnailContext, img image.Image) image.Ima
 	return thumbnail
 }
 
-func buildCacheKey(ctx ThumbnailContext) string {
+func buildKey(ctx ThumbnailContext) string {
 	parts := []string{
 		ctx.ImagePath,
 		string(ctx.Width) + "x" + string(ctx.Height),

@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/cache"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
 // Service defines the extension handlers.
@@ -28,7 +28,7 @@ func NewService(opts ...Option) Service {
 		config: options.Config,
 		mux:    m,
 		manager: thumbnails.SimpleManager{
-			Cache: cache.NewInMemoryCache(),
+			Storage: storage.NewInMemoryStorage(),
 		},
 		source: imgsource.WebDav{
 			Basepath: "http://localhost:9140/remote.php/webdav/",
@@ -77,7 +77,7 @@ func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 		Encoder:   encoder,
 	}
 
-	thumbnail := g.manager.GetCached(ctx)
+	thumbnail := g.manager.GetStored(ctx)
 	if thumbnail != nil {
 		w.Write(thumbnail)
 		return
