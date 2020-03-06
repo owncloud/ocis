@@ -74,9 +74,11 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	{
+		if options.Config.Tracing.Enabled {
+			handle = svc.NewTracing(handle)
+		}
 		handle = svc.NewInstrument(handle, options.Metrics)
 		handle = svc.NewLogging(handle, options.Logger)
-		handle = svc.NewTracing(handle)
 	}
 
 	service.Handle(
