@@ -136,12 +136,33 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   "--service gateway [--service authregistry]",
 			EnvVars: []string{"REVA_GATEWAY_SERVICES"},
 		},
-		// TODO should defaults to true. reverse logic to 'disable-share-commit'?
 		&cli.BoolFlag{
 			Name:        "commit-share-to-storage-grant",
-			Usage:       "Commit shares to the share manager as well as as a grant to the storage",
-			EnvVars:     []string{"REVA_GATEWAY_COMMIT_SHARE_TO_STRORAGE_GRANT"},
+			Value:       true,
+			Usage:       "Commit shares to the share manager",
+			EnvVars:     []string{"REVA_GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT"},
 			Destination: &cfg.Reva.Gateway.CommitShareToStorageGrant,
+		},
+		&cli.BoolFlag{
+			Name:  "commit-share-to-storage-ref",
+			Value: true,
+			// TODO clarify
+			Usage:       "Commit shares to the storage",
+			EnvVars:     []string{"REVA_GATEWAY_COMMIT_SHARE_TO_STORAGE_REF"},
+			Destination: &cfg.Reva.Gateway.CommitShareToStorageRef,
+		},
+		&cli.StringFlag{
+			Name:        "share-folder",
+			Value:       "/",
+			Usage:       "mount shares in this folder of the home storage provider",
+			EnvVars:     []string{"REVA_GATEWAY_SHARE_FOLDER"},
+			Destination: &cfg.Reva.Gateway.ShareFolder,
+		},
+		&cli.BoolFlag{
+			Name:        "disable-home-creation-on-login",
+			Usage:       "Disable creation of home folder on login",
+			EnvVars:     []string{"REVA_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN"},
+			Destination: &cfg.Reva.Gateway.DisableHomeCreationOnLogin,
 		},
 
 		// other services

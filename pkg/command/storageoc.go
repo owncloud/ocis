@@ -74,20 +74,12 @@ func StorageOC(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.StorageOC.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+					},
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.StorageOC.Network,
 						"address": cfg.Reva.StorageOC.Addr,
-						// TODO extract interceptor config, which is the same for all grpc services
-						"interceptors": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"token_manager": "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
@@ -114,8 +106,8 @@ func StorageOC(cfg *config.Config) *cli.Command {
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
-										"autocreate":    cfg.Reva.Storages.OwnCloud.Autocreate,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
+										"layout":        cfg.Reva.Storages.OwnCloud.Layout,
 									},
 									"s3": map[string]interface{}{
 										"region":     cfg.Reva.Storages.S3.Region,
@@ -126,21 +118,18 @@ func StorageOC(cfg *config.Config) *cli.Command {
 										"prefix":     cfg.Reva.Storages.S3.Prefix,
 									},
 								},
-								"path_wrapper": cfg.Reva.StorageOC.PathWrapper,
+								"mount_path":         cfg.Reva.StorageOC.MountPath,
+								"mount_id":           cfg.Reva.StorageOC.MountID,
+								"expose_data_server": cfg.Reva.StorageOC.ExposeDataServer,
+								"path_wrapper":       cfg.Reva.StorageOC.PathWrapper,
 								"path_wrappers": map[string]interface{}{
 									"context": map[string]interface{}{
 										"prefix": cfg.Reva.StorageOC.PathWrapperContext.Prefix,
 									},
 								},
-								"mount_path":         cfg.Reva.StorageOC.MountPath,
-								"mount_id":           cfg.Reva.StorageOC.MountID,
-								"expose_data_server": cfg.Reva.StorageOC.ExposeDataServer,
 								// TODO use cfg.Reva.SStorageOCData.URL, ?
-								"data_server_url": cfg.Reva.StorageOC.DataServerURL,
-								"available_checksums": map[string]interface{}{
-									"md5":   100,
-									"unset": 1000,
-								},
+								"data_server_url":      cfg.Reva.StorageOC.DataServerURL,
+								"enable_home_creation": cfg.Reva.StorageOC.EnableHomeCreation,
 							},
 						},
 					},

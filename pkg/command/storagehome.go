@@ -74,20 +74,12 @@ func StorageHome(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.StorageHome.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+					},
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.StorageHome.Network,
 						"address": cfg.Reva.StorageHome.Addr,
-						// TODO extract interceptor config, which is the same for all grpc services
-						"interceptors": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"token_manager": "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
@@ -114,7 +106,6 @@ func StorageHome(cfg *config.Config) *cli.Command {
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
-										"autocreate":    cfg.Reva.Storages.OwnCloud.Autocreate,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
 									},
 									"s3": map[string]interface{}{
@@ -126,21 +117,18 @@ func StorageHome(cfg *config.Config) *cli.Command {
 										"prefix":     cfg.Reva.Storages.S3.Prefix,
 									},
 								},
-								"path_wrapper": cfg.Reva.StorageHome.PathWrapper,
+								"mount_path":         cfg.Reva.StorageHome.MountPath,
+								"mount_id":           cfg.Reva.StorageHome.MountID,
+								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
+								"path_wrapper":       cfg.Reva.StorageHome.PathWrapper,
 								"path_wrappers": map[string]interface{}{
 									"context": map[string]interface{}{
 										"prefix": cfg.Reva.StorageHome.PathWrapperContext.Prefix,
 									},
 								},
-								"mount_path":         cfg.Reva.StorageHome.MountPath,
-								"mount_id":           cfg.Reva.StorageHome.MountID,
-								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
 								// TODO use cfg.Reva.StorageHomeData.URL, ?
-								"data_server_url": cfg.Reva.StorageHome.DataServerURL,
-								"available_checksums": map[string]interface{}{
-									"md5":   100,
-									"unset": 1000,
-								},
+								"data_server_url":      cfg.Reva.StorageHome.DataServerURL,
+								"enable_home_creation": cfg.Reva.StorageHome.EnableHomeCreation,
 							},
 						},
 					},

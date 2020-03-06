@@ -171,6 +171,12 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_ROOT_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageRoot.DataServerURL,
 		},
+		&cli.BoolFlag{
+			Name:        "enable-home-creation",
+			Usage:       "if enabled home dirs will be automatically created",
+			EnvVars:     []string{"REVA_STORAGE_HOME_ENABLE_HOME_CREATION"},
+			Destination: &cfg.Reva.StorageHome.EnableHomeCreation,
+		},
 
 		// Storage drivers
 
@@ -242,6 +248,12 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_EOS_USE_KEYTAB"},
 			Destination: &cfg.Reva.Storages.EOS.UseKeytab,
 		},
+		&cli.BoolFlag{
+			Name:        "storage-eos-enable-home",
+			Usage:       "enable the creation of home directories",
+			EnvVars:     []string{"REVA_STORAGE_EOS_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.EOS.EnableHome,
+		},
 		&cli.StringFlag{
 			Name:        "storage-eos-sec-protocol",
 			Value:       "",
@@ -262,6 +274,13 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "the username to use when SingleUserMode is enabled",
 			EnvVars:     []string{"REVA_STORAGE_EOS_SINGLE_USERNAME"},
 			Destination: &cfg.Reva.Storages.EOS.SingleUsername,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-layout",
+			Value:       "{{.Username}}",
+			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
+			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
+			Destination: &cfg.Reva.Storages.EOS.Layout,
 		},
 
 		// local
@@ -290,19 +309,19 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_SCAN"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Scan,
 		},
-		&cli.BoolFlag{
-			Name:        "storage-owncloud-autocreate",
-			Value:       true,
-			Usage:       "autocreate home path for new users",
-			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_AUTOCREATE"},
-			Destination: &cfg.Reva.Storages.OwnCloud.Autocreate,
-		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-redis",
 			Value:       ":6379",
 			Usage:       "the address of the redis server",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_REDIS_ADDR"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Redis,
+		},
+		&cli.StringFlag{
+			Name:        "storage-owncloud-layout",
+			Value:       "{{.Username}}",
+			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
+			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_LAYOUT"},
+			Destination: &cfg.Reva.Storages.OwnCloud.Layout,
 		},
 	}
 }

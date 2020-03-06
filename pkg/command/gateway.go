@@ -75,20 +75,13 @@ func Gateway(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.Gateway.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
+					},
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.Gateway.Network,
 						"address": cfg.Reva.Gateway.Addr,
-						// TODO extract interceptor config, which is the same for all grpc services
-						"interceptors": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"token_manager": "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"gateway": map[string]interface{}{
@@ -104,16 +97,13 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"publicshareprovidersvc":        cfg.Reva.Sharing.URL,
 								"ocmshareprovidersvc":           cfg.Reva.Sharing.URL,
 								"commit_share_to_storage_grant": cfg.Reva.Gateway.CommitShareToStorageGrant,
+								"commit_share_to_storage_ref":   cfg.Reva.Gateway.CommitShareToStorageRef,
+								"share_folder":                  cfg.Reva.Gateway.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 								// other
-								"datagateway":            cfg.Reva.Frontend.URL,
-								"transfer_shared_secret": cfg.Reva.TransferSecret,
-								"transfer_expires":       cfg.Reva.TransferExpires,
-								"token_manager":          "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
+								"disable_home_creation_on_login": cfg.Reva.Gateway.DisableHomeCreationOnLogin,
+								"datagateway":                    cfg.Reva.Frontend.URL,
+								"transfer_shared_secret":         cfg.Reva.TransferSecret,
+								"transfer_expires":               cfg.Reva.TransferExpires,
 							},
 							"authregistry": map[string]interface{}{
 								"driver": "static",
@@ -130,6 +120,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"driver": "static",
 								"drivers": map[string]interface{}{
 									"static": map[string]interface{}{
+										"home_provider": cfg.Reva.StorageHome.MountPath,
 										"rules": map[string]interface{}{
 											cfg.Reva.StorageRoot.MountPath: cfg.Reva.StorageRoot.URL,
 											cfg.Reva.StorageRoot.MountID:   cfg.Reva.StorageRoot.URL,

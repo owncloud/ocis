@@ -82,71 +82,30 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.Frontend.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
+					},
 					"http": map[string]interface{}{
 						"network": cfg.Reva.Frontend.Network,
 						"address": cfg.Reva.Frontend.Addr,
 						"middlewares": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"gateway":          cfg.Reva.Gateway.URL,
-								"credential_chain": []string{"basic", "bearer"},
-								"token_strategy":   "header",
-								"token_writer":     "header",
-								"token_manager":    "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
 							"cors": map[string]interface{}{
-								"allowed_origins": []string{"*"},
-								"allowed_methods": []string{
-									"OPTIONS",
-									"GET",
-									"PUT",
-									"POST",
-									"DELETE",
-									"MKCOL",
-									"PROPFIND",
-									"PROPPATCH",
-									"MOVE",
-									"COPY",
-									"REPORT",
-									"SEARCH",
-								},
-								"allowed_headers": []string{
-									"Origin",
-									"Accept",
-									"Depth",
-									"Content-Type",
-									"X-Requested-With",
-									"Authorization",
-									"Ocs-Apirequest",
-									"If-Match",
-									"If-None-Match",
-									"Destination",
-									"Overwrite",
-								},
-								"allow_credentials":   true,
-								"options_passthrough": false,
+								"allow_credentials": true,
 							},
 						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"datagateway": map[string]interface{}{
-								"prefix":                 "data",
-								"gateway":                "", // TODO not needed?
 								"transfer_shared_secret": cfg.Reva.TransferSecret,
 							},
 							"ocdav": map[string]interface{}{
 								"prefix":           "",
-								"chunk_folder":     "/var/tmp/revad/chunks",
-								"gateway":          cfg.Reva.Gateway.URL,
+								"chunk_folder":     "/var/tmp/reva/chunks",
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 							},
 							"ocs": map[string]interface{}{
-								"gateway": cfg.Reva.Gateway.URL,
 								"config": map[string]interface{}{
 									"version": "1.8",
 									"website": "reva",

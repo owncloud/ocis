@@ -4,8 +4,7 @@ go 1.13
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/cs3org/go-cs3apis v0.0.0-20191218073906-e3405ff6775e // indirect
-	github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5
+	github.com/cs3org/reva v0.0.2-0.20200212114015-0dbce24f7e8b
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/micro/cli/v2 v2.1.1
@@ -14,7 +13,7 @@ require (
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/prometheus/client_model v0.0.0-20191202183732-d1d2010b5bee // indirect
 	github.com/prometheus/procfs v0.0.8 // indirect
-	github.com/restic/calens v0.2.0 // indirect
+	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

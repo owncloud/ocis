@@ -74,20 +74,12 @@ func Users(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.Users.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+					},
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.Users.Network,
 						"address": cfg.Reva.Users.Addr,
-						// TODO extract interceptor config, which is the same for all grpc services
-						"interceptors": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"token_manager": "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"userprovider": map[string]interface{}{

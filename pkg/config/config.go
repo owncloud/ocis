@@ -18,7 +18,10 @@ type Debug struct {
 // Gateway defines the available gateway configuration.
 type Gateway struct {
 	Port
-	CommitShareToStorageGrant bool
+	CommitShareToStorageGrant  bool
+	CommitShareToStorageRef    bool
+	ShareFolder                string
+	DisableHomeCreationOnLogin bool
 }
 
 // Port defines the available port configuration.
@@ -65,7 +68,7 @@ type StoragePort struct {
 	MountID            string
 	ExposeDataServer   bool
 	DataServerURL      string
-	// TODO checksums ... figure out what that is supposed to do
+	EnableHomeCreation bool
 
 	// for HTTP ports with only one http service
 	Prefix     string
@@ -120,6 +123,9 @@ type DriverEOS struct {
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
 	UseKeytab bool
 
+	// EnableHome enables the creation of home directories.
+	EnableHome bool
+
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
 	SecProtocol string
 
@@ -128,6 +134,9 @@ type DriverEOS struct {
 
 	// SingleUsername is the username to use when SingleUserMode is enabled
 	SingleUsername string
+
+	// Layout of the users home dir path
+	Layout string
 }
 
 // DriverLocal defines the available local storage driver configuration.
@@ -139,8 +148,8 @@ type DriverLocal struct {
 type DriverOwnCloud struct {
 	Datadirectory string
 	Scan          bool
-	Autocreate    bool
 	Redis         string
+	Layout        string
 }
 
 // DriverS3 defines the available S3 storage driver configuration.

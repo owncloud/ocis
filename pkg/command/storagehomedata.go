@@ -74,23 +74,12 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 					"core": map[string]interface{}{
 						"max_cpus": cfg.Reva.StorageHomeData.MaxCPUs,
 					},
+					"shared": map[string]interface{}{
+						"jwt_secret": cfg.Reva.JWTSecret,
+					},
 					"http": map[string]interface{}{
 						"network": cfg.Reva.StorageHomeData.Network,
 						"address": cfg.Reva.StorageHomeData.Addr,
-						"middlewares": map[string]interface{}{
-							"auth": map[string]interface{}{
-								"gateway":          cfg.Reva.Gateway.URL,
-								"credential_chain": []string{"basic", "bearer"},
-								"token_strategy":   "header",
-								"token_writer":     "header",
-								"token_manager":    "jwt",
-								"token_managers": map[string]interface{}{
-									"jwt": map[string]interface{}{
-										"secret": cfg.Reva.JWTSecret,
-									},
-								},
-							},
-						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"dataprovider": map[string]interface{}{
@@ -118,7 +107,6 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
-										"autocreate":    cfg.Reva.Storages.OwnCloud.Autocreate,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
 									},
 									"s3": map[string]interface{}{
