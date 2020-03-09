@@ -20,7 +20,6 @@ require (
 	github.com/owncloud/ocis-ocs v0.0.0-20200207130609-800a64d45fac
 	github.com/owncloud/ocis-phoenix v0.1.1-0.20200213204418-06f50c42c225
 	github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad
-	// github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309135548-7e0d3cab3467
 	github.com/owncloud/ocis-reva v0.0.0-20200303122907-0b574786e182
 	github.com/owncloud/ocis-webdav v0.0.0-20200210113150-6c4d498c38b0
 	github.com/spf13/viper v1.6.1
@@ -34,5 +33,3 @@ require (
 replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.30.0-alpha1
 
 replace github.com/owncloud/ocis-konnectd => /Users/aunger/code/owncloud/ocis-konnectd
-
-replace github.com/owncloud/ocis-pkg/v2 => /Users/aunger/code/owncloud/ocis-pkg
