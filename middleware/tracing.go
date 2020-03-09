@@ -14,9 +14,14 @@ func Trace(next http.Handler) http.Handler {
 		var span *trace.Span
 
 		tc := tracecontext.HTTPFormat{}
-		sc, ok := tc.SpanContextFromRequest(r)
-		if ok {
+		// reconstruct span context from request
+		if sc, ok := tc.SpanContextFromRequest(r); ok {
+			// if there is one, add it to the new span
 			ctx, span = trace.StartSpanWithRemoteParent(r.Context(), r.URL.String(), sc)
+			defer span.End()
+		} else {
+			// create a new span if there is no context
+			ctx, span = trace.StartSpan(r.Context(), r.URL.String())
 			defer span.End()
 		}
 
