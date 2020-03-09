@@ -760,16 +760,12 @@ github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c h1:8g
 github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c/go.mod h1:zspcodmHIzGmB6Py8Ve+oO6wXFKRra5bEx1Q9HdJlrY=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5 h1:s4Cz5Mj08JS7yCpwcT5MXvGsDjL1cUC2sKocHhXJejo=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5/go.mod h1:5E/ej0jrrU3SNaBUi7eu5iuVu5R4mTTMH1jXXiwnhqI=
-github.com/owncloud/ocis-konnectd v0.0.0-20200303180152-937016f63393 h1:JqnnJAVSnUB+2Lb20+DjNn553Rvvh1gsEqDfE8+ppK8=
-github.com/owncloud/ocis-konnectd v0.0.0-20200303180152-937016f63393/go.mod h1:RSm/AcbZ+Wq608qRGW28Rp95ktn4Hxi9BvY2c9aj7lU=
 github.com/owncloud/ocis-ocs v0.0.0-20200207130609-800a64d45fac h1:UTRULqox7Wn3ccfUust9D5m+Fy97qpbxK9K5y12jA8U=
 github.com/owncloud/ocis-ocs v0.0.0-20200207130609-800a64d45fac/go.mod h1:wn9QBQTajhM4I2kSE8XadkInr3i11gyAY0RKev7sRPI=
 github.com/owncloud/ocis-phoenix v0.1.1-0.20200213204418-06f50c42c225 h1:5GK6AAx1qvp+WrAzZbhJUYhH16B0bDcOnlzybjVr0Js=
 github.com/owncloud/ocis-phoenix v0.1.1-0.20200213204418-06f50c42c225/go.mod h1:8P6Rc+/NYjXIgjFauZu5xFVwto6dtECThdI8E1DDhmA=
-github.com/owncloud/ocis-pkg/v2 v2.0.1 h1:3ISEtfjAz4pDFczTggIJwKuft3bVsAp1C7dFY9BBPEs=
-github.com/owncloud/ocis-pkg/v2 v2.0.1/go.mod h1:7bVnn3VUaqdmvpMkXF0QVEF1fRugs35hSkuVTAq9yjk=
-github.com/owncloud/ocis-reva v0.0.0-20200213202552-584d47daa8bc h1:62tQ2HhTLjKe8d1tkLICAk82XYOEd2Y7NkUkWxfdtXQ=
-github.com/owncloud/ocis-reva v0.0.0-20200213202552-584d47daa8bc/go.mod h1:1egXhucD6PLAcUvFyXUrixpLp2GloIPSY+Ybz2xLxSI=
+github.com/owncloud/ocis-reva v0.0.0-20200303122907-0b574786e182 h1:Z8QWbq9PMddKirPLCnpLomJ1anLv1vIhWkyxKZ+/BCQ=
+github.com/owncloud/ocis-reva v0.0.0-20200303122907-0b574786e182/go.mod h1:RmVk67YF7ivrkzAzltziM6O9wz5df2Ntmcb6jltTXJE=
 github.com/owncloud/ocis-webdav v0.0.0-20200210113150-6c4d498c38b0 h1:/WX5lRTZJD9qjMwiveypK0s5KxEzBDnwQSnZMXyll1c=
 github.com/owncloud/ocis-webdav v0.0.0-20200210113150-6c4d498c38b0/go.mod h1:j9RiMRf6j8NjjFcpSDTa6bl1j8ZSJq0wPXwTFtXkDgI=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
@@ -854,8 +850,6 @@ github.com/prometheus/procfs v0.0.8/go.mod h1:7Qr8sr6344vo1JqZ6HhLceV9o3AJ1Ff+Gx
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2/go.mod h1:7tZKcyumwBO6qip7RNQ5r77yrssm9bfCowcLEBcU5IA=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/restic/calens v0.1.0 h1:RHGokdZ72dICyIz1EjEsfZwUhvNZz/zy2SawxJktdWA=
-github.com/restic/calens v0.1.0/go.mod h1:u67f5msOjCTDYNzOf/NoAUSdmXP03YXPCwIQLYADy5M=
 github.com/restic/calens v0.2.0 h1:LVNAtmFc+Pb4ODX66qdX1T3Di1P0OTLyUsVyvM/xD7E=
 github.com/restic/calens v0.2.0/go.mod h1:UXwyAKS4wsgUZGEc7NrzzygJbLsQZIo3wl+62Q1wvmU=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=

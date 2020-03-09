@@ -1,4 +1,3 @@
-
 package command
 
 import (
@@ -34,7 +33,6 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Level = cfg.Log.Level
 	cfg.Konnectd.Log.Pretty = cfg.Log.Pretty
 	cfg.Konnectd.Log.Color = cfg.Log.Color
-	cfg.Konnectd.Tracing.Enabled = false
 	cfg.Konnectd.HTTP.Addr = "localhost:9130"
 	cfg.Konnectd.HTTP.Root = "/"
 

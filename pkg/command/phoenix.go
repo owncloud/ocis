@@ -27,7 +27,6 @@ func PhoenixCommand(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-
 			scfg := configurePhoenix(cfg)
 
 			return cli.HandleAction(

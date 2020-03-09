@@ -19,6 +19,7 @@ func Start(cfg *config.Config) error {
 	logger := NewLogger(cfg)
 
 	if cfg.Tracing.Enabled {
+
 		switch t := cfg.Tracing.Type; t {
 		case "agent":
 			exporter, err := ocagent.NewExporter(
