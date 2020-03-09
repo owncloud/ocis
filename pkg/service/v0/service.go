@@ -28,7 +28,7 @@ func NewService(opts ...Option) Service {
 		config: options.Config,
 		mux:    m,
 		manager: thumbnails.SimpleManager{
-			Storage: storage.NewInMemoryStorage(),
+			Storage: storage.NewFileSystemStorage(options.Config.FileSystemStorage),
 		},
 		source: imgsource.WebDav{
 			Basepath: "http://localhost:9140/remote.php/webdav/",
@@ -71,7 +71,7 @@ func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("can't encode that"))
 		return
 	}
-	ctx := thumbnails.ThumbnailContext{
+	ctx := thumbnails.Context{
 		Width:     width,
 		Height:    height,
 		ImagePath: filePath,

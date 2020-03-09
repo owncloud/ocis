@@ -38,11 +38,11 @@ type Config struct {
 	Debug             Debug
 	HTTP              HTTP
 	Tracing           Tracing
-	FilesystemStorage FilesystemStorage
+	FileSystemStorage FileSystemStorage
 }
 
-// FilesystemStorage defines the available filesystem storage configuration.
-type FilesystemStorage struct {
+// FileSystemStorage defines the available filesystem storage configuration.
+type FileSystemStorage struct {
 	RootDirectory string
 }
 

@@ -1,6 +1,7 @@
 package storage
 
-type StorageContext struct {
+// Context combines different attributes needed for storage operations.
+type Context struct {
 	ETag   string
 	Types  []string
 	Width  int
@@ -11,5 +12,5 @@ type StorageContext struct {
 type Storage interface {
 	Get(string) []byte
 	Set(string, []byte) error
-	BuildKey(StorageContext) string
+	BuildKey(Context) string
 }

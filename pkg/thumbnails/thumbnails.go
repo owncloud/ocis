@@ -3,14 +3,13 @@ package thumbnails
 import (
 	"bytes"
 	"image"
-	"time"
 
 	"github.com/nfnt/resize"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
-// ThumbnailContext bundles information needed to generate a thumbnail for afile
-type ThumbnailContext struct {
+// Context bundles information needed to generate a thumbnail for afile
+type Context struct {
 	Width     int
 	Height    int
 	ImagePath string
@@ -21,8 +20,10 @@ type ThumbnailContext struct {
 // Manager is responsible for generating thumbnails
 type Manager interface {
 	// Get will return a thumbnail for a file
-	Get(ThumbnailContext, image.Image) ([]byte, error)
-	GetStored(ThumbnailContext) []byte
+	Get(Context, image.Image) ([]byte, error)
+	// GetStored loads the thumbnail from the storage.
+	// It will return nil if no image is stored for the given context.
+	GetStored(Context) []byte
 }
 
 // SimpleManager is a simple implementation of Manager
@@ -31,7 +32,7 @@ type SimpleManager struct {
 }
 
 // Get implements the Get Method of Manager
-func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error) {
+func (s SimpleManager) Get(ctx Context, img image.Image) ([]byte, error) {
 	thumbnail := s.generate(ctx, img)
 
 	key := s.Storage.BuildKey(mapToStorageContext(ctx))
@@ -48,25 +49,19 @@ func (s SimpleManager) Get(ctx ThumbnailContext, img image.Image) ([]byte, error
 
 // GetStored tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
-func (s SimpleManager) GetStored(ctx ThumbnailContext) []byte {
+func (s SimpleManager) GetStored(ctx Context) []byte {
 	key := s.Storage.BuildKey(mapToStorageContext(ctx))
 	stored := s.Storage.Get(key)
-	if stored == nil {
-		return nil
-	}
 	return stored
 }
 
-func (s SimpleManager) generate(ctx ThumbnailContext, img image.Image) image.Image {
-	// TODO: remove, just for demo purposes
-	time.Sleep(time.Second * 2)
-
+func (s SimpleManager) generate(ctx Context, img image.Image) image.Image {
 	thumbnail := resize.Thumbnail(uint(ctx.Width), uint(ctx.Height), img, resize.Lanczos2)
 	return thumbnail
 }
 
-func mapToStorageContext(ctx ThumbnailContext) storage.StorageContext {
-	sCtx := storage.StorageContext{
+func mapToStorageContext(ctx Context) storage.Context {
+	sCtx := storage.Context{
 		ETag:   ctx.ETag,
 		Width:  ctx.Width,
 		Height: ctx.Height,
