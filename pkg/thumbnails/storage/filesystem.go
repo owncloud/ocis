@@ -7,15 +7,16 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/owncloud/ocis-thumbnails/pkg/config"
 )
 
-const BasePath = "/home/corby/tmp/thumbnails/fs/"
-
 type FileSystem struct {
+	cfg config.FilesystemStorage
 }
 
 func (s FileSystem) Get(key string) []byte {
-	content, err := ioutil.ReadFile(BasePath + key)
+	content, err := ioutil.ReadFile(filepath.Join(s.cfg.RootDirectory, key))
 	if err != nil {
 		return nil
 	}
@@ -24,12 +25,13 @@ func (s FileSystem) Get(key string) []byte {
 }
 
 func (s FileSystem) Set(key string, img []byte) error {
-	folder := filepath.Dir(BasePath + key)
+	path := filepath.Join(s.cfg.RootDirectory, key)
+	folder := filepath.Dir(path)
 	if err := createFolderIfNotExists(folder); err != nil {
 		return fmt.Errorf("error while creating folder %s", folder)
 	}
 
-	f, err := os.Create(BasePath + key)
+	f, err := os.Create(path)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

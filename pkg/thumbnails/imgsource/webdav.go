@@ -24,7 +24,7 @@ func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
 	u.Path = path.Join(u.Path, file)
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the file %s error: %s", file, err.Error())
+		return nil, fmt.Errorf("could not get the file \"%s\" error: %s", file, err.Error())
 	}
 
 	auth := ctx.GetString(WebDavAuth)
@@ -33,7 +33,7 @@ func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the file %s error: %s", file, err.Error())
+		return nil, fmt.Errorf("could not get the file \"%s\" error: %s", file, err.Error())
 	}
 
 	img, _, _ := image.Decode(resp.Body)

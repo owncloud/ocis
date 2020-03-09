@@ -134,5 +134,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"THUMBNAILS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name:        "filesystemstorage-root",
+			Value:       "/tmp/ocis-thumbnails/",
+			Usage:       "Root path of the filesystem storage directory",
+			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
+			Destination: &cfg.FilesystemStorage.RootDirectory,
+		},
 	}
 }

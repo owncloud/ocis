@@ -33,11 +33,17 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
+	File              string
+	Log               Log
+	Debug             Debug
+	HTTP              HTTP
+	Tracing           Tracing
+	FilesystemStorage FilesystemStorage
+}
+
+// FilesystemStorage defines the available filesystem storage configuration.
+type FilesystemStorage struct {
+	RootDirectory string
 }
 
 // New initializes a new configuration with or without defaults.
