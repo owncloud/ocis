@@ -11,6 +11,7 @@ require (
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/gorilla/mux v1.7.4
+	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/micro/cli/v2 v2.1.1
 	github.com/oklog/run v1.0.0
