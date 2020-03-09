@@ -1,10 +1,10 @@
 {{ $allVersions := . }}
 {{- range $index, $changes := . }}{{ with $changes -}}
+{{ if gt (len $allVersions) 1 -}}
 # Changelog for [{{ .Version }}] ({{ .Date }})
 
 The following sections list the changes in ocis-glauth {{ .Version }}.
 
-{{ if gt (len $allVersions) 1 -}}
 {{/* creating version compare links */ -}}
 {{ $next := add1 $index -}}
 {{ if ne (len $allVersions) $next -}}
@@ -23,7 +23,10 @@ The following sections list the changes in ocis-glauth {{ .Version }}.
 [{{ .Version }}]: https://github.com/owncloud/ocis-glauth/compare/178b6ccde34b64a88e8c14a9acb5857a4c6a3164...v{{ .Version }}
 
 {{ end -}}
-{{- end -}}
+{{ else -}}
+# Changes in {{ .Version }}
+
+{{ end -}}
 
 ## Summary
 {{ range $entry := .Entries }}{{ with $entry }}
