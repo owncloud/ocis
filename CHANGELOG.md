@@ -1,6 +1,4 @@
-# Changelog for [0.1.0] (2020-02-28)
-
-The following sections list the changes in ocis-glauth 0.1.0.
+# Changes in 0.1.0
 
 ## Summary
 
