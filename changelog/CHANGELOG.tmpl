@@ -1,10 +1,10 @@
 {{ $allVersions := . }}
 {{- range $index, $changes := . }}{{ with $changes -}}
+{{ if gt (len $allVersions) 1 -}}
 # Changelog for [{{ .Version }}] ({{ .Date }})
 
 The following sections list the changes in ocis-konnectd {{ .Version }}.
 
-{{ if gt (len $allVersions) 1 -}}
 {{/* creating version compare links */ -}}
 {{ $next := add1 $index -}}
 {{ if ne (len $allVersions) $next -}}
@@ -23,7 +23,10 @@ The following sections list the changes in ocis-konnectd {{ .Version }}.
 [{{ .Version }}]: https://github.com/owncloud/ocis-konnectd/compare/66337bb4dad4a3202880323adf7a51a1a3bb4085...v{{ .Version }}
 
 {{ end -}}
-{{- end -}}
+{{ else -}}
+# Changes in {{ .Version }}
+
+{{ end -}}
 
 ## Summary
 {{ range $entry := .Entries }}{{ with $entry }}
