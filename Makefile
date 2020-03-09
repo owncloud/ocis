@@ -58,7 +58,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST)
+	rm -rf $(BIN) $(DIST) $(HUGO)
 
 .PHONY: fmt
 fmt:

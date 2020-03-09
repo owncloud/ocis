@@ -1,6 +1,4 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes in ocis-konnectd unreleased.
+# Changes in unreleased
 
 ## Summary
 
