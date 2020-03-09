@@ -1,11 +1,9 @@
 package svc
 
 import (
-	"context"
 	"net/http"
 
-	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
-	"go.opencensus.io/trace"
+	"github.com/owncloud/ocis-pkg/v2/middleware"
 )
 
 // NewTracing returns a service that instruments traces.
@@ -21,16 +19,7 @@ type tracing struct {
 
 // ServeHTTP implements the Service interface.
 func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var ctx context.Context
-	var span *trace.Span
-	tp := tracecontext.HTTPFormat{}
-	sc, ok := tp.SpanContextFromRequest(r)
-	if ok {
-		ctx, span = trace.StartSpanWithRemoteParent(r.Context(), r.URL.String(), sc)
-		defer span.End()
-	}
-
-	t.next.ServeHTTP(w, r.WithContext(ctx))
+	middleware.Trace(t.next).ServeHTTP(w, r)
 }
 
 // Dummy implements the Service interface.
