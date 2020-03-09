@@ -16,7 +16,7 @@ require (
 	github.com/micro/cli/v2 v2.1.1
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309135548-7e0d3cab3467
+	github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.17.2
 	github.com/sirupsen/logrus v1.4.2

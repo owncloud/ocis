@@ -483,6 +483,8 @@ github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6/go.mod h1:L
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309135548-7e0d3cab3467 h1:7uOmEVi7tiwth1A34F3vk5eaGLDGnJyxgnptpVj8Vbo=
 github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309135548-7e0d3cab3467/go.mod h1:TrBRa+D8mUTsl+qvQiIksJbUvxdE/Qq9jEHUcERPQ60=
+github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad h1:R6JGg68GP8bzzl3L5xso8n9ifay5KUfz2XMQ1KS0pbI=
+github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad/go.mod h1:TrBRa+D8mUTsl+qvQiIksJbUvxdE/Qq9jEHUcERPQ60=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pelletier/go-buffruneio v0.2.0/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
