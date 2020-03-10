@@ -30,9 +30,7 @@ func NewService(opts ...Option) Service {
 		manager: thumbnails.SimpleManager{
 			Storage: storage.NewFileSystemStorage(options.Config.FileSystemStorage),
 		},
-		source: imgsource.WebDav{
-			Basepath: "http://localhost:9140/remote.php/webdav/",
-		},
+		source: imgsource.NewWebDavSource(options.Config.WebDavSource),
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {

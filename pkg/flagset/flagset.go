@@ -139,7 +139,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "/tmp/ocis-thumbnails/",
 			Usage:       "Root path of the filesystem storage directory",
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
-			Destination: &cfg.FilesystemStorage.RootDirectory,
+			Destination: &cfg.FileSystemStorage.RootDirectory,
+		},
+		&cli.StringFlag{
+			Name:        "webdavsource-baseurl",
+			Value:       "http://localhost:9140/remote.php/webdav/",
+			Usage:       "Base url for a webdav api",
+			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
+			Destination: &cfg.WebDavSource.BaseURL,
 		},
 	}
 }

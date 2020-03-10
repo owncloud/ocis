@@ -6,11 +6,20 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/owncloud/ocis-thumbnails/pkg/config"
 )
+
+// NewWebDavSource creates a new webdav instance.
+func NewWebDavSource(cfg config.WebDavSource) WebDav {
+	return WebDav{
+		baseURL: cfg.BaseURL,
+	}
+}
 
 // WebDav implements the Source interface for webdav services
 type WebDav struct {
-	Basepath string
+	baseURL string
 }
 
 const (
@@ -20,11 +29,11 @@ const (
 
 // Get downloads the file from a webdav service
 func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
-	u, _ := url.Parse(s.Basepath)
+	u, _ := url.Parse(s.baseURL)
 	u.Path = path.Join(u.Path, file)
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the file \"%s\" error: %s", file, err.Error())
+		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
 	}
 
 	auth := ctx.GetString(WebDavAuth)
@@ -33,9 +42,16 @@ func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the file \"%s\" error: %s", file, err.Error())
+		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
 	}
 
-	img, _, _ := image.Decode(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", file, resp.StatusCode)
+	}
+
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode the image \"%s\". error: %s", file, err.Error())
+	}
 	return img, nil
 }

@@ -39,11 +39,17 @@ type Config struct {
 	HTTP              HTTP
 	Tracing           Tracing
 	FileSystemStorage FileSystemStorage
+	WebDavSource      WebDavSource
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.
 type FileSystemStorage struct {
 	RootDirectory string
+}
+
+// WebDavSource defines the available webdav source configuration.
+type WebDavSource struct {
+	BaseURL string
 }
 
 // New initializes a new configuration with or without defaults.
