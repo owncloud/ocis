@@ -1,14 +1,12 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes for unreleased.
+# Changes in unreleased
 
 ## Summary
 
- * Chg #1: Initial release of basic version
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-proxy/issues/1)
 
 ## Details
 
- * Change #1: Initial release of basic version
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-proxy/issues/1)
 
    Just prepared an initial basic version.
 
