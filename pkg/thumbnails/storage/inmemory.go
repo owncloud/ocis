@@ -23,7 +23,7 @@ func (s InMemory) Set(key string, thumbnail []byte) error {
 	return nil
 }
 
-func (s InMemory) BuildKey(ctx StorageContext) string {
+func (s InMemory) BuildKey(ctx Context) string {
 	parts := []string{
 		ctx.ETag,
 		string(ctx.Width) + "x" + string(ctx.Height),
