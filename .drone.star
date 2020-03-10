@@ -5,6 +5,7 @@ def main(ctx):
 
   after = [
     changelog(ctx),
+    publish(ctx),
   ]
 
   return stages + after
@@ -130,6 +131,7 @@ def testing(ctx):
   }
 
 def changelog(ctx):
+  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -150,8 +152,8 @@ def changelog(ctx):
           'actions': [
             'clone',
           ],
-          'remote': 'https://github.com/%s' % (ctx.repo.slug),
-          'branch': ctx.build.branch if ctx.build.event == 'pull_request' else 'master',
+          'remote': 'https://github.com/%s' % (repo_slug),
+          'branch': ctx.build.source if ctx.build.event == 'pull_request' else 'master',
           'path': '/drone/src',
           'netrc_machine': 'github.com',
           'netrc_username': {
@@ -168,6 +170,14 @@ def changelog(ctx):
         'pull': 'always',
         'commands': [
           'make changelog',
+        ],
+      },
+      {
+        'name': 'diff',
+        'image': 'owncloud/alpine:latest',
+        'pull': 'always',
+        'commands': [
+          'git diff',
         ],
       },
       {
@@ -214,6 +224,58 @@ def changelog(ctx):
     'trigger': {
       'ref': [
         'refs/heads/master',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def publish(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'publish',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'prepare',
+        'image': 'owncloud/alpine:latest',
+        'pull': 'always',
+        'commands': [
+          'mkdir -p dist',
+        ],
+      },
+      {
+        'name': 'changelog',
+        'image': 'toolhippie/calens:latest',
+        'pull': 'always',
+        'commands': [
+          'calens --version %s -o dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+        ],
+      },
+      {
+        'name': 'release',
+        'image': 'plugins/github-release:1',
+        'pull': 'always',
+        'settings': {
+          'api_key': {
+            'from_secret': 'github_token',
+          },
+          'files': [],
+          'title': ctx.build.ref.replace("refs/tags/v", ""),
+          'note': 'dist/CHANGELOG.md',
+          'overwrite': True,
+          'prerelease': len(ctx.build.ref.split("-")) > 1,
+        },
+      },
+    ],
+    'depends_on': [
+      'testing',
+    ],
+    'trigger': {
+      'ref': [
         'refs/tags/**',
       ],
     },
