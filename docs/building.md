@@ -16,7 +16,7 @@ cd ocis
 
 All required tool besides Go itself and make are bundled or getting automatically installed within the `GOPATH`. All commands to build this project are part of our `Makefile`.
 
-### Simple Ocis
+## Simple Ocis
 
 Building the simple ocis binary:
 
@@ -37,7 +37,7 @@ devldap
 micro's own services
 ```
 
-### Backend
+## Backend
 
 {{< highlight txt >}}
 make generate
