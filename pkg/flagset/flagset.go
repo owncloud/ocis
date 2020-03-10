@@ -57,6 +57,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
+			Value:       false,
 			Usage:       "Enable sending traces",
 			EnvVars:     []string{"OCS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
