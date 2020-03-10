@@ -13,7 +13,7 @@ require (
 	github.com/ogier/pflag v0.0.1 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.1
+	github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad
 	github.com/spf13/viper v1.5.0
 	go.opencensus.io v0.22.2
 )
