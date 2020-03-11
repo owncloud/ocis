@@ -44,7 +44,7 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 Open [http://localhost:9100](http://localhost:9100) and login using one of the demo accounts:
 
 ```console
-einstein:relativity
+albert:relativity
 marie:radioactivty
 richard:superfluidity
 ```
