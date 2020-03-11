@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: bridge.md
 ---
 
+{{< toc >}}
+
 We are planning to build a bridge from ownCloud 10 to ocis. The idea is to have a reverse proxy infront of ownCloud 10 that will forward requests to ownCloud 10 or ocis-reva, depending on the migration status of the logged in user.
 
 This document is a work in progress of the current setup.
