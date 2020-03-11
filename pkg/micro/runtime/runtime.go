@@ -49,6 +49,7 @@ var (
 		"reva-storage-oc-data",
 		"devldap",
 		"konnectd",
+		"proxy",
 	}
 )
 

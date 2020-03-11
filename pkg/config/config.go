@@ -8,6 +8,7 @@ import (
 	konnectd "github.com/owncloud/ocis-konnectd/pkg/config"
 	ocs "github.com/owncloud/ocis-ocs/pkg/config"
 	phoenix "github.com/owncloud/ocis-phoenix/pkg/config"
+	proxy "github.com/owncloud/ocis-proxy/pkg/config"
 	reva "github.com/owncloud/ocis-reva/pkg/config"
 	webdav "github.com/owncloud/ocis-webdav/pkg/config"
 )
@@ -65,6 +66,7 @@ type Config struct {
 	WebDAV        *webdav.Config
 	Reva          *reva.Config
 	DevLDAP       *devldap.Config
+	Proxy         *proxy.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -79,5 +81,6 @@ func New() *Config {
 		WebDAV:        webdav.New(),
 		Reva:          reva.New(),
 		DevLDAP:       devldap.New(),
+		Proxy:         proxy.New(),
 	}
 }
