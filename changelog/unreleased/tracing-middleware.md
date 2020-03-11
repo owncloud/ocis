@@ -1,4 +1,4 @@
-Feature: Tracing middleware
+Enhancement: Tracing middleware
 
 A new tracing middleware has been added to unpack context propagation
 

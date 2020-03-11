@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := ocis-pkg
 IMPORT := github.com/owncloud/$(NAME)
+BIN := bin
+DIST := dist
 
 ifeq ($(OS), Windows_NT)
 	UNAME := Windows
@@ -33,6 +35,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
+	rm -rf $(BIN) $(DIST)
 
 .PHONY: fmt
 fmt:
