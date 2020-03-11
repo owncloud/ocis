@@ -15,7 +15,6 @@ import (
 	logw "github.com/owncloud/ocis-konnectd/pkg/log"
 	"github.com/owncloud/ocis-konnectd/pkg/middleware"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"go.opencensus.io/trace"
 	"stash.kopano.io/kc/konnect/bootstrap"
 	kcconfig "stash.kopano.io/kc/konnect/config"
 	"stash.kopano.io/kc/konnect/server"
@@ -206,11 +205,6 @@ func (k Konnectd) Index() http.HandlerFunc {
 	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if k.config.Tracing.Enabled {
-			_, span := trace.StartSpan(r.Context(), "/identifier/index.html")
-			defer span.End()
-		}
-
 		w.WriteHeader(http.StatusOK)
 		w.Write(indexHTML)
 	})
