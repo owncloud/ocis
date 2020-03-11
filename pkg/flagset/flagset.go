@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"os"
+	"path"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 )
@@ -136,7 +139,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "filesystemstorage-root",
-			Value:       "/tmp/ocis-thumbnails/",
+			Value:       path.Join(os.TempDir(), "ocis-thumbnails/"),
 			Usage:       "Root path of the filesystem storage directory",
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
 			Destination: &cfg.FileSystemStorage.RootDirectory,
