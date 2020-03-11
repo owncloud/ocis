@@ -1,6 +1,4 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes for unreleased.
+# Changes in unreleased
 
 ## Summary
 
