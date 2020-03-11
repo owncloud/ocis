@@ -27,6 +27,7 @@ type Manager interface {
 	GetStored(Context) []byte
 }
 
+// NewSimpleManager creates a new instance of SimpleManager
 func NewSimpleManager(storage storage.Storage, logger log.Logger) SimpleManager {
 	return SimpleManager{
 		storage: storage,
