@@ -70,6 +70,10 @@ func Server(cfg *config.Config) *cli.Command {
 						},
 					)
 
+					logger.Info().
+						Str("collector", cfg.Tracing.Collector).
+						Msg("Trace collector added")
+
 					if err != nil {
 						logger.Error().
 							Err(err).
@@ -137,8 +141,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Flags(flagset.RootWithConfig(config.New())),
+					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {

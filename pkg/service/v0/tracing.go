@@ -2,6 +2,8 @@ package svc
 
 import (
 	"net/http"
+
+	"github.com/owncloud/ocis-pkg/v2/middleware"
 )
 
 // NewTracing returns a service that instruments traces.
@@ -17,7 +19,7 @@ type tracing struct {
 
 // ServeHTTP implements the Service interface.
 func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t.next.ServeHTTP(w, r)
+	middleware.Trace(t.next).ServeHTTP(w, r)
 }
 
 // Dummy implements the Service interface.

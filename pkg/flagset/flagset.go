@@ -24,12 +24,14 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
+			Value:       true,
 			Usage:       "Enable pretty logging",
 			EnvVars:     []string{"OCS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
+			Value:       true,
 			Usage:       "Enable colored logging",
 			EnvVars:     []string{"OCS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
@@ -55,6 +57,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
+			Value:       false,
 			Usage:       "Enable sending traces",
 			EnvVars:     []string{"OCS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
