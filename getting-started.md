@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: getting-started.md
 ---
 
+{{< toc >}}
+
 ## Installation
 
 So far we are offering two different variants for the installation. You can choose between [Docker](https://www.docker.com/) or pre-built binaries which are stored on our download mirrors and GitHub releases. Maybe we will also provide system packages for the major distributions later if we see the need for it.

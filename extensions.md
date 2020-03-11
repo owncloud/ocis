@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: extensions.md
 ---
 
+{{< toc >}}
+
 ## How to build and run ocis-simple
 
 ocis uses build tags to build different flavors of the binary. In order to work on a new extension we are going to reduce the scope a little and use the `simple` tag. Let us begin by creating a dedicated folder:
