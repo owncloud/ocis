@@ -12,6 +12,7 @@ require (
 	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.0.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/prometheus/client_golang v1.2.1
+	github.com/restic/calens v0.2.0 // indirect
 	github.com/rs/zerolog v1.17.2
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	go.opencensus.io v0.22.2

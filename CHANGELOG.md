@@ -1,33 +1,54 @@
-# Changelog for 2.0.2
+# Changelog for [unreleased] (UNRELEASED)
 
-The following sections list the changes for 2.0.2.
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.0.2...master
 
 ## Summary
 
- * Enh #33: Allow http services to register handlers
+* Enhancement - Tracing middleware: [#35](https://github.com/owncloud/ocis-pkg/pull/35/)
 
 ## Details
 
- * Enhancement #33: Allow http services to register handlers
+* Enhancement - Tracing middleware: [#35](https://github.com/owncloud/ocis-pkg/pull/35/)
+
+   A new tracing middleware has been added to unpack context propagation
+
+   https://github.com/owncloud/ocis-pkg/pull/35/
+
+# Changelog for [2.0.2] (2020-03-04)
+
+The following sections list the changes in ocis-pkg 2.0.2.
+
+[2.0.2]: https://github.com/owncloud/ocis-pkg/compare/v2.0.0...v2.0.2
+
+## Summary
+
+* Enhancement - Allow http services to register handlers: [#33](https://github.com/owncloud/ocis-pkg/pull/33)
+
+## Details
+
+* Enhancement - Allow http services to register handlers: [#33](https://github.com/owncloud/ocis-pkg/pull/33)
 
    Added a handler option on http services
 
    https://github.com/owncloud/ocis-pkg/pull/33
 
+# Changelog for [2.0.0] (2020-02-05)
 
-# Changelog for 2.0.0
+The following sections list the changes in ocis-pkg 2.0.0.
 
-The following sections list the changes for 2.0.0.
+[2.0.0]: https://github.com/owncloud/ocis-pkg/compare/v2.0.0...v2.0.0
 
 ## Summary
 
- * Fix #25: Fix Module Path
- * Fix #27: Change import paths to ocis-pkg/v2
- * Chg #22: Upgrade the micro libraries
+* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
+* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
+* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
 ## Details
 
- * Bugfix #25: Fix Module Path
+* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
 
    The module version must be in the path. See
    https://github.com/golang/go/wiki/Modules#semantic-import-versioning for more
@@ -41,32 +62,35 @@ The following sections list the changes for 2.0.0.
 
    https://github.com/owncloud/ocis-pkg/pull/25
 
- * Bugfix #27: Change import paths to ocis-pkg/v2
+
+* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
 
    Changed the import paths to the current version
 
    https://github.com/owncloud/ocis-pkg/pull/27
 
- * Change #22: Upgrade the micro libraries
+
+* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
    Upgraded the go-micro libraries to v2.
 
    https://github.com/owncloud/ocis-pkg/pull/22
 
+# Changelog for [2.0.0] (2020-02-04)
 
-# Changelog for 2.0.0
+The following sections list the changes in ocis-pkg 2.0.0.
 
-The following sections list the changes for 2.0.0.
+[2.0.0]: https://github.com/owncloud/ocis-pkg/compare/v1.3.0...v2.0.0
 
 ## Summary
 
- * Fix #25: Fix Module Path
- * Fix #27: Change import paths to ocis-pkg/v2
- * Chg #22: Upgrade the micro libraries
+* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
+* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
+* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
 ## Details
 
- * Bugfix #25: Fix Module Path
+* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
 
    The module version must be in the path. See
    https://github.com/golang/go/wiki/Modules#semantic-import-versioning for more
@@ -80,32 +104,35 @@ The following sections list the changes for 2.0.0.
 
    https://github.com/owncloud/ocis-pkg/pull/25
 
- * Bugfix #27: Change import paths to ocis-pkg/v2
+
+* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
 
    Changed the import paths to the current version
 
    https://github.com/owncloud/ocis-pkg/pull/27
 
- * Change #22: Upgrade the micro libraries
+
+* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
    Upgraded the go-micro libraries to v2.
 
    https://github.com/owncloud/ocis-pkg/pull/22
 
+# Changelog for [1.3.0] (2020-01-20)
 
-# Changelog for 1.3.0
+The following sections list the changes in ocis-pkg 1.3.0.
 
-The following sections list the changes for 1.3.0.
+[1.3.0]: https://github.com/owncloud/ocis-pkg/compare/v1.2.0...v1.3.0
 
 ## Summary
 
- * Fix #14: Fix serving static assets
- * Chg #19: Add TLS support for http services
- * Enh #8: Introduce OpenID Connect middleware
+* Bugfix - Fix serving static assets: [#14](https://github.com/owncloud/ocis-pkg/pull/14)
+* Change - Add TLS support for http services: [#19](https://github.com/owncloud/ocis-pkg/issues/19)
+* Enhancement - Introduce OpenID Connect middleware: [#8](https://github.com/owncloud/ocis-pkg/issues/8)
 
 ## Details
 
- * Bugfix #14: Fix serving static assets
+* Bugfix - Fix serving static assets: [#14](https://github.com/owncloud/ocis-pkg/pull/14)
 
    Ocis-hello used "/" as root. adding another / caused the static middleware to always fail
    stripping that prefix. All requests will return 404. Setting root to `""` in the `ocis-hello`
@@ -114,7 +141,8 @@ The following sections list the changes for 1.3.0.
 
    https://github.com/owncloud/ocis-pkg/pull/14
 
- * Change #19: Add TLS support for http services
+
+* Change - Add TLS support for http services: [#19](https://github.com/owncloud/ocis-pkg/issues/19)
 
    `ocis-pkg` http services support TLS. The idea behind is setting the issuer on phoenix's
    `config.json` to `https`. Or in other words, use https to access the Kopano extension, and
@@ -122,65 +150,68 @@ The following sections list the changes for 1.3.0.
 
    https://github.com/owncloud/ocis-pkg/issues/19
 
- * Enhancement #8: Introduce OpenID Connect middleware
+
+* Enhancement - Introduce OpenID Connect middleware: [#8](https://github.com/owncloud/ocis-pkg/issues/8)
 
    Added an openid connect middleware that will try to authenticate users using OpenID Connect.
    The claims will be added to the context of the request.
 
    https://github.com/owncloud/ocis-pkg/issues/8
 
+# Changelog for [1.2.0] (2019-12-09)
 
-# Changelog for 1.2.0
+The following sections list the changes in ocis-pkg 1.2.0.
 
-The following sections list the changes for 1.2.0.
+[1.2.0]: https://github.com/owncloud/ocis-pkg/compare/v1.1.0...v1.2.0
 
 ## Summary
 
- * Chg #9: Add root path to static middleware
+* Change - Add root path to static middleware: [#9](https://github.com/owncloud/ocis-pkg/issues/9)
 
 ## Details
 
- * Change #9: Add root path to static middleware
+* Change - Add root path to static middleware: [#9](https://github.com/owncloud/ocis-pkg/issues/9)
 
    Currently the `Static` middleware always serves from the root path, but all our HTTP handlers
    accept a custom root path which also got to be applied to the static file handling.
 
    https://github.com/owncloud/ocis-pkg/issues/9
 
+# Changelog for [1.1.0] (2019-12-06)
 
-# Changelog for 1.1.0
+The following sections list the changes in ocis-pkg 1.1.0.
 
-The following sections list the changes for 1.1.0.
+[1.1.0]: https://github.com/owncloud/ocis-pkg/compare/v1.0.0...v1.1.0
 
 ## Summary
 
- * Chg #2: Better log level handling within micro
+* Change - Better log level handling within micro: [#2](https://github.com/owncloud/ocis-pkg/issues/2)
 
 ## Details
 
- * Change #2: Better log level handling within micro
+* Change - Better log level handling within micro: [#2](https://github.com/owncloud/ocis-pkg/issues/2)
 
    Currently every log message from the micro internals are logged with the info level, we really
    need to respect the proper defined log level within our log wrapper package.
 
    https://github.com/owncloud/ocis-pkg/issues/2
 
+# Changelog for [1.0.0] (2019-12-05)
 
-# Changelog for 1.0.0
+The following sections list the changes in ocis-pkg 1.0.0.
 
-The following sections list the changes for 1.0.0.
+[1.0.0]: https://github.com/owncloud/ocis-pkg/compare/63fa90a673cbc3238a503ea5e6304f1db7fdf47b...v1.0.0
 
 ## Summary
 
- * Chg #1: Initial release of basic version
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-pkg/issues/1)
 
 ## Details
 
- * Change #1: Initial release of basic version
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-pkg/issues/1)
 
    Just prepared an initial basic version to have some shared functionality published which can
    be used by all other ownCloud Infinite Scale extensions.
 
    https://github.com/owncloud/ocis-pkg/issues/1
-
 
