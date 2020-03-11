@@ -1,6 +1,7 @@
 package imgsource
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"net/http"
@@ -28,7 +29,7 @@ const (
 )
 
 // Get downloads the file from a webdav service
-func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
+func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	u, _ := url.Parse(s.baseURL)
 	u.Path = path.Join(u.Path, file)
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
@@ -36,7 +37,10 @@ func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
 		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
 	}
 
-	auth := ctx.GetString(WebDavAuth)
+	auth, ok := authorization(ctx)
+	if !ok {
+		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
+	}
 	req.Header.Add("Authorization", auth)
 
 	client := &http.Client{}
@@ -54,4 +58,9 @@ func (s WebDav) Get(file string, ctx SourceContext) (image.Image, error) {
 		return nil, fmt.Errorf("could not decode the image \"%s\". error: %s", file, err.Error())
 	}
 	return img, nil
+}
+
+func authorization(ctx context.Context) (string, bool) {
+	auth, ok := ctx.Value(WebDavAuth).(string)
+	return auth, ok
 }

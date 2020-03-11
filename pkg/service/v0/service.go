@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -24,7 +25,7 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
-	svc := Thumbnails{
+	svc := Thumbnail{
 		config: options.Config,
 		mux:    m,
 		manager: thumbnails.SimpleManager{
@@ -40,8 +41,8 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-// Thumbnails defines implements the business logic for Service.
-type Thumbnails struct {
+// Thumbnail implements the business logic for Service.
+type Thumbnail struct {
 	config  *config.Config
 	mux     *chi.Mux
 	manager thumbnails.Manager
@@ -49,12 +50,12 @@ type Thumbnails struct {
 }
 
 // ServeHTTP implements the Service interface.
-func (g Thumbnails) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (g Thumbnail) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
 // Thumbnails provides the endpoint to retrieve a thumbnail for an image
-func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
+func (g Thumbnail) Thumbnails(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	width, _ := strconv.Atoi(query.Get("width"))
 	height, _ := strconv.Atoi(query.Get("height"))
@@ -84,11 +85,9 @@ func (g Thumbnails) Thumbnails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth := r.Header.Get("Authorization")
-
-	sCtx := imgsource.NewContext()
-	sCtx.Set(imgsource.WebDavAuth, auth)
+	sCtx := context.WithValue(r.Context(), imgsource.WebDavAuth, auth)
 	// TODO: clean up error handling
-	img, err := g.source.Get(ctx.ImagePath, sCtx)
+	img, err := g.source.Get(sCtx, ctx.ImagePath)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
