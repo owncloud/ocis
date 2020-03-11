@@ -5,6 +5,7 @@ import (
 	"image"
 
 	"github.com/nfnt/resize"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
@@ -26,16 +27,24 @@ type Manager interface {
 	GetStored(Context) []byte
 }
 
+func NewSimpleManager(storage storage.Storage, logger log.Logger) SimpleManager {
+	return SimpleManager{
+		storage: storage,
+		logger:  logger,
+	}
+}
+
 // SimpleManager is a simple implementation of Manager
 type SimpleManager struct {
-	Storage storage.Storage
+	storage storage.Storage
+	logger  log.Logger
 }
 
 // Get implements the Get Method of Manager
 func (s SimpleManager) Get(ctx Context, img image.Image) ([]byte, error) {
 	thumbnail := s.generate(ctx, img)
 
-	key := s.Storage.BuildKey(mapToStorageContext(ctx))
+	key := s.storage.BuildKey(mapToStorageContext(ctx))
 
 	buf := new(bytes.Buffer)
 	err := ctx.Encoder.Encode(buf, thumbnail)
@@ -43,15 +52,18 @@ func (s SimpleManager) Get(ctx Context, img image.Image) ([]byte, error) {
 		return nil, err
 	}
 	bytes := buf.Bytes()
-	s.Storage.Set(key, bytes)
+	err = s.storage.Set(key, bytes)
+	if err != nil {
+		s.logger.Warn().Err(err).Msg("could not store thumbnail")
+	}
 	return bytes, nil
 }
 
 // GetStored tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
 func (s SimpleManager) GetStored(ctx Context) []byte {
-	key := s.Storage.BuildKey(mapToStorageContext(ctx))
-	stored := s.Storage.Get(key)
+	key := s.storage.BuildKey(mapToStorageContext(ctx))
+	stored := s.storage.Get(key)
 	return stored
 }
 

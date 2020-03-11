@@ -8,25 +8,29 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 )
 
 // NewFileSystemStorage creates a new instanz of FileSystem
-func NewFileSystemStorage(cfg config.FileSystemStorage) FileSystem {
+func NewFileSystemStorage(cfg config.FileSystemStorage, logger log.Logger) FileSystem {
 	return FileSystem{
-		dir: cfg.RootDirectory,
+		dir:    cfg.RootDirectory,
+		logger: logger,
 	}
 }
 
 // FileSystem represents a storage for the thumbnails using the local file system.
 type FileSystem struct {
-	dir string
+	dir    string
+	logger log.Logger
 }
 
 // Get loads the image from the file system.
 func (s FileSystem) Get(key string) []byte {
 	content, err := ioutil.ReadFile(filepath.Join(s.dir, key))
 	if err != nil {
+		s.logger.Warn().Err(err).Msgf("could not read file %s", key)
 		return nil
 	}
 
@@ -43,13 +47,12 @@ func (s FileSystem) Set(key string, img []byte) error {
 
 	f, err := os.Create(path)
 	if err != nil {
-		fmt.Println(err.Error())
-		return err
+		return fmt.Errorf("could not create file \"%s\" error: %s", key, err.Error())
 	}
 	defer f.Close()
 	_, err = f.Write(img)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not write to file \"%s\" error: %s", key, err.Error())
 	}
 	return nil
 }

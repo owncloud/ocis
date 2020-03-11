@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
@@ -28,10 +29,15 @@ func NewService(opts ...Option) Service {
 	svc := Thumbnail{
 		config: options.Config,
 		mux:    m,
-		manager: thumbnails.SimpleManager{
-			Storage: storage.NewFileSystemStorage(options.Config.FileSystemStorage),
-		},
+		manager: thumbnails.NewSimpleManager(
+			storage.NewFileSystemStorage(
+				options.Config.FileSystemStorage,
+				options.Logger,
+			),
+			options.Logger,
+		),
 		source: imgsource.NewWebDavSource(options.Config.WebDavSource),
+		logger: options.Logger,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -47,6 +53,7 @@ type Thumbnail struct {
 	mux     *chi.Mux
 	manager thumbnails.Manager
 	source  imgsource.Source
+	logger  log.Logger
 }
 
 // ServeHTTP implements the Service interface.
