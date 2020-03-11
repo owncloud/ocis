@@ -26,19 +26,26 @@ make generate build
 ./bin/ocis -h
 ```
 
-## Quickstart
-After building the binary with the above steps run all services
+## Prerequisites
 
-```console
-./bin/ocis server
-```
+### Redis server
 
 You will need to start a redis server as a cache. The ownCloud storage driver currently will try to connect to the default port.
+
+### Root storage
 
 To prepare the root storage you should fill it with two folders. They are necessary for resolving the home and ownCloud storages. This is subject to change.
 
 ```console
 mkdir -p /var/tmp/reva/root/{home,oc}
+```
+
+## Quickstart
+
+After building the binary with the above steps and also setting up the prerequisites, run this command to start all services:
+
+```console
+./bin/ocis server
 ```
 
 Open [http://localhost:9100](http://localhost:9100) and login using one of the demo accounts:
