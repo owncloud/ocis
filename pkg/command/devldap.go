@@ -32,7 +32,7 @@ func configureDevLDAP(cfg *config.Config) *svcconfig.Config {
 	cfg.DevLDAP.Log.Pretty = cfg.Log.Pretty
 	cfg.DevLDAP.Log.Color = cfg.Log.Color
 	cfg.DevLDAP.Tracing.Enabled = false
-	cfg.DevLDAP.LDAP.Addr = "localhost:9125"
+	cfg.DevLDAP.LDAP.Addr = "0.0.0.0:9125"
 	return cfg.DevLDAP
 }
 

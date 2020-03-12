@@ -34,7 +34,7 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	cfg.WebDAV.Log.Pretty = cfg.Log.Pretty
 	cfg.WebDAV.Log.Color = cfg.Log.Color
 	cfg.WebDAV.Tracing.Enabled = false
-	cfg.WebDAV.HTTP.Addr = "localhost:9115"
+	cfg.WebDAV.HTTP.Addr = "0.0.0.0:9115"
 	cfg.WebDAV.HTTP.Root = "/"
 
 	return cfg.WebDAV

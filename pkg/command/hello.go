@@ -32,9 +32,9 @@ func configureHello(cfg *config.Config) *svcconfig.Config {
 	cfg.Hello.Log.Pretty = cfg.Log.Pretty
 	cfg.Hello.Log.Color = cfg.Log.Color
 	cfg.Hello.Tracing.Enabled = false
-	cfg.Hello.HTTP.Addr = "localhost:9105"
+	cfg.Hello.HTTP.Addr = "0.0.0.0:9105"
 	cfg.Hello.HTTP.Root = "/"
-	cfg.Hello.GRPC.Addr = "localhost:9106"
+	cfg.Hello.GRPC.Addr = "0.0.0.0:9106"
 
 	return cfg.Hello
 }

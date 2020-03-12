@@ -34,7 +34,7 @@ func configureGraphExplorer(cfg *config.Config) *svcconfig.Config {
 	cfg.GraphExplorer.Log.Pretty = cfg.Log.Pretty
 	cfg.GraphExplorer.Log.Color = cfg.Log.Color
 	cfg.GraphExplorer.Tracing.Enabled = false
-	cfg.GraphExplorer.HTTP.Addr = "localhost:9135"
+	cfg.GraphExplorer.HTTP.Addr = "0.0.0.0:9135"
 	cfg.GraphExplorer.HTTP.Root = "/"
 
 	return cfg.GraphExplorer

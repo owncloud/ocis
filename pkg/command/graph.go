@@ -34,7 +34,7 @@ func configureGraph(cfg *config.Config) *svcconfig.Config {
 	cfg.Graph.Log.Pretty = cfg.Log.Pretty
 	cfg.Graph.Log.Color = cfg.Log.Color
 	cfg.Graph.Tracing.Enabled = false
-	cfg.Graph.HTTP.Addr = "localhost:9120"
+	cfg.Graph.HTTP.Addr = "0.0.0.0:9120"
 	cfg.Graph.HTTP.Root = "/"
 
 	return cfg.Graph
