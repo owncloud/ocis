@@ -19,7 +19,9 @@ func NewService(opts ...Option) grpc.Service {
 	)
 
 	hdlr := svc.New(options.Config)
-	proto.RegisterSettingsServiceHandler(service.Server(), hdlr)
+	if err := proto.RegisterSettingsServiceHandler(service.Server(), hdlr); err != nil {
+		options.Logger.Fatal().Err(err).Msg("could not register service handler")
+	}
 
 	service.Init()
 	return service
