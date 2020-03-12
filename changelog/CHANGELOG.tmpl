@@ -1,10 +1,10 @@
 {{ $allVersions := . }}
 {{- range $index, $changes := . }}{{ with $changes -}}
+{{ if gt (len $allVersions) 1 -}}
 # Changelog for [{{ .Version }}] ({{ .Date }})
 
 The following sections list the changes for {{ .Version }}.
 
-{{ if gt (len $allVersions) 1 -}}
 {{/* creating version compare links */ -}}
 {{ $next := add1 $index -}}
 {{ if ne (len $allVersions) $next -}}
@@ -23,7 +23,10 @@ The following sections list the changes for {{ .Version }}.
 [{{ .Version }}]: https://github.com/owncloud/ocis/compare/94f19e653e30cdf16dcf23dbaf36c6d753d37ae9...v{{ .Version }}
 
 {{ end -}}
-{{- end -}}
+{{ else -}}
+# Changes in {{ .Version }}
+
+{{ end -}}
 
 ## Summary
 {{ range $entry := .Entries }}{{ with $entry }}
