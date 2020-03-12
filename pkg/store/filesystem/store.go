@@ -18,9 +18,9 @@ import (
 
 var (
 	// StoreName is the default name for the accounts store
-	StoreName     string = "ocis-store"
-	managerName          = "filesystem"
-	emptyKeyError        = "key cannot be empty"
+	StoreName     = "ocis-store"
+	managerName   = "filesystem"
+	emptyKeyError = "key cannot be empty"
 )
 
 // StoreName is the default name for the store container
