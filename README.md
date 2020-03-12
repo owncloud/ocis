@@ -51,7 +51,7 @@ After building the binary with the above steps and also setting up the prerequis
 Open [http://localhost:9100](http://localhost:9100) and login using one of the demo accounts:
 
 ```console
-einstein:relativity
+albert:relativity
 marie:radioactivty
 richard:superfluidity
 ```
