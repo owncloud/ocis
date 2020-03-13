@@ -69,6 +69,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
+			Name:        "embedded-config",
+			Usage:       "Provided config file while running on single oCIS binary mode.",
+			EnvVars:     []string{"PROXY_EMBEDDED_CONFIG"},
+			Destination: &cfg.File,
+		},
+		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       "",
 			Usage:       "Endpoint for the agent",
