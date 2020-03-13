@@ -20,6 +20,8 @@ type HTTP struct {
 	Addr      string
 	Namespace string
 	Root      string
+	TLSCert   string
+	TLSKey    string
 }
 
 // Tracing defines the available tracing configuration.

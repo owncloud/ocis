@@ -2,32 +2,46 @@ package http
 
 import (
 	"crypto/tls"
-	"os"
-
-	occrypto "github.com/owncloud/ocis-konnectd/pkg/crypto"
 	svc "github.com/owncloud/ocis-pkg/v2/service/http"
+	"github.com/owncloud/ocis-proxy/pkg/crypto"
 	"github.com/owncloud/ocis-proxy/pkg/version"
+	"os"
 )
 
 // Server initializes the http service and server.
 func Server(opts ...Option) (svc.Service, error) {
 	options := newOptions(opts...)
+	l := options.Logger
+	httpCfg := options.Config.HTTP
 
-	// GenCert has side effects as it writes 2 files to the binary running location
-	occrypto.GenCert(options.Logger)
+	var cer tls.Certificate
+	var certErr error
 
-	cer, err := tls.LoadX509KeyPair("server.crt", "server.key")
-	if err != nil {
-		options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
+	if httpCfg.TLSCert == "" || httpCfg.TLSKey == "" {
+		l.Warn().Msgf("No tls certificate provided, using a generated one")
+
+		// GenCert has side effects as it writes 2 files to the binary running location
+		if err := crypto.GenCert(l); err != nil {
+			l.Fatal().Err(err).Msgf("Could not generate test-certificate")
+		}
+
+		httpCfg.TLSKey = "server.crt"
+		httpCfg.TLSKey = "server.key"
+	}
+
+	cer, certErr = tls.LoadX509KeyPair(httpCfg.TLSCert, httpCfg.TLSKey)
+
+	if certErr != nil {
+		options.Logger.Fatal().Err(certErr).Msg("Could not setup TLS")
 		os.Exit(1)
 	}
 
-	config := &tls.Config{Certificates: []tls.Certificate{cer}}
+	tlsConfig := &tls.Config{Certificates: []tls.Certificate{cer}}
 
 	service := svc.NewService(
 		svc.Name("web.proxy"),
 		svc.Handler(options.Handler),
-		svc.TLSConfig(config),
+		svc.TLSConfig(tlsConfig),
 		svc.Logger(options.Logger),
 		svc.Namespace(options.Namespace),
 		svc.Version(version.String),
@@ -36,7 +50,9 @@ func Server(opts ...Option) (svc.Service, error) {
 		svc.Flags(options.Flags...),
 	)
 
-	service.Init()
+	if err := service.Init(); err != nil {
+		l.Fatal().Err(err).Msgf("Error initializing")
+	}
 
 	return service, nil
 }

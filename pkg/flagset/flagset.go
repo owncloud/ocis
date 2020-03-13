@@ -143,5 +143,19 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_HTTP_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
+		&cli.StringFlag{
+			Name:        "transport-tls-cert",
+			Value:       "",
+			Usage:       "Certificate file for transport encryption",
+			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
+			Destination: &cfg.HTTP.TLSCert,
+		},
+		&cli.StringFlag{
+			Name:        "transport-tls-key",
+			Value:       "",
+			Usage:       "Secret file for transport encryption",
+			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
+			Destination: &cfg.HTTP.TLSKey,
+		},
 	}
 }
