@@ -1,26 +1,23 @@
 package svc
 
 import (
-	"net/http"
+	"context"
+
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 )
 
 // NewTracing returns a service that instruments traces.
-func NewTracing(next Service) Service {
+func NewTracing(next v0proto.ThumbnailServiceHandler) v0proto.ThumbnailServiceHandler {
 	return tracing{
 		next: next,
 	}
 }
 
 type tracing struct {
-	next Service
+	next v0proto.ThumbnailServiceHandler
 }
 
-// ServeHTTP implements the Service interface.
-func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t.next.ServeHTTP(w, r)
-}
-
-// Dummy implements the Service interface.
-func (t tracing) Thumbnails(w http.ResponseWriter, r *http.Request) {
-	t.next.Thumbnails(w, r)
+// GetThumbnail implements the ThumbnailServiceHandler interface.
+func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	return t.next.GetThumbnail(ctx, req, rsp)
 }

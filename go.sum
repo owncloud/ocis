@@ -487,6 +487,7 @@ github.com/micro/go-micro v1.18.0/go.mod h1:klwUJL1gkdY1MHFyz+fFJXn52dKcty4hoe95
 github.com/micro/go-micro/v2 v2.0.0 h1:bMx549RwJ9Yuiui8cDVlfYhVNP8I8KBJTMyLthEXpRw=
 github.com/micro/go-micro/v2 v2.0.0/go.mod h1:v7QP5UhKRt37ixjJe8DouWmg0/eE6dltr5h0idJ9BpE=
 github.com/micro/go-plugins v1.5.1/go.mod h1:jcxejzJCAMH731cQHbS/hncyKe0rxAbzKkibj8glad4=
+github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.0.1 h1:7IkXfl94MdLZQwk0lNmu9Cg5WP42Zak9EtQMeN4SvVs=
 github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.0.1/go.mod h1:QrkcwcDtIs2hIJpIEhozekyf6Rfz5C36kFI8+zzCpX0=
 github.com/micro/mdns v0.3.0 h1:bYycYe+98AXR3s8Nq5qvt6C573uFTDPIYzJemWON0QE=
 github.com/micro/mdns v0.3.0/go.mod h1:KJ0dW7KmicXU2BV++qkLlmHYcVv7/hHnbtguSWt9Aoc=

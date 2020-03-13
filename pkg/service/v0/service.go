@@ -2,33 +2,20 @@ package svc
 
 import (
 	"context"
-	"net/http"
-	"strconv"
+	"fmt"
 
-	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
-// Service defines the extension handlers.
-type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Thumbnails(http.ResponseWriter, *http.Request)
-}
-
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 
-	m := chi.NewMux()
-	m.Use(options.Middleware...)
-
 	svc := Thumbnail{
-		config: options.Config,
-		mux:    m,
 		manager: thumbnails.NewSimpleManager(
 			storage.NewFileSystemStorage(
 				options.Config.FileSystemStorage,
@@ -40,77 +27,52 @@ func NewService(opts ...Option) Service {
 		logger: options.Logger,
 	}
 
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/thumbnails", svc.Thumbnails)
-	})
-
 	return svc
 }
 
-// Thumbnail implements the business logic for Service.
+// Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	config  *config.Config
-	mux     *chi.Mux
 	manager thumbnails.Manager
 	source  imgsource.Source
 	logger  log.Logger
 }
 
-// ServeHTTP implements the Service interface.
-func (g Thumbnail) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	g.mux.ServeHTTP(w, r)
-}
-
-// Thumbnails provides the endpoint to retrieve a thumbnail for an image
-func (g Thumbnail) Thumbnails(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	width, _ := strconv.Atoi(query.Get("width"))
-	height, _ := strconv.Atoi(query.Get("height"))
-	fileType := query.Get("type")
-	filePath := query.Get("file_path")
-	etag := query.Get("etag")
-
-	encoder := thumbnails.EncoderForType(fileType)
+// GetThumbnail retrieves a thumbnail for an image
+func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	encoder := thumbnails.EncoderForType(req.Filetype.String())
 	if encoder == nil {
 		// TODO: better error responses
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("can't encode that"))
-		return
+		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
-	ctx := thumbnails.Context{
-		Width:     width,
-		Height:    height,
-		ImagePath: filePath,
+	tCtx := thumbnails.Context{
+		Width:     int(req.Width),
+		Height:    int(req.Height),
+		ImagePath: req.Filepath,
 		Encoder:   encoder,
-		ETag:      etag,
+		ETag:      req.Etag,
 	}
 
-	thumbnail := g.manager.GetStored(ctx)
+	thumbnail := g.manager.GetStored(tCtx)
 	if thumbnail != nil {
-		w.Write(thumbnail)
-		return
+		rsp.Thumbnail = thumbnail
+		return nil
 	}
 
-	auth := r.Header.Get("Authorization")
-	sCtx := context.WithValue(r.Context(), imgsource.WebDavAuth, auth)
+	auth := req.Authorization
+	sCtx := context.WithValue(ctx, imgsource.WebDavAuth, auth)
 	// TODO: clean up error handling
-	img, err := g.source.Get(sCtx, ctx.ImagePath)
+	img, err := g.source.Get(sCtx, tCtx.ImagePath)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+		return err
 	}
 	if img == nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("img is nil"))
-		return
+		return fmt.Errorf("could not retrieve image")
 	}
-	thumbnail, err = g.manager.Get(ctx, img)
+	thumbnail, err = g.manager.Get(tCtx, img)
 	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
+		return err
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	w.Write(thumbnail)
+	rsp.Thumbnail = thumbnail
+	return nil
 }

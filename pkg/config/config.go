@@ -15,11 +15,11 @@ type Debug struct {
 	Zpages bool
 }
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string
+// Server defines the available server configuration.
+type Server struct {
+	Name      string
 	Namespace string
-	Root      string
+	Address   string
 }
 
 // Tracing defines the available tracing configuration.
@@ -36,7 +36,7 @@ type Config struct {
 	File              string
 	Log               Log
 	Debug             Debug
-	HTTP              HTTP
+	Server            Server
 	Tracing           Tracing
 	FileSystemStorage FileSystemStorage
 	WebDavSource      WebDavSource

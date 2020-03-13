@@ -1,13 +1,14 @@
 package svc
 
 import (
-	"net/http"
+	"context"
 
 	"github.com/owncloud/ocis-thumbnails/pkg/metrics"
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 )
 
 // NewInstrument returns a service that instruments metrics.
-func NewInstrument(next Service, metrics *metrics.Metrics) Service {
+func NewInstrument(next v0proto.ThumbnailServiceHandler, metrics *metrics.Metrics) v0proto.ThumbnailServiceHandler {
 	return instrument{
 		next:    next,
 		metrics: metrics,
@@ -15,16 +16,11 @@ func NewInstrument(next Service, metrics *metrics.Metrics) Service {
 }
 
 type instrument struct {
-	next    Service
+	next    v0proto.ThumbnailServiceHandler
 	metrics *metrics.Metrics
 }
 
-// ServeHTTP implements the Service interface.
-func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	i.next.ServeHTTP(w, r)
-}
-
-// Dummy implements the Service interface.
-func (i instrument) Thumbnails(w http.ResponseWriter, r *http.Request) {
-	i.next.Thumbnails(w, r)
+// GetThumbnail implements the ThumbnailServiceHandler interface.
+func (i instrument) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	return i.next.GetThumbnail(ctx, req, rsp)
 }

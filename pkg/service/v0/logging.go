@@ -1,13 +1,14 @@
 package svc
 
 import (
-	"net/http"
+	"context"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next Service, logger log.Logger) Service {
+func NewLogging(next v0proto.ThumbnailServiceHandler, logger log.Logger) v0proto.ThumbnailServiceHandler {
 	return logging{
 		next:   next,
 		logger: logger,
@@ -15,16 +16,11 @@ func NewLogging(next Service, logger log.Logger) Service {
 }
 
 type logging struct {
-	next   Service
+	next   v0proto.ThumbnailServiceHandler
 	logger log.Logger
 }
 
-// ServeHTTP implements the Service interface.
-func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	l.next.ServeHTTP(w, r)
-}
-
-// Dummy implements the Service interface.
-func (l logging) Thumbnails(w http.ResponseWriter, r *http.Request) {
-	l.next.Thumbnails(w, r)
+// GetThumbnail implements the ThumbnailServiceHandler interface.
+func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	return l.next.GetThumbnail(ctx, req, rsp)
 }

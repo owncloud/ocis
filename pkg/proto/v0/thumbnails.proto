@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.owncloud.ocis.thumbnails.v0;
+option go_package = "proto";
+
+service ThumbnailService {
+    rpc GetThumbnail(GetRequest) returns (GetResponse);
+}
+
+message GetRequest {
+    string filepath = 1;
+    enum FileType {
+        PNG = 0;
+        JPG = 1;
+    }
+    FileType filetype = 2;
+    string etag = 3;
+    int32 width = 4;
+    int32 height = 5;
+    string authorization = 6;
+}
+
+message GetResponse {
+    bytes thumbnail = 1;
+}
