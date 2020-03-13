@@ -35,6 +35,10 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
+			if c.String("embedded-config") != "" {
+				config.Embedded(c, cfg)
+			}
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
