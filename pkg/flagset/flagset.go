@@ -151,7 +151,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
-			Name:        "transport- tls-key",
+			Name:        "transport-tls-key",
 			Value:       "",
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"KONNECTD_TRANSPORT_TLS_KEY"},
