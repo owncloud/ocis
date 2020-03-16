@@ -54,13 +54,13 @@ type Config struct {
 	File     string
 	Log      Log
 	Debug    Debug
-	HTTP     HTTP
+	HTTP     HTTP `mapstructure:"http"`
 	Tracing  Tracing
 	Asset    Asset
 	Policies []Policy `mapstructure:"policies"`
 }
 
-// New initializes a new configuration with or without defaults.
+// New initializes a new configuration
 func New() *Config {
 	return &Config{}
 }
