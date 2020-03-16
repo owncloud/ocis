@@ -194,4 +194,4 @@ watch:
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
 
 assets:
-	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/v0.5.0/phoenix.tar.gz | tar xvzf - -C assets/
+	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/v0.6.0/phoenix.tar.gz | tar xvzf - -C assets/
