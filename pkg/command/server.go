@@ -31,8 +31,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			// commands are loaded asynchronously, config gets lost along the way,
-			// therefore we need to run this routine again, since a new config is passed each time.
 			ParseConfig(ctx, cfg)
 
 			if cfg.HTTP.Root != "/" {
