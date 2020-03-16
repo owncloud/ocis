@@ -8,6 +8,7 @@ The following sections list the changes in ocis-phoenix unreleased.
 
 * Bugfix - Config file value not being read: [#45](https://github.com/owncloud/ocis-phoenix/pull/45)
 * Enhancement - Update to Phoenix v0.5.0: [#43](https://github.com/owncloud/ocis-phoenix/issues/43)
+* Enhancement - Update to Phoenix v0.6.0: [#53](https://github.com/owncloud/ocis-phoenix/pull/53)
 
 ## Details
 
@@ -25,6 +26,12 @@ The following sections list the changes in ocis-phoenix unreleased.
    Use the latest phoenix release
 
    https://github.com/owncloud/ocis-phoenix/issues/43
+
+* Enhancement - Update to Phoenix v0.6.0: [#53](https://github.com/owncloud/ocis-phoenix/pull/53)
+
+   Use the latest phoenix release
+
+   https://github.com/owncloud/ocis-phoenix/pull/53
 
 # Changelog for [0.1.0] (2020-02-03)
 
