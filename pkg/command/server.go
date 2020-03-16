@@ -30,15 +30,14 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
-		Before: func(c *cli.Context) error {
+		Before: func(ctx *cli.Context) error {
+			// commands are loaded asynchronously, config gets lost along the way,
+			// therefore we need to run this routine again, since a new config is passed each time.
+			ParseConfig(ctx, cfg)
+
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-
-			if c.String("embedded-config") != "" {
-				config.Embedded(c, cfg)
-			}
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -150,8 +149,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Flags(flagset.RootWithConfig(config.New())),
+					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {
