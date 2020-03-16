@@ -162,7 +162,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "backend-datastore",
-			Value:       "owncloud",
+			Value:       "config",
 			Usage:       "datastore to use as the backend. one of config, ldap or owncloud",
 			EnvVars:     []string{"GLAUTH_BACKEND_DATASTORE"},
 			Destination: &cfg.Backend.Datastore,

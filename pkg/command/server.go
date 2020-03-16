@@ -157,6 +157,29 @@ func Server(cfg *config.Config) *cli.Command {
 						SSHKeyAttr:  cfg.Backend.SSHKeyAttr,
 						UseGraphAPI: cfg.Backend.UseGraphAPI,
 					},
+					// TODO read users for the config backend from config file
+					Users: []glauthcfg.User{
+						glauthcfg.User{
+							Name:         "admin",
+							UnixID:       20000,
+							PrimaryGroup: 30000,
+							Mail:         "admin@example.com",
+							PassSHA256:   "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", // admin
+						},
+						glauthcfg.User{
+							Name:         "demo",
+							UnixID:       20001,
+							PrimaryGroup: 30000,
+							Mail:         "demo@example.com",
+							PassSHA256:   "2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea", // demo
+						},
+					},
+					Groups: []glauthcfg.Group{
+						glauthcfg.Group{
+							Name:   "users",
+							UnixID: 30000,
+						},
+					},
 				}
 				server, err := glauth.NewServer(
 					glauth.Logger(log),
