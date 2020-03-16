@@ -54,7 +54,7 @@ type Config struct {
 	File     string
 	Log      Log
 	Debug    Debug
-	HTTP     HTTP `mapstructure:"http"`
+	HTTP     HTTP
 	Tracing  Tracing
 	Asset    Asset
 	Policies []Policy `mapstructure:"policies"`
