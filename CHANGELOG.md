@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [2.1.0] (2020-03-16)
 
-The following sections list the changes in ocis-pkg unreleased.
+The following sections list the changes in ocis-pkg 2.1.0.
 
-[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.0.2...master
+[2.1.0]: https://github.com/owncloud/ocis-pkg/compare/v2.0.2...v2.1.0
 
 ## Summary
 
@@ -20,7 +20,7 @@ The following sections list the changes in ocis-pkg unreleased.
 
 The following sections list the changes in ocis-pkg 2.0.2.
 
-[2.0.2]: https://github.com/owncloud/ocis-pkg/compare/v2.0.0...v2.0.2
+[2.0.2]: https://github.com/owncloud/ocis-pkg/compare/v2.0.1...v2.0.2
 
 ## Summary
 
@@ -34,17 +34,16 @@ The following sections list the changes in ocis-pkg 2.0.2.
 
    https://github.com/owncloud/ocis-pkg/pull/33
 
-# Changelog for [2.0.0] (2020-02-05)
+# Changelog for [2.0.1] (2020-02-05)
 
-The following sections list the changes in ocis-pkg 2.0.0.
+The following sections list the changes in ocis-pkg 2.0.1.
 
-[2.0.0]: https://github.com/owncloud/ocis-pkg/compare/v2.0.0...v2.0.0
+[2.0.1]: https://github.com/owncloud/ocis-pkg/compare/v2.0.0...v2.0.1
 
 ## Summary
 
 * Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
 * Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
-* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
 ## Details
 
@@ -68,13 +67,6 @@ The following sections list the changes in ocis-pkg 2.0.0.
    Changed the import paths to the current version
 
    https://github.com/owncloud/ocis-pkg/pull/27
-
-
-* Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
-
-   Upgraded the go-micro libraries to v2.
-
-   https://github.com/owncloud/ocis-pkg/pull/22
 
 # Changelog for [2.0.0] (2020-02-04)
 
@@ -84,33 +76,9 @@ The following sections list the changes in ocis-pkg 2.0.0.
 
 ## Summary
 
-* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
-* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
 * Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
 ## Details
-
-* Bugfix - Fix Module Path: [#25](https://github.com/owncloud/ocis-pkg/pull/25)
-
-   The module version must be in the path. See
-   https://github.com/golang/go/wiki/Modules#semantic-import-versioning for more
-   information. > If the module is version v2 or higher, the major version of the module must be
-   included as a /vN at the end of the module paths used in go.mod files (e.g., module
-   github.com/my/mod/v2, require github.com/my/mod/v2 v2.0.1) and in the package import path
-   (e.g., import "github.com/my/mod/v2/mypkg"). This includes the paths used in go get
-   commands (e.g., go get github.com/my/mod/v2@v2.0.1. Note there is both a /v2 and a @v2.0.1 in
-   that example. One way to think about it is that the module name now includes the /v2, so include
-   /v2 whenever you are using the module name).
-
-   https://github.com/owncloud/ocis-pkg/pull/25
-
-
-* Bugfix - Change import paths to ocis-pkg/v2: [#27](https://github.com/owncloud/ocis-pkg/pull/27)
-
-   Changed the import paths to the current version
-
-   https://github.com/owncloud/ocis-pkg/pull/27
-
 
 * Change - Upgrade the micro libraries: [#22](https://github.com/owncloud/ocis-pkg/pull/22)
 
