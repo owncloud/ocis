@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
@@ -22,5 +23,21 @@ type logging struct {
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
 func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
-	return l.next.GetThumbnail(ctx, req, rsp)
+	start := time.Now()
+	err := l.next.GetThumbnail(ctx, req, rsp)
+
+	logger := l.logger.With().
+		Str("method", "Thumbnails.GetThumbnail").
+		Dur("duration", time.Since(start)).
+		Logger()
+
+	if err != nil {
+		logger.Warn().
+			Err(err).
+			Msg("Failed to execute")
+	} else {
+		logger.Debug().
+			Msg("")
+	}
+	return err
 }
