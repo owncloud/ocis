@@ -161,7 +161,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "iss",
 			Usage:       "OIDC issuer URL",
 			EnvVars:     []string{"KONNECTD_ISS"},
-			Value:       "https://localhost:9130",
+			Value:       "https://localhost:9200",
 			Destination: &cfg.Konnectd.Iss,
 		},
 		&cli.StringSliceFlag{
@@ -271,7 +271,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "tls",
 			Usage:       "Use TLS (disable only if konnectd is behind a TLS-terminating reverse-proxy).",
 			EnvVars:     []string{"KONNECTD_TLS"},
-			Value:       true,
+			Value:       false,
 			Destination: &cfg.HTTP.TLS,
 		},
 		&cli.StringSliceFlag{

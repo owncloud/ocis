@@ -109,8 +109,8 @@ func createConfigsIfNotExist(assets http.FileSystem) error {
 func initKonnectInternalEnvVars() error {
 	var defaults = map[string]string{
 		"LDAP_URI":                 "ldap://localhost:9125",
-		"LDAP_BINDDN":              "cn=admin,dc=example,dc=org",
-		"LDAP_BINDPW":              "admin",
+		"LDAP_BINDDN":              "cn=konnectd,ou=sysusers,dc=example,dc=org",
+		"LDAP_BINDPW":              "konnectd",
 		"LDAP_BASEDN":              "ou=users,dc=example,dc=org",
 		"LDAP_SCOPE":               "sub",
 		"LDAP_LOGIN_ATTRIBUTE":     "uid",
@@ -118,7 +118,7 @@ func initKonnectInternalEnvVars() error {
 		"LDAP_NAME_ATTRIBUTE":      "cn",
 		"LDAP_UUID_ATTRIBUTE":      "customuid",
 		"LDAP_UUID_ATTRIBUTE_TYPE": "text",
-		"LDAP_FILTER":              "(objectClass=person)",
+		"LDAP_FILTER":              "(objectClass=posixaccount)",
 	}
 
 	for k, v := range defaults {
