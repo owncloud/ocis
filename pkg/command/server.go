@@ -30,12 +30,14 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
-		Before: func(c *cli.Context) error {
+		Before: func(ctx *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return nil
+			// When running on single binary mode the before hook from the root command won't get called. We manually
+			// call this before hook from ocis command, so the configuration can be loaded.
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -146,8 +148,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Flags(flagset.RootWithConfig(config.New())),
+					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {

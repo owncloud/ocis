@@ -1,4 +1,7 @@
 {
+  "HTTP": {
+    "Namespace": "com.owncloud"
+  },
   "policies": [
     {
       "name": "reva",

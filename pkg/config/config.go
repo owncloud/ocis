@@ -60,7 +60,7 @@ type Config struct {
 	Policies []Policy `mapstructure:"policies"`
 }
 
-// New initializes a new configuration with or without defaults.
+// New initializes a new configuration
 func New() *Config {
 	return &Config{}
 }
