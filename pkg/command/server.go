@@ -30,6 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
+
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -48,7 +49,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.Konnectd.SigningPrivateKeyFiles = c.StringSlice("signing-private-key")
 			}
 
-			return nil
+			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -155,8 +156,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Flags(flagset.RootWithConfig(config.New())),
+					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {

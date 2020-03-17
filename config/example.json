@@ -7,7 +7,8 @@
   },
   "http": {
     "addr": "0.0.0.0:9130",
-    "root": "/"
+    "root": "/",
+    "tls": true
   },
   "tracing": {
     "enabled": false,

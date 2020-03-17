@@ -53,7 +53,6 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(tlsConfig),
 	)
 
-	options.Config.Konnectd.Listen = options.Config.HTTP.Addr
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
