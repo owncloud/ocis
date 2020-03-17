@@ -152,7 +152,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "web-config-server",
-			Value:       "http://localhost:9140",
+			Value:       "https://localhost:9200",
 			Usage:       "Server URL",
 			EnvVars:     []string{"PHOENIX_WEB_CONFIG_SERVER"},
 			Destination: &cfg.Phoenix.Config.Server,
@@ -179,14 +179,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-metadata-url",
-			Value:       "https://localhost:9130/.well-known/openid-configuration",
+			Value:       "https://localhost:9200/.well-known/openid-configuration",
 			Usage:       "OpenID Connect metadata URL",
 			EnvVars:     []string{"PHOENIX_OIDC_METADATA_URL"},
 			Destination: &cfg.Phoenix.Config.OpenIDConnect.MetadataURL,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-authority",
-			Value:       "https://localhost:9130",
+			Value:       "https://localhost:9200",
 			Usage:       "OpenID Connect authority", // TODO rename to Issuer
 			EnvVars:     []string{"PHOENIX_OIDC_AUTHORITY"},
 			Destination: &cfg.Phoenix.Config.OpenIDConnect.Authority,
