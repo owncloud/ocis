@@ -64,8 +64,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig load configuration for every extension
-// TODO: DRY this func, take Environment Prefix as parameter, as it is the only variable
+// ParseConfig loads proxy configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	logger := NewLogger(cfg)
 
