@@ -122,7 +122,7 @@ func (r *Runtime) Start() {
 		}
 
 		go (*r.R).Create(s, gorunArgs...)
-		args = args[:len(args)-1]
+		// args = args[:len(args)-1]
 	}
 }
 
