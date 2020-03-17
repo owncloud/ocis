@@ -25,6 +25,6 @@ func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Dummy implements the Service interface.
-func (l logging) Dummy(w http.ResponseWriter, r *http.Request) {
-	l.next.Dummy(w, r)
+func (l logging) Thumbnail(w http.ResponseWriter, r *http.Request) {
+	l.next.Thumbnail(w, r)
 }

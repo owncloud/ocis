@@ -2,15 +2,19 @@ package svc
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
+	"github.com/micro/go-micro/v2/client"
+	thumbnails "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-webdav/pkg/config"
+	thumbnail "github.com/owncloud/ocis-webdav/pkg/dav/thumbnails"
 )
 
 // Service defines the extension handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
-	Dummy(http.ResponseWriter, *http.Request)
+	Thumbnail(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -26,7 +30,7 @@ func NewService(opts ...Option) Service {
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/", svc.Dummy)
+		r.Get("/remote.php/dav/files/{user}/*", svc.Thumbnail)
 	})
 
 	return svc
@@ -43,10 +47,32 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-// Dummy implements the Service interface.
-func (g Webdav) Dummy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
+// Thumbnail implements the Service interface.
+func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
+	tr, err := thumbnail.NewRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", client.DefaultClient)
+	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetRequest{
+		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
+		Filetype:      thumbnails.GetRequest_JPG,
+		Etag:          tr.Etag,
+		Width:         int32(tr.Width),
+		Height:        int32(tr.Height),
+		Authorization: tr.Authorization,
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
 	w.WriteHeader(http.StatusOK)
 
-	w.Write([]byte(http.StatusText(http.StatusOK)))
+	w.Write(rsp.Thumbnail)
 }

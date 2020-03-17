@@ -21,6 +21,6 @@ func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Dummy implements the Service interface.
-func (t tracing) Dummy(w http.ResponseWriter, r *http.Request) {
-	t.next.Dummy(w, r)
+func (t tracing) Thumbnail(w http.ResponseWriter, r *http.Request) {
+	t.next.Thumbnail(w, r)
 }
