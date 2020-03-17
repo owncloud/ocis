@@ -1,28 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes in ocis-phoenix unreleased.
-
-[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...master
-
-## Summary
-
-* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
-
-## Details
-
-* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
-
-   We changed the default configuration to integrate better with ocis.
-
-   Clients are supposed to use the ocis-proxy endpoint `https://localhost:9200`
-
-   https://github.com/owncloud/ocis-phoenix/pull/55
-
 # Changelog for [0.2.0] (2020-03-17)
 
 The following sections list the changes in ocis-phoenix 0.2.0.
 
-[0.2.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.1.0...v0.2.0
+[0.2.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.3.0...v0.2.0
 
 ## Summary
 
@@ -52,6 +32,26 @@ The following sections list the changes in ocis-phoenix 0.2.0.
    Use the latest phoenix release
 
    https://github.com/owncloud/ocis-phoenix/pull/53
+
+# Changelog for [0.3.0] (2020-03-17)
+
+The following sections list the changes in ocis-phoenix 0.3.0.
+
+[0.3.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.1.0...v0.3.0
+
+## Summary
+
+* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
+
+## Details
+
+* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
+
+   We changed the default configuration to integrate better with ocis.
+
+   Clients are supposed to use the ocis-proxy endpoint `https://localhost:9200`
+
+   https://github.com/owncloud/ocis-phoenix/pull/55
 
 # Changelog for [0.1.0] (2020-02-03)
 
