@@ -1,4 +1,3 @@
-
 package command
 
 import (
@@ -18,14 +17,13 @@ func KonnectdCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Konnectd),
 		Action: func(c *cli.Context) error {
-			serverConfig := configureKonnectd(cfg)
-			serverCommand := command.Server(serverConfig)
+			konnectdCommand := command.Server(configureKonnectd(cfg))
 
-			if err := serverCommand.Before(c); err != nil {
+			if err := konnectdCommand.Before(c); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(serverCommand.Action, c)
+			return cli.HandleAction(konnectdCommand.Action, c)
 		},
 	}
 }
@@ -34,9 +32,6 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Level = cfg.Log.Level
 	cfg.Konnectd.Log.Pretty = cfg.Log.Pretty
 	cfg.Konnectd.Log.Color = cfg.Log.Color
-	cfg.Konnectd.Tracing.Enabled = false
-	cfg.Konnectd.HTTP.Addr = "localhost:9130"
-	cfg.Konnectd.HTTP.Root = "/"
 
 	return cfg.Konnectd
 }

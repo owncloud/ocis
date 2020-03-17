@@ -18,13 +18,14 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start graph explorer",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.GraphExplorer),
-		Action: func(c *cli.Context) error {
-			scfg := configureGraphExplorer(cfg)
+		Action: func(ctx *cli.Context) error {
+			graphExplorerCommand := command.Server(configureGraphExplorer(cfg))
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			if err := graphExplorerCommand.Before(ctx); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(graphExplorerCommand.Action, ctx)
 		},
 	}
 }
@@ -33,9 +34,6 @@ func configureGraphExplorer(cfg *config.Config) *svcconfig.Config {
 	cfg.GraphExplorer.Log.Level = cfg.Log.Level
 	cfg.GraphExplorer.Log.Pretty = cfg.Log.Pretty
 	cfg.GraphExplorer.Log.Color = cfg.Log.Color
-	cfg.GraphExplorer.Tracing.Enabled = false
-	cfg.GraphExplorer.HTTP.Addr = "localhost:9135"
-	cfg.GraphExplorer.HTTP.Root = "/"
 
 	return cfg.GraphExplorer
 }

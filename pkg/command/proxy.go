@@ -16,15 +16,14 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start proxy server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Proxy),
-		Action: func(c *cli.Context) error {
-			serverConfig := configureProxy(cfg)
-			serverCommand := command.Server(serverConfig)
+		Action: func(ctx *cli.Context) error {
+			proxyCommand := command.Server(configureProxy(cfg))
 
-			if err := serverCommand.Before(c); err != nil {
+			if err := proxyCommand.Before(ctx); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(serverCommand.Action, c)
+			return cli.HandleAction(proxyCommand.Action, ctx)
 		},
 	}
 }
