@@ -52,6 +52,7 @@ func Simple(cfg *config.Config) *cli.Command {
 				runtime.Logger(logger),
 				runtime.Services(append(runtime.RuntimeServices, SimpleRuntimeServices...)),
 				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
+				runtime.Context(c),
 			)
 
 			{
