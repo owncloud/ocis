@@ -160,24 +160,88 @@ func Server(cfg *config.Config) *cli.Command {
 					// TODO read users for the config backend from config file
 					Users: []glauthcfg.User{
 						glauthcfg.User{
-							Name:         "admin",
+							Name:         "einstein",
+							GivenName:    "Albert",
+							SN:           "Einstein",
 							UnixID:       20000,
 							PrimaryGroup: 30000,
-							Mail:         "admin@example.com",
-							PassSHA256:   "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", // admin
+							OtherGroups:  []int{30001, 30002, 30007},
+							Mail:         "einstein@example.org",
+							PassSHA256:   "69bf3575281a970f46e37ecd28b79cfbee6a46e55c10dc91dd36a43410387ab8", // relativity
 						},
 						glauthcfg.User{
-							Name:         "demo",
+							Name:         "marie",
+							GivenName:    "Marie",
+							SN:           "Curie",
 							UnixID:       20001,
 							PrimaryGroup: 30000,
-							Mail:         "demo@example.com",
-							PassSHA256:   "2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea", // demo
+							OtherGroups:  []int{30003, 30004, 30007},
+							Mail:         "marie@example.org",
+							PassSHA256:   "149a807f82e22b796942efa1010063f4a278cf078ff56ef1d3fc6c156037cef9", // radioactivity
+						},
+						glauthcfg.User{
+							Name:         "feynman",
+							GivenName:    "Richard",
+							SN:           "Feynman",
+							UnixID:       20002,
+							PrimaryGroup: 30000,
+							OtherGroups:  []int{30005, 30006, 30007},
+							Mail:         "feynman@example.org",
+							PassSHA256:   "1e2183d3a6017bb01131e27204bb66d3c5fa273acf421c8f9bd4bd633e3d70a8", // superfluidity
+						},
+
+						// technical users for ocis
+						glauthcfg.User{
+							Name:         "konnectd",
+							UnixID:       10000,
+							PrimaryGroup: 15000,
+							Mail:         "idp@example.org",
+							PassSHA256:   "e1b6c4460fda166b70f77093f8a2f9b9e0055a5141ed8c6a67cf1105b1af23ca", // konnectd
+						},
+						glauthcfg.User{
+							Name:         "reva",
+							UnixID:       10001,
+							PrimaryGroup: 15000,
+							Mail:         "storage@example.org",
+							PassSHA256:   "60a43483d1a41327e689c3ba0451c42661d6a101151e041aa09206305c83e74b", // reva
 						},
 					},
 					Groups: []glauthcfg.Group{
 						glauthcfg.Group{
 							Name:   "users",
 							UnixID: 30000,
+						},
+						glauthcfg.Group{
+							Name:   "sailing-lovers",
+							UnixID: 30001,
+						},
+						glauthcfg.Group{
+							Name:   "violin-haters",
+							UnixID: 30002,
+						},
+						glauthcfg.Group{
+							Name:   "radium-lovers",
+							UnixID: 30003,
+						},
+						glauthcfg.Group{
+							Name:   "polonium-lovers",
+							UnixID: 30004,
+						},
+						glauthcfg.Group{
+							Name:   "quantum-lovers",
+							UnixID: 30005,
+						},
+						glauthcfg.Group{
+							Name:   "philosophy-haters",
+							UnixID: 30006,
+						},
+						glauthcfg.Group{
+							Name:   "physics-lovers",
+							UnixID: 30007,
+						},
+						glauthcfg.Group{
+							Name:   "sysusers",
+							UnixID: 15000,
 						},
 					},
 				}

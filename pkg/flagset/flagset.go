@@ -169,7 +169,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "backend-basedn",
-			Value:       "dc=owncloud,dc=com",
+			Value:       "dc=example,dc=org",
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_BASEDN"},
 			Destination: &cfg.Backend.BaseDN,
