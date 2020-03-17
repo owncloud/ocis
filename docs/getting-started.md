@@ -78,7 +78,21 @@ To the list of available services.
 
 ## Configuration
 
-We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.
+oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
+
+### Configuration using config files
+
+Out of the box extensions will attempt to read configuration details from:
+
+```console
+/etc/ocis
+$HOME/.ocis
+./config
+```
+
+For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `ocis.json | yaml | toml ...`*.
+
+> Important note: As per the time of this writing, Viper does not play nice with urfave/cli flags, this results in values defined on config files taking precedence over cli flags. This behavior is different with environment variables, these will ALWAYS override any value, as they are the most explicit.
 
 ### Envrionment variables
 
