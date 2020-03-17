@@ -31,12 +31,11 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			ParseConfig(ctx, cfg)
-
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			return nil
+
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
