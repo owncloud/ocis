@@ -19,12 +19,13 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.WebDAV),
 		Action: func(c *cli.Context) error {
-			scfg := configureWebDAV(cfg)
+			webdavCommand := command.Server(configureWebDAV(cfg))
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			if err := webdavCommand.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(webdavCommand.Action, c)
 		},
 	}
 }
@@ -33,9 +34,6 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	cfg.WebDAV.Log.Level = cfg.Log.Level
 	cfg.WebDAV.Log.Pretty = cfg.Log.Pretty
 	cfg.WebDAV.Log.Color = cfg.Log.Color
-	cfg.WebDAV.Tracing.Enabled = false
-	cfg.WebDAV.HTTP.Addr = "localhost:9115"
-	cfg.WebDAV.HTTP.Root = "/"
 
 	return cfg.WebDAV
 }

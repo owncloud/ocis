@@ -23,17 +23,16 @@ func PhoenixCommand(cfg *config.Config) *cli.Command {
 			}
 
 			cfg.Phoenix.Phoenix.Config.Apps = c.StringSlice("web-config-app")
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
+			phoenixCommand := command.Server(configurePhoenix(cfg))
 
-			scfg := configurePhoenix(cfg)
+			if err := phoenixCommand.Before(c); err != nil {
+				return err
+			}
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			return cli.HandleAction(phoenixCommand.Action, c)
 		},
 	}
 }

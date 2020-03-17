@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"github.com/micro/cli/v2"
 	gorun "github.com/micro/go-micro/v2/runtime"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
@@ -10,6 +11,7 @@ type Options struct {
 	Services     []string
 	Logger       log.Logger
 	MicroRuntime *gorun.Runtime
+	Context      *cli.Context
 }
 
 // Option undocummented
@@ -44,5 +46,12 @@ func Logger(l log.Logger) Option {
 func MicroRuntime(rt *gorun.Runtime) Option {
 	return func(o *Options) {
 		o.MicroRuntime = rt
+	}
+}
+
+// Context option
+func Context(c *cli.Context) Option {
+	return func(o *Options) {
+		o.Context = c
 	}
 }

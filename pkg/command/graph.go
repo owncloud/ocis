@@ -18,13 +18,14 @@ func GraphCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start graph server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Graph),
-		Action: func(c *cli.Context) error {
-			scfg := configureGraph(cfg)
+		Action: func(ctx *cli.Context) error {
+			graphCommand := command.Server(configureGraph(cfg))
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			if err := graphCommand.Before(ctx); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(graphCommand.Action, ctx)
 		},
 	}
 }
@@ -33,9 +34,6 @@ func configureGraph(cfg *config.Config) *svcconfig.Config {
 	cfg.Graph.Log.Level = cfg.Log.Level
 	cfg.Graph.Log.Pretty = cfg.Log.Pretty
 	cfg.Graph.Log.Color = cfg.Log.Color
-	cfg.Graph.Tracing.Enabled = false
-	cfg.Graph.HTTP.Addr = "localhost:9120"
-	cfg.Graph.HTTP.Root = "/"
 
 	return cfg.Graph
 }

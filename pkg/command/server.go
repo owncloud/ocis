@@ -39,6 +39,7 @@ func Server(cfg *config.Config) *cli.Command {
 				runtime.Services(append(runtime.MicroServices, runtime.Extensions...)),
 				runtime.Logger(logger),
 				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
+				runtime.Context(c),
 			)
 
 			runtime.Start()

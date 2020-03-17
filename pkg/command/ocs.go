@@ -18,13 +18,14 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start ocs server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.OCS),
-		Action: func(c *cli.Context) error {
-			scfg := configureOCS(cfg)
+		Action: func(ctx *cli.Context) error {
+			ocsCommand := command.Server(configureOCS(cfg))
 
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			if err := ocsCommand.Before(ctx); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(ocsCommand.Action, ctx)
 		},
 	}
 }
@@ -33,9 +34,6 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	cfg.OCS.Log.Level = cfg.Log.Level
 	cfg.OCS.Log.Pretty = cfg.Log.Pretty
 	cfg.OCS.Log.Color = cfg.Log.Color
-	cfg.OCS.Tracing.Enabled = false
-	cfg.OCS.HTTP.Addr = "localhost:9110"
-	cfg.OCS.HTTP.Root = "/"
 
 	return cfg.OCS
 }
