@@ -21,16 +21,16 @@ var (
 
 	// MicroServices to start as part of the fullstack option
 	MicroServices = []string{
-		"api",      // :8080
-		"proxy",    // :8081
+		"api", // :8080
+		// "proxy",    // :8081
 		"web",      // :8082
 		"registry", // :8000
-		"runtime",  // :8088 (future proof. We want to be able to control extensions through a runtime)
+		// "runtime",  // :8088 (future proof. We want to be able to control extensions through a runtime)
 	}
 
 	// Extensions are ocis extension services
 	Extensions = []string{
-		"hello",
+		// "hello",
 		"phoenix",
 		"graph",
 		"graph-explorer",
@@ -49,7 +49,7 @@ var (
 		"reva-storage-oc-data",
 		"devldap",
 		"konnectd",
-		"proxy",
+		"proxy", // TODO rename this command. It collides with micro's `proxy`
 	}
 )
 
@@ -57,6 +57,7 @@ var (
 type Runtime struct {
 	Logger log.Logger
 	R      *gorun.Runtime
+	Ctx    *cli.Context
 
 	services []*gorun.Service
 }
@@ -68,6 +69,7 @@ func New(opts ...Option) Runtime {
 	r := Runtime{
 		Logger: options.Logger,
 		R:      options.MicroRuntime,
+		Ctx:    options.Context,
 	}
 
 	for _, v := range append(MicroServices, Extensions...) {
@@ -109,14 +111,18 @@ func (r Runtime) Trap() {
 func (r *Runtime) Start() {
 	env := os.Environ()
 
-	for i := range r.services {
-		args := []gorun.CreateOption{
-			gorun.WithCommand(os.Args[0], r.services[i].Name),
+	for _, s := range r.services {
+		args := []string{os.Args[0]}
+
+		args = append(args, s.Name)
+		gorunArgs := []gorun.CreateOption{
+			gorun.WithCommand(args...),
 			gorun.WithEnv(env),
 			gorun.WithOutput(os.Stdout),
 		}
 
-		go (*r.R).Create(r.services[i], args...)
+		go (*r.R).Create(s, gorunArgs...)
+		args = args[:len(args)-1]
 	}
 }
 
