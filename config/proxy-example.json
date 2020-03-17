@@ -1,6 +1,5 @@
 {
   "HTTP": {
-    "Addr": "0.0.0.0:9200",
     "Namespace": "com.owncloud"
   },
   "policies": [
