@@ -1,7 +1,7 @@
 package config
 
 import (
-	devldap "github.com/owncloud/ocis-devldap/pkg/config"
+	glauth "github.com/owncloud/ocis-glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis-graph/pkg/config"
 	hello "github.com/owncloud/ocis-hello/pkg/config"
@@ -65,7 +65,7 @@ type Config struct {
 	Phoenix       *phoenix.Config
 	WebDAV        *webdav.Config
 	Reva          *reva.Config
-	DevLDAP       *devldap.Config
+	GLAuth        *glauth.Config
 	Proxy         *proxy.Config
 }
 
@@ -80,7 +80,7 @@ func New() *Config {
 		Phoenix:       phoenix.New(),
 		WebDAV:        webdav.New(),
 		Reva:          reva.New(),
-		DevLDAP:       devldap.New(),
+		GLAuth:        glauth.New(),
 		Proxy:         proxy.New(),
 	}
 }

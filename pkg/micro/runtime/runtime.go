@@ -42,12 +42,12 @@ var (
 		"reva-auth-basic",
 		"reva-auth-bearer",
 		"reva-sharing",
-		"reva-storage-root",
+		//"reva-storage-root",
 		"reva-storage-home",
 		"reva-storage-home-data",
 		"reva-storage-oc",
 		"reva-storage-oc-data",
-		"devldap",
+		"glauth",
 		"konnectd",
 		"proxy", // TODO rename this command. It collides with micro's `proxy`
 	}
