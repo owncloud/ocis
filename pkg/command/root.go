@@ -35,7 +35,10 @@ func Execute() error {
 			return ParseConfig(c, cfg)
 		},
 
-		Commands: GetCommands(cfg),
+		Commands: []*cli.Command{
+			Server(cfg),
+			Health(cfg),
+		},
 	}
 
 	cli.HelpFlag = &cli.BoolFlag{
@@ -49,14 +52,6 @@ func Execute() error {
 	}
 
 	return app.Run(os.Args)
-}
-
-// GetCommands undocummented
-func GetCommands(cfg *config.Config) []*cli.Command {
-	return []*cli.Command{
-		Server(cfg),
-		Health(cfg),
-	}
 }
 
 // NewLogger initializes a service-specific logger instance.
