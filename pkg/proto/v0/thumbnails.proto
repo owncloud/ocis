@@ -22,4 +22,5 @@ message GetRequest {
 
 message GetResponse {
     bytes thumbnail = 1;
+    string mimetype = 2;
 }

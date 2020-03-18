@@ -14,6 +14,8 @@ type Encoder interface {
 	Encode(io.Writer, image.Image) error
 	// Types returns the formats suffixes.
 	Types() []string
+	// MimeType returns the mimetype used by the encoder.
+	MimeType() string
 }
 
 // PngEncoder encodes to png
@@ -29,6 +31,11 @@ func (e PngEncoder) Types() []string {
 	return []string{"png"}
 }
 
+// MimeType returns the mimetype for png files.
+func (e PngEncoder) MimeType() string {
+	return "image/png"
+}
+
 // JpegEncoder encodes to jpg.
 type JpegEncoder struct{}
 
@@ -40,6 +47,11 @@ func (e JpegEncoder) Encode(w io.Writer, i image.Image) error {
 // Types returns the jpg suffixes.
 func (e JpegEncoder) Types() []string {
 	return []string{"jpeg", "jpg"}
+}
+
+// MimeType returns the mimetype for jpg files.
+func (e JpegEncoder) MimeType() string {
+	return "image/jpeg"
 }
 
 // EncoderForType returns the encoder for a given file type

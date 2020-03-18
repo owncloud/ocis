@@ -55,6 +55,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	thumbnail := g.manager.GetStored(tCtx)
 	if thumbnail != nil {
 		rsp.Thumbnail = thumbnail
+		rsp.Mimetype = tCtx.Encoder.MimeType()
 		return nil
 	}
 
@@ -74,5 +75,6 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	}
 
 	rsp.Thumbnail = thumbnail
+	rsp.Mimetype = tCtx.Encoder.MimeType()
 	return nil
 }
