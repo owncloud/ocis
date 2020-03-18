@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// DefaultSize defines the default width and height of a thumbnail
 	DefaultSize = 32
 )
 
