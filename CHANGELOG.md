@@ -4,6 +4,7 @@
 
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 
 ## Details
 
@@ -22,4 +23,15 @@
 
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
+
+
+* Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
+
+   We've updated various extensions to a tagged release: - ocis-konnectd v0.2.0 - ocis-glauth
+   v0.4.0 - ocis-phoenix v0.3.0 (phoenix v0.6.0) - ocis-pkg v2.1.0 - ocis-proxy -v0.1.0
+
+   We also updated ocis-reva to a PR commit that brings the latest reva to ocis. Work on the PR is
+   ongoing because some acceptance tests fail.
+
+   https://github.com/owncloud/ocis/pull/151
 
