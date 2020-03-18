@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.4.0] (2020-03-18)
 
-The following sections list the changes in ocis-glauth unreleased.
+The following sections list the changes in ocis-glauth 0.4.0.
 
-[unreleased]: https://github.com/owncloud/ocis-glauth/compare/v0.2.0...master
+[0.4.0]: https://github.com/owncloud/ocis-glauth/compare/v0.2.0...v0.4.0
 
 ## Summary
 
