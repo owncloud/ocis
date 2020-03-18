@@ -37,7 +37,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			cfg.Backend.Servers = c.StringSlice("backend-server")
 
-			return nil
+			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
