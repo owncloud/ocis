@@ -7,6 +7,9 @@ The following sections list the changes in ocis-glauth unreleased.
 ## Summary
 
 * Enhancement - Configuration: [#11](https://github.com/owncloud/ocis-glauth/pull/11)
+* Enhancement - Improve default settings: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
+* Enhancement - Generate temporary ldap certificates if LDAPS is enabled: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
+* Enhancement - Provide additional tls-endpoint: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
 
 ## Details
 
@@ -16,6 +19,28 @@ The following sections list the changes in ocis-glauth unreleased.
    from default paths. Environment variables **WILL** take precedence over config files.
 
    https://github.com/owncloud/ocis-glauth/pull/11
+
+
+* Enhancement - Improve default settings: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
+
+   This helps achieve zero-config in single-binary.
+
+   https://github.com/owncloud/ocis-glauth/pull/12
+
+
+* Enhancement - Generate temporary ldap certificates if LDAPS is enabled: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
+
+   This change helps to achieve zero-configuration in single-binary mode.
+
+   https://github.com/owncloud/ocis-glauth/pull/12
+
+
+* Enhancement - Provide additional tls-endpoint: [#12](https://github.com/owncloud/ocis-glauth/pull/12)
+
+   Ocis-glauth is now able to concurrently serve a encrypted and an unencrypted ldap-port.
+   Please note that only SSL (no StarTLS) is supported at the moment.
+
+   https://github.com/owncloud/ocis-glauth/pull/12
 
 # Changelog for [0.2.0] (2020-03-17)
 
