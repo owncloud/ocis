@@ -27,8 +27,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	}
 
 	if options.Config.Policies == nil {
-		reverseProxy.logger.Debug().Msg("config file not provided, using oCIS embedded set of redirects")
+		reverseProxy.logger.Info().Str("policies source", "runtime").Msg("policies provided at runtime")
 		options.Config.Policies = defaultPolicies()
+	} else {
+		reverseProxy.logger.Info().Str("policies source", "config file").Msg("policies provided from config file")
 	}
 
 	for _, policy := range options.Config.Policies {
