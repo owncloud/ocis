@@ -5,6 +5,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
  * Chg #1: Initial release of basic version
+ * Enh #14: Configuration
 
 ## Details
 
@@ -14,5 +15,12 @@ The following sections list the changes for unreleased.
    project. It just provides a minimal viable product to demonstrate the microservice pattern.
 
    https://github.com/owncloud/ocis-webdav/issues/1
+
+ * Enhancement #14: Configuration
+
+   Extensions should be responsible of configuring themselves. We use Viper for config loading
+   from default paths. Environment variables **WILL** take precedence over config files.
+
+   https://github.com/owncloud/ocis-webdav/pull/14
 
 
