@@ -38,7 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			cfg.Phoenix.Config.Apps = c.StringSlice("web-config-app")
 
-			return nil
+			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
