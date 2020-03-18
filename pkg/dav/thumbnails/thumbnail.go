@@ -11,8 +11,10 @@ import (
 )
 
 const (
-	// DefaultSize defines the default width and height of a thumbnail
-	DefaultSize = 32
+	// DefaultWidth defines the default width of a thumbnail
+	DefaultWidth = 32
+	// DefaultHeight defines the default height of a thumbnail
+	DefaultHeight = 32
 )
 
 // Request combines all parameters provided when requesting a thumbnail
@@ -31,11 +33,11 @@ func NewRequest(r *http.Request) (Request, error) {
 	query := r.URL.Query()
 	width, err := strconv.Atoi(query.Get("x"))
 	if err != nil {
-		width = DefaultSize
+		width = DefaultWidth
 	}
 	height, err := strconv.Atoi(query.Get("y"))
 	if err != nil {
-		height = DefaultSize
+		height = DefaultHeight
 	}
 
 	etag := query.Get("c")
