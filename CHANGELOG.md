@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-glauth unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-glauth/compare/v0.2.0...master
+
+## Summary
+
+* Enhancement - Configuration: [#11](https://github.com/owncloud/ocis-glauth/pull/11)
+
+## Details
+
+* Enhancement - Configuration: [#11](https://github.com/owncloud/ocis-glauth/pull/11)
+
+   Extensions should be responsible of configuring themselves. We use Viper for config loading
+   from default paths. Environment variables **WILL** take precedence over config files.
+
+   https://github.com/owncloud/ocis-glauth/pull/11
+
 # Changelog for [0.2.0] (2020-03-17)
 
 The following sections list the changes in ocis-glauth 0.2.0.
