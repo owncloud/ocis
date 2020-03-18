@@ -62,7 +62,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("OCIS_ACCOUNTS")
+	viper.SetEnvPrefix("ACCOUNTS")
 	viper.AutomaticEnv()
 
 	if c.IsSet("config-file") {
