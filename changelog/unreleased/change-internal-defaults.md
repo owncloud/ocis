@@ -1,3 +1,3 @@
-Enhancement: Change internal-default config to have zero-configuration in single-binary mode
+Enhancement: Change default config for single-binary 
 
 https://github.com/owncloud/ocis-konnectd/pull/55
