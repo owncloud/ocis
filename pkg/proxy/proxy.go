@@ -28,6 +28,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 
 	for _, policy := range options.Config.Policies {
 		for _, route := range policy.Routes {
+			reverseProxy.logger.Debug().Str("fwd: ", route.Endpoint)
 			uri, err := url.Parse(route.Backend)
 			if err != nil {
 				reverseProxy.logger.
