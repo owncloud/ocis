@@ -66,7 +66,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Before: func(c *cli.Context) error {
 			logger = oclog.NewLogger(oclog.Name(cfg.Server.Name))
-			return nil
+			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			gr := run.Group{}
