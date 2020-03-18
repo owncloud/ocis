@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/owncloud/ocis-glauth/pkg/crypto"
 	"os"
 	"os/signal"
 	"strings"
@@ -245,6 +246,14 @@ func Server(cfg *config.Config) *cli.Command {
 						},
 					},
 				}
+
+				if cfg.LDAPS.Enabled {
+					// GenCert has side effects as it writes 2 files to the binary running location
+					if err := crypto.GenCert("ldap.crt", "ldap.key", logger); err != nil {
+						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
+					}
+				}
+
 				server, err := glauth.NewServer(
 					glauth.Logger(log),
 					glauth.Config(&cfg),
@@ -267,9 +276,28 @@ func Server(cfg *config.Config) *cli.Command {
 					case err <- server.ListenAndServe():
 						return <-err
 					}
+
 				}, func(_ error) {
 					logger.Info().
 						Str("transport", "ldap").
+						Msg("Shutting down server")
+
+					server.Shutdown()
+					cancel()
+				})
+
+				gr.Add(func() error {
+					err := make(chan error)
+					select {
+					case <-ctx.Done():
+						return nil
+					case err <- server.ListenAndServeTLS():
+						return <-err
+					}
+
+				}, func(_ error) {
+					logger.Info().
+						Str("transport", "ldaps").
 						Msg("Shutting down server")
 
 					server.Shutdown()
