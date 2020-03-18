@@ -113,10 +113,10 @@ func initKonnectInternalEnvVars() error {
 		"LDAP_BINDPW":              "konnectd",
 		"LDAP_BASEDN":              "ou=users,dc=example,dc=org",
 		"LDAP_SCOPE":               "sub",
-		"LDAP_LOGIN_ATTRIBUTE":     "uid",
+		"LDAP_LOGIN_ATTRIBUTE":     "cn",
 		"LDAP_EMAIL_ATTRIBUTE":     "mail",
-		"LDAP_NAME_ATTRIBUTE":      "cn",
-		"LDAP_UUID_ATTRIBUTE":      "customuid",
+		"LDAP_NAME_ATTRIBUTE":      "sn",
+		"LDAP_UUID_ATTRIBUTE":      "uid",
 		"LDAP_UUID_ATTRIBUTE_TYPE": "text",
 		"LDAP_FILTER":              "(objectClass=posixaccount)",
 	}
