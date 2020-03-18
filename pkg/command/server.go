@@ -28,13 +28,13 @@ func Server(cfg *config.Config) *cli.Command {
 				DefaultText: "filesystem",
 				Usage:       "accounts backend manager",
 				Value:       "filesystem",
-				EnvVars:     []string{"OCIS_ACCOUNTS_MANAGER"},
+				EnvVars:     []string{"ACCOUNTS_MANAGER"},
 				Destination: &cfg.Manager,
 			},
 			&cli.StringFlag{
 				Name:        "mount-path",
 				Usage:       "mounting point (necessary when manager=filesystem)",
-				EnvVars:     []string{"OCIS_ACCOUNTS_MOUNT_PATH"},
+				EnvVars:     []string{"ACCOUNTS_MOUNT_PATH"},
 				Destination: &cfg.MountPath,
 			},
 			&cli.StringFlag{
@@ -42,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 				Value:       "accounts",
 				DefaultText: "accounts",
 				Usage:       "service name",
-				EnvVars:     []string{"OCIS_ACCOUNTS_NAME"},
+				EnvVars:     []string{"ACCOUNTS_NAME"},
 				Destination: &cfg.Server.Name,
 			},
 			&cli.StringFlag{
@@ -51,7 +51,7 @@ func Server(cfg *config.Config) *cli.Command {
 				Value:       "com.owncloud",
 				DefaultText: "com.owncloud",
 				Usage:       "namespace",
-				EnvVars:     []string{"OCIS_ACCOUNTS_NAMESPACE"},
+				EnvVars:     []string{"ACCOUNTS_NAMESPACE"},
 				Destination: &cfg.Server.Namespace,
 			},
 			&cli.StringFlag{
@@ -60,7 +60,7 @@ func Server(cfg *config.Config) *cli.Command {
 				Value:       "localhost:9180",
 				DefaultText: "localhost:9180",
 				Usage:       "service endpoint",
-				EnvVars:     []string{"OCIS_ACCOUNTS_ADDRESS"},
+				EnvVars:     []string{"ACCOUNTS_ADDRESS"},
 				Destination: &cfg.Server.Address,
 			},
 		},
