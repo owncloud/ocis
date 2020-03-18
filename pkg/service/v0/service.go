@@ -59,7 +59,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", client.DefaultClient)
 	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		Filetype:      thumbnails.GetRequest_JPG,
+		Filetype:      extensionToFiletype(tr.Filetype),
 		Etag:          tr.Etag,
 		Width:         int32(tr.Width),
 		Height:        int32(tr.Height),
@@ -71,8 +71,12 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Type", rsp.GetMimetype())
 	w.WriteHeader(http.StatusOK)
-
 	w.Write(rsp.Thumbnail)
+}
+
+func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
+	val := thumbnails.GetRequest_FileType_value[strings.ToUpper(ext)]
+	return thumbnails.GetRequest_FileType(val)
 }

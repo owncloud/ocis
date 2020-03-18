@@ -42,11 +42,11 @@ func NewRequest(r *http.Request) (Request, error) {
 		return Request{}, fmt.Errorf("c (etag) is missing in query")
 	}
 
-	authorization := r.Header.Get("Authorizaiton")
+	authorization := r.Header.Get("Authorization")
 
 	tr := Request{
 		Filepath:      path,
-		Filetype:      filepath.Ext(path),
+		Filetype:      strings.Replace(filepath.Ext(path), ".", "", 1),
 		Etag:          etag,
 		Width:         width,
 		Height:        height,
