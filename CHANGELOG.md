@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-phoenix unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...master
+
+## Summary
+
+* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
+
+## Details
+
+* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
+
+   Extensions should be responsible of configuring themselves. We use Viper for config loading
+   from default paths. Environment variables **WILL** take precedence over config files.
+
+   https://github.com/owncloud/ocis-phoenix/pull/57
+
 # Changelog for [0.2.0] (2020-03-17)
 
 The following sections list the changes in ocis-phoenix 0.2.0.
