@@ -26,6 +26,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		logger:    options.Logger,
 	}
 
+	if options.Config.Policies == nil {
+		reverseProxy.logger.Debug().Msg("config file not provided")
+	}
+
 	for _, policy := range options.Config.Policies {
 		for _, route := range policy.Routes {
 			reverseProxy.logger.Debug().Str("fwd: ", route.Endpoint)
