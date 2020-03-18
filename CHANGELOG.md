@@ -3,6 +3,7 @@
 ## Summary
 
 * Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-thumbnails/issues/1)
+* Change - Implement the first working version: [#3](https://github.com/owncloud/ocis-thumbnails/pull/3)
 
 ## Details
 
@@ -12,4 +13,12 @@
    infrastructure in the scope of the ownCloud Infinite Scale project.
 
    https://github.com/owncloud/ocis-thumbnails/issues/1
+
+
+* Change - Implement the first working version: [#3](https://github.com/owncloud/ocis-thumbnails/pull/3)
+
+   We implemented the first simple version. It can load images via webdav and store them locally in
+   the filesystem.
+
+   https://github.com/owncloud/ocis-thumbnails/pull/3
 
