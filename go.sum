@@ -595,6 +595,7 @@ github.com/oracle/oci-go-sdk v7.0.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35ukw
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/ocis-hello v0.0.0-20200114105804-61741477dcec h1:gpILNWve7F8MIo/GBOM6bdszzZFfJEgcXPQBjDOMLAc=
 github.com/owncloud/ocis-hello v0.0.0-20200114105804-61741477dcec/go.mod h1:hrXqmloO2NHbdkDTPSNneobwzQgki8CUuQD8fqjkPv8=
+github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596 h1:3aMNmuDCIdKsaa4YdVTQEBJMjGz8KiuIB/+xlJUCT3k=
 github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596/go.mod h1:Wo0QfOmhadh2vNcUoQIsw2yaOT3zeftk+xaOOwP3y88=
 github.com/owncloud/ocis-pkg/v2 v2.0.1 h1:3ISEtfjAz4pDFczTggIJwKuft3bVsAp1C7dFY9BBPEs=
 github.com/owncloud/ocis-pkg/v2 v2.0.1/go.mod h1:7bVnn3VUaqdmvpMkXF0QVEF1fRugs35hSkuVTAq9yjk=

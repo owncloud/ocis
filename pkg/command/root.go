@@ -49,7 +49,7 @@ func Execute() error {
 // NewLogger initializes a service-specific logger instance.
 func NewLogger(cfg *config.Config) log.Logger {
 	return log.NewLogger(
-		log.Name("phoenix"),
+		log.Name("accounts"),
 		log.Level("info"),
 		log.Pretty(true),
 		log.Color(true),
