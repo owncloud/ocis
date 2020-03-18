@@ -21,39 +21,39 @@ type MultiHostReverseProxy struct {
 func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	options := newOptions(opts...)
 
-	reverseProxy := &MultiHostReverseProxy{
+	rp := &MultiHostReverseProxy{
 		Directors: make(map[string]map[string]func(req *http.Request)),
 		logger:    options.Logger,
 	}
 
 	if options.Config.Policies == nil {
-		reverseProxy.logger.Info().Str("policies source", "runtime").Msg("policies provided at runtime")
+		rp.logger.Info().Str("source", "runtime").Msg("Policies")
 		options.Config.Policies = defaultPolicies()
 	} else {
-		reverseProxy.logger.Info().Str("policies source", "config file").Msg("policies provided from config file")
+		rp.logger.Info().Str("source", "file").Msg("Policies")
 	}
 
 	for _, policy := range options.Config.Policies {
 		for _, route := range policy.Routes {
-			reverseProxy.logger.Debug().Str("fwd: ", route.Endpoint)
+			rp.logger.Debug().Str("fwd: ", route.Endpoint)
 			uri, err := url.Parse(route.Backend)
 			if err != nil {
-				reverseProxy.logger.
+				rp.logger.
 					Fatal().
 					Err(err).
 					Msgf("malformed url: %v", route.Backend)
 			}
 
-			reverseProxy.logger.
+			rp.logger.
 				Debug().
 				Interface("route", route).
 				Msg("adding route")
 
-			reverseProxy.AddHost(policy.Name, uri, route)
+			rp.AddHost(policy.Name, uri, route)
 		}
 	}
 
-	return reverseProxy
+	return rp
 }
 
 func singleJoiningSlash(a, b string) string {
