@@ -27,7 +27,8 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	}
 
 	if options.Config.Policies == nil {
-		reverseProxy.logger.Debug().Msg("config file not provided")
+		reverseProxy.logger.Debug().Msg("config file not provided, using oCIS embedded set of redirects")
+		options.Config.Policies = defaultPolicies()
 	}
 
 	for _, policy := range options.Config.Policies {
@@ -74,6 +75,8 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 	p.Directors[policy][rt.Endpoint] = func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
+		// Apache deployments host addresses need to match on req.Host and req.URL.Host
+		// see https://stackoverflow.com/questions/34745654/golang-reverseproxy-with-apache2-sni-hostname-error
 		if rt.ApacheVHost {
 			req.Host = target.Host
 		}
@@ -122,4 +125,87 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 
 	// Call upstream ServeHTTP
 	p.ReverseProxy.ServeHTTP(w, r)
+}
+
+func defaultPolicies() []config.Policy {
+	return []config.Policy{
+		config.Policy{
+			Name: "reva",
+			Routes: []config.Route{
+				config.Route{
+					Endpoint: "/",
+					Backend:  "http://localhost:9100",
+				},
+				config.Route{
+					Endpoint: "/.well-known/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint: "/konnect/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint: "/signin/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint: "/ocs/",
+					Backend:  "http://localhost:9140",
+				},
+				config.Route{
+					Endpoint: "/remote.php/",
+					Backend:  "http://localhost:9140",
+				},
+				config.Route{
+					Endpoint: "/dav/",
+					Backend:  "http://localhost:9140",
+				},
+				config.Route{
+					Endpoint: "/webdav/",
+					Backend:  "http://localhost:9140",
+				},
+			},
+		},
+		config.Policy{
+			Name: "oc10",
+			Routes: []config.Route{
+				config.Route{
+					Endpoint: "/",
+					Backend:  "http://localhost:9100",
+				},
+				config.Route{
+					Endpoint: "/.well-known/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint: "/konnect/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint: "/signin/",
+					Backend:  "http://localhost:9130",
+				},
+				config.Route{
+					Endpoint:    "/ocs/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				config.Route{
+					Endpoint:    "/remote.php/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				config.Route{
+					Endpoint:    "/dav/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				config.Route{
+					Endpoint:    "/webdav/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+			},
+		},
+	}
 }
