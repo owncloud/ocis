@@ -1,13 +1,15 @@
 package svc
 
 import (
-	"net/http"
+	"context"
+	"time"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next Service, logger log.Logger) Service {
+func NewLogging(next v0proto.ThumbnailServiceHandler, logger log.Logger) v0proto.ThumbnailServiceHandler {
 	return logging{
 		next:   next,
 		logger: logger,
@@ -15,16 +17,27 @@ func NewLogging(next Service, logger log.Logger) Service {
 }
 
 type logging struct {
-	next   Service
+	next   v0proto.ThumbnailServiceHandler
 	logger log.Logger
 }
 
-// ServeHTTP implements the Service interface.
-func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	l.next.ServeHTTP(w, r)
-}
+// GetThumbnail implements the ThumbnailServiceHandler interface.
+func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	start := time.Now()
+	err := l.next.GetThumbnail(ctx, req, rsp)
 
-// Dummy implements the Service interface.
-func (l logging) Dummy(w http.ResponseWriter, r *http.Request) {
-	l.next.Dummy(w, r)
+	logger := l.logger.With().
+		Str("method", "Thumbnails.GetThumbnail").
+		Dur("duration", time.Since(start)).
+		Logger()
+
+	if err != nil {
+		logger.Warn().
+			Err(err).
+			Msg("Failed to execute")
+	} else {
+		logger.Debug().
+			Msg("")
+	}
+	return err
 }

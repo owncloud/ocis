@@ -1,52 +1,80 @@
 package svc
 
 import (
-	"net/http"
+	"context"
+	"fmt"
 
-	"github.com/go-chi/chi"
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	"github.com/owncloud/ocis-pkg/v2/log"
+	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
-// Service defines the extension handlers.
-type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Dummy(http.ResponseWriter, *http.Request)
-}
-
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 
-	m := chi.NewMux()
-	m.Use(options.Middleware...)
-
-	svc := Thumbnails{
-		config: options.Config,
-		mux:    m,
+	svc := Thumbnail{
+		manager: thumbnails.NewSimpleManager(
+			storage.NewFileSystemStorage(
+				options.Config.FileSystemStorage,
+				options.Logger,
+			),
+			options.Logger,
+		),
+		source: imgsource.NewWebDavSource(options.Config.WebDavSource),
+		logger: options.Logger,
 	}
-
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/", svc.Dummy)
-	})
 
 	return svc
 }
 
-// Thumbnails defines implements the business logic for Service.
-type Thumbnails struct {
-	config *config.Config
-	mux    *chi.Mux
+// Thumbnail implements the GRPC handler.
+type Thumbnail struct {
+	manager thumbnails.Manager
+	source  imgsource.Source
+	logger  log.Logger
 }
 
-// ServeHTTP implements the Service interface.
-func (g Thumbnails) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	g.mux.ServeHTTP(w, r)
-}
+// GetThumbnail retrieves a thumbnail for an image
+func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+	encoder := thumbnails.EncoderForType(req.Filetype.String())
+	if encoder == nil {
+		// TODO: better error responses
+		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
+	}
+	tCtx := thumbnails.Context{
+		Width:     int(req.Width),
+		Height:    int(req.Height),
+		ImagePath: req.Filepath,
+		Encoder:   encoder,
+		ETag:      req.Etag,
+	}
 
-// Dummy implements the Service interface.
-func (g Thumbnails) Dummy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
+	thumbnail := g.manager.GetStored(tCtx)
+	if thumbnail != nil {
+		rsp.Thumbnail = thumbnail
+		rsp.Mimetype = tCtx.Encoder.MimeType()
+		return nil
+	}
 
-	w.Write([]byte("Hello ocis-thumbnails!"))
+	auth := req.Authorization
+	sCtx := context.WithValue(ctx, imgsource.WebDavAuth, auth)
+	// TODO: clean up error handling
+	img, err := g.source.Get(sCtx, tCtx.ImagePath)
+	if err != nil {
+		return err
+	}
+	if img == nil {
+		return fmt.Errorf("could not retrieve image")
+	}
+	thumbnail, err = g.manager.Get(tCtx, img)
+	if err != nil {
+		return err
+	}
+
+	rsp.Thumbnail = thumbnail
+	rsp.Mimetype = tCtx.Encoder.MimeType()
+	return nil
 }

@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 )
@@ -42,7 +45,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9114",
+			Value:       "0.0.0.0:9189",
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -89,7 +92,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9114",
+			Value:       "0.0.0.0:9189",
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -114,25 +117,39 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Debug.Zpages,
 		},
 		&cli.StringFlag{
-			Name:        "http-addr",
-			Value:       "0.0.0.0:9110",
-			Usage:       "Address to bind http server",
-			EnvVars:     []string{"THUMBNAILS_HTTP_ADDR"},
-			Destination: &cfg.HTTP.Addr,
+			Name:        "grpc-name",
+			Value:       "thumbnails",
+			Usage:       "Name of the service",
+			EnvVars:     []string{"THUMBNAILS_GRPC_NAME"},
+			Destination: &cfg.Server.Name,
 		},
 		&cli.StringFlag{
-			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
-			Usage:       "Set the base namespace for the http namespace",
-			EnvVars:     []string{"THUMBNAILS_HTTP_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
+			Name:        "grpc-addr",
+			Value:       "0.0.0.0:9185",
+			Usage:       "Address to bind grpc server",
+			EnvVars:     []string{"THUMBNAILS_GRPC_ADDR"},
+			Destination: &cfg.Server.Address,
 		},
 		&cli.StringFlag{
-			Name:        "http-root",
-			Value:       "/",
-			Usage:       "Root path of http server",
-			EnvVars:     []string{"THUMBNAILS_HTTP_ROOT"},
-			Destination: &cfg.HTTP.Root,
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"THUMBNAILS_GRPC_NAMESPACE"},
+			Destination: &cfg.Server.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "filesystemstorage-root",
+			Value:       filepath.Join(os.TempDir(), "ocis-thumbnails/"),
+			Usage:       "Root path of the filesystem storage directory",
+			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
+			Destination: &cfg.FileSystemStorage.RootDirectory,
+		},
+		&cli.StringFlag{
+			Name:        "webdavsource-baseurl",
+			Value:       "http://localhost:9140/remote.php/webdav/",
+			Usage:       "Base url for a webdav api",
+			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
+			Destination: &cfg.WebDavSource.BaseURL,
 		},
 	}
 }

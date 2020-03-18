@@ -2,9 +2,9 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -17,8 +17,7 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis-thumbnails/pkg/metrics"
-	"github.com/owncloud/ocis-thumbnails/pkg/server/debug"
-	"github.com/owncloud/ocis-thumbnails/pkg/server/http"
+	"github.com/owncloud/ocis-thumbnails/pkg/server/grpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -30,10 +29,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -131,72 +126,22 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			{
-				server, err := http.Server(
-					http.Logger(logger),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
-				)
+			service := grpc.NewService(
+				grpc.Logger(logger),
+				grpc.Context(ctx),
+				grpc.Config(cfg),
+				grpc.Name(cfg.Server.Name),
+				grpc.Namespace(cfg.Server.Namespace),
+				grpc.Address(cfg.Server.Address),
+				grpc.Metrics(metrics),
+			)
 
-				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "http").
-						Msg("Failed to initialize server")
-
-					return err
-				}
-
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
-					logger.Info().
-						Str("transport", "http").
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
-				)
-
-				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "debug").
-						Msg("Failed to initialize server")
-
-					return err
-				}
-
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("transport", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("transport", "debug").
-							Msg("Shutting down server")
-					}
-				})
-			}
+			gr.Add(func() error {
+				return service.Run()
+			}, func(_ error) {
+				fmt.Println("shutting down grpc server")
+				cancel()
+			})
 
 			{
 				stop := make(chan os.Signal, 1)
