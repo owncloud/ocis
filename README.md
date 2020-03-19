@@ -48,7 +48,7 @@ After building the binary with the above steps and also setting up the prerequis
 ./bin/ocis server
 ```
 
-Open [http://localhost:9100](http://localhost:9100) and login using one of the demo accounts:
+Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
 
 ```console
 albert:relativity
