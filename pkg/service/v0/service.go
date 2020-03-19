@@ -77,6 +77,9 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 }
 
 func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
-	val := thumbnails.GetRequest_FileType_value[strings.ToUpper(ext)]
+	val, ok := thumbnails.GetRequest_FileType_value[strings.ToUpper(ext)]
+	if !ok {
+		return thumbnails.GetRequest_FileType(-1)
+	}
 	return thumbnails.GetRequest_FileType(val)
 }
