@@ -17,5 +17,3 @@ require (
 	github.com/spf13/viper v1.5.0
 	go.opencensus.io v0.22.2
 )
-
-replace github.com/owncloud/ocis-pkg/v2 => /home/corby/Development/go/src/github.com/owncloud/ocis-pkg
