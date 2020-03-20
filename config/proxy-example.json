@@ -37,6 +37,14 @@
         {
           "endpoint": "/webdav/",
           "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "http://localhost:9140"
         }
       ]
     },
@@ -78,6 +86,14 @@
           "endpoint": "/webdav/",
           "backend": "https://demo.owncloud.com",
           "apache-vhost": true
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "https://demo.owncloud.com"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "https://demo.owncloud.com"
         }
       ]
     }

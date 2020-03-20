@@ -166,6 +166,14 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/webdav/",
 					Backend:  "http://localhost:9140",
 				},
+				config.Route{
+					Endpoint: "/status.php",
+					Backend:  "http://localhost:9140",
+				},
+				config.Route{
+					Endpoint: "/index.php/",
+					Backend:  "http://localhost:9140",
+				},
 			},
 		},
 		config.Policy{
@@ -204,6 +212,16 @@ func defaultPolicies() []config.Policy {
 				},
 				config.Route{
 					Endpoint:    "/webdav/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				config.Route{
+					Endpoint:    "/status.php",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				config.Route{
+					Endpoint:    "/index.php/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
