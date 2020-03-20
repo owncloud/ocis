@@ -23,7 +23,7 @@ $HOME/.ocis
 ./config
 ```
 
-For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `ocis.json | yaml | toml ...`*.
+For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
 
 ### Envrionment variables
 
