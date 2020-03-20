@@ -56,6 +56,17 @@ marie:radioactivty
 richard:superfluidity
 ```
 
+## Running single extensions
+
+The list of available extensions can be found in the "Extensions" section when running `./bin/ocis`.
+
+For example to run the "phoenix" extension:
+```console
+./bin/ocis --log-level debug phoenix
+```
+
+⚠ do not use the **run** subcommand for running extensions
+
 ## Security
 
 If you find a security issue please contact security@owncloud.com first.
