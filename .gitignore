@@ -3,3 +3,5 @@ coverage.out
 /bin
 /dist
 /hugo
+*.key
+*crt

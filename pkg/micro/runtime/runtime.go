@@ -50,6 +50,7 @@ var (
 		"glauth",
 		"konnectd",
 		"proxy", // TODO rename this command. It collides with micro's `proxy`
+		"thumbnails",
 	}
 )
 
