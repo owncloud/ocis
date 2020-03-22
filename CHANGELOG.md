@@ -3,13 +3,16 @@
 ## Summary
 
 * Bugfix - Set correct flag type in the flagsets: [#75](https://github.com/owncloud/ocis-reva/issues/75)
+* Bugfix - We fixed a typo in the `REVA_LDAP_SCHEMA_MAIL` environment variable: [#113](https://github.com/owncloud/ocis-reva/pull/113)
 * Bugfix - Allow different namespaces for /webdav and /dav/files: [#68](https://github.com/owncloud/ocis-reva/pull/68)
 * Change - Use /home as default namespace: [#68](https://github.com/owncloud/ocis-reva/pull/68)
 * Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-reva/issues/1)
 * Change - Start multiple services with dedicated commands: [#6](https://github.com/owncloud/ocis-reva/issues/6)
 * Change - Storage providers now default to exposing data servers: [#89](https://github.com/owncloud/ocis-reva/issues/89)
+* Change - Default to running behind ocis-proxy: [#113](https://github.com/owncloud/ocis-reva/pull/113)
 * Enhancement - Expose owncloud storage driver config in flagset: [#87](https://github.com/owncloud/ocis-reva/issues/87)
 * Enhancement - Update reva to v0.0.2-0.20200212114015-0dbce24f7e8b: [#91](https://github.com/owncloud/ocis-reva/pull/91)
+* Enhancement - Allow configuring user sharing driver: [#115](https://github.com/owncloud/ocis-reva/pull/115)
 
 ## Details
 
@@ -21,6 +24,13 @@
 
    https://github.com/owncloud/ocis-reva/issues/75
    https://github.com/owncloud/ocis-reva/pull/76
+
+
+* Bugfix - We fixed a typo in the `REVA_LDAP_SCHEMA_MAIL` environment variable: [#113](https://github.com/owncloud/ocis-reva/pull/113)
+
+   It was misspelled as `REVA_LDAP_SCHEMA_Mail`.
+
+   https://github.com/owncloud/ocis-reva/pull/113
 
 
 * Bugfix - Allow different namespaces for /webdav and /dav/files: [#68](https://github.com/owncloud/ocis-reva/pull/68)
@@ -76,8 +86,8 @@
 
    The initial version would only allow us to use a set of reva configurations to start multiple
    services. We use a more opinionated set of commands to start dedicated services that allows us
-   to configure them individually. It allowcs us to switch eg. the user backend to LDAP and fully it
-   on the cli.
+   to configure them individually. It allows us to switch eg. the user backend to LDAP and fully use
+   it on the cli.
 
    https://github.com/owncloud/ocis-reva/issues/6
 
@@ -90,6 +100,20 @@
    `REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1` `REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1`
 
    https://github.com/owncloud/ocis-reva/issues/89
+
+
+* Change - Default to running behind ocis-proxy: [#113](https://github.com/owncloud/ocis-reva/pull/113)
+
+   We changed the default configuration to integrate better with ocis.
+
+   - We use ocis-glauth as the default ldap server on port 9125 with base `dc=example,dc=org`. - We
+   use a dedicated technical `reva` user to make ldap binds - Clients are supposed to use the
+   ocis-proxy endpoint `https://localhost:9200` - We removed unneeded ocis configuration
+   from the frontend which no longer serves an oidc provider. - We changed the default user
+   OpaqueID attribute from `sub` to `preferred_username`. The latter is a claim populated by
+   konnectd that can also be used by the reva ldap user manager to look up users by their OpaqueId
+
+   https://github.com/owncloud/ocis-reva/pull/113
 
 
 * Enhancement - Expose owncloud storage driver config in flagset: [#87](https://github.com/owncloud/ocis-reva/issues/87)
@@ -116,4 +140,12 @@
 
    https://github.com/owncloud/ocis-reva/pull/91
    related:
+
+
+* Enhancement - Allow configuring user sharing driver: [#115](https://github.com/owncloud/ocis-reva/pull/115)
+
+   We now default to `json` which persists shares in the sharing manager in a json file instead of an
+   in memory db.
+
+   https://github.com/owncloud/ocis-reva/pull/115
 
