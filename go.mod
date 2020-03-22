@@ -23,7 +23,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.3.0
 	github.com/owncloud/ocis-pkg/v2 v2.1.0
 	github.com/owncloud/ocis-proxy v0.1.0
-	github.com/owncloud/ocis-reva v0.0.0-20200318210849-075c6608b85f
+	github.com/owncloud/ocis-reva v0.1.0
 	github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4
 	github.com/owncloud/ocis-webdav v0.0.0-20200319135906-711d1be75a2b
 	go.opencensus.io v0.22.3
