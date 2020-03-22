@@ -86,7 +86,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "users-driver",
-			Value:       "demo",
+			Value:       "ldap",
 			Usage:       "user driver: 'demo', 'json' or 'ldap'",
 			EnvVars:     []string{"REVA_USERS_DRIVER"},
 			Destination: &cfg.Reva.Users.Driver,
@@ -110,14 +110,14 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:        "ldap-port",
-			Value:       636,
+			Value:       9126,
 			Usage:       "LDAP port",
 			EnvVars:     []string{"REVA_LDAP_PORT"},
 			Destination: &cfg.Reva.LDAP.Port,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       "dc=owncloud,dc=com",
+			Value:       "dc=example,dc=org",
 			Usage:       "LDAP basedn",
 			EnvVars:     []string{"REVA_LDAP_BASE_DN"},
 			Destination: &cfg.Reva.LDAP.BaseDN,
@@ -138,14 +138,14 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       "cn=admin,dc=owncloud,dc=com",
+			Value:       "cn=reva,ou=sysusers,dc=example,dc=org",
 			Usage:       "LDAP bind dn",
 			EnvVars:     []string{"REVA_LDAP_BIND_DN"},
 			Destination: &cfg.Reva.LDAP.BindDN,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-password",
-			Value:       "admin",
+			Value:       "reva",
 			Usage:       "LDAP bind password",
 			EnvVars:     []string{"REVA_LDAP_BIND_PASSWORD"},
 			Destination: &cfg.Reva.LDAP.BindPassword,
@@ -162,12 +162,12 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "ldap-schema-mail",
 			Value:       "mail",
 			Usage:       "LDAP schema mail",
-			EnvVars:     []string{"REVA_LDAP_SCHEMA_Mail"},
+			EnvVars:     []string{"REVA_LDAP_SCHEMA_MAIL"},
 			Destination: &cfg.Reva.LDAP.Schema.Mail,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-schema-displayName",
-			Value:       "displayName",
+			Value:       "sn",
 			Usage:       "LDAP schema displayName",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_DISPLAYNAME"},
 			Destination: &cfg.Reva.LDAP.Schema.DisplayName,

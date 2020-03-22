@@ -131,20 +131,6 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageOC.Driver,
 		},
 		&cli.StringFlag{
-			Name:        "path-wrapper",
-			Value:       "",
-			Usage:       "path wrapper",
-			EnvVars:     []string{"REVA_STORAGE_OC_PATH_WRAPPER"},
-			Destination: &cfg.Reva.StorageOC.PathWrapper,
-		},
-		&cli.StringFlag{
-			Name:        "path-wrapper-context-prefix",
-			Value:       "",
-			Usage:       "path wrapper context prefix",
-			EnvVars:     []string{"REVA_STORAGE_OC_PATH_WRAPPER_CONTEXT_PREFIX"},
-			Destination: &cfg.Reva.StorageOC.PathWrapperContext.Prefix,
-		},
-		&cli.StringFlag{
 			Name:        "mount-path",
 			Value:       "/oc",
 			Usage:       "mount path",
@@ -173,11 +159,11 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageOC.DataServerURL,
 		},
 		&cli.BoolFlag{
-			Name: "enable-home-creation",
-			// Value:       true, // TODO jfd we may need to default to true here so the new webdav endpoint will autocreate user homes as well
+			Name:        "enable-home-creation",
+			Value:       false,
 			Usage:       "if enabled home dirs will be automatically created",
-			EnvVars:     []string{"REVA_STORAGE_HOME_ENABLE_HOME_CREATION"},
-			Destination: &cfg.Reva.StorageHome.EnableHomeCreation,
+			EnvVars:     []string{"REVA_STORAGE_OC_ENABLE_HOME_CREATION"},
+			Destination: &cfg.Reva.StorageOC.EnableHomeCreation,
 		},
 
 		// Storage drivers
@@ -317,6 +303,13 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "the address of the redis server",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_REDIS_ADDR"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Redis,
+		},
+		&cli.BoolFlag{
+			Name:        "storage-owncloud-enable-home",
+			Value:       false,
+			Usage:       "enable the creation of home storages",
+			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.OwnCloud.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",

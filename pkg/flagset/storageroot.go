@@ -131,20 +131,6 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageRoot.Driver,
 		},
 		&cli.StringFlag{
-			Name:        "path-wrapper",
-			Value:       "",
-			Usage:       "path wrapper",
-			EnvVars:     []string{"REVA_STORAGE_ROOT_PATH_WRAPPER"},
-			Destination: &cfg.Reva.StorageRoot.PathWrapper,
-		},
-		&cli.StringFlag{
-			Name:        "path-wrapper-context-prefix",
-			Value:       "",
-			Usage:       "path wrapper context prefix",
-			EnvVars:     []string{"REVA_STORAGE_ROOT_PATH_WRAPPER_CONTEXT_PREFIX"},
-			Destination: &cfg.Reva.StorageRoot.PathWrapperContext.Prefix,
-		},
-		&cli.StringFlag{
 			Name:        "mount-path",
 			Value:       "/",
 			Usage:       "mount path",
@@ -315,6 +301,13 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "the address of the redis server",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_REDIS_ADDR"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Redis,
+		},
+		&cli.BoolFlag{
+			Name:        "storage-owncloud-enable-home",
+			Value:       false,
+			Usage:       "enable the creation of home storages",
+			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.OwnCloud.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",

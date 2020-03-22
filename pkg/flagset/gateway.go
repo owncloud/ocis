@@ -170,6 +170,14 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		// storage registry
 
 		&cli.StringFlag{
+			Name:        "storage-home-provider",
+			Value:       "/home",
+			Usage:       "mount point of the storage provider for user homes in the global namespace",
+			EnvVars:     []string{"REVA_STORAGE_HOME_PROVIDER"},
+			Destination: &cfg.Reva.Gateway.HomeProvider,
+		},
+
+		&cli.StringFlag{
 			Name:        "frontend-url",
 			Value:       "localhost:9140",
 			Usage:       "URL to use for the reva service",

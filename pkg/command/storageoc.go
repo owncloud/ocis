@@ -107,7 +107,8 @@ func StorageOC(cfg *config.Config) *cli.Command {
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
-										"layout":        cfg.Reva.Storages.OwnCloud.Layout,
+										"enable_home":   cfg.Reva.Storages.OwnCloud.EnableHome,
+										"user_layout":   cfg.Reva.Storages.OwnCloud.Layout,
 									},
 									"s3": map[string]interface{}{
 										"region":     cfg.Reva.Storages.S3.Region,
@@ -121,12 +122,6 @@ func StorageOC(cfg *config.Config) *cli.Command {
 								"mount_path":         cfg.Reva.StorageOC.MountPath,
 								"mount_id":           cfg.Reva.StorageOC.MountID,
 								"expose_data_server": cfg.Reva.StorageOC.ExposeDataServer,
-								"path_wrapper":       cfg.Reva.StorageOC.PathWrapper,
-								"path_wrappers": map[string]interface{}{
-									"context": map[string]interface{}{
-										"prefix": cfg.Reva.StorageOC.PathWrapperContext.Prefix,
-									},
-								},
 								// TODO use cfg.Reva.SStorageOCData.URL, ?
 								"data_server_url":      cfg.Reva.StorageOC.DataServerURL,
 								"enable_home_creation": cfg.Reva.StorageOC.EnableHomeCreation,

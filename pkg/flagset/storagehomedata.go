@@ -282,6 +282,13 @@ func StorageHomeDataWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_REDIS_ADDR"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Redis,
 		},
+		&cli.BoolFlag{
+			Name:        "storage-owncloud-enable-home",
+			Value:       true,
+			Usage:       "enable the creation of home storages",
+			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.OwnCloud.EnableHome,
+		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",
 			Value:       "{{.Username}}",

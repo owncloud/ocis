@@ -86,7 +86,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "oidc-issuer",
-			Value:       "https://localhost:9130",
+			Value:       "https://localhost:9200",
 			Usage:       "OIDC issuer",
 			EnvVars:     []string{"REVA_OIDC_ISSUER"},
 			Destination: &cfg.Reva.OIDC.Issuer,
@@ -99,8 +99,14 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.OIDC.Insecure,
 		},
 		&cli.StringFlag{
-			Name:        "oidc-id-claim",
-			Value:       "sub", // sub is stable and defined as unique. the user manager needs to take care of the sub to user metadata lookup
+			Name: "oidc-id-claim",
+			// preferred_username is a workaround
+			// the user manager needs to take care of the sub to user metadata lookup, which ldap cannot do
+			// TODO sub is stable and defined as unique.
+			// AFAICT we want to use the account id from ocis-accounts
+			// TODO add an ocis middleware to reva that changes the users opaqueid?
+			// TODO add an ocis-accounts backed user manager
+			Value:       "preferred_username",
 			Usage:       "OIDC id claim",
 			EnvVars:     []string{"REVA_OIDC_ID_CLAIM"},
 			Destination: &cfg.Reva.OIDC.IDClaim,

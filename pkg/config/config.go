@@ -22,6 +22,16 @@ type Gateway struct {
 	CommitShareToStorageRef    bool
 	ShareFolder                string
 	DisableHomeCreationOnLogin bool
+	// include the home folder config for the storage registry
+	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
+	HomeProvider string
+}
+
+// Sharing defines the available sharing configuration.
+type Sharing struct {
+	Port
+	UserDriver   string
+	PublicDriver string
 }
 
 // Port defines the available port configuration.
@@ -53,17 +63,10 @@ type Users struct {
 	JSON   string
 }
 
-// PathWrapperContext defines the available PathWrapperContext configuration.
-type PathWrapperContext struct {
-	Prefix string
-}
-
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
 	Driver             string
-	PathWrapper        string
-	PathWrapperContext PathWrapperContext
 	MountPath          string
 	MountID            string
 	ExposeDataServer   bool
@@ -147,9 +150,10 @@ type DriverLocal struct {
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
 type DriverOwnCloud struct {
 	Datadirectory string
-	Scan          bool
-	Redis         string
 	Layout        string
+	Redis         string
+	Scan          bool
+	EnableHome    bool
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
@@ -212,7 +216,7 @@ type Reva struct {
 	Users             Users
 	AuthBasic         Port
 	AuthBearer        Port
-	Sharing           Port
+	Sharing           Sharing
 	StorageRoot       StoragePort
 	StorageHome       StoragePort
 	StorageHomeData   StoragePort

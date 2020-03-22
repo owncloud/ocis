@@ -120,7 +120,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"driver": "static",
 								"drivers": map[string]interface{}{
 									"static": map[string]interface{}{
-										"home_provider": cfg.Reva.StorageHome.MountPath,
+										"home_provider": cfg.Reva.Gateway.HomeProvider,
 										"rules": map[string]interface{}{
 											cfg.Reva.StorageRoot.MountPath: cfg.Reva.StorageRoot.URL,
 											cfg.Reva.StorageRoot.MountID:   cfg.Reva.StorageRoot.URL,

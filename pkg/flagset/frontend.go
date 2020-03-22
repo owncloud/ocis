@@ -109,32 +109,6 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
 		},
 
-		// OIDC
-
-		&cli.StringFlag{
-			Name:        "oidc-issuer",
-			Value:       "https://localhost:9130",
-			Usage:       "OIDC issuer",
-			EnvVars:     []string{"REVA_OIDC_ISSUER"},
-			Destination: &cfg.Reva.OIDC.Issuer,
-		},
-		&cli.BoolFlag{
-			Name:        "oidc-insecure",
-			Value:       true,
-			Usage:       "OIDC allow insecure communication",
-			EnvVars:     []string{"REVA_OIDC_INSECURE"},
-			Destination: &cfg.Reva.OIDC.Insecure,
-		},
-		&cli.StringFlag{
-			Name:        "oidc-id-claim",
-			Value:       "sub", // sub is stable and defined as unique. the user manager needs to take care of the sub to user metadata lookup
-			Usage:       "OIDC id claim",
-			EnvVars:     []string{"REVA_OIDC_ID_CLAIM"},
-			Destination: &cfg.Reva.OIDC.IDClaim,
-		},
-
-		// TODO allow configuring clients
-
 		// Services
 
 		// Frontend
@@ -169,8 +143,8 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   cli.NewStringSlice("datagateway", "wellknown", "oidcprovider", "ocdav", "ocs"),
-			Usage:   "--service datagateway [--service wellknown]",
+			Value:   cli.NewStringSlice("datagateway", "ocdav", "ocs"),
+			Usage:   "--service ocdav [--service ocs]",
 			EnvVars: []string{"REVA_FRONTEND_SERVICES"},
 		},
 

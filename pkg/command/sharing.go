@@ -84,10 +84,10 @@ func Sharing(cfg *config.Config) *cli.Command {
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"usershareprovider": map[string]interface{}{
-								"driver": "memory",
+								"driver": cfg.Reva.Sharing.UserDriver,
 							},
 							"publicshareprovider": map[string]interface{}{
-								"driver": "memory",
+								"driver": cfg.Reva.Sharing.PublicDriver,
 							},
 						},
 					},
