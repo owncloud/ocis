@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -13,7 +14,7 @@ import (
 // MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
-	Directors map[string]map[string]func(req *http.Request)
+	Directors map[string]map[config.RouteType]map[string]func(req *http.Request)
 	logger    log.Logger
 }
 
@@ -22,7 +23,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	options := newOptions(opts...)
 
 	rp := &MultiHostReverseProxy{
-		Directors: make(map[string]map[string]func(req *http.Request)),
+		Directors: make(map[string]map[config.RouteType]map[string]func(req *http.Request)),
 		logger:    options.Logger,
 	}
 
@@ -72,9 +73,16 @@ func singleJoiningSlash(a, b string) string {
 func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt config.Route) {
 	targetQuery := target.RawQuery
 	if p.Directors[policy] == nil {
-		p.Directors[policy] = make(map[string]func(req *http.Request))
+		p.Directors[policy] = make(map[config.RouteType]map[string]func(req *http.Request))
 	}
-	p.Directors[policy][rt.Endpoint] = func(req *http.Request) {
+	routeType := config.DefaultRouteType
+	if rt.Type != "" {
+		routeType = rt.Type
+	}
+	if p.Directors[policy][routeType] == nil {
+		p.Directors[policy][routeType] = make(map[string]func(req *http.Request))
+	}
+	p.Directors[policy][routeType][rt.Endpoint] = func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
 		// Apache deployments host addresses need to match on req.Host and req.URL.Host
@@ -107,26 +115,75 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 			Msgf("policy %v is not configured", policy)
 	}
 
-	for k := range p.Directors[policy] {
-		if strings.HasPrefix(r.URL.Path, k) && k != "/" {
-			p.Director = p.Directors[policy][k]
-			hit = true
-			p.logger.
-				Debug().
-				Str("policy", policy).
-				Str("prefix", k).
-				Str("path", r.URL.Path).
-				Msg("director found")
+	for i := 0; i < len(config.RouteTypes) && !hit; i++ {
+		routeType := config.RouteTypes[i]
+		var handler func(string, url.URL) bool
+		switch routeType {
+		case config.QueryRoute:
+			handler = p.queryRouteHandler
+		case config.RegexRoute:
+			handler = p.regexRouteHandler
+		case config.PrefixRoute:
+			fallthrough
+		default:
+			handler = p.prefixRouteHandler
+		}
+		for endpoint := range p.Directors[policy][routeType] {
+			if handler(endpoint, *r.URL) {
+				p.Director = p.Directors[policy][routeType][endpoint]
+				hit = true
+				p.logger.
+					Info().
+					Str("policy", policy).
+					Str("prefix", endpoint).
+					Str("path", r.URL.Path).
+					Str("routeType", string(routeType)).
+					Msg("director found")
+				break
+			}
 		}
 	}
 
 	// override default director with root. If any
-	if !hit && p.Directors[policy]["/"] != nil {
-		p.Director = p.Directors[policy]["/"]
+	if !hit && p.Directors[policy][config.PrefixRoute]["/"] != nil {
+		p.Director = p.Directors[policy][config.PrefixRoute]["/"]
 	}
 
 	// Call upstream ServeHTTP
 	p.ReverseProxy.ServeHTTP(w, r)
+}
+
+func (p MultiHostReverseProxy) queryRouteHandler(endpoint string, target url.URL) bool {
+	u, _ := url.Parse(endpoint)
+	if strings.HasPrefix(target.Path, u.Path) && endpoint != "/" {
+		query := u.Query()
+		if len(query) != 0 {
+			rQuery := target.Query()
+			match := true
+			for k := range query {
+				v := query.Get(k)
+				rv := rQuery.Get(k)
+				if rv != v {
+					match = false
+					break
+				}
+			}
+			return match
+		}
+	}
+	return false
+}
+
+func (p *MultiHostReverseProxy) regexRouteHandler(endpoint string, target url.URL) bool {
+	matched, err := regexp.MatchString(endpoint, target.String())
+	if err != nil {
+		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", endpoint)
+	}
+	return matched
+}
+
+func (p *MultiHostReverseProxy) prefixRouteHandler(endpoint string, target url.URL) bool {
+	return strings.HasPrefix(target.Path, endpoint) && endpoint != "/"
 }
 
 func defaultPolicies() []config.Policy {
@@ -153,6 +210,11 @@ func defaultPolicies() []config.Policy {
 				config.Route{
 					Endpoint: "/ocs/",
 					Backend:  "http://localhost:9140",
+				},
+				config.Route{
+					Type:     config.QueryRoute,
+					Endpoint: "/remote.php/?preview=1",
+					Backend:  "http://localhost:9115",
 				},
 				config.Route{
 					Endpoint: "/remote.php/",

@@ -44,10 +44,30 @@ type Policy struct {
 
 // Route define forwarding routes
 type Route struct {
+	Type        RouteType
 	Endpoint    string
 	Backend     string
 	ApacheVHost bool `mapstructure:"apache-vhost"`
 }
+
+// RouteType defines the type of a route
+type RouteType string
+
+const (
+	// PrefixRoute are routes matched by a prefix
+	PrefixRoute RouteType = "Prefix"
+	// QueryRoute are routes machted by a prefix and query parameters
+	QueryRoute RouteType = "Query"
+	// RegexRoute are routes matched by a pattern
+	RegexRoute RouteType = "Regex"
+	// DefaultRouteType is the PrefixRoute
+	DefaultRouteType RouteType = PrefixRoute
+)
+
+var (
+	// RouteTypes is an array of the available route types
+	RouteTypes []RouteType = []RouteType{QueryRoute, RegexRoute, PrefixRoute}
+)
 
 // Config combines all available configuration parts.
 type Config struct {
