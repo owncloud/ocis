@@ -1,4 +1,26 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for ocis-proxy unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...master
+
+## Summary
+
+* Enhancement - Proxy client urls in default configuration: [#19](https://github.com/owncloud/ocis-proxy/issues/19)
+
+## Details
+
+* Enhancement - Proxy client urls in default configuration: [#19](https://github.com/owncloud/ocis-proxy/issues/19)
+
+   Proxy /status.php and index.php/*
+
+   https://github.com/owncloud/ocis-proxy/issues/19
+
+# Changelog for [0.1.0] (2020-03-18)
+
+The following sections list the changes for ocis-proxy 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-proxy/compare/500e303cb544ed93d84153f01219d77eeee44929...v0.1.0
 
 ## Summary
 
