@@ -52,6 +52,25 @@ func TestInitWithMultipleResolutions(t *testing.T) {
 	}
 }
 
+func TestInitWithMultipleResolutionsShouldBeSorted(t *testing.T) {
+	rStrs := []string{"32x32", "64x64", "16x16", "128x128"}
+	rs, err := Init(rStrs)
+	if err != nil {
+		t.Errorf("Init with valid parameter should not fail. Error: %s.\n", err.Error())
+	}
+
+	for i := 0; i < len(rs)-1; i++ {
+		current := rs[i]
+		currentSize := current.Width * current.Height
+		next := rs[i]
+		nextSize := next.Width * next.Height
+
+		if currentSize > nextSize {
+			t.Error("Resolutions are not sorted.")
+		}
+
+	}
+}
 func TestClosestMatchWithEmptyResolutions(t *testing.T) {
 	rs, _ := Init(nil)
 	width := 24
@@ -66,12 +85,12 @@ func TestClosestMatchWithEmptyResolutions(t *testing.T) {
 func TestClosestMatch(t *testing.T) {
 	rs, _ := Init([]string{"16x16", "24x24", "32x32", "64x64", "128x128"})
 	table := [][]int{
-		[]int{17, 17, 16, 16},
-		[]int{12, 17, 16, 16},
+		[]int{17, 17, 24, 24},
+		[]int{12, 17, 24, 24},
 		[]int{24, 24, 24, 24},
 		[]int{20, 20, 24, 24},
-		[]int{20, 80, 64, 64},
-		[]int{80, 20, 64, 64},
+		[]int{20, 80, 128, 128},
+		[]int{80, 20, 128, 128},
 		[]int{48, 48, 64, 64},
 		[]int{1024, 1024, 128, 128},
 	}

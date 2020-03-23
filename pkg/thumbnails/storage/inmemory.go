@@ -32,7 +32,7 @@ func (s InMemory) Set(key string, thumbnail []byte) error {
 func (s InMemory) BuildKey(ctx Context) string {
 	parts := []string{
 		ctx.ETag,
-		string(ctx.Width) + "x" + string(ctx.Height),
+		ctx.Resolution.String(),
 		strings.Join(ctx.Types, ","),
 	}
 	return strings.Join(parts, "+")

@@ -6,16 +6,16 @@ import (
 
 	"github.com/nfnt/resize"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolution"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
 // Context bundles information needed to generate a thumbnail for afile
 type Context struct {
-	Width     int
-	Height    int
-	ImagePath string
-	Encoder   Encoder
-	ETag      string
+	Resolution resolution.Resolution
+	ImagePath  string
+	Encoder    Encoder
+	ETag       string
 }
 
 // Manager is responsible for generating thumbnails
@@ -69,16 +69,15 @@ func (s SimpleManager) GetStored(ctx Context) []byte {
 }
 
 func (s SimpleManager) generate(ctx Context, img image.Image) image.Image {
-	thumbnail := resize.Thumbnail(uint(ctx.Width), uint(ctx.Height), img, resize.Lanczos2)
+	thumbnail := resize.Thumbnail(uint(ctx.Resolution.Width), uint(ctx.Resolution.Height), img, resize.Lanczos2)
 	return thumbnail
 }
 
 func mapToStorageContext(ctx Context) storage.Context {
 	sCtx := storage.Context{
-		ETag:   ctx.ETag,
-		Width:  ctx.Width,
-		Height: ctx.Height,
-		Types:  ctx.Encoder.Types(),
+		ETag:       ctx.ETag,
+		Resolution: ctx.Resolution,
+		Types:      ctx.Encoder.Types(),
 	}
 	return sCtx
 }

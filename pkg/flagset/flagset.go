@@ -142,14 +142,20 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       filepath.Join(os.TempDir(), "ocis-thumbnails/"),
 			Usage:       "Root path of the filesystem storage directory",
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
-			Destination: &cfg.FileSystemStorage.RootDirectory,
+			Destination: &cfg.Thumbnail.FileSystemStorage.RootDirectory,
 		},
 		&cli.StringFlag{
 			Name:        "webdavsource-baseurl",
 			Value:       "http://localhost:9140/remote.php/webdav/",
 			Usage:       "Base url for a webdav api",
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
-			Destination: &cfg.WebDavSource.BaseURL,
+			Destination: &cfg.Thumbnail.WebDavSource.BaseURL,
+		},
+		&cli.StringSliceFlag{
+			Name:    "thumbnail-resolution",
+			Value:   cli.NewStringSlice("16x16", "32x32", "64x64", "128x128"),
+			Usage:   "--thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]",
+			EnvVars: []string{"THUMBNAILS_RESOLUTIONs"},
 		},
 	}
 }

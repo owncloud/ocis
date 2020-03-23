@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
@@ -68,7 +67,7 @@ func (s FileSystem) Set(key string, img []byte) error {
 func (s FileSystem) BuildKey(ctx Context) string {
 	etag := ctx.ETag
 	filetype := ctx.Types[0]
-	filename := strconv.Itoa(ctx.Width) + "x" + strconv.Itoa(ctx.Height) + "." + filetype
+	filename := ctx.Resolution.String() + "." + filetype
 
 	key := new(bytes.Buffer)
 	key.WriteString(etag[:2])

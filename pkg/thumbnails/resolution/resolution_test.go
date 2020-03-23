@@ -9,6 +9,20 @@ func TestParseWithEmptyString(t *testing.T) {
 	}
 }
 
+func TestParseWithInvalidWidth(t *testing.T) {
+	_, err := Parse("invalidx42")
+	if err == nil {
+		t.Error("Parse with invalid width should return an error.")
+	}
+}
+
+func TestParseWithInvalidHeight(t *testing.T) {
+	_, err := Parse("42xinvalid")
+	if err == nil {
+		t.Error("Parse with invalid height should return an error.")
+	}
+}
+
 func TestParse(t *testing.T) {
 	rStr := "42x23"
 	r, _ := Parse(rStr)

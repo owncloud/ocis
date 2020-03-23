@@ -8,23 +8,29 @@ import (
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolution"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
 // NewService returns a service implementation for Service.
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
-
+	logger := options.Logger
+	resolutions, err := resolution.Init(options.Config.Thumbnail.Resolutions)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
+	}
 	svc := Thumbnail{
 		manager: thumbnails.NewSimpleManager(
 			storage.NewFileSystemStorage(
-				options.Config.FileSystemStorage,
-				options.Logger,
+				options.Config.Thumbnail.FileSystemStorage,
+				logger,
 			),
-			options.Logger,
+			logger,
 		),
-		source: imgsource.NewWebDavSource(options.Config.WebDavSource),
-		logger: options.Logger,
+		resolutions: resolutions,
+		source:      imgsource.NewWebDavSource(options.Config.Thumbnail.WebDavSource),
+		logger:      logger,
 	}
 
 	return svc
@@ -32,9 +38,10 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	manager thumbnails.Manager
-	source  imgsource.Source
-	logger  log.Logger
+	manager     thumbnails.Manager
+	resolutions resolution.Resolutions
+	source      imgsource.Source
+	logger      log.Logger
 }
 
 // GetThumbnail retrieves a thumbnail for an image
@@ -44,12 +51,12 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		// TODO: better error responses
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
+	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
 	tCtx := thumbnails.Context{
-		Width:     int(req.Width),
-		Height:    int(req.Height),
-		ImagePath: req.Filepath,
-		Encoder:   encoder,
-		ETag:      req.Etag,
+		Resolution: r,
+		ImagePath:  req.Filepath,
+		Encoder:    encoder,
+		ETag:       req.Etag,
 	}
 
 	thumbnail := g.manager.GetStored(tCtx)
