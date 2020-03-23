@@ -157,10 +157,10 @@ This popped up when I tried to add `marie` as a collaborator in phoenix. That tr
 </ocs>
 ```
 
-{{< hint [info] >}}
+{{< hint info >}}
 The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
 {{< /hint >}}
-{{< hint [danger] >}}
+{{< hint danger >}}
 TODO add ocis cli tool to obtain a bearer token.
 {{< /hint >}}
 
@@ -172,7 +172,7 @@ We also have a few interesting log entries:
 10:43PM ERR home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/http/services/owncloud/ocs/reqres.go:94 > error sending a grpc stat request error="rpc error: code = Unknown desc = gateway: error calling Stat: rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp [::1]:9152: connect: connection refused\"" pid=17832 pkg=rhttp traceid=b4eb9a9f45921f7d3632523ca32a42b0
 ```
 
-{{< hint [danger] >}}
+{{< hint danger >}}
 TODO return the trace id in the response so we can correlate easier. For reva tracked in https://github.com/cs3org/reva/issues/587
 {{< /hint >}}
 
@@ -209,7 +209,7 @@ replace github.com/owncloud/ocis-reva => ../ocis-reva
 // also use the local reva repo
 replace github.com/cs3org/reva => ../reva
 ```
-{{< hint [info] >}}
+{{< hint info >}}
 The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
 {{< /hint >}}
 
