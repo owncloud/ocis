@@ -6,9 +6,18 @@ The following sections list the changes for ocis-proxy unreleased.
 
 ## Summary
 
+* Change - Route requests based on regex or query parameters: [#21](https://github.com/owncloud/ocis-proxy/issues/21)
 * Enhancement - Proxy client urls in default configuration: [#19](https://github.com/owncloud/ocis-proxy/issues/19)
 
 ## Details
+
+* Change - Route requests based on regex or query parameters: [#21](https://github.com/owncloud/ocis-proxy/issues/21)
+
+   Some requests needed to be distinguished based on a pattern or a query parameter. We've
+   implemented the functionality to route requests based on different conditions.
+
+   https://github.com/owncloud/ocis-proxy/issues/21
+
 
 * Enhancement - Proxy client urls in default configuration: [#19](https://github.com/owncloud/ocis-proxy/issues/19)
 
