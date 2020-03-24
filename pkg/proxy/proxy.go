@@ -115,10 +115,10 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 			Msgf("policy %v is not configured", policy)
 	}
 
-	for i := 0; i < len(config.RouteTypes) && !hit; i++ {
-		routeType := config.RouteTypes[i]
+Loop:
+	for _, rt := range config.RouteTypes {
 		var handler func(string, url.URL) bool
-		switch routeType {
+		switch rt {
 		case config.QueryRoute:
 			handler = p.queryRouteMatcher
 		case config.RegexRoute:
@@ -128,18 +128,18 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		default:
 			handler = p.prefixRouteMatcher
 		}
-		for endpoint := range p.Directors[policy][routeType] {
+		for endpoint := range p.Directors[policy][rt] {
 			if handler(endpoint, *r.URL) {
-				p.Director = p.Directors[policy][routeType][endpoint]
+				p.Director = p.Directors[policy][rt][endpoint]
 				hit = true
 				p.logger.
 					Debug().
 					Str("policy", policy).
 					Str("prefix", endpoint).
 					Str("path", r.URL.Path).
-					Str("routeType", string(routeType)).
+					Str("routeType", string(rt)).
 					Msg("director found")
-				break
+				break Loop
 			}
 		}
 	}
