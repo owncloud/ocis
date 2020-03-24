@@ -85,6 +85,7 @@ func TestClosestMatchWithEmptyResolutions(t *testing.T) {
 func TestClosestMatch(t *testing.T) {
 	rs, _ := Init([]string{"16x16", "24x24", "32x32", "64x64", "128x128"})
 	table := [][]int{
+		// width, height, expectedWidth, expectedHeight
 		[]int{17, 17, 24, 24},
 		[]int{12, 17, 24, 24},
 		[]int{24, 24, 24, 24},
