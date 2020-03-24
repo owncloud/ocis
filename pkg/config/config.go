@@ -55,11 +55,11 @@ type RouteType string
 
 const (
 	// PrefixRoute are routes matched by a prefix
-	PrefixRoute RouteType = "Prefix"
+	PrefixRoute RouteType = "prefix"
 	// QueryRoute are routes machted by a prefix and query parameters
-	QueryRoute RouteType = "Query"
+	QueryRoute RouteType = "query"
 	// RegexRoute are routes matched by a pattern
-	RegexRoute RouteType = "Regex"
+	RegexRoute RouteType = "regex"
 	// DefaultRouteType is the PrefixRoute
 	DefaultRouteType RouteType = PrefixRoute
 )

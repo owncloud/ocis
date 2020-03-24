@@ -120,20 +120,20 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		var handler func(string, url.URL) bool
 		switch routeType {
 		case config.QueryRoute:
-			handler = p.queryRouteHandler
+			handler = p.queryRouteMatcher
 		case config.RegexRoute:
-			handler = p.regexRouteHandler
+			handler = p.regexRouteMatcher
 		case config.PrefixRoute:
 			fallthrough
 		default:
-			handler = p.prefixRouteHandler
+			handler = p.prefixRouteMatcher
 		}
 		for endpoint := range p.Directors[policy][routeType] {
 			if handler(endpoint, *r.URL) {
 				p.Director = p.Directors[policy][routeType][endpoint]
 				hit = true
 				p.logger.
-					Info().
+					Debug().
 					Str("policy", policy).
 					Str("prefix", endpoint).
 					Str("path", r.URL.Path).
@@ -153,7 +153,7 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 	p.ReverseProxy.ServeHTTP(w, r)
 }
 
-func (p MultiHostReverseProxy) queryRouteHandler(endpoint string, target url.URL) bool {
+func (p MultiHostReverseProxy) queryRouteMatcher(endpoint string, target url.URL) bool {
 	u, _ := url.Parse(endpoint)
 	if strings.HasPrefix(target.Path, u.Path) && endpoint != "/" {
 		query := u.Query()
@@ -174,7 +174,7 @@ func (p MultiHostReverseProxy) queryRouteHandler(endpoint string, target url.URL
 	return false
 }
 
-func (p *MultiHostReverseProxy) regexRouteHandler(endpoint string, target url.URL) bool {
+func (p *MultiHostReverseProxy) regexRouteMatcher(endpoint string, target url.URL) bool {
 	matched, err := regexp.MatchString(endpoint, target.String())
 	if err != nil {
 		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", endpoint)
@@ -182,7 +182,7 @@ func (p *MultiHostReverseProxy) regexRouteHandler(endpoint string, target url.UR
 	return matched
 }
 
-func (p *MultiHostReverseProxy) prefixRouteHandler(endpoint string, target url.URL) bool {
+func (p *MultiHostReverseProxy) prefixRouteMatcher(endpoint string, target url.URL) bool {
 	return strings.HasPrefix(target.Path, endpoint) && endpoint != "/"
 }
 
