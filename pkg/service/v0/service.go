@@ -8,7 +8,7 @@ import (
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolution"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolutions"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
@@ -16,7 +16,7 @@ import (
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 	logger := options.Logger
-	resolutions, err := resolution.Init(options.Config.Thumbnail.Resolutions)
+	resolutions, err := resolutions.New(options.Config.Thumbnail.Resolutions)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
@@ -39,7 +39,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
 	manager     thumbnails.Manager
-	resolutions resolution.Resolutions
+	resolutions resolutions.Resolutions
 	source      imgsource.Source
 	logger      log.Logger
 }

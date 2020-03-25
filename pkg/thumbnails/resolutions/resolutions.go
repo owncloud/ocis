@@ -1,4 +1,4 @@
-package resolution
+package resolutions
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 	"sort"
 )
 
-// Init creates an instance of Resolutions from resolution strings.
-func Init(rStrs []string) (Resolutions, error) {
+// New creates an instance of Resolutions from resolution strings.
+func New(rStrs []string) (Resolutions, error) {
 	var rs Resolutions
 	for _, rStr := range rStrs {
 		r, err := Parse(rStr)
@@ -47,8 +47,7 @@ func (r Resolutions) ClosestMatch(width, height int) Resolution {
 	var match Resolution
 	minDiff := math.MaxInt32
 
-	for i := 1; i < len(r); i++ {
-		current := r[i]
+	for _, current := range r {
 		len := dimensionLength(current, isLandscape)
 		diff := givenLen - len
 		if diff > 0 {

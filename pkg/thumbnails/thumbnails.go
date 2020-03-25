@@ -6,13 +6,13 @@ import (
 
 	"github.com/nfnt/resize"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolution"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolutions"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
 // Context bundles information needed to generate a thumbnail for afile
 type Context struct {
-	Resolution resolution.Resolution
+	Resolution resolutions.Resolution
 	ImagePath  string
 	Encoder    Encoder
 	ETag       string

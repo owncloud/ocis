@@ -1,4 +1,4 @@
-package resolution
+package resolutions
 
 import (
 	"fmt"

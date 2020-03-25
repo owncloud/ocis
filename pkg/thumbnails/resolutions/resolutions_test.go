@@ -1,11 +1,11 @@
-package resolution
+package resolutions
 
 import (
 	"testing"
 )
 
 func TestInitWithEmptyArray(t *testing.T) {
-	rs, err := Init([]string{})
+	rs, err := New([]string{})
 	if err != nil {
 		t.Errorf("Init with an empty array should not fail. Error: %s.\n", err.Error())
 	}
@@ -15,7 +15,7 @@ func TestInitWithEmptyArray(t *testing.T) {
 }
 
 func TestInitWithNil(t *testing.T) {
-	rs, err := Init(nil)
+	rs, err := New(nil)
 	if err != nil {
 		t.Errorf("Init with nil parameter should not fail. Error: %s.\n", err.Error())
 	}
@@ -25,14 +25,14 @@ func TestInitWithNil(t *testing.T) {
 }
 
 func TestInitWithInvalidValuesInArray(t *testing.T) {
-	_, err := Init([]string{"invalid"})
+	_, err := New([]string{"invalid"})
 	if err == nil {
 		t.Error("Init with invalid parameter should fail.\n")
 	}
 }
 
 func TestInit(t *testing.T) {
-	rs, err := Init([]string{"16x16"})
+	rs, err := New([]string{"16x16"})
 	if err != nil {
 		t.Errorf("Init with valid parameter should not fail. Error: %s.\n", err.Error())
 	}
@@ -43,7 +43,7 @@ func TestInit(t *testing.T) {
 
 func TestInitWithMultipleResolutions(t *testing.T) {
 	rStrs := []string{"16x16", "32x32", "64x64", "128x128"}
-	rs, err := Init(rStrs)
+	rs, err := New(rStrs)
 	if err != nil {
 		t.Errorf("Init with valid parameter should not fail. Error: %s.\n", err.Error())
 	}
@@ -54,7 +54,7 @@ func TestInitWithMultipleResolutions(t *testing.T) {
 
 func TestInitWithMultipleResolutionsShouldBeSorted(t *testing.T) {
 	rStrs := []string{"32x32", "64x64", "16x16", "128x128"}
-	rs, err := Init(rStrs)
+	rs, err := New(rStrs)
 	if err != nil {
 		t.Errorf("Init with valid parameter should not fail. Error: %s.\n", err.Error())
 	}
@@ -72,7 +72,7 @@ func TestInitWithMultipleResolutionsShouldBeSorted(t *testing.T) {
 	}
 }
 func TestClosestMatchWithEmptyResolutions(t *testing.T) {
-	rs, _ := Init(nil)
+	rs, _ := New(nil)
 	width := 24
 	height := 24
 
@@ -83,7 +83,7 @@ func TestClosestMatchWithEmptyResolutions(t *testing.T) {
 }
 
 func TestClosestMatch(t *testing.T) {
-	rs, _ := Init([]string{"16x16", "24x24", "32x32", "64x64", "128x128"})
+	rs, _ := New([]string{"16x16", "24x24", "32x32", "64x64", "128x128"})
 	table := [][]int{
 		// width, height, expectedWidth, expectedHeight
 		[]int{17, 17, 24, 24},
