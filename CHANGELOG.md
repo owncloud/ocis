@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
  * Chg #1: Initial release of basic version
  * Enh #14: Configuration
+ * Enh #13: Implement preview API
 
 ## Details
 
@@ -22,5 +23,11 @@ The following sections list the changes for unreleased.
    from default paths. Environment variables **WILL** take precedence over config files.
 
    https://github.com/owncloud/ocis-webdav/pull/14
+
+ * Enhancement #13: Implement preview API
+
+   Added the API endpoint for file previews.
+
+   https://github.com/owncloud/ocis-webdav/pull/13
 
 
