@@ -25,7 +25,7 @@ func Server(opts ...Option) (svc.Service, error) {
 			l.Fatal().Err(err).Msgf("Could not generate test-certificate")
 		}
 
-		httpCfg.TLSKey = "server.crt"
+		httpCfg.TLSCert = "server.crt"
 		httpCfg.TLSKey = "server.key"
 	}
 
