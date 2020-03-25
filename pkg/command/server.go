@@ -2,6 +2,10 @@ package command
 
 import (
 	"context"
+	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/middleware"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -19,7 +23,7 @@ import (
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
 	"github.com/owncloud/ocis-proxy/pkg/proxy"
 	"github.com/owncloud/ocis-proxy/pkg/server/debug"
-	"github.com/owncloud/ocis-proxy/pkg/server/http"
+	proxyHTTP "github.com/owncloud/ocis-proxy/pkg/server/http"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -141,15 +145,16 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			{
-				server, err := http.Server(
-					http.Handler(rp),
-					http.Logger(logger),
-					http.Namespace(httpNamespace),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
+				server, err := proxyHTTP.Server(
+					proxyHTTP.Handler(rp),
+					proxyHTTP.Logger(logger),
+					proxyHTTP.Namespace(httpNamespace),
+					proxyHTTP.Context(ctx),
+					proxyHTTP.Config(cfg),
+					proxyHTTP.Metrics(metrics),
+					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
+					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
+					proxyHTTP.Middlewares(loadMiddlewares(cfg, logger)...),
 				)
 
 				if err != nil {
@@ -227,4 +232,23 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+func loadMiddlewares(cfg *config.Config, l log.Logger) []func(handler http.Handler) http.Handler {
+	var configuredMiddlewares = make([]func(handler http.Handler) http.Handler, 0)
+	if cfg.OIDC != nil {
+		l.Info().Msg("Loading OIDC-Middleware")
+		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
+		oidcMW := middleware.OpenIDConnect(
+			oidc.Endpoint(cfg.OIDC.Endpoint),
+			oidc.Insecure(cfg.OIDC.Insecure),
+			oidc.Realm(cfg.OIDC.Realm),
+			oidc.SigningAlgs(cfg.OIDC.SigningAlgs),
+			oidc.Logger(l),
+		)
+
+		configuredMiddlewares = append(configuredMiddlewares, oidcMW)
+	}
+
+	return configuredMiddlewares
 }

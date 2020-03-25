@@ -5,6 +5,7 @@ import (
 	svc "github.com/owncloud/ocis-pkg/v2/service/http"
 	"github.com/owncloud/ocis-proxy/pkg/crypto"
 	"github.com/owncloud/ocis-proxy/pkg/version"
+	"net/http"
 	"os"
 )
 
@@ -40,7 +41,6 @@ func Server(opts ...Option) (svc.Service, error) {
 
 	service := svc.NewService(
 		svc.Name("web.proxy"),
-		svc.Handler(options.Handler),
 		svc.TLSConfig(tlsConfig),
 		svc.Logger(options.Logger),
 		svc.Namespace(options.Namespace),
@@ -48,6 +48,11 @@ func Server(opts ...Option) (svc.Service, error) {
 		svc.Address(options.Config.HTTP.Addr),
 		svc.Context(options.Context),
 		svc.Flags(options.Flags...),
+		svc.Handler(applyMiddlewares(
+			options.Handler,
+			options.Middlewares...,
+		),
+		),
 	)
 
 	if err := service.Init(); err != nil {
@@ -55,4 +60,13 @@ func Server(opts ...Option) (svc.Service, error) {
 	}
 
 	return service, nil
+}
+
+func applyMiddlewares(h http.Handler, mws ...func(handler http.Handler) http.Handler) http.Handler {
+	var han = h
+	for _, mw := range mws {
+		han = mw(han)
+	}
+
+	return han
 }

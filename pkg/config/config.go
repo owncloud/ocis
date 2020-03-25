@@ -80,6 +80,16 @@ type Config struct {
 	Tracing  Tracing
 	Asset    Asset
 	Policies []Policy
+	OIDC     *OIDC
+}
+
+// OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
+// with the configured oidc-provider
+type OIDC struct {
+	Endpoint    string
+	Realm       string
+	SigningAlgs []string
+	Insecure    bool
 }
 
 // New initializes a new configuration
