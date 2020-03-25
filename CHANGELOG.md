@@ -5,6 +5,7 @@
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 
 ## Details
@@ -31,6 +32,11 @@
 
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
+
+
+* Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
+
+   https://github.com/owncloud/ocis/pull/167
 
 
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
