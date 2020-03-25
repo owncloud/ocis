@@ -1,3 +1,19 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for ocis-proxy unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...master
+
+## Summary
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+## Details
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+   https://github.com/owncloud/ocis-proxy/pull/25
+
 # Changelog for [0.2.0] (2020-03-25)
 
 The following sections list the changes for ocis-proxy 0.2.0.
