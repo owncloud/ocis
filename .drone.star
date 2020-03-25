@@ -126,6 +126,80 @@ def testing(ctx):
           },
         },
       },
+      {
+        'name': 'ocis-server',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'detach': True,
+        'environment' : {
+          'REVA_LDAP_HOSTNAME': 'ldap',
+          'REVA_LDAP_PORT': 636,
+          'REVA_LDAP_BIND_PASSWORD': 'admin',
+          'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
+          'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
+          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
+          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
+          'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+          },
+        'commands': [
+          'mkdir -p /srv/app/tmp/reva',
+          'bin/ocis server'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app'
+          },
+        ]
+      },
+      {
+        'name': 'acceptance-tests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_OCIS':'true',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+        },
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+          'cd /srv/app/testrunner',
+          'make test-acceptance-api',
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+    ],
+    'services': [
+      {
+        'name': 'ldap',
+        'image': 'osixia/openldap',
+        'pull': 'always',
+        'environment': {
+          'LDAP_DOMAIN': 'owncloud.com',
+          'LDAP_ORGANISATION': 'ownCloud',
+          'LDAP_ADMIN_PASSWORD': 'admin',
+          'LDAP_TLS_VERIFY_CLIENT': 'never',
+          'HOSTNAME': 'ldap'
+        },
+      },
+      {
+        'name': 'redis',
+        'image': 'webhippie/redis',
+        'pull': 'always',
+        'environment': {
+          'REDIS_DATABASES': 1
+        },
+      },
     ],
     'volumes': [
       {
