@@ -12,7 +12,7 @@ The following sections list the changes for {{ .Version }}.
 {{ range $entry := .Entries }}{{ with $entry }}
  * {{ .Type }} #{{ .PrimaryID }}: {{ .Title }}
 {{ range $par := .Paragraphs }}
-   {{ wrap $par 80 3 }}
+   {{ wrapIndent $par 80 3 }}
 {{ end -}}
 {{ range $url := .IssueURLs }}
    {{ $url -}}
