@@ -155,7 +155,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:    "thumbnail-resolution",
 			Value:   cli.NewStringSlice("16x16", "32x32", "64x64", "128x128"),
 			Usage:   "--thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]",
-			EnvVars: []string{"THUMBNAILS_RESOLUTIONs"},
+			EnvVars: []string{"THUMBNAILS_RESOLUTIONS"},
 		},
 	}
 }
