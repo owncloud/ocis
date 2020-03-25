@@ -10,8 +10,8 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
 )
 
-// Context bundles information needed to generate a thumbnail for afile
-type Context struct {
+// Request bundles information needed to generate a thumbnail for afile
+type Request struct {
 	Resolution resolutions.Resolution
 	ImagePath  string
 	Encoder    Encoder
@@ -21,10 +21,10 @@ type Context struct {
 // Manager is responsible for generating thumbnails
 type Manager interface {
 	// Get will return a thumbnail for a file
-	Get(Context, image.Image) ([]byte, error)
+	Get(Request, image.Image) ([]byte, error)
 	// GetStored loads the thumbnail from the storage.
 	// It will return nil if no image is stored for the given context.
-	GetStored(Context) []byte
+	GetStored(Request) []byte
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
@@ -42,13 +42,13 @@ type SimpleManager struct {
 }
 
 // Get implements the Get Method of Manager
-func (s SimpleManager) Get(ctx Context, img image.Image) ([]byte, error) {
-	thumbnail := s.generate(ctx, img)
+func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
+	thumbnail := s.generate(r, img)
 
-	key := s.storage.BuildKey(mapToStorageContext(ctx))
+	key := s.storage.BuildKey(mapToStorageRequest(r))
 
 	buf := new(bytes.Buffer)
-	err := ctx.Encoder.Encode(buf, thumbnail)
+	err := r.Encoder.Encode(buf, thumbnail)
 	if err != nil {
 		return nil, err
 	}
@@ -62,22 +62,22 @@ func (s SimpleManager) Get(ctx Context, img image.Image) ([]byte, error) {
 
 // GetStored tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
-func (s SimpleManager) GetStored(ctx Context) []byte {
-	key := s.storage.BuildKey(mapToStorageContext(ctx))
+func (s SimpleManager) GetStored(r Request) []byte {
+	key := s.storage.BuildKey(mapToStorageRequest(r))
 	stored := s.storage.Get(key)
 	return stored
 }
 
-func (s SimpleManager) generate(ctx Context, img image.Image) image.Image {
-	thumbnail := resize.Thumbnail(uint(ctx.Resolution.Width), uint(ctx.Resolution.Height), img, resize.Lanczos2)
+func (s SimpleManager) generate(r Request, img image.Image) image.Image {
+	thumbnail := resize.Thumbnail(uint(r.Resolution.Width), uint(r.Resolution.Height), img, resize.Lanczos2)
 	return thumbnail
 }
 
-func mapToStorageContext(ctx Context) storage.Context {
-	sCtx := storage.Context{
-		ETag:       ctx.ETag,
-		Resolution: ctx.Resolution,
-		Types:      ctx.Encoder.Types(),
+func mapToStorageRequest(r Request) storage.Request {
+	sR := storage.Request{
+		ETag:       r.ETag,
+		Resolution: r.Resolution,
+		Types:      r.Encoder.Types(),
 	}
-	return sCtx
+	return sR
 }

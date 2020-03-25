@@ -64,10 +64,10 @@ func (s FileSystem) Set(key string, img []byte) error {
 // e.g. 97/9f/4c8db98f7b82e768ef478d3c8612/500x300.png
 //
 // The key also represents the path to the thumbnail in the filesystem under the configured root directory.
-func (s FileSystem) BuildKey(ctx Context) string {
-	etag := ctx.ETag
-	filetype := ctx.Types[0]
-	filename := ctx.Resolution.String() + "." + filetype
+func (s FileSystem) BuildKey(r Request) string {
+	etag := r.ETag
+	filetype := r.Types[0]
+	filename := r.Resolution.String() + "." + filetype
 
 	key := new(bytes.Buffer)
 	key.WriteString(etag[:2])

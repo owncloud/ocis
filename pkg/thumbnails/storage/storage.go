@@ -2,8 +2,8 @@ package storage
 
 import "github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolutions"
 
-// Context combines different attributes needed for storage operations.
-type Context struct {
+// Request combines different attributes needed for storage operations.
+type Request struct {
 	ETag       string
 	Types      []string
 	Resolution resolutions.Resolution
@@ -13,5 +13,5 @@ type Context struct {
 type Storage interface {
 	Get(string) []byte
 	Set(string, []byte) error
-	BuildKey(Context) string
+	BuildKey(Request) string
 }

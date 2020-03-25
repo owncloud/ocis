@@ -29,11 +29,11 @@ func (s InMemory) Set(key string, thumbnail []byte) error {
 }
 
 // BuildKey generates a unique key to store and retrieve the thumbnail.
-func (s InMemory) BuildKey(ctx Context) string {
+func (s InMemory) BuildKey(r Request) string {
 	parts := []string{
-		ctx.ETag,
-		ctx.Resolution.String(),
-		strings.Join(ctx.Types, ","),
+		r.ETag,
+		r.Resolution.String(),
+		strings.Join(r.Types, ","),
 	}
 	return strings.Join(parts, "+")
 }

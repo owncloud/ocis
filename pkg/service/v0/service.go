@@ -52,36 +52,36 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
 	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
-	tCtx := thumbnails.Context{
+	tr := thumbnails.Request{
 		Resolution: r,
 		ImagePath:  req.Filepath,
 		Encoder:    encoder,
 		ETag:       req.Etag,
 	}
 
-	thumbnail := g.manager.GetStored(tCtx)
+	thumbnail := g.manager.GetStored(tr)
 	if thumbnail != nil {
 		rsp.Thumbnail = thumbnail
-		rsp.Mimetype = tCtx.Encoder.MimeType()
+		rsp.Mimetype = tr.Encoder.MimeType()
 		return nil
 	}
 
 	auth := req.Authorization
 	sCtx := context.WithValue(ctx, imgsource.WebDavAuth, auth)
 	// TODO: clean up error handling
-	img, err := g.source.Get(sCtx, tCtx.ImagePath)
+	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
 		return err
 	}
 	if img == nil {
 		return fmt.Errorf("could not retrieve image")
 	}
-	thumbnail, err = g.manager.Get(tCtx, img)
+	thumbnail, err = g.manager.Get(tr, img)
 	if err != nil {
 		return err
 	}
 
 	rsp.Thumbnail = thumbnail
-	rsp.Mimetype = tCtx.Encoder.MimeType()
+	rsp.Mimetype = tr.Encoder.MimeType()
 	return nil
 }
