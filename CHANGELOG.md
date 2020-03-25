@@ -8,6 +8,7 @@ The following sections list the changes for ocis-proxy unreleased.
 
 * Change - Route requests based on regex or query parameters: [#21](https://github.com/owncloud/ocis-proxy/issues/21)
 * Enhancement - Proxy client urls in default configuration: [#19](https://github.com/owncloud/ocis-proxy/issues/19)
+* Enhancement - Make TLS-Cert configurable: [#14](https://github.com/owncloud/ocis-proxy/pull/14)
 
 ## Details
 
@@ -24,6 +25,13 @@ The following sections list the changes for ocis-proxy unreleased.
    Proxy /status.php and index.php/*
 
    https://github.com/owncloud/ocis-proxy/issues/19
+
+
+* Enhancement - Make TLS-Cert configurable: [#14](https://github.com/owncloud/ocis-proxy/pull/14)
+
+   Before a generates certificates on every start was used for dev purposes.
+
+   https://github.com/owncloud/ocis-proxy/pull/14
 
 # Changelog for [0.1.0] (2020-03-18)
 
