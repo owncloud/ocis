@@ -7,4 +7,4 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: _index.md
 ---
 
-This service provides ...
+This service provides an ocis extensions which generates thumbnails for image files.

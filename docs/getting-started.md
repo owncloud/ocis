@@ -72,19 +72,28 @@ THUMBNAILS_DEBUG_PPROF
 THUMBNAILS_DEBUG_ZPAGES
 : Enable zpages debugging, defaults to `false`
 
-THUMBNAILS_HTTP_ADDR
-: Address to bind http server, defaults to `0.0.0.0:9110`
+THUMBNAILS_GRPC_NAME
+: Name of the service, defaults to `thumbnails`
 
-THUMBNAILS_HTTP_NAMESPACE
-: The http namespace
+THUMBNAILS_GRPC_ADDR
+: Address to bind grpc server, defaults to `0.0.0.0:9185`
 
-THUMBNAILS_HTTP_ROOT
-: Root path of http server, defaults to `/`
+THUMBNAILS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace", defaults to `com.owncloud.api`
+
+THUMBNAILS_FILESYSTEMSTORAGE_ROOT
+: Root path of the filesystem storage directory, defaults to `<os tempdir>/ocis-thumbnails/`
+
+THUMBNAILS_WEBDAVSOURCE_BASEURL
+: Base url for a webdav api, defaults to `htp://localhost:9140/remote.php/webdav/`
+
+THUMBNAILS_RESOLUTIONS
+: List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
 
 #### Health
 
 THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint, defaults to `0.0.0.0:9114`
+: Address to debug endpoint, defaults to `0.0.0.0:9189`
 
 ### Commandline flags
 
@@ -122,7 +131,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Service name for tracing, defaults to `thumbnails`
 
 --debug-addr
-: Address to bind debug server, defaults to `0.0.0.0:9114`
+: Address to bind debug server, defaults to `0.0.0.0:9189`
 
 --debug-token
 : Token to grant metrics access, empty default value
@@ -133,19 +142,28 @@ If you prefer to configure the service with commandline flags you can see the av
 --debug-zpages
 : Enable zpages debugging, defaults to `false`
 
---http-addr
-: Address to bind http server, defaults to `0.0.0.0:9110`
+--grpc-name
+: Name of the service, defaults to `thumbnails`
 
---http-namespace
-: Namespace for internal services communication, defaults to `com.owncloud.web`
+--grpc-addr
+: Address to bind grpc server, defaults to `0.0.0.0:9185`
 
---http-root
-: Root path of http server, defaults to `/`
+--grpc-namespace
+: Set the base namespace for the grpc namespace", defaults to `com.owncloud.api`
+
+--filesystemstorage-root
+: Root path of the filesystem storage directory, defaults to `<os tempdir>/ocis-thumbnails/`
+
+--webdavsource-baseurl
+: Base url for a webdav api, defaults to `htp://localhost:9140/remote.php/webdav/`
+
+--thumbnail-resolution
+: List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
 
 #### Health
 
 --debug-addr
-: Address to debug endpoint, defaults to `0.0.0.0:9114`
+: Address to debug endpoint, defaults to `0.0.0.0:9189`
 
 ### Configuration file
 
