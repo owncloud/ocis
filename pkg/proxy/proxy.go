@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"github.com/owncloud/ocis-proxy/pkg/proxy/policy"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -14,8 +15,9 @@ import (
 // MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
-	Directors map[string]map[config.RouteType]map[string]func(req *http.Request)
-	logger    log.Logger
+	Directors      map[string]map[config.RouteType]map[string]func(req *http.Request)
+	PolicySelector policy.Selector
+	logger         log.Logger
 }
 
 // NewMultiHostReverseProxy undocummented
@@ -34,8 +36,29 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		rp.logger.Info().Str("source", "file").Msg("Policies")
 	}
 
-	for _, policy := range options.Config.Policies {
-		for _, route := range policy.Routes {
+	if options.Config.PolicySelector == nil {
+		firstPolicy := options.Config.Policies[0].Name
+		rp.logger.Warn().Msgf("policy-selector not configured. Will always use first policy: '%v'", firstPolicy)
+		options.Config.PolicySelector = &config.PolicySelector{
+			Static: &config.StaticSelectorConf{
+				Policy: firstPolicy,
+			},
+		}
+	}
+
+	rp.logger.Debug().
+		Interface("selector_config", options.Config.PolicySelector).
+		Msg("loading policy-selector")
+
+	policySelector, err := policy.LoadSelector(options.Config.PolicySelector)
+	if err != nil {
+		rp.logger.Fatal().Err(err).Msg("Could not load policy-selector")
+	}
+
+	rp.PolicySelector = policySelector
+
+	for _, pol := range options.Config.Policies {
+		for _, route := range pol.Routes {
 			rp.logger.Debug().Str("fwd: ", route.Endpoint)
 			uri, err := url.Parse(route.Backend)
 			if err != nil {
@@ -50,7 +73,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 				Interface("route", route).
 				Msg("adding route")
 
-			rp.AddHost(policy.Name, uri, route)
+			rp.AddHost(pol.Name, uri, route)
 		}
 	}
 
@@ -105,14 +128,16 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// TODO need to fetch from the accounts service
 	var hit bool
-	policy := "reva"
+	pol, err := p.PolicySelector(r.Context(), r)
+	if err != nil {
+		p.logger.Error().Msgf("Error while selecting pol %v", err)
+	}
 
-	if _, ok := p.Directors[policy]; !ok {
+	if _, ok := p.Directors[pol]; !ok {
 		p.logger.
 			Error().
-			Msgf("policy %v is not configured", policy)
+			Msgf("policy %v is not configured", pol)
 	}
 
 Loop:
@@ -128,13 +153,13 @@ Loop:
 		default:
 			handler = p.prefixRouteMatcher
 		}
-		for endpoint := range p.Directors[policy][rt] {
+		for endpoint := range p.Directors[pol][rt] {
 			if handler(endpoint, *r.URL) {
-				p.Director = p.Directors[policy][rt][endpoint]
+				p.Director = p.Directors[pol][rt][endpoint]
 				hit = true
 				p.logger.
 					Debug().
-					Str("policy", policy).
+					Str("policy", pol).
 					Str("prefix", endpoint).
 					Str("path", r.URL.Path).
 					Str("routeType", string(rt)).
@@ -145,8 +170,8 @@ Loop:
 	}
 
 	// override default director with root. If any
-	if !hit && p.Directors[policy][config.PrefixRoute]["/"] != nil {
-		p.Director = p.Directors[policy][config.PrefixRoute]["/"]
+	if !hit && p.Directors[pol][config.PrefixRoute]["/"] != nil {
+		p.Director = p.Directors[pol][config.PrefixRoute]["/"]
 	}
 
 	// Call upstream ServeHTTP
@@ -188,101 +213,101 @@ func (p *MultiHostReverseProxy) prefixRouteMatcher(endpoint string, target url.U
 
 func defaultPolicies() []config.Policy {
 	return []config.Policy{
-		config.Policy{
+		{
 			Name: "reva",
 			Routes: []config.Route{
-				config.Route{
+				{
 					Endpoint: "/",
 					Backend:  "http://localhost:9100",
 				},
-				config.Route{
+				{
 					Endpoint: "/.well-known/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint: "/konnect/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint: "/signin/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint: "/ocs/",
 					Backend:  "http://localhost:9140",
 				},
-				config.Route{
+				{
 					Type:     config.QueryRoute,
 					Endpoint: "/remote.php/?preview=1",
 					Backend:  "http://localhost:9115",
 				},
-				config.Route{
+				{
 					Endpoint: "/remote.php/",
 					Backend:  "http://localhost:9140",
 				},
-				config.Route{
+				{
 					Endpoint: "/dav/",
 					Backend:  "http://localhost:9140",
 				},
-				config.Route{
+				{
 					Endpoint: "/webdav/",
 					Backend:  "http://localhost:9140",
 				},
-				config.Route{
+				{
 					Endpoint: "/status.php",
 					Backend:  "http://localhost:9140",
 				},
-				config.Route{
+				{
 					Endpoint: "/index.php/",
 					Backend:  "http://localhost:9140",
 				},
 			},
 		},
-		config.Policy{
+		{
 			Name: "oc10",
 			Routes: []config.Route{
-				config.Route{
+				{
 					Endpoint: "/",
 					Backend:  "http://localhost:9100",
 				},
-				config.Route{
+				{
 					Endpoint: "/.well-known/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint: "/konnect/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint: "/signin/",
 					Backend:  "http://localhost:9130",
 				},
-				config.Route{
+				{
 					Endpoint:    "/ocs/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
-				config.Route{
+				{
 					Endpoint:    "/remote.php/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
-				config.Route{
+				{
 					Endpoint:    "/dav/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
-				config.Route{
+				{
 					Endpoint:    "/webdav/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
-				config.Route{
+				{
 					Endpoint:    "/status.php",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
-				config.Route{
+				{
 					Endpoint:    "/index.php/",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,

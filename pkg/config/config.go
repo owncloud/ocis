@@ -73,14 +73,15 @@ var (
 
 // Config combines all available configuration parts.
 type Config struct {
-	File     string
-	Log      Log
-	Debug    Debug
-	HTTP     HTTP
-	Tracing  Tracing
-	Asset    Asset
-	Policies []Policy
-	OIDC     *OIDC
+	File           string
+	Log            Log
+	Debug          Debug
+	HTTP           HTTP
+	Tracing        Tracing
+	Asset          Asset
+	Policies       []Policy
+	OIDC           *OIDC
+	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
@@ -90,6 +91,24 @@ type OIDC struct {
 	Realm       string
 	SigningAlgs []string
 	Insecure    bool
+}
+
+// PolicySelector is the toplevel-configuration for different selectors
+type PolicySelector struct {
+	Static    *StaticSelectorConf
+	Migration *MigrationSelectorConf
+}
+
+// StaticSelectorConf is the config for the static-policy-selector
+type StaticSelectorConf struct {
+	Policy string
+}
+
+// MigrationSelectorConf is the config for the migration-selector
+type MigrationSelectorConf struct {
+	AccFoundPolicy        string `mapstructure:"acc_found_policy"`
+	AccNotFoundPolicy     string `mapstructure:"acc_not_found_policy"`
+	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
 }
 
 // New initializes a new configuration
