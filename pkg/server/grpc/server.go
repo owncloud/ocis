@@ -24,6 +24,7 @@ func NewService(opts ...Option) grpc.Service {
 	{
 		thumbnail = svc.NewService(
 			svc.Config(options.Config),
+			svc.Logger(options.Logger),
 		)
 		thumbnail = svc.NewInstrument(thumbnail, options.Metrics)
 		thumbnail = svc.NewLogging(thumbnail, options.Logger)

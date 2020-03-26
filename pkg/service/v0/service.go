@@ -6,25 +6,31 @@ import (
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
 // NewService returns a service implementation for Service.
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
-
+	logger := options.Logger
+	resolutions, err := resolution.New(options.Config.Thumbnail.Resolutions)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
+	}
 	svc := Thumbnail{
-		manager: thumbnails.NewSimpleManager(
+		manager: thumbnail.NewSimpleManager(
 			storage.NewFileSystemStorage(
-				options.Config.FileSystemStorage,
-				options.Logger,
+				options.Config.Thumbnail.FileSystemStorage,
+				logger,
 			),
-			options.Logger,
+			logger,
 		),
-		source: imgsource.NewWebDavSource(options.Config.WebDavSource),
-		logger: options.Logger,
+		resolutions: resolutions,
+		source:      imgsource.NewWebDavSource(options.Config.Thumbnail.WebDavSource),
+		logger:      logger,
 	}
 
 	return svc
@@ -32,49 +38,50 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	manager thumbnails.Manager
-	source  imgsource.Source
-	logger  log.Logger
+	manager     thumbnail.Manager
+	resolutions resolution.Resolutions
+	source      imgsource.Source
+	logger      log.Logger
 }
 
 // GetThumbnail retrieves a thumbnail for an image
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
-	encoder := thumbnails.EncoderForType(req.Filetype.String())
+	encoder := thumbnail.EncoderForType(req.Filetype.String())
 	if encoder == nil {
 		// TODO: better error responses
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
-	tCtx := thumbnails.Context{
-		Width:     int(req.Width),
-		Height:    int(req.Height),
-		ImagePath: req.Filepath,
-		Encoder:   encoder,
-		ETag:      req.Etag,
+	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
+	tr := thumbnail.Request{
+		Resolution: r,
+		ImagePath:  req.Filepath,
+		Encoder:    encoder,
+		ETag:       req.Etag,
 	}
 
-	thumbnail := g.manager.GetStored(tCtx)
+	thumbnail := g.manager.GetStored(tr)
 	if thumbnail != nil {
 		rsp.Thumbnail = thumbnail
-		rsp.Mimetype = tCtx.Encoder.MimeType()
+		rsp.Mimetype = tr.Encoder.MimeType()
 		return nil
 	}
 
 	auth := req.Authorization
 	sCtx := context.WithValue(ctx, imgsource.WebDavAuth, auth)
 	// TODO: clean up error handling
-	img, err := g.source.Get(sCtx, tCtx.ImagePath)
+	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
 		return err
 	}
 	if img == nil {
 		return fmt.Errorf("could not retrieve image")
 	}
-	thumbnail, err = g.manager.Get(tCtx, img)
+	thumbnail, err = g.manager.Get(tr, img)
 	if err != nil {
 		return err
 	}
 
 	rsp.Thumbnail = thumbnail
-	rsp.Mimetype = tCtx.Encoder.MimeType()
+	rsp.Mimetype = tr.Encoder.MimeType()
 	return nil
 }

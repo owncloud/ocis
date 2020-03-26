@@ -29,11 +29,11 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
+			cfg.Thumbnail.Resolutions = c.StringSlice("thumbnail-resolution")
 			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
 				case "agent":

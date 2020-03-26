@@ -33,13 +33,12 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File              string
-	Log               Log
-	Debug             Debug
-	Server            Server
-	Tracing           Tracing
-	FileSystemStorage FileSystemStorage
-	WebDavSource      WebDavSource
+	File      string
+	Log       Log
+	Debug     Debug
+	Server    Server
+	Tracing   Tracing
+	Thumbnail Thumbnail
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.
@@ -50,6 +49,13 @@ type FileSystemStorage struct {
 // WebDavSource defines the available webdav source configuration.
 type WebDavSource struct {
 	BaseURL string
+}
+
+// Thumbnail defines the available thumbnail related configuration.
+type Thumbnail struct {
+	Resolutions       []string
+	FileSystemStorage FileSystemStorage
+	WebDavSource      WebDavSource
 }
 
 // New initializes a new configuration with or without defaults.

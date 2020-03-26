@@ -1,4 +1,4 @@
-package thumbnails
+package thumbnail
 
 import (
 	"image"
