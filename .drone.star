@@ -187,6 +187,31 @@ def testing(ctx):
             },
           ]
       },
+      {
+        'name': 'import-litmus-users',
+        'image': 'emeraldsquad/ldapsearch',
+        'pull': 'always',
+        'commands': [
+          'ldapadd -h ldap -p 389 -D "cn=admin,dc=owncloud,dc=com" -w admin -f ./tests/data/testusers.ldif',
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ],
+      },
+      {
+        'name': 'litmus',
+        'image': 'owncloud/litmus:latest',
+        'pull': 'always',
+        'environment' : {
+          'LITMUS_URL': 'http://reva-server:9140/remote.php/webdav',
+          'LITMUS_USERNAME': 'tu1',
+          'LITMUS_PASSWORD': '1234',
+          'TESTS': 'basic http'
+         },
+      },
     ],
     'services': [
       {
