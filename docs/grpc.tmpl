@@ -7,106 +7,69 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: grpc.md
 ---
 
-<a name="top"></a>
+{{`{{< toc >}}`}}
 
-## Table of Contents
-{{range .Files}}
-{{$file_name := .Name}}- [{{.Name}}](#{{.Name}})
-  {{- if .Messages }}
-  {{range .Messages}}  - [{{.LongName}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-  {{- if .Enums }}
-  {{range .Enums}}  - [{{.LongName}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-  {{- if .Extensions }}
-  {{range .Extensions}}  - [File-level Extensions](#{{$file_name}}-extensions)
-  {{end}}
-  {{- end -}}
-  {{- if .Services }}
-  {{range .Services}}  - [{{.Name}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-{{end}}
-- [Scalar Value Types](#scalar-value-types)
+{{ range .Files -}}
+## {{ .Name }}
 
-{{range .Files}}
-{{$file_name := .Name}}
-<a name="{{.Name}}"></a>
-<p align="right"><a href="#top">Top</a></p>
+{{ .Description }}
+{{- range .Messages -}}
+{{- /* remove newline */}}### {{ .LongName }}
 
-## {{.Name}}
-{{.Description}}
+{{ .Description }}
 
-{{range .Messages}}
-<a name="{{.FullName}}"></a>
-
-### {{.LongName}}
-{{.Description}}
-
-{{if .HasFields}}
+{{ if .HasFields -}}
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-{{range .Fields -}}
-  | {{.Name}} | [{{.LongType}}](#{{.FullType}}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
-{{end}}
-{{end}}
-
-{{if .HasExtensions}}
+{{ range .Fields -}}
+| {{.Name}} | [{{.LongType}}](#{{.LongType | lower | replace "." "" }}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
+{{ end -}}
+{{ end }}
+{{ if .HasExtensions -}}
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
-{{range .Extensions -}}
-  | {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
-{{end}}
-{{end}}
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range .Enums -}}
+### {{ .LongName }}
 
-{{end}} <!-- end messages -->
-
-{{range .Enums}}
-<a name="{{.FullName}}"></a>
-
-### {{.LongName}}
-{{.Description}}
+{{ .Description }}
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 {{range .Values -}}
-  | {{.Name}} | {{.Number}} | {{nobr .Description}} |
-{{end}}
+| {{.Name}} | {{.Number}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
 
-{{end}} <!-- end enums -->
-
-{{if .HasExtensions}}
-<a name="{{$file_name}}-extensions"></a>
+{{ if .HasExtensions }}
 
 ### File-level Extensions
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
-{{range .Extensions -}}
-  | {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
-{{end}}
-{{end}} <!-- end HasExtensions -->
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
+{{ end -}}
+{{ end -}} 
+{{- range .Services }}
+### {{ .Name }}
 
-{{range .Services}}
-<a name="{{.FullName}}"></a>
-
-### {{.Name}}
-{{.Description}}
+{{ .Description }}
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-{{range .Methods -}}
-  | {{.Name}} | [{{.RequestLongType}}](#{{.RequestFullType}}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseFullType}}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
-{{end}}
-{{end}} <!-- end services -->
-
-{{end}}
-
+{{ range .Methods -}}
+| {{.Name}} | [{{.RequestLongType}}](#{{.RequestLongType | lower | replace "." "" }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseLongType | lower | replace "." "" }}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
+{{ end }}
 ## Scalar Value Types
 
-| .proto Type | Notes | C++ | Java | Python | Go | C# | PHP | Ruby |
-| ----------- | ----- | --- | ---- | ------ | -- | -- | --- | ---- |
-{{range .Scalars -}}
-  | <a name="{{.ProtoType}}" /> {{.ProtoType}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} | {{.PythonType}} | {{.GoType}} | {{.CSharp}} | {{.PhpType}} | {{.RubyType}} |
-{{end}}
+| .proto Type | Notes | C++ | Java |
+| ----------- | ----- | --- | ---- |
+{{ range .Scalars -}}
+| {{`{{< div id="`}}{{.ProtoType}}{{`" content="`}}{{.ProtoType}}{{`" >}}`}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} |
+{{ end }}
