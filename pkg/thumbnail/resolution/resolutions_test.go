@@ -1,4 +1,4 @@
-package resolutions
+package resolution
 
 import (
 	"testing"

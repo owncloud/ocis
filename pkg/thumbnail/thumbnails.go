@@ -1,4 +1,4 @@
-package thumbnails
+package thumbnail
 
 import (
 	"bytes"
@@ -6,13 +6,13 @@ import (
 
 	"github.com/nfnt/resize"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolutions"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
 // Request bundles information needed to generate a thumbnail for afile
 type Request struct {
-	Resolution resolutions.Resolution
+	Resolution resolution.Resolution
 	ImagePath  string
 	Encoder    Encoder
 	ETag       string

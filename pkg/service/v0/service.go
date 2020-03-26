@@ -6,22 +6,22 @@ import (
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/imgsource"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/resolutions"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnails/storage"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
 // NewService returns a service implementation for Service.
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 	logger := options.Logger
-	resolutions, err := resolutions.New(options.Config.Thumbnail.Resolutions)
+	resolutions, err := resolution.New(options.Config.Thumbnail.Resolutions)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
-		manager: thumbnails.NewSimpleManager(
+		manager: thumbnail.NewSimpleManager(
 			storage.NewFileSystemStorage(
 				options.Config.Thumbnail.FileSystemStorage,
 				logger,
@@ -38,21 +38,21 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	manager     thumbnails.Manager
-	resolutions resolutions.Resolutions
+	manager     thumbnail.Manager
+	resolutions resolution.Resolutions
 	source      imgsource.Source
 	logger      log.Logger
 }
 
 // GetThumbnail retrieves a thumbnail for an image
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
-	encoder := thumbnails.EncoderForType(req.Filetype.String())
+	encoder := thumbnail.EncoderForType(req.Filetype.String())
 	if encoder == nil {
 		// TODO: better error responses
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
 	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
-	tr := thumbnails.Request{
+	tr := thumbnail.Request{
 		Resolution: r,
 		ImagePath:  req.Filepath,
 		Encoder:    encoder,
