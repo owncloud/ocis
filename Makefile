@@ -4,6 +4,8 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
+PROTO_VERSION := v0
+PROTO_SRC := pkg/proto/$(PROTO_VERSION)/*.proto
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -131,6 +133,11 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
+.PHONY: proto-docs-build
+proto-docs-build:
+	go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc; \
+	protoc --doc_out=./docs --doc_opt=./docs/grpc.tmpl,grpc.md $(PROTO_SRC)
+
 .PHONY: docs-copy
 docs-copy:
 	mkdir -p $(HUGO); \
@@ -141,54 +148,19 @@ docs-copy:
 	git remote add origin https://github.com/owncloud/owncloud.github.io; \
 	git fetch; \
 	git checkout origin/source -f; \
-	rsync --delete -ax ../docs/ content/extensions/$(NAME)
+	rsync --delete -ax ../docs/*.md content/extensions/$(NAME)
 
 .PHONY: docs-build
 docs-build:
 	cd $(HUGO); hugo
 
 .PHONY: docs
-docs: docs-copy docs-build
+docs: proto-docs-build docs-copy docs-build
 
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-# $(GOPATH)/bin/protoc-gen-go:
-# 	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
-
-# $(GOPATH)/bin/protoc-gen-micro:
-# 	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
-
-# $(GOPATH)/bin/protoc-gen-microweb:
-# 	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
-
-# $(GOPATH)/bin/protoc-gen-swagger:
-# 	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
-
-# pkg/proto/v0/example.pb.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# .PHONY: protobuf
-# protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
+.PHONY: pb
+pb:
+	protoc --go_out=. --micro_out=. $(PROTO_SRC)
