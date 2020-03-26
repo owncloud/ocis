@@ -22,7 +22,7 @@ require (
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.3.0
 	github.com/owncloud/ocis-pkg/v2 v2.1.0
-	github.com/owncloud/ocis-proxy v0.2.0
+	github.com/owncloud/ocis-proxy v0.2.1
 	github.com/owncloud/ocis-reva v0.1.0
 	github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4
 	github.com/owncloud/ocis-webdav v0.0.0-20200319135906-711d1be75a2b
