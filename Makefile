@@ -136,7 +136,7 @@ release-finish: release-copy release-check
 .PHONY: proto-docs-build
 proto-docs-build:
 	go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc; \
-	protoc --doc_out=./docs --doc_opt=./docs/grpc.tmpl,grpc.md $(PROTO_SRC)
+	protoc --doc_out=./docs --doc_opt=./templates/grpc.tmpl,grpc.md $(PROTO_SRC)
 
 .PHONY: docs-copy
 docs-copy:
@@ -148,7 +148,7 @@ docs-copy:
 	git remote add origin https://github.com/owncloud/owncloud.github.io; \
 	git fetch; \
 	git checkout origin/source -f; \
-	rsync --delete -ax ../docs/*.md content/extensions/$(NAME)
+	rsync --delete -ax ../docs/ content/extensions/$(NAME)
 
 .PHONY: docs-build
 docs-build:
