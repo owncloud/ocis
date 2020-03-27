@@ -236,6 +236,9 @@ func Server(cfg *config.Config) *cli.Command {
 
 func loadMiddlewares(cfg *config.Config, l log.Logger) []func(handler http.Handler) http.Handler {
 	var configuredMiddlewares = make([]func(handler http.Handler) http.Handler, 0)
+
+	configuredMiddlewares = append(configuredMiddlewares, middleware.RedirectToHTTPS)
+
 	if cfg.OIDC != nil {
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
