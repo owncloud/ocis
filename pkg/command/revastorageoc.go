@@ -32,8 +32,6 @@ func configureRevaStorageOC(cfg *config.Config) *svcconfig.Config {
 	cfg.Reva.Log.Pretty = cfg.Log.Pretty
 	cfg.Reva.Log.Color = cfg.Log.Color
 
-	cfg.Reva.Reva.StorageOC.ExposeDataServer = true
-
 	return cfg.Reva
 }
 
