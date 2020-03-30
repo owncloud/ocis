@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.1.0...master
+
+## Summary
+
+* Change - Add header to cors handler: [#41](https://github.com/owncloud/ocis-pkg/issues/41)
+
+## Details
+
+* Change - Add header to cors handler: [#41](https://github.com/owncloud/ocis-pkg/issues/41)
+
+   The `x-requested-with` header was added to allow ajax requests.
+
+   https://github.com/owncloud/ocis-pkg/issues/41
+
 # Changelog for [2.1.0] (2020-03-16)
 
 The following sections list the changes in ocis-pkg 2.1.0.
