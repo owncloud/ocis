@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [2.2.0] (2020-03-30)
 
-The following sections list the changes in ocis-pkg unreleased.
+The following sections list the changes in ocis-pkg 2.2.0.
 
-[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.1.0...master
+[2.2.0]: https://github.com/owncloud/ocis-pkg/compare/v2.1.0...v2.2.0
 
 ## Summary
 
