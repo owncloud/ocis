@@ -100,6 +100,8 @@ func StorageOCData(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
+										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
+										"user_layout":            cfg.Reva.Storages.EOS.Layout,
 									},
 									"local": map[string]interface{}{
 										"root": cfg.Reva.Storages.Local.Root,
