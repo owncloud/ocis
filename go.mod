@@ -11,7 +11,7 @@ require (
 	github.com/micro/go-micro/v2 v2.0.0
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.1
+	github.com/owncloud/ocis-pkg/v2 v2.2.0
 	github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/viper v1.5.0
