@@ -2,7 +2,7 @@
 
 The following sections list the changes in ocis-phoenix unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...master
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.4.0...master
 
 ## Summary
 
@@ -16,6 +16,24 @@ The following sections list the changes in ocis-phoenix unreleased.
    from default paths. Environment variables **WILL** take precedence over config files.
 
    https://github.com/owncloud/ocis-phoenix/pull/57
+
+# Changelog for [0.4.0] (2020-03-31)
+
+The following sections list the changes in ocis-phoenix 0.4.0.
+
+[0.4.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...v0.4.0
+
+## Summary
+
+* Change - Update Phoenix: [#60](https://github.com/owncloud/ocis-phoenix/pull/60)
+
+## Details
+
+* Change - Update Phoenix: [#60](https://github.com/owncloud/ocis-phoenix/pull/60)
+
+   Updated phoenix from v0.6.0 to v0.7.0
+
+   https://github.com/owncloud/ocis-phoenix/pull/60
 
 # Changelog for [0.2.0] (2020-03-17)
 
