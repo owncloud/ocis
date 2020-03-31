@@ -15,15 +15,12 @@ import (
 )
 
 var (
-	// SimpleRuntimeServices declares which services will be started for the fullstack server
+	// SimpleRuntimeServices declares which services will be started for the simple server
 	SimpleRuntimeServices = []string{
 		"hello",
 		"phoenix",
-		"reva-frontend",
-		"reva-gateway",
-		"reva-users",
-		"reva-auth-basic",
-		"reva-auth-bearer",
+		"konnectd",
+		"glauth",
 	}
 )
 
@@ -50,7 +47,7 @@ func Simple(cfg *config.Config) *cli.Command {
 
 			runtime := runtime.New(
 				runtime.Logger(logger),
-				runtime.Services(append(runtime.RuntimeServices, SimpleRuntimeServices...)),
+				runtime.Services(append(runtime.MicroServices, SimpleRuntimeServices...)),
 				runtime.MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 				runtime.Context(c),
 			)
