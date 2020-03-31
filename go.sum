@@ -432,6 +432,7 @@ github.com/oracle/oci-go-sdk v7.0.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35ukw
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/ocis-pkg/v2 v2.0.1 h1:3ISEtfjAz4pDFczTggIJwKuft3bVsAp1C7dFY9BBPEs=
 github.com/owncloud/ocis-pkg/v2 v2.0.1/go.mod h1:7bVnn3VUaqdmvpMkXF0QVEF1fRugs35hSkuVTAq9yjk=
+github.com/owncloud/ocis-pkg/v2 v2.2.0/go.mod h1:MXv7QzsYsu4YWuyJxhq1kLLmJa/r5gbqHe1FXulMHaw=
 github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4 h1:A0Swro39iP0VPUaLiY6JRzShfria6b2Nq/VjF9ZNbuY=
 github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4/go.mod h1:VmCoxwitTs6oRxIaGz6xridLPwA6ReRMej22jBhkRIM=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
