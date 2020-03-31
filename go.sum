@@ -435,8 +435,8 @@ github.com/openzipkin/zipkin-go v0.2.2 h1:nY8Hti+WKaP0cRsSeQ026wU03QsM762XBeCXBb
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/oracle/oci-go-sdk v7.0.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35ukwStZIg5F66tcBccjip/j888=
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
-github.com/owncloud/ocis-pkg/v2 v2.1.0 h1:DVKIb4jG8heUvHz2BIhLW44PnwT6A/FvqeFO80zxWr8=
-github.com/owncloud/ocis-pkg/v2 v2.1.0/go.mod h1:MXv7QzsYsu4YWuyJxhq1kLLmJa/r5gbqHe1FXulMHaw=
+github.com/owncloud/ocis-pkg/v2 v2.2.0 h1:lsb1PSn8F4ppPHOECVc3fqziDM/VdGQ/zqxQnEk+qi8=
+github.com/owncloud/ocis-pkg/v2 v2.2.0/go.mod h1:MXv7QzsYsu4YWuyJxhq1kLLmJa/r5gbqHe1FXulMHaw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pelletier/go-buffruneio v0.2.0/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
