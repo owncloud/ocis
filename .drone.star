@@ -142,7 +142,17 @@ def testing(ctx):
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          },
+          'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+          'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
+          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
+          'KONNECTD_ISS': 'https://ocis-server:9200',
+          'KONNECTD_TLS': 'true',
+          'LDAP_URI': 'ldap://ldap',
+          'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
+          'LDAP_BINDPW': 'admin',
+          'LDAP_BASEDN': 'dc=owncloud,dc=com'
+        },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
           'bin/ocis server'
@@ -155,7 +165,7 @@ def testing(ctx):
         ]
       },
       {
-        'name': 'acceptance-tests',
+        'name': 'oC10APIAcceptanceTests',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -171,12 +181,43 @@ def testing(ctx):
           'cd /srv/app/testrunner',
           'make test-acceptance-api',
         ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ]
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+      {
+        'name': 'phoenixWebUIAcceptanceTests',
+        'image': 'owncloudci/nodejs:10',
+        'pull': 'always',
+        'environment': {
+          'SERVER_HOST': 'http://ocis-server:9100',
+          'BACKEND_HOST': 'http://ocis-server:9140',
+          'RUN_ON_OCIS': 'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
+          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
+          'OCIS_PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'LDAP_SERVER_URL': 'ldap://ldap',
+          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
+          'LOCAL_UPLOAD_DIR': '/uploads'
+        },
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
+          'git clone -b master --depth=1 https://github.com/owncloud/phoenix.git /srv/app/phoenix',
+          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/phoenix',
+          'yarn install-all',
+          'yarn dist',
+          'yarn run acceptance-tests-drone'
+        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+        {
+          'name': 'uploads',
+          'path': '/uploads'
+        }]
       },
     ],
     'services': [
@@ -200,12 +241,25 @@ def testing(ctx):
           'REDIS_DATABASES': 1
         },
       },
+      {
+        'name': 'selenium',
+        'image': 'selenium/standalone-chrome-debug:latest',
+        'pull': 'always',
+        'volumes': [{
+            'name': 'uploads',
+            'path': '/uploads'
+        }],
+      },
     ],
     'volumes': [
       {
         'name': 'gopath',
         'temp': {},
       },
+      {
+        'name': 'uploads',
+        'temp': {}
+      }
     ],
     'trigger': {
       'ref': [
