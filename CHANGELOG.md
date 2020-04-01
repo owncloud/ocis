@@ -6,6 +6,7 @@
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
+* Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 
 ## Details
@@ -37,6 +38,15 @@
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
    https://github.com/owncloud/ocis/pull/167
+
+
+* Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
+
+   We've updated various extensions to a tagged release: - ocis-phoenix v0.4.0 (phoenix v0.7.0)
+   - ocis-pkg v2.2.0 - ocis-proxy v0.3.1 - ocis-reva v0.1.1 - ocis-thumbnails v0.1.0 -
+   ocis-webdav v0.1.0
+
+   https://github.com/owncloud/ocis/pull/180
 
 
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
