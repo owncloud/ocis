@@ -1,31 +1,31 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.4.1] (2020-04-01)
 
-The following sections list the changes in ocis-phoenix unreleased.
+The following sections list the changes in ocis-phoenix 0.4.1.
 
-[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.4.0...master
+[0.4.1]: https://github.com/owncloud/ocis-phoenix/compare/v0.4.0...v0.4.1
 
 ## Summary
 
-* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
+* Bugfix - Create a new tag to fix v0.4.0: [#62](https://github.com/owncloud/ocis-phoenix/pull/62)
 
 ## Details
 
-* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
+* Bugfix - Create a new tag to fix v0.4.0: [#62](https://github.com/owncloud/ocis-phoenix/pull/62)
 
-   Extensions should be responsible of configuring themselves. We use Viper for config loading
-   from default paths. Environment variables **WILL** take precedence over config files.
+   Release v0.4.0 is using the wrong assets. We fixed that by creating a new release.
 
-   https://github.com/owncloud/ocis-phoenix/pull/57
+   https://github.com/owncloud/ocis-phoenix/pull/62
 
 # Changelog for [0.4.0] (2020-03-31)
 
 The following sections list the changes in ocis-phoenix 0.4.0.
 
-[0.4.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.3.0...v0.4.0
+[0.4.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...v0.4.0
 
 ## Summary
 
 * Change - Update Phoenix: [#60](https://github.com/owncloud/ocis-phoenix/pull/60)
+* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
 
 ## Details
 
@@ -35,31 +35,18 @@ The following sections list the changes in ocis-phoenix 0.4.0.
 
    https://github.com/owncloud/ocis-phoenix/pull/60
 
-# Changelog for [0.3.0] (2020-03-17)
+* Enhancement - Configuration: [#57](https://github.com/owncloud/ocis-phoenix/pull/57)
 
-The following sections list the changes in ocis-phoenix 0.3.0.
+   Extensions should be responsible of configuring themselves. We use Viper for config loading
+   from default paths. Environment variables **WILL** take precedence over config files.
 
-[0.3.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.2.0...v0.3.0
-
-## Summary
-
-* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
-
-## Details
-
-* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
-
-   We changed the default configuration to integrate better with ocis.
-
-   Clients are supposed to use the ocis-proxy endpoint `https://localhost:9200`
-
-   https://github.com/owncloud/ocis-phoenix/pull/55
+   https://github.com/owncloud/ocis-phoenix/pull/57
 
 # Changelog for [0.2.0] (2020-03-17)
 
 The following sections list the changes in ocis-phoenix 0.2.0.
 
-[0.2.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.1.0...v0.2.0
+[0.2.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.3.0...v0.2.0
 
 ## Summary
 
@@ -89,6 +76,26 @@ The following sections list the changes in ocis-phoenix 0.2.0.
    Use the latest phoenix release
 
    https://github.com/owncloud/ocis-phoenix/pull/53
+
+# Changelog for [0.3.0] (2020-03-17)
+
+The following sections list the changes in ocis-phoenix 0.3.0.
+
+[0.3.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.1.0...v0.3.0
+
+## Summary
+
+* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
+
+## Details
+
+* Change - Default to running behind ocis-proxy: [#55](https://github.com/owncloud/ocis-phoenix/pull/55)
+
+   We changed the default configuration to integrate better with ocis.
+
+   Clients are supposed to use the ocis-proxy endpoint `https://localhost:9200`
+
+   https://github.com/owncloud/ocis-phoenix/pull/55
 
 # Changelog for [0.1.0] (2020-02-03)
 
