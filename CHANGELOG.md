@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-konnectd unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-konnectd/compare/v0.2.0...master
+
+## Summary
+
+* Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis-konnectd/issues/26)
+
+## Details
+
+* Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis-konnectd/issues/26)
+
+   The phoenix client was not set as trusted therefore when logging out the user was redirected to a
+   default page instead of the provided url.
+
+   https://github.com/owncloud/ocis-konnectd/issues/26
+
 # Changelog for [0.2.0] (2020-03-18)
 
 The following sections list the changes in ocis-konnectd 0.2.0.
