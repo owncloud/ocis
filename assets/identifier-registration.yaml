@@ -9,8 +9,8 @@ clients:
     trusted: yes
     redirect_uris:
       - http://localhost:9100/oidc-callback.html
-      - http://localhost:9100
-      - https://localhost:9200
+      - http://localhost:9100/
+      - https://localhost:9200/
       - https://localhost:9200/oidc-callback.html
     origins:
       - http://localhost:9100
