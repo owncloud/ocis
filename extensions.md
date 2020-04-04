@@ -1,5 +1,5 @@
 ---
-title: "Extensions"
+title: "Extension"
 date: 2020-02-27T20:35:00+01:00
 weight: 40
 geekdocRepo: https://github.com/owncloud/ocis
