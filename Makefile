@@ -144,12 +144,16 @@ docs-copy:
 	git checkout origin/source -f; \
 	rsync --delete -ax ../docs/ content/$(NAME)
 
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| docs/configuration.md
+
 .PHONY: docs-build
 docs-build:
 	cd $(HUGO); hugo
 
 .PHONY: docs
-docs: docs-copy docs-build
+docs: config-docs-generate docs-copy docs-build
 
 .PHONY: watch
 watch:
