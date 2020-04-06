@@ -198,7 +198,7 @@ def testing(ctx):
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'OCIS_PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'LDAP_SERVER_URL': 'ldap://ldap',
-          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
+          'TEST_TAGS': '@skipOnOCIS',
           'LOCAL_UPLOAD_DIR': '/uploads'
         },
         'commands': [
