@@ -11,7 +11,7 @@ require (
 	github.com/micro/cli/v2 v2.1.1
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.1
+	github.com/owncloud/ocis-pkg/v2 v2.2.0
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.5.0
 	go.opencensus.io v0.22.2
