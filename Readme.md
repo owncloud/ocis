@@ -1,7 +1,6 @@
 # ownCloud Infinite Scale: Proxy
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-proxy/status.svg)](https://cloud.drone.io/owncloud/ocis-proxy)
-[![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d005a4722c1b463b9b95060479018e99)](https://www.codacy.com/gh/owncloud/ocis-proxy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-proxy&amp;utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-proxy?status.svg)](http://godoc.org/github.com/owncloud/ocis-proxy)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-proxy)](http://goreportcard.com/report/github.com/owncloud/ocis-proxy)
