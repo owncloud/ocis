@@ -1,7 +1,8 @@
 # ownCloud Infinite Scale: Proxy
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-proxy/status.svg)](https://cloud.drone.io/owncloud/ocis-proxy)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d005a4722c1b463b9b95060479018e99)](https://www.codacy.com/gh/owncloud/ocis-proxy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-proxy&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/636af6e2270e4c7ca0f3eb2efc814c21)](https://www.codacy.com/gh/owncloud/ocis-proxy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-bridge&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/636af6e2270e4c7ca0f3eb2efc814c21)](https://www.codacy.com/gh/owncloud/ocis-proxy?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-bridge&utm_campaign=Badge_Coverage)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-proxy?status.svg)](http://godoc.org/github.com/owncloud/ocis-proxy)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-proxy)](http://goreportcard.com/report/github.com/owncloud/ocis-proxy)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-proxy.svg)](http://microbadger.com/images/owncloud/ocis-proxy "Get your own image badge on microbadger.com")
