@@ -1,0 +1,9 @@
+coverage.out
+
+.idea
+/bin
+/dist
+/hugo
+
+/node_modules
+/assets
