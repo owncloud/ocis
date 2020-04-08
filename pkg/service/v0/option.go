@@ -3,8 +3,10 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
 // Option defines a single option function.
@@ -12,9 +14,11 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger     log.Logger
-	Config     *config.Config
-	Middleware []func(http.Handler) http.Handler
+	Logger           log.Logger
+	Config           *config.Config
+	Middleware       []func(http.Handler) http.Handler
+	ThumbnailStorage storage.Storage
+	ImageSource      imgsource.Source
 }
 
 // newOptions initializes the available default options.
@@ -46,5 +50,19 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// ThumbnailStorage provides a function to set the thumbnail storage option.
+func ThumbnailStorage(val storage.Storage) Option {
+	return func(o *Options) {
+		o.ThumbnailStorage = val
+	}
+}
+
+// ThumbnailSource provides a function to set the image source option.
+func ThumbnailSource(val imgsource.Source) Option {
+	return func(o *Options) {
+		o.ImageSource = val
 	}
 }

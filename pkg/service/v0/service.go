@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
 type contextKey string
@@ -28,14 +27,11 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	}
 	svc := Thumbnail{
 		manager: thumbnail.NewSimpleManager(
-			storage.NewFileSystemStorage(
-				options.Config.Thumbnail.FileSystemStorage,
-				logger,
-			),
+			options.ThumbnailStorage,
 			logger,
 		),
 		resolutions: resolutions,
-		source:      imgsource.NewWebDavSource(options.Config.Thumbnail.WebDavSource),
+		source:      options.ImageSource,
 		logger:      logger,
 	}
 
