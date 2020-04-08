@@ -9,6 +9,7 @@ The following sections list the changes in ocis-konnectd unreleased.
 * Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis-konnectd/issues/26)
 * Change - Add a trailing slash to trusted redirect uris: [#26](https://github.com/owncloud/ocis-konnectd/issues/26)
 * Change - Improve client identifiers for end users: [#62](https://github.com/owncloud/ocis-konnectd/pull/62)
+* Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
 
 ## Details
 
@@ -33,6 +34,11 @@ The following sections list the changes in ocis-konnectd unreleased.
    Improved end user facing client names in default identifier-registration.yaml
 
    https://github.com/owncloud/ocis-konnectd/pull/62
+
+
+* Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
+
+   https://github.com/owncloud/product/issues/14
 
 # Changelog for [0.2.0] (2020-03-18)
 
