@@ -21,7 +21,7 @@ require (
 	github.com/owncloud/ocis-konnectd v0.2.0
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.3.0
-	github.com/owncloud/ocis-pkg/v2 v2.1.0
+	github.com/owncloud/ocis-pkg/v2 v2.2.0
 	github.com/owncloud/ocis-proxy v0.1.0
 	github.com/owncloud/ocis-reva v0.0.0-20200318210849-075c6608b85f
 	github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4
@@ -38,3 +38,9 @@ require (
 replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.30.0-alpha1
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+
+replace github.com/owncloud/ocis-reva => ../ocis-reva
+
+replace github.com/cs3org/reva => ../../refs/reva
+
+replace github.com/owncloud/ocis-proxy => ../ocis-proxy

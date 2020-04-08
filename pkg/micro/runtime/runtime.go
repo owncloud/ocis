@@ -44,6 +44,7 @@ var (
 		"reva-sharing",
 		//"reva-storage-root",
 		"reva-storage-home",
+		"reva-storage-public-link",
 		"reva-storage-home-data",
 		"reva-storage-oc",
 		"reva-storage-oc-data",
