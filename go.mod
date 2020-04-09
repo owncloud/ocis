@@ -11,6 +11,7 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-micro/v2 v2.0.0
 	github.com/oklog/run v1.0.0
+	github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203
 	github.com/owncloud/ocis-pkg/v2 v2.0.1
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/prometheus/client_model v0.0.0-20191202183732-d1d2010b5bee // indirect
@@ -23,7 +24,6 @@ require (
 	github.com/uber/jaeger-client-go v2.20.1+incompatible // indirect
 	golang.org/x/sys v0.0.0-20200103143344-a1369afcdac7 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
-	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
