@@ -14,6 +14,7 @@ import (
 	"github.com/owncloud/ocis-reva/pkg/config"
 	"github.com/owncloud/ocis-reva/pkg/flagset"
 	"github.com/owncloud/ocis-reva/pkg/server/debug"
+	"github.com/owncloud/ocis-reva/pkg/service/external"
 )
 
 // Gateway is the entrypoint for the gateway command.
@@ -145,6 +146,18 @@ func Gateway(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(func() error {
+					err := external.RegisterGRPCEndpoint(
+						ctx,
+						"com.owncloud.reva",
+						uuid.String(),
+						cfg.Reva.Gateway.Addr,
+						logger,
+					)
+
+					if err != nil {
+						return err
+					}
+
 					runtime.Run(rcfg, pidFile)
 					return nil
 				}, func(_ error) {
@@ -154,6 +167,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 
 					cancel()
 				})
+
 			}
 
 			{
