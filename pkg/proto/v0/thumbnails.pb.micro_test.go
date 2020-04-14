@@ -49,6 +49,21 @@ func init() {
 	service.Server().Start()
 }
 
+func TestGetThumbnailInvalidImage(t *testing.T) {
+	req := proto.GetRequest{
+		Filepath: "invalid.png",
+		Filetype: proto.GetRequest_PNG,
+		Etag:     "33a64df551425fcc55e4d42a148795d9f25f89d4",
+		Height:   32,
+		Width:    32,
+	}
+	client := service.Client()
+	cl := proto.NewThumbnailService("com.owncloud.api.thumbnails", client)
+	_, err := cl.GetThumbnail(context.Background(), &req)
+
+	assert.NotNil(t, err)
+}
+
 func TestGetThumbnail(t *testing.T) {
 	req := proto.GetRequest{
 		Filepath: "oc.png",
@@ -69,19 +84,4 @@ func TestGetThumbnail(t *testing.T) {
 	assert.Equal(t, 32, img.Bounds().Size().X)
 
 	assert.Equal(t, "image/png", rsp.GetMimetype())
-}
-
-func TestGetThumbnailInvalidImage(t *testing.T) {
-	req := proto.GetRequest{
-		Filepath: "invalid.png",
-		Filetype: proto.GetRequest_PNG,
-		Etag:     "33a64df551425fcc55e4d42a148795d9f25f89d4",
-		Height:   32,
-		Width:    32,
-	}
-	client := service.Client()
-	cl := proto.NewThumbnailService("com.owncloud.api.thumbnails", client)
-	_, err := cl.GetThumbnail(context.Background(), &req)
-
-	assert.NotNil(t, err)
 }
