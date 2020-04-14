@@ -139,7 +139,7 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "mount-id",
-			Value:       "123e4567-e89b-12d3-a456-426655440000",
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162",
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_OC_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageOC.MountID,
@@ -176,6 +176,20 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Namespace for metadata operations",
 			EnvVars:     []string{"REVA_STORAGE_EOS_NAMESPACE"},
 			Destination: &cfg.Reva.Storages.EOS.Namespace,
+		},
+		&cli.StringFlag{
+			Name: "storage-eos-shadow-namespace",
+			// Defaults to path.Join(c.Namespace, ".shadow")
+			Usage:       "Shadow namespace where share references are stored",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHADOW_NAMESPACE"},
+			Destination: &cfg.Reva.Storages.EOS.ShadowNamespace,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-share-folder",
+			Value:       "",
+			Usage:       "name of the share folder",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.Storages.EOS.ShareFolder,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-binary",
@@ -265,7 +279,7 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-layout",
-			Value:       "{{.Username}}",
+			Value:       "{{substr 0 1 .Username}}/{{.Username}}",
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.EOS.Layout,

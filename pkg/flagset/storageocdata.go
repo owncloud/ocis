@@ -156,6 +156,20 @@ func StorageOCDataWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Storages.EOS.Namespace,
 		},
 		&cli.StringFlag{
+			Name: "storage-eos-shadow-namespace",
+			// Defaults to path.Join(c.Namespace, ".shadow")
+			Usage:       "Shadow namespace where share references are stored",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHADOW_NAMESPACE"},
+			Destination: &cfg.Reva.Storages.EOS.ShadowNamespace,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-share-folder",
+			Value:       "",
+			Usage:       "name of the share folder",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.Storages.EOS.ShareFolder,
+		},
+		&cli.StringFlag{
 			Name:        "storage-eos-binary",
 			Value:       "/usr/bin/eos",
 			Usage:       "Location of the eos binary",
@@ -243,7 +257,7 @@ func StorageOCDataWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-layout",
-			Value:       "{{.Username}}",
+			Value:       "{{substr 0 1 .Username}}/{{.Username}}",
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.EOS.Layout,

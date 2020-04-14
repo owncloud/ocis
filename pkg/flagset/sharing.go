@@ -128,6 +128,13 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Sharing.UserDriver,
 		},
 		&cli.StringFlag{
+			Name:        "user-json-file",
+			Value:       "/var/tmp/reva/shares.json",
+			Usage:       "file used to persist shares for the UserShareProvider",
+			EnvVars:     []string{"REVA_SHARING_USER_JSON_FILE"},
+			Destination: &cfg.Reva.Sharing.UserJSONFile,
+		},
+		&cli.StringFlag{
 			Name:        "public-driver",
 			Value:       "memory",
 			Usage:       "driver to use for the PublicShareProvider",

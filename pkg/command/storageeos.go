@@ -16,14 +16,14 @@ import (
 	"github.com/owncloud/ocis-reva/pkg/server/debug"
 )
 
-// StorageHomeData is the entrypoint for the storage-home-data command.
-func StorageHomeData(cfg *config.Config) *cli.Command {
+// StorageEOS is the entrypoint for the storage-eos command.
+func StorageEOS(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "storage-home-data",
-		Usage: "Start reva storage-home-data service",
-		Flags: flagset.StorageHomeDataWithConfig(cfg),
+		Name:  "storage-eos",
+		Usage: "Start reva storage-eos service",
+		Flags: flagset.StorageEOSWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.StorageHomeData.Services = c.StringSlice("service")
+			cfg.Reva.StorageEOS.Services = c.StringSlice("service")
 
 			return nil
 		},
@@ -72,25 +72,24 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus": cfg.Reva.StorageHomeData.MaxCPUs,
+						"max_cpus": cfg.Reva.StorageEOS.MaxCPUs,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
 					},
-					"http": map[string]interface{}{
-						"network": cfg.Reva.StorageHomeData.Network,
-						"address": cfg.Reva.StorageHomeData.Addr,
+					"grpc": map[string]interface{}{
+						"network": cfg.Reva.StorageEOS.Network,
+						"address": cfg.Reva.StorageEOS.Addr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
-							"dataprovider": map[string]interface{}{
-								"prefix": cfg.Reva.StorageHomeData.Prefix,
-								"driver": cfg.Reva.StorageHomeData.Driver,
+							"storageprovider": map[string]interface{}{
+								"driver": cfg.Reva.StorageEOS.Driver,
 								"drivers": map[string]interface{}{
 									"eos": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
-										"eos_binary":             cfg.Reva.Storages.EOS.EosBinary,
 										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
 										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
+										"eos_binary":             cfg.Reva.Storages.EOS.EosBinary,
 										"xrdcopy_binary":         cfg.Reva.Storages.EOS.XrdcopyBinary,
 										"master_url":             cfg.Reva.Storages.EOS.MasterURL,
 										"slave_url":              cfg.Reva.Storages.EOS.SlaveURL,
@@ -124,7 +123,12 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 										"prefix":     cfg.Reva.Storages.S3.Prefix,
 									},
 								},
-								"temp_folder": cfg.Reva.StorageHomeData.TempFolder,
+								"mount_path":         cfg.Reva.StorageEOS.MountPath,
+								"mount_id":           cfg.Reva.StorageEOS.MountID,
+								"expose_data_server": cfg.Reva.StorageEOS.ExposeDataServer,
+								// TODO use cfg.Reva.SStorageEOSData.URL, ?
+								"data_server_url":      cfg.Reva.StorageEOS.DataServerURL,
+								"enable_home_creation": cfg.Reva.StorageEOS.EnableHomeCreation,
 							},
 						},
 					},
@@ -145,7 +149,7 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 			{
 				server, err := debug.Server(
 					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.StorageHomeData.DebugAddr),
+					debug.Addr(cfg.Reva.StorageEOS.DebugAddr),
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),

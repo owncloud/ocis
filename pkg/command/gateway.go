@@ -125,7 +125,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 											cfg.Reva.StorageRoot.MountPath: cfg.Reva.StorageRoot.URL,
 											cfg.Reva.StorageRoot.MountID:   cfg.Reva.StorageRoot.URL,
 											cfg.Reva.StorageHome.MountPath: cfg.Reva.StorageHome.URL,
-											// home has no lookup by mount id because it resolves to another storage
+											// the home storage has no mount id. In responses it returns the mount id of the actual storage
 											cfg.Reva.StorageEOS.MountPath:    cfg.Reva.StorageEOS.URL,
 											cfg.Reva.StorageEOS.MountID:      cfg.Reva.StorageEOS.URL,
 											cfg.Reva.StorageOC.MountPath:     cfg.Reva.StorageOC.URL,

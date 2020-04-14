@@ -137,8 +137,9 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars: []string{"REVA_GATEWAY_SERVICES"},
 		},
 		&cli.BoolFlag{
-			Name:        "commit-share-to-storage-grant",
-			Value:       true,
+			Name:  "commit-share-to-storage-grant",
+			Value: true,
+			// TODO clarify
 			Usage:       "Commit shares to the share manager",
 			EnvVars:     []string{"REVA_GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT"},
 			Destination: &cfg.Reva.Gateway.CommitShareToStorageGrant,
@@ -153,7 +154,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "share-folder",
-			Value:       "/",
+			Value:       "Shares",
 			Usage:       "mount shares in this folder of the home storage provider",
 			EnvVars:     []string{"REVA_GATEWAY_SHARE_FOLDER"},
 			Destination: &cfg.Reva.Gateway.ShareFolder,
@@ -229,7 +230,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-root-mount-id",
-			Value:       "123e4567-e89b-12d3-a456-426655440001",
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009152",
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_ROOT_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageRoot.MountID,
@@ -249,20 +250,28 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_PATH"},
 			Destination: &cfg.Reva.StorageHome.MountPath,
 		},
-		&cli.StringFlag{
-			Name:        "storage-home-mount-id",
-			Value:       "123e4567-e89b-12d3-a456-426655440000",
-			Usage:       "mount id",
-			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
-			Destination: &cfg.Reva.StorageHome.MountID,
-		},
+		// The home storage has no mount id. In responses it returns the mount id of the actual storage
 
 		&cli.StringFlag{
-			Name:        "storage-home-data-url",
-			Value:       "localhost:9156",
+			Name:        "storage-eos-url",
+			Value:       "localhost:9158",
 			Usage:       "URL to use for the reva service",
-			EnvVars:     []string{"REVA_STORAGE_HOME_DATA_URL"},
-			Destination: &cfg.Reva.StorageHomeData.URL,
+			EnvVars:     []string{"REVA_STORAGE_EOS_URL"},
+			Destination: &cfg.Reva.StorageEOS.URL,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-mount-path",
+			Value:       "/eos",
+			Usage:       "mount path",
+			EnvVars:     []string{"REVA_STORAGE_EOS_MOUNT_PATH"},
+			Destination: &cfg.Reva.StorageEOS.MountPath,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-mount-id",
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009158",
+			Usage:       "mount id",
+			EnvVars:     []string{"REVA_STORAGE_EOS_MOUNT_ID"},
+			Destination: &cfg.Reva.StorageEOS.MountID,
 		},
 
 		&cli.StringFlag{
@@ -281,18 +290,10 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-oc-mount-id",
-			Value:       "123e4567-e89b-12d3-a456-426655440000",
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162",
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_OC_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageOC.MountID,
-		},
-
-		&cli.StringFlag{
-			Name:        "storage-oc-data-url",
-			Value:       "localhost:9164",
-			Usage:       "URL to use for the reva service",
-			EnvVars:     []string{"REVA_STORAGE_OC_DATA_URL"},
-			Destination: &cfg.Reva.StorageOCData.URL,
 		},
 	}
 }

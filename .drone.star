@@ -137,11 +137,12 @@ def testing(ctx):
           'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
           'REVA_LDAP_BIND_PASSWORD': 'admin',
           'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
+          'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayName',
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379'
+          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',

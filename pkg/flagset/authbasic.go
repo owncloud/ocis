@@ -150,6 +150,13 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_LDAP_BIND_PASSWORD"},
 			Destination: &cfg.Reva.LDAP.BindPassword,
 		},
+		&cli.StringFlag{
+			Name:        "ldap-idp",
+			Value:       "https://localhost:9200",
+			Usage:       "Identity provider to use for users",
+			EnvVars:     []string{"REVA_LDAP_IDP"},
+			Destination: &cfg.Reva.LDAP.IDP,
+		},
 		// ldap dn is always the dn
 		&cli.StringFlag{
 			Name:        "ldap-schema-uid",

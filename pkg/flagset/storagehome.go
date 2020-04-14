@@ -138,8 +138,10 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageHome.MountPath,
 		},
 		&cli.StringFlag{
-			Name:        "mount-id",
-			Value:       "123e4567-e89b-12d3-a456-426655440000",
+			Name: "mount-id",
+			// This is tho mount id of the /oc storage
+			// set it to 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162",
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageHome.MountID,
@@ -172,10 +174,24 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "storage-eos-namespace",
-			Value:       "",
+			Value:       "/eos/dockertest/reva/users",
 			Usage:       "Namespace for metadata operations",
 			EnvVars:     []string{"REVA_STORAGE_EOS_NAMESPACE"},
 			Destination: &cfg.Reva.Storages.EOS.Namespace,
+		},
+		&cli.StringFlag{
+			Name: "storage-eos-shadow-namespace",
+			// Defaults to path.Join(c.Namespace, ".shadow")
+			Usage:       "Shadow namespace where share references are stored",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHADOW_NAMESPACE"},
+			Destination: &cfg.Reva.Storages.EOS.ShadowNamespace,
+		},
+		&cli.StringFlag{
+			Name:        "storage-eos-share-folder",
+			Value:       "/Shares",
+			Usage:       "name of the share folder",
+			EnvVars:     []string{"REVA_STORAGE_EOS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.Storages.EOS.ShareFolder,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-binary",
@@ -193,14 +209,14 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-master-url",
-			Value:       "root://eos-example.org",
+			Value:       "root://eos-mgm1.eoscluster.cern.ch:1094",
 			Usage:       "URL of the Master EOS MGM",
 			EnvVars:     []string{"REVA_STORAGE_EOS_MASTER_URL"},
 			Destination: &cfg.Reva.Storages.EOS.MasterURL,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-slave-url",
-			Value:       "root://eos-example.org",
+			Value:       "root://eos-mgm1.eoscluster.cern.ch:1094",
 			Usage:       "URL of the Slave EOS MGM",
 			EnvVars:     []string{"REVA_STORAGE_EOS_SLAVE_URL"},
 			Destination: &cfg.Reva.Storages.EOS.SlaveURL,
@@ -238,35 +254,33 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "storage-eos-enable-home",
+			Value:       true,
 			Usage:       "enable the creation of home directories",
 			EnvVars:     []string{"REVA_STORAGE_EOS_ENABLE_HOME"},
 			Destination: &cfg.Reva.Storages.EOS.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-sec-protocol",
-			Value:       "",
 			Usage:       "the xrootd security protocol to use between the server and EOS",
 			EnvVars:     []string{"REVA_STORAGE_EOS_SEC_PROTOCOL"},
 			Destination: &cfg.Reva.Storages.EOS.SecProtocol,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-keytab",
-			Value:       "",
 			Usage:       "the location of the keytab to use to authenticate to EOS",
 			EnvVars:     []string{"REVA_STORAGE_EOS_KEYTAB"},
 			Destination: &cfg.Reva.Storages.EOS.Keytab,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-single-username",
-			Value:       "",
 			Usage:       "the username to use when SingleUserMode is enabled",
 			EnvVars:     []string{"REVA_STORAGE_EOS_SINGLE_USERNAME"},
 			Destination: &cfg.Reva.Storages.EOS.SingleUsername,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-layout",
-			Value:       "{{.Username}}",
-			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
+			Value:       "{{substr 0 1 .Username}}/{{.Username}}",
+			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "E/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.EOS.Layout,
 		},
