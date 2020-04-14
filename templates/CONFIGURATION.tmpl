@@ -1,17 +1,11 @@
 ---
 title: "Configuration"
-<<<<<<< HEAD
-date: "{{ dateInZone "2006-01-02T15:04:05" (now) "UTC"}}"
-=======
 date: "{{ date "2006-01-02T15:04:05-0700" now }}"
->>>>>>> Add Flagset extractor, generate configuration docs
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
 geekdocFilePath: configuration.md
 ---
-<<<<<<< HEAD
-=======
 {{- define "options"}}
 {{ $fnName := (last . ).Flags -}}
 {{ range $opt := first . }}{{ with list $fnName $opt -}}
@@ -24,26 +18,16 @@ geekdocFilePath: configuration.md
 {{ end -}}
 {{ end -}}
 {{ end }}
->>>>>>> Add Flagset extractor, generate configuration docs
 
 {{`{{< toc >}}`}}
 
 ## Configuration
 
-<<<<<<< HEAD
-## Configuration of extensions
-
-=======
->>>>>>> Add Flagset extractor, generate configuration docs
 oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
 
 Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/ocis_proxy/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
-<<<<<<< HEAD
-## Configuration using config files
-=======
 ### Configuration using config files
->>>>>>> Add Flagset extractor, generate configuration docs
 
 Out of the box extensions will attempt to read configuration details from:
 
@@ -55,65 +39,6 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
 
-<<<<<<< HEAD
-### Configuration file
-
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
-
-## Envrionment variables
-
-If you prefer to configure the service with environment variables you can see the available variables below.
-
-### Server
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "ServerWithConfig"}}
-{{ index .Env 0 }}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-{{ end }}
-{{- end }}
-{{- end }}
-### Root Command
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "RootWithConfig"}}
-{{ index .Env 0 }}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-{{ end }}
-{{- end }}
-{{- end }}
-### Health
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "HealthWithConfig"}}
-{{ index .Env 0 }}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-{{ end }}
-{{- end }}
-{{- end }}
-## Commandline flags
-
-If you prefer to configure the service with commandline flags you can see the available variables below.
-
-### Server
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "ServerWithConfig"}}
---{{ .Name}}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-{{ end }}
-{{- end }}
-{{- end }}
-### Root Command
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "RootWithConfig"}}
---{{ .Name}}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-{{ end }}
-{{- end }}
-{{- end }}
-### Health
-{{ range $opts := . }}{{ with $opts }}
-{{- if eq .FnName "HealthWithConfig"}}
---{{ .Name}}
-: {{ .Usage }}. {{- if .Default }} Default: `{{ .Default }}`.{{ end }}
-=======
 So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
 ### Envrionment variables
@@ -164,7 +89,6 @@ There are more subcommands to start the individual extensions. Please check the 
 
 {{ .Usage }}
 
->>>>>>> Add Flagset extractor, generate configuration docs
 {{ end -}}
 {{- end -}}
 {{- end -}}
