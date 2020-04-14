@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.1.1...master
+
+## Summary
+
+* Bugfix - Fix eos config: [#125](https://github.com/owncloud/ocis-reva/pull/125)
+
+## Details
+
+* Bugfix - Fix eos config: [#125](https://github.com/owncloud/ocis-reva/pull/125)
+
+   We have added missing config options for the home layout to the config struct that is passed to
+   eos.
+
+   https://github.com/owncloud/ocis-reva/pull/125
+
 # Changelog for [0.1.1] (2020-03-31)
 
 The following sections list the changes in ocis-reva 0.1.1.
