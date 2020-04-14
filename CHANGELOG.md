@@ -2,7 +2,7 @@
 
 The following sections list the changes in ocis-konnectd 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.2.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.3.1...v0.3.0
 
 ## Summary
 
@@ -40,25 +40,29 @@ The following sections list the changes in ocis-konnectd 0.3.0.
 
    https://github.com/owncloud/product/issues/14
 
-# Changelog for [0.2.0] (2020-03-18)
+# Changelog for [0.3.1] (2020-04-14)
 
-The following sections list the changes in ocis-konnectd 0.2.0.
+The following sections list the changes in ocis-konnectd 0.3.1.
 
-[0.2.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.1.0...v0.2.0
+[0.3.1]: https://github.com/owncloud/ocis-konnectd/compare/v0.1.0...v0.3.1
 
 ## Summary
 
-* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis-konnectd/pull/55)
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
 
 ## Details
 
-* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis-konnectd/pull/55)
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
 
-   https://github.com/owncloud/ocis-konnectd/pull/55
+   PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
+
+   https://github.com/owncloud/ocis-konnectd/pull/64
 
 # Changelog for [0.1.0] (2020-03-18)
 
 The following sections list the changes in ocis-konnectd 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.2.0...v0.1.0
 
 [0.1.0]: https://github.com/owncloud/ocis-konnectd/compare/66337bb4dad4a3202880323adf7a51a1a3bb4085...v0.1.0
 
@@ -102,4 +106,18 @@ The following sections list the changes in ocis-konnectd 0.1.0.
    `https://localhost:9200`
 
    https://github.com/owncloud/ocis-konnectd/pull/52
+
+# Changelog for [0.2.0] (2020-03-18)
+
+The following sections list the changes in ocis-konnectd 0.2.0.
+
+## Summary
+
+* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis-konnectd/pull/55)
+
+## Details
+
+* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis-konnectd/pull/55)
+
+   https://github.com/owncloud/ocis-konnectd/pull/55
 
