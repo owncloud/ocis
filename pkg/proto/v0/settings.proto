@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "proto";
+
+service BundleService {
+  rpc CreateSettingsBundle(CreateSettingsBundleRequest) returns (CreateSettingsBundleResponse);
+  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse);
+  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse);
+}
+
+// requests and responses
+message CreateSettingsBundleRequest {
+  SettingsBundle settingsBundle = 1;
+}
+
+message CreateSettingsBundleResponse {
+  SettingsBundle settingsBundle = 1;
+}
+
+message GetSettingsBundleRequest {
+  string extension = 1;
+  string key = 2;
+}
+
+message GetSettingsBundleResponse {
+  SettingsBundle settingsBundle = 1;
+}
+
+message ListSettingsBundlesRequest {
+  string extension = 1;// can be limited to all settings bundles of an extension
+}
+
+message ListSettingsBundlesResponse {
+  repeated SettingsBundle settingsBundles = 1;
+}
+
+// payloads
+message SettingsBundle {
+  string extension = 1;
+  string key = 2;
+  string displayName = 3;
+  repeated Setting settings = 4;
+}
+
+message Setting {
+  string key = 1;
+  string displayName = 2;
+  string description = 3;
+  repeated SettingsValue values = 4;
+}
+
+message SettingsValue {
+  string type = 1;
+}

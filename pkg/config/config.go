@@ -31,9 +31,15 @@ type Tracing struct {
 	Service   string
 }
 
+// Storage defines the available storage configuration.
+type Storage struct {
+	RootMountPath string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
+	Storage Storage
 	Log     Log
 	Debug   Debug
 	HTTP    HTTP

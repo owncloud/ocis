@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/owncloud/ocis-settings/pkg/server/grpc"
 	"os"
 	"os/signal"
 	"strings"
@@ -16,9 +17,7 @@ import (
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/flagset"
-	"github.com/owncloud/ocis-settings/pkg/metrics"
 	"github.com/owncloud/ocis-settings/pkg/server/debug"
-	"github.com/owncloud/ocis-settings/pkg/server/http"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -129,30 +128,19 @@ func Server(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
 			)
 
 			defer cancel()
 
 			{
-				server, err := http.Server(
-					http.Logger(logger),
-					http.Namespace(httpNamespace),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
+				server := grpc.Server(
+					grpc.Name("ocis-settings"),
+					grpc.Address(":9190"),
+					grpc.Logger(logger),
+					grpc.Context(ctx),
+					grpc.Config(cfg),
+					grpc.Namespace(httpNamespace),
 				)
-
-				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "http").
-						Msg("Failed to initialize server")
-
-					return err
-				}
 
 				gr.Add(func() error {
 					return server.Run()

@@ -1,52 +1,58 @@
 package svc
 
 import (
-	"net/http"
+	"context"
+	"github.com/owncloud/ocis-settings/pkg/settings"
+	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
 
-	"github.com/go-chi/chi"
+	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/owncloud/ocis-settings/pkg/config"
 )
 
-// Service defines the extension handlers.
-type Service interface {
-	ServeHTTP(http.ResponseWriter, *http.Request)
-	Dummy(http.ResponseWriter, *http.Request)
+type Service struct {
+	config *config.Config
+	manager settings.Manager
 }
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
-	options := newOptions(opts...)
-
-	m := chi.NewMux()
-	m.Use(options.Middleware...)
-
-	svc := Settings{
-		config: options.Config,
-		mux:    m,
+func NewService(cfg *config.Config) Service {
+	return Service{
+		config:cfg,
+		manager:store.New(cfg),
 	}
-
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/", svc.Dummy)
-	})
-
-	return svc
 }
 
-// Settings defines implements the business logic for Service.
-type Settings struct {
-	config *config.Config
-	mux    *chi.Mux
+func (g Service) CreateSettingsBundle(c context.Context, req *proto.CreateSettingsBundleRequest, res *proto.CreateSettingsBundleResponse) error {
+	r, err := g.manager.Write(req.SettingsBundle)
+	if err != nil {
+		return err
+	}
+	res.SettingsBundle = r
+	return nil
 }
 
-// ServeHTTP implements the Service interface.
-func (g Settings) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	g.mux.ServeHTTP(w, r)
+func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
+	r, err := g.manager.Read(req.Extension, req.Key)
+	if err != nil {
+		return err
+	}
+	res.SettingsBundle = r
+	return nil
 }
 
-// Dummy implements the Service interface.
-func (g Settings) Dummy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
+func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
+	r, err := listSettingsBundles(g, req.Extension)
+	if err != nil {
+		return err
+	}
+	res.SettingsBundles = r
+	return nil
+}
 
-	w.Write([]byte("Hello ocis-settings!"))
+func listSettingsBundles(g Service, extension string) ([]*proto.SettingsBundle, error) {
+	if len(extension) == 0 {
+		return g.manager.List()
+	} else {
+		return g.manager.ListByExtension(extension)
+	}
 }

@@ -134,5 +134,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"SETTINGS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name:        "settings-root-mount-path",
+			Value:       "/",
+			Usage:       "Mount path for the storage",
+			EnvVars:     []string{"SETTINGS_ROOT_MOUNT_PATH"},
+			Destination: &cfg.Storage.RootMountPath,
+		},
 	}
 }
