@@ -177,7 +177,7 @@ def testing(ctx):
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
         },
         'commands': [
-          'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+          'git clone -b testPropfindHref --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
           'cd /srv/app/testrunner',
           'make test-acceptance-api',
         ],
