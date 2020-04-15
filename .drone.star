@@ -208,6 +208,7 @@ def testing(ctx):
           'cd /srv/app/phoenix',
           'yarn install-all',
           'yarn dist',
+          'cp -r /drone/src/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
           'yarn run acceptance-tests-drone'
         ],
         'volumes': [{
