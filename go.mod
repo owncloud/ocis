@@ -15,7 +15,7 @@ require (
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/flaex v0.0.0-20200403112718-56e2e067dd26
+	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis-glauth v0.4.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
