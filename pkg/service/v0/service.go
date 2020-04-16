@@ -2,23 +2,24 @@ package svc
 
 import (
 	"context"
+
 	"github.com/owncloud/ocis-settings/pkg/settings"
 	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
 
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/owncloud/ocis-settings/pkg/config"
+	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 type Service struct {
-	config *config.Config
+	config  *config.Config
 	manager settings.Manager
 }
 
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config) Service {
 	return Service{
-		config:cfg,
-		manager:store.New(cfg),
+		config:  cfg,
+		manager: store.New(cfg),
 	}
 }
 

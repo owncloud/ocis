@@ -2,16 +2,17 @@
 package store
 
 import (
-	"encoding/json"
 	"fmt"
-	olog "github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-settings/pkg/config"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"github.com/owncloud/ocis-settings/pkg/settings"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/golang/protobuf/jsonpb"
+	olog "github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-settings/pkg/config"
+	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis-settings/pkg/settings"
 )
 
 var (
@@ -84,14 +85,14 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 // Read tries to find a bundle by the given extension and key within the mountPath
 func (s Store) Read(extension string, key string) (*proto.SettingsBundle, error) {
 	fileName := buildFileNameFromData(extension, key)
-	contents, err := ioutil.ReadFile(path.Join(s.mountPath, fileName))
+	contents, err := os.Open(path.Join(s.mountPath, fileName))
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading contents for extension %v and key %v: file not found", extension, key)
 		return nil, err
 	}
 
 	record := proto.SettingsBundle{}
-	if err = json.Unmarshal(contents, &record); err != nil {
+	if err = jsonpb.Unmarshal(contents, &record); err != nil {
 		s.Logger.Err(err).Msg("error unmarshalling record")
 		return nil, err
 	}
@@ -106,18 +107,30 @@ func (s Store) Write(rec *proto.SettingsBundle) (*proto.SettingsBundle, error) {
 		return nil, fmt.Errorf(emptyKeyError)
 	}
 
-	contents, err := json.Marshal(rec)
-	if err != nil {
-		s.Logger.Err(err).Msg("record could not be marshalled")
-		return nil, err
-	}
-
+	marshaler := jsonpb.Marshaler{}
 	recordPath := path.Join(s.mountPath, buildFileNameFromBundle(rec))
-	if err := ioutil.WriteFile(recordPath, contents, 0644); err != nil {
+	if err := ioutil.WriteFile(recordPath, []byte{}, 0644); err != nil {
 		return nil, err
 	}
 
-	s.Logger.Info().Msgf("%v bytes written to %v", len(contents), recordPath)
+	fd, err := os.OpenFile(recordPath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		s.Logger.Err(err).
+			Str(
+				"finding file",
+				fmt.Sprintf("file `%v` not found on store: `%v`", recordPath, s.mountPath),
+			)
+	}
+
+	if err = marshaler.Marshal(fd, rec); err != nil {
+		s.Logger.Err(err).
+			Str(
+				"marshaling record",
+				fmt.Sprintf("error marshaling record: %+v", rec),
+			)
+	}
+
+	s.Logger.Info().Msgf("request contents written to file: %v", recordPath)
 	return rec, nil
 }
 
