@@ -8,7 +8,7 @@ import (
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-accounts/pkg/config"
-	"github.com/owncloud/ocis-accounts/pkg/micro/grpc"
+	"github.com/owncloud/ocis-accounts/pkg/server/grpc"
 	oclog "github.com/owncloud/ocis-pkg/v2/log"
 )
 
