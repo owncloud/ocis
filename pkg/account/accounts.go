@@ -25,9 +25,3 @@ type Manager interface {
 	// List all records
 	List() ([]*proto.Record, error)
 }
-
-// Record is an entry in the account storage
-type Record struct {
-	Key   string
-	Value []byte
-}
