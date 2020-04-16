@@ -5,9 +5,11 @@
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
+* Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 
 ## Details
 
@@ -35,6 +37,15 @@
    https://github.com/owncloud/ocis/issues/136
 
 
+* Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
+
+   We have added rules to the Makefile that use the official [eos docker
+   images](https://gitlab.cern.ch/eos/eos-docker) to boot an eos cluster and configure OCIS
+   to use it.
+
+   https://github.com/owncloud/ocis/pull/172
+
+
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
    https://github.com/owncloud/ocis/pull/167
@@ -56,4 +67,12 @@
    ocis-reva v0.1.0
 
    https://github.com/owncloud/ocis/pull/151
+
+
+* Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
+
+   We've updated various extensions: - ocis-konnectd v0.3.1 - ocis-phoenix v0.5.0 (phoenix
+   v0.8.0) - ocis-reva v0.2.0
+
+   https://github.com/owncloud/ocis/pull/209
 

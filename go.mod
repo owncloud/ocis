@@ -20,12 +20,12 @@ require (
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
-	github.com/owncloud/ocis-konnectd v0.2.0
+	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
-	github.com/owncloud/ocis-phoenix v0.4.1
+	github.com/owncloud/ocis-phoenix v0.5.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.0
 	github.com/owncloud/ocis-proxy v0.3.1
-	github.com/owncloud/ocis-reva v0.1.2-0.20200415163208-833cdbbcb04d
+	github.com/owncloud/ocis-reva v0.2.0
 	github.com/owncloud/ocis-thumbnails v0.1.0
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/restic/calens v0.2.0
@@ -34,9 +34,6 @@ require (
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
-	stash.kopano.io/kc/konnect v0.29.0 // indirect
 )
-
-replace stash.kopano.io/kc/konnect => github.com/IljaN/konnect v0.30.0-alpha1
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
