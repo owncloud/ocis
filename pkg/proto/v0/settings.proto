@@ -47,9 +47,47 @@ message Setting {
   string key = 1;
   string displayName = 2;
   string description = 3;
-  repeated SettingsValue values = 4;
+  oneof value {
+    IntSetting intValue = 4;
+    StringSetting stringValue = 5;
+    BoolSetting boolValue = 6;
+    SingleChoiceListSetting singleChoiceValue = 7;
+    MultiChoiceListSetting multiChoiceValue = 8;
+  }
 }
 
-message SettingsValue {
-  string type = 1;
+message IntSetting {
+  int64 default = 1;
+  int64 min = 2;
+  int64 max = 3;
+  int64 step = 4;
+  string placeholder = 5;
+}
+
+message StringSetting {
+  string default = 1;
+  bool required = 2;
+  int32 minLength = 3;
+  int32 maxLength = 4;
+  string placeholder = 5;
+}
+
+message BoolSetting {
+  bool default = 1;
+}
+
+message SingleChoiceListSetting {
+  repeated ListOption options = 1;
+}
+
+message MultiChoiceListSetting {
+  repeated ListOption options = 1;
+}
+
+message ListOption {
+  oneof option {
+    string stringValue = 1;
+    int64 intValue = 2;
+  }
+  bool selected = 3;
 }

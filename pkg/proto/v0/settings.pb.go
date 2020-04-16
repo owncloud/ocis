@@ -100,8 +100,8 @@ func (m *CreateSettingsBundleResponse) GetSettingsBundle() *SettingsBundle {
 }
 
 type GetSettingsBundleRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Extension            string   `protobuf:"bytes,2,opt,name=extension,proto3" json:"extension,omitempty"`
+	Extension            string   `protobuf:"bytes,1,opt,name=extension,proto3" json:"extension,omitempty"`
+	Key                  string   `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -132,16 +132,16 @@ func (m *GetSettingsBundleRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetSettingsBundleRequest proto.InternalMessageInfo
 
-func (m *GetSettingsBundleRequest) GetKey() string {
+func (m *GetSettingsBundleRequest) GetExtension() string {
 	if m != nil {
-		return m.Key
+		return m.Extension
 	}
 	return ""
 }
 
-func (m *GetSettingsBundleRequest) GetExtension() string {
+func (m *GetSettingsBundleRequest) GetKey() string {
 	if m != nil {
-		return m.Extension
+		return m.Key
 	}
 	return ""
 }
@@ -265,9 +265,9 @@ func (m *ListSettingsBundlesResponse) GetSettingsBundles() []*SettingsBundle {
 
 // payloads
 type SettingsBundle struct {
-	Key                  string     `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	DisplayName          string     `protobuf:"bytes,2,opt,name=displayName,proto3" json:"displayName,omitempty"`
-	Extension            string     `protobuf:"bytes,3,opt,name=extension,proto3" json:"extension,omitempty"`
+	Extension            string     `protobuf:"bytes,1,opt,name=extension,proto3" json:"extension,omitempty"`
+	Key                  string     `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	DisplayName          string     `protobuf:"bytes,3,opt,name=displayName,proto3" json:"displayName,omitempty"`
 	Settings             []*Setting `protobuf:"bytes,4,rep,name=settings,proto3" json:"settings,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -299,6 +299,13 @@ func (m *SettingsBundle) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SettingsBundle proto.InternalMessageInfo
 
+func (m *SettingsBundle) GetExtension() string {
+	if m != nil {
+		return m.Extension
+	}
+	return ""
+}
+
 func (m *SettingsBundle) GetKey() string {
 	if m != nil {
 		return m.Key
@@ -313,13 +320,6 @@ func (m *SettingsBundle) GetDisplayName() string {
 	return ""
 }
 
-func (m *SettingsBundle) GetExtension() string {
-	if m != nil {
-		return m.Extension
-	}
-	return ""
-}
-
 func (m *SettingsBundle) GetSettings() []*Setting {
 	if m != nil {
 		return m.Settings
@@ -328,13 +328,19 @@ func (m *SettingsBundle) GetSettings() []*Setting {
 }
 
 type Setting struct {
-	Key                  string           `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	DisplayName          string           `protobuf:"bytes,2,opt,name=displayName,proto3" json:"displayName,omitempty"`
-	Description          string           `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Values               []*SettingsValue `protobuf:"bytes,4,rep,name=values,proto3" json:"values,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	Key         string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	DisplayName string `protobuf:"bytes,2,opt,name=displayName,proto3" json:"displayName,omitempty"`
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Types that are valid to be assigned to Value:
+	//	*Setting_IntValue
+	//	*Setting_StringValue
+	//	*Setting_BoolValue
+	//	*Setting_SingleChoiceValue
+	//	*Setting_MultiChoiceValue
+	Value                isSetting_Value `protobuf_oneof:"value"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *Setting) Reset()         { *m = Setting{} }
@@ -383,50 +389,438 @@ func (m *Setting) GetDescription() string {
 	return ""
 }
 
-func (m *Setting) GetValues() []*SettingsValue {
+type isSetting_Value interface {
+	isSetting_Value()
+}
+
+type Setting_IntValue struct {
+	IntValue *IntSetting `protobuf:"bytes,4,opt,name=intValue,proto3,oneof"`
+}
+
+type Setting_StringValue struct {
+	StringValue *StringSetting `protobuf:"bytes,5,opt,name=stringValue,proto3,oneof"`
+}
+
+type Setting_BoolValue struct {
+	BoolValue *BoolSetting `protobuf:"bytes,6,opt,name=boolValue,proto3,oneof"`
+}
+
+type Setting_SingleChoiceValue struct {
+	SingleChoiceValue *SingleChoiceListSetting `protobuf:"bytes,7,opt,name=singleChoiceValue,proto3,oneof"`
+}
+
+type Setting_MultiChoiceValue struct {
+	MultiChoiceValue *MultiChoiceListSetting `protobuf:"bytes,8,opt,name=multiChoiceValue,proto3,oneof"`
+}
+
+func (*Setting_IntValue) isSetting_Value() {}
+
+func (*Setting_StringValue) isSetting_Value() {}
+
+func (*Setting_BoolValue) isSetting_Value() {}
+
+func (*Setting_SingleChoiceValue) isSetting_Value() {}
+
+func (*Setting_MultiChoiceValue) isSetting_Value() {}
+
+func (m *Setting) GetValue() isSetting_Value {
 	if m != nil {
-		return m.Values
+		return m.Value
 	}
 	return nil
 }
 
-type SettingsValue struct {
-	Type                 string   `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+func (m *Setting) GetIntValue() *IntSetting {
+	if x, ok := m.GetValue().(*Setting_IntValue); ok {
+		return x.IntValue
+	}
+	return nil
+}
+
+func (m *Setting) GetStringValue() *StringSetting {
+	if x, ok := m.GetValue().(*Setting_StringValue); ok {
+		return x.StringValue
+	}
+	return nil
+}
+
+func (m *Setting) GetBoolValue() *BoolSetting {
+	if x, ok := m.GetValue().(*Setting_BoolValue); ok {
+		return x.BoolValue
+	}
+	return nil
+}
+
+func (m *Setting) GetSingleChoiceValue() *SingleChoiceListSetting {
+	if x, ok := m.GetValue().(*Setting_SingleChoiceValue); ok {
+		return x.SingleChoiceValue
+	}
+	return nil
+}
+
+func (m *Setting) GetMultiChoiceValue() *MultiChoiceListSetting {
+	if x, ok := m.GetValue().(*Setting_MultiChoiceValue); ok {
+		return x.MultiChoiceValue
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Setting) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*Setting_IntValue)(nil),
+		(*Setting_StringValue)(nil),
+		(*Setting_BoolValue)(nil),
+		(*Setting_SingleChoiceValue)(nil),
+		(*Setting_MultiChoiceValue)(nil),
+	}
+}
+
+type IntSetting struct {
+	Default              int64    `protobuf:"varint,1,opt,name=default,proto3" json:"default,omitempty"`
+	Min                  int64    `protobuf:"varint,2,opt,name=min,proto3" json:"min,omitempty"`
+	Max                  int64    `protobuf:"varint,3,opt,name=max,proto3" json:"max,omitempty"`
+	Step                 int64    `protobuf:"varint,4,opt,name=step,proto3" json:"step,omitempty"`
+	Placeholder          string   `protobuf:"bytes,5,opt,name=placeholder,proto3" json:"placeholder,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *SettingsValue) Reset()         { *m = SettingsValue{} }
-func (m *SettingsValue) String() string { return proto.CompactTextString(m) }
-func (*SettingsValue) ProtoMessage()    {}
-func (*SettingsValue) Descriptor() ([]byte, []int) {
+func (m *IntSetting) Reset()         { *m = IntSetting{} }
+func (m *IntSetting) String() string { return proto.CompactTextString(m) }
+func (*IntSetting) ProtoMessage()    {}
+func (*IntSetting) Descriptor() ([]byte, []int) {
 	return fileDescriptor_199e73d7d5fd837b, []int{8}
 }
 
-func (m *SettingsValue) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SettingsValue.Unmarshal(m, b)
+func (m *IntSetting) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IntSetting.Unmarshal(m, b)
 }
-func (m *SettingsValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SettingsValue.Marshal(b, m, deterministic)
+func (m *IntSetting) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IntSetting.Marshal(b, m, deterministic)
 }
-func (m *SettingsValue) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SettingsValue.Merge(m, src)
+func (m *IntSetting) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IntSetting.Merge(m, src)
 }
-func (m *SettingsValue) XXX_Size() int {
-	return xxx_messageInfo_SettingsValue.Size(m)
+func (m *IntSetting) XXX_Size() int {
+	return xxx_messageInfo_IntSetting.Size(m)
 }
-func (m *SettingsValue) XXX_DiscardUnknown() {
-	xxx_messageInfo_SettingsValue.DiscardUnknown(m)
+func (m *IntSetting) XXX_DiscardUnknown() {
+	xxx_messageInfo_IntSetting.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SettingsValue proto.InternalMessageInfo
+var xxx_messageInfo_IntSetting proto.InternalMessageInfo
 
-func (m *SettingsValue) GetType() string {
+func (m *IntSetting) GetDefault() int64 {
 	if m != nil {
-		return m.Type
+		return m.Default
+	}
+	return 0
+}
+
+func (m *IntSetting) GetMin() int64 {
+	if m != nil {
+		return m.Min
+	}
+	return 0
+}
+
+func (m *IntSetting) GetMax() int64 {
+	if m != nil {
+		return m.Max
+	}
+	return 0
+}
+
+func (m *IntSetting) GetStep() int64 {
+	if m != nil {
+		return m.Step
+	}
+	return 0
+}
+
+func (m *IntSetting) GetPlaceholder() string {
+	if m != nil {
+		return m.Placeholder
 	}
 	return ""
+}
+
+type StringSetting struct {
+	Default              string   `protobuf:"bytes,1,opt,name=default,proto3" json:"default,omitempty"`
+	Required             bool     `protobuf:"varint,2,opt,name=required,proto3" json:"required,omitempty"`
+	MinLength            int32    `protobuf:"varint,3,opt,name=minLength,proto3" json:"minLength,omitempty"`
+	MaxLength            int32    `protobuf:"varint,4,opt,name=maxLength,proto3" json:"maxLength,omitempty"`
+	Placeholder          string   `protobuf:"bytes,5,opt,name=placeholder,proto3" json:"placeholder,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *StringSetting) Reset()         { *m = StringSetting{} }
+func (m *StringSetting) String() string { return proto.CompactTextString(m) }
+func (*StringSetting) ProtoMessage()    {}
+func (*StringSetting) Descriptor() ([]byte, []int) {
+	return fileDescriptor_199e73d7d5fd837b, []int{9}
+}
+
+func (m *StringSetting) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StringSetting.Unmarshal(m, b)
+}
+func (m *StringSetting) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StringSetting.Marshal(b, m, deterministic)
+}
+func (m *StringSetting) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StringSetting.Merge(m, src)
+}
+func (m *StringSetting) XXX_Size() int {
+	return xxx_messageInfo_StringSetting.Size(m)
+}
+func (m *StringSetting) XXX_DiscardUnknown() {
+	xxx_messageInfo_StringSetting.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StringSetting proto.InternalMessageInfo
+
+func (m *StringSetting) GetDefault() string {
+	if m != nil {
+		return m.Default
+	}
+	return ""
+}
+
+func (m *StringSetting) GetRequired() bool {
+	if m != nil {
+		return m.Required
+	}
+	return false
+}
+
+func (m *StringSetting) GetMinLength() int32 {
+	if m != nil {
+		return m.MinLength
+	}
+	return 0
+}
+
+func (m *StringSetting) GetMaxLength() int32 {
+	if m != nil {
+		return m.MaxLength
+	}
+	return 0
+}
+
+func (m *StringSetting) GetPlaceholder() string {
+	if m != nil {
+		return m.Placeholder
+	}
+	return ""
+}
+
+type BoolSetting struct {
+	Default              bool     `protobuf:"varint,1,opt,name=default,proto3" json:"default,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BoolSetting) Reset()         { *m = BoolSetting{} }
+func (m *BoolSetting) String() string { return proto.CompactTextString(m) }
+func (*BoolSetting) ProtoMessage()    {}
+func (*BoolSetting) Descriptor() ([]byte, []int) {
+	return fileDescriptor_199e73d7d5fd837b, []int{10}
+}
+
+func (m *BoolSetting) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BoolSetting.Unmarshal(m, b)
+}
+func (m *BoolSetting) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BoolSetting.Marshal(b, m, deterministic)
+}
+func (m *BoolSetting) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BoolSetting.Merge(m, src)
+}
+func (m *BoolSetting) XXX_Size() int {
+	return xxx_messageInfo_BoolSetting.Size(m)
+}
+func (m *BoolSetting) XXX_DiscardUnknown() {
+	xxx_messageInfo_BoolSetting.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BoolSetting proto.InternalMessageInfo
+
+func (m *BoolSetting) GetDefault() bool {
+	if m != nil {
+		return m.Default
+	}
+	return false
+}
+
+type SingleChoiceListSetting struct {
+	Options              []*ListOption `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *SingleChoiceListSetting) Reset()         { *m = SingleChoiceListSetting{} }
+func (m *SingleChoiceListSetting) String() string { return proto.CompactTextString(m) }
+func (*SingleChoiceListSetting) ProtoMessage()    {}
+func (*SingleChoiceListSetting) Descriptor() ([]byte, []int) {
+	return fileDescriptor_199e73d7d5fd837b, []int{11}
+}
+
+func (m *SingleChoiceListSetting) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SingleChoiceListSetting.Unmarshal(m, b)
+}
+func (m *SingleChoiceListSetting) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SingleChoiceListSetting.Marshal(b, m, deterministic)
+}
+func (m *SingleChoiceListSetting) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SingleChoiceListSetting.Merge(m, src)
+}
+func (m *SingleChoiceListSetting) XXX_Size() int {
+	return xxx_messageInfo_SingleChoiceListSetting.Size(m)
+}
+func (m *SingleChoiceListSetting) XXX_DiscardUnknown() {
+	xxx_messageInfo_SingleChoiceListSetting.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SingleChoiceListSetting proto.InternalMessageInfo
+
+func (m *SingleChoiceListSetting) GetOptions() []*ListOption {
+	if m != nil {
+		return m.Options
+	}
+	return nil
+}
+
+type MultiChoiceListSetting struct {
+	Options              []*ListOption `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *MultiChoiceListSetting) Reset()         { *m = MultiChoiceListSetting{} }
+func (m *MultiChoiceListSetting) String() string { return proto.CompactTextString(m) }
+func (*MultiChoiceListSetting) ProtoMessage()    {}
+func (*MultiChoiceListSetting) Descriptor() ([]byte, []int) {
+	return fileDescriptor_199e73d7d5fd837b, []int{12}
+}
+
+func (m *MultiChoiceListSetting) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MultiChoiceListSetting.Unmarshal(m, b)
+}
+func (m *MultiChoiceListSetting) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MultiChoiceListSetting.Marshal(b, m, deterministic)
+}
+func (m *MultiChoiceListSetting) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MultiChoiceListSetting.Merge(m, src)
+}
+func (m *MultiChoiceListSetting) XXX_Size() int {
+	return xxx_messageInfo_MultiChoiceListSetting.Size(m)
+}
+func (m *MultiChoiceListSetting) XXX_DiscardUnknown() {
+	xxx_messageInfo_MultiChoiceListSetting.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MultiChoiceListSetting proto.InternalMessageInfo
+
+func (m *MultiChoiceListSetting) GetOptions() []*ListOption {
+	if m != nil {
+		return m.Options
+	}
+	return nil
+}
+
+type ListOption struct {
+	// Types that are valid to be assigned to Option:
+	//	*ListOption_StringValue
+	//	*ListOption_IntValue
+	Option               isListOption_Option `protobuf_oneof:"option"`
+	Selected             bool                `protobuf:"varint,3,opt,name=selected,proto3" json:"selected,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
+}
+
+func (m *ListOption) Reset()         { *m = ListOption{} }
+func (m *ListOption) String() string { return proto.CompactTextString(m) }
+func (*ListOption) ProtoMessage()    {}
+func (*ListOption) Descriptor() ([]byte, []int) {
+	return fileDescriptor_199e73d7d5fd837b, []int{13}
+}
+
+func (m *ListOption) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListOption.Unmarshal(m, b)
+}
+func (m *ListOption) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListOption.Marshal(b, m, deterministic)
+}
+func (m *ListOption) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListOption.Merge(m, src)
+}
+func (m *ListOption) XXX_Size() int {
+	return xxx_messageInfo_ListOption.Size(m)
+}
+func (m *ListOption) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListOption.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListOption proto.InternalMessageInfo
+
+type isListOption_Option interface {
+	isListOption_Option()
+}
+
+type ListOption_StringValue struct {
+	StringValue string `protobuf:"bytes,1,opt,name=stringValue,proto3,oneof"`
+}
+
+type ListOption_IntValue struct {
+	IntValue int64 `protobuf:"varint,2,opt,name=intValue,proto3,oneof"`
+}
+
+func (*ListOption_StringValue) isListOption_Option() {}
+
+func (*ListOption_IntValue) isListOption_Option() {}
+
+func (m *ListOption) GetOption() isListOption_Option {
+	if m != nil {
+		return m.Option
+	}
+	return nil
+}
+
+func (m *ListOption) GetStringValue() string {
+	if x, ok := m.GetOption().(*ListOption_StringValue); ok {
+		return x.StringValue
+	}
+	return ""
+}
+
+func (m *ListOption) GetIntValue() int64 {
+	if x, ok := m.GetOption().(*ListOption_IntValue); ok {
+		return x.IntValue
+	}
+	return 0
+}
+
+func (m *ListOption) GetSelected() bool {
+	if m != nil {
+		return m.Selected
+	}
+	return false
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ListOption) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ListOption_StringValue)(nil),
+		(*ListOption_IntValue)(nil),
+	}
 }
 
 func init() {
@@ -438,7 +832,12 @@ func init() {
 	proto.RegisterType((*ListSettingsBundlesResponse)(nil), "proto.ListSettingsBundlesResponse")
 	proto.RegisterType((*SettingsBundle)(nil), "proto.SettingsBundle")
 	proto.RegisterType((*Setting)(nil), "proto.Setting")
-	proto.RegisterType((*SettingsValue)(nil), "proto.SettingsValue")
+	proto.RegisterType((*IntSetting)(nil), "proto.IntSetting")
+	proto.RegisterType((*StringSetting)(nil), "proto.StringSetting")
+	proto.RegisterType((*BoolSetting)(nil), "proto.BoolSetting")
+	proto.RegisterType((*SingleChoiceListSetting)(nil), "proto.SingleChoiceListSetting")
+	proto.RegisterType((*MultiChoiceListSetting)(nil), "proto.MultiChoiceListSetting")
+	proto.RegisterType((*ListOption)(nil), "proto.ListOption")
 }
 
 func init() {
@@ -446,30 +845,48 @@ func init() {
 }
 
 var fileDescriptor_199e73d7d5fd837b = []byte{
-	// 392 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x41, 0x4f, 0xea, 0x40,
-	0x10, 0xc7, 0x53, 0xe0, 0xc1, 0x63, 0x08, 0xbc, 0xf7, 0xf6, 0x61, 0x52, 0x0b, 0x89, 0x75, 0xb9,
-	0x18, 0x63, 0xc0, 0xe0, 0xcd, 0xc4, 0x98, 0xe0, 0xc1, 0xc4, 0x18, 0x0f, 0x25, 0xe1, 0x40, 0x50,
-	0x53, 0x61, 0x42, 0x1a, 0xb0, 0xad, 0xdd, 0x85, 0xc8, 0x87, 0xd0, 0x8f, 0xe1, 0xe7, 0x34, 0xb4,
-	0x8b, 0xb0, 0xeb, 0x96, 0x83, 0x7a, 0xda, 0xcd, 0xcc, 0x7f, 0xfe, 0xfb, 0xdb, 0xe9, 0x6c, 0xa1,
-	0x16, 0x4e, 0xc6, 0xad, 0x30, 0x0a, 0x78, 0xd0, 0x9a, 0x1f, 0xb7, 0x18, 0x72, 0xee, 0xf9, 0x63,
-	0xd6, 0x8c, 0x23, 0xe4, 0x57, 0xbc, 0xd0, 0x01, 0xd4, 0x2e, 0x22, 0x74, 0x39, 0x76, 0x45, 0xba,
-	0x33, 0xf3, 0x47, 0x53, 0x74, 0xf0, 0x69, 0x86, 0x8c, 0x93, 0x33, 0xa8, 0x30, 0x29, 0x61, 0x1a,
-	0xb6, 0x71, 0x50, 0x6a, 0xef, 0x24, 0x2e, 0x4d, 0xa5, 0x4a, 0x11, 0xd3, 0x5b, 0xa8, 0xeb, 0xdd,
-	0x59, 0x18, 0xf8, 0x0c, 0xbf, 0x6b, 0x7f, 0x05, 0xe6, 0x25, 0x72, 0x3d, 0xf9, 0x5f, 0xc8, 0x4e,
-	0x70, 0x11, 0xfb, 0x15, 0x9d, 0xe5, 0x96, 0xd4, 0xa1, 0x88, 0xcf, 0x1c, 0x7d, 0xe6, 0x05, 0xbe,
-	0x99, 0x89, 0xe3, 0xeb, 0x00, 0xed, 0xc3, 0xae, 0xc6, 0xeb, 0x67, 0x38, 0x4f, 0xc1, 0xba, 0xf6,
-	0x98, 0x62, 0xce, 0x56, 0xa4, 0x12, 0x97, 0xa1, 0x72, 0xdd, 0x41, 0x4d, 0x5b, 0x2b, 0xc8, 0xce,
-	0xe1, 0x8f, 0x7c, 0x18, 0x33, 0x0d, 0x3b, 0x9b, 0x8e, 0xa6, 0xaa, 0xe9, 0xab, 0x01, 0x15, 0x59,
-	0xa3, 0x69, 0x9d, 0x0d, 0xa5, 0x91, 0xc7, 0xc2, 0xa9, 0xbb, 0xb8, 0x71, 0x1f, 0x51, 0x34, 0x6f,
-	0x33, 0x24, 0x5f, 0x22, 0xab, 0x5c, 0x82, 0x1c, 0xc2, 0xef, 0xd5, 0xb9, 0x66, 0x2e, 0xc6, 0xab,
-	0xc8, 0x78, 0xce, 0x47, 0x9e, 0xbe, 0x18, 0x50, 0x10, 0xd1, 0x2f, 0x91, 0x2c, 0x15, 0xc8, 0x86,
-	0x91, 0x17, 0xf2, 0x35, 0xcb, 0x66, 0x88, 0x1c, 0x41, 0x7e, 0xee, 0x4e, 0x67, 0xb8, 0x62, 0xa9,
-	0x2a, 0xad, 0xea, 0x2d, 0x93, 0x8e, 0xd0, 0xd0, 0x06, 0x94, 0xa5, 0x04, 0x21, 0x90, 0xe3, 0x8b,
-	0x10, 0x05, 0x55, 0xbc, 0x6f, 0xbf, 0x65, 0xa0, 0x9c, 0x74, 0xaf, 0x8b, 0xd1, 0xdc, 0x1b, 0x22,
-	0xb9, 0x87, 0xaa, 0x6e, 0xf4, 0x09, 0x15, 0x87, 0x6d, 0x79, 0x75, 0x56, 0x63, 0xab, 0x46, 0x7c,
-	0xf9, 0x1e, 0xfc, 0xfb, 0x34, 0xb0, 0x64, 0x4f, 0x54, 0xa6, 0x3d, 0x0b, 0xcb, 0x4e, 0x17, 0x08,
-	0xdf, 0x01, 0xfc, 0xd7, 0x0c, 0x1c, 0xd9, 0x17, 0x85, 0xe9, 0x83, 0x6c, 0xd1, 0x6d, 0x92, 0xc4,
-	0xbd, 0x53, 0xe8, 0x27, 0x3f, 0x9e, 0x87, 0x7c, 0xbc, 0x9c, 0xbc, 0x07, 0x00, 0x00, 0xff, 0xff,
-	0x1d, 0x4a, 0xf8, 0xc6, 0xa5, 0x04, 0x00, 0x00,
+	// 684 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x5d, 0x6f, 0xd3, 0x4a,
+	0x10, 0xad, 0xeb, 0xa4, 0x71, 0x26, 0x6a, 0x6f, 0xbb, 0xb7, 0xf7, 0x5e, 0xdf, 0xb4, 0x40, 0x58,
+	0x1e, 0x40, 0x20, 0x35, 0xa8, 0xbc, 0x20, 0x24, 0x84, 0x94, 0x0a, 0x28, 0x50, 0x8a, 0xb4, 0x95,
+	0xfa, 0x50, 0x15, 0x90, 0x9b, 0x0c, 0xe9, 0xaa, 0x8e, 0xed, 0x7a, 0x37, 0x55, 0xfa, 0xc6, 0x2f,
+	0xe0, 0x4f, 0x80, 0xf8, 0x9d, 0xc8, 0x63, 0x3b, 0xfe, 0x88, 0x53, 0xb5, 0x82, 0xa7, 0xac, 0x67,
+	0xce, 0x39, 0x73, 0x32, 0xb3, 0x1f, 0xb0, 0x11, 0x9c, 0x0d, 0xbb, 0x41, 0xe8, 0x6b, 0xbf, 0x7b,
+	0xf1, 0xb8, 0xab, 0x50, 0x6b, 0xe9, 0x0d, 0xd5, 0x16, 0x45, 0x58, 0x9d, 0x7e, 0xf8, 0x31, 0x6c,
+	0xec, 0x84, 0xe8, 0x68, 0x3c, 0x48, 0xd2, 0xbd, 0xb1, 0x37, 0x70, 0x51, 0xe0, 0xf9, 0x18, 0x95,
+	0x66, 0xcf, 0x61, 0x45, 0x15, 0x12, 0xb6, 0xd1, 0x31, 0x1e, 0xb4, 0xb6, 0xff, 0x89, 0x55, 0xb6,
+	0x4a, 0xac, 0x12, 0x98, 0x7f, 0x84, 0xcd, 0x6a, 0x75, 0x15, 0xf8, 0x9e, 0xc2, 0xdf, 0x95, 0x7f,
+	0x0b, 0xf6, 0x6b, 0xd4, 0xd5, 0xce, 0x37, 0xa1, 0x89, 0x13, 0x8d, 0x9e, 0x92, 0xbe, 0x47, 0xaa,
+	0x4d, 0x91, 0x05, 0xd8, 0x2a, 0x98, 0x67, 0x78, 0x69, 0x2f, 0x52, 0x3c, 0x5a, 0xf2, 0x23, 0xf8,
+	0xbf, 0x42, 0xeb, 0xcf, 0xf8, 0x7c, 0x06, 0xed, 0x3d, 0xa9, 0x4a, 0xe2, 0xea, 0x5a, 0x4e, 0xf9,
+	0x27, 0xd8, 0xa8, 0xe4, 0x26, 0xce, 0x5e, 0xc0, 0x5f, 0xc5, 0x62, 0xca, 0x36, 0x3a, 0xe6, 0x7c,
+	0x6b, 0x65, 0x34, 0xff, 0x66, 0xc0, 0x4a, 0x11, 0x73, 0xd3, 0xd6, 0xb1, 0x0e, 0xb4, 0x06, 0x52,
+	0x05, 0xae, 0x73, 0xb9, 0xef, 0x8c, 0xd0, 0x36, 0x29, 0x93, 0x0f, 0xb1, 0x87, 0x60, 0xa5, 0x75,
+	0xed, 0x1a, 0xd9, 0x5b, 0x29, 0xda, 0x13, 0xd3, 0x3c, 0xff, 0x61, 0x42, 0x23, 0x89, 0xa6, 0xb5,
+	0x8c, 0xb9, 0xb5, 0x16, 0x67, 0x6b, 0x45, 0x08, 0x54, 0xfd, 0x50, 0x06, 0x3a, 0xf2, 0x9f, 0xba,
+	0xc9, 0x42, 0xac, 0x0b, 0x96, 0xf4, 0xf4, 0xa1, 0xe3, 0x8e, 0xd1, 0xae, 0xd1, 0x1c, 0xd7, 0x12,
+	0x37, 0x6f, 0xbc, 0xb4, 0xd1, 0xbb, 0x0b, 0x62, 0x0a, 0x62, 0x4f, 0xa1, 0xa5, 0x74, 0x28, 0xbd,
+	0x61, 0xcc, 0xa9, 0x13, 0x67, 0x3d, 0xfd, 0x07, 0x94, 0xc9, 0x68, 0x79, 0x28, 0xdb, 0x86, 0xe6,
+	0x89, 0xef, 0xbb, 0x31, 0x6f, 0x89, 0x78, 0x2c, 0xe1, 0xf5, 0x7c, 0xdf, 0xcd, 0x58, 0x19, 0x8c,
+	0xed, 0xc3, 0x9a, 0x92, 0xde, 0xd0, 0xc5, 0x9d, 0x53, 0x5f, 0xf6, 0x31, 0xe6, 0x36, 0x88, 0x7b,
+	0x3b, 0xad, 0x99, 0xcb, 0xe7, 0x76, 0xc7, 0xee, 0x82, 0x98, 0xa5, 0xb2, 0x77, 0xb0, 0x3a, 0x1a,
+	0xbb, 0x5a, 0xe6, 0xe5, 0x2c, 0x92, 0xbb, 0x95, 0xc8, 0xbd, 0xcf, 0xd2, 0x45, 0xb5, 0x19, 0x62,
+	0xaf, 0x01, 0xf5, 0x8b, 0x68, 0xc1, 0xbf, 0x1a, 0x00, 0x59, 0xbb, 0x98, 0x0d, 0x8d, 0x01, 0x7e,
+	0x71, 0xc6, 0xae, 0xa6, 0x69, 0x99, 0x22, 0xfd, 0x8c, 0x66, 0x38, 0x92, 0x1e, 0x4d, 0xca, 0x14,
+	0xd1, 0x92, 0x22, 0xce, 0x84, 0x26, 0x13, 0x45, 0x9c, 0x09, 0x63, 0x50, 0x53, 0x1a, 0x03, 0x9a,
+	0x86, 0x29, 0x68, 0x1d, 0xcd, 0x31, 0x70, 0x9d, 0x3e, 0x9e, 0xfa, 0xee, 0x00, 0x43, 0x6a, 0x7a,
+	0x53, 0xe4, 0x43, 0xfc, 0xbb, 0x01, 0xcb, 0x85, 0xee, 0x97, 0x5d, 0x34, 0x33, 0x17, 0x6d, 0xb0,
+	0x42, 0x3c, 0x1f, 0xcb, 0x10, 0x07, 0x64, 0xc5, 0x12, 0xd3, 0xef, 0x68, 0xbf, 0x8f, 0xa4, 0xb7,
+	0x87, 0xde, 0x50, 0x9f, 0x92, 0xab, 0xba, 0xc8, 0x02, 0x94, 0x75, 0x26, 0x49, 0xb6, 0x96, 0x64,
+	0xd3, 0xc0, 0x35, 0x5c, 0xde, 0x87, 0x56, 0x6e, 0xd4, 0x65, 0x8b, 0xd6, 0xd4, 0x22, 0x7f, 0x05,
+	0xff, 0xcd, 0x99, 0x2b, 0x7b, 0x04, 0x0d, 0x9f, 0xf6, 0x6e, 0x7a, 0xba, 0xd3, 0x0d, 0x1b, 0x81,
+	0x3e, 0x50, 0x46, 0xa4, 0x08, 0xfe, 0x12, 0xfe, 0xad, 0x1e, 0xe8, 0xcd, 0x64, 0x34, 0x40, 0x16,
+	0x66, 0xbc, 0x78, 0x04, 0xa8, 0xbb, 0xe5, 0xcd, 0xbe, 0x99, 0x3b, 0x57, 0x34, 0xee, 0xc2, 0x21,
+	0x6a, 0x47, 0x77, 0x80, 0x8b, 0x7d, 0x8d, 0x03, 0x6a, 0xb2, 0x25, 0xa6, 0xdf, 0x3d, 0x0b, 0x96,
+	0xe2, 0xb2, 0xdb, 0x3f, 0x17, 0x61, 0x39, 0xbe, 0x86, 0x0e, 0x30, 0xbc, 0x90, 0x7d, 0x64, 0x9f,
+	0x61, 0xbd, 0xea, 0x0d, 0x61, 0x3c, 0xf1, 0x7e, 0xc5, 0xf3, 0xd5, 0xbe, 0x77, 0x25, 0x26, 0xb9,
+	0x42, 0x0f, 0x61, 0x6d, 0xe6, 0xe6, 0x67, 0x77, 0x12, 0xe6, 0xbc, 0xf7, 0xa5, 0xdd, 0x99, 0x0f,
+	0x48, 0x74, 0x8f, 0xe1, 0xef, 0x8a, 0x9b, 0x9b, 0xdd, 0xcd, 0xf5, 0xbc, 0xfa, 0x45, 0x68, 0xf3,
+	0xab, 0x20, 0xb1, 0x7a, 0xaf, 0x71, 0x14, 0xbf, 0xe0, 0x27, 0x4b, 0xf4, 0xf3, 0xe4, 0x57, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x2b, 0x5c, 0xdc, 0x93, 0xee, 0x07, 0x00, 0x00,
 }
