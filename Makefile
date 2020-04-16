@@ -58,7 +58,7 @@ sync:
 	go mod download
 
 .PHONY: clean
-clean:
+clean: clean-config
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST) $(HUGO)
 
