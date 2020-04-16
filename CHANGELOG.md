@@ -9,6 +9,7 @@
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
+* Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 
 ## Details
 
@@ -66,4 +67,12 @@
    ocis-reva v0.1.0
 
    https://github.com/owncloud/ocis/pull/151
+
+
+* Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
+
+   We've updated various extensions: - ocis-konnectd v0.3.1 - ocis-phoenix v0.5.0 (phoenix
+   v0.8.0) - ocis-reva v0.2.0
+
+   https://github.com/owncloud/ocis/pull/209
 
