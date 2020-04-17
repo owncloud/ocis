@@ -4,6 +4,7 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
+CONFIG := config/identifier-registration.yaml
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -57,9 +58,13 @@ sync:
 	go mod download
 
 .PHONY: clean
-clean:
+clean: clean-config
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST) $(HUGO)
+
+.PHONY: clean-config
+clean-config:
+	rm -rf $(CONFIG)
 
 .PHONY: fmt
 fmt:
