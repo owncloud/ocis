@@ -2,8 +2,11 @@ package command
 
 import (
 	"os"
+	"os/user"
+	"path"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/version"
@@ -14,12 +17,37 @@ import (
 	_ "github.com/owncloud/ocis-accounts/pkg/store"
 )
 
+var (
+	defaultConfigPaths = []string{"/etc/ocis", "$HOME/.ocis", "./config"}
+	defaultFilename    = "accounts"
+)
+
 // Execute is the entry point for the ocis-accounts command.
 func Execute() error {
 	app := &cli.App{
 		Name:    "ocis-accounts",
 		Version: version.String,
 		Usage:   "Example service for Reva/oCIS",
+
+		Before: func(c *cli.Context) error {
+			log := NewLogger(config.New())
+			for _, v := range defaultConfigPaths {
+				// location is the user's home
+				if v[0] == '$' || v[0] == '~' {
+					usr, _ := user.Current()
+					err := godotenv.Load(path.Join(usr.HomeDir, ".ocis", defaultFilename+".env"))
+					if err != nil {
+						log.Debug().Msgf("ignoring missing env file on dir: %v", v)
+					}
+				} else {
+					err := godotenv.Load(path.Join(v, defaultFilename+".env"))
+					if err != nil {
+						log.Debug().Msgf("ignoring missing env file on dir: %v", v)
+					}
+				}
+			}
+			return nil
+		},
 
 		Authors: []*cli.Author{
 			{
@@ -58,7 +86,6 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads accounts configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	// ParseConfig loads proxy configuration from Viper known paths.
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -68,11 +95,11 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if c.IsSet("config-file") {
 		viper.SetConfigFile(c.String("config-file"))
 	} else {
-		viper.SetConfigName("accounts")
+		viper.SetConfigName(defaultFilename)
 
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+		for _, v := range defaultConfigPaths {
+			viper.AddConfigPath(v)
+		}
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
