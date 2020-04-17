@@ -45,6 +45,8 @@ var (
 		//"reva-storage-root",
 		"reva-storage-home",
 		"reva-storage-home-data",
+		"reva-storage-eos",
+		"reva-storage-eos-data",
 		"reva-storage-oc",
 		"reva-storage-oc-data",
 		"glauth",

@@ -4,6 +4,7 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
+CONFIG := config/identifier-registration.yaml
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -46,6 +47,7 @@ ifndef DATE
 endif
 
 LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
 GCFLAGS += all=-N -l
 
 .PHONY: all
@@ -56,9 +58,13 @@ sync:
 	go mod download
 
 .PHONY: clean
-clean:
+clean: clean-config
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST) $(HUGO)
+
+.PHONY: clean-config
+clean-config:
+	rm -rf $(CONFIG)
 
 .PHONY: fmt
 fmt:
@@ -99,7 +105,7 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
@@ -143,13 +149,142 @@ docs-copy:
 	git checkout origin/source -f; \
 	rsync --delete -ax ../docs/ content/$(NAME)
 
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| docs/configuration.md
+
 .PHONY: docs-build
 docs-build:
 	cd $(HUGO); hugo
 
 .PHONY: docs
-docs: docs-copy docs-build
+docs: config-docs-generate docs-copy docs-build
 
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
+
+# -------------------------------------------------------------------------------
+# EOS related destinations
+# -------------------------------------------------------------------------------
+
+eos-docker:
+	git clone https://gitlab.cern.ch/eos/eos-docker.git
+
+eos-docker/scripts/start_services_ocis.sh: eos-docker
+	# TODO find a way to properly inject the following env vars into the container:
+	# EOS_UTF8=1 enables utf8 filenames
+	# EOS_NS_ACCOUNTING=1 enables dir size propagation
+	# EOS_SYNCTIME_ACCOUNTING=1 enables mtime propagation
+	#  - needs the sys.mtime.propagation=1 on a home dir, handled by the reva eos storage driver
+	#  - sys.allow.oc.sync=1 is not needed, it is an option for the eos built in webdav endpoint
+	# 1. -e: for now, we patch the start_services.sh and use that
+	# 2. -e: we need to expose the storageprovider ports whan running the docker containen
+	# TODO use port from address to open different ports, this currently only works for one client container
+	sed -e "s/--name eos-mgm1 --net/--name eos-mgm1 --env EOS_UTF8=1 --env EOS_NS_ACCOUNTING=1 --env EOS_SYNCTIME_ACCOUNTING=1 --net/" -e 's/--name $${CLIENTHOSTNAME} --net=eoscluster.cern.ch/--name $${CLIENTHOSTNAME} -p 9154:9154 -p 9155:9155 -p 9156:9156 -p 9157:9157 -p 9158:9158 -p 9159:9159 -p 9160:9160 -p 9161:9161 --net=eoscluster.cern.ch/' ./eos-docker/scripts/start_services.sh > ./eos-docker/scripts/start_services_ocis.sh
+	chmod +x ./eos-docker/scripts/start_services_ocis.sh
+
+.PHONY: eos-deploy
+eos-deploy: eos-docker/scripts/start_services_ocis.sh
+	# TODO keep eos up to date: see https://gitlab.cern.ch/dss/eos/tags
+	./eos-docker/scripts/start_services_ocis.sh -i gitlab-registry.cern.ch/dss/eos:4.7.5 -q
+	# Install ldap packages
+	docker exec -i eos-mgm1 yum install -y nss-pam-ldapd nscd authconfig
+	docker exec -i eos-cli1 yum install -y nss-pam-ldapd nscd authconfig
+
+.PHONY: eos-setup
+eos-setup: eos-docker/scripts/start_services_ocis.sh
+	#Allow resolving uids against ldap
+	# 9125 is the ldap port, 9126 would be tls ... but self signed cert
+	# TODO check out the error message (ignoring for now ... still works): read LDAP host from env var, if not set fall back to docker host, in docker compose should be the ocis-glauth container because it contains guest accounts a well
+	export LDAP_HOST=`docker exec -it eos-mgm1 /sbin/ip route|awk '/default/ { print $$3 }'`; \
+	docker exec -i eos-mgm1 authconfig --enableldap --enableldapauth --ldapserver="`echo -n $$LDAP_HOST`:9125" --ldapbasedn="dc=example,dc=org" --update; \
+	docker exec -i eos-cli1 authconfig --enableldap --enableldapauth --ldapserver="`echo -n $$LDAP_HOST`:9125" --ldapbasedn="dc=example,dc=org" --update;
+
+	# setup users on mgm
+	#TODO Failed to get D-Bus connection: Operation not permitted\ngetsebool:  SELinux is disabled
+	docker exec -i eos-mgm1 sed -i "s/#binddn cn=.*/binddn cn=reva,ou=sysusers,dc=example,dc=org/" /etc/nslcd.conf
+	docker exec -i eos-mgm1 sed -i "s/#bindpw .*/bindpw reva/" /etc/nslcd.conf
+	# print the actual authconfig
+	docker exec -i eos-mgm1 authconfig --test
+	# start nslcd. you need to restart it if you change the ldap config
+	docker exec -i eos-mgm1 nslcd
+	# use unix accounts
+	docker exec -i eos-mgm1 eos vid set map -unix "<pwd>" vuid:0 vgid:0
+	# allow cli to create homes
+	docker exec -i eos-mgm1 eos vid add gateway eos-cli1
+	# krb not needed
+	docker exec -i eos-mgm1 eos vid disable krb5
+
+	# setup users on cli, same as for mgm
+	docker exec -i eos-cli1 sed -i "s/#binddn cn=.*/binddn cn=reva,ou=sysusers,dc=example,dc=org/" /etc/nslcd.conf
+	docker exec -i eos-cli1 sed -i "s/#bindpw .*/bindpw reva/" /etc/nslcd.conf
+	docker exec -i eos-cli1 nslcd
+
+	# create necessary lib link for ocis
+	docker exec -i eos-cli1 ln -s /lib64/ld-linux-x86-64.so.2 /lib
+
+.PHONY: eos-test
+eos-test:
+	# check we know the demo users
+	docker exec -i eos-mgm1 id einstein
+	docker exec -i eos-mgm1 id marie
+	docker exec -i eos-mgm1 id feynman
+
+.PHONY: eos-copy-ocis
+eos-copy-ocis: build
+	# copy the binary to the eos-cli1 container
+	docker cp ./bin/ocis eos-cli1:/usr/local/bin/ocis
+	docker cp ./bin/ocis-debug eos-cli1:/usr/local/bin/ocis-debug
+
+.PHONY: eos-ocis-storage-home
+eos-ocis-storage-home:
+	# configure the home storage to use the eos driver and return the mount id of the eos driver in responses
+	docker exec -i \
+	--env OCIS_LOG_LEVEL=debug \
+	--env REVA_STORAGE_HOME_DRIVER=eos \
+	--env REVA_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 \
+	eos-cli1 ocis reva-storage-home &
+	docker exec -i \
+	--env OCIS_LOG_LEVEL=debug \
+	--env REVA_STORAGE_HOME_DATA_DRIVER=eos \
+	eos-cli1 ocis reva-storage-home-data &
+	docker exec -i \
+	--env OCIS_LOG_LEVEL=debug \
+	eos-cli1 ocis reva-storage-eos &
+	docker exec -i \
+	--env OCIS_LOG_LEVEL=debug \
+	eos-cli1 ocis reva-storage-eos-data &
+
+.PHONY: eos-ocis
+eos-ocis:
+	export OCIS_LOG_LEVEL=debug; \
+	export DAV_FILES_NAMESPACE="/eos/"; \
+	bin/ocis micro & \
+	bin/ocis glauth & \
+	bin/ocis graph-explorer & \
+	bin/ocis graph & \
+	bin/ocis konnectd & \
+	bin/ocis phoenix & \
+	bin/ocis thumbnails & \
+	bin/ocis webdav & \
+	bin/ocis reva-auth-basic & \
+	bin/ocis reva-auth-bearer & \
+	bin/ocis reva-frontend & \
+	bin/ocis reva-gateway & \
+	bin/ocis reva-sharing & \
+	bin/ocis reva-users & \
+	bin/ocis proxy &
+
+
+.PHONY: eos-start
+eos-start: eos-deploy eos-setup eos-copy-ocis eos-ocis-storage-home eos-ocis
+
+.PHONY: eos-clean
+eos-clean:
+	rm eos-docker/scripts/start_services_ocis.sh
+
+.PHONY: eos-stop
+eos-stop: eos-docker
+	./eos-docker/scripts/shutdown_services.sh
+
