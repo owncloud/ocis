@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.2.0...master
+
+## Summary
+
+* Enhancement - Allow configuring the gateway for dataproviders: [#136](https://github.com/owncloud/ocis-reva/pull/136)
+
+## Details
+
+* Enhancement - Allow configuring the gateway for dataproviders: [#136](https://github.com/owncloud/ocis-reva/pull/136)
+
+   This allows using basic or bearer auth when directly talking to dataproviders.
+
+   https://github.com/owncloud/ocis-reva/pull/136
+
 # Changelog for [0.2.0] (2020-04-15)
 
 The following sections list the changes in ocis-reva 0.2.0.
