@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/cs3org/reva v0.1.1-0.20200414133413-5e90b20d20ca
+	github.com/cs3org/reva v0.1.1-0.20200416050838-5fc8adf27f83
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/micro/cli/v2 v2.1.1
@@ -25,5 +25,3 @@ require (
 	golang.org/x/sys v0.0.0-20200103143344-a1369afcdac7 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 )
-
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

@@ -80,6 +80,7 @@ func StorageOCData(cfg *config.Config) *cli.Command {
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
 					},
 					"http": map[string]interface{}{
 						"network": cfg.Reva.StorageOCData.Network,
