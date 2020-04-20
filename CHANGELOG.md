@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.2.0...master
+
+## Summary
+
+* Bugfix - Pass flags to micro service: [#44](https://github.com/owncloud/ocis-pkg/pull/44)
+
+## Details
+
+* Bugfix - Pass flags to micro service: [#44](https://github.com/owncloud/ocis-pkg/pull/44)
+
+   Passed flags to the micro service to be able to pass cli arguments while starting a grpc service.
+
+   https://github.com/owncloud/ocis-pkg/pull/44
+
 # Changelog for [2.2.0] (2020-03-30)
 
 The following sections list the changes in ocis-pkg 2.2.0.
