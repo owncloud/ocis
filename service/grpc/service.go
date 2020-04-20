@@ -42,7 +42,7 @@ func NewService(opts ...Option) Service {
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 		micro.Context(sopts.Context),
-		// micro.Flags(sopts.Flags...),
+		micro.Flags(sopts.Flags...),
 	}
 
 	return Service{
