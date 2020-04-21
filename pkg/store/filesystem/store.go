@@ -6,9 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 
-	"github.com/golang/protobuf/jsonpb"
 	olog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
@@ -56,7 +54,7 @@ func (s Store) ListAll() ([]*proto.SettingsBundle, error) {
 
 	s.Logger.Info().Msg("listing bundles")
 	for _, v := range bundles {
-		records = append(records, parseFileName(v.Name()))
+		records = append(records, parseBundleFromFileName(v.Name()))
 	}
 
 	return records, nil
@@ -73,7 +71,7 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 
 	s.Logger.Info().Msgf("listing bundles by extension %v", extension)
 	for _, v := range bundles {
-		record := parseFileName(v.Name())
+		record := parseBundleFromFileName(v.Name())
 		if record.Extension == extension {
 			records = append(records, record)
 		}
@@ -84,73 +82,35 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 
 // Read tries to find a bundle by the given extension and key within the mountPath
 func (s Store) Read(extension string, key string) (*proto.SettingsBundle, error) {
-	fileName := buildFileNameFromData(extension, key)
-	contents, err := os.Open(path.Join(s.mountPath, fileName))
-	if err != nil {
-		s.Logger.Err(err).Msgf("error reading contents for extension %v and key %v: file not found", extension, key)
-		return nil, err
+	if len(extension) < 1 || len(key) < 1 {
+		s.Logger.Error().Msg("extension and key cannot be empty")
+		return nil, fmt.Errorf(emptyKeyError)
 	}
 
+	filePath := path.Join(s.mountPath, buildFileNameFromBundleArgs(extension, key))
 	record := proto.SettingsBundle{}
-	if err = jsonpb.Unmarshal(contents, &record); err != nil {
-		s.Logger.Err(err).Msg("error unmarshalling record")
+	if err := s.parseRecordFromFile(&record, filePath); err != nil {
 		return nil, err
 	}
 
+	s.Logger.Debug().Msgf("read contents from file: %v", filePath)
 	return &record, nil
 }
 
 // Write writes the given record into a file within the mountPath
-func (s Store) Write(rec *proto.SettingsBundle) (*proto.SettingsBundle, error) {
-	if len(rec.Key) < 1 {
-		s.Logger.Error().Msg("key cannot be empty")
+func (s Store) Write(record *proto.SettingsBundle) (*proto.SettingsBundle, error) {
+	if len(record.Extension) < 1 || len(record.Key) < 1 {
+		s.Logger.Error().Msg("extension and key cannot be empty")
 		return nil, fmt.Errorf(emptyKeyError)
 	}
 
-	marshaler := jsonpb.Marshaler{}
-	recordPath := path.Join(s.mountPath, buildFileNameFromBundle(rec))
-	if err := ioutil.WriteFile(recordPath, []byte{}, 0644); err != nil {
+	filePath := path.Join(s.mountPath, buildFileNameFromBundle(record))
+	if err := s.writeRecordToFile(record, filePath); err != nil {
 		return nil, err
 	}
 
-	fd, err := os.OpenFile(recordPath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	if err != nil {
-		s.Logger.Err(err).
-			Str(
-				"finding file",
-				fmt.Sprintf("file `%v` not found on store: `%v`", recordPath, s.mountPath),
-			)
-	}
-
-	if err = marshaler.Marshal(fd, rec); err != nil {
-		s.Logger.Err(err).
-			Str(
-				"marshaling record",
-				fmt.Sprintf("error marshaling record: %+v", rec),
-			)
-	}
-
-	s.Logger.Info().Msgf("request contents written to file: %v", recordPath)
-	return rec, nil
-}
-
-// Builds a unique file name from the given bundle
-func buildFileNameFromBundle(bundle *proto.SettingsBundle) string {
-	return buildFileNameFromData(bundle.Extension, bundle.Key)
-}
-
-// Builds a unique file name from the given params
-func buildFileNameFromData(extension string, key string) string {
-	return extension + "__" + key + ".json"
-}
-
-// Extracts extension and key from the given fileName and builds a (minimalistic) bundle from it
-func parseFileName(fileName string) *proto.SettingsBundle {
-	parts := strings.Split(strings.Replace(fileName, ".json", "", 1), "__")
-	return &proto.SettingsBundle{
-		Key:       parts[1],
-		Extension: parts[0],
-	}
+	s.Logger.Debug().Msgf("request contents written to file: %v", filePath)
+	return record, nil
 }
 
 func init() {

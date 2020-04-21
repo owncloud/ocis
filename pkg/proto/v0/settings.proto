@@ -90,4 +90,5 @@ message ListOption {
     int64 intValue = 2;
   }
   bool selected = 3;
+  string displayValue = 4;
 }

@@ -1,4 +1,4 @@
-// package http
+package http
 
 // import (
 // 	svc "github.com/owncloud/ocis-settings/pkg/service/v0"
