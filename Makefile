@@ -157,6 +157,41 @@ docs: docs-copy docs-build
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-.PHONY: protoc-micro
-protoc-micro:
-	protoc --go_out=. --micro_out=. $(PROTO_SRC)
+$(GOPATH)/bin/protoc-gen-go:
+	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+
+$(GOPATH)/bin/protoc-gen-micro:
+	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
+
+$(GOPATH)/bin/protoc-gen-microweb:
+	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
+
+$(GOPATH)/bin/protoc-gen-swagger:
+	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+
+pkg/proto/v0/settings.pb.go: pkg/proto/v0/settings.proto
+	protoc \
+		-I=third_party/ \
+		-I=pkg/proto/v0/ \
+		--go_out=logtostderr=true:pkg/proto/v0 settings.proto
+
+pkg/proto/v0/settings.pb.micro.go: pkg/proto/v0/settings.proto
+	protoc \
+		-I=third_party/ \
+		-I=pkg/proto/v0/ \
+		--micro_out=logtostderr=true:pkg/proto/v0 settings.proto
+
+pkg/proto/v0/settings.pb.web.go: pkg/proto/v0/settings.proto
+	protoc \
+		-I=third_party/ \
+		-I=pkg/proto/v0/ \
+		--microweb_out=logtostderr=true:pkg/proto/v0 settings.proto
+
+pkg/proto/v0/settings.swagger.json: pkg/proto/v0/settings.proto
+	protoc \
+		-I=third_party/ \
+		-I=pkg/proto/v0/ \
+		--swagger_out=logtostderr=true:pkg/proto/v0 settings.proto
+
+.PHONY: protobuf
+protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/settings.pb.go pkg/proto/v0/settings.pb.micro.go pkg/proto/v0/settings.pb.web.go pkg/proto/v0/settings.swagger.json

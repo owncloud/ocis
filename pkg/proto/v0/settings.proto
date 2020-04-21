@@ -3,10 +3,50 @@ syntax = "proto3";
 package proto;
 option go_package = "proto";
 
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "Settings";
+    version: "1.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis-settings";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis-settings/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "http://owncloud.github.io/extensions/ocis_settings/";
+  };
+};
+
 service BundleService {
-  rpc CreateSettingsBundle(CreateSettingsBundleRequest) returns (CreateSettingsBundleResponse);
-  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse);
-  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse);
+  rpc CreateSettingsBundle(CreateSettingsBundleRequest) returns (CreateSettingsBundleResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/bundles",
+      body: "*"
+    };
+  };
+  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse) {
+    option (google.api.http) = {
+      get: "/api/v0/bundles/{extension}/{key}"
+    };
+  };
+  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse) {
+    option (google.api.http) = {
+      get: "/api/v0/bundles"
+    };
+  };
 }
 
 // requests and responses
