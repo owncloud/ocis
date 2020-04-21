@@ -10,8 +10,8 @@ compression:
 
 custom:
   - files:
-    - "../../ui/"
-    base: "../../ui/"
+    - "../../assets/"
+    base: "../../assets/"
     prefix: ""
 
 ...

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"github.com/owncloud/ocis-settings/pkg/server/grpc"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,6 +17,8 @@ import (
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/flagset"
 	"github.com/owncloud/ocis-settings/pkg/server/debug"
+	"github.com/owncloud/ocis-settings/pkg/server/grpc"
+	"github.com/owncloud/ocis-settings/pkg/server/http"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -39,7 +40,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
@@ -133,13 +133,30 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
+				server := http.Server(
+					http.Name("settings"),
+					http.Logger(logger),
+					http.Context(ctx),
+					http.Config(cfg),
+				)
+
+				gr.Add(func() error {
+					return server.Run()
+				}, func(_ error) {
+					logger.Info().
+						Str("server", "http").
+						Msg("Shutting down server")
+
+					cancel()
+				})
+			}
+
+			{
 				server := grpc.Server(
-					grpc.Name("ocis-settings"),
-					grpc.Address(":9190"),
+					grpc.Name("settings"),
 					grpc.Logger(logger),
 					grpc.Context(ctx),
 					grpc.Config(cfg),
-					grpc.Namespace(httpNamespace),
 				)
 
 				gr.Add(func() error {
