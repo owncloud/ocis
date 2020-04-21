@@ -75,7 +75,7 @@ func ReportSettingsBundle(l *olog.Logger) {
 	// TODO wrap this in an infinite for loop with a BREAK label to GOTO once the request succeed.
 	svc := micro.NewService()
 	svc.Init()
-	service := settings.NewBundleService("com.owncloud.ocis-settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
+	service := settings.NewBundleService("com.owncloud.web.ocis-settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
 
 	// TODO avoid hardcoding these values, perhaps load them from a file and using jsonpb's type Marshal.
 	createBundleRequest := settings.CreateSettingsBundleRequest{
@@ -92,16 +92,16 @@ func ReportSettingsBundle(l *olog.Logger) {
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
 								&settings.ListOption{
-									Selected: true,
 									Option: &settings.ListOption_StringValue{
 										StringValue: "Europe/Berlin",
 									},
+									DisplayValue: "Europe/Berlin",
 								},
 								&settings.ListOption{
-									Selected: false,
 									Option: &settings.ListOption_StringValue{
 										StringValue: "Asia/Kathmandu",
 									},
+									DisplayValue: "Asia/Kathmandu",
 								},
 							},
 						},
@@ -115,16 +115,16 @@ func ReportSettingsBundle(l *olog.Logger) {
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
 								&settings.ListOption{
-									Selected: true,
 									Option: &settings.ListOption_StringValue{
 										StringValue: "de_DE",
 									},
+									DisplayValue: "Deutsch",
 								},
 								&settings.ListOption{
-									Selected: false,
 									Option: &settings.ListOption_StringValue{
 										StringValue: "en_EN",
 									},
+									DisplayValue: "English",
 								},
 							},
 						},
