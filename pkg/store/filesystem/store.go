@@ -45,8 +45,8 @@ func New(cfg *config.Config) settings.Manager {
 	return &s
 }
 
-// List returns all the bundles in the mountPath folder
-func (s Store) List() ([]*proto.SettingsBundle, error) {
+// ListAll returns all the bundles in the mountPath folder
+func (s Store) ListAll() ([]*proto.SettingsBundle, error) {
 	records := []*proto.SettingsBundle{}
 	bundles, err := ioutil.ReadDir(s.mountPath)
 	if err != nil {
