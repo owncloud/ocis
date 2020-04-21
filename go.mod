@@ -21,3 +21,5 @@ require (
 	go.opencensus.io v0.22.2
 	google.golang.org/genproto v0.0.0-20200420144010-e5e8543f8aeb
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
