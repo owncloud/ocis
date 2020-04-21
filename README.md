@@ -42,11 +42,34 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 
 ## Quickstart
 
-After building the binary with the above steps and also setting up the prerequisites, run this command to start all services:
+After building the binary with the above steps and setting up the prerequisites
 
-```console
-./bin/ocis server
-```
+1.  create a file called `identifier-registration.yml` with this content:
+
+    ```yml
+    ---
+
+    # OpenID Connect client registry.
+    clients:
+       - id: phoenix
+         name: ownCloud web
+         application_type: web
+         insecure: yes
+         trusted: yes
+         redirect_uris:
+           - https://localhost:9200/oidc-callback.html
+           - https://localhost:9200/
+         origins:
+           - https://localhost:9200
+
+    authorities:
+    ```
+
+2.  run this command to start all services:
+
+    ```console
+    KONNECTD_IDENTIFIER_REGISTRATION_CONF=<path to identifier-registration.yml> ./bin/ocis server
+    ```
 
 Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
 
