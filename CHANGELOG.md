@@ -1,4 +1,27 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-thumbnails unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-thumbnails/compare/v0.1.0...master
+
+## Summary
+
+* Bugfix - Fix execution when passing program flags: [#15](https://github.com/owncloud/ocis-thumbnails/issues/15)
+
+## Details
+
+* Bugfix - Fix execution when passing program flags: [#15](https://github.com/owncloud/ocis-thumbnails/issues/15)
+
+   The program flags where not correctly recognized because we didn't pass them to the micro
+   framework when initializing a grpc service.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/15
+
+# Changelog for [0.1.0] (2020-03-31)
+
+The following sections list the changes in ocis-thumbnails 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-thumbnails/compare/c43f3a33cb0b57d7e25ebc88c138d22e95f88cfe...v0.1.0
 
 ## Summary
 
