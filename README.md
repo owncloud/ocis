@@ -28,6 +28,8 @@ make generate build
 
 To run a demo installation you can use the preconfigured defaults and start all necessary services:
 ```
+export REVA_USERS_DRIVER=demo
+
 bin/ocis-reva frontend & \
 bin/ocis-reva gateway & \
 bin/ocis-reva users & \
