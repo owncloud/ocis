@@ -36,7 +36,7 @@ docker run --hostname ldap.my-company.com \
 
 ### Run ocis-reva with that ldap server
 
-`ocis-reva` provides multiple subcommands. To configure them all via env vars you can export these environment variables. 
+`ocis-reva` provides multiple subcommands. To configure them all via env vars you can export these environment variables.
 
 ```
 export REVA_USERS_DRIVER=ldap
@@ -80,6 +80,12 @@ OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
 BEHAT_FILTER_TAGS='~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage'
 ```
 
+Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment
+
+This will run all tests that can work with LDAP and are not skipped on OCIS
+
+To run a single test add `BEHAT_FEATURE=<feature file>`
+
 ### Notes
-- rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users
-- users are created with usernames like `user0`, the default password is `123456`
+- in a normal case the test-code cleans up users after the test-run, but if a test-run is interrupted (e.g. by CTRL+C) users might have been left on the LDAP server. In that case rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users.
+- the tests usually create users in the OU `TestUsers` with usernames specified in the feature file. If not defined in the feature file, most users have the password `123456`, defined by `regularUserPassword` in `behat.yml`, but other passwords are also used, see [`\FeatureContext::getPasswordForUser()`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L386) for mapping and [`\FeatureContext::__construct`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L1668) for the password definitions.
