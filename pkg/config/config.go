@@ -31,6 +31,11 @@ type Tracing struct {
 	Service   string
 }
 
+// Asset undocumented
+type Asset struct {
+	Path string
+}
+
 // Storage defines the available storage configuration.
 type Storage struct {
 	RootMountPath string
@@ -44,6 +49,7 @@ type Config struct {
 	Debug   Debug
 	HTTP    HTTP
 	Tracing Tracing
+	Asset   Asset
 }
 
 // New initializes a new configuration with or without defaults.
