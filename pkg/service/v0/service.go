@@ -12,6 +12,12 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
 )
 
+type contextKey string
+
+const (
+	authorization contextKey = imgsource.WebDavAuth
+)
+
 // NewService returns a service implementation for Service.
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
@@ -48,7 +54,6 @@ type Thumbnail struct {
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
 	encoder := thumbnail.EncoderForType(req.Filetype.String())
 	if encoder == nil {
-		// TODO: better error responses
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
 	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
@@ -67,8 +72,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	}
 
 	auth := req.Authorization
-	sCtx := context.WithValue(ctx, imgsource.WebDavAuth, auth)
-	// TODO: clean up error handling
+	sCtx := context.WithValue(ctx, authorization, auth)
 	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
 		return err

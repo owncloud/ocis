@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/metrics"
@@ -20,6 +21,7 @@ type Options struct {
 	Config    *config.Config
 	Metrics   *metrics.Metrics
 	Namespace string
+	Flags     []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -79,5 +81,12 @@ func Metrics(val *metrics.Metrics) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// Flags provides a function to set the flags option.
+func Flags(flags []cli.Flag) Option {
+	return func(o *Options) {
+		o.Flags = append(o.Flags, flags...)
 	}
 }

@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis-thumbnails/pkg/version"
-	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/spf13/viper"
 )
 
@@ -32,45 +32,7 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-			viper.SetEnvPrefix("THUMBNAILS")
-			viper.AutomaticEnv()
-
-			if c.IsSet("config-file") {
-				viper.SetConfigFile(c.String("config-file"))
-			} else {
-				viper.SetConfigName("thumbnails")
-
-				viper.AddConfigPath("/etc/ocis")
-				viper.AddConfigPath("$HOME/.ocis")
-				viper.AddConfigPath("./config")
-			}
-
-			if err := viper.ReadInConfig(); err != nil {
-				switch err.(type) {
-				case viper.ConfigFileNotFoundError:
-					logger.Info().
-						Msg("Continue without config")
-				case viper.UnsupportedConfigError:
-					logger.Fatal().
-						Err(err).
-						Msg("Unsupported config type")
-				default:
-					logger.Fatal().
-						Err(err).
-						Msg("Failed to read config")
-				}
-			}
-
-			if err := viper.Unmarshal(&cfg); err != nil {
-				logger.Fatal().
-					Err(err).
-					Msg("Failed to parse config")
-			}
-
-			return nil
+			return ParseConfig(c, cfg)
 		},
 
 		Commands: []*cli.Command{
@@ -100,4 +62,47 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
 	)
+}
+
+// ParseConfig loads configuration from Viper known paths.
+func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	logger := NewLogger(cfg)
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetEnvPrefix("THUMBNAILS")
+	viper.AutomaticEnv()
+
+	if c.IsSet("config-file") {
+		viper.SetConfigFile(c.String("config-file"))
+	} else {
+		viper.SetConfigName("thumbnails")
+
+		viper.AddConfigPath("/etc/ocis")
+		viper.AddConfigPath("$HOME/.ocis")
+		viper.AddConfigPath("./config")
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		switch err.(type) {
+		case viper.ConfigFileNotFoundError:
+			logger.Info().
+				Msg("Continue without config")
+		case viper.UnsupportedConfigError:
+			logger.Fatal().
+				Err(err).
+				Msg("Unsupported config type")
+		default:
+			logger.Fatal().
+				Err(err).
+				Msg("Failed to read config")
+		}
+	}
+
+	if err := viper.Unmarshal(&cfg); err != nil {
+		logger.Fatal().
+			Err(err).
+			Msg("Failed to parse config")
+	}
+
+	return nil
 }

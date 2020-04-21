@@ -27,12 +27,14 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
+			Value:       true,
 			Usage:       "Enable pretty logging",
 			EnvVars:     []string{"THUMBNAILS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
+			Value:       true,
 			Usage:       "Enable colored logging",
 			EnvVars:     []string{"THUMBNAILS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,

@@ -30,7 +30,8 @@ func Server(cfg *config.Config) *cli.Command {
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Thumbnail.Resolutions = c.StringSlice("thumbnail-resolution")
-			return nil
+
+			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -134,6 +135,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Namespace(cfg.Server.Namespace),
 				grpc.Address(cfg.Server.Address),
 				grpc.Metrics(metrics),
+				grpc.Flags(flagset.RootWithConfig(config.New())),
 			)
 
 			gr.Add(func() error {
