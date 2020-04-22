@@ -77,10 +77,11 @@ func (h *webBundleServiceHandler) ListSettingsBundles(w http.ResponseWriter, r *
 
 	resp := &ListSettingsBundlesResponse{}
 
-	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
-	//	return
-	//}
+	// TODO no need to parse any body on a get request. This code shoud be removed fro GET endpoints
+	// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	// 	http.Error(w, err.Error(), http.StatusPreconditionFailed)
+	// 	return
+	// }
 
 	if err := h.h.ListSettingsBundles(
 		context.Background(),
