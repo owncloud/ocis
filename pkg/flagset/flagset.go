@@ -140,8 +140,15 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "grpc-addr",
 			Value:       "0.0.0.0:9191",
 			Usage:       "Address to bind grpc server",
-			EnvVars:     []string{"HELLO_GRPC_ADDR"},
+			EnvVars:     []string{"SETTINGS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
+		},
+		&cli.StringFlag{
+			Name:        "asset-path",
+			Value:       "",
+			Usage:       "Path to custom assets",
+			EnvVars:     []string{"SETTINGS_ASSET_PATH"},
+			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",

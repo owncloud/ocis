@@ -77,10 +77,10 @@ func (h *webBundleServiceHandler) ListSettingsBundles(w http.ResponseWriter, r *
 
 	resp := &ListSettingsBundlesResponse{}
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusPreconditionFailed)
-		return
-	}
+	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
+	//	return
+	//}
 
 	if err := h.h.ListSettingsBundles(
 		context.Background(),

@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-
 	"github.com/owncloud/ocis-settings/pkg/settings"
 	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
 
