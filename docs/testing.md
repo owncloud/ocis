@@ -10,7 +10,7 @@ geekdocFilePath: testing.md
 
 ## Acceptance tests
 
-We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, an ldap server that the acceptance tests can use to manage users and the ocis-reva code.
+We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the ocis-reva code.
 
 ### Getting the tests
 
@@ -19,7 +19,7 @@ All you need to do to get the acceptance tests is check out the core repo:
 git clone https://github.com/owncloud/core.git
 ```
 
-### Run an ldap server in a docker container
+### Run a ldap server in a docker container
 
 The ownCloud 10 acceptance tests will need write permission. You can start a suitable ldap server in a docker container with:
 
@@ -33,6 +33,11 @@ docker run --hostname ldap.my-company.com \
     -p 127.0.0.1:389:389 \
     -p 636:636 -d osixia/openldap
 ```
+### Run a redis server in a docker container
+
+File versions need a redis server. Start one with docker by using:
+
+`docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
 
 ### Run ocis-reva with that ldap server
 

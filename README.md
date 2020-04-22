@@ -67,64 +67,6 @@ richard:superfluidity
 
 For details on the `json` and `ldap` backends see the [documentation](https://owncloud.github.io/ocis-reva/#users)
 
-## Run oC10 API acceptance tests
-1.  start an LDAP server e.g. with docker:
-    ```
-    docker run --hostname ldap.my-company.com \
-        -e LDAP_TLS_VERIFY_CLIENT=never \
-        -e LDAP_DOMAIN=owncloud.com \
-        -e LDAP_ORGANISATION=ownCloud \
-        -e LDAP_ADMIN_PASSWORD=admin \
-        --name docker-slapd \
-        -p 127.0.0.1:389:389 \
-        -p 636:636 -d osixia/openldap
-    ```
-2.  start a Redis server e.g. with docker:
-    `docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
-
-3.  clone oC10 code: `git clone https://github.com/owncloud/core.git`
-
-4.  start reva with `REVA_USERS_DRIVER=ldap`:
-    ```
-    bin/ocis-reva gateway & \
-    REVA_USERS_DRIVER=ldap bin/ocis-reva users & \
-    REVA_USERS_DRIVER=ldap bin/ocis-reva auth-basic & \
-    bin/ocis-reva auth-bearer & \
-    bin/ocis-reva sharing & \
-    bin/ocis-reva storage-root & \
-    bin/ocis-reva storage-home & \
-    bin/ocis-reva storage-home-data & \
-    bin/ocis-reva storage-oc & \
-    bin/ocis-reva storage-oc-data & \
-    bin/ocis-reva frontend
-    ```
-
-5.  from inside the oC10 repo run the tests:
-    ```
-    make test-acceptance-api \
-        TEST_SERVER_URL=http://localhost:9140 \
-        TEST_EXTERNAL_USER_BACKENDS=true \
-        TEST_OCIS=true \
-        OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-        BEHAT_FILTER_TAGS='~@skipOnOcis&&@TestAlsoOnExternalUserBackend&&~@skipOnLDAP'
-    ```
-
-    Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment
-
-    This will run all tests that can work with LDAP and are not skipped on OCIS
-    To run a subset of tests, e.g. a single suite, file or tag have a look at the [acceptance tests documentation](https://doc.owncloud.com/server/10.0/developer_manual/core/acceptance-tests.html#running-acceptance-tests-for-a-suite).
-    E.g. you can run all tests that are marked with a specific issue:
-    ```
-    make test-acceptance-api \
-        TEST_SERVER_URL=http://localhost:9140 \
-        TEST_EXTERNAL_USER_BACKENDS=true \
-        TEST_OCIS=true \
-        OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-        BEHAT_FILTER_TAGS='@TestAlsoOnExternalUserBackend&&~@skipOnLDAP&&@issue-ocis-reva-46'
-    ```
-
-    Note that the `~@skipOnOcis` tag is removed here, because to fix an issue you want also to run the tests that are skipped in the CI run
-
 ## Security
 
 If you find a security issue please contact security@owncloud.com first.
