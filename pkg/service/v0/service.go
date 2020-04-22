@@ -68,14 +68,12 @@ func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) 
 	return nil
 }
 
-// ReportSettingsBundle writes the settings bundle for the extension on the ocis-settings service.
-// TODO implement retry logic.
-// TODO ensure the settings service is available.
-func ReportSettingsBundle(l *olog.Logger) {
-	// TODO wrap this in an infinite for loop with a BREAK label to GOTO once the request succeed.
+// RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
+func RegisterSettingsBundles(l *olog.Logger) {
+	// TODO it's ok if this fails. But show a warning that the settings service is not reachable. Make sure that init doesn't die if the settings service is not reachable.
 	svc := micro.NewService()
 	svc.Init()
-	service := settings.NewBundleService("com.owncloud.web.ocis-settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
+	service := settings.NewBundleService("com.owncloud.api.settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
 
 	// TODO avoid hardcoding these values, perhaps load them from a file and using jsonpb's type Marshal.
 	createBundleRequest := settings.CreateSettingsBundleRequest{
@@ -84,20 +82,20 @@ func ReportSettingsBundle(l *olog.Logger) {
 			Key:         "profile",
 			DisplayName: "Profile",
 			Settings: []*settings.Setting{
-				&settings.Setting{
+				{
 					Key:         "timezone",
 					DisplayName: "Timezone",
 					Description: "User timezone",
 					Value: &settings.Setting_SingleChoiceValue{
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
-								&settings.ListOption{
+								{
 									Option: &settings.ListOption_StringValue{
 										StringValue: "Europe/Berlin",
 									},
 									DisplayValue: "Europe/Berlin",
 								},
-								&settings.ListOption{
+								{
 									Option: &settings.ListOption_StringValue{
 										StringValue: "Asia/Kathmandu",
 									},
@@ -107,20 +105,20 @@ func ReportSettingsBundle(l *olog.Logger) {
 						},
 					},
 				},
-				&settings.Setting{
+				{
 					Key:         "language",
 					DisplayName: "Language",
 					Description: "User language",
 					Value: &settings.Setting_SingleChoiceValue{
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
-								&settings.ListOption{
+								{
 									Option: &settings.ListOption_StringValue{
 										StringValue: "de_DE",
 									},
 									DisplayValue: "Deutsch",
 								},
-								&settings.ListOption{
+								{
 									Option: &settings.ListOption_StringValue{
 										StringValue: "en_EN",
 									},
@@ -137,11 +135,11 @@ func ReportSettingsBundle(l *olog.Logger) {
 	res, err := service.CreateSettingsBundle(context.Background(), &createBundleRequest)
 	if err != nil {
 		l.Err(err).
-			Msg("Error reporting settings bundle")
+			Msg("Error registering settings bundle")
 	} else {
 		l.Info().
 			Str("bundle key", res.GetSettingsBundle().GetKey()).
-			Msg("Succesfully reported settings bundle")
+			Msg("Successfully registered settings bundle")
 	}
 
 }

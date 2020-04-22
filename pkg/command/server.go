@@ -90,7 +90,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			gr.Add(func() error {
 				logger.Info().Str("service", service.Name()).Msg("Reporting settings bundle to account service")
-				go svc.ReportSettingsBundle(&logger)
+				go svc.RegisterSettingsBundles(&logger)
 				return service.Run()
 			}, func(_ error) {
 				fmt.Println("shutting down grpc server")
