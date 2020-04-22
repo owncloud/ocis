@@ -138,6 +138,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Logger(logger),
 					http.Context(ctx),
 					http.Config(cfg),
+					http.Flags(flagset.RootWithConfig(cfg)),
+					http.Flags(flagset.ServerWithConfig(cfg)),
 				)
 
 				gr.Add(func() error {
@@ -157,6 +159,8 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Logger(logger),
 					grpc.Context(ctx),
 					grpc.Config(cfg),
+					grpc.Flags(flagset.RootWithConfig(cfg)),
+					grpc.Flags(flagset.ServerWithConfig(cfg)),
 				)
 
 				gr.Add(func() error {

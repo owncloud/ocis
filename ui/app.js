@@ -1,10 +1,11 @@
+import 'regenerator-runtime/runtime'
 import SettingsApp from './components/SettingsApp.vue'
 import store from './store'
 
 const appInfo = {
   name: 'Settings',
   id: 'settings',
-  icon: 'gear',
+  icon: 'info',
   isFileEditor: false,
   extensions: [],
   config: {

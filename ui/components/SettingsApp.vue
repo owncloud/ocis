@@ -7,23 +7,12 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
 export default {
   name: 'SettingsApp',
-  computed: {
-    ...mapGetters({
-      settingsBundles: 'Settings/settingsBundles'
-    })
-  },
-  methods: {
-    ...mapActions('Settings', [
-      'fetchSettingsBundles'
-    ])
-  },
-  mounted () {
-    this.fetchSettingsBundles().then(() => {
-      console.log(this.settingsBundles);
-    });
+  async mounted () {
+    const settingsBundles = await this.$store.dispatch('Settings/fetchSettingsBundles')
+    console.log(settingsBundles)
+    console.log("test")
   }
 }
 </script>
