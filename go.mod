@@ -27,7 +27,7 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/viper v1.5.0
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.2
 	golang.org/x/crypto v0.0.0-20200420201142-3c4aac89819a // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
