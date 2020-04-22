@@ -69,6 +69,19 @@ func (s Store) List() ([]*proto.Record, error) {
 	return records, nil
 }
 
+// NewRecord initializes a new record with the given options
+func NewRecord(options ...Option) *proto.Record {
+	opts := NewOptions(options...)
+
+	return &proto.Record{
+		Payload: &proto.Payload{
+			Account: &proto.Account{
+				Uuid: opts.UUID,
+			},
+		},
+	}
+}
+
 // Read implements the store interface. This implementation only reads by id.
 func (s Store) Read(key string) (*proto.Record, error) {
 	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
@@ -77,13 +90,16 @@ func (s Store) Read(key string) (*proto.Record, error) {
 		return nil, err
 	}
 
-	record := proto.Record{}
-	if err = json.Unmarshal(contents, &record); err != nil {
+	rec := NewRecord(
+		WithUUID(key),
+	)
+
+	if err = json.Unmarshal(contents, rec); err != nil {
 		s.Logger.Err(err).Msg("error unmarshaling record")
 		return nil, err
 	}
 
-	return &record, nil
+	return rec, nil
 }
 
 // Write implements the store interface

@@ -16,13 +16,13 @@ message Record {
 }
 
 message Payload {
-    Phoenix phoenix = 1;
-    Account account = 2;
+    Account account = 1;
 }
 
 message Account {
-    StandardClaims standard_claims = 1;
-    repeated IdHistory identities = 2; // keep track of every identity of a given user
+    string uuid = 1;
+    StandardClaims standard_claims = 2;
+    repeated IdHistory identities = 3; // keep track of every identity of a given user
 }
 
 // OIDC standard claims https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
@@ -61,10 +61,6 @@ message Address {
 message IdHistory {
     string sub = 1;
     string iss = 2;
-}
-
-message Phoenix {
-    string theme = 1;
 }
 
 message Query {
