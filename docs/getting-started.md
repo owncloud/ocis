@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
-weight: 20
+weight: 15
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
 geekdocFilePath: getting-started.md
@@ -15,38 +15,23 @@ So far we are offering two different variants for the installation. You can choo
 
 ### Docker
 
-TBD
+Docker images for ocis-reva are hosted on https://hub.docker.com/r/owncloud/ocis-proxy.
+
+The `latest` tag always reflects the current master branch.
+
+```console
+docker pull owncloud/ocis-proxy
+```
 
 ### Binaries
 
-TBD
+The pre-built binaries for different platforms are downloadable at https://download.owncloud.com/ocis/ocis-proxy/ . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in https://download.owncloud.com/ocis/ocis-proxy/testing/
 
-## Configuration
-
-We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.
-
-### Envrionment variables
-
-If you prefer to configure the service with environment variables you can see the available variables below.
-
-#### Server
-
-OCIS_PROXY_NAME
-: Name of the proxy service. It will be part of the namespace.
-
-OCIS_PROXY_NAMESPACE
-: Namespace of the proxy service.
-
-OCIS_PROXY_ADDRESS
-: Endpoint for the http service endpoint.
-
-### Commandline flags
-
-If you prefer to configure the service with commandline flags you can see the available variables below.
-
-### Configuration file
-
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-proxy/tree/master/pkg/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/proxy.yml`, `${HOME}/.ocis/proxy.yml` or `$(pwd)/config/proxy.yml`.
+```console
+curl https://download.owncloud.com/ocis/ocis-proxy/1.0.0-beta1/ocis-proxy-1.0.0-beta1-darwin-amd64 --output ocis-proxy
+chmod +x ocis-proxy
+./ocis-proxy server
+```
 
 ## Usage
 

@@ -12,6 +12,7 @@ require (
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
+	github.com/owncloud/flaex v0.2.0 // indirect
 	github.com/owncloud/ocis-accounts v0.1.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.0
 	github.com/prometheus/client_golang v1.2.1
@@ -24,5 +25,4 @@ require (
 	golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
