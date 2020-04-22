@@ -46,6 +46,7 @@ ifndef DATE
 endif
 
 LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
 GCFLAGS += all=-N -l
 
 .PHONY: all
@@ -99,7 +100,7 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
@@ -143,12 +144,16 @@ docs-copy:
 	git checkout origin/source -f; \
 	rsync --delete -ax ../docs/ content/extensions/$(NAME)
 
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| docs/configuration.md
+
 .PHONY: docs-build
 docs-build:
 	cd $(HUGO); hugo
 
 .PHONY: docs
-docs: docs-copy docs-build
+docs: config-docs-generate docs-copy docs-build
 
 .PHONY: watch
 watch:
