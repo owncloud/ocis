@@ -51,6 +51,11 @@ type WebDavSource struct {
 	BaseURL string
 }
 
+// FileSystemSource defines the available filesystem source configuration.
+type FileSystemSource struct {
+	BasePath string
+}
+
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
 	Resolutions       []string
