@@ -1,8 +1,26 @@
+# Changelog for [0.3.1] (2020-04-14)
+
+The following sections list the changes in ocis-konnectd 0.3.1.
+
+[0.3.1]: https://github.com/owncloud/ocis-konnectd/compare/v0.3.0...v0.3.1
+
+## Summary
+
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
+
+## Details
+
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
+
+   PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
+
+   https://github.com/owncloud/ocis-konnectd/pull/64
+
 # Changelog for [0.3.0] (2020-04-14)
 
 The following sections list the changes in ocis-konnectd 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.3.1...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-konnectd/compare/v0.1.0...v0.3.0
 
 ## Summary
 
@@ -39,24 +57,6 @@ The following sections list the changes in ocis-konnectd 0.3.0.
 * Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
 
    https://github.com/owncloud/product/issues/14
-
-# Changelog for [0.3.1] (2020-04-14)
-
-The following sections list the changes in ocis-konnectd 0.3.1.
-
-[0.3.1]: https://github.com/owncloud/ocis-konnectd/compare/v0.1.0...v0.3.1
-
-## Summary
-
-* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
-
-## Details
-
-* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis-konnectd/pull/64)
-
-   PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
-
-   https://github.com/owncloud/ocis-konnectd/pull/64
 
 # Changelog for [0.1.0] (2020-03-18)
 
