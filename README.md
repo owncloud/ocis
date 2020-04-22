@@ -11,7 +11,7 @@
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/reva/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis-reva/)
+You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/reva/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/extensions/ocis_reva/)
 
 ## Development
 
@@ -65,7 +65,7 @@ marie:radioactivty
 richard:superfluidity
 ```
 
-For details on the `json` and `ldap` backends see the [documentation](https://owncloud.github.io/ocis-reva/#users)
+For details on the `json` and `ldap` backends see the [documentation](https://owncloud.github.io/extensions/ocis_reva/users/)
 
 ## Security
 
