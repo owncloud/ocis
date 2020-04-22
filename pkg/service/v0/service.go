@@ -42,18 +42,10 @@ func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBund
 }
 
 func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
-	r, err := listSettingsBundles(g, req.Extension)
+	r, err := g.manager.ListByExtension(req.Extension)
 	if err != nil {
 		return err
 	}
 	res.SettingsBundles = r
 	return nil
-}
-
-func listSettingsBundles(g Service, extension string) ([]*proto.SettingsBundle, error) {
-	if len(extension) == 0 {
-		return g.manager.ListAll()
-	} else {
-		return g.manager.ListByExtension(extension)
-	}
 }

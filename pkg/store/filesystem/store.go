@@ -43,23 +43,6 @@ func New(cfg *config.Config) settings.Manager {
 	return &s
 }
 
-// ListAll returns all the bundles in the mountPath folder
-func (s Store) ListAll() ([]*proto.SettingsBundle, error) {
-	records := []*proto.SettingsBundle{}
-	bundles, err := ioutil.ReadDir(s.mountPath)
-	if err != nil {
-		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
-		return nil, err
-	}
-
-	s.Logger.Info().Msg("listing bundles")
-	for _, v := range bundles {
-		records = append(records, parseBundleFromFileName(v.Name()))
-	}
-
-	return records, nil
-}
-
 // ListByExtension returns all bundles in the mountPath folder belonging to the given extension
 func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error) {
 	records := []*proto.SettingsBundle{}
@@ -71,9 +54,10 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 
 	s.Logger.Info().Msgf("listing bundles by extension %v", extension)
 	for _, v := range bundles {
-		record := parseBundleFromFileName(v.Name())
-		if record.Extension == extension {
-			records = append(records, record)
+		record := proto.SettingsBundle{}
+		err = s.parseRecordFromFile(&record, path.Join(s.mountPath, v.Name()))
+		if err == nil && (len(extension) == 0 || extension == record.Extension) {
+			records = append(records, &record)
 		}
 	}
 

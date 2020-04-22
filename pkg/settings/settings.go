@@ -17,6 +17,5 @@ type RegisterFunc func(*config.Config) Manager
 type Manager interface {
 	Read(extension string, key string) (*proto.SettingsBundle, error)
 	Write(bundle *proto.SettingsBundle) (*proto.SettingsBundle, error)
-	ListAll() ([]*proto.SettingsBundle, error)
 	ListByExtension(extension string) ([]*proto.SettingsBundle, error)
 }
