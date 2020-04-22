@@ -134,7 +134,7 @@
     "protoCreateSettingsBundleRequest": {
       "type": "object",
       "properties": {
-        "settingsBundle": {
+        "settings_bundle": {
           "$ref": "#/definitions/protoSettingsBundle"
         }
       },
@@ -143,7 +143,7 @@
     "protoCreateSettingsBundleResponse": {
       "type": "object",
       "properties": {
-        "settingsBundle": {
+        "settings_bundle": {
           "$ref": "#/definitions/protoSettingsBundle"
         }
       }
@@ -151,7 +151,7 @@
     "protoGetSettingsBundleResponse": {
       "type": "object",
       "properties": {
-        "settingsBundle": {
+        "settings_bundle": {
           "$ref": "#/definitions/protoSettingsBundle"
         }
       }
@@ -183,10 +183,10 @@
     "protoListOption": {
       "type": "object",
       "properties": {
-        "stringValue": {
+        "string_value": {
           "type": "string"
         },
-        "intValue": {
+        "int_value": {
           "type": "string",
           "format": "int64"
         },
@@ -194,7 +194,7 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "displayValue": {
+        "display_value": {
           "type": "string"
         }
       }
@@ -202,7 +202,7 @@
     "protoListSettingsBundlesResponse": {
       "type": "object",
       "properties": {
-        "settingsBundles": {
+        "settings_bundles": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoSettingsBundle"
@@ -227,25 +227,25 @@
         "key": {
           "type": "string"
         },
-        "displayName": {
+        "display_name": {
           "type": "string"
         },
         "description": {
           "type": "string"
         },
-        "intValue": {
+        "int_value": {
           "$ref": "#/definitions/protoIntSetting"
         },
-        "stringValue": {
+        "string_value": {
           "$ref": "#/definitions/protoStringSetting"
         },
-        "boolValue": {
+        "bool_value": {
           "$ref": "#/definitions/protoBoolSetting"
         },
-        "singleChoiceValue": {
+        "single_choice_value": {
           "$ref": "#/definitions/protoSingleChoiceListSetting"
         },
-        "multiChoiceValue": {
+        "multi_choice_value": {
           "$ref": "#/definitions/protoMultiChoiceListSetting"
         }
       }
@@ -259,7 +259,7 @@
         "key": {
           "type": "string"
         },
-        "displayName": {
+        "display_name": {
           "type": "string"
         },
         "settings": {
@@ -292,11 +292,11 @@
           "type": "boolean",
           "format": "boolean"
         },
-        "minLength": {
+        "min_length": {
           "type": "integer",
           "format": "int32"
         },
-        "maxLength": {
+        "max_length": {
           "type": "integer",
           "format": "int32"
         },

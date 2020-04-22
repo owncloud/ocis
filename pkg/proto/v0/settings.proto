@@ -51,11 +51,11 @@ service BundleService {
 
 // requests and responses
 message CreateSettingsBundleRequest {
-  SettingsBundle settingsBundle = 1;
+  SettingsBundle settings_bundle = 1;
 }
 
 message CreateSettingsBundleResponse {
-  SettingsBundle settingsBundle = 1;
+  SettingsBundle settings_bundle = 1;
 }
 
 message GetSettingsBundleRequest {
@@ -64,7 +64,7 @@ message GetSettingsBundleRequest {
 }
 
 message GetSettingsBundleResponse {
-  SettingsBundle settingsBundle = 1;
+  SettingsBundle settings_bundle = 1;
 }
 
 message ListSettingsBundlesRequest {
@@ -72,27 +72,27 @@ message ListSettingsBundlesRequest {
 }
 
 message ListSettingsBundlesResponse {
-  repeated SettingsBundle settingsBundles = 1;
+  repeated SettingsBundle settings_bundles = 1;
 }
 
 // payloads
 message SettingsBundle {
   string extension = 1;
   string key = 2;
-  string displayName = 3;
+  string display_name = 3;
   repeated Setting settings = 4;
 }
 
 message Setting {
   string key = 1;
-  string displayName = 2;
+  string display_name = 2;
   string description = 3;
   oneof value {
-    IntSetting intValue = 4;
-    StringSetting stringValue = 5;
-    BoolSetting boolValue = 6;
-    SingleChoiceListSetting singleChoiceValue = 7;
-    MultiChoiceListSetting multiChoiceValue = 8;
+    IntSetting int_value = 4;
+    StringSetting string_value = 5;
+    BoolSetting bool_value = 6;
+    SingleChoiceListSetting single_choice_value = 7;
+    MultiChoiceListSetting multi_choice_value = 8;
   }
 }
 
@@ -107,8 +107,8 @@ message IntSetting {
 message StringSetting {
   string default = 1;
   bool required = 2;
-  int32 minLength = 3;
-  int32 maxLength = 4;
+  int32 min_length = 3;
+  int32 max_length = 4;
   string placeholder = 5;
 }
 
@@ -126,9 +126,9 @@ message MultiChoiceListSetting {
 
 message ListOption {
   oneof option {
-    string stringValue = 1;
-    int64 intValue = 2;
+    string string_value = 1;
+    int64 int_value = 2;
   }
   bool selected = 3;
-  string displayValue = 4;
+  string display_value = 4;
 }
