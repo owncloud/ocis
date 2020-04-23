@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/owncloud/ocis-accounts/pkg/flagset"
 	"syscall"
 
 	"github.com/micro/cli/v2"
@@ -23,48 +24,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:        "server",
 		Usage:       "Start ocis accounts service",
 		Description: "an accounts backend manager (driver) needs to be specified. By default the service uses the filesystem as storage",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "manager",
-				DefaultText: "filesystem",
-				Usage:       "accounts backend manager",
-				Value:       "filesystem",
-				EnvVars:     []string{"ACCOUNTS_MANAGER"},
-				Destination: &cfg.Manager,
-			},
-			&cli.StringFlag{
-				Name:        "mount-path",
-				Usage:       "mounting point (necessary when manager=filesystem)",
-				EnvVars:     []string{"ACCOUNTS_MOUNT_PATH"},
-				Destination: &cfg.MountPath,
-			},
-			&cli.StringFlag{
-				Name:        "name",
-				Value:       "accounts",
-				DefaultText: "accounts",
-				Usage:       "service name",
-				EnvVars:     []string{"ACCOUNTS_NAME"},
-				Destination: &cfg.Server.Name,
-			},
-			&cli.StringFlag{
-				Name:        "namespace",
-				Aliases:     []string{"ns"},
-				Value:       "com.owncloud",
-				DefaultText: "com.owncloud",
-				Usage:       "namespace",
-				EnvVars:     []string{"ACCOUNTS_NAMESPACE"},
-				Destination: &cfg.Server.Namespace,
-			},
-			&cli.StringFlag{
-				Name:        "address",
-				Aliases:     []string{"addr"},
-				Value:       "localhost:9180",
-				DefaultText: "localhost:9180",
-				Usage:       "service endpoint",
-				EnvVars:     []string{"ACCOUNTS_ADDRESS"},
-				Destination: &cfg.Server.Address,
-			},
-		},
+		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			logger = oclog.NewLogger(
 				oclog.Name(cfg.Server.Name),
