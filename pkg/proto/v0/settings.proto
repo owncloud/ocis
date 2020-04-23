@@ -114,6 +114,7 @@ message StringSetting {
 
 message BoolSetting {
   bool default = 1;
+  string label = 2;
 }
 
 message SingleChoiceListSetting {

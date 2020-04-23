@@ -58,5 +58,9 @@
   "browserslist": [
     "> 1%",
     "not dead"
-  ]
+  ],
+  "dependencies": {
+    "owncloud-design-system": "^1.2.2",
+    "vuex": "^3.2.0"
+  }
 }
