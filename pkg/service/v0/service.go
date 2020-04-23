@@ -76,12 +76,64 @@ func RegisterSettingsBundles(l *olog.Logger) {
 	service := settings.NewBundleService("com.owncloud.api.settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
 
 	// TODO avoid hardcoding these values, perhaps load them from a file and using jsonpb's type Marshal.
-	createBundleRequest := settings.CreateSettingsBundleRequest{
+	requests := []settings.CreateSettingsBundleRequest{
+		generateSettingsBundleProfileRequest(),
+		generateSettingsBundleNotificationsRequest(),
+	}
+
+	for _, request := range requests {
+		res, err := service.CreateSettingsBundle(context.Background(), &request)
+		if err != nil {
+			l.Err(err).
+				Msg("Error registering settings bundle")
+		} else {
+			l.Info().
+				Str("bundle key", res.GetSettingsBundle().GetKey()).
+				Msg("Successfully registered settings bundle")
+		}
+	}
+}
+
+func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest {
+	return settings.CreateSettingsBundleRequest{
 		SettingsBundle: &settings.SettingsBundle{
 			Extension:   "ocis-accounts",
 			Key:         "profile",
 			DisplayName: "Profile",
 			Settings: []*settings.Setting{
+				{
+					Key:         "firstname",
+					DisplayName: "Firstname",
+					Description: "Input for firstname",
+					Value: &settings.Setting_StringValue{
+						StringValue: &settings.StringSetting{
+							Placeholder: "Set firstname",
+						},
+					},
+				},
+				{
+					Key:         "lastname",
+					DisplayName: "Lastname",
+					Description: "Input for lastname",
+					Value: &settings.Setting_StringValue{
+						StringValue: &settings.StringSetting{
+							Placeholder: "Set lastname",
+						},
+					},
+				},
+				{
+					Key:         "age",
+					DisplayName: "Age",
+					Description: "Input for age",
+					Value: &settings.Setting_IntValue{
+						IntValue: &settings.IntSetting{
+							Placeholder: "Set age",
+							Min:         16,
+							Max:         200,
+							Step:        2,
+						},
+					},
+				},
 				{
 					Key:         "timezone",
 					DisplayName: "Timezone",
@@ -131,15 +183,36 @@ func RegisterSettingsBundles(l *olog.Logger) {
 			},
 		},
 	}
+}
 
-	res, err := service.CreateSettingsBundle(context.Background(), &createBundleRequest)
-	if err != nil {
-		l.Err(err).
-			Msg("Error registering settings bundle")
-	} else {
-		l.Info().
-			Str("bundle key", res.GetSettingsBundle().GetKey()).
-			Msg("Successfully registered settings bundle")
+func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleRequest {
+	return settings.CreateSettingsBundleRequest{
+		SettingsBundle: &settings.SettingsBundle{
+			Extension:   "ocis-accounts",
+			Key:         "notifications",
+			DisplayName: "Notifications",
+			Settings: []*settings.Setting{
+				{
+					Key:         "email",
+					DisplayName: "Email",
+					Value: &settings.Setting_BoolValue{
+						BoolValue: &settings.BoolSetting{
+							Default: false,
+							Label:   "Send via email",
+						},
+					},
+				},
+				{
+					Key:         "stream",
+					DisplayName: "Stream",
+					Value: &settings.Setting_BoolValue{
+						BoolValue: &settings.BoolSetting{
+							Default: true,
+							Label:   "Show in stream",
+						},
+					},
+				},
+			},
+		},
 	}
-
 }
