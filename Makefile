@@ -107,6 +107,9 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
+$(BIN)/$(EXECUTABLE)-linux: $(SOURCES)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
 
@@ -168,6 +171,8 @@ watch:
 # EOS related destinations
 # -------------------------------------------------------------------------------
 
+EOS_LDAP_HOST ?= host.docker.internal:9125
+
 eos-docker:
 	git clone https://gitlab.cern.ch/eos/eos-docker.git
 
@@ -197,9 +202,13 @@ eos-setup: eos-docker/scripts/start_services_ocis.sh
 	#Allow resolving uids against ldap
 	# 9125 is the ldap port, 9126 would be tls ... but self signed cert
 	# TODO check out the error message (ignoring for now ... still works): read LDAP host from env var, if not set fall back to docker host, in docker compose should be the ocis-glauth container because it contains guest accounts a well
-	export LDAP_HOST=`docker exec -it eos-mgm1 /sbin/ip route|awk '/default/ { print $$3 }'`; \
-	docker exec -i eos-mgm1 authconfig --enableldap --enableldapauth --ldapserver="`echo -n $$LDAP_HOST`:9125" --ldapbasedn="dc=example,dc=org" --update; \
-	docker exec -i eos-cli1 authconfig --enableldap --enableldapauth --ldapserver="`echo -n $$LDAP_HOST`:9125" --ldapbasedn="dc=example,dc=org" --update;
+ifeq ($(UNAME), Linux)
+	#on linux add host.docker.internal to hosts: https://stackoverflow.com/questions/714100/os-detecting-makefile
+	docker exec -it eos-mgm1 /bin/sh -c $$'echo -e "`/sbin/ip route | awk \'/default/ { print $$3 }\'`\thost.docker.internal" | sudo tee -a /etc/hosts > /dev/null'
+	docker exec -it eos-cli1 /bin/sh -c $$'echo -e "`/sbin/ip route | awk \'/default/ { print $$3 }\'`\thost.docker.internal" | sudo tee -a /etc/hosts > /dev/null'
+endif
+	docker exec -i eos-mgm1 authconfig --enableldap --enableldapauth --ldapserver=$(EOS_LDAP_HOST) --ldapbasedn="dc=example,dc=org" --update; \
+	docker exec -i eos-cli1 authconfig --enableldap --enableldapauth --ldapserver=$(EOS_LDAP_HOST) --ldapbasedn="dc=example,dc=org" --update;
 
 	# setup users on mgm
 	#TODO Failed to get D-Bus connection: Operation not permitted\ngetsebool:  SELinux is disabled
@@ -232,10 +241,9 @@ eos-test:
 	docker exec -i eos-mgm1 id feynman
 
 .PHONY: eos-copy-ocis
-eos-copy-ocis: build
-	# copy the binary to the eos-cli1 container
-	docker cp ./bin/ocis eos-cli1:/usr/local/bin/ocis
-	docker cp ./bin/ocis-debug eos-cli1:/usr/local/bin/ocis-debug
+eos-copy-ocis: build $(BIN)/$(EXECUTABLE)-linux
+	# copy the linux binary to the eos-cli1 container
+	docker cp ./bin/ocis-linux eos-cli1:/usr/local/bin/ocis
 
 .PHONY: eos-ocis-storage-home
 eos-ocis-storage-home:
