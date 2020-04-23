@@ -144,9 +144,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 											"undelete":          true,
 											"versioning":        true,
 										},
-										"dav": map[string]interface{}{
-											"chunking": "1.0",
-										},
+										"dav": map[string]interface{}{},
 										"files_sharing": map[string]interface{}{
 											"api_enabled":                       true,
 											"resharing":                         true,
