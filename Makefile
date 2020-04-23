@@ -256,18 +256,20 @@ eos-ocis-storage-home:
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
 	--env REVA_STORAGE_HOME_DATA_DRIVER=eos \
+	--env REVA_GATEWAY_URL=host.docker.internal:9142 \
 	eos-cli1 ocis reva-storage-home-data &
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
 	eos-cli1 ocis reva-storage-eos &
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
+	--env REVA_GATEWAY_URL=host.docker.internal:9142 \
 	eos-cli1 ocis reva-storage-eos-data &
 
 .PHONY: eos-ocis
 eos-ocis:
 	export OCIS_LOG_LEVEL=debug; \
-	export DAV_FILES_NAMESPACE="/eos/"; \
+	export DAV_FILES_NAMESPACE="/home/"; \
 	bin/ocis micro & \
 	bin/ocis glauth & \
 	bin/ocis graph-explorer & \
