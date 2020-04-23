@@ -8,6 +8,10 @@
 export default {
   name: 'SettingUnknown',
   props: {
+    bundle: {
+      type: Object,
+      required: true
+    },
     setting: {
       type: Object,
       required: true

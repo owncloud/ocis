@@ -193,7 +193,7 @@
           "type": "string",
           "format": "int64"
         },
-        "selected": {
+        "default": {
           "type": "boolean",
           "format": "boolean"
         },

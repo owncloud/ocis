@@ -9,6 +9,7 @@
         <div class="uk-position-relative"
              :is="getSettingComponent(setting)"
              :id="getElementId(bundle, setting)"
+             :bundle="bundle"
              :setting="setting"
         />
       </div>
@@ -18,6 +19,7 @@
 
 <script>
 import SettingBoolean from "./settings/SettingBoolean.vue";
+import SettingMultiChoice from "./settings/SettingMultiChoice.vue";
 import SettingNumber from "./settings/SettingNumber.vue";
 import SettingSingleChoice from "./settings/SettingSingleChoice.vue";
 import SettingString from "./settings/SettingString.vue";
@@ -41,6 +43,7 @@ export default {
   },
   components: {
     SettingBoolean,
+    SettingMultiChoice,
     SettingNumber,
     SettingSingleChoice,
     SettingString,

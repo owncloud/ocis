@@ -1,8 +1,8 @@
 <template>
   <div>
     <oc-button :id="buttonElementId" class="uk-width-expand">
-      <span v-if="selectedOption">
-        {{ selectedOption.displayValue }}
+      <span v-if="selectedOptions !== null && selectedOptions.length > 0">
+        {{ selectedOptionsDisplayValues }}
       </span>
       <span v-else>
         {{ setting.placeholder || $gettext('Please select') }}
@@ -16,16 +16,16 @@
       >
       <ul class="uk-list">
         <li
-          v-for="(option, index) in setting.singleChoiceValue.options"
+          v-for="(option, index) in setting.multiChoiceValue.options"
           :key="getOptionElementId(index)"
         >
           <label :for="getOptionElementId(index)">
             <input
               :id="getOptionElementId(index)"
-              type="radio"
-              class="oc-radiobutton"
-              v-model="selectedOption"
+              type="checkbox"
+              class="oc-checkbox"
               :value="option"
+              v-model="selectedOptions"
               @input="onSelectedOption"
             />
             {{ option.displayValue }}
@@ -38,7 +38,7 @@
 
 <script>
 export default {
-  name: 'SettingSingleChoice',
+  name: 'SettingMultiChoice',
   props: {
     bundle: {
       type: Object,
@@ -51,15 +51,18 @@ export default {
   },
   data() {
     return {
-      selectedOption: null
+      selectedOptions: null
     }
   },
   computed: {
+    selectedOptionsDisplayValues() {
+      return Array.from(this.selectedOptions).map(option => option.displayValue).join(', ')
+    },
     dropElementId() {
-      return `single-choice-drop-${this.bundle.key}-${this.setting.key}`
+      return `multi-choice-drop-${this.bundle.key}-${this.setting.key}`
     },
     buttonElementId() {
-      return `single-choice-toggle-${this.bundle.key}-${this.setting.key}`
+      return `multi-choice-toggle-${this.bundle.key}-${this.setting.key}`
     },
   },
   methods: {
@@ -72,14 +75,11 @@ export default {
     }
   },
   mounted() {
-    this.selectedOption = null
-    // TODO: load the settings value of the authenticated user and set it in `selectedOption`
-    // if not set, yet, apply default from settings bundle definition
-    if (this.selectedOption === null) {
-      const defaults = this.setting.singleChoiceValue.options.filter(option => option.default)
-      if (defaults.length === 1) {
-        this.selectedOption = defaults[0]
-      }
+    this.selectedOptions = null
+    // TODO: load the settings value of the authenticated user and set it in `selectedOptions`
+    // if not set, yet, apply defaults from settings bundle definition
+    if (this.selectedOptions === null) {
+      this.selectedOptions = this.setting.multiChoiceValue.options.filter(option => option.default)
     }
   }
 }

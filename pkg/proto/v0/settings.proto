@@ -130,6 +130,6 @@ message ListOption {
     string string_value = 1;
     int64 int_value = 2;
   }
-  bool selected = 3;
+  bool default = 3;
   string display_value = 4;
 }

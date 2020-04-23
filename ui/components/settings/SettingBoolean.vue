@@ -8,6 +8,10 @@
 export default {
   name: 'SettingBoolean',
   props: {
+    bundle: {
+      type: Object,
+      required: true
+    },
     setting: {
       type: Object,
       required: true
