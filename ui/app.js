@@ -10,7 +10,7 @@ function $gettext(msg) {
 const appInfo = {
   name: $gettext('Settings'),
   id: 'settings',
-  icon: 'info',
+  icon: 'application',
   isFileEditor: false,
   extensions: [],
   config: {

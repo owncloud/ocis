@@ -8,18 +8,20 @@
         </p>
       </oc-alert>
       <template v-else>
-        <div class="uk-flex uk-flex-between uk-flex-middle">
-          <h1 v-translate class="oc-page-title">{{ selectedExtensionName }}</h1>
-        </div>
-        <hr />
-        <template>
-          <settings-bundle
-            v-for="bundle in selectedSettingsBundles"
-            :key="'bundle-' + bundle.key"
-            :bundle="bundle"
-            class="uk-margin-top"
-          />
+        <template v-if="selectedExtensionName">
+          <div class="uk-flex uk-flex-between uk-flex-middle">
+            <h1 class="oc-page-title">
+              {{ selectedExtensionName }}
+            </h1>
+          </div>
+          <hr />
         </template>
+        <settings-bundle
+          v-for="bundle in selectedSettingsBundles"
+          :key="'bundle-' + bundle.key"
+          :bundle="bundle"
+          class="uk-margin-top"
+        />
       </template>
     </div>
     <oc-loader v-else />
@@ -51,6 +53,8 @@ export default {
       // TODO: extensions need to be registered with display names, separate from the settings bundles. until then: hardcoded translation
       if (this.selectedExtension === 'ocis-accounts') {
         return 'Account'
+      } else if (this.selectedExtension === 'ocis-test') {
+        return 'Test'
       }
       return this.selectedExtension
     },
@@ -73,8 +77,9 @@ export default {
       }
     }
   },
-  created () {
-    this.initialize()
+  async created () {
+    await this.initialize()
+    this.resetSelectedExtension()
   },
   watch: {
     initialized() {
