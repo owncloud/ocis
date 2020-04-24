@@ -12,7 +12,9 @@
       :drop-id="dropElementId"
       :toggle="`#${buttonElementId}`"
       mode="click"
-      :options="{ offset: 0, delayHide: 0, flip: false }"
+      close-on-click
+      position="bottom-justify"
+      :options="{ offset: 0, delayHide: 200, flip: false }"
       >
       <ul class="uk-list">
         <li
