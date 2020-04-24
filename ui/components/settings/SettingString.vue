@@ -47,6 +47,7 @@ export default {
     applyValue() {
       // TODO: propagate value to parent
       // TODO: show a spinner while the request for saving the value is running!
+      this.initialValue = this.value
     },
     cancel() {
       this.value = this.initialValue

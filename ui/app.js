@@ -2,8 +2,13 @@ import 'regenerator-runtime/runtime'
 import SettingsApp from './components/SettingsApp.vue'
 import store from './store'
 
+// just a dummy function to trick gettext tools
+function $gettext(msg) {
+  return msg
+}
+
 const appInfo = {
-  name: 'Settings',
+  name: $gettext('Settings'),
   id: 'settings',
   icon: 'info',
   isFileEditor: false,
@@ -16,7 +21,7 @@ const appInfo = {
 const routes = [
   {
     name: 'settings',
-    path: '/',
+    path: '/:extension?',
     components: {
       app: SettingsApp
     }
@@ -25,7 +30,7 @@ const routes = [
 
 const navItems = [
   {
-    name: 'Settings',
+    name: $gettext('Settings'),
     iconMaterial: appInfo.icon,
     route: {
       name: 'settings',

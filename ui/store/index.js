@@ -2,11 +2,13 @@ import { ListSettingsBundles } from '../client/settings'
 
 const state = {
   config: null,
+  initialized: false,
   settingsBundles: []
 }
 
 const getters = {
   config: state => state.config,
+  initialized: state => state.initialized,
   settingsBundles: state => state.settingsBundles,
   extensions: state => {
     return [...new Set(Array.from(state.settingsBundles).map(bundle => bundle.extension))].sort()
@@ -19,6 +21,9 @@ const getters = {
 }
 
 const mutations = {
+  SET_INITIALIZED (state, value) {
+    state.initialized = value
+  },
   SET_SETTINGS_BUNDLES (state, payload) {
     state.settingsBundles = payload
   },
@@ -30,6 +35,11 @@ const mutations = {
 const actions = {
   loadConfig ({ commit }, config) {
     commit('LOAD_CONFIG', config)
+  },
+
+  async initialize({ commit, dispatch }) {
+    await dispatch('fetchSettingsBundles')
+    commit('SET_INITIALIZED', true)
   },
 
   async fetchSettingsBundles ({ commit, dispatch, getters }) {
