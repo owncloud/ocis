@@ -269,7 +269,7 @@ eos-ocis-storage-home:
 .PHONY: eos-ocis
 eos-ocis:
 	export OCIS_LOG_LEVEL=debug; \
-	export DAV_FILES_NAMESPACE="/home/"; \
+	export DAV_FILES_NAMESPACE="/eos/users/{{substr 0 1 .Username}}/"; \
 	bin/ocis micro & \
 	bin/ocis glauth & \
 	bin/ocis graph-explorer & \
@@ -285,7 +285,6 @@ eos-ocis:
 	bin/ocis reva-sharing & \
 	bin/ocis reva-users & \
 	bin/ocis proxy &
-
 
 .PHONY: eos-start
 eos-start: eos-deploy eos-setup eos-copy-ocis eos-ocis-storage-home eos-ocis
