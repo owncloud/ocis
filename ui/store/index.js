@@ -39,24 +39,28 @@ const actions = {
     if (response.status === 200) {
       // the settings markup has implicit typing. inject an explicit type variable here
       const settingsBundles = response.data.settingsBundles
-      settingsBundles.forEach(bundle => {
-        bundle.settings.forEach(setting => {
-          if (setting['intValue']) {
-            setting.type = 'number'
-          } else if (setting['stringValue']) {
-            setting.type = 'string'
-          } else if (setting['boolValue']) {
-            setting.type = 'boolean'
-          } else if (setting['singleChoiceValue']) {
-            setting.type = 'singleChoice'
-          } else if (setting['multiChoiceValue']) {
-            setting.type = 'multiChoice'
-          } else {
-            setting.type = 'unknown'
-          }
+      if (settingsBundles) {
+        settingsBundles.forEach(bundle => {
+          bundle.settings.forEach(setting => {
+            if (setting['intValue']) {
+              setting.type = 'number'
+            } else if (setting['stringValue']) {
+              setting.type = 'string'
+            } else if (setting['boolValue']) {
+              setting.type = 'boolean'
+            } else if (setting['singleChoiceValue']) {
+              setting.type = 'singleChoice'
+            } else if (setting['multiChoiceValue']) {
+              setting.type = 'multiChoice'
+            } else {
+              setting.type = 'unknown'
+            }
+          })
         })
-      })
-      commit('SET_SETTINGS_BUNDLES', settingsBundles)
+        commit('SET_SETTINGS_BUNDLES', settingsBundles)
+      } else {
+        commit('SET_SETTINGS_BUNDLES', [])
+      }
     } else {
       dispatch('showMessage', {
         title: 'Failed to fetch settings bundles.',

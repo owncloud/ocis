@@ -7,8 +7,8 @@
       </div>
       <hr />
       <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
-        <p>
-          <oc-icon name="info" />
+        <p class="uk-flex uk-flex-middle">
+          <oc-icon name="info" class="uk-margin-xsmall-right" />
           <translate>No settings available</translate>
         </p>
       </oc-alert>
