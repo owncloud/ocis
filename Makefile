@@ -175,25 +175,25 @@ watch:
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--go_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--micro_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--microweb_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--swagger_out=pkg/proto/v0 example.proto
 
 # .PHONY: protobuf
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
