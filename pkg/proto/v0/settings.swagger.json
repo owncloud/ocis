@@ -24,7 +24,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v0/bundles": {
+    "/api/v0/settings/bundles": {
       "get": {
         "operationId": "ListSettingsBundles",
         "responses": {
@@ -84,7 +84,7 @@
         ]
       }
     },
-    "/api/v0/bundles/{extension}/{key}": {
+    "/api/v0/settings/bundles/{extension}/{bundle_key}": {
       "get": {
         "operationId": "GetSettingsBundle",
         "responses": {
@@ -109,7 +109,7 @@
             "type": "string"
           },
           {
-            "name": "key",
+            "name": "bundle_key",
             "in": "path",
             "required": true,
             "type": "string"
@@ -117,6 +117,86 @@
         ],
         "tags": [
           "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/values": {
+      "post": {
+        "operationId": "SaveSettingsValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSaveSettingsValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSaveSettingsValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values/{account_uuid}/{extension}/{bundle_key}/{setting_key}": {
+      "get": {
+        "operationId": "GetSettingsValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetSettingsValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account_uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "extension",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bundle_key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "setting_key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ValueService"
         ]
       }
     }
@@ -141,7 +221,7 @@
           "$ref": "#/definitions/protoSettingsBundle"
         }
       },
-      "title": "requests and responses"
+      "title": "requests and responses for settings bundles"
     },
     "protoCreateSettingsBundleResponse": {
       "type": "object",
@@ -156,6 +236,26 @@
       "properties": {
         "settings_bundle": {
           "$ref": "#/definitions/protoSettingsBundle"
+        }
+      }
+    },
+    "protoGetSettingsValueResponse": {
+      "type": "object",
+      "properties": {
+        "settings_value": {
+          "$ref": "#/definitions/protoSettingsValue"
+        }
+      }
+    },
+    "protoIntListValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
         }
       }
     },
@@ -224,10 +324,27 @@
         }
       }
     },
+    "protoSaveSettingsValueRequest": {
+      "type": "object",
+      "properties": {
+        "settings_value": {
+          "$ref": "#/definitions/protoSettingsValue"
+        }
+      },
+      "title": "requests and responses for settings values"
+    },
+    "protoSaveSettingsValueResponse": {
+      "type": "object",
+      "properties": {
+        "settings_value": {
+          "$ref": "#/definitions/protoSettingsValue"
+        }
+      }
+    },
     "protoSetting": {
       "type": "object",
       "properties": {
-        "key": {
+        "setting_key": {
           "type": "string"
         },
         "display_name": {
@@ -259,7 +376,7 @@
         "extension": {
           "type": "string"
         },
-        "key": {
+        "bundle_key": {
           "type": "string"
         },
         "display_name": {
@@ -272,7 +389,42 @@
           }
         }
       },
-      "title": "payloads"
+      "title": "payloads for settings bundles"
+    },
+    "protoSettingsValue": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "bundle_key": {
+          "type": "string"
+        },
+        "setting_key": {
+          "type": "string"
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "int_value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "int_list_value": {
+          "$ref": "#/definitions/protoIntListValue"
+        },
+        "string_list_value": {
+          "$ref": "#/definitions/protoStringListValue"
+        }
+      },
+      "title": "payloads for settings values"
     },
     "protoSingleChoiceListSetting": {
       "type": "object",
@@ -281,6 +433,17 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoListOption"
+          }
+        }
+      }
+    },
+    "protoStringListValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }

@@ -58,10 +58,8 @@ func Server(opts ...Option) http.Service {
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		proto.RegisterBundleServiceWeb(
-			r,
-			handle,
-		)
+		proto.RegisterBundleServiceWeb(r, handle)
+		proto.RegisterValueServiceWeb(r, handle)
 	})
 
 	service.Handle(

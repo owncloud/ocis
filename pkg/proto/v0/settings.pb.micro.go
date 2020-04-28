@@ -119,3 +119,73 @@ func (h *bundleServiceHandler) GetSettingsBundle(ctx context.Context, in *GetSet
 func (h *bundleServiceHandler) ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, out *ListSettingsBundlesResponse) error {
 	return h.BundleServiceHandler.ListSettingsBundles(ctx, in, out)
 }
+
+// Client API for ValueService service
+
+type ValueService interface {
+	SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, opts ...client.CallOption) (*SaveSettingsValueResponse, error)
+	GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, opts ...client.CallOption) (*GetSettingsValueResponse, error)
+}
+
+type valueService struct {
+	c    client.Client
+	name string
+}
+
+func NewValueService(name string, c client.Client) ValueService {
+	return &valueService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *valueService) SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, opts ...client.CallOption) (*SaveSettingsValueResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.SaveSettingsValue", in)
+	out := new(SaveSettingsValueResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *valueService) GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, opts ...client.CallOption) (*GetSettingsValueResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.GetSettingsValue", in)
+	out := new(GetSettingsValueResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for ValueService service
+
+type ValueServiceHandler interface {
+	SaveSettingsValue(context.Context, *SaveSettingsValueRequest, *SaveSettingsValueResponse) error
+	GetSettingsValue(context.Context, *GetSettingsValueRequest, *GetSettingsValueResponse) error
+}
+
+func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts ...server.HandlerOption) error {
+	type valueService interface {
+		SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, out *SaveSettingsValueResponse) error
+		GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error
+	}
+	type ValueService struct {
+		valueService
+	}
+	h := &valueServiceHandler{hdlr}
+	return s.Handle(s.NewHandler(&ValueService{h}, opts...))
+}
+
+type valueServiceHandler struct {
+	ValueServiceHandler
+}
+
+func (h *valueServiceHandler) SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, out *SaveSettingsValueResponse) error {
+	return h.ValueServiceHandler.SaveSettingsValue(ctx, in, out)
+}
+
+func (h *valueServiceHandler) GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error {
+	return h.ValueServiceHandler.GetSettingsValue(ctx, in, out)
+}

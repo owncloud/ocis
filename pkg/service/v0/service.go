@@ -11,8 +11,8 @@ import (
 )
 
 type Service struct {
-	config  *config.Config
-	manager settings.Manager
+	config       *config.Config
+	manager      settings.Manager
 }
 
 // NewService returns a service implementation for Service.
@@ -24,7 +24,7 @@ func NewService(cfg *config.Config) Service {
 }
 
 func (g Service) CreateSettingsBundle(c context.Context, req *proto.CreateSettingsBundleRequest, res *proto.CreateSettingsBundleResponse) error {
-	r, err := g.manager.Write(req.SettingsBundle)
+	r, err := g.manager.WriteBundle(req.SettingsBundle)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (g Service) CreateSettingsBundle(c context.Context, req *proto.CreateSettin
 }
 
 func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
-	r, err := g.manager.Read(req.Extension, req.Key)
+	r, err := g.manager.ReadBundle(req.Extension, req.BundleKey)
 	if err != nil {
 		return err
 	}
@@ -47,5 +47,23 @@ func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsB
 		return err
 	}
 	res.SettingsBundles = r
+	return nil
+}
+
+func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsValueRequest, res *proto.SaveSettingsValueResponse) error {
+	r, err := g.manager.WriteValue(req.SettingsValue)
+	if err != nil {
+		return err
+	}
+	res.SettingsValue = r
+	return nil
+}
+
+func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValueRequest, res *proto.GetSettingsValueResponse) error {
+	r, err := g.manager.ReadValue(req.AccountUuid, req.Extension, req.BundleKey, req.SettingKey)
+	if err != nil {
+		return err
+	}
+	res.SettingsValue = r
 	return nil
 }
