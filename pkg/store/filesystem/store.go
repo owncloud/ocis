@@ -45,19 +45,28 @@ func New(cfg *config.Config) settings.Manager {
 
 // ListByExtension returns all bundles in the mountPath folder belonging to the given extension
 func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error) {
-	records := []*proto.SettingsBundle{}
-	bundles, err := ioutil.ReadDir(s.mountPath)
+	bundlesFolder := buildFolderPathBundles(s.mountPath)
+	extensionFolders, err := ioutil.ReadDir(bundlesFolder)
 	if err != nil {
-		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
+		s.Logger.Err(err).Msgf("error reading %v", bundlesFolder)
 		return nil, err
 	}
 
 	s.Logger.Info().Msgf("listing bundles by extension %v", extension)
-	for _, v := range bundles {
-		record := proto.SettingsBundle{}
-		err = s.parseRecordFromFile(&record, path.Join(s.mountPath, v.Name()))
-		if err == nil && (len(extension) == 0 || extension == record.Extension) {
-			records = append(records, &record)
+	var records []*proto.SettingsBundle
+	for _, extensionFolder := range extensionFolders {
+		extensionPath := path.Join(bundlesFolder, extensionFolder.Name())
+		bundleFiles, err := ioutil.ReadDir(extensionPath)
+		if err == nil {
+			for _, bundleFile := range bundleFiles {
+				record := proto.SettingsBundle{}
+				err = s.parseRecordFromFile(&record, path.Join(extensionPath, bundleFile.Name()))
+				if err == nil && (len(extension) == 0 || extension == record.Extension) {
+					records = append(records, &record)
+				}
+			}
+		} else {
+			s.Logger.Err(err).Msgf("error reading %v", extensionPath)
 		}
 	}
 
@@ -71,7 +80,7 @@ func (s Store) Read(extension string, key string) (*proto.SettingsBundle, error)
 		return nil, fmt.Errorf(emptyKeyError)
 	}
 
-	filePath := path.Join(s.mountPath, buildFileNameFromBundleArgs(extension, key))
+	filePath := buildFilePathFromBundleArgs(s.mountPath, extension, key)
 	record := proto.SettingsBundle{}
 	if err := s.parseRecordFromFile(&record, filePath); err != nil {
 		return nil, err
@@ -88,7 +97,7 @@ func (s Store) Write(record *proto.SettingsBundle) (*proto.SettingsBundle, error
 		return nil, fmt.Errorf(emptyKeyError)
 	}
 
-	filePath := path.Join(s.mountPath, buildFileNameFromBundle(record))
+	filePath := buildFilePathFromBundle(s.mountPath, record)
 	if err := s.writeRecordToFile(record, filePath); err != nil {
 		return nil, err
 	}
