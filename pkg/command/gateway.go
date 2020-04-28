@@ -162,7 +162,11 @@ func Gateway(cfg *config.Config) *cli.Command {
 						return err
 					}
 
-					runtime.Run(rcfg, pidFile)
+					runtime.RunWithOptions(
+						rcfg,
+						pidFile,
+						runtime.WithLogger(&logger.Logger),
+					)
 					return nil
 				}, func(_ error) {
 					logger.Info().
