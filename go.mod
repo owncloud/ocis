@@ -21,7 +21,7 @@ require (
 	github.com/owncloud/ocis-konnectd v0.2.0
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.3.0
-	github.com/owncloud/ocis-pkg/v2 v2.2.0
+	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.1.0
 	github.com/owncloud/ocis-reva v0.0.0-20200318210849-075c6608b85f
 	github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4
