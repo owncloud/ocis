@@ -212,6 +212,29 @@ func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleR
 						},
 					},
 				},
+				{
+					Key:         "transport",
+					DisplayName: "Transport",
+					Value: &settings.Setting_MultiChoiceValue{
+						MultiChoiceValue: &settings.MultiChoiceListSetting{
+							Options: []*settings.ListOption{
+								{
+									Option: &settings.ListOption_StringValue{
+										StringValue: "email",
+									},
+									DisplayValue: "Send via email",
+								},
+								{
+									Option: &settings.ListOption_StringValue{
+										StringValue: "stream",
+									},
+									DisplayValue: "Show in stream",
+									Default: true,
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
