@@ -22,17 +22,16 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
 	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
-	github.com/owncloud/ocis-phoenix v0.5.0
-	github.com/owncloud/ocis-pkg/v2 v2.2.0
+	github.com/owncloud/ocis-phoenix v0.6.0
+	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.3.1
-	github.com/owncloud/ocis-reva v0.2.1-0.20200422092105-7d8638a67485
-	github.com/owncloud/ocis-thumbnails v0.1.0
+	github.com/owncloud/ocis-reva v0.2.1
+	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/restic/calens v0.2.0
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 )
 
