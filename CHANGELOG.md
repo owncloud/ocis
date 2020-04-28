@@ -1,13 +1,14 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.2.1] (2020-04-28)
 
-The following sections list the changes in ocis-reva unreleased.
+The following sections list the changes in ocis-reva 0.2.1.
 
-[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.2.0...master
+[0.2.1]: https://github.com/owncloud/ocis-reva/compare/v0.2.0...v0.2.1
 
 ## Summary
 
 * Bugfix - Stop advertising unsupported chunking v2: [#145](https://github.com/owncloud/ocis-reva/pull/145)
 * Enhancement - Allow configuring the gateway for dataproviders: [#136](https://github.com/owncloud/ocis-reva/pull/136)
+* Enhancement - Use a configured logger on reva runtime: [#153](https://github.com/owncloud/ocis-reva/pull/153)
 
 ## Details
 
@@ -25,6 +26,14 @@ The following sections list the changes in ocis-reva unreleased.
    This allows using basic or bearer auth when directly talking to dataproviders.
 
    https://github.com/owncloud/ocis-reva/pull/136
+
+
+* Enhancement - Use a configured logger on reva runtime: [#153](https://github.com/owncloud/ocis-reva/pull/153)
+
+   For consistency reasons we need a configured logger that is inline with an ocis logger, so the
+   log cascade can be easily parsed by a human.
+
+   https://github.com/owncloud/ocis-reva/pull/153
 
 # Changelog for [0.2.0] (2020-04-15)
 
