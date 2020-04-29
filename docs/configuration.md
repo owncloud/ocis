@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-04-14T22:00:52+0200"
+date: "2020-04-29T12:08:23+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
@@ -112,13 +112,49 @@ Usage: `ocis server [command options] [arguments...]`
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis proxy
+#### ocis graph
 
-Start proxy server
+Start graph server
+
+#### ocis graph-explorer
+
+Start graph explorer
+
+#### ocis phoenix
+
+Start phoenix server
 
 #### ocis reva-storage-oc-data
 
 Start reva oc storage dataprovider
+
+#### ocis reva-auth-basic
+
+Start reva auth-basic service
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis reva-storage-eos-data
+
+Start reva eos storage dataprovider
+
+#### ocis hello
+
+Start hello server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis reva-storage-eos
+
+Start reva eos storage
+
+#### ocis reva-storage-root
+
+Start reva root storage
 
 #### ocis reva-auth-bearer
 
@@ -128,33 +164,9 @@ Start reva auth-bearer service
 
 Start webdav server
 
-#### ocis reva-sharing
-
-Start reva sharing service
-
 #### ocis reva-gateway
 
 Start reva gateway
-
-#### ocis graph-explorer
-
-Start graph explorer
-
-#### ocis reva-auth-basic
-
-Start reva auth-basic service
-
-#### ocis hello
-
-Start hello server
-
-#### ocis reva-storage-home
-
-Start reva home storage
-
-#### ocis reva-storage-oc
-
-Start reva oc storage
 
 #### ocis reva-frontend
 
@@ -164,35 +176,31 @@ Start reva frontend
 
 Start reva home storage dataprovider
 
-#### ocis graph
-
-Start graph server
-
 #### ocis konnectd
 
 Start konnectd server
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis phoenix
-
-Start phoenix server
-
-#### ocis ocs
-
-Start ocs server
 
 #### ocis reva-users
 
 Start reva users service
 
-#### ocis reva-storage-root
+#### ocis proxy
 
-Start reva root storage
+Start proxy server
+
+#### ocis reva-sharing
+
+Start reva sharing service
+
+#### ocis reva-storage-home
+
+Start reva home storage
+
+#### ocis reva-storage-oc
+
+Start reva oc storage
+
+#### ocis thumbnails
+
+Start thumbnails server
 
