@@ -18,7 +18,7 @@ func (s Store) buildFolderPathBundles() string {
 
 // Builds a unique file name from the given settings bundle
 func (s Store) buildFilePathFromBundle(bundle *proto.SettingsBundle) string {
-	return s.buildFilePathFromBundleArgs(bundle.Extension, bundle.BundleKey)
+	return s.buildFilePathFromBundleArgs(bundle.Identifier.Extension, bundle.Identifier.BundleKey)
 }
 
 // Builds a unique file name from the given params
@@ -37,7 +37,7 @@ func (s Store) buildFolderPathValues() string {
 
 // Builds a unique file name from the given settings value
 func (s Store) buildFilePathFromValue(value *proto.SettingsValue) string {
-	return s.buildFilePathFromValueArgs(value.AccountUuid, value.Extension, value.BundleKey)
+	return s.buildFilePathFromValueArgs(value.Identifier.AccountUuid, value.Identifier.Extension, value.Identifier.BundleKey)
 }
 
 // Builds a unique file name from the given params

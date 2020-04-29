@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     getElementId(bundle, setting) {
-      return `setting-${bundle.key}-${setting.key}`
+      return `setting-${bundle.identifier.bundleKey}-${setting.settingKey}`
     },
     getSettingComponent(setting) {
       return 'Setting' + setting.type[0].toUpperCase() + setting.type.substr(1)

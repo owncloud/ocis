@@ -20,13 +20,14 @@ type Manager interface {
 
 // BundleManager
 type BundleManager interface {
-	ReadBundle(extension string, bundleKey string) (*proto.SettingsBundle, error)
+	ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, error)
 	WriteBundle(bundle *proto.SettingsBundle) (*proto.SettingsBundle, error)
-	ListByExtension(extension string) ([]*proto.SettingsBundle, error)
+	ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundle, error)
 }
 
 // ValueManager
 type ValueManager interface {
-	ReadValue(accountUuid string, extension string, bundleKey string, settingKey string) (*proto.SettingsValue, error)
+	ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error)
 	WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error)
+	ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue, error)
 }

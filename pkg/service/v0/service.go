@@ -23,7 +23,7 @@ func NewService(cfg *config.Config) Service {
 	}
 }
 
-func (g Service) CreateSettingsBundle(c context.Context, req *proto.CreateSettingsBundleRequest, res *proto.CreateSettingsBundleResponse) error {
+func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBundleRequest, res *proto.SaveSettingsBundleResponse) error {
 	r, err := g.manager.WriteBundle(req.SettingsBundle)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (g Service) CreateSettingsBundle(c context.Context, req *proto.CreateSettin
 }
 
 func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
-	r, err := g.manager.ReadBundle(req.Extension, req.BundleKey)
+	r, err := g.manager.ReadBundle(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBund
 }
 
 func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
-	r, err := g.manager.ListByExtension(req.Extension)
+	r, err := g.manager.ListBundles(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -60,10 +60,27 @@ func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsVal
 }
 
 func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValueRequest, res *proto.GetSettingsValueResponse) error {
-	r, err := g.manager.ReadValue(req.AccountUuid, req.Extension, req.BundleKey, req.SettingKey)
+	r, err := g.manager.ReadValue(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
 		return err
 	}
 	res.SettingsValue = r
 	return nil
+}
+
+func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsValuesRequest, res *proto.ListSettingsValuesResponse) error {
+	r, err := g.manager.ListValues(getFailsafeIdentifier(req.Identifier))
+	if err != nil {
+		return err
+	}
+	res.SettingsValues = r
+	return nil
+}
+
+func getFailsafeIdentifier(identifier *proto.Identifier) *proto.Identifier {
+	if identifier == nil {
+		return &proto.Identifier{}
+	} else {
+		return identifier
+	}
 }

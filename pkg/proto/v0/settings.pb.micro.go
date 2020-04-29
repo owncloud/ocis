@@ -36,7 +36,7 @@ var _ server.Option
 // Client API for BundleService service
 
 type BundleService interface {
-	CreateSettingsBundle(ctx context.Context, in *CreateSettingsBundleRequest, opts ...client.CallOption) (*CreateSettingsBundleResponse, error)
+	SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, opts ...client.CallOption) (*SaveSettingsBundleResponse, error)
 	GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, opts ...client.CallOption) (*GetSettingsBundleResponse, error)
 	ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, opts ...client.CallOption) (*ListSettingsBundlesResponse, error)
 }
@@ -53,9 +53,9 @@ func NewBundleService(name string, c client.Client) BundleService {
 	}
 }
 
-func (c *bundleService) CreateSettingsBundle(ctx context.Context, in *CreateSettingsBundleRequest, opts ...client.CallOption) (*CreateSettingsBundleResponse, error) {
-	req := c.c.NewRequest(c.name, "BundleService.CreateSettingsBundle", in)
-	out := new(CreateSettingsBundleResponse)
+func (c *bundleService) SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, opts ...client.CallOption) (*SaveSettingsBundleResponse, error) {
+	req := c.c.NewRequest(c.name, "BundleService.SaveSettingsBundle", in)
+	out := new(SaveSettingsBundleResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -86,14 +86,14 @@ func (c *bundleService) ListSettingsBundles(ctx context.Context, in *ListSetting
 // Server API for BundleService service
 
 type BundleServiceHandler interface {
-	CreateSettingsBundle(context.Context, *CreateSettingsBundleRequest, *CreateSettingsBundleResponse) error
+	SaveSettingsBundle(context.Context, *SaveSettingsBundleRequest, *SaveSettingsBundleResponse) error
 	GetSettingsBundle(context.Context, *GetSettingsBundleRequest, *GetSettingsBundleResponse) error
 	ListSettingsBundles(context.Context, *ListSettingsBundlesRequest, *ListSettingsBundlesResponse) error
 }
 
 func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, opts ...server.HandlerOption) error {
 	type bundleService interface {
-		CreateSettingsBundle(ctx context.Context, in *CreateSettingsBundleRequest, out *CreateSettingsBundleResponse) error
+		SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, out *SaveSettingsBundleResponse) error
 		GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, out *GetSettingsBundleResponse) error
 		ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, out *ListSettingsBundlesResponse) error
 	}
@@ -108,8 +108,8 @@ type bundleServiceHandler struct {
 	BundleServiceHandler
 }
 
-func (h *bundleServiceHandler) CreateSettingsBundle(ctx context.Context, in *CreateSettingsBundleRequest, out *CreateSettingsBundleResponse) error {
-	return h.BundleServiceHandler.CreateSettingsBundle(ctx, in, out)
+func (h *bundleServiceHandler) SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, out *SaveSettingsBundleResponse) error {
+	return h.BundleServiceHandler.SaveSettingsBundle(ctx, in, out)
 }
 
 func (h *bundleServiceHandler) GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, out *GetSettingsBundleResponse) error {
@@ -125,6 +125,7 @@ func (h *bundleServiceHandler) ListSettingsBundles(ctx context.Context, in *List
 type ValueService interface {
 	SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, opts ...client.CallOption) (*SaveSettingsValueResponse, error)
 	GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, opts ...client.CallOption) (*GetSettingsValueResponse, error)
+	ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, opts ...client.CallOption) (*ListSettingsValuesResponse, error)
 }
 
 type valueService struct {
@@ -159,17 +160,29 @@ func (c *valueService) GetSettingsValue(ctx context.Context, in *GetSettingsValu
 	return out, nil
 }
 
+func (c *valueService) ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, opts ...client.CallOption) (*ListSettingsValuesResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.ListSettingsValues", in)
+	out := new(ListSettingsValuesResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for ValueService service
 
 type ValueServiceHandler interface {
 	SaveSettingsValue(context.Context, *SaveSettingsValueRequest, *SaveSettingsValueResponse) error
 	GetSettingsValue(context.Context, *GetSettingsValueRequest, *GetSettingsValueResponse) error
+	ListSettingsValues(context.Context, *ListSettingsValuesRequest, *ListSettingsValuesResponse) error
 }
 
 func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts ...server.HandlerOption) error {
 	type valueService interface {
 		SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, out *SaveSettingsValueResponse) error
 		GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error
+		ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, out *ListSettingsValuesResponse) error
 	}
 	type ValueService struct {
 		valueService
@@ -188,4 +201,8 @@ func (h *valueServiceHandler) SaveSettingsValue(ctx context.Context, in *SaveSet
 
 func (h *valueServiceHandler) GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error {
 	return h.ValueServiceHandler.GetSettingsValue(ctx, in, out)
+}
+
+func (h *valueServiceHandler) ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, out *ListSettingsValuesResponse) error {
+	return h.ValueServiceHandler.ListSettingsValues(ctx, in, out)
 }

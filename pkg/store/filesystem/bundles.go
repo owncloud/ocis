@@ -9,8 +9,8 @@ import (
 	"path"
 )
 
-// ListByExtension returns all bundles in the mountPath folder belonging to the given extension
-func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error) {
+// ListBundles returns all bundles in the mountPath folder belonging to the given extension
+func (s Store) ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundle, error) {
 	bundlesFolder := s.buildFolderPathBundles()
 	extensionFolders, err := ioutil.ReadDir(bundlesFolder)
 	if err != nil {
@@ -18,7 +18,11 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 		return nil, err
 	}
 
-	s.Logger.Info().Msgf("listing bundles by extension %v", extension)
+	if len(identifier.Extension) < 1 {
+		s.Logger.Info().Msg("listing all bundles")
+	} else {
+		s.Logger.Info().Msgf("listing bundles by extension %v", identifier.Extension)
+	}
 	var records []*proto.SettingsBundle
 	for _, extensionFolder := range extensionFolders {
 		extensionPath := path.Join(bundlesFolder, extensionFolder.Name())
@@ -27,7 +31,7 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 			for _, bundleFile := range bundleFiles {
 				record := proto.SettingsBundle{}
 				err = s.parseRecordFromFile(&record, path.Join(extensionPath, bundleFile.Name()))
-				if err == nil && (len(extension) == 0 || extension == record.Extension) {
+				if err == nil && (len(identifier.Extension) == 0 || identifier.Extension == record.Identifier.Extension) {
 					records = append(records, &record)
 				}
 			}
@@ -40,13 +44,13 @@ func (s Store) ListByExtension(extension string) ([]*proto.SettingsBundle, error
 }
 
 // Read tries to find a bundle by the given extension and key within the mountPath
-func (s Store) ReadBundle(extension string, bundleKey string) (*proto.SettingsBundle, error) {
-	if len(extension) < 1 || len(bundleKey) < 1 {
+func (s Store) ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, error) {
+	if len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 {
 		s.Logger.Error().Msg("extension and bundleKey cannot be empty")
 		return nil, gstatus.Error(codes.InvalidArgument, "Missing a required identifier attribute")
 	}
 
-	filePath := s.buildFilePathFromBundleArgs(extension, bundleKey)
+	filePath := s.buildFilePathFromBundleArgs(identifier.Extension, identifier.BundleKey)
 	record := proto.SettingsBundle{}
 	if err := s.parseRecordFromFile(&record, filePath); err != nil {
 		return nil, err
@@ -58,7 +62,7 @@ func (s Store) ReadBundle(extension string, bundleKey string) (*proto.SettingsBu
 
 // Write writes the given record into a file within the mountPath
 func (s Store) WriteBundle(record *proto.SettingsBundle) (*proto.SettingsBundle, error) {
-	if len(record.Extension) < 1 || len(record.BundleKey) < 1 {
+	if len(record.Identifier.Extension) < 1 || len(record.Identifier.BundleKey) < 1 {
 		s.Logger.Error().Msg("extension and bundleKey cannot be empty")
 		return nil, gstatus.Error(codes.InvalidArgument, "Missing a required identifier attribute")
 	}

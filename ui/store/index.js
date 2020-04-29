@@ -1,4 +1,4 @@
-import { ListSettingsBundles } from '../client/settings'
+import { ListSettingsBundles, ListSettingsValues } from '../client/settings'
 
 const state = {
   config: null,
@@ -11,11 +11,11 @@ const getters = {
   initialized: state => state.initialized,
   settingsBundles: state => state.settingsBundles,
   extensions: state => {
-    return [...new Set(Array.from(state.settingsBundles).map(bundle => bundle.extension))].sort()
+    return [...new Set(Array.from(state.settingsBundles).map(bundle => bundle.identifier.extension))].sort()
   },
   getSettingsBundlesByExtension: state => extension => {
-    return state.settingsBundles.filter(bundle => bundle.extension === extension).sort((b1,b2) => {
-      return b1.key.localeCompare(b2.key)
+    return state.settingsBundles.filter(bundle => bundle.identifier.extension === extension).sort((b1,b2) => {
+      return b1.identifier.bundleKey.localeCompare(b2.identifier.bundleKey)
     })
   }
 }
@@ -38,14 +38,19 @@ const actions = {
   },
 
   async initialize({ commit, dispatch }) {
-    await dispatch('fetchSettingsBundles')
+    await Promise.all([
+      dispatch('fetchSettingsBundles'),
+      // dispatch('fetchSettingsValues')
+    ])
     commit('SET_INITIALIZED', true)
   },
 
   async fetchSettingsBundles ({ commit, dispatch, getters }) {
     const response = await ListSettingsBundles({
-      $domain: getters.config.url
+      $domain: getters.config.url,
+      identifierExtension: "ocis-accounts"
     })
+    console.log(response)
     if (response.status === 200) {
       // the settings markup has implicit typing. inject an explicit type variable here
       const settingsBundles = response.data.settingsBundles
@@ -77,6 +82,18 @@ const actions = {
         desc: response.statusText,
         status: 'danger'
       }, { root: true })
+    }
+  },
+
+  async fetchSettingsValues ({ commit, dispatch, getters }) {
+    const response = await ListSettingsValues({
+      $domain: getters.config.url,
+      identifierAccountUuid: "5681371F-4A6E-43BC-8BB5-9C9237FA9C58",
+      identifierExtension: "ocis-accounts",
+      identifierBundleKey: "notifications"
+    })
+    console.log(response)
+    if (response.status === 200) {
     }
   }
 }

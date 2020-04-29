@@ -18,7 +18,7 @@
         </template>
         <settings-bundle
           v-for="bundle in selectedSettingsBundles"
-          :key="'bundle-' + bundle.key"
+          :key="'bundle-' + bundle.identifier.bundleKey"
           :bundle="bundle"
           class="uk-margin-top"
         />

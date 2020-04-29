@@ -31,21 +31,17 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 };
 
 service BundleService {
-  rpc CreateSettingsBundle(CreateSettingsBundleRequest) returns (CreateSettingsBundleResponse) {
+  rpc SaveSettingsBundle(SaveSettingsBundleRequest) returns (SaveSettingsBundleResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/bundles",
       body: "*"
     };
   };
   rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse) {
-    option (google.api.http) = {
-      get: "/api/v0/settings/bundles/{extension}/{bundle_key}"
-    };
+    option (google.api.http).get = "/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}";
   };
   rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse) {
-    option (google.api.http) = {
-      get: "/api/v0/settings/bundles"
-    };
+    option (google.api.http).get = "/api/v0/settings/bundles/{identifier.extension}";
   };
 }
 
@@ -57,24 +53,24 @@ service ValueService {
     };
   };
   rpc GetSettingsValue(GetSettingsValueRequest) returns (GetSettingsValueResponse) {
-    option (google.api.http) = {
-      get: "/api/v0/settings/values/{account_uuid}/{extension}/{bundle_key}/{setting_key}"
-    };
+    option (google.api.http).get = "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}";
+  };
+  rpc ListSettingsValues(ListSettingsValuesRequest) returns (ListSettingsValuesResponse) {
+    option (google.api.http).get = "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}";
   };
 }
 
 // requests and responses for settings bundles
-message CreateSettingsBundleRequest {
+message SaveSettingsBundleRequest {
   SettingsBundle settings_bundle = 1;
 }
 
-message CreateSettingsBundleResponse {
+message SaveSettingsBundleResponse {
   SettingsBundle settings_bundle = 1;
 }
 
 message GetSettingsBundleRequest {
-  string extension = 1;
-  string bundle_key = 2;
+  Identifier identifier = 1;
 }
 
 message GetSettingsBundleResponse {
@@ -82,7 +78,7 @@ message GetSettingsBundleResponse {
 }
 
 message ListSettingsBundlesRequest {
-  string extension = 1;// can be limited to all settings bundles of an extension
+  Identifier identifier = 1;
 }
 
 message ListSettingsBundlesResponse {
@@ -99,22 +95,34 @@ message SaveSettingsValueResponse {
 }
 
 message GetSettingsValueRequest {
-  string account_uuid = 1;
-  string extension = 2;
-  string bundle_key = 3;
-  string setting_key = 4;
+  Identifier identifier = 1;
 }
 
 message GetSettingsValueResponse {
   SettingsValue settings_value = 1;
 }
 
-// payloads for settings bundles
-message SettingsBundle {
+message ListSettingsValuesRequest {
+  Identifier identifier = 1;
+}
+
+message ListSettingsValuesResponse {
+  repeated SettingsValue settings_values = 1;
+}
+
+// generic payloads
+message Identifier {
   string extension = 1;
   string bundle_key = 2;
-  string display_name = 3;
-  repeated Setting settings = 4;
+  string setting_key = 3;
+  string account_uuid = 4;
+}
+
+// payloads for settings bundles
+message SettingsBundle {
+  Identifier identifier = 1;
+  string display_name = 2;
+  repeated Setting settings = 3;
 }
 
 message Setting {
@@ -170,16 +178,13 @@ message ListOption {
 
 // payloads for settings values
 message SettingsValue {
-  string account_uuid = 1;
-  string extension = 2;
-  string bundle_key = 3;
-  string setting_key = 4;
+  Identifier identifier = 1;
   oneof value {
-    bool bool_value = 5;
-    int64 int_value = 6;
-    string string_value = 7;
-    IntListValue int_list_value = 8;
-    StringListValue string_list_value = 9;
+    bool bool_value = 2;
+    int64 int_value = 3;
+    string string_value = 4;
+    IntListValue int_list_value = 5;
+    StringListValue string_list_value = 6;
   }
 }
 
@@ -193,5 +198,5 @@ message StringListValue {
 
 // only meant for serialization
 message SettingsValues {
-  map<string,SettingsValue> values = 1;
+  map<string, SettingsValue> values = 1;
 }

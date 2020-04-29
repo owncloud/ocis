@@ -60,15 +60,15 @@ export default {
       return Array.from(this.selectedOptions).map(option => option.displayValue).join(', ')
     },
     dropElementId() {
-      return `multi-choice-drop-${this.bundle.key}-${this.setting.key}`
+      return `multi-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
     buttonElementId() {
-      return `multi-choice-toggle-${this.bundle.key}-${this.setting.key}`
+      return `multi-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
   },
   methods: {
     getOptionElementId(index) {
-      return `${this.bundle.key}-${this.setting.key}-${index}`
+      return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
     },
     onSelectedOption() {
       // TODO: propagate selection to parent

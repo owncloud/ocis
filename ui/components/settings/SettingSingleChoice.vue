@@ -58,15 +58,15 @@ export default {
   },
   computed: {
     dropElementId() {
-      return `single-choice-drop-${this.bundle.key}-${this.setting.key}`
+      return `single-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
     buttonElementId() {
-      return `single-choice-toggle-${this.bundle.key}-${this.setting.key}`
+      return `single-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
   },
   methods: {
     getOptionElementId(index) {
-      return `${this.bundle.key}-${this.setting.key}-${index}`
+      return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
     },
     onSelectedOption() {
       // TODO: propagate selection to parent
