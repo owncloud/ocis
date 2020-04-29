@@ -52,8 +52,8 @@ Open [https://localhost:9200](https://localhost:9200) and login using one of the
 
 ```console
 albert:relativity
-marie:radioactivty
-richard:superfluidity
+marie:radioactivity
+feynman:superfluidity
 ```
 
 ## Running single extensions
