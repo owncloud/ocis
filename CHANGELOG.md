@@ -1,4 +1,27 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-accounts unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.1.0...master
+
+## Summary
+
+* Enhancement - Logging is configurable: [#24](https://github.com/owncloud/ocis-accounts/pull/24)
+
+## Details
+
+* Enhancement - Logging is configurable: [#24](https://github.com/owncloud/ocis-accounts/pull/24)
+
+   ACCOUNTS_LOG_* env-vars or cli-flags can be used for logging configuration. See --help for
+   more details.
+
+   https://github.com/owncloud/ocis-accounts/pull/24
+
+# Changelog for [0.1.0] (2020-03-18)
+
+The following sections list the changes in ocis-accounts 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-accounts/compare/500e303cb544ed93d84153f01219d77eeee44929...v0.1.0
 
 ## Summary
 
