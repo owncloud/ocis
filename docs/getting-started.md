@@ -87,8 +87,8 @@ Open https://localhost:9200 and login using one of the demo accounts:
 
 ```console
 einstein:relativity
-marie:radioactivty
-richard:superfluidity
+marie:radioactivity
+feynman:superfluidity
 ```
 
 ## Runtime
