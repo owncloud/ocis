@@ -19,8 +19,8 @@ import (
 // StorageEOSData is the entrypoint for the storage-oc-data command.
 func StorageEOSData(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "storage-oc-data",
-		Usage: "Start reva storage-oc-data service",
+		Name:  "storage-eos-data",
+		Usage: "Start reva storage-eos-data service",
 		Flags: flagset.StorageEOSDataWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.StorageEOSData.Services = c.StringSlice("service")
@@ -109,24 +109,6 @@ func StorageEOSData(cfg *config.Config) *cli.Command {
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
 										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
 										"user_layout":            cfg.Reva.Storages.EOS.Layout,
-									},
-									"local": map[string]interface{}{
-										"root": cfg.Reva.Storages.Local.Root,
-									},
-									"owncloud": map[string]interface{}{
-										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
-										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
-										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
-										"enable_home":   cfg.Reva.Storages.OwnCloud.EnableHome,
-										"user_layout":   cfg.Reva.Storages.OwnCloud.Layout,
-									},
-									"s3": map[string]interface{}{
-										"region":     cfg.Reva.Storages.S3.Region,
-										"access_key": cfg.Reva.Storages.S3.AccessKey,
-										"secret_key": cfg.Reva.Storages.S3.SecretKey,
-										"endpoint":   cfg.Reva.Storages.S3.Endpoint,
-										"bucket":     cfg.Reva.Storages.S3.Bucket,
-										"prefix":     cfg.Reva.Storages.S3.Prefix,
 									},
 								},
 								"temp_folder": cfg.Reva.StorageEOSData.TempFolder,
