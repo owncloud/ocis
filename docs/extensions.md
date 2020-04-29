@@ -169,7 +169,9 @@ This is what hello is: copy and extend!
 
 ## Phoenix extension points
 
-> Note: For an up to date list check out [the phoenix documentation](https://github.com/owncloud/phoenix/issues/2423). 
+{{< hint info >}}
+For an up to date list check out [the phoenix documentation](https://github.com/owncloud/phoenix/issues/2423).
+{{< /hint >}}
 
 Several ones available:
 
