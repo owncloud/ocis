@@ -49,6 +49,7 @@ var (
 		"reva-storage-eos-data",
 		"reva-storage-oc",
 		"reva-storage-oc-data",
+		"accounts",
 		"glauth",
 		"konnectd",
 		"proxy", // TODO rename this command. It collides with micro's `proxy`
