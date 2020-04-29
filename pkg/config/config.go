@@ -1,6 +1,7 @@
 package config
 
 import (
+	accounts "github.com/owncloud/ocis-accounts/pkg/config"
 	glauth "github.com/owncloud/ocis-glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis-graph/pkg/config"
@@ -58,22 +59,24 @@ type Config struct {
 	GRPC    GRPC
 	Tracing Tracing
 
+	Accounts      *accounts.Config
 	Graph         *graph.Config
 	GraphExplorer *graphExplorer.Config
+	GLAuth        *glauth.Config
 	Hello         *hello.Config
 	Konnectd      *konnectd.Config
 	OCS           *ocs.Config
 	Phoenix       *phoenix.Config
-	WebDAV        *webdav.Config
-	Reva          *reva.Config
-	GLAuth        *glauth.Config
 	Proxy         *proxy.Config
+	Reva          *reva.Config
 	Thumbnails    *thumbnails.Config
+	WebDAV        *webdav.Config
 }
 
 // New initializes a new configuration with or without defaults.
 func New() *Config {
 	return &Config{
+		Accounts:      accounts.New(),
 		Graph:         graph.New(),
 		GraphExplorer: graphExplorer.New(),
 		Hello:         hello.New(),
