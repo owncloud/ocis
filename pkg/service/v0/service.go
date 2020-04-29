@@ -76,33 +76,35 @@ func RegisterSettingsBundles(l *olog.Logger) {
 	service := settings.NewBundleService("com.owncloud.api.settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
 
 	// TODO avoid hardcoding these values, perhaps load them from a file and using jsonpb's type Marshal.
-	requests := []settings.CreateSettingsBundleRequest{
+	requests := []settings.SaveSettingsBundleRequest{
 		generateSettingsBundleProfileRequest(),
 		generateSettingsBundleNotificationsRequest(),
 	}
 
 	for _, request := range requests {
-		res, err := service.CreateSettingsBundle(context.Background(), &request)
+		res, err := service.SaveSettingsBundle(context.Background(), &request)
 		if err != nil {
 			l.Err(err).
 				Msg("Error registering settings bundle")
 		} else {
 			l.Info().
-				Str("bundle key", res.GetSettingsBundle().GetKey()).
+				Str("bundle key", res.SettingsBundle.Identifier.BundleKey).
 				Msg("Successfully registered settings bundle")
 		}
 	}
 }
 
-func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest {
-	return settings.CreateSettingsBundleRequest{
+func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
+	return settings.SaveSettingsBundleRequest{
 		SettingsBundle: &settings.SettingsBundle{
-			Extension:   "ocis-accounts",
-			Key:         "profile",
+			Identifier: &settings.Identifier{
+				Extension: "ocis-accounts",
+				BundleKey: "profile",
+			},
 			DisplayName: "Profile",
 			Settings: []*settings.Setting{
 				{
-					Key:         "firstname",
+					SettingKey:  "firstname",
 					DisplayName: "Firstname",
 					Description: "Input for firstname",
 					Value: &settings.Setting_StringValue{
@@ -112,7 +114,7 @@ func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest
 					},
 				},
 				{
-					Key:         "lastname",
+					SettingKey:  "lastname",
 					DisplayName: "Lastname",
 					Description: "Input for lastname",
 					Value: &settings.Setting_StringValue{
@@ -122,7 +124,7 @@ func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest
 					},
 				},
 				{
-					Key:         "age",
+					SettingKey:  "age",
 					DisplayName: "Age",
 					Description: "Input for age",
 					Value: &settings.Setting_IntValue{
@@ -135,7 +137,7 @@ func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest
 					},
 				},
 				{
-					Key:         "timezone",
+					SettingKey:  "timezone",
 					DisplayName: "Timezone",
 					Description: "User timezone",
 					Value: &settings.Setting_SingleChoiceValue{
@@ -158,7 +160,7 @@ func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest
 					},
 				},
 				{
-					Key:         "language",
+					SettingKey:  "language",
 					DisplayName: "Language",
 					Description: "User language",
 					Value: &settings.Setting_SingleChoiceValue{
@@ -185,15 +187,17 @@ func generateSettingsBundleProfileRequest() settings.CreateSettingsBundleRequest
 	}
 }
 
-func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleRequest {
-	return settings.CreateSettingsBundleRequest{
+func generateSettingsBundleNotificationsRequest() settings.SaveSettingsBundleRequest {
+	return settings.SaveSettingsBundleRequest{
 		SettingsBundle: &settings.SettingsBundle{
-			Extension:   "ocis-accounts",
-			Key:         "notifications",
+			Identifier: &settings.Identifier{
+				Extension: "ocis-accounts",
+				BundleKey: "notifications",
+			},
 			DisplayName: "Notifications",
 			Settings: []*settings.Setting{
 				{
-					Key:         "email",
+					SettingKey:  "email",
 					DisplayName: "Email",
 					Value: &settings.Setting_BoolValue{
 						BoolValue: &settings.BoolSetting{
@@ -203,7 +207,7 @@ func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleR
 					},
 				},
 				{
-					Key:         "stream",
+					SettingKey:  "stream",
 					DisplayName: "Stream",
 					Value: &settings.Setting_BoolValue{
 						BoolValue: &settings.BoolSetting{
@@ -213,7 +217,7 @@ func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleR
 					},
 				},
 				{
-					Key:         "transport",
+					SettingKey:  "transport",
 					DisplayName: "Transport",
 					Value: &settings.Setting_MultiChoiceValue{
 						MultiChoiceValue: &settings.MultiChoiceListSetting{
@@ -229,7 +233,7 @@ func generateSettingsBundleNotificationsRequest() settings.CreateSettingsBundleR
 										StringValue: "stream",
 									},
 									DisplayValue: "Show in stream",
-									Default: true,
+									Default:      true,
 								},
 							},
 						},
