@@ -4,6 +4,7 @@
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
+* Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
@@ -27,6 +28,15 @@
    the context of the ownCloud Infinite Scale project.
 
    https://github.com/owncloud/ocis/issues/2
+
+
+* Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
+
+   Starts ocis-accounts in single binary mode (./ocis server). This service stores the
+   user-account information.
+
+   https://github.com/owncloud/product/issues/25
+   https://github.com/owncloud/ocis/pull/239/files
 
 
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
