@@ -9,6 +9,9 @@ import (
 	"time"
 
 	oidc "github.com/coreos/go-oidc"
+	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/registry"
+	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
 	"golang.org/x/oauth2"
 )
@@ -16,6 +19,8 @@ import (
 var (
 	// ErrInvalidToken is returned when the request token is invalid.
 	ErrInvalidToken = errors.New("invalid or missing token")
+
+	accountSvc = "com.owncloud.accounts"
 )
 
 // newOIDCOptions initializes the available default options.
@@ -30,7 +35,7 @@ func newOIDCOptions(opts ...ocisoidc.Option) ocisoidc.Options {
 }
 
 // OpenIDConnect provides a middleware to check access secured by a static token.
-func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
+func OpenIDConnect(opts ...ocisoidc.Option) M {
 	opt := newOIDCOptions(opts...)
 
 	// set defaults
@@ -96,7 +101,6 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 				return
 			}
 
-			// parse claims
 			if err := userInfo.Claims(&claims); err != nil {
 				opt.Logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -111,4 +115,35 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, nr)
 		})
 	}
+}
+
+// from the user claims we need to get the uuid from the accounts service
+func uuidFromClaims(claims ocisoidc.StandardClaims) (string, error) {
+	var node string
+	// get accounts node from micro registry
+	// TODO this assumes we use mdns as registry. This should be configurable for any ocis extension.
+	svc, err := registry.GetService(accountSvc)
+	if err != nil {
+		return "", err
+	}
+
+	if len(svc) > 0 {
+		node = svc[0].Nodes[0].Address
+	}
+
+	c := acc.NewSettingsService("accounts", mclient.DefaultClient)
+	_, err = c.Get(context.Background(), &acc.Query{
+		// TODO accounts query message needs to be updated to query for multiple fields
+		// queries by key makes little sense as it is unknown.
+		Key: "73912d13-32f7-4fb6-aeb2-ea2088a3a264",
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// by this point, rec.Payload contains the Account info. To include UUID, see:
+	// https://github.com/owncloud/ocis-accounts/pull/22/files#diff-b425175389864c4f9218ecd9cae80223R23
+
+	// return rec.GetPayload().Account.UUID, nil // depends on the aforementioned PR
+	return node, nil
 }

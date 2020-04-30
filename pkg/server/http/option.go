@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
+	"github.com/owncloud/ocis-proxy/pkg/middleware"
 )
 
 // Option defines a single option function.
@@ -22,7 +23,7 @@ type Options struct {
 	Metrics     *metrics.Metrics
 	Flags       []cli.Flag
 	Namespace   string
-	Middlewares []func(handler http.Handler) http.Handler
+	Middlewares []middleware.M
 }
 
 // newOptions initializes the available default options.
@@ -86,7 +87,7 @@ func Handler(h http.Handler) Option {
 }
 
 // Middlewares provides a function to register middlewares
-func Middlewares(val ...func(handler http.Handler) http.Handler) Option {
+func Middlewares(val ...middleware.M) Option {
 	return func(o *Options) {
 		o.Middlewares = val
 	}

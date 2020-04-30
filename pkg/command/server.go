@@ -2,14 +2,14 @@ package command
 
 import (
 	"context"
-	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
-	"github.com/owncloud/ocis-proxy/pkg/middleware"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/middleware"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -234,8 +234,8 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(cfg *config.Config, l log.Logger) []func(handler http.Handler) http.Handler {
-	var configuredMiddlewares = make([]func(handler http.Handler) http.Handler, 0)
+func loadMiddlewares(cfg *config.Config, l log.Logger) []middleware.M {
+	var configuredMiddlewares = make([]middleware.M, 0)
 
 	configuredMiddlewares = append(configuredMiddlewares, middleware.RedirectToHTTPS)
 
