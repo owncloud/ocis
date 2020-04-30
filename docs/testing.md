@@ -89,7 +89,7 @@ Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` acc
 
 This will run all tests that can work with LDAP and are not skipped on OCIS
 
-To run a single test add `BEHAT_FEATURE=<feature file>`
+To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to the feature file and an optional line number. For example `BEHAT_FEATURE='tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature:21'`
 
 ### use existing tests for BDD
 
