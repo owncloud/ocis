@@ -8,9 +8,9 @@ geekdocFilePath: testing.md
 ---
 
 
-## Acceptance tests
+## API Acceptance tests
 
-We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the ocis-reva code.
+We are using the ownCloud 10 API acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the ocis-reva code.
 
 ### Getting the tests
 
@@ -72,7 +72,7 @@ bin/ocis-reva storage-oc-data & \
 bin/ocis-reva users &
 ```
 
-### Run the acceptance tests
+### Run the API acceptance tests
 
 In the ownCloud 10 core repo run
 
@@ -89,7 +89,7 @@ Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` acc
 
 This will run all tests that can work with LDAP and are not skipped on OCIS
 
-To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to the feature file and an optional line number. For example `BEHAT_FEATURE='tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature:21'`
+To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to the feature file and an optional line number. For example: `BEHAT_FEATURE='tests/acceptance/features/apiWebdavUpload1/uploadFile.feature:12'`
 
 ### use existing tests for BDD
 
