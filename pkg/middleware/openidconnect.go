@@ -58,6 +58,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 			path := r.URL.Path
 
 			// void call for testing purposes.
+			// TODO: Add uuid to the request context for the next handler.
 			uuidFromClaims(ocisoidc.StandardClaims{})
 
 			// Ignore request to "/konnect/v1/userinfo" as this will cause endless loop when getting userinfo
