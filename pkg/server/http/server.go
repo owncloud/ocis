@@ -51,7 +51,7 @@ func Server(opts ...Option) (svc.Service, error) {
 		svc.Context(options.Context),
 		svc.Flags(options.Flags...),
 		svc.Handler(
-			applyMiddlewares(options.Handler, options.Middlewares...)
+			applyMiddlewares(options.Handler, options.Middlewares...),
 		),
 	)
 
