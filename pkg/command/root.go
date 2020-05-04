@@ -1,6 +1,7 @@
 package command
 
 import (
+	"github.com/owncloud/ocis-accounts/pkg/flagset"
 	"os"
 	"os/user"
 	"path"
@@ -24,25 +25,26 @@ var (
 
 // Execute is the entry point for the ocis-accounts command.
 func Execute() error {
+	rootCfg := config.New()
 	app := &cli.App{
 		Name:    "ocis-accounts",
 		Version: version.String,
 		Usage:   "Example service for Reva/oCIS",
-
+		Flags:   flagset.RootWithConfig(rootCfg),
 		Before: func(c *cli.Context) error {
-			log := NewLogger(config.New())
+			logger := NewLogger(config.New())
 			for _, v := range defaultConfigPaths {
 				// location is the user's home
 				if v[0] == '$' || v[0] == '~' {
 					usr, _ := user.Current()
 					err := godotenv.Load(path.Join(usr.HomeDir, ".ocis", defaultFilename+".env"))
 					if err != nil {
-						log.Debug().Msgf("ignoring missing env file on dir: %v", v)
+						logger.Debug().Msgf("ignoring missing env file on dir: %v", v)
 					}
 				} else {
 					err := godotenv.Load(path.Join(v, defaultFilename+".env"))
 					if err != nil {
-						log.Debug().Msgf("ignoring missing env file on dir: %v", v)
+						logger.Debug().Msgf("ignoring missing env file on dir: %v", v)
 					}
 				}
 			}
@@ -57,7 +59,7 @@ func Execute() error {
 		},
 
 		Commands: []*cli.Command{
-			Server(config.New()),
+			Server(rootCfg),
 		},
 	}
 
@@ -78,9 +80,9 @@ func Execute() error {
 func NewLogger(cfg *config.Config) log.Logger {
 	return log.NewLogger(
 		log.Name("accounts"),
-		log.Level("info"),
-		log.Pretty(true),
-		log.Color(true),
+		log.Level(cfg.Log.Level),
+		log.Pretty(cfg.Log.Pretty),
+		log.Color(cfg.Log.Color),
 	)
 }
 

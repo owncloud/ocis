@@ -8,11 +8,19 @@ type Server struct {
 	Address   string
 }
 
+// Log defines the available logging configuration.
+type Log struct {
+	Level  string
+	Pretty bool
+	Color  bool
+}
+
 // Config merges all Account config parameters.
 type Config struct {
 	MountPath string
 	Manager   string
 	Server    Server
+	Log       Log
 }
 
 // New returns a new config.
