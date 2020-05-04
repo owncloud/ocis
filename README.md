@@ -42,19 +42,25 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 
 ## Quickstart
 
-After building the binary with the above steps and also setting up the prerequisites, run this command to start all services:
+-   Make sure that the binary was built with the above steps.
 
-```console
-./bin/ocis server
-```
+-   Now start all services with the following command
 
-Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
+    ```console
+    ./bin/ocis server
+    ```
 
-```console
-einstein:relativity
-marie:radioactivity
-feynman:superfluidity
-```
+-   Open [https://localhost:9200](https://localhost:9200)
+
+-   Accept the self-signed certificate (it is regenerated every time the server starts)
+
+-   Login using one of the demo accounts:
+
+    ```console
+    einstein:relativity
+    marie:radioactivty
+    richard:superfluidity
+    ```
 
 ## Running single extensions
 
