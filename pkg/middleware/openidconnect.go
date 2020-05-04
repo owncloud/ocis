@@ -4,21 +4,25 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	oidc "github.com/coreos/go-oidc"
 	mclient "github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/registry"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/cache"
 	"golang.org/x/oauth2"
 )
 
 var (
 	// ErrInvalidToken is returned when the request token is invalid.
 	ErrInvalidToken = errors.New("invalid or missing token")
+
+	// svcCache caches requests for given services to prevent round trips to the service
+	svcCache = cache.NewCache()
 
 	accountSvc = "com.owncloud.accounts"
 )
@@ -52,6 +56,9 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
 			path := r.URL.Path
+
+			// void call for testing purposes.
+			uuidFromClaims(ocisoidc.StandardClaims{})
 
 			// Ignore request to "/konnect/v1/userinfo" as this will cause endless loop when getting userinfo
 			// needs a better idea on how to not hardcode this
@@ -107,6 +114,16 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 				return
 			}
 
+			// add UUID to the request context for the handler to deal with
+			// void call for correct staticchecks.
+			_, err = uuidFromClaims(claims)
+
+			if err != nil {
+				opt.Logger.Error().Err(err).Interface("account uuid", userInfo).Msg("failed to unmarshal userinfo claims")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
 			opt.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")
 			// store claims in context
 			// uses the original context, not the one with probably reduced security
@@ -117,33 +134,49 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 	}
 }
 
+// AccountsCacheEntry stores a request to the accounts service on the cache.
+// this type declaration should be on each respective service.
+type AccountsCacheEntry struct {
+	Email string
+	UUID  string
+}
+
+const (
+	// AccountsKey declares the svcKey for the Accounts service.
+	AccountsKey = "accounts"
+
+	// NodeKey declares the key that will be used to store the node address.
+	// It is shared between services.
+	NodeKey = "node"
+)
+
 // from the user claims we need to get the uuid from the accounts service
 func uuidFromClaims(claims ocisoidc.StandardClaims) (string, error) {
-	var node string
-	// get accounts node from micro registry
-	// TODO this assumes we use mdns as registry. This should be configurable for any ocis extension.
-	svc, err := registry.GetService(accountSvc)
+	entry, err := svcCache.Get(AccountsKey, claims.Email)
 	if err != nil {
-		return "", err
+		c := acc.NewSettingsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		resp, err := c.Get(context.Background(), &acc.Query{
+			Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce", // use hardcoded key...
+			// Email: claims.Email // depends on @jfd PR.
+		})
+		if err != nil {
+			return "", err
+		}
+
+		// TODO add logging info. Round trip has been made to the accounts service.
+		err = svcCache.Set(AccountsKey, claims.Email, resp.Payload.Account.Uuid)
+		if err != nil {
+			return "", err
+		}
+
+		return resp.Key, nil
 	}
 
-	if len(svc) > 0 {
-		node = svc[0].Nodes[0].Address
+	uuid, ok := entry.V.(string)
+	if !ok {
+		return "", fmt.Errorf("unexpected type on cache entry value. Expected string type")
 	}
 
-	c := acc.NewSettingsService("accounts", mclient.DefaultClient)
-	_, err = c.Get(context.Background(), &acc.Query{
-		// TODO accounts query message needs to be updated to query for multiple fields
-		// queries by key makes little sense as it is unknown.
-		Key: "73912d13-32f7-4fb6-aeb2-ea2088a3a264",
-	})
-	if err != nil {
-		return "", err
-	}
-
-	// by this point, rec.Payload contains the Account info. To include UUID, see:
-	// https://github.com/owncloud/ocis-accounts/pull/22/files#diff-b425175389864c4f9218ecd9cae80223R23
-
-	// return rec.GetPayload().Account.UUID, nil // depends on the aforementioned PR
-	return node, nil
+	// TODO add logging info. Read from cache.
+	return uuid, nil
 }
