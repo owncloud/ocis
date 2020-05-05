@@ -25,6 +25,9 @@ var (
 	svcCache = cache.NewCache()
 
 	accountSvc = "com.owncloud.accounts"
+
+	// UUIDKey works as a context key
+	UUIDKey interface{} = "uuid"
 )
 
 // newOIDCOptions initializes the available default options.
@@ -57,9 +60,13 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 			header := r.Header.Get("Authorization")
 			path := r.URL.Path
 
-			// void call for testing purposes.
-			// TODO: Add uuid to the request context for the next handler.
-			uuidFromClaims(ocisoidc.StandardClaims{})
+			uuid, err := uuidFromClaims(ocisoidc.StandardClaims{})
+			if err != nil {
+				// stop the auth flow altogether?
+			}
+
+			withUUID := context.WithValue(r.Context(), UUIDKey, uuid)
+			r = r.WithContext(withUUID)
 
 			// Ignore request to "/konnect/v1/userinfo" as this will cause endless loop when getting userinfo
 			// needs a better idea on how to not hardcode this
@@ -158,7 +165,7 @@ func uuidFromClaims(claims ocisoidc.StandardClaims) (string, error) {
 		c := acc.NewSettingsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 		resp, err := c.Get(context.Background(), &acc.Query{
 			Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce", // use hardcoded key...
-			// Email: claims.Email // depends on @jfd PR.
+			// Email: claims.Email // depends on https://github.com/owncloud/ocis-accounts/pull/28
 		})
 		if err != nil {
 			return "", err
