@@ -41,6 +41,38 @@ func TestSet(t *testing.T) {
 	}
 }
 
+func TestEvict(t *testing.T) {
+	c := NewCache(
+		Size(256),
+	)
+
+	if err := c.Set("accounts", "hello@foo.bar", AccountsCacheEntry{
+		Email: "hello@foo.bar",
+		UUID:  "9c31b040-59e2-4a2b-926b-334d9e3fbd05",
+	}); err != nil {
+		t.Error(err)
+	}
+
+	if err := c.Invalidate("accounts", "hello@foo.bar"); err != nil {
+		t.Error(err)
+	}
+
+	v, err := c.Get("accounts", "hello@foo.bar")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if v.Valid {
+		t.Errorf("cache key unexpected valid state")
+	}
+
+	c.Evict()
+
+	if c.Length("accounts") != 0 {
+		t.Errorf("expected length 0 got `%v`", len(c.entries))
+	}
+}
+
 func TestGet(t *testing.T) {
 	svcCache := NewCache(
 		Size(256),

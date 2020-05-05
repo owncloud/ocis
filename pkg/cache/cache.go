@@ -16,7 +16,7 @@ type Entry struct {
 type Cache struct {
 	entries map[string]map[string]Entry
 	size    int
-	ttl     time.Duration
+	ttl     time.Duration // duration of a single entry.
 	m       sync.Mutex
 }
 
@@ -71,18 +71,29 @@ func (c *Cache) Set(svcKey, key string, val interface{}) error {
 }
 
 // Invalidate invalidates a cache Entry by key.
-func (c *Cache) Invalidate(key string) error {
-	c.m.Lock()
-	defer c.m.Unlock()
-
-	if _, ok := c.entries[key]; !ok {
-		return fmt.Errorf("invalid key: `%v`", key)
+func (c *Cache) Invalidate(svcKey, key string) error {
+	r, err := c.Get(svcKey, key)
+	if err != nil {
+		return err
 	}
 
+	r.Valid = false
+	c.entries[svcKey][key] = *r
 	return nil
 }
 
-// Length returns the amount of entries.
+// Evict frees memory from the cache by removing invalid keys. It is a noop.
+func (c *Cache) Evict() {
+	for _, v := range c.entries {
+		for k, svcEntry := range v {
+			if !svcEntry.Valid {
+				delete(v, k)
+			}
+		}
+	}
+}
+
+// Length returns the amount of entries per service key.
 func (c *Cache) Length(k string) int {
 	return len(c.entries[k])
 }
