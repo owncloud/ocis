@@ -10,11 +10,11 @@ geekdocFilePath: _index.md
 ## Abstract
 
 When using oCIS, the requirement to store settings arises. This extension provides functionality
-for other extensions to register new settings within oCIS. It is responsible for saving the respective
+for other extensions to register new settings within oCIS. It is responsible for storing the respective
 settings values as well.
 
 For ease of use, this extension provides an ocis-web extension which allows users to change their settings values.
-Please refer to the [extensions docs](https://owncloud.github.io/ocis/extensions/#external-phoenix-apps)
+Please refer to the [ocis-web extension docs](https://owncloud.github.io/ocis/extensions/#external-phoenix-apps)
 for running ocis-web extensions.
 
 {{< mermaid class="text-center">}}
@@ -32,14 +32,13 @@ graph TD
 {{< /mermaid >}}
 
 The diagram shows how the settings service integrates into oCIS:
-- oCIS extensions can register settings bundles with ocis-settings.
-- The frontend can be plugged into ocis-web, showing generated forms for changing settings values as a user.
+**Settings management:**
+- oCIS extensions can register settings bundles with the ocis-settings service.
+- The settings frontend can be plugged into ocis-web, showing generated forms for changing settings values as a user.
+
+**Settings usage:**
 - Extensions can query ocis-settings for settings values of a user.
 - The ownCloud SDK, used as a data abstraction layer for ocis-web, will query ocis-settings for settings values of a user,
 if it's available. The SDK uses sensible defaults when ocis-settings is not part of the setup.
 
-For compatibility with ownCloud 10, a migration of settings into the storage of ocis-settings will be available.
-
-## Table of Contents
-
-{{< toc-tree >}}
+For compatibility with ownCloud 10, a migration of ownCloud 10 settings into the storage of ocis-settings will be available.

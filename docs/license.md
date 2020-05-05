@@ -1,7 +1,7 @@
 ---
 title: "License"
 date: 2018-05-02T00:00:00+00:00
-weight: 40
+weight: 90
 geekdocRepo: https://github.com/owncloud/ocis-settings
 geekdocEditPath: edit/master/docs
 geekdocFilePath: license.md
