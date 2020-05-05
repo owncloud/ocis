@@ -72,12 +72,10 @@ In an `ocis` folder
 ```
 $ git clone git@github.com:owncloud/ocis-glauth.git
 $ cd ocis-glauth
-$ git checkout start-glauth
 $ make
 ```
 This should give you a `bin/ocis-glauth` binary. Try listing the help with `bin/ocis-glauth --help`.
 
-TODO merge glauth PR https://github.com/owncloud/ocis-glauth/pull/1
 
 #### Run it!
 
