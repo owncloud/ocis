@@ -58,7 +58,7 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 
     ```console
     einstein:relativity
-    marie:radioactivty
+    marie:radioactivity
     richard:superfluidity
     ```
 
@@ -88,5 +88,5 @@ Apache-2.0
 ## Copyright
 
 ```console
-Copyright (c) 2019 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
 ```
