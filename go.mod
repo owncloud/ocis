@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/coreos/go-oidc v2.1.0+incompatible
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.4.0
 	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/oklog/run v1.1.0
@@ -26,3 +26,5 @@ require (
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.0 // indirect
 )
+
+replace github.com/owncloud/ocis-accounts => ../ocis-accounts
