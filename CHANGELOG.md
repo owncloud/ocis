@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-thumbnails unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-thumbnails/compare/v0.1.1...master
+
+## Summary
+
+* Bugfix - Fix usage of context.Context: [#18](https://github.com/owncloud/ocis-thumbnails/issues/18)
+
+## Details
+
+* Bugfix - Fix usage of context.Context: [#18](https://github.com/owncloud/ocis-thumbnails/issues/18)
+
+   The context was filled with a key defined in the package service but read with a key from the
+   package imgsource. Since `service.key` and `imgsource.key` are different types imgsource
+   could not read the value provided by service.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/18
+
 # Changelog for [0.1.1] (2020-04-21)
 
 The following sections list the changes in ocis-thumbnails 0.1.1.
