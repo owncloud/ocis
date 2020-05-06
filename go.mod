@@ -22,6 +22,7 @@ require (
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
 	github.com/owncloud/ocis-konnectd v0.3.1
+	github.com/owncloud/ocis-migration v0.0.0-20200504185909-72274a4f1449
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.6.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
