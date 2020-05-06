@@ -10,7 +10,6 @@ require (
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
@@ -37,3 +36,9 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+
+replace github.com/owncloud/ocis-proxy => ../ocis-proxy
+
+replace github.com/owncloud/ocis-accounts => ../ocis-accounts
+
+replace github.com/owncloud/ocis-settings => ../ocis-settings
