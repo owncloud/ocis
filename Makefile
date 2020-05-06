@@ -192,7 +192,7 @@ eos-docker/scripts/start_services_ocis.sh: eos-docker
 .PHONY: eos-deploy
 eos-deploy: eos-docker/scripts/start_services_ocis.sh
 	# TODO keep eos up to date: see https://gitlab.cern.ch/dss/eos/tags
-	./eos-docker/scripts/start_services_ocis.sh -i gitlab-registry.cern.ch/dss/eos:4.7.5 -q
+	./eos-docker/scripts/start_services_ocis.sh -i gitlab-registry.cern.ch/dss/eos:4.7.12 -q
 	# Install ldap packages
 	docker exec -i eos-mgm1 yum install -y nss-pam-ldapd nscd authconfig
 	docker exec -i eos-cli1 yum install -y nss-pam-ldapd nscd authconfig
