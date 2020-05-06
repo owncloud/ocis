@@ -11,12 +11,6 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
 )
 
-type contextKey string
-
-const (
-	authorization contextKey = imgsource.WebDavAuth
-)
-
 // NewService returns a service implementation for Service.
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
@@ -68,7 +62,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	}
 
 	auth := req.Authorization
-	sCtx := context.WithValue(ctx, authorization, auth)
+	sCtx := imgsource.WithAuthorization(ctx, auth)
 	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
 		return err

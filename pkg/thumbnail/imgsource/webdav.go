@@ -23,11 +23,6 @@ type WebDav struct {
 	baseURL string
 }
 
-const (
-	// WebDavAuth is the parameter name for the autorization token
-	WebDavAuth = "Authorization"
-)
-
 // Get downloads the file from a webdav service
 func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	u, _ := url.Parse(s.baseURL)
@@ -37,8 +32,8 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
 	}
 
-	auth, ok := authorization(ctx)
-	if !ok {
+	auth := authorization(ctx)
+	if auth == "" {
 		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
 	}
 	req.Header.Add("Authorization", auth)
@@ -58,9 +53,4 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 		return nil, fmt.Errorf("could not decode the image \"%s\". error: %s", file, err.Error())
 	}
 	return img, nil
-}
-
-func authorization(ctx context.Context) (string, bool) {
-	auth, ok := ctx.Value(WebDavAuth).(string)
-	return auth, ok
 }
