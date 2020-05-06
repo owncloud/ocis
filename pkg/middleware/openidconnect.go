@@ -28,6 +28,9 @@ var (
 
 	// UUIDKey works as a context key
 	UUIDKey interface{} = "uuid"
+
+	// ClaimsKey works as a context key for user claims
+	ClaimsKey interface{} = "claims"
 )
 
 // newOIDCOptions initializes the available default options.
@@ -42,7 +45,7 @@ func newOIDCOptions(opts ...ocisoidc.Option) ocisoidc.Options {
 }
 
 // OpenIDConnect provides a middleware to check access secured by a static token.
-func OpenIDConnect(opts ...ocisoidc.Option) M {
+func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler {
 	opt := newOIDCOptions(opts...)
 
 	// set defaults
@@ -59,14 +62,6 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
 			path := r.URL.Path
-
-			uuid, err := uuidFromClaims(ocisoidc.StandardClaims{})
-			if err != nil {
-				// stop the auth flow altogether?
-			}
-
-			withUUID := context.WithValue(r.Context(), UUIDKey, uuid)
-			r = r.WithContext(withUUID)
 
 			// Ignore request to "/konnect/v1/userinfo" as this will cause endless loop when getting userinfo
 			// needs a better idea on how to not hardcode this
@@ -122,10 +117,13 @@ func OpenIDConnect(opts ...ocisoidc.Option) M {
 				return
 			}
 
+			// inject claims to the request context for the account_uuid middleware.
+			ctxWithClaims := context.WithValue(r.Context(), ClaimsKey, claims)
+			r = r.WithContext(ctxWithClaims)
+
 			// add UUID to the request context for the handler to deal with
 			// void call for correct staticchecks.
 			_, err = uuidFromClaims(claims)
-
 			if err != nil {
 				opt.Logger.Error().Err(err).Interface("account uuid", userInfo).Msg("failed to unmarshal userinfo claims")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -164,7 +162,7 @@ func uuidFromClaims(claims ocisoidc.StandardClaims) (string, error) {
 	if err != nil {
 		c := acc.NewSettingsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 		resp, err := c.Get(context.Background(), &acc.Query{
-			Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce", // use hardcoded key...
+			Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
 			// Email: claims.Email // depends on https://github.com/owncloud/ocis-accounts/pull/28
 		})
 		if err != nil {

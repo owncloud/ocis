@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/justinas/alice"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/middleware"
@@ -154,7 +155,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Metrics(metrics),
 					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
 					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
-					proxyHTTP.Middlewares(loadMiddlewares(cfg, logger)...),
+					proxyHTTP.Middlewares(loadMiddlewares(cfg, logger)),
 				)
 
 				if err != nil {
@@ -234,11 +235,7 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(cfg *config.Config, l log.Logger) []middleware.M {
-	var configuredMiddlewares = make([]middleware.M, 0)
-
-	configuredMiddlewares = append(configuredMiddlewares, middleware.RedirectToHTTPS)
-
+func loadMiddlewares(cfg *config.Config, l log.Logger) alice.Chain {
 	if cfg.OIDC != nil {
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
@@ -250,8 +247,9 @@ func loadMiddlewares(cfg *config.Config, l log.Logger) []middleware.M {
 			oidc.Logger(l),
 		)
 
-		configuredMiddlewares = append(configuredMiddlewares, oidcMW)
+		// configuredMiddlewares = append(configuredMiddlewares, oidcMW, middleware.AccountUUID)
+		return alice.New(middleware.RedirectToHTTPS, oidcMW, middleware.AccountUUID)
 	}
 
-	return configuredMiddlewares
+	return alice.New(middleware.RedirectToHTTPS)
 }

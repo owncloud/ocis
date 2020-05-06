@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
-	"github.com/owncloud/ocis-proxy/pkg/middleware"
 )
 
 // Option defines a single option function.
@@ -23,7 +23,7 @@ type Options struct {
 	Metrics     *metrics.Metrics
 	Flags       []cli.Flag
 	Namespace   string
-	Middlewares []middleware.M
+	Middlewares alice.Chain
 }
 
 // newOptions initializes the available default options.
@@ -87,7 +87,7 @@ func Handler(h http.Handler) Option {
 }
 
 // Middlewares provides a function to register middlewares
-func Middlewares(val ...middleware.M) Option {
+func Middlewares(val alice.Chain) Option {
 	return func(o *Options) {
 		o.Middlewares = val
 	}
