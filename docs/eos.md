@@ -29,7 +29,11 @@ $ cd ocis
 
 ### Run it!
 
-We poured the nitty gritty details of setting up ocis into Makefile destinations. After running
+Preconditions
+* `go` (from golang.org/dl) and `gcc` (via e.g. `apt install build-essential`) are installed
+* No eos components are running. If in doubt, begin with `make eos-stop`
+
+We poured the nitty gritty details of setting up ocis into Makefile targets. After running
 
 ```
 $ make eos-start
