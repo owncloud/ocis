@@ -57,15 +57,15 @@ If you encounter an error when the IdP redirects you back to phoenix, just reloa
 Create a folder in the ui. Then check it was created in eos:
 
 ```
-$ docker exec -it eos-mgm1 eos ls /eos/dockertest/einstein
+$ docker exec -it eos-mgm1 eos ls -l /eos/dockertest/reva/users/e/einstein
 ```
 
 Now create a new folder in eos (using eos-mgm1 you will be logged in as admin, see the `whoami`, which is why we `chown` the folder to the uid and gid of einstein afterwards):
 
 ```
 $ docker exec -it eos-mgm1 eos whoami
-$ docker exec -it eos-mgm1 eos mkdir /eos/dockertest/einstein/rocks
-$ docker exec -it eos-mgm1 eos chown 20000:30000 /eos/dockertest/einstein/rocks
+$ docker exec -it eos-mgm1 eos mkdir /eos/dockertest/reva/users/e/einstein/rocks
+$ docker exec -it eos-mgm1 eos chown 20000:30000 /eos/dockertest/reva/users/e/einstein/rocks
 ```
 
 Check that the folder exists in the web ui.
