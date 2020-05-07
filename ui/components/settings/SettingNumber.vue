@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import isNil from "lodash/isNil"
 export default {
   name: 'SettingNumber',
   props: {
@@ -32,6 +33,10 @@ export default {
     setting: {
       type: Object,
       required: true
+    },
+    persistedValue: {
+      type: Object,
+      required: false
     }
   },
   data() {
@@ -46,13 +51,13 @@ export default {
     },
     inputAttributes() {
       const attributes = {}
-      if (this.setting.intValue.min !== null && this.setting.intValue.min !== undefined) {
+      if (!isNil(this.setting.intValue.min)) {
         attributes.min = this.setting.intValue.min
       }
-      if (this.setting.intValue.max !== null && this.setting.intValue.max !== undefined) {
+      if (!isNil(this.setting.intValue.max)) {
         attributes.max = this.setting.intValue.max
       }
-      if (this.setting.intValue.step !== null && this.setting.intValue.step !== undefined) {
+      if (!isNil(this.setting.intValue.step)) {
         attributes.step = this.setting.intValue.step
       }
       return attributes
@@ -69,7 +74,13 @@ export default {
     }
   },
   mounted() {
-    // TODO: load the settings value of the authenticated user and apply it to the value
+    if (!isNil(this.persistedValue)) {
+      this.value = this.persistedValue.intValue
+    }
+    if (isNil(this.value) && !isNil(this.setting.intValue.default)) {
+      this.value = this.setting.intValue.default
+    }
+    this.initialValue = this.value
   }
 }
 </script>

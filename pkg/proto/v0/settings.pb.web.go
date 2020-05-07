@@ -53,10 +53,10 @@ func (h *webBundleServiceHandler) GetSettingsBundle(w http.ResponseWriter, r *ht
 
 	resp := &GetSettingsBundleResponse{}
 
-	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
-	//	return
-	//}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
 
 	if err := h.h.GetSettingsBundle(
 		context.Background(),
@@ -67,7 +67,7 @@ func (h *webBundleServiceHandler) GetSettingsBundle(w http.ResponseWriter, r *ht
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -77,10 +77,10 @@ func (h *webBundleServiceHandler) ListSettingsBundles(w http.ResponseWriter, r *
 
 	resp := &ListSettingsBundlesResponse{}
 
-	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
-	//	return
-	//}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
 
 	if err := h.h.ListSettingsBundles(
 		context.Background(),
@@ -91,7 +91,7 @@ func (h *webBundleServiceHandler) ListSettingsBundles(w http.ResponseWriter, r *
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -101,9 +101,9 @@ func RegisterBundleServiceWeb(r chi.Router, i BundleServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/settings/bundles", handler.SaveSettingsBundle)
-	r.MethodFunc("GET", "/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}", handler.GetSettingsBundle)
-	r.MethodFunc("GET", "/api/v0/settings/bundles/{identifier.extension}", handler.ListSettingsBundles)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-save", handler.SaveSettingsBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-get", handler.GetSettingsBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundles-list", handler.ListSettingsBundles)
 }
 
 type webValueServiceHandler struct {
@@ -145,10 +145,10 @@ func (h *webValueServiceHandler) GetSettingsValue(w http.ResponseWriter, r *http
 
 	resp := &GetSettingsValueResponse{}
 
-	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
-	//	return
-	//}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
 
 	if err := h.h.GetSettingsValue(
 		context.Background(),
@@ -159,7 +159,7 @@ func (h *webValueServiceHandler) GetSettingsValue(w http.ResponseWriter, r *http
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -169,10 +169,10 @@ func (h *webValueServiceHandler) ListSettingsValues(w http.ResponseWriter, r *ht
 
 	resp := &ListSettingsValuesResponse{}
 
-	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//	http.Error(w, err.Error(), http.StatusPreconditionFailed)
-	//	return
-	//}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
 
 	if err := h.h.ListSettingsValues(
 		context.Background(),
@@ -183,7 +183,7 @@ func (h *webValueServiceHandler) ListSettingsValues(w http.ResponseWriter, r *ht
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -193,9 +193,9 @@ func RegisterValueServiceWeb(r chi.Router, i ValueServiceHandler, middlewares ..
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/settings/values", handler.SaveSettingsValue)
-	r.MethodFunc("GET", "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}", handler.GetSettingsValue)
-	r.MethodFunc("GET", "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}", handler.ListSettingsValues)
+	r.MethodFunc("POST", "/api/v0/settings/value-save", handler.SaveSettingsValue)
+	r.MethodFunc("POST", "/api/v0/settings/value-get", handler.GetSettingsValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-list", handler.ListSettingsValues)
 }
 
 // SaveSettingsBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all

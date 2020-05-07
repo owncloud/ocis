@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package proto;
-option go_package = "proto";
+option go_package = ".;proto";
 
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
@@ -33,30 +33,42 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 service BundleService {
   rpc SaveSettingsBundle(SaveSettingsBundleRequest) returns (SaveSettingsBundleResponse) {
     option (google.api.http) = {
-      post: "/api/v0/settings/bundles",
+      post: "/api/v0/settings/bundle-save",
       body: "*"
     };
   };
   rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse) {
-    option (google.api.http).get = "/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}";
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundle-get",
+      body: "*"
+    };
   };
   rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse) {
-    option (google.api.http).get = "/api/v0/settings/bundles/{identifier.extension}";
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundles-list",
+      body: "*"
+    };
   };
 }
 
 service ValueService {
   rpc SaveSettingsValue(SaveSettingsValueRequest) returns (SaveSettingsValueResponse) {
     option (google.api.http) = {
-      post: "/api/v0/settings/values",
+      post: "/api/v0/settings/value-save",
       body: "*"
     };
   };
   rpc GetSettingsValue(GetSettingsValueRequest) returns (GetSettingsValueResponse) {
-    option (google.api.http).get = "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}";
+    option (google.api.http) = {
+      post: "/api/v0/settings/value-get",
+      body: "*"
+    };
   };
   rpc ListSettingsValues(ListSettingsValuesRequest) returns (ListSettingsValuesResponse) {
-    option (google.api.http).get = "/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}";
+    option (google.api.http) = {
+      post: "/api/v0/settings/values-list",
+      body: "*"
+    };
   };
 }
 

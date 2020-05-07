@@ -48,6 +48,10 @@ export default {
     setting: {
       type: Object,
       required: true
+    },
+    persistedValue: {
+      type: Object,
+      required: false
     }
   },
   data() {

@@ -29,16 +29,16 @@ export const request = (method, url, body, queryParameters, form, config) => {
  ==========================================================*/
 /**
  * 
- * request: SaveSettingsBundle
- * url: SaveSettingsBundleURL
- * method: SaveSettingsBundle_TYPE
- * raw_url: SaveSettingsBundle_RAW_URL
+ * request: BundleService_GetSettingsBundle
+ * url: BundleService_GetSettingsBundleURL
+ * method: BundleService_GetSettingsBundle_TYPE
+ * raw_url: BundleService_GetSettingsBundle_RAW_URL
  * @param body - 
  */
-export const SaveSettingsBundle = function(parameters = {}) {
+export const BundleService_GetSettingsBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v0/settings/bundles'
+  let path = '/api/v0/settings/bundle-get'
   let body
   let queryParameters = {}
   let form = {}
@@ -55,16 +55,16 @@ export const SaveSettingsBundle = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const SaveSettingsBundle_RAW_URL = function() {
-  return '/api/v0/settings/bundles'
+export const BundleService_GetSettingsBundle_RAW_URL = function() {
+  return '/api/v0/settings/bundle-get'
 }
-export const SaveSettingsBundle_TYPE = function() {
+export const BundleService_GetSettingsBundle_TYPE = function() {
   return 'post'
 }
-export const SaveSettingsBundleURL = function(parameters = {}) {
+export const BundleService_GetSettingsBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/bundles'
+  let path = '/api/v0/settings/bundle-get'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -75,147 +75,16 @@ export const SaveSettingsBundleURL = function(parameters = {}) {
 }
 /**
  * 
- * request: ListSettingsBundles
- * url: ListSettingsBundlesURL
- * method: ListSettingsBundles_TYPE
- * raw_url: ListSettingsBundles_RAW_URL
- * @param identifierExtension - 
- * @param identifierBundleKey - 
- * @param identifierSettingKey - 
- * @param identifierAccountUuid - 
- */
-export const ListSettingsBundles = function(parameters = {}) {
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  const config = parameters.$config
-  let path = '/api/v0/settings/bundles/{identifier.extension}'
-  let body
-  let queryParameters = {}
-  let form = {}
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  if (parameters['identifierExtension'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierExtension'))
-  }
-  if (parameters['identifierBundleKey'] !== undefined) {
-    queryParameters['identifier.bundle_key'] = parameters['identifierBundleKey']
-  }
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
-  }
-  if (parameters['identifierAccountUuid'] !== undefined) {
-    queryParameters['identifier.account_uuid'] = parameters['identifierAccountUuid']
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    });
-  }
-  return request('get', domain + path, body, queryParameters, form, config)
-}
-export const ListSettingsBundles_RAW_URL = function() {
-  return '/api/v0/settings/bundles/{identifier.extension}'
-}
-export const ListSettingsBundles_TYPE = function() {
-  return 'get'
-}
-export const ListSettingsBundlesURL = function(parameters = {}) {
-  let queryParameters = {}
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/bundles/{identifier.extension}'
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  if (parameters['identifierBundleKey'] !== undefined) {
-    queryParameters['identifier.bundle_key'] = parameters['identifierBundleKey']
-  }
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
-  }
-  if (parameters['identifierAccountUuid'] !== undefined) {
-    queryParameters['identifier.account_uuid'] = parameters['identifierAccountUuid']
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    })
-  }
-  let keys = Object.keys(queryParameters)
-  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
-}
-/**
- * 
- * request: GetSettingsBundle
- * url: GetSettingsBundleURL
- * method: GetSettingsBundle_TYPE
- * raw_url: GetSettingsBundle_RAW_URL
- * @param identifierExtension - 
- * @param identifierBundleKey - 
- * @param identifierSettingKey - 
- * @param identifierAccountUuid - 
- */
-export const GetSettingsBundle = function(parameters = {}) {
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  const config = parameters.$config
-  let path = '/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}'
-  let body
-  let queryParameters = {}
-  let form = {}
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  if (parameters['identifierExtension'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierExtension'))
-  }
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  if (parameters['identifierBundleKey'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierBundleKey'))
-  }
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
-  }
-  if (parameters['identifierAccountUuid'] !== undefined) {
-    queryParameters['identifier.account_uuid'] = parameters['identifierAccountUuid']
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    });
-  }
-  return request('get', domain + path, body, queryParameters, form, config)
-}
-export const GetSettingsBundle_RAW_URL = function() {
-  return '/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}'
-}
-export const GetSettingsBundle_TYPE = function() {
-  return 'get'
-}
-export const GetSettingsBundleURL = function(parameters = {}) {
-  let queryParameters = {}
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/bundles/{identifier.extension}/{identifier.bundle_key}'
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
-  }
-  if (parameters['identifierAccountUuid'] !== undefined) {
-    queryParameters['identifier.account_uuid'] = parameters['identifierAccountUuid']
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    })
-  }
-  let keys = Object.keys(queryParameters)
-  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
-}
-/**
- * 
- * request: SaveSettingsValue
- * url: SaveSettingsValueURL
- * method: SaveSettingsValue_TYPE
- * raw_url: SaveSettingsValue_RAW_URL
+ * request: BundleService_SaveSettingsBundle
+ * url: BundleService_SaveSettingsBundleURL
+ * method: BundleService_SaveSettingsBundle_TYPE
+ * raw_url: BundleService_SaveSettingsBundle_RAW_URL
  * @param body - 
  */
-export const SaveSettingsValue = function(parameters = {}) {
+export const BundleService_SaveSettingsBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v0/settings/values'
+  let path = '/api/v0/settings/bundle-save'
   let body
   let queryParameters = {}
   let form = {}
@@ -232,16 +101,16 @@ export const SaveSettingsValue = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const SaveSettingsValue_RAW_URL = function() {
-  return '/api/v0/settings/values'
+export const BundleService_SaveSettingsBundle_RAW_URL = function() {
+  return '/api/v0/settings/bundle-save'
 }
-export const SaveSettingsValue_TYPE = function() {
+export const BundleService_SaveSettingsBundle_TYPE = function() {
   return 'post'
 }
-export const SaveSettingsValueURL = function(parameters = {}) {
+export const BundleService_SaveSettingsBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/values'
+  let path = '/api/v0/settings/bundle-save'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -252,60 +121,42 @@ export const SaveSettingsValueURL = function(parameters = {}) {
 }
 /**
  * 
- * request: ListSettingsValues
- * url: ListSettingsValuesURL
- * method: ListSettingsValues_TYPE
- * raw_url: ListSettingsValues_RAW_URL
- * @param identifierAccountUuid - 
- * @param identifierExtension - 
- * @param identifierBundleKey - 
- * @param identifierSettingKey - 
+ * request: BundleService_ListSettingsBundles
+ * url: BundleService_ListSettingsBundlesURL
+ * method: BundleService_ListSettingsBundles_TYPE
+ * raw_url: BundleService_ListSettingsBundles_RAW_URL
+ * @param body - 
  */
-export const ListSettingsValues = function(parameters = {}) {
+export const BundleService_ListSettingsBundles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}'
+  let path = '/api/v0/settings/bundles-list'
   let body
   let queryParameters = {}
   let form = {}
-  path = path.replace('{identifier.account_uuid}', `${parameters['identifierAccountUuid']}`)
-  if (parameters['identifierAccountUuid'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierAccountUuid'))
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
   }
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  if (parameters['identifierExtension'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierExtension'))
-  }
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  if (parameters['identifierBundleKey'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierBundleKey'))
-  }
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
   }
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
     });
   }
-  return request('get', domain + path, body, queryParameters, form, config)
+  return request('post', domain + path, body, queryParameters, form, config)
 }
-export const ListSettingsValues_RAW_URL = function() {
-  return '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}'
+export const BundleService_ListSettingsBundles_RAW_URL = function() {
+  return '/api/v0/settings/bundles-list'
 }
-export const ListSettingsValues_TYPE = function() {
-  return 'get'
+export const BundleService_ListSettingsBundles_TYPE = function() {
+  return 'post'
 }
-export const ListSettingsValuesURL = function(parameters = {}) {
+export const BundleService_ListSettingsBundlesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}'
-  path = path.replace('{identifier.account_uuid}', `${parameters['identifierAccountUuid']}`)
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  if (parameters['identifierSettingKey'] !== undefined) {
-    queryParameters['identifier.setting_key'] = parameters['identifierSettingKey']
-  }
+  let path = '/api/v0/settings/bundles-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -316,59 +167,134 @@ export const ListSettingsValuesURL = function(parameters = {}) {
 }
 /**
  * 
- * request: GetSettingsValue
- * url: GetSettingsValueURL
- * method: GetSettingsValue_TYPE
- * raw_url: GetSettingsValue_RAW_URL
- * @param identifierAccountUuid - 
- * @param identifierExtension - 
- * @param identifierBundleKey - 
- * @param identifierSettingKey - 
+ * request: ValueService_GetSettingsValue
+ * url: ValueService_GetSettingsValueURL
+ * method: ValueService_GetSettingsValue_TYPE
+ * raw_url: ValueService_GetSettingsValue_RAW_URL
+ * @param body - 
  */
-export const GetSettingsValue = function(parameters = {}) {
+export const ValueService_GetSettingsValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}'
+  let path = '/api/v0/settings/value-get'
   let body
   let queryParameters = {}
   let form = {}
-  path = path.replace('{identifier.account_uuid}', `${parameters['identifierAccountUuid']}`)
-  if (parameters['identifierAccountUuid'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierAccountUuid'))
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
   }
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  if (parameters['identifierExtension'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierExtension'))
-  }
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  if (parameters['identifierBundleKey'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierBundleKey'))
-  }
-  path = path.replace('{identifier.setting_key}', `${parameters['identifierSettingKey']}`)
-  if (parameters['identifierSettingKey'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: identifierSettingKey'))
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
   }
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
     });
   }
-  return request('get', domain + path, body, queryParameters, form, config)
+  return request('post', domain + path, body, queryParameters, form, config)
 }
-export const GetSettingsValue_RAW_URL = function() {
-  return '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}'
+export const ValueService_GetSettingsValue_RAW_URL = function() {
+  return '/api/v0/settings/value-get'
 }
-export const GetSettingsValue_TYPE = function() {
-  return 'get'
+export const ValueService_GetSettingsValue_TYPE = function() {
+  return 'post'
 }
-export const GetSettingsValueURL = function(parameters = {}) {
+export const ValueService_GetSettingsValueURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v0/settings/values/{identifier.account_uuid}/{identifier.extension}/{identifier.bundle_key}/{identifier.setting_key}'
-  path = path.replace('{identifier.account_uuid}', `${parameters['identifierAccountUuid']}`)
-  path = path.replace('{identifier.extension}', `${parameters['identifierExtension']}`)
-  path = path.replace('{identifier.bundle_key}', `${parameters['identifierBundleKey']}`)
-  path = path.replace('{identifier.setting_key}', `${parameters['identifierSettingKey']}`)
+  let path = '/api/v0/settings/value-get'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * 
+ * request: ValueService_SaveSettingsValue
+ * url: ValueService_SaveSettingsValueURL
+ * method: ValueService_SaveSettingsValue_TYPE
+ * raw_url: ValueService_SaveSettingsValue_RAW_URL
+ * @param body - 
+ */
+export const ValueService_SaveSettingsValue = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/settings/value-save'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const ValueService_SaveSettingsValue_RAW_URL = function() {
+  return '/api/v0/settings/value-save'
+}
+export const ValueService_SaveSettingsValue_TYPE = function() {
+  return 'post'
+}
+export const ValueService_SaveSettingsValueURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/settings/value-save'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * 
+ * request: ValueService_ListSettingsValues
+ * url: ValueService_ListSettingsValuesURL
+ * method: ValueService_ListSettingsValues_TYPE
+ * raw_url: ValueService_ListSettingsValues_RAW_URL
+ * @param body - 
+ */
+export const ValueService_ListSettingsValues = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/settings/values-list'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const ValueService_ListSettingsValues_RAW_URL = function() {
+  return '/api/v0/settings/values-list'
+}
+export const ValueService_ListSettingsValues_TYPE = function() {
+  return 'post'
+}
+export const ValueService_ListSettingsValuesURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/settings/values-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]

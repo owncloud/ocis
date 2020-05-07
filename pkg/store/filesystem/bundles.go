@@ -30,8 +30,13 @@ func (s Store) ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundl
 		if err == nil {
 			for _, bundleFile := range bundleFiles {
 				record := proto.SettingsBundle{}
-				err = s.parseRecordFromFile(&record, path.Join(extensionPath, bundleFile.Name()))
-				if err == nil && (len(identifier.Extension) == 0 || identifier.Extension == record.Identifier.Extension) {
+				bundlePath := path.Join(extensionPath, bundleFile.Name())
+				err = s.parseRecordFromFile(&record, bundlePath)
+				if err != nil {
+					s.Logger.Warn().Msgf("error reading %v", bundlePath)
+					continue
+				}
+				if len(identifier.Extension) == 0 || identifier.Extension == record.Identifier.Extension {
 					records = append(records, &record)
 				}
 			}

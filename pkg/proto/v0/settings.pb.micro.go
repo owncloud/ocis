@@ -13,6 +13,7 @@ import (
 
 import (
 	context "context"
+	api "github.com/micro/go-micro/v2/api"
 	client "github.com/micro/go-micro/v2/client"
 	server "github.com/micro/go-micro/v2/server"
 )
@@ -29,9 +30,38 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Reference imports to suppress errors if they are not otherwise used.
+var _ api.Endpoint
 var _ context.Context
 var _ client.Option
 var _ server.Option
+
+// Api Endpoints for BundleService service
+
+func NewBundleServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "BundleService.SaveSettingsBundle",
+			Path:    []string{"/api/v0/settings/bundle-save"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "BundleService.GetSettingsBundle",
+			Path:    []string{"/api/v0/settings/bundle-get"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "BundleService.ListSettingsBundles",
+			Path:    []string{"/api/v0/settings/bundles-list"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+	}
+}
 
 // Client API for BundleService service
 
@@ -101,6 +131,27 @@ func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, op
 		bundleService
 	}
 	h := &bundleServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "BundleService.SaveSettingsBundle",
+		Path:    []string{"/api/v0/settings/bundle-save"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "BundleService.GetSettingsBundle",
+		Path:    []string{"/api/v0/settings/bundle-get"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "BundleService.ListSettingsBundles",
+		Path:    []string{"/api/v0/settings/bundles-list"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
 	return s.Handle(s.NewHandler(&BundleService{h}, opts...))
 }
 
@@ -118,6 +169,34 @@ func (h *bundleServiceHandler) GetSettingsBundle(ctx context.Context, in *GetSet
 
 func (h *bundleServiceHandler) ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, out *ListSettingsBundlesResponse) error {
 	return h.BundleServiceHandler.ListSettingsBundles(ctx, in, out)
+}
+
+// Api Endpoints for ValueService service
+
+func NewValueServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "ValueService.SaveSettingsValue",
+			Path:    []string{"/api/v0/settings/value-save"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "ValueService.GetSettingsValue",
+			Path:    []string{"/api/v0/settings/value-get"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "ValueService.ListSettingsValues",
+			Path:    []string{"/api/v0/settings/values-list"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+	}
 }
 
 // Client API for ValueService service
@@ -188,6 +267,27 @@ func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts
 		valueService
 	}
 	h := &valueServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "ValueService.SaveSettingsValue",
+		Path:    []string{"/api/v0/settings/value-save"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "ValueService.GetSettingsValue",
+		Path:    []string{"/api/v0/settings/value-get"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "ValueService.ListSettingsValues",
+		Path:    []string{"/api/v0/settings/values-list"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
 	return s.Handle(s.NewHandler(&ValueService{h}, opts...))
 }
 

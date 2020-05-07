@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import isNil from "lodash/isNil"
 export default {
   name: 'SettingString',
   props: {
@@ -30,6 +31,10 @@ export default {
     setting: {
       type: Object,
       required: true
+    },
+    persistedValue: {
+      type: Object,
+      required: false
     }
   },
   data() {
@@ -54,7 +59,13 @@ export default {
     }
   },
   mounted() {
-    // TODO: load the settings value of the authenticated user and apply it to the value
+    if (!isNil(this.persistedValue)) {
+      this.value = this.persistedValue.stringValue
+    }
+    if (isNil(this.value) && !isNil(this.setting.stringValue.default)) {
+      this.value = this.setting.stringValue.default
+    }
+    this.initialValue = this.value
   }
 }
 </script>

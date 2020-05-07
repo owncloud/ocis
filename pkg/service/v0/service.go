@@ -79,8 +79,10 @@ func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsVa
 
 func getFailsafeIdentifier(identifier *proto.Identifier) *proto.Identifier {
 	if identifier == nil {
-		return &proto.Identifier{}
-	} else {
-		return identifier
+		identifier = &proto.Identifier{}
 	}
+	if identifier.AccountUuid == "me" {
+		identifier.AccountUuid = "5681371F-4A6E-43BC-8BB5-9C9237FA9C58"
+	}
+	return identifier
 }
