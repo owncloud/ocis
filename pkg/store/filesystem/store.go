@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	// gproto "github.com/golang/protobuf/proto"
 	"github.com/owncloud/ocis-accounts/pkg/account"
@@ -20,6 +21,10 @@ var (
 	// StoreName is the default name for the accounts store
 	StoreName     = "ocis-store"
 	managerName   = "filesystem"
+	uuidSpace     = "uuid"
+	usernameSpace = "username"
+	emailSpace    = "email"
+	identitySpace = "identity"
 	emptyKeyError = "key cannot be empty"
 )
 
@@ -53,7 +58,7 @@ func New(cfg *config.Config) account.Manager {
 // List returns all the identities in the mountPath folder
 func (s Store) List() ([]*proto.Record, error) {
 	records := []*proto.Record{}
-	identities, err := ioutil.ReadDir(s.mountPath)
+	identities, err := ioutil.ReadDir(path.Join(s.mountPath, uuidSpace))
 	if err != nil {
 		s.Logger.Err(err).Msgf("error reading %v", s.mountPath)
 		return nil, err
@@ -69,24 +74,10 @@ func (s Store) List() ([]*proto.Record, error) {
 	return records, nil
 }
 
-// NewRecord initializes a new record with the given options
-func NewRecord(options ...Option) *proto.Record {
-	opts := NewOptions(options...)
-
-	return &proto.Record{
-		Payload: &proto.Payload{
-			Account: &proto.Account{
-				Uuid: opts.UUID,
-			},
-		},
-	}
-}
-
-// Read implements the store interface. This implementation only reads by id.
-func (s Store) Read(key string) (*proto.Record, error) {
-	contents, err := ioutil.ReadFile(path.Join(s.mountPath, key))
+func (s Store) readSpace(space string, subspace string, key string) (*proto.Record, error) {
+	contents, err := ioutil.ReadFile(path.Join(s.mountPath, space, subspace, key))
 	if err != nil {
-		s.Logger.Err(err).Msgf("error reading contents of key %v: file not found", key)
+		s.Logger.Err(err).Str("space", space).Str("subspace", subspace).Str("key", key).Msg("error reading record")
 		return nil, err
 	}
 
@@ -102,14 +93,44 @@ func (s Store) Read(key string) (*proto.Record, error) {
 	return rec, nil
 }
 
+// Read implements the store interface. This implementation only reads by id.
+func (s Store) Read(uuid string) (*proto.Record, error) {
+	return s.readSpace(uuidSpace, "", uuid)
+}
+
+// ReadByUsername implements the store interface. This implementation only reads by username.
+func (s Store) ReadByUsername(username string) (*proto.Record, error) {
+	return s.readSpace(usernameSpace, "", username)
+}
+
+// ReadByEmail implements the store interface. This implementation only reads by email.
+func (s Store) ReadByEmail(email string) (*proto.Record, error) {
+	i := strings.LastIndex(email, "@")
+	if i < 0 {
+		// no domain part
+		return s.readSpace(emailSpace, "local", email)
+	}
+
+	return s.readSpace(emailSpace, email[:i], email[i:])
+}
+
+// ReadByIdentity implements the store interface. This implementation only reads by iss & sub.
+func (s Store) ReadByIdentity(identity *proto.IdHistory) (*proto.Record, error) {
+	if identity.Iss == "" {
+		s.Logger.Error().Msg("iss cannot be empty")
+		return nil, fmt.Errorf(emptyKeyError)
+	}
+	return s.readSpace(identitySpace, identity.Iss, identity.Sub)
+}
+
 // Write implements the store interface
 func (s Store) Write(rec *proto.Record) (*proto.Record, error) {
-	path := filepath.Join(s.mountPath, rec.Key)
-
 	if len(rec.Key) < 1 {
 		s.Logger.Error().Msg("key cannot be empty")
 		return nil, fmt.Errorf(emptyKeyError)
 	}
+
+	path := filepath.Join(s.mountPath, uuidSpace, rec.Key)
 
 	contents, err := json.Marshal(rec)
 	if err != nil {
@@ -120,8 +141,50 @@ func (s Store) Write(rec *proto.Record) (*proto.Record, error) {
 	if err := ioutil.WriteFile(path, contents, 0644); err != nil {
 		return nil, err
 	}
+	s.Logger.Info().Int("bytes", len(contents)).Str("path", path).Msg("wrote account")
 
-	s.Logger.Info().Msgf("%v bytes written to %v", len(contents), path)
+	// write symlinks for other lookups
+	// use hardlinks?
+	// TODO what if target already exists? use dirs with multiple symlinks to uuid?
+	// TODO what if username or email changes? use uuid folder with a file per property? srsly ... we should use a proper storage for this
+	if rec.Payload != nil {
+		if rec.Payload.Account != nil {
+			if rec.Payload.Account.StandardClaims != nil {
+				if rec.Payload.Account.StandardClaims.PreferredUsername != "" {
+					p := filepath.Join(s.mountPath, usernameSpace, rec.Payload.Account.StandardClaims.PreferredUsername)
+					os.MkdirAll(filepath.Dir(p), 0700)
+					os.Symlink(path, p)
+				} else {
+					s.Logger.Warn().Str("uuid", rec.Key).Msg("has no preferred username in standard claims")
+				}
+				if rec.Payload.Account.StandardClaims.Email != "" {
+					p := filepath.Join(s.mountPath, emailSpace, rec.Payload.Account.StandardClaims.Email)
+					os.MkdirAll(filepath.Dir(p), 0700)
+					os.Symlink(path, p)
+				} else {
+					s.Logger.Warn().Str("uuid", rec.Key).Msg("has no email in standard claims")
+				}
+				if rec.Payload.Account.Issuer != "" {
+					if rec.Payload.Account.StandardClaims.Sub != "" {
+						p := filepath.Join(s.mountPath, identitySpace, rec.Payload.Account.Issuer, rec.Payload.Account.StandardClaims.Sub)
+						os.MkdirAll(filepath.Dir(p), 0700)
+						os.Symlink(path, p)
+					} else {
+						s.Logger.Warn().Str("uuid", rec.Key).Msg("has no sub in standard claims")
+					}
+				} else {
+					s.Logger.Warn().Str("uuid", rec.Key).Msg("has no issuer in account")
+				}
+			} else {
+				s.Logger.Warn().Str("uuid", rec.Key).Msg("has no standard claims in account")
+			}
+		} else {
+			s.Logger.Warn().Str("uuid", rec.Key).Msg("has no account in payload")
+		}
+	} else {
+		s.Logger.Warn().Str("uuid", rec.Key).Msg("has no payload")
+	}
+
 	return rec, nil
 }
 

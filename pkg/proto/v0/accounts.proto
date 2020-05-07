@@ -22,9 +22,10 @@ message Payload {
 }
 
 message Account {
-    string uuid = 1;
-    StandardClaims standard_claims = 2;
-    repeated IdHistory identities = 3; // keep track of every identity of a given user
+    StandardClaims standard_claims = 1;
+    repeated IdHistory identities = 2; // keep track of every identity of a given user
+    string Issuer = 3;
+    string Password = 4;
 }
 
 // OIDC standard claims https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims

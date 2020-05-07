@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
@@ -46,15 +47,68 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 }
 
 // Get implements the AccountsServiceHandler interface
-func (s Service) Get(c context.Context, req *proto.GetRequest, res *proto.Record) error {
+func (s Service) Get(c context.Context, req *proto.GetRequest, res *proto.Record) (err error) {
 	// TODO implement other GetRequest properties: Identity, username&password, email
-	r, err := s.Manager.Read(req.GetUuid())
-	if err != nil {
-		return err
+	var r, ruuid, rname, rmail *proto.Record
+	if req.GetIdentity() != nil {
+		r, err = s.Manager.ReadByIdentity(req.GetIdentity())
+		if err != nil {
+			return err
+		}
+	}
+	if req.GetUuid() != "" {
+		ruuid, err = s.Manager.Read(req.GetUuid())
+		if err != nil {
+			return err
+		}
+
+		if r == nil {
+			r = ruuid
+		} else if r.Key != ruuid.Key {
+			r = nil
+			return errors.New("uuid mismatch")
+		}
+	}
+	if req.GetUsername() != "" {
+		rname, err = s.Manager.ReadByUsername(req.GetUsername())
+		if err != nil {
+			return err
+		}
+		if r == nil {
+			r = rname
+		} else if r.Key != rname.Key {
+			r = nil
+			return errors.New("username mismatch")
+		}
+	}
+	if req.GetEmail() != "" {
+		rmail, err = s.Manager.ReadByEmail(req.GetEmail())
+		if err != nil {
+			return err
+		}
+		if r == nil {
+			r = rmail
+		} else if r.Key != rmail.Key {
+			r = nil
+			return errors.New("email mismatch")
+		}
 	}
 
-	res.Payload = r.GetPayload()
-	return nil
+	if r != nil {
+		// TODO store only salted hash
+		if req.GetPassword() != "" {
+			if r.Payload.Account.Password != req.GetPassword() {
+				return errors.New("wrong password")
+			}
+		}
+		res.Key = r.Key
+		res.Payload = r.GetPayload()
+		// password never leaves
+		res.Payload.Account.Password = ""
+		return nil
+	}
+
+	return errors.New("at least one request param must be set")
 }
 
 // Search implements the AccountsServiceHandler interface
