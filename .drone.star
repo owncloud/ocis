@@ -244,7 +244,7 @@ def testing(ctx):
       },
       {
         'name': 'selenium',
-        'image': 'selenium/standalone-chrome-debug:latest',
+        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
         'pull': 'always',
         'volumes': [{
             'name': 'uploads',
