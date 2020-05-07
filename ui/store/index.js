@@ -1,4 +1,11 @@
-import {BundleService_ListSettingsBundles, ValueService_ListSettingsValues} from '../client/settings'
+import {
+  // eslint-disable-next-line camelcase
+  BundleService_ListSettingsBundles,
+  // eslint-disable-next-line camelcase
+  ValueService_ListSettingsValues,
+  // eslint-disable-next-line camelcase
+  ValueService_SaveSettingsValue
+} from '../client/settings'
 
 const state = {
   config: null,
@@ -21,10 +28,10 @@ const getters = {
     }
     return []
   },
-  getSettingsValueByIdentifier: state => ({extension, bundleKey, settingKey}) => {
-    if (state.settingsValues.has(extension)
-      && state.settingsValues.get(extension).has(bundleKey)
-      && state.settingsValues.get(extension).get(bundleKey).has(settingKey)) {
+  getSettingsValueByIdentifier: state => ({ extension, bundleKey, settingKey }) => {
+    if (state.settingsValues.has(extension) &&
+      state.settingsValues.get(extension).has(bundleKey) &&
+      state.settingsValues.get(extension).get(bundleKey).has(settingKey)) {
       return state.settingsValues.get(extension).get(bundleKey).get(settingKey)
     }
     return null
@@ -32,12 +39,12 @@ const getters = {
 }
 
 const mutations = {
-  SET_INITIALIZED(state, value) {
+  SET_INITIALIZED (state, value) {
     state.initialized = value
   },
-  SET_SETTINGS_BUNDLES(state, payload) {
+  SET_SETTINGS_BUNDLES (state, settingsBundles) {
     const map = new Map()
-    Array.from(payload).forEach(bundle => {
+    Array.from(settingsBundles).forEach(bundle => {
       if (!map.has(bundle.identifier.extension)) {
         map.set(bundle.identifier.extension, new Map())
       }
@@ -45,30 +52,25 @@ const mutations = {
     })
     state.settingsBundles = map
   },
-  SET_SETTINGS_VALUES(state, payload) {
+  SET_SETTINGS_VALUES (state, settingsValues) {
     const map = new Map()
-    Array.from(payload).forEach(value => {
-      if (!map.has(value.identifier.extension)) {
-        map.set(value.identifier.extension, new Map())
-      }
-      if (!map.get(value.identifier.extension).has(value.identifier.bundleKey)) {
-        map.get(value.identifier.extension).set(value.identifier.bundleKey, new Map())
-      }
-      map.get(value.identifier.extension).get(value.identifier.bundleKey).set(value.identifier.settingKey, value)
-    })
+    Array.from(settingsValues).forEach(value => applySettingsValueToMap(value, map))
     state.settingsValues = map
   },
-  LOAD_CONFIG(state, config) {
+  SET_SETTINGS_VALUE (state, settingsValue) {
+    applySettingsValueToMap(settingsValue, state.settingsValues)
+  },
+  LOAD_CONFIG (state, config) {
     state.config = config
   }
 }
 
 const actions = {
-  loadConfig({commit}, config) {
+  loadConfig ({ commit }, config) {
     commit('LOAD_CONFIG', config)
   },
 
-  async initialize({commit, dispatch}) {
+  async initialize ({ commit, dispatch }) {
     await Promise.all([
       dispatch('fetchSettingsBundles'),
       dispatch('fetchSettingsValues')
@@ -76,7 +78,7 @@ const actions = {
     commit('SET_INITIALIZED', true)
   },
 
-  async fetchSettingsBundles({commit, dispatch, getters}) {
+  async fetchSettingsBundles ({ commit, dispatch, getters }) {
     const response = await BundleService_ListSettingsBundles({
       $domain: getters.config.url,
       body: {}
@@ -87,15 +89,15 @@ const actions = {
       if (settingsBundles) {
         settingsBundles.forEach(bundle => {
           bundle.settings.forEach(setting => {
-            if (setting['intValue']) {
+            if (setting.intValue) {
               setting.type = 'number'
-            } else if (setting['stringValue']) {
+            } else if (setting.stringValue) {
               setting.type = 'string'
-            } else if (setting['boolValue']) {
+            } else if (setting.boolValue) {
               setting.type = 'boolean'
-            } else if (setting['singleChoiceValue']) {
+            } else if (setting.singleChoiceValue) {
               setting.type = 'singleChoice'
-            } else if (setting['multiChoiceValue']) {
+            } else if (setting.multiChoiceValue) {
               setting.type = 'multiChoice'
             } else {
               setting.type = 'unknown'
@@ -111,16 +113,16 @@ const actions = {
         title: 'Failed to fetch settings bundles.',
         desc: response.statusText,
         status: 'danger'
-      }, {root: true})
+      }, { root: true })
     }
   },
 
-  async fetchSettingsValues({commit, dispatch, getters}) {
+  async fetchSettingsValues ({ commit, dispatch, getters }) {
     const response = await ValueService_ListSettingsValues({
       $domain: getters.config.url,
       body: {
         identifier: {
-          account_uuid: "me"
+          account_uuid: 'me'
         }
       }
     })
@@ -136,7 +138,27 @@ const actions = {
         title: 'Failed to fetch settings values.',
         desc: response.statusText,
         status: 'danger'
-      }, {root: true})
+      }, { root: true })
+    }
+  },
+
+  async saveSettingsValue ({ commit, dispatch, getters }, payload) {
+    const response = await ValueService_SaveSettingsValue({
+      $domain: getters.config.url,
+      body: {
+        settingsValue: payload
+      }
+    })
+    if (response.status === 201) {
+      if (response.data.settingsValue) {
+        commit('SET_SETTINGS_VALUE', response.data.settingsValue)
+      }
+    } else {
+      dispatch('showMessage', {
+        title: 'Failed to save settings value.',
+        desc: response.statusText,
+        status: 'danger'
+      }, { root: true })
     }
   }
 }
@@ -147,4 +169,15 @@ export default {
   getters,
   actions,
   mutations
+}
+
+function applySettingsValueToMap (settingsValue, map) {
+  if (!map.has(settingsValue.identifier.extension)) {
+    map.set(settingsValue.identifier.extension, new Map())
+  }
+  if (!map.get(settingsValue.identifier.extension).has(settingsValue.identifier.bundleKey)) {
+    map.get(settingsValue.identifier.extension).set(settingsValue.identifier.bundleKey, new Map())
+  }
+  map.get(settingsValue.identifier.extension).get(settingsValue.identifier.bundleKey).set(settingsValue.identifier.settingKey, settingsValue)
+  return map
 }

@@ -1,11 +1,11 @@
 <template>
   <div>
-    <oc-checkbox v-model="value" :label="setting.boolValue.label" />
+    <oc-checkbox v-model="value" :label="setting.boolValue.label" @change="applyValue" />
   </div>
 </template>
 
 <script>
-import isNil from "lodash/isNil"
+import isNil from 'lodash/isNil'
 export default {
   name: 'SettingBoolean',
   props: {
@@ -22,31 +22,31 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {
-      initialValue: null,
       value: null
     }
   },
-  computed: {
-    isChanged() {
-      return this.initialValue !== this.value
-    }
-  },
   methods: {
-    applyValue() {
-      // TODO: propagate value to parent
+    async applyValue () {
+      const value = {
+        boolValue: this.value
+      }
+      await this.$emit('onSave', {
+        bundle: this.bundle,
+        setting: this.setting,
+        value
+      })
       // TODO: show a spinner while the request for saving the value is running!
     }
   },
-  mounted() {
+  mounted () {
     if (!isNil(this.persistedValue)) {
       this.value = this.persistedValue.boolValue
     }
     if (isNil(this.value) && !isNil(this.setting.boolValue.default)) {
       this.value = this.setting.boolValue.default
     }
-    this.initialValue = this.value
   }
 }
 </script>

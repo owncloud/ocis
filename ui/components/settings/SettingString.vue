@@ -6,6 +6,7 @@
         :placeholder="setting.stringValue.placeholder"
         :label="setting.description"
         @keydown.enter="applyValue"
+        @keydown.esc="cancel"
       />
     </div>
     <div v-if="isChanged">
@@ -20,7 +21,7 @@
 </template>
 
 <script>
-import isNil from "lodash/isNil"
+import isNil from 'lodash/isNil'
 export default {
   name: 'SettingString',
   props: {
@@ -37,28 +38,35 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {
       initialValue: null,
       value: null
     }
   },
   computed: {
-    isChanged() {
+    isChanged () {
       return this.initialValue !== this.value
     }
   },
   methods: {
-    applyValue() {
-      // TODO: propagate value to parent
+    async applyValue () {
+      const value = {
+        stringValue: this.value
+      }
+      await this.$emit('onSave', {
+        bundle: this.bundle,
+        setting: this.setting,
+        value
+      })
       // TODO: show a spinner while the request for saving the value is running!
       this.initialValue = this.value
     },
-    cancel() {
+    cancel () {
       this.value = this.initialValue
     }
   },
-  mounted() {
+  mounted () {
     if (!isNil(this.persistedValue)) {
       this.value = this.persistedValue.stringValue
     }

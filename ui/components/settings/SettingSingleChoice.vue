@@ -28,7 +28,7 @@
               class="oc-radiobutton"
               v-model="selectedOption"
               :value="option"
-              @input="onSelectedOption"
+              @change="onSelectedOption"
             />
             {{ option.displayValue }}
           </label>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 export default {
   name: 'SettingSingleChoice',
   props: {
@@ -55,33 +56,62 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {
       selectedOption: null
     }
   },
   computed: {
-    dropElementId() {
+    dropElementId () {
       return `single-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
-    buttonElementId() {
+    buttonElementId () {
       return `single-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
-    },
+    }
   },
   methods: {
-    getOptionElementId(index) {
+    getOptionElementId (index) {
       return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
     },
-    onSelectedOption() {
-      // TODO: propagate selection to parent
+    async onSelectedOption () {
+      const value = {}
+      if (this.selectedOption) {
+        if (!isNil(this.selectedOption.intValue)) {
+          value.intListValue = {
+            value: [this.selectedOption ? this.selectedOption.intValue : null]
+          }
+        } else {
+          value.stringListValue = {
+            value: [this.selectedOption ? this.selectedOption.stringValue : null]
+          }
+        }
+      }
+      await this.$emit('onSave', {
+        bundle: this.bundle,
+        setting: this.setting,
+        value
+      })
       // TODO: show a spinner while the request for saving the value is running!
     }
   },
-  mounted() {
-    this.selectedOption = null
-    // TODO: load the settings value of the authenticated user and set it in `selectedOption`
+  mounted () {
+    if (!isNil(this.persistedValue)) {
+      if (!isNil(this.persistedValue.intListValue)) {
+        const selected = this.persistedValue.intListValue.value[0]
+        const filtered = this.setting.singleChoiceValue.options.filter(option => option.intValue === selected)
+        if (filtered.length > 0) {
+          this.selectedOption = filtered[0]
+        }
+      } else {
+        const selected = this.persistedValue.stringListValue.value[0]
+        const filtered = this.setting.singleChoiceValue.options.filter(option => option.stringValue === selected)
+        if (filtered.length > 0) {
+          this.selectedOption = filtered[0]
+        }
+      }
+    }
     // if not set, yet, apply default from settings bundle definition
-    if (this.selectedOption === null) {
+    if (isNil(this.selectedOption)) {
       const defaults = this.setting.singleChoiceValue.options.filter(option => option.default)
       if (defaults.length === 1) {
         this.selectedOption = defaults[0]

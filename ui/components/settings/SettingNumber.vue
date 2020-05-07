@@ -8,6 +8,7 @@
         :placeholder="setting.intValue.placeholder"
         :label="setting.description"
         @keydown.enter="applyValue"
+        @keydown.esc="cancel"
       />
     </div>
     <div v-if="isChanged">
@@ -22,7 +23,7 @@
 </template>
 
 <script>
-import isNil from "lodash/isNil"
+import isNil from 'lodash/isNil'
 export default {
   name: 'SettingNumber',
   props: {
@@ -39,17 +40,17 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {
       initialValue: null,
       value: null
     }
   },
   computed: {
-    isChanged() {
+    isChanged () {
       return this.initialValue !== this.value
     },
-    inputAttributes() {
+    inputAttributes () {
       const attributes = {}
       if (!isNil(this.setting.intValue.min)) {
         attributes.min = this.setting.intValue.min
@@ -64,16 +65,23 @@ export default {
     }
   },
   methods: {
-    cancel() {
+    cancel () {
       this.value = this.initialValue
     },
-    applyValue() {
-      // TODO: propagate value to parent
+    async applyValue () {
+      const value = {
+        intValue: this.value
+      }
+      await this.$emit('onSave', {
+        bundle: this.bundle,
+        setting: this.setting,
+        value
+      })
       // TODO: show a spinner while the request for saving the value is running!
       this.initialValue = this.value
     }
   },
-  mounted() {
+  mounted () {
     if (!isNil(this.persistedValue)) {
       this.value = this.persistedValue.intValue
     }

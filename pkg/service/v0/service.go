@@ -24,6 +24,7 @@ func NewService(cfg *config.Config) Service {
 }
 
 func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBundleRequest, res *proto.SaveSettingsBundleResponse) error {
+	req.SettingsBundle.Identifier = getFailsafeIdentifier(req.SettingsBundle.Identifier)
 	r, err := g.manager.WriteBundle(req.SettingsBundle)
 	if err != nil {
 		return err
@@ -51,6 +52,7 @@ func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsB
 }
 
 func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsValueRequest, res *proto.SaveSettingsValueResponse) error {
+	req.SettingsValue.Identifier = getFailsafeIdentifier(req.SettingsValue.Identifier)
 	r, err := g.manager.WriteValue(req.SettingsValue)
 	if err != nil {
 		return err

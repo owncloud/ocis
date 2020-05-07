@@ -30,10 +30,10 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import SettingsBundle from "./SettingsBundle.vue";
+import SettingsBundle from './SettingsBundle.vue'
 export default {
   name: 'SettingsApp',
-  components: {SettingsBundle},
+  components: { SettingsBundle },
   data () {
     return {
       loading: true,
@@ -46,10 +46,10 @@ export default {
       'initialized',
       'getSettingsBundlesByExtension'
     ]),
-    extensionRouteParam() {
+    extensionRouteParam () {
       return this.$route.params.extension
     },
-    selectedExtensionName() {
+    selectedExtensionName () {
       // TODO: extensions need to be registered with display names, separate from the settings bundles. until then: hardcoded translation
       if (this.selectedExtension === 'ocis-accounts') {
         return 'Account'
@@ -58,7 +58,7 @@ export default {
       }
       return this.selectedExtension
     },
-    selectedSettingsBundles() {
+    selectedSettingsBundles () {
       if (this.selectedExtension) {
         return this.getSettingsBundlesByExtension(this.selectedExtension)
       }
@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     ...mapActions('Settings', ['initialize']),
-    resetSelectedExtension() {
+    resetSelectedExtension () {
       if (this.extensions.length > 0) {
         if (this.extensionRouteParam && this.extensions.includes(this.extensionRouteParam)) {
           this.selectedExtension = this.extensionRouteParam
@@ -82,10 +82,10 @@ export default {
     this.resetSelectedExtension()
   },
   watch: {
-    initialized() {
+    initialized () {
       this.resetSelectedExtension()
     },
-    extensionRouteParam() {
+    extensionRouteParam () {
       this.resetSelectedExtension()
     }
   }

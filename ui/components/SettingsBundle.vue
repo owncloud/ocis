@@ -12,6 +12,7 @@
              :bundle="bundle"
              :setting="setting"
              :persisted-value="getSettingsValue(bundle, setting)"
+             @onSave="onSaveSettingsValue"
         />
       </div>
     </oc-grid>
@@ -19,13 +20,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import SettingBoolean from "./settings/SettingBoolean.vue";
-import SettingMultiChoice from "./settings/SettingMultiChoice.vue";
-import SettingNumber from "./settings/SettingNumber.vue";
-import SettingSingleChoice from "./settings/SettingSingleChoice.vue";
-import SettingString from "./settings/SettingString.vue";
-import SettingUnknown from "./settings/SettingUnknown.vue";
+import { mapGetters, mapActions } from 'vuex'
+import SettingBoolean from './settings/SettingBoolean.vue'
+import SettingMultiChoice from './settings/SettingMultiChoice.vue'
+import SettingNumber from './settings/SettingNumber.vue'
+import SettingSingleChoice from './settings/SettingSingleChoice.vue'
+import SettingString from './settings/SettingString.vue'
+import SettingUnknown from './settings/SettingUnknown.vue'
 
 export default {
   name: 'SettingsBundle',
@@ -37,19 +38,32 @@ export default {
   },
   computed: mapGetters('Settings', ['getSettingsValueByIdentifier']),
   methods: {
-    getElementId(bundle, setting) {
+    ...mapActions('Settings', ['saveSettingsValue']),
+    getElementId (bundle, setting) {
       return `setting-${bundle.identifier.bundleKey}-${setting.settingKey}`
     },
-    getSettingComponent(setting) {
+    getSettingComponent (setting) {
       return 'Setting' + setting.type[0].toUpperCase() + setting.type.substr(1)
     },
-    getSettingsValue(bundle, setting) {
+    getSettingsValue (bundle, setting) {
       const identifier = {
         extension: bundle.identifier.extension,
         bundleKey: bundle.identifier.bundleKey,
-        settingKey: setting.settingKey,
+        settingKey: setting.settingKey
       }
       return this.getSettingsValueByIdentifier(identifier)
+    },
+    async onSaveSettingsValue ({ bundle, setting, value }) {
+      const payload = {
+        identifier: {
+          accountUuid: 'me',
+          extension: bundle.identifier.extension,
+          bundleKey: bundle.identifier.bundleKey,
+          settingKey: setting.settingKey
+        },
+        ...value
+      }
+      await this.saveSettingsValue(payload)
     }
   },
   components: {
