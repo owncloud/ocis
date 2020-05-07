@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). FIle up and download needs proper configuration of the dataprovider to also use eos.
+Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). File up and download needs proper configuration of the dataprovider to also use eos.
 
 ## How to do it
 
