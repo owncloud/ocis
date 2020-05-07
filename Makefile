@@ -58,7 +58,7 @@ sync:
 	go mod download
 
 .PHONY: clean
-clean: clean-config
+clean: clean-config eos-clean
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST) $(HUGO)
 
@@ -290,7 +290,7 @@ eos-start: eos-deploy eos-setup eos-copy-ocis eos-ocis-storage-home eos-ocis
 
 .PHONY: eos-clean
 eos-clean:
-	rm eos-docker/scripts/start_services_ocis.sh
+	rm -f eos-docker/scripts/start_services_ocis.sh
 
 .PHONY: eos-stop
 eos-stop: eos-docker
