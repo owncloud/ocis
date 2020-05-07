@@ -180,12 +180,9 @@ message MultiChoiceListSetting {
 }
 
 message ListOption {
-  oneof option {
-    string string_value = 1;
-    int64 int_value = 2;
-  }
-  bool default = 3;
-  string display_value = 4;
+  ListOptionValue value = 1;
+  bool default = 2;
+  string display_value = 3;
 }
 
 // payloads for settings values
@@ -195,17 +192,19 @@ message SettingsValue {
     bool bool_value = 2;
     int64 int_value = 3;
     string string_value = 4;
-    IntListValue int_list_value = 5;
-    StringListValue string_list_value = 6;
+    ListValue list_value = 5;
   }
 }
 
-message IntListValue {
-  repeated int64 value = 1;
+message ListValue {
+  repeated ListOptionValue values = 1;
 }
 
-message StringListValue {
-  repeated string value = 1;
+message ListOptionValue {
+  oneof option {
+    string string_value = 1;
+    int64 int_value = 2;
+  }
 }
 
 // only meant for serialization

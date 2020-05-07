@@ -990,77 +990,77 @@ func (m *SettingsValue) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*SettingsValue)(nil)
 
-// IntListValueJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of IntListValue. This struct is safe to replace or modify but
+// ListValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntListValueJSONMarshaler = new(jsonpb.Marshaler)
+var ListValueJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *IntListValue) MarshalJSON() ([]byte, error) {
+func (m *ListValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := IntListValueJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListValueJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*IntListValue)(nil)
+var _ json.Marshaler = (*ListValue)(nil)
 
-// IntListValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of IntListValue. This struct is safe to replace or modify but
+// ListValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntListValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *IntListValue) UnmarshalJSON(b []byte) error {
-	return IntListValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListValue) UnmarshalJSON(b []byte) error {
+	return ListValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*IntListValue)(nil)
+var _ json.Unmarshaler = (*ListValue)(nil)
 
-// StringListValueJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of StringListValue. This struct is safe to replace or modify but
+// ListOptionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringListValueJSONMarshaler = new(jsonpb.Marshaler)
+var ListOptionValueJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *StringListValue) MarshalJSON() ([]byte, error) {
+func (m *ListOptionValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := StringListValueJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListOptionValueJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*StringListValue)(nil)
+var _ json.Marshaler = (*ListOptionValue)(nil)
 
-// StringListValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of StringListValue. This struct is safe to replace or modify but
+// ListOptionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringListValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListOptionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *StringListValue) UnmarshalJSON(b []byte) error {
-	return StringListValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListOptionValue) UnmarshalJSON(b []byte) error {
+	return ListOptionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*StringListValue)(nil)
+var _ json.Unmarshaler = (*ListOptionValue)(nil)
 
 // SettingsValuesJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of SettingsValues. This struct is safe to replace or modify but

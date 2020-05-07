@@ -27,7 +27,7 @@
               class="oc-checkbox"
               :value="option"
               v-model="selectedOptions"
-              @input="onSelectedOption"
+              @change="onSelectedOption"
             />
             {{ option.displayValue }}
           </label>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 export default {
   name: 'SettingMultiChoice',
   props: {
@@ -54,33 +55,77 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {
       selectedOptions: null
     }
   },
   computed: {
-    selectedOptionsDisplayValues() {
+    selectedOptionsDisplayValues () {
       return Array.from(this.selectedOptions).map(option => option.displayValue).join(', ')
     },
-    dropElementId() {
+    dropElementId () {
       return `multi-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
     },
-    buttonElementId() {
+    buttonElementId () {
       return `multi-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
-    },
+    }
   },
   methods: {
-    getOptionElementId(index) {
+    getOptionElementId (index) {
       return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
     },
-    onSelectedOption() {
-      // TODO: propagate selection to parent
+    async onSelectedOption () {
+      const values = []
+      if (!isNil(this.selectedOptions)) {
+        this.selectedOptions.forEach(option => {
+          if (option.value.intValue) {
+            values.push({ intValue: option.value.intValue })
+          }
+          if (option.value.stringValue) {
+            values.push({ stringValue: option.value.stringValue })
+          }
+        })
+      }
+      await this.$emit('onSave', {
+        bundle: this.bundle,
+        setting: this.setting,
+        value: {
+          listValue: {
+            values
+          }
+        }
+      })
       // TODO: show a spinner while the request for saving the value is running!
     }
   },
-  mounted() {
-    this.selectedOptions = null
+  mounted () {
+    if (!isNil(this.persistedValue) && !isNil(this.persistedValue.listValue)) {
+      const selectedValues = []
+      if (this.persistedValue.listValue.values) {
+        this.persistedValue.listValue.values.forEach(value => {
+          if (value.intValue) {
+            selectedValues.push(value.intValue)
+          }
+          if (value.stringValue) {
+            selectedValues.push(value.stringValue)
+          }
+        })
+      }
+      if (selectedValues.length === 0) {
+        this.selectedOptions = []
+      } else {
+        this.selectedOptions = this.setting.multiChoiceValue.options.filter(option => {
+          if (option.value.intValue) {
+            return selectedValues.includes(option.value.intValue)
+          }
+          if (option.value.stringValue) {
+            return selectedValues.includes(option.value.stringValue)
+          }
+          return false
+        })
+      }
+    }
     // TODO: load the settings value of the authenticated user and set it in `selectedOptions`
     // if not set, yet, apply defaults from settings bundle definition
     if (this.selectedOptions === null) {

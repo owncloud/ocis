@@ -74,40 +74,39 @@ export default {
       return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
     },
     async onSelectedOption () {
-      const value = {}
-      if (this.selectedOption) {
-        if (!isNil(this.selectedOption.intValue)) {
-          value.intListValue = {
-            value: [this.selectedOption ? this.selectedOption.intValue : null]
-          }
-        } else {
-          value.stringListValue = {
-            value: [this.selectedOption ? this.selectedOption.stringValue : null]
-          }
+      const values = []
+      if (!isNil(this.selectedOption)) {
+        if (this.selectedOption.value.intValue) {
+          values.push({ intValue: this.selectedOption.value.intValue })
+        }
+        if (this.selectedOption.value.stringValue) {
+          values.push({ stringValue: this.selectedOption.value.stringValue })
         }
       }
       await this.$emit('onSave', {
         bundle: this.bundle,
         setting: this.setting,
-        value
+        value: {
+          listValue: {
+            values
+          }
+        }
       })
       // TODO: show a spinner while the request for saving the value is running!
     }
   },
   mounted () {
-    if (!isNil(this.persistedValue)) {
-      if (!isNil(this.persistedValue.intListValue)) {
-        const selected = this.persistedValue.intListValue.value[0]
-        const filtered = this.setting.singleChoiceValue.options.filter(option => option.intValue === selected)
-        if (filtered.length > 0) {
-          this.selectedOption = filtered[0]
+    if (!isNil(this.persistedValue) && !isNil(this.persistedValue.listValue)) {
+      const selected = this.persistedValue.listValue.values[0]
+      const filtered = this.setting.singleChoiceValue.options.filter(option => {
+        if (selected.intValue) {
+          return option.value.intValue === selected.intValue
+        } else {
+          return option.value.stringValue === selected.stringValue
         }
-      } else {
-        const selected = this.persistedValue.stringListValue.value[0]
-        const filtered = this.setting.singleChoiceValue.options.filter(option => option.stringValue === selected)
-        if (filtered.length > 0) {
-          this.selectedOption = filtered[0]
-        }
+      })
+      if (filtered.length > 0) {
+        this.selectedOption = filtered[0]
       }
     }
     // if not set, yet, apply default from settings bundle definition

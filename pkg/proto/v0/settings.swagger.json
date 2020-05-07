@@ -280,18 +280,6 @@
       },
       "title": "generic payloads"
     },
-    "protoIntListValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "int64"
-          }
-        }
-      }
-    },
     "protoIntSetting": {
       "type": "object",
       "properties": {
@@ -319,12 +307,8 @@
     "protoListOption": {
       "type": "object",
       "properties": {
-        "string_value": {
-          "type": "string"
-        },
-        "int_value": {
-          "type": "string",
-          "format": "int64"
+        "value": {
+          "$ref": "#/definitions/protoListOptionValue"
         },
         "default": {
           "type": "boolean",
@@ -332,6 +316,18 @@
         },
         "display_value": {
           "type": "string"
+        }
+      }
+    },
+    "protoListOptionValue": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int_value": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -369,6 +365,17 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoSettingsValue"
+          }
+        }
+      }
+    },
+    "protoListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoListOptionValue"
           }
         }
       }
@@ -482,11 +489,8 @@
         "string_value": {
           "type": "string"
         },
-        "int_list_value": {
-          "$ref": "#/definitions/protoIntListValue"
-        },
-        "string_list_value": {
-          "$ref": "#/definitions/protoStringListValue"
+        "list_value": {
+          "$ref": "#/definitions/protoListValue"
         }
       },
       "title": "payloads for settings values"
@@ -498,17 +502,6 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoListOption"
-          }
-        }
-      }
-    },
-    "protoStringListValue": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "array",
-          "items": {
-            "type": "string"
           }
         }
       }

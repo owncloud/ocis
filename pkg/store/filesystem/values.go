@@ -32,7 +32,7 @@ func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, er
 // Writes the given SettingsValue into a file within the mountPath
 func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error) {
 	if len(value.Identifier.AccountUuid) < 1 || len(value.Identifier.Extension) < 1 || len(value.Identifier.BundleKey) < 1 || len(value.Identifier.SettingKey) < 1 {
-		s.Logger.Error().Msg("account-uuid, extension, bundle and setting are required")
+		s.Logger.Error().Msg("all identifier keys are required")
 		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
 	}
 
