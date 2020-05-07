@@ -39,7 +39,7 @@ We poured the nitty gritty details of setting up ocis into Makefile targets. Aft
 $ make eos-start
 ```
 
-the eos related docker containers will be created, started and setup to authenticate a gainst the ocis-glauth service.
+the eos related docker containers will be created, started and setup to authenticate against the ocis-glauth service.
 
 It will also copy the ocis binary to the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
 
