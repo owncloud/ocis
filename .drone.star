@@ -165,7 +165,7 @@ def testing(ctx):
         ]
       },
       {
-        'name': 'oC10APIAcceptanceTests',
+        'name': 'oC10APIAcceptanceTests-checkCapabilities',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -175,9 +175,10 @@ def testing(ctx):
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'BEHAT_FEATURE': 'tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature'
         },
         'commands': [
-          'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+          'git clone -b normal-user-capabilities --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
           'cd /srv/app/testrunner',
           'make test-acceptance-api',
         ],
