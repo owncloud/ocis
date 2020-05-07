@@ -144,14 +144,18 @@ func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "Europe/Berlin",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "Europe/Berlin",
+										},
 									},
 									DisplayValue: "Europe/Berlin",
 								},
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "Asia/Kathmandu",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "Asia/Kathmandu",
+										},
 									},
 									DisplayValue: "Asia/Kathmandu",
 								},
@@ -167,14 +171,18 @@ func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
 						SingleChoiceValue: &settings.SingleChoiceListSetting{
 							Options: []*settings.ListOption{
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "de_DE",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "de_DE",
+										},
 									},
 									DisplayValue: "Deutsch",
 								},
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "en_EN",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "en_EN",
+										},
 									},
 									DisplayValue: "English",
 								},
@@ -223,14 +231,18 @@ func generateSettingsBundleNotificationsRequest() settings.SaveSettingsBundleReq
 						MultiChoiceValue: &settings.MultiChoiceListSetting{
 							Options: []*settings.ListOption{
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "email",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "email",
+										},
 									},
 									DisplayValue: "Send via email",
 								},
 								{
-									Option: &settings.ListOption_StringValue{
-										StringValue: "stream",
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "stream",
+										},
 									},
 									DisplayValue: "Show in stream",
 									Default:      true,
