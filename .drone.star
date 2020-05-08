@@ -174,9 +174,11 @@ def testing(ctx):
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'TEST_OCIS':'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/'
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/var/www/owncloud/server/apps/testing/data/apiSkeleton'
          },
          'commands': [
+           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /var/www/owncloud/server/apps/testing',
            'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
            'cd /srv/app/testrunner',
            'make test-acceptance-api'
