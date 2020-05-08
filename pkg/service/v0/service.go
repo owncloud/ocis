@@ -2,14 +2,18 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
+	"fmt"
 
-	"github.com/owncloud/ocis-accounts/pkg/account"
+	"github.com/golang/protobuf/ptypes/empty"
+	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis-pkg/v2/log"
-	mclient "github.com/micro/go-micro/v2/client"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/ldap.v2"
 )
 
 // New returns a new instance of Service
@@ -18,111 +22,107 @@ func New(cfg *config.Config) Service {
 		Config: cfg,
 	}
 
-	if newReg, ok := account.Registry[cfg.Manager]; ok {
-		s.Manager = newReg(cfg)
-	} else {
-		l := olog.NewLogger(olog.Name("ocis-accounts"))
-		l.Fatal().Msgf("unknown manager: %v", cfg.Manager)
-	}
-
 	return s
 }
 
 // Service implements the AccountsServiceHandler interface
 type Service struct {
-	Config  *config.Config
-	Manager account.Manager
+	Config *config.Config
 }
 
-// Set implements the AccountsServiceHandler interface
-// This implementation replaces the existent data with the requested. It does not calculate diff
-func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
-	r, err := s.Manager.Write(req)
+// ListAccounts implements the AccountsServiceHandler interface
+func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) error {
+
+	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", s.Config.LDAP.Hostname, s.Config.LDAP.Port), &tls.Config{InsecureSkipVerify: true})
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+
+	// First bind with a read only user
+	err = l.Bind(s.Config.LDAP.BindDN, s.Config.LDAP.BindPassword)
 	if err != nil {
 		return err
 	}
 
-	res.Payload = r.GetPayload()
-	return nil
-}
+	// TODO parse query using https://github.com/araddon/qlbridge
+	// TODO combine the parsed query with a query filter from the config, eg. fmt.Sprintf(s.Config.LDAP.UserFilter, clientID)
+	filter := "(&)" // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
 
-// Get implements the AccountsServiceHandler interface
-func (s Service) Get(c context.Context, req *proto.GetRequest, res *proto.Record) (err error) {
-	// TODO implement other GetRequest properties: Identity, username&password, email
-	var r, ruuid, rname, rmail *proto.Record
-	if req.GetIdentity() != nil {
-		r, err = s.Manager.ReadByIdentity(req.GetIdentity())
-		if err != nil {
-			return err
-		}
-	}
-	if req.GetUuid() != "" {
-		ruuid, err = s.Manager.Read(req.GetUuid())
-		if err != nil {
-			return err
-		}
+	// Search for the given clientID
+	searchRequest := ldap.NewSearchRequest(
+		s.Config.LDAP.BaseDN,
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+		filter,
+		[]string{"dn", s.Config.LDAP.Schema.AccountID, s.Config.LDAP.Schema.Username, s.Config.LDAP.Schema.DisplayName, s.Config.LDAP.Schema.Mail, s.Config.LDAP.Schema.Groups}, // TODO Groups, Identities?
+		nil,
+	)
 
-		if r == nil {
-			r = ruuid
-		} else if r.Key != ruuid.Key {
-			r = nil
-			return errors.New("uuid mismatch")
-		}
-	}
-	if req.GetUsername() != "" {
-		rname, err = s.Manager.ReadByUsername(req.GetUsername())
-		if err != nil {
-			return err
-		}
-		if r == nil {
-			r = rname
-		} else if r.Key != rname.Key {
-			r = nil
-			return errors.New("username mismatch")
-		}
-	}
-	if req.GetEmail() != "" {
-		rmail, err = s.Manager.ReadByEmail(req.GetEmail())
-		if err != nil {
-			return err
-		}
-		if r == nil {
-			r = rmail
-		} else if r.Key != rmail.Key {
-			r = nil
-			return errors.New("email mismatch")
-		}
-	}
-
-	if r != nil {
-		// TODO store only salted hash
-		if req.GetPassword() != "" {
-			if r.Payload.Account.Password != req.GetPassword() {
-				return errors.New("wrong password")
-			}
-		}
-		res.Key = r.Key
-		res.Payload = r.GetPayload()
-		// password never leaves
-		res.Payload.Account.Password = ""
-		return nil
-	}
-
-	return errors.New("at least one request param must be set")
-}
-
-// Search implements the AccountsServiceHandler interface
-func (s Service) Search(ctx context.Context, in *proto.Query, res *proto.Records) error {
-	r, err := s.Manager.List()
+	sr, err := l.Search(searchRequest)
 	if err != nil {
 		return err
 	}
 
-	// TODO implement filter
-	// TODO implement pagination
+	log.Debug().Interface("entries", sr.Entries).Msg("entries")
 
-	res.Records = r
+	res.Accounts = make([]*proto.Account, 0)
+	for i := range sr.Entries {
+		res.Accounts = append(res.Accounts, &proto.Account{
+			AccountId: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.AccountID),
+			// TODO identities
+			Username:    sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Username),
+			DisplayName: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.DisplayName),
+			Mail:        sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Mail),
+			//Groups:      sr.Entries[i].GetAttributeValues(s.Config.LDAP.Schema.Groups),
+		})
+	}
+
 	return nil
+}
+
+// GetAccount implements the AccountsServiceHandler interface
+func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res *proto.Account) (err error) {
+	return errors.New("not implemented")
+}
+
+// CreateAccount implements the AccountsServiceHandler interface
+func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountRequest, res *proto.Account) (err error) {
+	return errors.New("not implemented")
+}
+
+// UpdateAccount implements the AccountsServiceHandler interface
+func (s Service) UpdateAccount(c context.Context, req *proto.UpdateAccountRequest, res *proto.Account) (err error) {
+	return errors.New("not implemented")
+}
+
+// DeleteAccount implements the AccountsServiceHandler interface
+func (s Service) DeleteAccount(c context.Context, req *proto.DeleteAccountRequest, res *empty.Empty) (err error) {
+	return errors.New("not implemented")
+}
+
+// ListGroups implements the AccountsServiceHandler interface
+func (s Service) ListGroups(c context.Context, req *proto.ListGroupsRequest, res *proto.ListGroupsResponse) (err error) {
+	return errors.New("not implemented")
+}
+
+// GetGroup implements the AccountsServiceHandler interface
+func (s Service) GetGroup(c context.Context, req *proto.GetGroupRequest, res *proto.Group) (err error) {
+	return errors.New("not implemented")
+}
+
+// CreateGroup implements the AccountsServiceHandler interface
+func (s Service) CreateGroup(c context.Context, req *proto.CreateGroupRequest, res *proto.Group) (err error) {
+	return errors.New("not implemented")
+}
+
+// UpdateGroup implements the AccountsServiceHandler interface
+func (s Service) UpdateGroup(c context.Context, req *proto.UpdateGroupRequest, res *proto.Group) (err error) {
+	return errors.New("not implemented")
+}
+
+// DeleteGroup implements the AccountsServiceHandler interface
+func (s Service) DeleteGroup(c context.Context, req *proto.DeleteGroupRequest, res *empty.Empty) (err error) {
+	return errors.New("not implemented")
 }
 
 // RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.

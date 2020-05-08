@@ -1,11 +1,12 @@
 package command
 
 import (
-	"github.com/owncloud/ocis-accounts/pkg/flagset"
 	"os"
 	"os/user"
 	"path"
 	"strings"
+
+	"github.com/owncloud/ocis-accounts/pkg/flagset"
 
 	"github.com/joho/godotenv"
 	"github.com/micro/cli/v2"
@@ -13,9 +14,6 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/spf13/viper"
-
-	// init store manager
-	_ "github.com/owncloud/ocis-accounts/pkg/store"
 )
 
 var (

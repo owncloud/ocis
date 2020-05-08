@@ -6,7 +6,9 @@ package proto
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
+	_ "google.golang.org/genproto/protobuf/field_mask"
 	math "math"
 )
 
@@ -35,9 +37,26 @@ var _ server.Option
 // Client API for AccountsService service
 
 type AccountsService interface {
-	Set(ctx context.Context, in *Record, opts ...client.CallOption) (*Record, error)
-	Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*Record, error)
-	Search(ctx context.Context, in *Query, opts ...client.CallOption) (*Records, error)
+	// Lists accounts
+	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...client.CallOption) (*ListAccountsResponse, error)
+	// Gets an account
+	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...client.CallOption) (*Account, error)
+	// Creates an account
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...client.CallOption) (*Account, error)
+	// Updates an account
+	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...client.CallOption) (*Account, error)
+	// Deletes an account
+	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*empty.Empty, error)
+	// Lists groups
+	ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error)
+	// Gets an groups
+	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Creates a group
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Updates a group
+	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Deletes a group
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error)
 }
 
 type accountsService struct {
@@ -52,9 +71,9 @@ func NewAccountsService(name string, c client.Client) AccountsService {
 	}
 }
 
-func (c *accountsService) Set(ctx context.Context, in *Record, opts ...client.CallOption) (*Record, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.Set", in)
-	out := new(Record)
+func (c *accountsService) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...client.CallOption) (*ListAccountsResponse, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.ListAccounts", in)
+	out := new(ListAccountsResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,9 +81,9 @@ func (c *accountsService) Set(ctx context.Context, in *Record, opts ...client.Ca
 	return out, nil
 }
 
-func (c *accountsService) Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*Record, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.Get", in)
-	out := new(Record)
+func (c *accountsService) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...client.CallOption) (*Account, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.GetAccount", in)
+	out := new(Account)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,9 +91,79 @@ func (c *accountsService) Get(ctx context.Context, in *GetRequest, opts ...clien
 	return out, nil
 }
 
-func (c *accountsService) Search(ctx context.Context, in *Query, opts ...client.CallOption) (*Records, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.Search", in)
-	out := new(Records)
+func (c *accountsService) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...client.CallOption) (*Account, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.CreateAccount", in)
+	out := new(Account)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...client.CallOption) (*Account, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.UpdateAccount", in)
+	out := new(Account)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*empty.Empty, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.DeleteAccount", in)
+	out := new(empty.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.ListGroups", in)
+	out := new(ListGroupsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.GetGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.CreateGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.UpdateGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error) {
+	req := c.c.NewRequest(c.name, "AccountsService.DeleteGroup", in)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -85,16 +174,40 @@ func (c *accountsService) Search(ctx context.Context, in *Query, opts ...client.
 // Server API for AccountsService service
 
 type AccountsServiceHandler interface {
-	Set(context.Context, *Record, *Record) error
-	Get(context.Context, *GetRequest, *Record) error
-	Search(context.Context, *Query, *Records) error
+	// Lists accounts
+	ListAccounts(context.Context, *ListAccountsRequest, *ListAccountsResponse) error
+	// Gets an account
+	GetAccount(context.Context, *GetAccountRequest, *Account) error
+	// Creates an account
+	CreateAccount(context.Context, *CreateAccountRequest, *Account) error
+	// Updates an account
+	UpdateAccount(context.Context, *UpdateAccountRequest, *Account) error
+	// Deletes an account
+	DeleteAccount(context.Context, *DeleteAccountRequest, *empty.Empty) error
+	// Lists groups
+	ListGroups(context.Context, *ListGroupsRequest, *ListGroupsResponse) error
+	// Gets an groups
+	GetGroup(context.Context, *GetGroupRequest, *Group) error
+	// Creates a group
+	CreateGroup(context.Context, *CreateGroupRequest, *Group) error
+	// Updates a group
+	UpdateGroup(context.Context, *UpdateGroupRequest, *Group) error
+	// Deletes a group
+	DeleteGroup(context.Context, *DeleteGroupRequest, *empty.Empty) error
 }
 
 func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler, opts ...server.HandlerOption) error {
 	type accountsService interface {
-		Set(ctx context.Context, in *Record, out *Record) error
-		Get(ctx context.Context, in *GetRequest, out *Record) error
-		Search(ctx context.Context, in *Query, out *Records) error
+		ListAccounts(ctx context.Context, in *ListAccountsRequest, out *ListAccountsResponse) error
+		GetAccount(ctx context.Context, in *GetAccountRequest, out *Account) error
+		CreateAccount(ctx context.Context, in *CreateAccountRequest, out *Account) error
+		UpdateAccount(ctx context.Context, in *UpdateAccountRequest, out *Account) error
+		DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error
+		ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error
+		GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error
+		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error
+		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error
+		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error
 	}
 	type AccountsService struct {
 		accountsService
@@ -107,14 +220,42 @@ type accountsServiceHandler struct {
 	AccountsServiceHandler
 }
 
-func (h *accountsServiceHandler) Set(ctx context.Context, in *Record, out *Record) error {
-	return h.AccountsServiceHandler.Set(ctx, in, out)
+func (h *accountsServiceHandler) ListAccounts(ctx context.Context, in *ListAccountsRequest, out *ListAccountsResponse) error {
+	return h.AccountsServiceHandler.ListAccounts(ctx, in, out)
 }
 
-func (h *accountsServiceHandler) Get(ctx context.Context, in *GetRequest, out *Record) error {
-	return h.AccountsServiceHandler.Get(ctx, in, out)
+func (h *accountsServiceHandler) GetAccount(ctx context.Context, in *GetAccountRequest, out *Account) error {
+	return h.AccountsServiceHandler.GetAccount(ctx, in, out)
 }
 
-func (h *accountsServiceHandler) Search(ctx context.Context, in *Query, out *Records) error {
-	return h.AccountsServiceHandler.Search(ctx, in, out)
+func (h *accountsServiceHandler) CreateAccount(ctx context.Context, in *CreateAccountRequest, out *Account) error {
+	return h.AccountsServiceHandler.CreateAccount(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, out *Account) error {
+	return h.AccountsServiceHandler.UpdateAccount(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error {
+	return h.AccountsServiceHandler.DeleteAccount(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error {
+	return h.AccountsServiceHandler.ListGroups(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error {
+	return h.AccountsServiceHandler.GetGroup(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error {
+	return h.AccountsServiceHandler.CreateGroup(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error {
+	return h.AccountsServiceHandler.UpdateGroup(ctx, in, out)
+}
+
+func (h *accountsServiceHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error {
+	return h.AccountsServiceHandler.DeleteGroup(ctx, in, out)
 }

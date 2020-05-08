@@ -5,125 +5,255 @@ option go_package = "pkg/proto/v0;proto";
 package settings;
 
 import "google/api/field_behavior.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 
+// Follow recommended Methods for rpc APIs https://cloud.google.com/apis/design/resources?hl=de#methods
+// https://cloud.google.com/apis/design/standard_methods?hl=de#list
+// https://cloud.google.com/apis/design/naming_convention?hl=de
 service AccountsService {
-    rpc Set(Record) returns (Record);
-    rpc Get(GetRequest) returns (Record);
-    rpc Search(Query) returns (Records);
+    // Lists accounts
+    rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {
+        // List method maps to HTTP GET
+        option (google.api.http) = {
+            get: "/v0/accounts"
+        };
+    }
+    // Gets an account
+    rpc GetAccount(GetAccountRequest) returns (Account) {
+        option (google.api.http) = {
+            get: "/v0/accounts/{account_id=*}"
+            body: "*"
+        };
+    }
+    // Creates an account
+    rpc CreateAccount(CreateAccountRequest) returns (Account) {
+        // Create maps to HTTP POST. URL path as the collection name.
+        // HTTP request body contains the resource
+        option (google.api.http) = {
+            post: "/v0/accounts"
+            body: "account"
+        };
+    }
+    // Updates an account
+    rpc UpdateAccount(UpdateAccountRequest) returns (Account) {
+        // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
+        // Resource is contained in the HTTP request body
+        option (google.api.http) = {
+            patch: "/v0/accounts/{account.account_id=*}"
+            body: "account"
+        };
+    };
+    // Deletes an account
+    rpc DeleteAccount(DeleteAccountRequest) returns (google.protobuf.Empty) {
+        // Delete maps to HTTP DELETE. Resource name maps to the URL path.
+        // There is no request body
+        option (google.api.http) = {
+            delete: "/v0/accounts/{account_id=*}"
+        };
+    }
+
+    // Lists groups
+    rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
+        // List method maps to HTTP GET
+        option (google.api.http) = {
+            get: "/v0/groups"
+        };
+    }
+    // Gets an groups
+    rpc GetGroup(GetGroupRequest) returns (Group) {
+        option (google.api.http) = {
+            get: "/v0/groups/{group_id=*}"
+            body: "*"
+        };
+    }
+    // Creates a group
+    rpc CreateGroup(CreateGroupRequest) returns (Group) {
+        // Create maps to HTTP POST. URL path as the collection name.
+        // HTTP request body contains the resource
+        option (google.api.http) = {
+            post: "/v0/groups"
+            body: "group"
+        };
+    }
+    // Updates a group
+    rpc UpdateGroup(UpdateGroupRequest) returns (Group) {
+        // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
+        // Resource is contained in the HTTP request body
+        option (google.api.http) = {
+            patch: "/v0/groups/{group.group_id=*}"
+            body: "group"
+        };
+    };
+    // Deletes a group
+    rpc DeleteGroup(DeleteGroupRequest) returns (google.protobuf.Empty) {
+        // Delete maps to HTTP DELETE. Resource name maps to the URL path.
+        // There is no request body
+        option (google.api.http) = {
+            delete: "/v0/groups/{group_id=*}"
+        };
+    }
 }
 
-message Record {
-    string key = 1;
-    Payload payload = 2;
-}
-
-message Payload {
-    Account account = 1;
-}
-
-message Account {
-    StandardClaims standard_claims = 1;
-    repeated IdHistory identities = 2; // keep track of every identity of a given user
-    string Issuer = 3;
-    string Password = 4;
-}
-
-// OIDC standard claims https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
-message StandardClaims {
-    string sub = 1;
-    string name = 2;
-    string given_name = 3;
-    string family_name = 4;
-    string middle_name = 5;
-    string nickname = 6;
-    string preferred_username = 7;
-    string profile = 8;
-    string picture = 9;
-    string website = 10;
-    string email = 11;
-    bool email_verified = 12;
-    string gender = 13;
-    string birthdate = 14;
-    string zoneinfo = 15;
-    string locale = 16;
-    string phone_number = 17;
-    bool phone_number_verified = 18;
-    int32 updated_at = 19;
-    Address address = 20;
-}
-
-message Address {
-    string formatted = 1;
-    string street_address = 2;
-    string locality = 3;
-    string region = 4;
-    string postal_code = 5;
-    string country = 6;
-}
-
-message IdHistory {
-    string sub = 1;
-    string iss = 2;
-}
-
-message Phoenix {
-    string theme = 1;
-}
-
-// Used to fetch exactly one user. The conditions are optional. If set, all have to be true.
-message GetRequest {
-    // Used to look up user by the oidc sub and iss
-    IdHistory identity = 1;
-
-    // Used to look up the user by our internal uuid
-    string uuid = 2;
-
-    // Used to authenticate users using basic auth
-    string username = 3;
-    string password = 4;
-
-    // Used as a fallback mechanism in case sub or iss changed for an existing user
-    string email = 5;
-}
-
-message Query {
-    // Optional. The maximum number of accounts to return in the response.
+message ListAccountsRequest {
+    // Optional. The maximum number of accounts to return in the response
     int32 page_size = 1 [(google.api.field_behavior) = OPTIONAL];
 
     // Optional. A pagination token returned from a previous call to `Get`
-    // that indicates from where search should continue.
+    // that indicates from where search should continue
     string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
 
-    // Search criteria used to select the Accounts to return.
+    // Optional. Search criteria used to select the accounts to return.
     // If no search criteria is specified then all accounts will be
-    // returned.
+    // returned
     //
-    // Query expressions can be used to restrict results based upon the standard claims,
-    // iss, and uuid where the operators `=`, `NOT`, `AND` and `OR`
+    // TODO update query language
+    // Query expressions can be used to restrict results based upon
+    // the account properties where the operators `=`, `NOT`, `AND` and `OR`
     // can be used along with the suffix wildcard symbol `*`.
     //
-    // The *_name claims in a query expression should use escaped quotes
+    // The string properties in a query expression should use escaped quotes
     // for values that include whitespace to prevent unexpected behavior.
     //
     // Some example queries are:
     //
-    // * Query `name=Th*` returns accounts whose name claim
-    // starts with "Th".
+    // * Query `display_name=Th*` returns accounts whose display_name
+    // starts with "Th"
     // * Query `email=foo@example.com` returns accounts with
-    // `email` set to `foo@example.com`.
-    // * Query `address/country=de` returns accounts that have
-    // an address in Germany
-    // * Query `name=\\"Test String\\"` returns accounts with
-    // display names that include both "Test" and "String".
-    string query = 3;
+    // `email` set to `foo@example.com`
+    // * Query `display_name=\\"Test String\\"` returns accounts with
+    // display names that include both "Test" and "String"
+    string query = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
-message Records {
-    // A possibly paginated accounts search result for
-    // the specified query.
-    repeated Record records = 1;
+message ListAccountsResponse {
+    // The field name should match the noun "accounts" in the method name.  There
+    // will be a maximum number of items returned based on the page_size field
+    // in the request
+    repeated Account accounts = 1;
 
-    // A pagination token returned from a previous call to `Search`
-    // that indicates from where searching should continue.
+    // Token to retrieve the next page of results, or empty if there are no
+    // more results in the list
     string next_page_token = 2;
+}
+
+message GetAccountRequest {
+    string account_id = 1;
+}
+
+message CreateAccountRequest {
+    // The account id to use for this account
+    string account_id = 1;
+
+    // The account resource to create
+    Account account = 2;
+}
+
+message UpdateAccountRequest {
+    // The account resource which replaces the resource on the server
+    Account account = 1;
+
+    // The update mask applies to the resource. For the `FieldMask` definition,
+    // see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    google.protobuf.FieldMask update_mask = 2;
+  }
+
+message DeleteAccountRequest {
+    string account_id = 1;
+}
+
+message Account {
+    // the non reassignable and stable account_id of an account
+    string account_id = 1;
+
+    // The identities that are mapped to this account
+    repeated Identities identities = 2; // keep track of every identity of a given user
+
+    string username = 3;
+    string display_name = 4;
+    string mail = 5;
+    // TODO avatar needed? because the standard claims contain it or our own avatar service will use the accountid or email to look up the avatar
+
+    repeated Group groups = 6;
+}
+
+message Identities {
+    string sign_in_type = 1;
+    string issuer = 2;
+    string issuer_assigned_id = 3;
+}
+
+message ListGroupsRequest {
+    // Optional. The maximum number of groups to return in the response
+    int32 page_size = 1 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A pagination token returned from a previous call to `Get`
+    // that indicates from where search should continue
+    string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Search criteria used to select the groups to return.
+    // If no search criteria is specified then all groups will be
+    // returned
+    //
+    // TODO update query language
+    // Query expressions can be used to restrict results based upon
+    // the account properties where the operators `=`, `NOT`, `AND` and `OR`
+    // can be used along with the suffix wildcard symbol `*`.
+    //
+    // The string properties in a query expression should use escaped quotes
+    // for values that include whitespace to prevent unexpected behavior.
+    //
+    // Some example queries are:
+    //
+    // * Query `display_name=Th*` returns accounts whose display_name
+    // starts with "Th"
+    // * Query `display_name=\\"Test String\\"` returns groups with
+    // display names that include both "Test" and "String"
+    string query = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message ListGroupsResponse {
+    // The field name should match the noun "group" in the method name.  There
+    // will be a maximum number of items returned based on the page_size field
+    // in the request
+    repeated Group groups = 1;
+
+    // Token to retrieve the next page of results, or empty if there are no
+    // more results in the list
+    string next_page_token = 2;
+}
+
+message GetGroupRequest {
+    string group_id = 1;
+}
+
+message CreateGroupRequest {
+    // The group id to use for this group
+    string group_id = 1;
+
+    // The account resource to create
+    Group group = 2;
+}
+
+message UpdateGroupRequest {
+    // The group resource which replaces the resource on the server
+    Group group = 1;
+
+    // The update mask applies to the resource. For the `FieldMask` definition,
+    // see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    google.protobuf.FieldMask update_mask = 2;
+  }
+
+message DeleteGroupRequest {
+    string group_id = 1;
+}
+
+message Group {
+    // the non reassignable and stable group_id of a group
+    string group_id = 1;
+
+    string groupname = 2;
+
+    repeated Account accounts = 3;
 }
