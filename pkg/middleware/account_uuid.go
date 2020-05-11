@@ -20,20 +20,18 @@ func AccountUUID(next http.Handler) http.Handler {
 
 		entry, err := svcCache.Get(AccountsKey, claims.(ocisoidc.StandardClaims).Email)
 		if err != nil {
-			c := acc.NewSettingsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-			resp, err := c.Get(context.Background(), &acc.Query{
-				Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
+			c := acc.NewAccountsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+			resp, err := c.Get(context.Background(), &acc.GetRequest{
+				Uuid: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
 				// Email: claims.Email // depends on https://github.com/owncloud/ocis-accounts/pull/28
 			})
 			if err != nil {
-				// placeholder. Add more meaningful response
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 
 			err = svcCache.Set(AccountsKey, claims.(ocisoidc.StandardClaims).Email, resp.Payload.Account.Uuid)
 			if err != nil {
-				// placeholder. Add more meaningful response
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

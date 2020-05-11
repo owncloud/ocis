@@ -122,7 +122,6 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 			r = r.WithContext(ctxWithClaims)
 
 			// add UUID to the request context for the handler to deal with
-			// void call for correct staticchecks.
 			_, err = uuidFromClaims(claims)
 			if err != nil {
 				opt.Logger.Error().Err(err).Interface("account uuid", userInfo).Msg("failed to unmarshal userinfo claims")
@@ -160,9 +159,9 @@ const (
 func uuidFromClaims(claims ocisoidc.StandardClaims) (string, error) {
 	entry, err := svcCache.Get(AccountsKey, claims.Email)
 	if err != nil {
-		c := acc.NewSettingsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		resp, err := c.Get(context.Background(), &acc.Query{
-			Key: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
+		c := acc.NewAccountsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		resp, err := c.Get(context.Background(), &acc.GetRequest{
+			Uuid: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
 			// Email: claims.Email // depends on https://github.com/owncloud/ocis-accounts/pull/28
 		})
 		if err != nil {

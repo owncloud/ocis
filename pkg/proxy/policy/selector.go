@@ -3,11 +3,12 @@ package policy
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/micro/go-micro/v2/client/grpc"
 	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/config"
-	"net/http"
 )
 
 var (
@@ -63,7 +64,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 	if cfg.Migration != nil {
 		return NewMigrationSelector(
 			cfg.Migration,
-			accounts.NewSettingsService("com.owncloud.accounts", grpc.NewClient())), nil
+			accounts.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
 	}
 
 	return nil, ErrUnexpectedConfigError
@@ -94,13 +95,13 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 // thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
-func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.SettingsService) Selector {
+func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
 	var acc = ss
 	return func(ctx context.Context, r *http.Request) (s string, err error) {
 		var userID string
 		if claims := ocisoidc.FromContext(r.Context()); claims != nil {
 			userID = claims.PreferredUsername
-			if _, err := acc.Get(ctx, &accounts.Query{Key: userID}); err != nil {
+			if _, err := acc.Get(ctx, &accounts.GetRequest{Uuid: userID}); err != nil {
 				return cfg.AccNotFoundPolicy, nil
 			}
 
