@@ -14,7 +14,7 @@ require (
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
 	github.com/oklog/run v1.1.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
-	github.com/owncloud/ocis-settings v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis-settings v0.0.0-20200511093940-0fddb624d0da
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/viper v1.6.3
@@ -24,5 +24,3 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
-
-replace github.com/owncloud/ocis-settings => ../ocis-settings
