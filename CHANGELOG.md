@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.1.2] (2020-05-11)
 
-The following sections list the changes in ocis-thumbnails unreleased.
+The following sections list the changes in ocis-thumbnails 0.1.2.
 
-[unreleased]: https://github.com/owncloud/ocis-thumbnails/compare/v0.1.1...master
+[0.1.2]: https://github.com/owncloud/ocis-thumbnails/compare/v0.1.1...v0.1.2
 
 ## Summary
 
