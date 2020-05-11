@@ -22,8 +22,7 @@ func AccountUUID(next http.Handler) http.Handler {
 		if err != nil {
 			c := acc.NewAccountsService("com.owncloud.accounts", mclient.DefaultClient) // TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 			resp, err := c.Get(context.Background(), &acc.GetRequest{
-				Uuid: "200~a54bf154-e6a5-4e96-851b-a56c9f6c1fce",
-				// Email: claims.Email // depends on https://github.com/owncloud/ocis-accounts/pull/28
+				Email: claims.(ocisoidc.StandardClaims).Email,
 			})
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -38,17 +37,17 @@ func AccountUUID(next http.Handler) http.Handler {
 
 			// TODO: build JWT and set it, instead of the uuid on that header.
 			w.Header().Set("x-ocis-accounts-uuid", resp.Payload.Account.Uuid)
-		}
+		} else {
+			uuid, ok := entry.V.(string)
+			if !ok {
+				// placeholder. Add more meaningful response
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-		uuid, ok := entry.V.(string)
-		if !ok {
-			// placeholder. Add more meaningful response
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			// TODO: build JWT and set it, instead of the uuid on that header.
+			w.Header().Set("x-ocis-accounts-uuid", uuid)
 		}
-
-		// TODO: build JWT and set it, instead of the uuid on that header.
-		w.Header().Set("x-ocis-accounts-uuid", uuid)
 
 		next.ServeHTTP(w, r)
 	})
