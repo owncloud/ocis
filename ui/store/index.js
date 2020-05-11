@@ -1,10 +1,7 @@
 import {
-  // eslint-disable-next-line camelcase
-  BundleService_ListSettingsBundles,
-  // eslint-disable-next-line camelcase
-  ValueService_ListSettingsValues,
-  // eslint-disable-next-line camelcase
-  ValueService_SaveSettingsValue
+  ListSettingsBundles,
+  ListSettingsValues,
+  SaveSettingsValue
 } from '../client/settings'
 
 const state = {
@@ -79,7 +76,7 @@ const actions = {
   },
 
   async fetchSettingsBundles ({ commit, dispatch, getters }) {
-    const response = await BundleService_ListSettingsBundles({
+    const response = await ListSettingsBundles({
       $domain: getters.config.url,
       body: {}
     })
@@ -118,7 +115,7 @@ const actions = {
   },
 
   async fetchSettingsValues ({ commit, dispatch, getters }) {
-    const response = await ValueService_ListSettingsValues({
+    const response = await ListSettingsValues({
       $domain: getters.config.url,
       body: {
         identifier: {
@@ -143,7 +140,7 @@ const actions = {
   },
 
   async saveSettingsValue ({ commit, dispatch, getters }, payload) {
-    const response = await ValueService_SaveSettingsValue({
+    const response = await SaveSettingsValue({
       $domain: getters.config.url,
       body: {
         settingsValue: payload
