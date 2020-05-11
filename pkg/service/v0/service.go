@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/micro/go-micro/v2"
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
@@ -28,13 +27,13 @@ func New(cfg *config.Config) Service {
 	return s
 }
 
-// Service implements the SettingsServiceHandler interface
+// Service implements the AccountsServiceHandler interface
 type Service struct {
 	Config  *config.Config
 	Manager account.Manager
 }
 
-// Set implements the SettingsServiceHandler interface
+// Set implements the AccountsServiceHandler interface
 // This implementation replaces the existent data with the requested. It does not calculate diff
 func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) error {
 	r, err := s.Manager.Write(req)
@@ -46,9 +45,10 @@ func (s Service) Set(c context.Context, req *proto.Record, res *proto.Record) er
 	return nil
 }
 
-// Get implements the SettingsServiceHandler interface
-func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) error {
-	r, err := s.Manager.Read(req.GetKey())
+// Get implements the AccountsServiceHandler interface
+func (s Service) Get(c context.Context, req *proto.GetRequest, res *proto.Record) error {
+	// TODO implement other GetRequest properties: Identity, username&password, email
+	r, err := s.Manager.Read(req.GetUuid())
 	if err != nil {
 		return err
 	}
@@ -57,12 +57,15 @@ func (s Service) Get(c context.Context, req *proto.Query, res *proto.Record) err
 	return nil
 }
 
-// List implements the SettingsServiceHandler interface
-func (s Service) List(ctx context.Context, in *empty.Empty, res *proto.Records) error {
+// Search implements the AccountsServiceHandler interface
+func (s Service) Search(ctx context.Context, in *proto.Query, res *proto.Records) error {
 	r, err := s.Manager.List()
 	if err != nil {
 		return err
 	}
+
+	// TODO implement filter
+	// TODO implement pagination
 
 	res.Records = r
 	return nil

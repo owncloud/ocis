@@ -1,13 +1,15 @@
 syntax = "proto3";
 
-package settings;
-option go_package = "proto";
-import "google/protobuf/empty.proto";
+option go_package = "pkg/proto/v0;proto";
 
-service SettingsService {
+package settings;
+
+import "google/api/field_behavior.proto";
+
+service AccountsService {
     rpc Set(Record) returns (Record);
-    rpc Get(Query) returns (Record);
-    rpc List(google.protobuf.Empty) returns(Records);
+    rpc Get(GetRequest) returns (Record);
+    rpc Search(Query) returns (Records);
 }
 
 message Record {
@@ -63,10 +65,64 @@ message IdHistory {
     string iss = 2;
 }
 
+message Phoenix {
+    string theme = 1;
+}
+
+// Used to fetch exactly one user. The conditions are optional. If set, all have to be true.
+message GetRequest {
+    // Used to look up user by the oidc sub and iss
+    IdHistory identity = 1;
+
+    // Used to look up the user by our internal uuid
+    string uuid = 2;
+
+    // Used to authenticate users using basic auth
+    string username = 3;
+    string password = 4;
+
+    // Used as a fallback mechanism in case sub or iss changed for an existing user
+    string email = 5;
+}
+
 message Query {
-    string key = 1;
+    // Optional. The maximum number of accounts to return in the response.
+    int32 page_size = 1 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A pagination token returned from a previous call to `Get`
+    // that indicates from where search should continue.
+    string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
+
+    // Search criteria used to select the Accounts to return.
+    // If no search criteria is specified then all accounts will be
+    // returned.
+    //
+    // Query expressions can be used to restrict results based upon the standard claims,
+    // iss, and uuid where the operators `=`, `NOT`, `AND` and `OR`
+    // can be used along with the suffix wildcard symbol `*`.
+    //
+    // The *_name claims in a query expression should use escaped quotes
+    // for values that include whitespace to prevent unexpected behavior.
+    //
+    // Some example queries are:
+    //
+    // * Query `name=Th*` returns accounts whose name claim
+    // starts with "Th".
+    // * Query `email=foo@example.com` returns accounts with
+    // `email` set to `foo@example.com`.
+    // * Query `address/country=de` returns accounts that have
+    // an address in Germany
+    // * Query `name=\\"Test String\\"` returns accounts with
+    // display names that include both "Test" and "String".
+    string query = 3;
 }
 
 message Records {
+    // A possibly paginated accounts search result for
+    // the specified query.
     repeated Record records = 1;
+
+    // A pagination token returned from a previous call to `Search`
+    // that indicates from where searching should continue.
+    string next_page_token = 2;
 }
