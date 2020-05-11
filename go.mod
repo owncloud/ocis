@@ -37,11 +37,3 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
-
-// replace github.com/owncloud/ocis-proxy => ../ocis-proxy
-
-// replace github.com/owncloud/ocis-accounts => ../ocis-accounts
-
-// replace github.com/owncloud/ocis-settings => ../ocis-settings
-
-// replace github.com/owncloud/ocis-migration => ../ocis-migration
