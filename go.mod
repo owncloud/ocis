@@ -12,8 +12,8 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.5.1-0.20200417165434-16db76bee2fb
-	github.com/micro/protoc-gen-micro/v2 v2.3.0 // indirect
+	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
+	github.com/micro/protoc-gen-micro v1.0.0 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-hello v0.1.0-alpha1
