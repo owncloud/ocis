@@ -3,7 +3,7 @@ import SettingsApp from './components/SettingsApp.vue'
 import store from './store'
 
 // just a dummy function to trick gettext tools
-function $gettext(msg) {
+function $gettext (msg) {
   return msg
 }
 
@@ -14,7 +14,7 @@ const appInfo = {
   isFileEditor: false,
   extensions: [],
   config: {
-    url: 'http://localhost:9190'
+    url: 'https://localhost:9200'
   }
 }
 

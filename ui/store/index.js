@@ -3,6 +3,7 @@ import {
   ListSettingsValues,
   SaveSettingsValue
 } from '../client/settings'
+import axios from 'axios'
 
 const state = {
   config: null,
@@ -75,7 +76,8 @@ const actions = {
     commit('SET_INITIALIZED', true)
   },
 
-  async fetchSettingsBundles ({ commit, dispatch, getters }) {
+  async fetchSettingsBundles ({ commit, dispatch, getters, rootGetters }) {
+    injectAuthToken(rootGetters)
     const response = await ListSettingsBundles({
       $domain: getters.config.url,
       body: {}
@@ -114,7 +116,8 @@ const actions = {
     }
   },
 
-  async fetchSettingsValues ({ commit, dispatch, getters }) {
+  async fetchSettingsValues ({ commit, dispatch, getters, rootGetters }) {
+    injectAuthToken(rootGetters)
     const response = await ListSettingsValues({
       $domain: getters.config.url,
       body: {
@@ -139,7 +142,8 @@ const actions = {
     }
   },
 
-  async saveSettingsValue ({ commit, dispatch, getters }, payload) {
+  async saveSettingsValue ({ commit, dispatch, getters, rootGetters }, payload) {
+    injectAuthToken(rootGetters)
     const response = await SaveSettingsValue({
       $domain: getters.config.url,
       body: {
@@ -177,4 +181,16 @@ function applySettingsValueToMap (settingsValue, map) {
   }
   map.get(settingsValue.identifier.extension).get(settingsValue.identifier.bundleKey).set(settingsValue.identifier.settingKey, settingsValue)
   return map
+}
+
+function injectAuthToken (rootGetters) {
+  axios.interceptors.request.use(config => {
+    if (typeof config.headers.Authorization === 'undefined') {
+      const token = rootGetters.user.token
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    }
+    return config
+  })
 }
