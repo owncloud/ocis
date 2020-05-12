@@ -127,6 +127,68 @@ def testing(ctx):
         },
       },
       {
+        'name': 'copy-config',
+        'image': 'webhippie/golang:1.13',
+        'commands': [
+           'mkdir -p /srv/config/drone',
+           'ls -la tests/config',
+           'cp -r tests/config/config.json /srv/config/drone',
+           'cp -r tests/config/identifier-registration.yml /srv/config/drone',
+           'ls -la /srv/config/drone',
+         ],
+         'volumes': [
+           {
+             'name': 'config',
+             'path': '/srv/config',
+           },
+        ]
+      },
+      {
+        'name': 'konnectd',
+        'image': 'owncloud/ocis-konnectd',
+        'pull': 'always',
+        'detach': True,
+        'environment': {
+          'LDAP_BASEDN': 'ou=TestUsers,dc=owncloud,dc=com',
+          'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
+          'LDAP_URI': 'ldap://ldap:389',
+          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/srv/config/drone/identifier-registration.yml',
+          'KONNECTD_ISS': 'https://konnectd:9130',
+          'KONNECTD_TLS': 'true',
+          'LDAP_BINDPW': 'admin',
+          'LDAP_SCOPE': 'sub',
+          'LDAP_LOGIN_ATTRIBUTE': 'uid',
+          'LDAP_EMAIL_ATTRIBUTE': 'mail',
+          'LDAP_NAME_ATTRIBUTE': 'givenName',
+          'LDAP_UUID_ATTRIBUTE': 'uid',
+          'LDAP_UUID_ATTRIBUTE_TYPE': 'text',
+          'LDAP_FILTER': "(objectClass=posixaccount)"
+        },
+        'volumes': [
+          {
+            'name': 'config',
+            'path': '/srv/config',
+          },
+        ]
+      },
+      {
+        'name': 'phoenix',
+        'image': 'owncloud/ocis-phoenix',
+        'pull': 'always',
+        'detach': True,
+        'environment': {
+            'PHOENIX_WEB_CONFIG': '/srv/config/drone/config.json',
+            # 'PHOENIX_ASSET_PATH': '/var/www/owncloud/phoenix/dist',
+            'PHOENIX_OIDC_CLIENT_ID': 'phoenix'
+        },
+        'volumes': [
+          {
+            'name': 'config',
+            'path': '/srv/config',
+          },
+        ]
+      },
+      {
         'name': 'reva-server',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
@@ -142,7 +204,8 @@ def testing(ctx):
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
+          'REVA_OIDC_ISSUER': 'https://konnectd:9130',
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
@@ -164,31 +227,70 @@ def testing(ctx):
           },
         ]
       },
+      # {
+      #   'name': 'acceptance-tests',
+      #   'image': 'owncloudci/php:7.2',
+      #   'pull': 'always',
+      #   'environment' : {
+      #     'TEST_SERVER_URL': 'http://reva-server:9140',
+      #     'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+      #     'REVA_LDAP_HOSTNAME':'ldap',
+      #     'TEST_EXTERNAL_USER_BACKENDS':'true',
+      #     'TEST_OCIS':'true',
+      #     'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/'
+      #    },
+      #    'commands': [
+      #      'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+      #      'cd /srv/app/testrunner',
+      #      'make test-acceptance-api'
+      #     ],
+      #     'volumes': [
+      #       {
+      #         'name': 'gopath',
+      #         'path': '/srv/app',
+      #       },
+      #     ]
+      # },
       {
-        'name': 'acceptance-tests',
-        'image': 'owncloudci/php:7.2',
+        'name': 'ui-tests',
+        'image': 'owncloudci/nodejs:11',
         'pull': 'always',
         'environment' : {
-          'TEST_SERVER_URL': 'http://reva-server:9140',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'REVA_LDAP_HOSTNAME':'ldap',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'TEST_OCIS':'true',
+          'SERVER_HOST': 'http://phoenix:9100',
+          'BACKEND_HOST': 'http://reva-server:9140',
+          'SELENIUM_PORT': '4444',
+          'RUN_ON_OCIS': 'true',
+          'OCIS_SKELETON_DIR': '/srv/app/testingapp/data/webUISkeleton',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
-          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton'
-         },
-         'commands': [
-           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-           'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
-           'cd /srv/app/testrunner',
-           'make test-acceptance-api'
-          ],
-          'volumes': [
-            {
-              'name': 'gopath',
-              'path': '/srv/app',
-            },
-          ]
+          'LDAP_SERVER_URL': 'ldap://ldap',
+          'PHOENIX_CONFIG': '/srv/config/drone/config.json',
+          'TEST_CONTEXT': '',
+          'LOCAL_UPLOAD_DIR': '/uploads',
+        },
+        'commands': [
+          'ls -la /srv/config/drone',
+          'git clone https://github.com/owncloud/testing.git /srv/app/testingapp',
+          'git clone -b master --depth=1 https://github.com/owncloud/phoenix.git /srv/app/uitestrunner',
+          'cd /srv/app/uitestrunner',
+          'yarn install --all',
+          'yarn run acceptance-tests-drone'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+          {
+            'name': 'config',
+            'path': '/srv/config',
+          },
+          {
+            'name': 'uploads',
+            'path': '/srv/app/phoenix/tests/acceptance/uitestrunner',
+          },
+        ]
       },
       {
         'name': 'import-litmus-users',
@@ -230,6 +332,15 @@ def testing(ctx):
          },
       },
       {
+        'name': 'selenium',
+        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+        'pull': 'always',
+        'volumes': [{
+          'name': 'uploads',
+          'path': '/uploads'
+        }],
+      },
+      {
         'name': 'redis',
         'image': 'webhippie/redis',
         'pull': 'always',
@@ -241,6 +352,14 @@ def testing(ctx):
     'volumes': [
       {
         'name': 'gopath',
+        'temp': {},
+      },
+      {
+        'name': 'config',
+        'temp': {},
+      },
+      {
+        'name': 'uploads',
         'temp': {},
       },
     ],
