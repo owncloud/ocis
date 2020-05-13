@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). FIle up and download needs proper configuration of the dataprovider to also use eos.
+Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). File up and download needs proper configuration of the dataprovider to also use eos.
 
 ## How to do it
 
@@ -39,9 +39,9 @@ We poured the nitty gritty details of setting up ocis into Makefile targets. Aft
 $ make eos-start
 ```
 
-the eos related docker containers will be created, started and setup to authenticate a gainst the ocis-glauth service.
+the eos related docker containers will be created, started and setup to authenticate against the ocis-glauth service.
 
-It will also copy the ocis binary tho the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
+It will also copy the ocis binary to the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
 
 For details have a look at the `Makefile`.
 
