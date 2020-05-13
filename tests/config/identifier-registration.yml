@@ -11,6 +11,6 @@ clients:
       - http://phoenix:9100/oidc-callback.html
       - http://phoenix:9100/
     origins:
-      -  http://phoenix:9100
+      - http://phoenix:9100
 
 authorities:
