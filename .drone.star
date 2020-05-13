@@ -210,7 +210,7 @@ def testing(ctx):
           'LITMUS_URL': 'http://reva-server:9140/remote.php/webdav',
           'LITMUS_USERNAME': 'tu1',
           'LITMUS_PASSWORD': '1234',
-          'TESTS': 'basic http'
+          'TESTS': 'basic http copymove'
          },
       },
     ],
