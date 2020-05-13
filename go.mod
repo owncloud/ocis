@@ -28,11 +28,13 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
+	github.com/stretchr/testify v1.4.0
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tredoe/osutil v1.0.5
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/protobuf v1.25.0
+	gopkg.in/go-playground/assert.v1 v1.2.1
 	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
 
