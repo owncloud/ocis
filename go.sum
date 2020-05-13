@@ -80,6 +80,7 @@ github.com/aws/aws-sdk-go v1.30.12/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZve
 github.com/aws/aws-sdk-go v1.30.21 h1:19EO1Jr80+jLwJyITzH8c79C/6EwY5mMyasqDbBiCuc=
 github.com/aws/aws-sdk-go v1.30.21/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.30.22/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.30.25/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f/go.mod h1:AuiFmCCPBSrqvVMvuqFuk0qogytodnVFVSN5CeJB8Gc=
 github.com/beevik/ntp v0.2.0/go.mod h1:hIHWr+l3+/clUnF44zdK+CWW7fO8dR5cIylAQ76NRpg=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -156,6 +157,8 @@ github.com/cs3org/reva v0.1.1-0.20200506094053-4da63dd518a5 h1:hvrRJsQ89TP7y1Yq+
 github.com/cs3org/reva v0.1.1-0.20200506094053-4da63dd518a5/go.mod h1:BOxqZjt8eyD0S+w5yXXAPhqJptno3f3HmslCL7/CacI=
 github.com/cs3org/reva v0.1.1-0.20200507093219-c853e65a5c10 h1:hSwIn8HT6Y0HW7eOAR5XXvo+169bYyK+fQ+8StNjz8k=
 github.com/cs3org/reva v0.1.1-0.20200507093219-c853e65a5c10/go.mod h1:8CEZ2Vg0IQQEF/4rHe4l1KYsNYB9TehC79l5cFdY/zo=
+github.com/cs3org/reva v0.1.1-0.20200512135421-3aa67e818a8d h1:lDNY2AnYNY2RLlKebaeHBsqfepXvg8k5ntYvEZ/zjxA=
+github.com/cs3org/reva v0.1.1-0.20200512135421-3aa67e818a8d/go.mod h1:YIgUciBl5fg6xhV+ZPWkfWlc5H4wjXg/8+ngIYPzvKI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
