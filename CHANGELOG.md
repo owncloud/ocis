@@ -6,26 +6,30 @@ The following sections list the changes in ocis-reva unreleased.
 
 ## Summary
 
-* Enhancement - Update reva to v0.1.1-0.20200507093219: [#161](https://github.com/owncloud/ocis-reva/pull/161)
+* Enhancement - Update reva to v0.1.1-0.20200512135421: [#161](https://github.com/owncloud/ocis-reva/pull/161)
 
 ## Details
 
-* Enhancement - Update reva to v0.1.1-0.20200507093219: [#161](https://github.com/owncloud/ocis-reva/pull/161)
+* Enhancement - Update reva to v0.1.1-0.20200512135421: [#161](https://github.com/owncloud/ocis-reva/pull/161)
 
-   - Update reva to v0.1.1-0.20200507093219 (#161, #180) - Disable chunking v1 by default
-   (reva/#678) - Implement ocs to http status code mapping (#26, reva/#696, reva/#707,
-   reva/#711) - Handle the case if directory already exists (reva/#695) - Added TUS upload
-   support (reva/#674, reva/#725, reva/#717) - Always return file sizes in Webdav PROPFIND
-   (reva/#712) - Use default mime type when none was detected (reva/#713) - Fixed Webdav shallow
-   COPY (reva/#714) - Fixed arbitrary namespace usage for custom properties in PROPFIND (#57,
-   reva/#720) - Implement returning Webdav custom properties from xattr (#57, reva/#721) -
-   Minor fix in OCM share pkg (reva/#718)
+   - Update reva to v0.1.1-0.20200507093219 (#161, #180, #192) - Fixed regression when
+   uploading empty files to OCFS or EOS with PUT and TUS (#188, reva/#734) - On delete move the file
+   versions to the trashbin (#94, reva/#731) - Fix OCFS move operation (#182, reva/#729) - Fix
+   OCFS custom property / xattr removal (reva/#728) - Retry trashbin in case of timestamp
+   collision (reva/#730) - Disable chunking v1 by default (reva/#678) - Implement ocs to http
+   status code mapping (#26, reva/#696, reva/#707, reva/#711) - Handle the case if directory
+   already exists (reva/#695) - Added TUS upload support (reva/#674, reva/#725, reva/#717) -
+   Always return file sizes in Webdav PROPFIND (reva/#712) - Use default mime type when none was
+   detected (reva/#713) - Fixed Webdav shallow COPY (reva/#714) - Fixed arbitrary namespace
+   usage for custom properties in PROPFIND (#57, reva/#720) - Implement returning Webdav custom
+   properties from xattr (#57, reva/#721) - Minor fix in OCM share pkg (reva/#718)
 
    https://github.com/owncloud/ocis-reva/issues/26
    https://github.com/owncloud/ocis-reva/issues/67
    https://github.com/owncloud/ocis-reva/issues/57
    https://github.com/owncloud/ocis-reva/pull/161
    https://github.com/owncloud/ocis-reva/pull/180
+   https://github.com/owncloud/ocis-reva/pull/192
    https://github.com/cs3org/reva/pull/678
    https://github.com/cs3org/reva/pull/696
    https://github.com/cs3org/reva/pull/707
@@ -38,6 +42,14 @@ The following sections list the changes in ocis-reva unreleased.
    https://github.com/cs3org/reva/pull/713
    https://github.com/cs3org/reva/pull/720
    https://github.com/cs3org/reva/pull/718
+   https://github.com/cs3org/reva/pull/731
+   https://github.com/cs3org/reva/pull/734
+   https://github.com/cs3org/reva/pull/729
+   https://github.com/cs3org/reva/pull/728
+   https://github.com/cs3org/reva/pull/730
+   https://github.com/owncloud/ocis-reva/issue/94
+   https://github.com/owncloud/ocis-reva/issue/188
+   https://github.com/owncloud/ocis-reva/issue/182
 
 # Changelog for [0.2.1] (2020-04-28)
 
