@@ -3,6 +3,7 @@
 ## Summary
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
+* Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
@@ -20,6 +21,12 @@
    Added the thumbnails command so that the thumbnails service can get started via ocis.
 
    https://github.com/owncloud/ocis/issues/156
+
+
+* Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
+
+   https://github.com/owncloud/ocis/pull/249
+   https://github.com/owncloud/ocis-migration
 
 
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
