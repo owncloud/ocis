@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). FIle up and download needs proper configuration of the dataprovider to also use eos.
+Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). File up and download needs proper configuration of the dataprovider to also use eos.
 
 ## How to do it
 
@@ -29,15 +29,19 @@ $ cd ocis
 
 ### Run it!
 
-We poured the nitty gritty details of setting up ocis into Makefile destinations. After running
+Preconditions
+* `go` (from golang.org/dl) and `gcc` (via e.g. `apt install build-essential`) are installed
+* No eos components are running. If in doubt, begin with `make eos-stop`
+
+We poured the nitty gritty details of setting up ocis into Makefile targets. After running
 
 ```
 $ make eos-start
 ```
 
-the eos related docker containers will be created, started and setup to authenticate a gainst the ocis-glauth service.
+the eos related docker containers will be created, started and setup to authenticate against the ocis-glauth service.
 
-It will also copy the ocis binary tho the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
+It will also copy the ocis binary to the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
 
 For details have a look at the `Makefile`.
 
@@ -53,15 +57,15 @@ If you encounter an error when the IdP redirects you back to phoenix, just reloa
 Create a folder in the ui. Then check it was created in eos:
 
 ```
-$ docker exec -it eos-mgm1 eos ls /eos/dockertest/einstein
+$ docker exec -it eos-mgm1 eos ls -l /eos/dockertest/reva/users/e/einstein
 ```
 
 Now create a new folder in eos (using eos-mgm1 you will be logged in as admin, see the `whoami`, which is why we `chown` the folder to the uid and gid of einstein afterwards):
 
 ```
 $ docker exec -it eos-mgm1 eos whoami
-$ docker exec -it eos-mgm1 eos mkdir /eos/dockertest/einstein/rocks
-$ docker exec -it eos-mgm1 eos chown 20000:30000 /eos/dockertest/einstein/rocks
+$ docker exec -it eos-mgm1 eos mkdir /eos/dockertest/reva/users/e/einstein/rocks
+$ docker exec -it eos-mgm1 eos chown 20000:30000 /eos/dockertest/reva/users/e/einstein/rocks
 ```
 
 Check that the folder exists in the web ui.
