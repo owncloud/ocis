@@ -1,6 +1,5 @@
 import {
   ListSettingsBundles,
-  ListSettingsValues,
   SaveSettingsValue
 } from '../client/settings'
 import axios from 'axios'
@@ -8,8 +7,7 @@ import axios from 'axios'
 const state = {
   config: null,
   initialized: false,
-  settingsBundles: {},
-  settingsValues: {}
+  settingsBundles: {}
 }
 
 const getters = {
@@ -25,14 +23,6 @@ const getters = {
       })
     }
     return []
-  },
-  getSettingsValueByIdentifier: state => ({ extension, bundleKey, settingKey }) => {
-    if (state.settingsValues.has(extension) &&
-      state.settingsValues.get(extension).has(bundleKey) &&
-      state.settingsValues.get(extension).get(bundleKey).has(settingKey)) {
-      return state.settingsValues.get(extension).get(bundleKey).get(settingKey)
-    }
-    return null
   }
 }
 
@@ -50,14 +40,6 @@ const mutations = {
     })
     state.settingsBundles = map
   },
-  SET_SETTINGS_VALUES (state, settingsValues) {
-    const map = new Map()
-    Array.from(settingsValues).forEach(value => applySettingsValueToMap(value, map))
-    state.settingsValues = map
-  },
-  SET_SETTINGS_VALUE (state, settingsValue) {
-    applySettingsValueToMap(settingsValue, state.settingsValues)
-  },
   LOAD_CONFIG (state, config) {
     state.config = config
   }
@@ -69,10 +51,7 @@ const actions = {
   },
 
   async initialize ({ commit, dispatch }) {
-    await Promise.all([
-      dispatch('fetchSettingsBundles'),
-      dispatch('fetchSettingsValues')
-    ])
+    await dispatch('fetchSettingsBundles')
     commit('SET_INITIALIZED', true)
   },
 
@@ -116,32 +95,6 @@ const actions = {
     }
   },
 
-  async fetchSettingsValues ({ commit, dispatch, getters, rootGetters }) {
-    injectAuthToken(rootGetters)
-    const response = await ListSettingsValues({
-      $domain: getters.config.url,
-      body: {
-        identifier: {
-          account_uuid: 'me'
-        }
-      }
-    })
-    if (response.status === 201) {
-      const settingsValues = response.data.settingsValues
-      if (settingsValues) {
-        commit('SET_SETTINGS_VALUES', settingsValues)
-      } else {
-        commit('SET_SETTINGS_VALUES', [])
-      }
-    } else {
-      dispatch('showMessage', {
-        title: 'Failed to fetch settings values.',
-        desc: response.statusText,
-        status: 'danger'
-      }, { root: true })
-    }
-  },
-
   async saveSettingsValue ({ commit, dispatch, getters, rootGetters }, payload) {
     injectAuthToken(rootGetters)
     const response = await SaveSettingsValue({
@@ -152,7 +105,7 @@ const actions = {
     })
     if (response.status === 201) {
       if (response.data.settingsValue) {
-        commit('SET_SETTINGS_VALUE', response.data.settingsValue)
+        commit('SET_SETTINGS_VALUE', response.data.settingsValue, { root: true })
       }
     } else {
       dispatch('showMessage', {
@@ -170,17 +123,6 @@ export default {
   getters,
   actions,
   mutations
-}
-
-function applySettingsValueToMap (settingsValue, map) {
-  if (!map.has(settingsValue.identifier.extension)) {
-    map.set(settingsValue.identifier.extension, new Map())
-  }
-  if (!map.get(settingsValue.identifier.extension).has(settingsValue.identifier.bundleKey)) {
-    map.get(settingsValue.identifier.extension).set(settingsValue.identifier.bundleKey, new Map())
-  }
-  map.get(settingsValue.identifier.extension).get(settingsValue.identifier.bundleKey).set(settingsValue.identifier.settingKey, settingsValue)
-  return map
 }
 
 function injectAuthToken (rootGetters) {

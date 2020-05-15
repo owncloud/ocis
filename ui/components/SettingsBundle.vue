@@ -4,17 +4,19 @@
       <translate>{{ bundle.displayName }}</translate>
     </div>
     <oc-grid gutter="small">
-      <div class="uk-width-1-1" v-for="setting in bundle.settings" :key="getElementId(bundle, setting)">
-        <label class="oc-label" :for="getElementId(bundle, setting)">{{ setting.displayName }}</label>
-        <div class="uk-position-relative"
-             :is="getSettingComponent(setting)"
-             :id="getElementId(bundle, setting)"
-             :bundle="bundle"
-             :setting="setting"
-             :persisted-value="getSettingsValue(bundle, setting)"
-             @onSave="onSaveSettingsValue"
-        />
-      </div>
+      <template>
+        <div class="uk-width-1-1" v-for="setting in bundle.settings" :key="getElementId(bundle, setting)">
+          <label class="oc-label" :for="getElementId(bundle, setting)">{{ setting.displayName }}</label>
+          <div class="uk-position-relative"
+               :is="getSettingComponent(setting)"
+               :id="getElementId(bundle, setting)"
+               :bundle="bundle"
+               :setting="setting"
+               :persisted-value="getSettingsValue(bundle, setting)"
+               @onSave="onSaveSettingsValue"
+          />
+        </div>
+      </template>
     </oc-grid>
   </div>
 </template>
@@ -36,7 +38,7 @@ export default {
       required: true
     }
   },
-  computed: mapGetters('Settings', ['getSettingsValueByIdentifier']),
+  computed: mapGetters(['getSettingsValueByIdentifier']),
   methods: {
     ...mapActions('Settings', ['saveSettingsValue']),
     getElementId (bundle, setting) {

@@ -16,12 +16,20 @@
           </div>
           <hr />
         </template>
-        <settings-bundle
-          v-for="bundle in selectedSettingsBundles"
-          :key="'bundle-' + bundle.identifier.bundleKey"
-          :bundle="bundle"
-          class="uk-margin-top"
-        />
+        <template v-if="settingsValuesLoaded">
+          <settings-bundle
+            v-for="bundle in selectedSettingsBundles"
+            :key="'bundle-' + bundle.identifier.bundleKey"
+            :bundle="bundle"
+            class="uk-margin-top"
+          />
+        </template>
+        <div class="uk-margin-top" v-else>
+          <oc-loader :aria-label="$gettext('Loading settings values')" />
+          <oc-alert :aria-hidden="true" varition="primary" no-close>
+            <p v-translate>Loading settings values...</p>
+          </oc-alert>
+        </div>
       </template>
     </div>
     <oc-loader v-else />
@@ -41,6 +49,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['settingsValuesLoaded']),
     ...mapGetters('Settings', [
       'extensions',
       'initialized',
