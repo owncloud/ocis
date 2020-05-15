@@ -176,7 +176,15 @@ func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
 								{
 									Value: &settings.ListOptionValue{
 										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "de_DE",
+											StringValue: "cs",
+										},
+									},
+									DisplayValue: "Czech",
+								},
+								{
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "de",
 										},
 									},
 									DisplayValue: "Deutsch",
@@ -184,10 +192,42 @@ func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
 								{
 									Value: &settings.ListOptionValue{
 										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "en_EN",
+											StringValue: "en",
 										},
 									},
 									DisplayValue: "English",
+								},
+								{
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "es",
+										},
+									},
+									DisplayValue: "Español",
+								},
+								{
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "fr",
+										},
+									},
+									DisplayValue: "Français",
+								},
+								{
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "gl",
+										},
+									},
+									DisplayValue: "Galego",
+								},
+								{
+									Value: &settings.ListOptionValue{
+										Option: &settings.ListOptionValue_StringValue{
+											StringValue: "it",
+										},
+									},
+									DisplayValue: "Italiano",
 								},
 							},
 						},
