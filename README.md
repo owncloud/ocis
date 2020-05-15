@@ -9,6 +9,8 @@
 
 **This project is under heavy development, it's not in a working state yet!**
 
+Trigger CI
+
 ## Install
 
 You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/ocis/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis/)
