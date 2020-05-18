@@ -1,6 +1,8 @@
 import {
-  ListSettingsBundles,
-  SaveSettingsValue
+  // eslint-disable-next-line camelcase
+  BundleService_ListSettingsBundles,
+  // eslint-disable-next-line camelcase
+  ValueService_SaveSettingsValue
 } from '../client/settings'
 import axios from 'axios'
 
@@ -57,7 +59,7 @@ const actions = {
 
   async fetchSettingsBundles ({ commit, dispatch, getters, rootGetters }) {
     injectAuthToken(rootGetters)
-    const response = await ListSettingsBundles({
+    const response = await BundleService_ListSettingsBundles({
       $domain: getters.config.url,
       body: {}
     })
@@ -97,7 +99,7 @@ const actions = {
 
   async saveSettingsValue ({ commit, dispatch, getters, rootGetters }, payload) {
     injectAuthToken(rootGetters)
-    const response = await SaveSettingsValue({
+    const response = await ValueService_SaveSettingsValue({
       $domain: getters.config.url,
       body: {
         settingsValue: payload
