@@ -40,7 +40,7 @@ func NewService(opts ...Option) grpc.Service {
 		thumbnail = svc.NewLogging(thumbnail, options.Logger)
 	}
 
-	proto.RegisterThumbnailServiceHandler(
+	_ = proto.RegisterThumbnailServiceHandler(
 		service.Server(),
 		thumbnail,
 	)

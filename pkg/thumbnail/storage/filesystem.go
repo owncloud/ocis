@@ -27,7 +27,8 @@ type FileSystem struct {
 
 // Get loads the image from the file system.
 func (s FileSystem) Get(key string) []byte {
-	content, err := ioutil.ReadFile(filepath.Join(s.dir, key))
+	path := filepath.Join(s.dir, key)
+	content, err := ioutil.ReadFile(filepath.Clean(path))
 	if err != nil {
 		s.logger.Warn().Err(err).Msgf("could not read file %s", key)
 		return nil
@@ -48,7 +49,11 @@ func (s FileSystem) Set(key string, img []byte) error {
 	if err != nil {
 		return fmt.Errorf("could not create file \"%s\" error: %s", key, err.Error())
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			s.logger.Warn().Err(err).Msg("closing file resulted in an error")
+		}
+	}()
 	_, err = f.Write(img)
 	if err != nil {
 		return fmt.Errorf("could not write to file \"%s\" error: %s", key, err.Error())
