@@ -6,9 +6,18 @@ The following sections list the changes in ocis-thumbnails unreleased.
 
 ## Summary
 
+* Change - Add more default resolutions: [#23](https://github.com/owncloud/ocis-thumbnails/issues/23)
 * Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
 
 ## Details
+
+* Change - Add more default resolutions: [#23](https://github.com/owncloud/ocis-thumbnails/issues/23)
+
+   The `ocis-thumbnails` service was also used by the mediaviewer but the returned images were
+   too small since the highest resolution was 128x128 pixels.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/23
+
 
 * Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
 
