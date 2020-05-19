@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 
-	"github.com/micro/go-micro/v2"
 	"github.com/owncloud/ocis-accounts/pkg/account"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis-pkg/v2/log"
+	mclient "github.com/micro/go-micro/v2/client"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -73,19 +73,17 @@ func (s Service) Search(ctx context.Context, in *proto.Query, res *proto.Records
 
 // RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
 func RegisterSettingsBundles(l *olog.Logger) {
-	// TODO it's ok if this fails. But show a warning that the settings service is not reachable. Make sure that init doesn't die if the settings service is not reachable.
-	svc := micro.NewService()
-	svc.Init()
-	service := settings.NewBundleService("com.owncloud.api.settings", svc.Client()) // TODO fetch service name instead of hardcoding it.
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)
 
-	// TODO avoid hardcoding these values, perhaps load them from a file and using jsonpb's type Marshal.
 	requests := []settings.SaveSettingsBundleRequest{
 		generateSettingsBundleProfileRequest(),
 		generateSettingsBundleNotificationsRequest(),
 	}
 
-	for _, request := range requests {
-		res, err := service.SaveSettingsBundle(context.Background(), &request)
+	for i := range requests {
+		res, err := service.SaveSettingsBundle(context.Background(), &requests[i])
 		if err != nil {
 			l.Err(err).
 				Msg("Error registering settings bundle")
@@ -94,207 +92,5 @@ func RegisterSettingsBundles(l *olog.Logger) {
 				Str("bundle key", res.SettingsBundle.Identifier.BundleKey).
 				Msg("Successfully registered settings bundle")
 		}
-	}
-}
-
-func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
-	return settings.SaveSettingsBundleRequest{
-		SettingsBundle: &settings.SettingsBundle{
-			Identifier: &settings.Identifier{
-				Extension: "ocis-accounts",
-				BundleKey: "profile",
-			},
-			DisplayName: "Profile",
-			Settings: []*settings.Setting{
-				{
-					SettingKey:  "firstname",
-					DisplayName: "Firstname",
-					Description: "Input for firstname",
-					Value: &settings.Setting_StringValue{
-						StringValue: &settings.StringSetting{
-							Placeholder: "Set firstname",
-						},
-					},
-				},
-				{
-					SettingKey:  "lastname",
-					DisplayName: "Lastname",
-					Description: "Input for lastname",
-					Value: &settings.Setting_StringValue{
-						StringValue: &settings.StringSetting{
-							Placeholder: "Set lastname",
-						},
-					},
-				},
-				{
-					SettingKey:  "age",
-					DisplayName: "Age",
-					Description: "Input for age",
-					Value: &settings.Setting_IntValue{
-						IntValue: &settings.IntSetting{
-							Placeholder: "Set age",
-							Min:         16,
-							Max:         200,
-							Step:        2,
-						},
-					},
-				},
-				{
-					SettingKey:  "timezone",
-					DisplayName: "Timezone",
-					Description: "User timezone",
-					Value: &settings.Setting_SingleChoiceValue{
-						SingleChoiceValue: &settings.SingleChoiceListSetting{
-							Options: []*settings.ListOption{
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "Europe/Berlin",
-										},
-									},
-									DisplayValue: "Europe/Berlin",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "Asia/Kathmandu",
-										},
-									},
-									DisplayValue: "Asia/Kathmandu",
-								},
-							},
-						},
-					},
-				},
-				{
-					SettingKey:  "language",
-					DisplayName: "Language",
-					Description: "User language",
-					Value: &settings.Setting_SingleChoiceValue{
-						SingleChoiceValue: &settings.SingleChoiceListSetting{
-							Options: []*settings.ListOption{
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "cs",
-										},
-									},
-									DisplayValue: "Czech",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "de",
-										},
-									},
-									DisplayValue: "Deutsch",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "en",
-										},
-									},
-									DisplayValue: "English",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "es",
-										},
-									},
-									DisplayValue: "Español",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "fr",
-										},
-									},
-									DisplayValue: "Français",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "gl",
-										},
-									},
-									DisplayValue: "Galego",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "it",
-										},
-									},
-									DisplayValue: "Italiano",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func generateSettingsBundleNotificationsRequest() settings.SaveSettingsBundleRequest {
-	return settings.SaveSettingsBundleRequest{
-		SettingsBundle: &settings.SettingsBundle{
-			Identifier: &settings.Identifier{
-				Extension: "ocis-accounts",
-				BundleKey: "notifications",
-			},
-			DisplayName: "Notifications",
-			Settings: []*settings.Setting{
-				{
-					SettingKey:  "email",
-					DisplayName: "Email",
-					Value: &settings.Setting_BoolValue{
-						BoolValue: &settings.BoolSetting{
-							Default: false,
-							Label:   "Send via email",
-						},
-					},
-				},
-				{
-					SettingKey:  "stream",
-					DisplayName: "Stream",
-					Value: &settings.Setting_BoolValue{
-						BoolValue: &settings.BoolSetting{
-							Default: true,
-							Label:   "Show in stream",
-						},
-					},
-				},
-				{
-					SettingKey:  "transport",
-					DisplayName: "Transport",
-					Value: &settings.Setting_MultiChoiceValue{
-						MultiChoiceValue: &settings.MultiChoiceListSetting{
-							Options: []*settings.ListOption{
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "email",
-										},
-									},
-									DisplayValue: "Send via email",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "stream",
-										},
-									},
-									DisplayValue: "Show in stream",
-									Default:      true,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
 	}
 }
