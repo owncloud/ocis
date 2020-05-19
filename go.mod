@@ -11,6 +11,7 @@ require (
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
@@ -30,6 +31,7 @@ require (
 	github.com/owncloud/ocis-reva v0.2.2-0.20200513073117-ee9cd9b8d3ab
 	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
 	github.com/owncloud/ocis-webdav v0.1.0
+	github.com/refs/pman v0.0.0-20200518220537-f6667770d0e9
 	github.com/restic/calens v0.2.0
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.5.1 // indirect

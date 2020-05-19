@@ -19,10 +19,7 @@ func Command(app *cli.App) *cli.Command {
 				MicroRuntime(cmd.DefaultCmd.Options().Runtime),
 			)
 
-			{
-				runtime.Start()
-				runtime.Trap()
-			}
+			runtime.Start()
 
 			return nil
 		},

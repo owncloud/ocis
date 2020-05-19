@@ -43,7 +43,6 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			runtime.Start()
-			runtime.Trap()
 
 			return nil
 		},

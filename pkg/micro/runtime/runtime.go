@@ -1,9 +1,13 @@
 package runtime
 
 import (
+	"fmt"
+	golog "log"
+	"net/rpc"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/micro/cli/v2"
 	gorun "github.com/micro/go-micro/v2/runtime"
@@ -13,6 +17,9 @@ import (
 	"github.com/micro/micro/v2/runtime"
 	"github.com/micro/micro/v2/web"
 	"github.com/owncloud/ocis-pkg/v2/log"
+
+	"github.com/refs/pman/pkg/process"
+	"github.com/refs/pman/pkg/service"
 )
 
 var (
@@ -21,16 +28,13 @@ var (
 
 	// MicroServices to start as part of the fullstack option
 	MicroServices = []string{
-		"api", // :8080
-		// "proxy",    // :8081
+		"api",      // :8080
 		"web",      // :8082
 		"registry", // :8000
-		// "runtime",  // :8088 (future proof. We want to be able to control extensions through a runtime)
 	}
 
 	// Extensions are ocis extension services
 	Extensions = []string{
-		// "hello",
 		"phoenix",
 		"graph",
 		"graph-explorer",
@@ -52,7 +56,7 @@ var (
 		"accounts",
 		"glauth",
 		"konnectd",
-		"proxy", // TODO rename this command. It collides with micro's `proxy`
+		"proxy",
 		"thumbnails",
 	}
 )
@@ -111,22 +115,33 @@ func (r Runtime) Trap() {
 	os.Exit(0)
 }
 
-// Start starts preconfigured services
+// Start rpc runtime
 func (r *Runtime) Start() {
-	env := os.Environ()
+	go r.Launch()
+	service.Start()
+}
 
-	for _, s := range r.services {
-		args := []string{os.Args[0]}
+// Launch ocis Extensions
+func (r *Runtime) Launch() {
+	client, err := rpc.DialHTTP("tcp", "localhost:10666")
+	if err != nil {
+		// ensure the rpc service is running before attempting to start any extension
+		fmt.Println("rpc service not available, retrying in 1 second...")
+		time.Sleep(1 * time.Second)
+		r.Launch()
+	}
 
-		args = append(args, s.Name)
-		gorunArgs := []gorun.CreateOption{
-			gorun.WithCommand(args...),
-			gorun.WithEnv(env),
-			gorun.WithOutput(os.Stdout),
+	// loop over extensions starting them
+	for i := range Extensions {
+		arg0 := process.NewProcEntry(
+			Extensions[i],
+			[]string{Extensions[i]}...,
+		)
+		var arg1 int
+
+		if err := client.Call("Service.Start", arg0, &arg1); err != nil {
+			golog.Fatal(err)
 		}
-
-		go (*r.R).Create(s, gorunArgs...)
-		// args = args[:len(args)-1]
 	}
 }
 

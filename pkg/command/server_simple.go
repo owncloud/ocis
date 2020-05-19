@@ -52,10 +52,7 @@ func Simple(cfg *config.Config) *cli.Command {
 				runtime.Context(c),
 			)
 
-			{
-				runtime.Start()
-				runtime.Trap()
-			}
+			runtime.Start()
 
 			return nil
 		},
