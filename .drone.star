@@ -434,18 +434,44 @@ def uiTests(ctx):
         ]
       },
       {
+        'name': 'clone-build-phoenix',
+        'image': 'owncloudci/nodejs:10',
+        'pull': 'always',
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/phoenix.git /srv/app/uitestrunner',
+          'cd /srv/app/uitestrunner',
+          'yarn install --all',
+          'yarn dist',
+        ],
+        'volumes': [
+          {
+            'name': 'config',
+            'path': '/srv/config',
+          },
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
         'name': 'phoenix',
         'image': 'owncloud/ocis-phoenix',
         'pull': 'always',
         'detach': True,
         'environment': {
-            'PHOENIX_WEB_CONFIG': '/srv/config/drone/config.json',
-            'PHOENIX_OIDC_CLIENT_ID': 'phoenix'
+          'PHOENIX_WEB_CONFIG': '/srv/config/drone/config.json',
+          'PHOENIX_OIDC_CLIENT_ID': 'phoenix',
+          'PHOENIX_ASSET_PATH': '/srv/app/uitestrunner/dist'
         },
         'volumes': [
           {
             'name': 'config',
             'path': '/srv/config',
+          },
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
           },
         ]
       },
@@ -509,9 +535,7 @@ def uiTests(ctx):
         'commands': [
           'ls -la /srv/config/drone',
           'git clone https://github.com/owncloud/testing.git /srv/app/testingapp',
-          'git clone -b master --depth=1 https://github.com/owncloud/phoenix.git /srv/app/uitestrunner',
           'cd /srv/app/uitestrunner',
-          'yarn install --all',
           'yarn run acceptance-tests-drone'
         ],
         'volumes': [
