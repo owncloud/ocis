@@ -63,6 +63,8 @@ def apiTests(ctx):
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
+          'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
         },
@@ -269,6 +271,8 @@ def testing(ctx):
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
+          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
           'REVA_OIDC_ISSUER': 'https://konnectd:9130',
@@ -440,6 +444,8 @@ def uiTests(ctx):
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/phoenix.git /srv/app/uitestrunner',
           'cd /srv/app/uitestrunner',
+          'mkdir -p filesForUpload',
+          'cp -r tests/acceptance/filesForUpload/* /filesForUpload/',
           'yarn install --all',
           'yarn dist',
         ],
@@ -447,6 +453,10 @@ def uiTests(ctx):
           {
             'name': 'config',
             'path': '/srv/config',
+          },
+          {
+            'name': 'uploads',
+            'path': '/filesForUpload',
           },
           {
             'name': 'gopath',
@@ -490,9 +500,15 @@ def uiTests(ctx):
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
           'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
+          'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
           'REVA_OIDC_ISSUER': 'https://konnectd:9130',
+          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
+          'REVA_USERS_DRIVER': 'ldap',
+          'REVA_STORAGE_HOME_EXPOSE_DATA_SERVER': '1',
+          'REVA_STORAGE_OC_EXPOSE_DATA_SERVER': '1',
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
