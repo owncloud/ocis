@@ -40,15 +40,15 @@ func New() *Metrics {
 		}, []string{}),
 	}
 
-	prometheus.Register(
+	_ = prometheus.Register(
 		m.Counter,
 	)
 
-	prometheus.Register(
+	_ = prometheus.Register(
 		m.Latency,
 	)
 
-	prometheus.Register(
+	_ = prometheus.Register(
 		m.Duration,
 	)
 

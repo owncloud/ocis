@@ -25,7 +25,7 @@ type FileSystem struct {
 // Get retrieves an image from the filesystem.
 func (s FileSystem) Get(ctx context.Context, file string) (image.Image, error) {
 	imgPath := filepath.Join(s.basePath, file)
-	f, err := os.Open(imgPath)
+	f, err := os.Open(filepath.Clean(imgPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load the file %s from %s error %s", file, imgPath, err.Error())
 	}
