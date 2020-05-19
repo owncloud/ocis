@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-thumbnails unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-thumbnails/compare/v0.1.2...master
+
+## Summary
+
+* Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
+
+## Details
+
+* Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
+
+   Scanning the code using a static code analyzer showed some code smells. This change fixes them.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/21
+
 # Changelog for [0.1.2] (2020-05-11)
 
 The following sections list the changes in ocis-thumbnails 0.1.2.
