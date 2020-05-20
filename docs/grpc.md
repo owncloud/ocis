@@ -1,7 +1,7 @@
 ---
 title: "GRPC API"
 date: 2018-05-02T00:00:00+00:00
-weight: 40
+weight: 50
 geekdocRepo: https://github.com/owncloud/ocis-thumbnails
 geekdocEditPath: edit/master/docs
 geekdocFilePath: grpc.md
