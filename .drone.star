@@ -179,7 +179,7 @@ def testing(ctx):
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
+          'git clone -b moveFile-ocis2 --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
           'cd /srv/app/testrunner',
           'make test-acceptance-api',
         ],
