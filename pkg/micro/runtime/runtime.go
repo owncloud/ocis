@@ -4,19 +4,14 @@ import (
 	"fmt"
 	golog "log"
 	"net/rpc"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/micro/cli/v2"
-	gorun "github.com/micro/go-micro/v2/runtime"
-	"github.com/micro/micro/v2/api"
-	"github.com/micro/micro/v2/proxy"
-	"github.com/micro/micro/v2/registry"
-	"github.com/micro/micro/v2/runtime"
-	"github.com/micro/micro/v2/web"
-	"github.com/owncloud/ocis-pkg/v2/log"
+
+	"github.com/micro/micro/v2/client/api"
+	"github.com/micro/micro/v2/client/proxy"
+	"github.com/micro/micro/v2/client/web"
+	"github.com/micro/micro/v2/service/registry"
 
 	"github.com/refs/pman/pkg/process"
 	"github.com/refs/pman/pkg/service"
@@ -61,81 +56,34 @@ var (
 	}
 )
 
-// Runtime is a wrapper around micro's own runtime
-type Runtime struct {
-	Logger log.Logger
-	R      *gorun.Runtime
-	Ctx    *cli.Context
-
-	services []*gorun.Service
-}
+// Runtime represents an oCIS runtime environment.
+type Runtime struct{}
 
 // New creates a new ocis + micro runtime
-func New(opts ...Option) Runtime {
-	options := newOptions(opts...)
-
-	r := Runtime{
-		Logger: options.Logger,
-		R:      options.MicroRuntime,
-		Ctx:    options.Context,
-	}
-
-	for _, v := range append(MicroServices, Extensions...) {
-		r.services = append(r.services, &gorun.Service{Name: v})
-	}
-
-	return r
-}
-
-// Trap listen and blocks for termination signals
-func (r Runtime) Trap() {
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
-
-	if err := (*r.R).Start(); err != nil {
-		os.Exit(1)
-	}
-
-	for range shutdown {
-		r.Logger.Info().Msg("shutdown signal received")
-		close(shutdown)
-	}
-
-	if err := (*r.R).Stop(); err != nil {
-		r.Logger.Err(err).Msgf("error while shutting down")
-	}
-
-	for _, s := range r.services {
-		r.Logger.Info().Msgf("gracefully stopping service %v", s.Name)
-		if err := (*r.R).Delete(s); err != nil {
-			r.Logger.Err(err).Msgf("error while deleting service: %v", s.Name)
-		}
-	}
-
-	os.Exit(0)
+func New() Runtime {
+	return Runtime{}
 }
 
 // Start rpc runtime
-func (r *Runtime) Start() {
+func (r *Runtime) Start() error {
 	go r.Launch()
-	service.Start()
+	return service.Start()
 }
 
 // Launch ocis Extensions
 func (r *Runtime) Launch() {
 	client, err := rpc.DialHTTP("tcp", "localhost:10666")
 	if err != nil {
-		// ensure the rpc service is running before attempting to start any extension
 		fmt.Println("rpc service not available, retrying in 1 second...")
 		time.Sleep(1 * time.Second)
 		r.Launch()
 	}
 
-	// loop over extensions starting them
-	for i := range Extensions {
+	all := append(Extensions, MicroServices...)
+	for i := range all {
 		arg0 := process.NewProcEntry(
-			Extensions[i],
-			[]string{Extensions[i]}...,
+			all[i],
+			[]string{all[i]}...,
 		)
 		var arg1 int
 
@@ -153,7 +101,6 @@ func AddMicroPlatform(app *cli.App) {
 	app.Commands = append(app.Commands, proxy.Commands()...)
 	app.Commands = append(app.Commands, web.Commands()...)
 	app.Commands = append(app.Commands, registry.Commands()...)
-	app.Commands = append(app.Commands, runtime.Commands()...)
 }
 
 // provide a config.Config with default values?
@@ -172,7 +119,4 @@ func setDefaults() {
 
 	// registry
 	registry.Name = OwncloudNamespace + "registry"
-
-	// runtime
-	runtime.Name = OwncloudNamespace + "runtime"
 }
