@@ -13,7 +13,7 @@ To release a new version of ocis-thumbnails, you have to follow a few simple ste
 
 ## Preperation
 
-1. Create a new branch e.g. `prepare-release-x.x.x` where `x.x.x` is the version you want to release.
+1. Create a new branch e.g. `release-x.x.x` where `x.x.x` is the version you want to release.
 2. Checkout the preparation branch.
 3. Create a new changelog folder and move the unreleased snippets there.
 {{< highlight txt >}}
@@ -39,6 +39,7 @@ git pull
 git tag -s vx.x.x -m "release vx.x.x"
 git push --tags
 {{< / highlight >}}
+3. Wait for CI and check that the GitHub release was published.
 
 
 Congratulations, you just released ocis-thumbnails!
