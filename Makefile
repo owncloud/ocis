@@ -69,10 +69,6 @@ fmt:
 vet:
 	go vet $(PACKAGES)
 
-.PHONY: staticcheck
-staticcheck:
-	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
-
 .PHONY: lint
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
