@@ -3,7 +3,6 @@ package cache
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
 // Entry represents an entry on the cache. You can type assert on V.
@@ -16,7 +15,6 @@ type Entry struct {
 type Cache struct {
 	entries map[string]map[string]Entry
 	size    int
-	ttl     time.Duration // duration of a single entry.
 	m       sync.Mutex
 }
 
@@ -99,8 +97,5 @@ func (c *Cache) Length(k string) int {
 }
 
 func (c *Cache) fits() bool {
-	if c.size < len(c.entries) {
-		return false
-	}
-	return true
+	return c.size >= len(c.entries)
 }

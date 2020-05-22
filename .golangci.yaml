@@ -1,21 +1,18 @@
 issues:
-  # exclude-rules:
-  #   - path: pkg/proto/v0/settings.pb.go
-  #     text: "SA1019:"
-  #     linters:
-  #       - staticcheck
-  #   - path: pkg/store/filesystem/io.go
-  #     text: "SA1019:"
-  #     linters:
-  #       - staticcheck
+  exclude-rules:
+    - path: pkg/middleware/account_uuid.go
+      text: "SA4006:"
+      linters:
+        - staticcheck
+    - path: pkg/proxy/proxy_integration_test.go
+      linters:
+        - bodyclose
 linters:
   enable:
     - bodyclose
     - deadcode
-    - errcheck
     - gosimple
     - govet
-    - ineffassign
     - staticcheck
     - structcheck
     - typecheck
@@ -23,12 +20,14 @@ linters:
     - varcheck
     - depguard
     - golint
-    - goimports
     - unconvert
-    - scopelint
+    # - scopelint
     - maligned
     - misspell
-    # - gocritic
     - prealloc
     #- gosec
 
+  disable:
+    - errcheck
+    - ineffassign
+    - scopelint
