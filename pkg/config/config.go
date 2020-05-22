@@ -11,6 +11,7 @@ import (
 	phoenix "github.com/owncloud/ocis-phoenix/pkg/config"
 	proxy "github.com/owncloud/ocis-proxy/pkg/config"
 	reva "github.com/owncloud/ocis-reva/pkg/config"
+	settings "github.com/owncloud/ocis-settings/pkg/config"
 	thumbnails "github.com/owncloud/ocis-thumbnails/pkg/config"
 	webdav "github.com/owncloud/ocis-webdav/pkg/config"
 )
@@ -71,6 +72,7 @@ type Config struct {
 	Reva          *reva.Config
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
+	Settings      *settings.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -88,5 +90,6 @@ func New() *Config {
 		GLAuth:        glauth.New(),
 		Proxy:         proxy.New(),
 		Thumbnails:    thumbnails.New(),
+		Settings:      settings.New(),
 	}
 }

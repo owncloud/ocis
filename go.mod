@@ -15,7 +15,6 @@ require (
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/lucas-clemente/quic-go v0.15.7 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/micro/cli/v2 v2.1.2
@@ -26,18 +25,19 @@ require (
 	github.com/nats-io/nats.go v1.10.0 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.1
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200522103104-a5d5eac711c1
 	github.com/owncloud/ocis-glauth v0.4.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
 	github.com/owncloud/ocis-konnectd v0.3.1
-	github.com/owncloud/ocis-migration v0.0.0-20200504185909-72274a4f1449
+	github.com/owncloud/ocis-migration v0.1.1-0.20200519133726-4c6b7daff23c
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.6.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
-	github.com/owncloud/ocis-proxy v0.3.1
+	github.com/owncloud/ocis-proxy v0.3.2-0.20200522110058-d7eab502160d
 	github.com/owncloud/ocis-reva v0.2.2-0.20200513073117-ee9cd9b8d3ab
+	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/refs/pman v0.0.0-20200520152433-d1823a649d98

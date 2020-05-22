@@ -30,6 +30,8 @@ var (
 
 	// Extensions are ocis extension services
 	Extensions = []string{
+		"proxy",
+		"settings",
 		"phoenix",
 		"graph",
 		"graph-explorer",
@@ -51,7 +53,6 @@ var (
 		"accounts",
 		"glauth",
 		"konnectd",
-		"proxy",
 		"thumbnails",
 	}
 )
