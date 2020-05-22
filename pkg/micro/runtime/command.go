@@ -12,9 +12,7 @@ func Command(app *cli.App) *cli.Command {
 		Category:    "Micro",
 		Action: func(c *cli.Context) error {
 			runtime := New()
-			runtime.Start()
-
-			return nil
+			return runtime.Start()
 		},
 	}
 	return &command

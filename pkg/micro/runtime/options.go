@@ -15,17 +15,6 @@ type Options struct {
 // Option undocummented
 type Option func(o *Options)
 
-// newOptions initializes the available default options.
-func newOptions(opts ...Option) Options {
-	opt := Options{}
-
-	for _, o := range opts {
-		o(&opt)
-	}
-
-	return opt
-}
-
 // Services option
 func Services(s []string) Option {
 	return func(o *Options) {

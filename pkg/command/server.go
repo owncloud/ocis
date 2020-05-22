@@ -33,9 +33,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			runtime := runtime.New()
-			runtime.Start()
-
-			return nil
+			return runtime.Start()
 		},
 	}
 }
