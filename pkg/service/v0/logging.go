@@ -6,10 +6,8 @@ import (
 
 // NewLogging returns a service that logs messages.
 func NewLogging(next Service, logger log.Logger) Service {
-	return Service{}
-}
-
-type logging struct {
-	next   Service
-	logger log.Logger
+	return Service{
+		manager: next.manager,
+		config:  next.config,
+	}
 }

@@ -13,10 +13,22 @@ var (
 // RegisterFunc stores store constructors
 type RegisterFunc func(*config.Config) Manager
 
-// Manager
+// Manager combines service interfaces for abstraction of storage implementations
 type Manager interface {
-	Read(extension string, key string) (*proto.SettingsBundle, error)
-	Write(bundle *proto.SettingsBundle) (*proto.SettingsBundle, error)
-	ListAll() ([]*proto.SettingsBundle, error)
-	ListByExtension(extension string) ([]*proto.SettingsBundle, error)
+	BundleManager
+	ValueManager
+}
+
+// BundleManager is a bundle service interface for abstraction of storage implementations
+type BundleManager interface {
+	ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, error)
+	WriteBundle(bundle *proto.SettingsBundle) (*proto.SettingsBundle, error)
+	ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundle, error)
+}
+
+// ValueManager is a value service interface for abstraction of storage implementations
+type ValueManager interface {
+	ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error)
+	WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error)
+	ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue, error)
 }

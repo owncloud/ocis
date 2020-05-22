@@ -1,58 +1,152 @@
 syntax = "proto3";
 
 package proto;
-option go_package = "proto";
+option go_package = ".;proto";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "Settings";
+    version: "1.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis-settings";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis-settings/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "http://owncloud.github.io/extensions/ocis_settings/";
+  };
+};
 
 service BundleService {
-  rpc CreateSettingsBundle(CreateSettingsBundleRequest) returns (CreateSettingsBundleResponse);
-  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse);
-  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse);
+  rpc SaveSettingsBundle(SaveSettingsBundleRequest) returns (SaveSettingsBundleResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundle-save",
+      body: "*"
+    };
+  };
+  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundle-get",
+      body: "*"
+    };
+  };
+  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundles-list",
+      body: "*"
+    };
+  };
 }
 
-// requests and responses
-message CreateSettingsBundleRequest {
-  SettingsBundle settingsBundle = 1;
+service ValueService {
+  rpc SaveSettingsValue(SaveSettingsValueRequest) returns (SaveSettingsValueResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/value-save",
+      body: "*"
+    };
+  };
+  rpc GetSettingsValue(GetSettingsValueRequest) returns (GetSettingsValueResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/value-get",
+      body: "*"
+    };
+  };
+  rpc ListSettingsValues(ListSettingsValuesRequest) returns (ListSettingsValuesResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/values-list",
+      body: "*"
+    };
+  };
 }
 
-message CreateSettingsBundleResponse {
-  SettingsBundle settingsBundle = 1;
+// requests and responses for settings bundles
+message SaveSettingsBundleRequest {
+  SettingsBundle settings_bundle = 1;
+}
+
+message SaveSettingsBundleResponse {
+  SettingsBundle settings_bundle = 1;
 }
 
 message GetSettingsBundleRequest {
-  string extension = 1;
-  string key = 2;
+  Identifier identifier = 1;
 }
 
 message GetSettingsBundleResponse {
-  SettingsBundle settingsBundle = 1;
+  SettingsBundle settings_bundle = 1;
 }
 
 message ListSettingsBundlesRequest {
-  string extension = 1;// can be limited to all settings bundles of an extension
+  Identifier identifier = 1;
 }
 
 message ListSettingsBundlesResponse {
-  repeated SettingsBundle settingsBundles = 1;
+  repeated SettingsBundle settings_bundles = 1;
 }
 
-// payloads
-message SettingsBundle {
+// requests and responses for settings values
+message SaveSettingsValueRequest {
+  SettingsValue settings_value = 1;
+}
+
+message SaveSettingsValueResponse {
+  SettingsValue settings_value = 1;
+}
+
+message GetSettingsValueRequest {
+  Identifier identifier = 1;
+}
+
+message GetSettingsValueResponse {
+  SettingsValue settings_value = 1;
+}
+
+message ListSettingsValuesRequest {
+  Identifier identifier = 1;
+}
+
+message ListSettingsValuesResponse {
+  repeated SettingsValue settings_values = 1;
+}
+
+// generic payloads
+message Identifier {
   string extension = 1;
-  string key = 2;
-  string displayName = 3;
-  repeated Setting settings = 4;
+  string bundle_key = 2;
+  string setting_key = 3;
+  string account_uuid = 4;
+}
+
+// payloads for settings bundles
+message SettingsBundle {
+  Identifier identifier = 1;
+  string display_name = 2;
+  repeated Setting settings = 3;
 }
 
 message Setting {
-  string key = 1;
-  string displayName = 2;
+  string setting_key = 1;
+  string display_name = 2;
   string description = 3;
   oneof value {
-    IntSetting intValue = 4;
-    StringSetting stringValue = 5;
-    BoolSetting boolValue = 6;
-    SingleChoiceListSetting singleChoiceValue = 7;
-    MultiChoiceListSetting multiChoiceValue = 8;
+    IntSetting int_value = 4;
+    StringSetting string_value = 5;
+    BoolSetting bool_value = 6;
+    SingleChoiceListSetting single_choice_value = 7;
+    MultiChoiceListSetting multi_choice_value = 8;
   }
 }
 
@@ -67,13 +161,14 @@ message IntSetting {
 message StringSetting {
   string default = 1;
   bool required = 2;
-  int32 minLength = 3;
-  int32 maxLength = 4;
+  int32 min_length = 3;
+  int32 max_length = 4;
   string placeholder = 5;
 }
 
 message BoolSetting {
   bool default = 1;
+  string label = 2;
 }
 
 message SingleChoiceListSetting {
@@ -85,10 +180,34 @@ message MultiChoiceListSetting {
 }
 
 message ListOption {
-  oneof option {
-    string stringValue = 1;
-    int64 intValue = 2;
+  ListOptionValue value = 1;
+  bool default = 2;
+  string display_value = 3;
+}
+
+// payloads for settings values
+message SettingsValue {
+  Identifier identifier = 1;
+  oneof value {
+    bool bool_value = 2;
+    int64 int_value = 3;
+    string string_value = 4;
+    ListValue list_value = 5;
   }
-  bool selected = 3;
-  string displayValue = 4;
+}
+
+message ListValue {
+  repeated ListOptionValue values = 1;
+}
+
+message ListOptionValue {
+  oneof option {
+    string string_value = 1;
+    int64 int_value = 2;
+  }
+}
+
+// only meant for serialization
+message SettingsValues {
+  map<string, SettingsValue> values = 1;
 }

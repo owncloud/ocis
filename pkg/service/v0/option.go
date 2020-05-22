@@ -3,8 +3,8 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-settings/pkg/config"
 )
 
 // Option defines a single option function.
@@ -15,17 +15,6 @@ type Options struct {
 	Logger     log.Logger
 	Config     *config.Config
 	Middleware []func(http.Handler) http.Handler
-}
-
-// newOptions initializes the available default options.
-func newOptions(opts ...Option) Options {
-	opt := Options{}
-
-	for _, o := range opts {
-		o(&opt)
-	}
-
-	return opt
 }
 
 // Logger provides a function to set the logger option.
