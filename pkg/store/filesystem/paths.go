@@ -1,9 +1,10 @@
 package store
 
 import (
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"os"
 	"path"
+
+	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 const folderNameBundles = "bundles"
@@ -27,6 +28,13 @@ func (s Store) buildFilePathFromBundleArgs(extension string, bundleKey string) s
 	s.ensureFolderExists(extensionFolder)
 	return path.Join(extensionFolder, bundleKey+".json")
 }
+
+// // Builds the folder path for storing settings values
+// func (s Store) buildFolderPathValues() string {
+// 	folderPath := path.Join(s.mountPath, folderNameValues)
+// 	s.ensureFolderExists(folderPath)
+// 	return folderPath
+// }
 
 // Builds a unique file name from the given settings value
 func (s Store) buildFilePathFromValue(value *proto.SettingsValue) string {

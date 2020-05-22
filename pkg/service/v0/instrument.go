@@ -11,8 +11,3 @@ func NewInstrument(next Service, metrics *metrics.Metrics) Service {
 		config:  next.config,
 	}
 }
-
-type instrument struct {
-	next    Service
-	metrics *metrics.Metrics
-}

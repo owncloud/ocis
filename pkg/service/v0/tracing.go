@@ -7,7 +7,3 @@ func NewTracing(next Service) Service {
 		config:  next.config,
 	}
 }
-
-type tracing struct {
-	next Service
-}

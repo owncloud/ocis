@@ -67,6 +67,8 @@ func Server(opts ...Option) http.Service {
 		mux,
 	)
 
-	service.Init()
+	if err := service.Init(); err != nil {
+		panic(err)
+	}
 	return service
 }

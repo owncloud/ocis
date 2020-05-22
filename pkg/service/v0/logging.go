@@ -11,8 +11,3 @@ func NewLogging(next Service, logger log.Logger) Service {
 		config:  next.config,
 	}
 }
-
-type logging struct {
-	next   Service
-	logger log.Logger
-}

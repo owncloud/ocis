@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+
 	"github.com/owncloud/ocis-settings/pkg/settings"
 	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
 
@@ -10,8 +11,8 @@ import (
 )
 
 type Service struct {
-	config       *config.Config
-	manager      settings.Manager
+	config  *config.Config
+	manager settings.Manager
 }
 
 // NewService returns a service implementation for Service.

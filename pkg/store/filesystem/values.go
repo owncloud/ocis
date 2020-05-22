@@ -2,12 +2,13 @@
 package store
 
 import (
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"google.golang.org/grpc/codes"
-	gstatus "google.golang.org/grpc/status"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"google.golang.org/grpc/codes"
+	gstatus "google.golang.org/grpc/status"
 )
 
 // ReadValue tries to find a value by the given identifier attributes within the mountPath

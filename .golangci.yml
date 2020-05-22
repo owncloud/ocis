@@ -28,7 +28,7 @@ linters:
     - scopelint
     - maligned
     - misspell
-    - gocritic
+    # - gocritic
     - prealloc
     #- gosec
 

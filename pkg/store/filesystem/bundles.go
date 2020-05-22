@@ -2,11 +2,12 @@
 package store
 
 import (
+	"io/ioutil"
+	"path"
+
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"google.golang.org/grpc/codes"
 	gstatus "google.golang.org/grpc/status"
-	"io/ioutil"
-	"path"
 )
 
 // ListBundles returns all bundles in the mountPath folder belonging to the given extension
