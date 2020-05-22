@@ -73,7 +73,7 @@ def testing(ctx):
       },
       {
         'name': 'staticcheck',
-        'image': image: golangci/golangci-lint:latest',
+        'image': golangci/golangci-lint:latest',
         'pull': 'always',
         'commands': [
           golangci-lint run,
