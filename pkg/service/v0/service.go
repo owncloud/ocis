@@ -10,6 +10,7 @@ import (
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
+// Service represents a service.
 type Service struct {
 	config  *config.Config
 	manager settings.Manager
