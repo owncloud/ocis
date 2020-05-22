@@ -7,6 +7,8 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis-pkg/v2/log"
+	mclient "github.com/micro/go-micro/v2/client"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 // New returns a new instance of Service
@@ -67,4 +69,27 @@ func (s Service) Search(ctx context.Context, in *proto.Query, res *proto.Records
 
 	res.Records = r
 	return nil
+}
+
+// RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
+func RegisterSettingsBundles(l *olog.Logger) {
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)
+
+	requests := []settings.SaveSettingsBundleRequest{
+		generateSettingsBundleProfileRequest(),
+	}
+
+	for i := range requests {
+		res, err := service.SaveSettingsBundle(context.Background(), &requests[i])
+		if err != nil {
+			l.Err(err).
+				Msg("Error registering settings bundle")
+		} else {
+			l.Info().
+				Str("bundle key", res.SettingsBundle.Identifier.BundleKey).
+				Msg("Successfully registered settings bundle")
+		}
+	}
 }

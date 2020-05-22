@@ -8,14 +8,14 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.1
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.14.4 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.0.0
+	github.com/micro/go-micro/v2 v2.6.0
+	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
 	github.com/oklog/run v1.1.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/restic/calens v0.2.0
-	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/viper v1.6.3
 	google.golang.org/genproto v0.0.0-20200430143042-b979b6f78d84
 	google.golang.org/protobuf v1.22.0

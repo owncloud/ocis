@@ -10,6 +10,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/server/grpc"
+	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
 	oclog "github.com/owncloud/ocis-pkg/v2/log"
 )
 
@@ -25,7 +26,12 @@ func Server(cfg *config.Config) *cli.Command {
 		Description: "an accounts backend manager (driver) needs to be specified. By default the service uses the filesystem as storage",
 		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			logger = oclog.NewLogger(oclog.Name(cfg.Server.Name))
+			logger = oclog.NewLogger(
+				oclog.Name(cfg.Server.Name),
+				oclog.Level("info"),
+				oclog.Color(true),
+				oclog.Pretty(true),
+			)
 			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -43,6 +49,8 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			gr.Add(func() error {
+				logger.Info().Str("service", service.Name()).Msg("Reporting settings bundle to account service")
+				go svc.RegisterSettingsBundles(&logger)
 				return service.Run()
 			}, func(_ error) {
 				fmt.Println("shutting down grpc server")
