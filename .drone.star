@@ -164,6 +164,17 @@ def docker(ctx, arch):
     },
     'steps': [
       {
+        'name': 'frontend',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'commands': [
+          'yarn install --frozen-lockfile',
+          'yarn lint',
+          'yarn test',
+          'yarn build',
+        ],
+      },
+      {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
