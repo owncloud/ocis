@@ -28,13 +28,6 @@ func (s Store) buildFilePathFromBundleArgs(extension string, bundleKey string) s
 	return path.Join(extensionFolder, bundleKey+".json")
 }
 
-// Builds the folder path for storing settings values
-func (s Store) buildFolderPathValues() string {
-	folderPath := path.Join(s.mountPath, folderNameValues)
-	s.ensureFolderExists(folderPath)
-	return folderPath
-}
-
 // Builds a unique file name from the given settings value
 func (s Store) buildFilePathFromValue(value *proto.SettingsValue) string {
 	return s.buildFilePathFromValueArgs(value.Identifier.AccountUuid, value.Identifier.Extension, value.Identifier.BundleKey)
