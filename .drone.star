@@ -313,6 +313,15 @@ def binary(ctx, name):
     },
     'steps': [
       {
+        'name': 'frontend',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'commands': [
+          'yarn install --frozen-lockfile',
+          'yarn build',
+        ],
+      },
+      {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
