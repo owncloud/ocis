@@ -22,6 +22,12 @@ type HTTP struct {
 	Root      string
 }
 
+// GRPC defines the available grpc configuration.
+type GRPC struct {
+	Addr      string
+	Namespace string
+}
+
 // Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool
@@ -31,13 +37,26 @@ type Tracing struct {
 	Service   string
 }
 
+// Asset undocumented
+type Asset struct {
+	Path string
+}
+
+// Storage defines the available storage configuration.
+type Storage struct {
+	RootMountPath string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
+	Storage Storage
 	Log     Log
 	Debug   Debug
 	HTTP    HTTP
+	GRPC    GRPC
 	Tracing Tracing
+	Asset   Asset
 }
 
 // New initializes a new configuration with or without defaults.

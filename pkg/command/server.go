@@ -16,8 +16,8 @@ import (
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/flagset"
-	"github.com/owncloud/ocis-settings/pkg/metrics"
 	"github.com/owncloud/ocis-settings/pkg/server/debug"
+	"github.com/owncloud/ocis-settings/pkg/server/grpc"
 	"github.com/owncloud/ocis-settings/pkg/server/http"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -40,7 +40,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
@@ -129,34 +128,38 @@ func Server(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
 			)
 
 			defer cancel()
 
 			{
-				server, err := http.Server(
+				server := http.Server(
+					http.Name("settings"),
 					http.Logger(logger),
-					http.Namespace(httpNamespace),
 					http.Context(ctx),
 					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
+					http.Flags(flagset.RootWithConfig(cfg)),
+					http.Flags(flagset.ServerWithConfig(cfg)),
 				)
 
-				if err != nil {
-					logger.Error().
-						Err(err).
+				gr.Add(server.Run, func(_ error) {
+					logger.Info().
 						Str("server", "http").
-						Msg("Failed to initialize server")
+						Msg("Shutting down server")
 
-					return err
-				}
+					cancel()
+				})
+			}
 
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
+			{
+				server := grpc.Server(
+					grpc.Name("settings"),
+					grpc.Logger(logger),
+					grpc.Context(ctx),
+					grpc.Config(cfg),
+				)
+
+				gr.Add(server.Run, func(_ error) {
 					logger.Info().
 						Str("server", "http").
 						Msg("Shutting down server")
@@ -181,9 +184,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
+				gr.Add(server.ListenAndServe, func(_ error) {
 					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
 
 					defer timeout()

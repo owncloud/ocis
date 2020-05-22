@@ -136,5 +136,32 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"SETTINGS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name:        "grpc-addr",
+			Value:       "0.0.0.0:9191",
+			Usage:       "Address to bind grpc server",
+			EnvVars:     []string{"SETTINGS_GRPC_ADDR"},
+			Destination: &cfg.GRPC.Addr,
+		},
+		&cli.StringFlag{
+			Name:        "asset-path",
+			Value:       "",
+			Usage:       "Path to custom assets",
+			EnvVars:     []string{"SETTINGS_ASSET_PATH"},
+			Destination: &cfg.Asset.Path,
+		},
+		&cli.StringFlag{
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"SETTINGS_GRPC_NAMESPACE"},
+			Destination: &cfg.GRPC.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "mount-path",
+			Usage:       "Mount path for the storage",
+			EnvVars:     []string{"SETTINGS_ROOT_MOUNT_PATH"},
+			Destination: &cfg.Storage.RootMountPath,
+		},
 	}
 }

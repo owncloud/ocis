@@ -33,6 +33,17 @@ def testing(ctx):
     },
     'steps': [
       {
+        'name': 'frontend',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'commands': [
+          'yarn install --frozen-lockfile',
+          'yarn lint',
+          'yarn test',
+          'yarn build',
+        ],
+      },
+      {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
@@ -62,10 +73,10 @@ def testing(ctx):
       },
       {
         'name': 'staticcheck',
-        'image': 'webhippie/golang:1.13',
+        'image': 'golangci/golangci-lint:latest',
         'pull': 'always',
         'commands': [
-          'make staticcheck',
+          'golangci-lint run',
         ],
         'volumes': [
           {
@@ -152,6 +163,17 @@ def docker(ctx, arch):
       'arch': arch,
     },
     'steps': [
+      {
+        'name': 'frontend',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'commands': [
+          'yarn install --frozen-lockfile',
+          'yarn lint',
+          'yarn test',
+          'yarn build',
+        ],
+      },
       {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
@@ -290,6 +312,15 @@ def binary(ctx, name):
       'arch': 'amd64',
     },
     'steps': [
+      {
+        'name': 'frontend',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'commands': [
+          'yarn install --frozen-lockfile',
+          'yarn build',
+        ],
+      },
       {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
