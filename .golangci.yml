@@ -1,0 +1,34 @@
+issues:
+  exclude-rules:
+    - path: pkg/proto/v0/settings.pb.go
+      text: "SA1019:"
+      linters:
+        - staticcheck
+    - path: pkg/store/filesystem/io.go
+      text: "SA1019:"
+      linters:
+        - staticcheck
+linters:
+  enable:
+    - bodyclose
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - depguard
+    - golint
+    - goimports
+    - unconvert
+    - scopelint
+    - maligned
+    - misspell
+    - gocritic
+    - prealloc
+    #- gosec
+
