@@ -32,7 +32,7 @@ def testing(ctx):
       'arch': 'amd64',
     },
     'steps': [
-
+      {
         'name': 'frontend',
         'image': 'webhippie/nodejs:latest',
         'pull': 'always',
