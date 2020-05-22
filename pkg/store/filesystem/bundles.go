@@ -48,7 +48,8 @@ func (s Store) ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundl
 	return records, nil
 }
 
-// Read tries to find a bundle by the given extension and key within the mountPath
+// ReadBundle tries to find a bundle by the given identifier within the mountPath.
+// Extension and BundleKey within the identifier are required.
 func (s Store) ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, error) {
 	if len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 {
 		s.Logger.Error().Msg("extension and bundleKey cannot be empty")
@@ -65,7 +66,8 @@ func (s Store) ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, 
 	return &record, nil
 }
 
-// Write writes the given record into a file within the mountPath
+// WriteBundle writes the given record into a file within the mountPath
+// Extension and BundleKey within the record identifier are required.
 func (s Store) WriteBundle(record *proto.SettingsBundle) (*proto.SettingsBundle, error) {
 	if len(record.Identifier.Extension) < 1 || len(record.Identifier.BundleKey) < 1 {
 		s.Logger.Error().Msg("extension and bundleKey cannot be empty")

@@ -41,8 +41,8 @@ func (s Store) buildFilePathFromValue(value *proto.SettingsValue) string {
 }
 
 // Builds a unique file name from the given params
-func (s Store) buildFilePathFromValueArgs(accountUuid string, extension string, bundleKey string) string {
-	extensionFolder := path.Join(s.mountPath, folderNameValues, accountUuid, extension)
+func (s Store) buildFilePathFromValueArgs(accountUUID string, extension string, bundleKey string) string {
+	extensionFolder := path.Join(s.mountPath, folderNameValues, accountUUID, extension)
 	s.ensureFolderExists(extensionFolder)
 	return path.Join(extensionFolder, bundleKey+".json")
 }

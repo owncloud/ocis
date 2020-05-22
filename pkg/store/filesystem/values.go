@@ -10,7 +10,8 @@ import (
 	"path/filepath"
 )
 
-// Tries to find a value by the given identifier attributes within the mountPath
+// ReadValue tries to find a value by the given identifier attributes within the mountPath
+// All identifier fields are required.
 func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error) {
 	if len(identifier.AccountUuid) < 1 || len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 || len(identifier.SettingKey) < 1 {
 		s.Logger.Error().Msg("account-uuid, extension, bundle and setting are required")
@@ -29,7 +30,8 @@ func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, er
 	return nil, gstatus.Error(codes.NotFound, "SettingsValue not set")
 }
 
-// Writes the given SettingsValue into a file within the mountPath
+// WriteValue writes the given SettingsValue into a file within the mountPath
+// All identifier fields within the value are required.
 func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error) {
 	if len(value.Identifier.AccountUuid) < 1 || len(value.Identifier.Extension) < 1 || len(value.Identifier.BundleKey) < 1 || len(value.Identifier.SettingKey) < 1 {
 		s.Logger.Error().Msg("all identifier keys are required")
@@ -48,7 +50,8 @@ func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, err
 	return value, nil
 }
 
-// Reads all values within the scope of the given identifier
+// ListValues reads all values within the scope of the given identifier
+// AccountUuid is required.
 func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue, error) {
 	if len(identifier.AccountUuid) < 1 {
 		s.Logger.Error().Msg("account-uuid is required")

@@ -22,6 +22,7 @@ func NewService(cfg *config.Config) Service {
 	}
 }
 
+// SaveSettingsBundle implements the BundleServiceHandler interface
 func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBundleRequest, res *proto.SaveSettingsBundleResponse) error {
 	req.SettingsBundle.Identifier = getFailsafeIdentifier(req.SettingsBundle.Identifier)
 	r, err := g.manager.WriteBundle(req.SettingsBundle)
@@ -32,6 +33,7 @@ func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBu
 	return nil
 }
 
+// GetSettingsBundle implements the BundleServiceHandler interface
 func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
 	r, err := g.manager.ReadBundle(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
@@ -41,6 +43,7 @@ func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBund
 	return nil
 }
 
+// ListSettingsBundles implements the BundleServiceHandler interface
 func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
 	r, err := g.manager.ListBundles(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
@@ -50,6 +53,7 @@ func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsB
 	return nil
 }
 
+// SaveSettingsValue implements the ValueServiceHandler interface
 func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsValueRequest, res *proto.SaveSettingsValueResponse) error {
 	req.SettingsValue.Identifier = getFailsafeIdentifier(req.SettingsValue.Identifier)
 	r, err := g.manager.WriteValue(req.SettingsValue)
@@ -60,6 +64,7 @@ func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsVal
 	return nil
 }
 
+// GetSettingsValue implements the ValueServiceHandler interface
 func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValueRequest, res *proto.GetSettingsValueResponse) error {
 	r, err := g.manager.ReadValue(getFailsafeIdentifier(req.Identifier))
 	if err != nil {
@@ -69,6 +74,7 @@ func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValue
 	return nil
 }
 
+// ListSettingsValues implements the ValueServiceHandler interface
 func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsValuesRequest, res *proto.ListSettingsValuesResponse) error {
 	r, err := g.manager.ListValues(getFailsafeIdentifier(req.Identifier))
 	if err != nil {

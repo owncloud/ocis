@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	// StoreName is the default name for the settings store
-	StoreName     = "ocis-settings-store"
-	managerName   = "filesystem"
+	// Name is the default name for the settings store
+	Name        = "ocis-settings-store"
+	managerName = "filesystem"
 )
 
 // Store interacts with the filesystem to manage settings information
@@ -26,7 +26,7 @@ type Store struct {
 func New(cfg *config.Config) settings.Manager {
 	s := Store{}
 
-	dest := path.Join(cfg.Storage.RootMountPath, StoreName)
+	dest := path.Join(cfg.Storage.RootMountPath, Name)
 	if _, err := os.Stat(dest); err != nil {
 		s.Logger.Info().Msgf("creating container on %v", dest)
 		err := os.MkdirAll(dest, 0700)
