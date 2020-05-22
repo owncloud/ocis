@@ -79,7 +79,6 @@ func RegisterSettingsBundles(l *olog.Logger) {
 
 	requests := []settings.SaveSettingsBundleRequest{
 		generateSettingsBundleProfileRequest(),
-		generateSettingsBundleNotificationsRequest(),
 	}
 
 	for i := range requests {
