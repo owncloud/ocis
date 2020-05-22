@@ -157,8 +157,6 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Logger(logger),
 					grpc.Context(ctx),
 					grpc.Config(cfg),
-					grpc.Flags(flagset.RootWithConfig(cfg)),
-					grpc.Flags(flagset.ServerWithConfig(cfg)),
 				)
 
 				gr.Add(server.Run, func(_ error) {
