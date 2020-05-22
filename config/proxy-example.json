@@ -2,6 +2,12 @@
   "HTTP": {
     "Namespace": "com.owncloud"
   },
+  "oidc": {
+    "endpoint": "https://localhost:9200",
+    "realm": "",
+    "signing_algs": ["RS256", "PS256"],
+    "insecure": true
+  },
   "policy_selector": {
     "static": {"policy" : "reva"}
   },

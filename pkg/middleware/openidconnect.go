@@ -8,14 +8,21 @@ import (
 	"strings"
 	"time"
 
-	oidc "github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/cache"
 	"golang.org/x/oauth2"
 )
 
 var (
 	// ErrInvalidToken is returned when the request token is invalid.
 	ErrInvalidToken = errors.New("invalid or missing token")
+
+	// svcCache caches requests for given services to prevent round trips to the service
+	svcCache = cache.NewCache()
+
+	// ClaimsKey works as a context key for user claims
+	ClaimsKey interface{} = "claims"
 )
 
 // newOIDCOptions initializes the available default options.
@@ -30,7 +37,7 @@ func newOIDCOptions(opts ...ocisoidc.Option) ocisoidc.Options {
 }
 
 // OpenIDConnect provides a middleware to check access secured by a static token.
-func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
+func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler {
 	opt := newOIDCOptions(opts...)
 
 	// set defaults
@@ -96,12 +103,15 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 				return
 			}
 
-			// parse claims
 			if err := userInfo.Claims(&claims); err != nil {
 				opt.Logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+
+			// inject claims to the request context for the account_uuid middleware.
+			ctxWithClaims := context.WithValue(r.Context(), ClaimsKey, claims)
+			r = r.WithContext(ctxWithClaims)
 
 			opt.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")
 			// store claims in context
@@ -112,3 +122,19 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 		})
 	}
 }
+
+// AccountsCacheEntry stores a request to the accounts service on the cache.
+// this type declaration should be on each respective service.
+type AccountsCacheEntry struct {
+	Email string
+	UUID  string
+}
+
+const (
+	// AccountsKey declares the svcKey for the Accounts service.
+	AccountsKey = "accounts"
+
+	// NodeKey declares the key that will be used to store the node address.
+	// It is shared between services.
+	NodeKey = "node"
+)

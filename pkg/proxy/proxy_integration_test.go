@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"bytes"
-	"github.com/owncloud/ocis-proxy/pkg/config"
 	"io"
 	"io/ioutil"
 	"log"
@@ -10,6 +9,8 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/owncloud/ocis-proxy/pkg/config"
 )
 
 func TestProxyIntegration(t *testing.T) {
