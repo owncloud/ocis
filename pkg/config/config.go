@@ -54,7 +54,7 @@ type Config struct {
 	Log     Log
 	Debug   Debug
 	HTTP    HTTP
-	GRPC	GRPC
+	GRPC    GRPC
 	Tracing Tracing
 	Asset   Asset
 }
