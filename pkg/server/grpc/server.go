@@ -7,7 +7,7 @@ import (
 	"github.com/owncloud/ocis-settings/pkg/version"
 )
 
-// NewService initializes a new go-micro service ready to run
+// Server initializes a new go-micro service ready to run
 func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
