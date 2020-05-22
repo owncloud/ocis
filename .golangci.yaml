@@ -1,0 +1,24 @@
+linters:
+  enable:
+    - bodyclose
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - depguard
+    - golint
+    - goimports
+    - unconvert
+    - scopelint
+    - maligned
+    - misspell
+    # - gocritic
+    - prealloc
+    #- gosec
+
