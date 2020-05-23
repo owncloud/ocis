@@ -40,7 +40,7 @@ require (
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
 	github.com/owncloud/ocis-webdav v0.1.0
-	github.com/refs/pman v0.0.0-20200520152433-d1823a649d98
+	github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c
 	github.com/restic/calens v0.2.0
 	go.opencensus.io v0.22.3
 	go.uber.org/zap v1.15.0 // indirect

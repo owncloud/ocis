@@ -961,6 +961,8 @@ github.com/refs/pman v0.0.0-20200518220537-f6667770d0e9 h1:t4ltdrT7pxVHYo3pli98b
 github.com/refs/pman v0.0.0-20200518220537-f6667770d0e9/go.mod h1:0ivDlwrVfoxdAIbFV1RN1EDPJHMtUG8iJrhW3erRiwM=
 github.com/refs/pman v0.0.0-20200520152433-d1823a649d98 h1:aHgtTwIbeFFEtcZ9NSZ/4UqxS5m8z+sXwTq1nTnBSaQ=
 github.com/refs/pman v0.0.0-20200520152433-d1823a649d98/go.mod h1:0ivDlwrVfoxdAIbFV1RN1EDPJHMtUG8iJrhW3erRiwM=
+github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c h1:RObWeoWH9jKuDr5XKdKIZP5nPZRYRSsJipe9UxQITKQ=
+github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c/go.mod h1:0ivDlwrVfoxdAIbFV1RN1EDPJHMtUG8iJrhW3erRiwM=
 github.com/restic/calens v0.1.0/go.mod h1:u67f5msOjCTDYNzOf/NoAUSdmXP03YXPCwIQLYADy5M=
 github.com/restic/calens v0.2.0 h1:LVNAtmFc+Pb4ODX66qdX1T3Di1P0OTLyUsVyvM/xD7E=
 github.com/restic/calens v0.2.0/go.mod h1:UXwyAKS4wsgUZGEc7NrzzygJbLsQZIo3wl+62Q1wvmU=
