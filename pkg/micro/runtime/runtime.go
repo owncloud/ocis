@@ -43,7 +43,6 @@ var (
 		"reva-auth-basic",
 		"reva-auth-bearer",
 		"reva-sharing",
-		//"reva-storage-root",
 		"reva-storage-home",
 		"reva-storage-home-data",
 		"reva-storage-eos",
@@ -55,6 +54,9 @@ var (
 		"konnectd",
 		"thumbnails",
 	}
+
+	// Maximum number of retries until getting a connection to the rpc runtime service.
+	maxRetries int = 10
 )
 
 // Runtime represents an oCIS runtime environment.
@@ -71,21 +73,30 @@ func (r *Runtime) Start() error {
 	return service.Start()
 }
 
-// Launch ocis Extensions
+// Launch ocis default ocis extensions.
 func (r *Runtime) Launch() {
-	client, err := rpc.DialHTTP("tcp", "localhost:10666")
-	if err != nil {
-		fmt.Println("rpc service not available, retrying in 1 second...")
-		time.Sleep(1 * time.Second)
-		r.Launch()
+	var client *rpc.Client
+	var err error
+	var try int
+
+	for {
+		if try >= maxRetries {
+			golog.Fatal("could not get a connection to rpc runtime on localhost:10666")
+		}
+		client, err = rpc.DialHTTP("tcp", "localhost:10666")
+		if err != nil {
+			try++
+			fmt.Println("runtime not available, retrying in 1 second...")
+			time.Sleep(1 * time.Second)
+		} else {
+			goto OUT
+		}
 	}
 
+OUT:
 	all := append(Extensions, MicroServices...)
-	for i := range all {
-		arg0 := process.NewProcEntry(
-			all[i],
-			[]string{all[i]}...,
-		)
+	for _, v := range all {
+		arg0 := process.NewProcEntry(v, []string{v}...)
 		var arg1 int
 
 		if err := client.Call("Service.Start", arg0, &arg1); err != nil {
@@ -99,7 +110,6 @@ func AddMicroPlatform(app *cli.App) {
 	setDefaults()
 
 	app.Commands = append(app.Commands, api.Commands()...)
-	app.Commands = append(app.Commands, proxy.Commands()...)
 	app.Commands = append(app.Commands, web.Commands()...)
 	app.Commands = append(app.Commands, registry.Commands()...)
 }
