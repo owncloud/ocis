@@ -18,7 +18,15 @@ linters:
     - scopelint
     - maligned
     - misspell
-    # - gocritic
+    - gocritic
     - prealloc
-    #- gosec
-
+    - gosec
+    - rowserrcheck
+    - goconst
+    - gocyclo
+    - maligned
+    - unparam
+    - goprintffuncname
+    - nestif
+    - nolintlint
+    # - gomnd
