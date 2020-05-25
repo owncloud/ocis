@@ -42,7 +42,6 @@ var (
 		"reva-users",
 		"reva-auth-basic",
 		"reva-auth-bearer",
-		"reva-sharing",
 		"reva-storage-home",
 		"reva-storage-home-data",
 		"reva-storage-eos",
@@ -53,6 +52,11 @@ var (
 		"glauth",
 		"konnectd",
 		"thumbnails",
+	}
+
+	// There seem to be a race condition when reva-sharing needs to read the sharing.json file and the parent folder is not present.
+	dependants = []string{
+		"reva-sharing",
 	}
 
 	// Maximum number of retries until getting a connection to the rpc runtime service.
@@ -96,6 +100,17 @@ func (r *Runtime) Launch() {
 OUT:
 	all := append(Extensions, MicroServices...)
 	for _, v := range all {
+		arg0 := process.NewProcEntry(v, []string{v}...)
+		var arg1 int
+
+		if err := client.Call("Service.Start", arg0, &arg1); err != nil {
+			golog.Fatal(err)
+		}
+	}
+
+	// ugly hack to avoid dependencies.
+	time.Sleep(2 * time.Second)
+	for _, v := range dependants {
 		arg0 := process.NewProcEntry(v, []string{v}...)
 		var arg1 int
 
