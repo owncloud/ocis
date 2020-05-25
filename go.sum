@@ -256,6 +256,7 @@ github.com/cs3org/reva v0.1.1-0.20200512135421-3aa67e818a8d h1:lDNY2AnYNY2RLlKeb
 github.com/cs3org/reva v0.1.1-0.20200512135421-3aa67e818a8d/go.mod h1:YIgUciBl5fg6xhV+ZPWkfWlc5H4wjXg/8+ngIYPzvKI=
 github.com/cs3org/reva v0.1.1-0.20200518061204-dd26e9bf62cd h1:Q9/Va5jNmHH7msuSOHxIz3fZXv2FLLHZrGjOb5d6wgg=
 github.com/cs3org/reva v0.1.1-0.20200518061204-dd26e9bf62cd/go.mod h1:XGcK/IC3PQ+C8pKlkfDbGbFKSeN8D2FV6qlwaR35rCY=
+github.com/cs3org/reva v0.1.1-0.20200520150229-ce94fda7436f h1:SXxBH0dzdQMRkvKqVUdKPoVszngCmJQgYhy0xtCN9qk=
 github.com/cs3org/reva v0.1.1-0.20200520150229-ce94fda7436f/go.mod h1:fVZ7IXTQaxNit5Q9yA+x6ciJmUpEHgBrxtwmiGGBY40=
 github.com/davecgh/go-spew v0.0.0-20151105211317-5215b55f46b2/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -913,6 +914,8 @@ github.com/owncloud/ocis-reva v0.2.2-0.20200522122942-2b94f09bfb33 h1:E9gY4t9Qv4
 github.com/owncloud/ocis-reva v0.2.2-0.20200522122942-2b94f09bfb33/go.mod h1:dkXikZp6HbawRNbaQn7Dh8uQ5JLTSm3MyQLuSqUxEYU=
 github.com/owncloud/ocis-reva v0.2.2-0.20200525100054-754fdfc93a20 h1:I9Kd8nAxhLXYqPDWDSeeu/JGyr8hZFdsaNSMC8jhyJY=
 github.com/owncloud/ocis-reva v0.2.2-0.20200525100054-754fdfc93a20/go.mod h1:AHqIFXy/2mUkmDd9c6lEOze+eQn6JwOuSQmk/Skx3uM=
+github.com/owncloud/ocis-reva v0.3.0 h1:vjgE1+Hl/BZIpFScVNd7AumqPiz7bz0f+vC6jxPKBlo=
+github.com/owncloud/ocis-reva v0.3.0/go.mod h1:AHqIFXy/2mUkmDd9c6lEOze+eQn6JwOuSQmk/Skx3uM=
 github.com/owncloud/ocis-settings v0.0.0-20200505071911-0e9f3791fe02 h1:cqam+Be8B7O+ZvhOTr1PoI1r1g9euoGPuE48PR0Z7vU=
 github.com/owncloud/ocis-settings v0.0.0-20200505071911-0e9f3791fe02/go.mod h1:/hN4p01cRNdayKfa3dk9QaZ3FqJ77L54Wycle3CRN84=
 github.com/owncloud/ocis-settings v0.0.0-20200511093940-0fddb624d0da/go.mod h1:1PyfbVIZMTX21JxsRT+maRIjRFD3H+yhfpr1jMz3PeA=
