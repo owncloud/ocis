@@ -25,22 +25,23 @@ mv changelog/unreleased/* changelog/x.x.x_yyyy-MM-dd/
 {{< highlight txt >}}
 git add --all
 git commit -m "prepare release x.x.x"
-git push
+git push origin release-x.x.x
 {{< / highlight >}}
 6. Create a pull request to the master branch.
 
 ## Release
 1. After the preparation branch has been merged update your local master.
+2. [Wait for CI](https://cloud.drone.io/owncloud/ocis-reva) to generate a commit for the changelog update
+3. Check out master (or make sure to check out the generated changelog commit in case of subsequent merges)
 {{< highlight txt >}}
 git checkout master
-git pull
+git pull origin master
 {{< / highlight >}}
-2. Create a new tag (preferably signed).
+4. Create a new tag (preferably signed) and replace the version number accordingly.
 {{< highlight txt >}}
 git tag -s vx.x.x -m "release vx.x.x"
-git push --tags
+git push origin vx.x.x
 {{< / highlight >}}
-3. Wait for CI and check that the GitHub release was published.
-
+5. Wait for CI and check that the GitHub release was published.
 
 Congratulations, you just released ocis-reva!
