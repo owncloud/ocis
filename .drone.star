@@ -155,6 +155,7 @@ def testing(ctx):
           'LDAP_BASEDN': 'dc=owncloud,dc=com'
         },
         'commands': [
+          'apk add mailcap', # install /etc/mime.types
           'mkdir -p /srv/app/tmp/reva',
           'bin/ocis server'
         ],
