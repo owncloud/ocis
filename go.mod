@@ -7,6 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/aws/aws-sdk-go v1.31.1 // indirect
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/coreos/etcd v3.3.21+incompatible // indirect
@@ -36,7 +37,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.6.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.3.2-0.20200522110058-d7eab502160d
-	github.com/owncloud/ocis-reva v0.3.0
+	github.com/owncloud/ocis-reva v0.2.2-0.20200522122942-2b94f09bfb33
 	github.com/owncloud/ocis-settings v0.0.0-20200522102142-c1adfd2c26b2
 	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
 	github.com/owncloud/ocis-webdav v0.1.0
