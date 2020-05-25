@@ -171,12 +171,14 @@ def testing(ctx):
         'environment' : {
           'TEST_SERVER_URL': 'http://ocis-server:9140',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
         },
         'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
           'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
           'cd /srv/app/testrunner',
           'make test-acceptance-api',
@@ -244,7 +246,7 @@ def testing(ctx):
       },
       {
         'name': 'selenium',
-        'image': 'selenium/standalone-chrome-debug:latest',
+        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
         'pull': 'always',
         'volumes': [{
             'name': 'uploads',
