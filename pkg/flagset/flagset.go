@@ -99,7 +99,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "debug-token",
 			Value:       "",
-			Usage:       "TokenManager to grant metrics access",
+			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"PROXY_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
 		},
