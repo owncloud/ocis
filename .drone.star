@@ -140,6 +140,7 @@ def testing(ctx):
           'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
           'REVA_LDAP_USERFILTER': '(&(objectclass=posixAccount)(cn=%s))',
           'REVA_LDAP_GROUPFILTER': '(&(objectclass=posixGroup)(cn=%s))',
+          'REVA_LDAP_SCHEMA_UID': 'uid',
           'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
           'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
           'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
