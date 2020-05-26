@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"github.com/owncloud/ocis-proxy/pkg/config"
 	"net/http"
 
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -19,6 +20,8 @@ type AccountMiddlewareOption func(o *AccountMiddlewareOptions)
 type AccountMiddlewareOptions struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
+	// TokenManagerConfig for communicating with the reva token manager
+	TokenManagerConfig config.TokenManager
 }
 
 // Logger provides a function to set the logger option.
@@ -28,21 +31,32 @@ func Logger(l log.Logger) AccountMiddlewareOption {
 	}
 }
 
-// AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
-// on the oidc-claims
-func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.Handler {
+// TokenManagerConfig provides a function to set the token manger config option.
+func TokenManagerConfig(cfg config.TokenManager) AccountMiddlewareOption {
+	return func(o *AccountMiddlewareOptions) {
+		o.TokenManagerConfig = cfg
+	}
+}
+
+func newAccountUUIDOptions(opts ...AccountMiddlewareOption) AccountMiddlewareOptions {
 	opt := AccountMiddlewareOptions{}
 	for _, o := range opts {
 		o(&opt)
 	}
+	return opt
+}
+
+// AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
+// on the oidc-claims
+func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.Handler {
+	opt := newAccountUUIDOptions(opts...)
 
 	return func(next http.Handler) http.Handler {
 		// TODO: handle error
 		tokenManager, err := jwt.New(map[string]interface{}{
-			"secret":  "Pive-Fumkiu4",
+			"secret":  opt.TokenManagerConfig.JWTSecret,
 			"expires": int64(60),
 		})
-
 		if err != nil {
 			opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
 		}
@@ -103,7 +117,7 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 				return
 			}
 
-			w.Header().Set("x-access-token", token)
+			r.Header.Set("x-access-token", token)
 			next.ServeHTTP(w, r)
 		})
 	}
