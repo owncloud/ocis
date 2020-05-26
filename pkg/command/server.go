@@ -247,7 +247,10 @@ func loadMiddlewares(cfg *config.Config, l log.Logger) alice.Chain {
 			oidc.Logger(l),
 		)
 
-		uuidMW := middleware.AccountUUID(middleware.Logger(l))
+		uuidMW := middleware.AccountUUID(
+			middleware.Logger(l),
+			middleware.TokenManagerConfig(cfg.TokenManager),
+		)
 
 		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW)
 	}

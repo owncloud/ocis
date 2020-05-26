@@ -99,7 +99,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "debug-token",
 			Value:       "",
-			Usage:       "Token to grant metrics access",
+			Usage:       "TokenManager to grant metrics access",
 			EnvVars:     []string{"PROXY_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
 		},
@@ -156,6 +156,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
+		},
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
+			EnvVars:     []string{"PROXY_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
 		},
 	}
 }

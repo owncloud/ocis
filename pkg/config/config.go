@@ -81,6 +81,7 @@ type Config struct {
 	Asset          Asset
 	Policies       []Policy
 	OIDC           *OIDC
+	TokenManager   TokenManager
 	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
 }
 
@@ -102,6 +103,11 @@ type PolicySelector struct {
 // StaticSelectorConf is the config for the static-policy-selector
 type StaticSelectorConf struct {
 	Policy string
+}
+
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string
 }
 
 // MigrationSelectorConf is the config for the migration-selector
