@@ -253,6 +253,9 @@ type Reva struct {
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}
+	// chunking and resumable upload config (TUS)
+	UploadMaxChunkSize       int
+	UploadHttpMethodOverride string
 }
 
 // Tracing defines the available tracing configuration.

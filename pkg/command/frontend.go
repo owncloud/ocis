@@ -143,6 +143,13 @@ func Frontend(cfg *config.Config) *cli.Command {
 											"blacklisted_files": []string{},
 											"undelete":          true,
 											"versioning":        true,
+											"tus_support": map[string]interface{}{
+												"version":              "1.0.0",
+												"resumable":            "1.0.0",
+												"extension":            "creation,creation-with-upload",
+												"http_method_override": cfg.Reva.UploadHttpMethodOverride,
+												"max_chunk_size":       int(cfg.Reva.UploadMaxChunkSize),
+											},
 										},
 										"dav": map[string]interface{}{},
 										"files_sharing": map[string]interface{}{
