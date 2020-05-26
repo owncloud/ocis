@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: 2020-02-27T20:35:00+01:00
+date: "2020-04-29T12:08:23+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
@@ -12,6 +12,8 @@ geekdocFilePath: configuration.md
 ## Configuration
 
 oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
+
+Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/ocis_proxy/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
 ### Configuration using config files
 
@@ -25,254 +27,180 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
 
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+
 ### Envrionment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
-#### Global
-
-OCIS_CONFIG_FILE
-: Path to config file
-
-OCIS_LOG_LEVEL
-: Set logging level, defaults to `info`
-
-OCIS_LOG_COLOR
-: Enable colored logging, defaults to `true`
-
-OCIS_LOG_PRETTY
-: Enable pretty logging, defaults to `true`
-
-#### Server
-
-OCIS_TRACING_ENABLED
-: Enable sending traces
-
-OCIS_TRACING_TYPE
-: Tracing backend type,
-
-OCIS_TRACING_ENDPOINT
-:Endpoint for the agent
-
-OCIS_TRACING_COLLECTOR
-: Endpoint for the collector
-
-OCIS_TRACING_SERVICE
-: Service name for tracing"
-
-OCIS_DEBUG_ADDR
-: Address to bind debug server, defaults to `0.0.0.0:9010`
-
-OCIS_DEBUG_TOKEN
-: Token to grant metrics access, empty default value
-
-OCIS_DEBUG_PPROF
-: Enable pprof debugging, defaults to `false`
-
-OCIS_DEBUG_ZPAGES
-: Enable zpages debugging, defaults to `false`
-
-OCIS_HTTP_ADDR
-: Address to bind http server, defaults to `0.0.0.0:9000`
-
-OCIS_HTTP_ROOT
-: Root path for http endpoint, defaults to `/`
-
-OCIS_GRPC_ADDR
-: Address to bind grpc server, defaults to `0.0.0.0:9001`
-
-OCIS_SERVICES_ENABLED
-: List of enabled services, defaults to `phoenix,konnectd,graph,ocs,webdav,hello`
-
-#### Health
-
-OCIS_DEBUG_ADDR
-: Address to debug endpoint, defaults to `0.0.0.0:9010`
-
 ### Commandline flags
 
-If you prefer to configure the service with commandline flags you can see the available variables below.
+If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-#### Global
+## Root Command
 
---config-file
-: Path to config file
+ownCloud Infinite Scale Stack
 
---log-level
-: Set logging level, defaults to `info`
+Usage: `ocis [global options] command [command options] [arguments...]`
 
---log-color
-: Enable colored logging, defaults to `true`
+--config-file | $OCIS_CONFIG_FILE  
+: Path to config file.
 
---log-pretty
-: Enable pretty logging, defaults to `true`
+--log-level | $OCIS_LOG_LEVEL  
+: Set logging level. Default: `info`.
 
-#### Server
+--log-pretty | $OCIS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
 
---tracing-enabled
-: Enable sending traces
+--log-color | $OCIS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
---tracing-type
-: Tracing backend type,
+## Sub Commands
 
---tracing-endpoint
-:Endpoint for the agent
+### ocis health
 
---tracing-collector
-: Endpoint for the collector
+Check health status
 
---tracing-service
-: Service name for tracing"
+Usage: `ocis health [command options] [arguments...]`
 
---debug-addr
-: Address to bind debug server, defaults to `0.0.0.0:9010`
+--debug-addr | $OCIS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
 
---debug-token
-: Token to grant metrics access, empty default value
+### ocis server
 
---debug-pprof
-: Enable pprof debugging, defaults to `false`
+Start fullstack server
 
---debug-zpages
-: Enable zpages debugging, defaults to `false`
+Usage: `ocis server [command options] [arguments...]`
 
---http-addr
-: Address to bind http server, defaults to `0.0.0.0:9000`
+--tracing-enabled | $OCIS_TRACING_ENABLED  
+: Enable sending traces.
 
---http-root
-: Root path for http endpoint, defaults to `/`
+--tracing-type | $OCIS_TRACING_TYPE  
+: Tracing backend type. Default: `jaeger`.
 
---grpc-addr
-: Address to bind grpc server, defaults to `0.0.0.0:9001`
+--tracing-endpoint | $OCIS_TRACING_ENDPOINT  
+: Endpoint for the agent.
 
---services-enabled
-: List of enabled services, defaults to `hello,phoenix,graph,graph-explorer,ocs,webdav,reva-frontend,reva-gateway,reva-users,reva-auth-basic,reva-auth-bearer,reva-sharing,reva-storage-root,reva-storage-home,reva-storage-home-data,reva-storage-oc,reva-storage-oc-data,devldap`
+--tracing-collector | $OCIS_TRACING_COLLECTOR  
+: Endpoint for the collector.
 
-#### Health
+--tracing-service | $OCIS_TRACING_SERVICE  
+: Service name for tracing. Default: `ocis`.
 
---debug-addr
-: Address to debug endpoint, defaults to `0.0.0.0:9010`
+--debug-addr | $OCIS_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9010`.
 
-### Configuration file
+--debug-token | $OCIS_DEBUG_TOKEN  
+: Token to grant metrics access.
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+--debug-pprof | $OCIS_DEBUG_PPROF  
+: Enable pprof debugging.
 
-## Usage
+--debug-zpages | $OCIS_DEBUG_ZPAGES  
+: Enable zpages debugging.
 
-The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formated help output if you execute the binary via `ocis --help`.
+--http-addr | $OCIS_HTTP_ADDR  
+: Address to bind http server. Default: `0.0.0.0:9000`.
 
-### Server
+--http-root | $OCIS_HTTP_ROOT  
+: Root path of http server. Default: `/`.
 
-The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
+--grpc-addr | $OCIS_GRPC_ADDR  
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
 
-{{< highlight txt >}}
-ocis server --help
-{{< / highlight >}}
+### List of available Extension subcommands
 
-### Health
+There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
+#### ocis graph
 
-{{< highlight txt >}}
-ocis health --help
-{{< / highlight >}}
+Start graph server
 
-## Metrics
+#### ocis graph-explorer
 
-This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `OCIS_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:8001/metrics`.
+Start graph explorer
 
-go_gc_duration_seconds
-: A summary of the GC invocation durations
+#### ocis phoenix
 
-go_gc_duration_seconds_sum
-: A summary of the GC invocation durations
+Start phoenix server
 
-go_gc_duration_seconds_count
-: A summary of the GC invocation durations
+#### ocis reva-storage-oc-data
 
-go_goroutines
-: Number of goroutines that currently exist
+Start reva oc storage dataprovider
 
-go_info
-: Information about the Go environment
+#### ocis reva-auth-basic
 
-go_memstats_alloc_bytes
-: Number of bytes allocated and still in use
+Start reva auth-basic service
 
-go_memstats_alloc_bytes_total
-: Total number of bytes allocated, even if freed
+#### ocis glauth
 
-go_memstats_buck_hash_sys_bytes
-: Number of bytes used by the profiling bucket hash table
+Start glauth server
 
-go_memstats_frees_total
-: Total number of frees
+#### ocis reva-storage-eos-data
 
-go_memstats_gc_cpu_fraction
-: The fraction of this program's available CPU time used by the GC since the program started
+Start reva eos storage dataprovider
 
-go_memstats_gc_sys_bytes
-: Number of bytes used for garbage collection system metadata
+#### ocis hello
 
-go_memstats_heap_alloc_bytes
-: Number of heap bytes allocated and still in use
+Start hello server
 
-go_memstats_heap_idle_bytes
-: Number of heap bytes waiting to be used
+#### ocis ocs
 
-go_memstats_heap_inuse_bytes
-: Number of heap bytes that are in use
+Start ocs server
 
-go_memstats_heap_objects
-: Number of allocated objects
+#### ocis reva-storage-eos
 
-go_memstats_heap_released_bytes
-: Number of heap bytes released to OS
+Start reva eos storage
 
-go_memstats_heap_sys_bytes
-: Number of heap bytes obtained from system
+#### ocis reva-storage-root
 
-go_memstats_last_gc_time_seconds
-: Number of seconds since 1970 of last garbage collection
+Start reva root storage
 
-go_memstats_lookups_total
-: Total number of pointer lookups
+#### ocis reva-auth-bearer
 
-go_memstats_mallocs_total
-: Total number of mallocs
+Start reva auth-bearer service
 
-go_memstats_mcache_inuse_bytes
-: Number of bytes in use by mcache structures
+#### ocis webdav
 
-go_memstats_mcache_sys_bytes
-: Number of bytes used for mcache structures obtained from system
+Start webdav server
 
-go_memstats_mspan_inuse_bytes
-: Number of bytes in use by mspan structures
+#### ocis reva-gateway
 
-go_memstats_mspan_sys_bytes
-: Number of bytes used for mspan structures obtained from system
+Start reva gateway
 
-go_memstats_next_gc_bytes
-: Number of heap bytes when next garbage collection will take place
+#### ocis reva-frontend
 
-go_memstats_other_sys_bytes
-: Number of bytes used for other system allocations
+Start reva frontend
 
-go_memstats_stack_inuse_bytes
-: Number of bytes in use by the stack allocator
+#### ocis reva-storage-home-data
 
-go_memstats_stack_sys_bytes
-: Number of bytes obtained from system for stack allocator
+Start reva home storage dataprovider
 
-go_memstats_sys_bytes
-: Number of bytes obtained from system
+#### ocis konnectd
 
-go_threads
-: Number of OS threads created
+Start konnectd server
 
-promhttp_metric_handler_requests_in_flight
-: Current number of scrapes being served
+#### ocis reva-users
 
-promhttp_metric_handler_requests_total
-: Total number of scrapes by HTTP status code
+Start reva users service
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis reva-sharing
+
+Start reva sharing service
+
+#### ocis reva-storage-home
+
+Start reva home storage
+
+#### ocis reva-storage-oc
+
+Start reva oc storage
+
+#### ocis thumbnails
+
+Start thumbnails server
+

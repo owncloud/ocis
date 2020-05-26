@@ -9,25 +9,25 @@ import (
 	"github.com/owncloud/ocis/pkg/register"
 )
 
-// RevaStorageHomeCommand is the entrypoint for the reva-storage-home command.
-func RevaStorageHomeCommand(cfg *config.Config) *cli.Command {
+// RevaStorageEOSDataCommand is the entrypoint for the reva-storage-eos-data command.
+func RevaStorageEOSDataCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "reva-storage-home",
-		Usage:    "Start reva home storage",
+		Name:     "reva-storage-eos-data",
+		Usage:    "Start reva eos storage dataprovider",
 		Category: "Extensions",
-		Flags:    flagset.StorageHomeWithConfig(cfg.Reva),
+		Flags:    flagset.StorageEOSDataWithConfig(cfg.Reva),
 		Action: func(c *cli.Context) error {
-			scfg := configureRevaStorageHome(cfg)
+			scfg := configureRevaStorageEOSData(cfg)
 
 			return cli.HandleAction(
-				command.StorageHome(scfg).Action,
+				command.StorageEOSData(scfg).Action,
 				c,
 			)
 		},
 	}
 }
 
-func configureRevaStorageHome(cfg *config.Config) *svcconfig.Config {
+func configureRevaStorageEOSData(cfg *config.Config) *svcconfig.Config {
 	cfg.Reva.Log.Level = cfg.Log.Level
 	cfg.Reva.Log.Pretty = cfg.Log.Pretty
 	cfg.Reva.Log.Color = cfg.Log.Color
@@ -36,5 +36,5 @@ func configureRevaStorageHome(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(RevaStorageHomeCommand)
+	register.AddCommand(RevaStorageEOSDataCommand)
 }

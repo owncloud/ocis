@@ -14,11 +14,23 @@ git clone https://github.com/owncloud/ocis.git
 cd ocis
 {{< / highlight >}}
 
-All required tool besides Go itself and make are bundled or getting automatically installed within the `GOPATH`. All commands to build this project are part of our `Makefile`.
+All required tools besides Go itself and make are bundled or getting automatically installed within the `GOPATH`. All commands to build this project are part of our `Makefile`. To build the `ocis` binary run:
 
-## Simple Ocis
+{{< highlight txt >}}
+make generate
+make build
+{{< / highlight >}}
 
-Building the simple ocis binary:
+Finally, you should have the binary within the `bin/` folder now, give it a try with `./bin/ocis -h` to see all available options.
+
+
+## Simple Ocis fo extonsions example
+
+Currently, we are using a go build tag to allow building a more simple set of the binary. It was intended to let extension developers focus on only the necessary services.
+
+{{< hint info >}}
+While it the tag based simple build demonstrates how to use ocis as a framework for a micro service architecture, we may change to an approach that uses an explicit command to run only a subset of the services.
+{{< / hint >}}
 
 ```console
 TAGS=simple make build
@@ -28,20 +40,10 @@ The artifact lives in `/bin/ocis`
 
 The generated simple ocis binary is a subset of the ocis command with a restricted set of services meant for ease up development. The services included are
 
-
 ```
 ocis-hello
-phoenix
-konnectd
-devldap
+ocis-phoenix
+ocis-konnectd
+ocis-glauth
 micro's own services
 ```
-
-## Backend
-
-{{< highlight txt >}}
-make generate
-make build
-{{< / highlight >}}
-
-Finally you should have the binary within the `bin/` folder now, give it a try with `./bin/ocis -h` to see all available options.
