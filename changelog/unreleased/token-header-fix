@@ -1,0 +1,5 @@
+Bugfix: Fix x-access-token in header
+
+We fixed setting the x-access-token in the request header, which was broken before.
+
+https://github.com/owncloud/ocis-proxy/pull/41
