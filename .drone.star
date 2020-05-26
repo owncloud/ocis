@@ -158,7 +158,8 @@ def testing(ctx):
           'LDAP_URI': 'ldap://ldap',
           'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
           'LDAP_BINDPW': 'admin',
-          'LDAP_BASEDN': 'dc=owncloud,dc=com'
+          'LDAP_BASEDN': 'dc=owncloud,dc=com',
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
         },
         'commands': [
           'apk add mailcap', # install /etc/mime.types
