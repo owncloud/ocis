@@ -103,7 +103,7 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 				return
 			}
 
-			w.Header().Set("x-access-token", token)
+			r.Header.Set("x-access-token", token)
 			next.ServeHTTP(w, r)
 		})
 	}
