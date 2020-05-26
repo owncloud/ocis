@@ -132,6 +132,7 @@ def testing(ctx):
         'pull': 'always',
         'detach': True,
         'environment' : {
+          'REVA_USERS_DRIVER' : 'ldap',
           'REVA_LDAP_HOSTNAME': 'ldap',
           'REVA_LDAP_PORT': 636,
           'REVA_LDAP_BIND_PASSWORD': 'admin',
