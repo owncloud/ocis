@@ -18,6 +18,7 @@ func newAccountOptions(opts ...account.Option) account.Options {
 	return opt
 }
 
+// UUIDKey serves as key for the account uuid in the context
 var UUIDKey struct{}
 
 // ExtractAccountUUID provides a middleware to extract the account uuid from the x-access-token header value
