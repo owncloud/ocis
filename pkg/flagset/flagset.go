@@ -163,5 +163,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"SETTINGS_ROOT_MOUNT_PATH"},
 			Destination: &cfg.Storage.RootMountPath,
 		},
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
+			EnvVars:     []string{"SETTINGS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
 	}
 }
