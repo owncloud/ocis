@@ -7,24 +7,31 @@ import (
 // NewInMemoryStorage creates a new InMemory instance.
 func NewInMemoryStorage() InMemory {
 	return InMemory{
-		store: make(map[string][]byte),
+		store: make(map[string]map[string][]byte),
 	}
 }
 
 // InMemory represents an in memory storage for thumbnails
 // Can be used during development
 type InMemory struct {
-	store map[string][]byte
+	store map[string]map[string][]byte
 }
 
 // Get loads the thumbnail from memory.
-func (s InMemory) Get(key string) []byte {
-	return s.store[key]
+func (s InMemory) Get(username string, key string) []byte {
+	userImages := s.store[username]
+	if userImages == nil {
+		return nil
+	}
+	return s.store[username][key]
 }
 
 // Set stores the thumbnail in memory.
-func (s InMemory) Set(key string, thumbnail []byte) error {
-	s.store[key] = thumbnail
+func (s InMemory) Set(username string, key string, thumbnail []byte) error {
+	if _, ok := s.store[username]; !ok {
+		s.store[username] = make(map[string][]byte)
+	}
+	s.store[username][key] = thumbnail
 	return nil
 }
 

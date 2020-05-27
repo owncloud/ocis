@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"gopkg.in/square/go-jose.v2/jwt"
+
 	"github.com/owncloud/ocis-pkg/v2/log"
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+	"github.com/pkg/errors"
 )
 
 // NewService returns a service implementation for Service.
@@ -47,11 +50,22 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
 	}
 	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
+
+	auth := req.Authorization
+	if auth == "" {
+		return fmt.Errorf("authorization is missing")
+	}
+	username, err := usernameFromAuthorization(auth)
+	if err != nil {
+		return err
+	}
+
 	tr := thumbnail.Request{
 		Resolution: r,
 		ImagePath:  req.Filepath,
 		Encoder:    encoder,
 		ETag:       req.Etag,
+		Username:   username,
 	}
 
 	thumbnail := g.manager.GetStored(tr)
@@ -61,7 +75,6 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		return nil
 	}
 
-	auth := req.Authorization
 	sCtx := imgsource.WithAuthorization(ctx, auth)
 	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
@@ -78,4 +91,23 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	rsp.Thumbnail = thumbnail
 	rsp.Mimetype = tr.Encoder.MimeType()
 	return nil
+}
+
+func usernameFromAuthorization(auth string) (string, error) {
+	tokenString := auth[len("Bearer "):] // strip the bearer prefix
+
+	var claims map[string]interface{}
+	token, err := jwt.ParseSigned(tokenString)
+	if err != nil {
+		return "", errors.Wrap(err, "could not parse auth token")
+	}
+	err = token.UnsafeClaimsWithoutVerification(&claims)
+	if err != nil {
+		return "", errors.Wrap(err, "could not get claims from auth token")
+	}
+
+	identityMap := claims["kc.identity"].(map[string]interface{})
+	username := identityMap["kc.i.un"].(string)
+
+	return username, nil
 }

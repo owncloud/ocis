@@ -16,6 +16,7 @@ type Request struct {
 	ImagePath  string
 	Encoder    Encoder
 	ETag       string
+	Username   string
 }
 
 // Manager is responsible for generating thumbnails
@@ -53,7 +54,7 @@ func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
 		return nil, err
 	}
 	bytes := buf.Bytes()
-	err = s.storage.Set(key, bytes)
+	err = s.storage.Set(r.Username, key, bytes)
 	if err != nil {
 		s.logger.Warn().Err(err).Msg("could not store thumbnail")
 	}
@@ -64,7 +65,7 @@ func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
 // If there is no cached thumbnail it will return nil
 func (s SimpleManager) GetStored(r Request) []byte {
 	key := s.storage.BuildKey(mapToStorageRequest(r))
-	stored := s.storage.Get(key)
+	stored := s.storage.Get(r.Username, key)
 	return stored
 }
 
