@@ -2,12 +2,11 @@ package svc
 
 import (
 	"context"
-
-	"github.com/owncloud/ocis-settings/pkg/settings"
-	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
-
+	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis-settings/pkg/settings"
+	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
 )
 
 // Service represents a service.
@@ -26,7 +25,7 @@ func NewService(cfg *config.Config) Service {
 
 // SaveSettingsBundle implements the BundleServiceHandler interface
 func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBundleRequest, res *proto.SaveSettingsBundleResponse) error {
-	req.SettingsBundle.Identifier = getFailsafeIdentifier(req.SettingsBundle.Identifier)
+	req.SettingsBundle.Identifier = getFailsafeIdentifier(c, req.SettingsBundle.Identifier)
 	r, err := g.manager.WriteBundle(req.SettingsBundle)
 	if err != nil {
 		return err
@@ -37,7 +36,7 @@ func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBu
 
 // GetSettingsBundle implements the BundleServiceHandler interface
 func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
-	r, err := g.manager.ReadBundle(getFailsafeIdentifier(req.Identifier))
+	r, err := g.manager.ReadBundle(getFailsafeIdentifier(c, req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -47,7 +46,7 @@ func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBund
 
 // ListSettingsBundles implements the BundleServiceHandler interface
 func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
-	r, err := g.manager.ListBundles(getFailsafeIdentifier(req.Identifier))
+	r, err := g.manager.ListBundles(getFailsafeIdentifier(c, req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -57,7 +56,7 @@ func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsB
 
 // SaveSettingsValue implements the ValueServiceHandler interface
 func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsValueRequest, res *proto.SaveSettingsValueResponse) error {
-	req.SettingsValue.Identifier = getFailsafeIdentifier(req.SettingsValue.Identifier)
+	req.SettingsValue.Identifier = getFailsafeIdentifier(c, req.SettingsValue.Identifier)
 	r, err := g.manager.WriteValue(req.SettingsValue)
 	if err != nil {
 		return err
@@ -68,7 +67,7 @@ func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsVal
 
 // GetSettingsValue implements the ValueServiceHandler interface
 func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValueRequest, res *proto.GetSettingsValueResponse) error {
-	r, err := g.manager.ReadValue(getFailsafeIdentifier(req.Identifier))
+	r, err := g.manager.ReadValue(getFailsafeIdentifier(c, req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -78,7 +77,7 @@ func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValue
 
 // ListSettingsValues implements the ValueServiceHandler interface
 func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsValuesRequest, res *proto.ListSettingsValuesResponse) error {
-	r, err := g.manager.ListValues(getFailsafeIdentifier(req.Identifier))
+	r, err := g.manager.ListValues(getFailsafeIdentifier(c, req.Identifier))
 	if err != nil {
 		return err
 	}
@@ -86,12 +85,20 @@ func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsVa
 	return nil
 }
 
-func getFailsafeIdentifier(identifier *proto.Identifier) *proto.Identifier {
+// getFailsafeIdentifier makes sure that there is an identifier, and that the account uuid is injected if needed.
+func getFailsafeIdentifier(c context.Context, identifier *proto.Identifier) *proto.Identifier {
 	if identifier == nil {
 		identifier = &proto.Identifier{}
 	}
 	if identifier.AccountUuid == "me" {
-		identifier.AccountUuid = "5681371F-4A6E-43BC-8BB5-9C9237FA9C58"
+		ownAccountUUID := c.Value(middleware.UUIDKey).(string)
+		if len(ownAccountUUID) > 0 {
+			identifier.AccountUuid = ownAccountUUID
+		} else {
+			// might be valid for the request not having an AccountUuid in the identifier.
+			// but clear it, instead of passing on `me`.
+			identifier.AccountUuid = ""
+		}
 	}
 	return identifier
 }
