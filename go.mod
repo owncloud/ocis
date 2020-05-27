@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/aws/aws-sdk-go v1.31.1 // indirect
+	github.com/bmatcuk/doublestar v1.3.0 // indirect
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/coreos/etcd v3.3.21+incompatible // indirect
@@ -15,15 +15,16 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/golang/protobuf v1.4.2 // indirect
-	github.com/lucas-clemente/quic-go v0.15.7 // indirect
+	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
+	github.com/karrick/godirwalk v1.15.6 // indirect
+	github.com/labstack/echo v3.3.10+incompatible // indirect
+	github.com/labstack/gommon v0.3.0 // indirect
+	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.7.0
-	github.com/micro/micro v1.16.0 // indirect
-	github.com/micro/micro/v2 v2.7.0
-	github.com/miekg/dns v1.1.29 // indirect
-	github.com/nats-io/nats.go v1.10.0 // indirect
+	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
+	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
+	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
+	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis-accounts v0.1.2-0.20200522103104-a5d5eac711c1
@@ -34,25 +35,22 @@ require (
 	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-migration v0.1.1-0.20200519133726-4c6b7daff23c
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
-	github.com/owncloud/ocis-phoenix v0.6.0
+	github.com/owncloud/ocis-phoenix v0.7.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
-	github.com/owncloud/ocis-proxy v0.3.2-0.20200522110058-d7eab502160d
-	github.com/owncloud/ocis-reva v0.3.1-0.20200525143909-a948b5fe5db6
-	github.com/owncloud/ocis-settings v0.0.0-20200522102142-c1adfd2c26b2
-	github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb
+	github.com/owncloud/ocis-proxy v0.3.1
+	github.com/owncloud/ocis-reva v0.3.0
+	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c
 	github.com/restic/calens v0.2.0
+	github.com/valyala/fasttemplate v1.1.0 // indirect
 	go.opencensus.io v0.22.3
-	go.uber.org/zap v1.15.0 // indirect
+	go.uber.org/atomic v1.5.1 // indirect
+	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
-	golang.org/x/net v0.0.0-20200519113804-d87ec0cfa476 // indirect
-	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
-	golang.org/x/tools v0.0.0-20200519205726-57a9e4404bf7 // indirect
-	google.golang.org/genproto v0.0.0-20200519141106-08726f379972 // indirect
-	gopkg.in/olivere/elastic.v5 v5.0.83 // indirect
+	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
+	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
