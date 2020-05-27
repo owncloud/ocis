@@ -874,6 +874,8 @@ github.com/owncloud/ocis-pkg/v2 v2.2.1 h1:LK7WxHYugEFQ9NHTOz0EP8DRjbt51wXhyqruV0
 github.com/owncloud/ocis-pkg/v2 v2.2.1/go.mod h1:MXv7QzsYsu4YWuyJxhq1kLLmJa/r5gbqHe1FXulMHaw=
 github.com/owncloud/ocis-proxy v0.3.1 h1:49weyxHNQjOeWTaf31LlQp5uul8ZoJenfe9o4P4fetU=
 github.com/owncloud/ocis-proxy v0.3.1/go.mod h1:HwsIKM9etps19bBVwjOX+Jrv9pfDvw3azvaHaxMiBCI=
+github.com/owncloud/ocis-proxy v0.3.2-0.20200526160332-ea254d603659 h1:zWDmNSbhfZB5NiW63a0wCbeugH70SnlQABaRJf7WbR8=
+github.com/owncloud/ocis-proxy v0.3.2-0.20200526160332-ea254d603659/go.mod h1:XPqctXYxoXPmqtxuXRQ8RJ9StVrbilFLkwsWh9bcdsE=
 github.com/owncloud/ocis-reva v0.2.1 h1:4aOOJT7tn9GCeNCM+qr33de2xobW4nAKJUvbb0BpL2k=
 github.com/owncloud/ocis-reva v0.2.1/go.mod h1:Ew9XgScQzFbdpSZySq1PHVISgd4y03Ms62lFy+mAx2s=
 github.com/owncloud/ocis-reva v0.2.2-0.20200513073117-ee9cd9b8d3ab h1:WNIv1WkJi5JiLEEf8OzSZXUjiad9pqYk9+EUKklwq9k=

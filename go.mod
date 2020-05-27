@@ -36,7 +36,7 @@ require (
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.7.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
-	github.com/owncloud/ocis-proxy v0.3.1
+	github.com/owncloud/ocis-proxy v0.3.2-0.20200526160332-ea254d603659
 	github.com/owncloud/ocis-reva v0.3.0
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/owncloud/ocis-thumbnails v0.1.2
@@ -56,5 +56,3 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
-
-replace github.com/owncloud/ocis-proxy => ../ocis-proxy
