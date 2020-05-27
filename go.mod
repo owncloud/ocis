@@ -19,7 +19,9 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.3
 	go.opencensus.io v0.22.3
+	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
+	golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2 // indirect
 	google.golang.org/genproto v0.0.0-20200420144010-e5e8543f8aeb
 	google.golang.org/grpc v1.28.0
 	google.golang.org/protobuf v1.21.0
