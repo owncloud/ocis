@@ -18,3 +18,5 @@ require (
 	go.opencensus.io v0.22.3
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
