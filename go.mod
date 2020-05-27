@@ -12,6 +12,7 @@ require (
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
 	github.com/golang/protobuf v1.3.2
+	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/mattn/go-colorable v0.1.2 // indirect
@@ -23,6 +24,7 @@ require (
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.2.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.2.2 // indirect
@@ -32,5 +34,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200420201142-3c4aac89819a // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/tools v0.0.0-20200421042724-cfa8b22178d2 // indirect
+	gopkg.in/square/go-jose.v2 v2.3.1
 	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )
