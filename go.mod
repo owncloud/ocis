@@ -41,7 +41,7 @@ require (
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
-	github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c
+	github.com/refs/pman v0.0.0-20200527204655-c9ccd1c53cc3
 	github.com/restic/calens v0.2.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	go.opencensus.io v0.22.3
