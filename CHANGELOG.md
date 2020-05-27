@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.2.1...master
+
+## Summary
+
+* Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
+
+## Details
+
+* Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
+
+   We added a middleware that dismantles the `x-access-token` from the request header and makes
+   it available in the context.
+
+   https://github.com/owncloud/ocis-pkg/pull/46
+
 # Changelog for [2.2.1] (2020-04-21)
 
 The following sections list the changes in ocis-pkg 2.2.1.
