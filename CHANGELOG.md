@@ -8,6 +8,7 @@ The following sections list the changes in ocis-thumbnails unreleased.
 
 * Change - Add more default resolutions: [#23](https://github.com/owncloud/ocis-thumbnails/issues/23)
 * Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
+* Enhancement - Limit users to access own thumbnails: [#5](https://github.com/owncloud/ocis-thumbnails/issues/5)
 
 ## Details
 
@@ -24,6 +25,14 @@ The following sections list the changes in ocis-thumbnails unreleased.
    Scanning the code using a static code analyzer showed some code smells. This change fixes them.
 
    https://github.com/owncloud/ocis-thumbnails/issues/21
+
+
+* Enhancement - Limit users to access own thumbnails: [#5](https://github.com/owncloud/ocis-thumbnails/issues/5)
+
+   Users of the service can no longer request thumbnails of another users by guessing the etag. The
+   thumbnails are now only accessible by the users who created the thumbnail.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/5
 
 # Changelog for [0.1.2] (2020-05-11)
 
