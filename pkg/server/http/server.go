@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/owncloud/ocis-pkg/v2/account"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/service/http"
 	"github.com/owncloud/ocis-settings/pkg/assets"
@@ -39,6 +40,10 @@ func Server(opts ...Option) http.Service {
 	mux.Use(middleware.Cache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)
+	mux.Use(middleware.ExtractAccountUUID(
+		account.Logger(options.Logger),
+		account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+	)
 
 	mux.Use(middleware.Version(
 		"settings",
