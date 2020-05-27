@@ -15,15 +15,14 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
-	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
-	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
+	github.com/micro/cli/v2 v2.1.2
+	github.com/micro/go-micro/v2 v2.7.0
+	github.com/micro/micro/v2 v2.7.0
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
@@ -39,6 +38,7 @@ require (
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.3.1
 	github.com/owncloud/ocis-reva v0.3.0
+	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c
@@ -56,3 +56,5 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
+
+replace github.com/owncloud/ocis-proxy => ../ocis-proxy
