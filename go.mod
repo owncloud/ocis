@@ -42,13 +42,10 @@ require (
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
-<<<<<<< HEAD
-=======
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
 	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
->>>>>>> master
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
