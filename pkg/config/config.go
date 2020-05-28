@@ -21,6 +21,7 @@ type Gateway struct {
 	CommitShareToStorageGrant  bool
 	CommitShareToStorageRef    bool
 	ShareFolder                string
+	LinkGrants                 string
 	DisableHomeCreationOnLogin bool
 	// include the home folder config for the storage registry
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
@@ -77,6 +78,16 @@ type StoragePort struct {
 	// for HTTP ports with only one http service
 	Prefix     string
 	TempFolder string
+}
+
+// PublicStorage configures a public storage provider
+type PublicStorage struct {
+	StoragePort
+
+	PublicShareProviderAddr string
+	StorageProviderAddr     string
+	UserProviderAddr        string
+	MountID                 string
 }
 
 // StorageConfig combines all available storage driver configuration parts.
@@ -238,6 +249,7 @@ type Reva struct {
 	StorageWNDData    StoragePort
 	StorageCustom     StoragePort
 	StorageCustomData StoragePort
+	StoragePublicLink PublicStorage
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}

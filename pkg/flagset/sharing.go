@@ -136,7 +136,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "public-driver",
-			Value:       "memory",
+			Value:       "json",
 			Usage:       "driver to use for the PublicShareProvider",
 			EnvVars:     []string{"REVA_SHARING_PUBLIC_DRIVER"},
 			Destination: &cfg.Reva.Sharing.PublicDriver,

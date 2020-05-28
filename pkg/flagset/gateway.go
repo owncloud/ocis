@@ -159,6 +159,14 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_GATEWAY_SHARE_FOLDER"},
 			Destination: &cfg.Reva.Gateway.ShareFolder,
 		},
+		// TODO(refs) temporary workaround needed for storing link grants.
+		&cli.StringFlag{
+			Name:        "link_grants_file",
+			Value:       "/var/tmp/reva/link_grants.json",
+			Usage:       "when using a json manager, file to use as json serialized database",
+			EnvVars:     []string{"REVA_GATEWAY_LINK_GRANTS_FILE"},
+			Destination: &cfg.Reva.Gateway.LinkGrants,
+		},
 		&cli.BoolFlag{
 			Name:        "disable-home-creation-on-login",
 			Usage:       "Disable creation of home folder on login",
@@ -294,6 +302,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_OC_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageOC.MountID,
+		},
+		&cli.StringFlag{
+			Name:        "public-links-url",
+			Value:       "localhost:10054",
+			Usage:       "URL to use for the public links service",
+			EnvVars:     []string{"REVA_STORAGE_PUBLIC_LINK_URL"},
+			Destination: &cfg.Reva.StoragePublicLink.URL,
 		},
 	}
 }
