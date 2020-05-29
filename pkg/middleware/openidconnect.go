@@ -48,6 +48,15 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 		opt.SigningAlgs = []string{"RS256", "PS256"}
 	}
 
+	var oidcHTTPClient = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: opt.Insecure,
+			},
+			DisableKeepAlives: true,
+		},
+		Timeout: time.Second * 10,
+	}
 	var oidcProvider *oidc.Provider
 
 	return func(next http.Handler) http.Handler {
@@ -62,17 +71,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 				return
 			}
 
-			token := header[7:]
-			customHTTPClient := &http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: opt.Insecure,
-					},
-				},
-				Timeout: time.Second * 10,
-			}
-
-			customCtx := context.WithValue(r.Context(), oauth2.HTTPClient, customHTTPClient)
+			customCtx := context.WithValue(r.Context(), oauth2.HTTPClient, oidcHTTPClient)
 
 			// use cached provider
 			if oidcProvider == nil {
@@ -89,13 +88,15 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 				oidcProvider = provider
 			}
 
-			// The claims we want to have
-			var claims ocisoidc.StandardClaims
+			token := strings.TrimPrefix(header, "Bearer ")
 
 			// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
 			oauth2Token := &oauth2.Token{
 				AccessToken: token,
 			}
+
+			// The claims we want to have
+			var claims ocisoidc.StandardClaims
 			userInfo, err := oidcProvider.UserInfo(customCtx, oauth2.StaticTokenSource(oauth2Token))
 			if err != nil {
 				opt.Logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
