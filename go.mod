@@ -10,7 +10,6 @@ require (
 	github.com/bmatcuk/doublestar v1.3.0 // indirect
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
-	github.com/cs3org/reva v0.1.1-0.20200528123359-7d74bf8e9928 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
@@ -36,7 +35,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.7.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.3.1
-	github.com/owncloud/ocis-reva v0.3.1-0.20200528185917-b1aedb9f6095
+	github.com/owncloud/ocis-reva v0.4.0
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/restic/calens v0.2.0
