@@ -186,7 +186,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 											},
 										},
 										"notifications": map[string]interface{}{
-											"endpoints": []string{"list", "get", "delete"},
+											"endpoints": []string{"disable"},
 										},
 									},
 									"version": map[string]interface{}{
