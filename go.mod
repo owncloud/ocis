@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/cs3org/reva v0.1.1-0.20200528123359-7d74bf8e9928
+	github.com/cs3org/reva v0.1.1-0.20200529120551-4f2d9c85d3c9
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect
