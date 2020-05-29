@@ -255,7 +255,8 @@ type Reva struct {
 	Configs map[string]interface{}
 	// chunking and resumable upload config (TUS)
 	UploadMaxChunkSize       int
-	UploadHttpMethodOverride string
+	UploadHTTPMethodOverride string
+	UploadDisableTus         bool
 }
 
 // Tracing defines the available tracing configuration.

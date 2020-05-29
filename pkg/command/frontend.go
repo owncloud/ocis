@@ -78,6 +78,24 @@ func Frontend(cfg *config.Config) *cli.Command {
 					desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 				}
 
+				filesCfg := map[string]interface{}{
+					"private_links":     false,
+					"bigfilechunking":   false,
+					"blacklisted_files": []string{},
+					"undelete":          true,
+					"versioning":        true,
+				}
+
+				if !cfg.Reva.UploadDisableTus {
+					filesCfg["tus_support"] = map[string]interface{}{
+						"version":              "1.0.0",
+						"resumable":            "1.0.0",
+						"extension":            "creation,creation-with-upload",
+						"http_method_override": cfg.Reva.UploadHTTPMethodOverride,
+						"max_chunk_size":       int(cfg.Reva.UploadMaxChunkSize),
+					}
+				}
+
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
 						"max_cpus":             cfg.Reva.Users.MaxCPUs,
@@ -108,6 +126,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"chunk_folder":     "/var/tmp/reva/chunks",
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
+								"disable_tus":      cfg.Reva.UploadDisableTus,
 							},
 							"ocs": map[string]interface{}{
 								"config": map[string]interface{}{
@@ -117,6 +136,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 									"contact": "admin@localhost",
 									"ssl":     "false",
 								},
+								"disable_tus": cfg.Reva.UploadDisableTus,
 								"capabilities": map[string]interface{}{
 									"capabilities": map[string]interface{}{
 										"core": map[string]interface{}{
@@ -137,21 +157,8 @@ func Frontend(cfg *config.Config) *cli.Command {
 											"supported_types":       []string{"SHA256"},
 											"preferred_upload_type": "SHA256",
 										},
-										"files": map[string]interface{}{
-											"private_links":     false,
-											"bigfilechunking":   false,
-											"blacklisted_files": []string{},
-											"undelete":          true,
-											"versioning":        true,
-											"tus_support": map[string]interface{}{
-												"version":              "1.0.0",
-												"resumable":            "1.0.0",
-												"extension":            "creation,creation-with-upload",
-												"http_method_override": cfg.Reva.UploadHttpMethodOverride,
-												"max_chunk_size":       int(cfg.Reva.UploadMaxChunkSize),
-											},
-										},
-										"dav": map[string]interface{}{},
+										"files": filesCfg,
+										"dav":   map[string]interface{}{},
 										"files_sharing": map[string]interface{}{
 											"api_enabled":                       true,
 											"resharing":                         true,

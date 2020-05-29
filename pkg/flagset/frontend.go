@@ -159,6 +159,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		// Chunking
+		&cli.BoolFlag{
+			Name:        "upload-disable-tus",
+			Value:       false,
+			Usage:       "Tells clients to not use TUS by disabling the capability (this doesn't disable the endpoints)",
+			EnvVars:     []string{"REVA_FRONTEND_UPLOAD_DISABLE_TUS"},
+			Destination: &cfg.Reva.UploadDisableTus,
+		},
 		&cli.IntFlag{
 			Name:        "upload-max-chunk-size",
 			Value:       0,
@@ -171,7 +178,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "",
 			Usage:       "Specify an HTTP method (ex: POST) to use when uploading in case OPTIONS and PATCH are not available",
 			EnvVars:     []string{"REVA_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE"},
-			Destination: &cfg.Reva.UploadHttpMethodOverride,
+			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
 	}
 }
