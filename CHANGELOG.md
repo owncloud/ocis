@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Bugfix - Fix x-access-token in header: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
+* Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
 * Enhancement - Make jwt secret configurable: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
 
 ## Details
@@ -16,6 +17,15 @@ The following sections list the changes for ocis-proxy unreleased.
    We fixed setting the x-access-token in the request header, which was broken before.
 
    https://github.com/owncloud/ocis-proxy/pull/41
+
+
+* Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
+
+   This should reduce file-descriptor counts
+
+   https://github.com/owncloud/ocis/issues/268
+   https://github.com/owncloud/ocis-proxy/pull/42
+   https://github.com/cs3org/reva/pull/787
 
 
 * Enhancement - Make jwt secret configurable: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
