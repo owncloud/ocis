@@ -6,6 +6,7 @@
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-thumbnails?status.svg)](http://godoc.org/github.com/owncloud/ocis-thumbnails)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-thumbnails)](http://goreportcard.com/report/github.com/owncloud/ocis-thumbnails)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-thumbnails.svg)](http://microbadger.com/images/owncloud/ocis-thumbnails "Get your own image badge on microbadger.com")
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=owncloud_ocis-thumbnails&metric=alert_status)](https://sonarcloud.io/dashboard?id=owncloud_ocis-thumbnails)
 
 **This project is under heavy development, it's not in a working state yet!**
 
