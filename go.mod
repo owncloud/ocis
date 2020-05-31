@@ -20,6 +20,7 @@ require (
 	github.com/micro/cli/v2 v2.1.2-0.20200203150404-894195727d9c
 	github.com/micro/go-micro/v2 v2.0.1-0.20200212105717-d76baf59de2e
 	github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
@@ -34,7 +35,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.7.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/owncloud/ocis-proxy v0.3.1
-	github.com/owncloud/ocis-reva v0.3.0
+	github.com/owncloud/ocis-reva v0.4.0
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/restic/calens v0.2.0
