@@ -7,4 +7,4 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: extensions-framework/_index.md
 ---
 
-Extension framework is one of the fundamental building blocks of oCIS. In the following documentation, you will learn how oCIS extensions work and how to create your own.
+The extension framework is one of the fundamental building blocks of oCIS. In the following documentation, you will learn how oCIS extensions work, how to create your own and how they can be integrated into your setup. If you want to see an example oCIS extension, you can take a look at the [ocis-hello documentation](https://owncloud.github.io/extensions/ocis_hello/).

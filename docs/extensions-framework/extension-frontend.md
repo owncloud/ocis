@@ -1,16 +1,16 @@
 ---
-title: "Create frontend"
+title: "Extension frontend"
 date: 2020-05-28T10:39:00+01:00
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
-geekdocFilePath: extensions-framework/create-frontend.md
+geekdocFilePath: extensions-framework/extension-frontend.md
 ---
 
 {{< toc >}}
 
-## Extension points
-As of today, there are several extension points inside of Phoenix.
+## Frontend extension points
+As of today, there are several extension points inside of ocis-web.
 
 | Name          | Description |
 | :------------ | :---------- |
@@ -20,7 +20,7 @@ As of today, there are several extension points inside of Phoenix.
 | Nav items     | Nav items included in the navigation sidebar pointing to their assigned routes. |
 | Store         | A global store which can be accessed by any other extension. |
 
-In addition to all the Phoenix extension points, we have defined also the following extension points inside of our [files app](https://github.com/owncloud/phoenix/tree/master/apps/files).
+In addition to all the ocis-web extension points, we have defined the following extension points inside of our [files app](https://github.com/owncloud/phoenix/tree/master/apps/files).
 
 | Name                   | Description |
 | :------------          | :---------- |
@@ -42,7 +42,7 @@ All necessary information about the extension.
 const appInfo = {
   name: 'Example extension',
   id: 'example-extension',
-  icon: 'document',
+  icon: 'document', // You can find a list of available icons in our design system documentation https://owncloud.design/#/Design%20Tokens/Icon
   // Following values are optional and part of the files app extension points
   // In case the extension is a file editor, you can register it by providing file extensions
   extensions: [
@@ -88,7 +88,7 @@ const navItems = [
 ```
 
 #### Final export
-In the final export should be also included store and translations, if exists.
+The final export can optionally include a vuex-store and translations.
 
 ```js
 export default {
