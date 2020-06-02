@@ -12,7 +12,7 @@
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 * Enhancement - Update extensions: [#290](https://github.com/owncloud/ocis/pull/290)
-* Enhancement - Update ocis-phoenix to 0.7.0: [#293](https://github.com/owncloud/ocis/pull/293)
+* Enhancement - Update ocis-reva to 0.4.0: [#295](https://github.com/owncloud/ocis/pull/295)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
@@ -99,11 +99,12 @@
    https://github.com/owncloud/ocis/pull/290
 
 
-* Enhancement - Update ocis-phoenix to 0.7.0: [#293](https://github.com/owncloud/ocis/pull/293)
+* Enhancement - Update ocis-reva to 0.4.0: [#295](https://github.com/owncloud/ocis/pull/295)
 
-   - ocis-phoenix v0.7.0 (tag)
+   Brings in fixes for trashbin and TUS upload. Also adds partial implementation of public
+   shares.
 
-   https://github.com/owncloud/ocis/pull/293
+   https://github.com/owncloud/ocis/pull/295
 
 
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
