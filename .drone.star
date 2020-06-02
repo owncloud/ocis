@@ -65,7 +65,7 @@ def testing(ctx):
         'image': 'golangci/golangci-lint:latest',
         'pull': 'always',
         'commands': [
-          'golangci-lint run',
+          'golangci-lint run --timeout 30s',
         ],
         'volumes': [
           {
