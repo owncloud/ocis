@@ -62,10 +62,10 @@ def testing(ctx):
       },
       {
         'name': 'staticcheck',
-        'image': 'golangci/golangci-lint:latest',
+        'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
-          'golangci-lint run --timeout 30s',
+          'make staticcheck',
         ],
         'volumes': [
           {
