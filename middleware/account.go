@@ -46,6 +46,8 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 				return
 			}
 
+			// Important: user.Id.OpaqueId is the AccountUUID. Set this way in the account uuid middleware in ocis-proxy.
+			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
 			ctx := context.WithValue(r.Context(), UUIDKey, user.Id.OpaqueId)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
