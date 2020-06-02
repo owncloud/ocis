@@ -42,7 +42,6 @@ var (
 		"reva-users",
 		"reva-auth-basic",
 		"reva-auth-bearer",
-		"reva-sharing",
 		// "reva-storage-root",
 		"reva-storage-home",
 		"reva-storage-public-link",
