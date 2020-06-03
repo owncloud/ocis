@@ -28,7 +28,12 @@ func validateSaveSettingsBundle(req *proto.SaveSettingsBundleRequest) error {
 	if err := validateBundleIdentifier(req.SettingsBundle.Identifier); err != nil {
 		return err
 	}
-	return nil
+	bundleErrors := validation.ValidateStruct(
+		req.SettingsBundle,
+		validation.Field(&req.SettingsBundle.DisplayName, validation.Required),
+		validation.Field(&req.SettingsBundle.Settings, validation.Required),
+	)
+	return bundleErrors
 }
 
 func validateGetSettingsBundle(req *proto.GetSettingsBundleRequest) error {

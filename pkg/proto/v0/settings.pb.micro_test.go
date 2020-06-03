@@ -16,6 +16,21 @@ import (
 
 var service = grpc.Service{}
 
+var (
+	dummySettings = []*proto.Setting{
+		{
+			DisplayName: "dummy setting",
+			SettingKey:  "dummy-setting",
+			Value: &proto.Setting_IntValue{
+				IntValue: &proto.IntSetting{
+					Default: 42,
+				},
+			},
+			Description: "dummy setting",
+		},
+	}
+)
+
 func init() {
 	service = grpc.NewService(
 		grpc.Namespace("com.owncloud.api"),
@@ -65,7 +80,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "settings: cannot be blank.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
 			"UTF",
@@ -153,12 +173,17 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 		},
 		{
 			"spaces in values",
-			"simple-bundle-key",
-			"simple-key",
-			"simple-display-name",
-			"simple-extension-name",
+			"simple bundle key",
+			"simple key",
+			"simple display name",
+			"simple extension name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
 			"bundle key missing",
@@ -195,7 +220,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "settings: cannot be blank.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
 			"display name missing",
@@ -204,7 +234,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "display_name: cannot be blank; settings: cannot be blank.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
 			"UUID missing (omitted on bundles)",
@@ -213,7 +248,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "settings: cannot be blank.",
+				Status: "Internal Server Error",
+			},
 		},
 	}
 	for _, testCase := range tests {
@@ -600,7 +640,18 @@ func TestGetSettingsBundleAccessOtherBundle(t *testing.T) {
 			BundleKey: "alice-bundle",
 		},
 		DisplayName: "alice settings bundle",
-		Settings:    nil,
+		Settings: []*proto.Setting{
+			{
+				DisplayName: "dummy setting",
+				SettingKey:  "dummy-setting",
+				Value: &proto.Setting_IntValue{
+					IntValue: &proto.IntSetting{
+						Default: 42,
+					},
+				},
+				Description: "dummy setting",
+			},
+		},
 	}
 	createRequest := proto.SaveSettingsBundleRequest{
 		SettingsBundle: &aliceBundle,
@@ -736,6 +787,8 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -747,6 +800,8 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -758,6 +813,8 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "an-other-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -786,6 +843,8 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -797,6 +856,8 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -808,6 +869,8 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				Extension: "an-other-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -851,6 +914,8 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -862,6 +927,8 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				Extension: "great-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -873,6 +940,8 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				Extension: "an-other-extension",
 				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings: dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
