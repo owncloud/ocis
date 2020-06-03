@@ -789,7 +789,7 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "alices-bundle",
 			},
 			DisplayName: "Alice's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -802,7 +802,7 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -815,7 +815,7 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -845,7 +845,7 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "alices-bundle",
 			},
 			DisplayName: "Alice's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -858,7 +858,7 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -871,7 +871,7 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -916,7 +916,7 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				BundleKey: "alices-bundle",
 			},
 			DisplayName: "Alice's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -929,7 +929,7 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -942,7 +942,7 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 				BundleKey: "bobs-bundle",
 			},
 			DisplayName: "Bob's Bundle",
-			Settings: dummySettings,
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)

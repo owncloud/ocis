@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	regexForKeys = regexp.MustCompile("^[A-Za-z0-9\\-_]*$")
-	keyRule = []validation.Rule{
+	regexForKeys = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
+	keyRule      = []validation.Rule{
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
@@ -83,4 +83,3 @@ func validateValueIdentifier(identifier *proto.Identifier) error {
 		validation.Field(&identifier.AccountUuid, accountUUIDRule...),
 	)
 }
-
