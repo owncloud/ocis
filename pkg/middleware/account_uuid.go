@@ -95,13 +95,14 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 				}
 
 				uuid = resp.Payload.Account.Uuid
+			} else {
+				uuid, ok = entry.V.(string)
+				if !ok {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 			}
 
-			uuid, ok = entry.V.(string)
-			if !ok {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
 
 			l.Debug().Interface("claims", claims).Interface("uuid", uuid).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
