@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"strings"
 
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -123,5 +124,6 @@ func getFailsafeIdentifier(c context.Context, identifier *proto.Identifier) *pro
 			identifier.AccountUuid = ""
 		}
 	}
+	identifier.AccountUuid = strings.ToLower(identifier.AccountUuid)
 	return identifier
 }
