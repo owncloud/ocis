@@ -9,6 +9,7 @@ require (
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/go-chi/chi v4.1.0+incompatible
 	github.com/go-chi/render v1.0.1
+	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 	github.com/golang/protobuf v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect

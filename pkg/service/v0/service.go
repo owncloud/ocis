@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
@@ -27,6 +26,9 @@ func NewService(cfg *config.Config) Service {
 // SaveSettingsBundle implements the BundleServiceHandler interface
 func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBundleRequest, res *proto.SaveSettingsBundleResponse) error {
 	req.SettingsBundle.Identifier = getFailsafeIdentifier(c, req.SettingsBundle.Identifier)
+	if validationError := validateSaveSettingsBundle(req); validationError != nil {
+		return validationError
+	}
 	r, err := g.manager.WriteBundle(req.SettingsBundle)
 	if err != nil {
 		return err
@@ -37,7 +39,11 @@ func (g Service) SaveSettingsBundle(c context.Context, req *proto.SaveSettingsBu
 
 // GetSettingsBundle implements the BundleServiceHandler interface
 func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBundleRequest, res *proto.GetSettingsBundleResponse) error {
-	r, err := g.manager.ReadBundle(getFailsafeIdentifier(c, req.Identifier))
+	req.Identifier = getFailsafeIdentifier(c, req.Identifier)
+	if validationError := validateGetSettingsBundle(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ReadBundle(req.Identifier)
 	if err != nil {
 		return err
 	}
@@ -47,7 +53,11 @@ func (g Service) GetSettingsBundle(c context.Context, req *proto.GetSettingsBund
 
 // ListSettingsBundles implements the BundleServiceHandler interface
 func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsBundlesRequest, res *proto.ListSettingsBundlesResponse) error {
-	r, err := g.manager.ListBundles(getFailsafeIdentifier(c, req.Identifier))
+	req.Identifier = getFailsafeIdentifier(c, req.Identifier)
+	if validationError := validateListSettingsBundles(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ListBundles(req.Identifier)
 	if err != nil {
 		return err
 	}
@@ -58,6 +68,9 @@ func (g Service) ListSettingsBundles(c context.Context, req *proto.ListSettingsB
 // SaveSettingsValue implements the ValueServiceHandler interface
 func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsValueRequest, res *proto.SaveSettingsValueResponse) error {
 	req.SettingsValue.Identifier = getFailsafeIdentifier(c, req.SettingsValue.Identifier)
+	if validationError := validateSaveSettingsValue(req); validationError != nil {
+		return validationError
+	}
 	r, err := g.manager.WriteValue(req.SettingsValue)
 	if err != nil {
 		return err
@@ -68,7 +81,11 @@ func (g Service) SaveSettingsValue(c context.Context, req *proto.SaveSettingsVal
 
 // GetSettingsValue implements the ValueServiceHandler interface
 func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValueRequest, res *proto.GetSettingsValueResponse) error {
-	r, err := g.manager.ReadValue(getFailsafeIdentifier(c, req.Identifier))
+	req.Identifier = getFailsafeIdentifier(c, req.Identifier)
+	if validationError := validateGetSettingsValue(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ReadValue(req.Identifier)
 	if err != nil {
 		return err
 	}
@@ -78,7 +95,11 @@ func (g Service) GetSettingsValue(c context.Context, req *proto.GetSettingsValue
 
 // ListSettingsValues implements the ValueServiceHandler interface
 func (g Service) ListSettingsValues(c context.Context, req *proto.ListSettingsValuesRequest, res *proto.ListSettingsValuesResponse) error {
-	r, err := g.manager.ListValues(getFailsafeIdentifier(c, req.Identifier))
+	req.Identifier = getFailsafeIdentifier(c, req.Identifier)
+	if validationError := validateListSettingsValues(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ListValues(req.Identifier)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package proto_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -74,9 +75,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
 			"सिम्प्ले",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"bundle key with ../ in the name",
 			"../file-a-level-higher-up",
@@ -84,9 +89,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"bundle key in the root directory",
 			"/tmp/file",
@@ -97,11 +106,10 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "open ocis-settings-store/bundles/simple-extension-name/tmp/file.json: no such file or directory",
+				Detail: "bundle_key: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"extension name with ../ in the name",
 			"simple-bundle-key",
@@ -109,9 +117,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"../folder-a-level-higher-up",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/16
 		{
 			"extension name with \\ in the name",
 			"simple-bundle-key",
@@ -119,9 +131,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"\\",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/16
 		{
 			"bundle key with \\ as the name",
 			"\\",
@@ -129,7 +145,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
 			"spaces in values",
@@ -150,7 +171,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "bundle_key: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -164,12 +185,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "extension: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
 		{
-			"setting key missing",
+			"setting key missing (omitted on bundles)",
 			"simple-bundle-key",
 			"",
 			"simple-display-name",
@@ -187,7 +208,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{},
 		},
 		{
-			"UUID missing",
+			"UUID missing (omitted on bundles)",
 			"simple-bundle-key",
 			"simple-key",
 			"simple-display-name",
@@ -218,6 +239,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			cl := proto.NewBundleService("com.owncloud.api.settings", client)
 
 			cresponse, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
+			fmt.Println(err)
 			if err != nil || (CustomError{} != testCase.expectedError) {
 				var errorData CustomError
 				_ = json.Unmarshal([]byte(err.Error()), &errorData)
