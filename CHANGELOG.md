@@ -1,3 +1,27 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.4.0...master
+
+## Summary
+
+* Enhancement - Add TUS global capability: [#177](https://github.com/owncloud/ocis-reva/issues/177)
+
+## Details
+
+* Enhancement - Add TUS global capability: [#177](https://github.com/owncloud/ocis-reva/issues/177)
+
+   The TUS global capabilities from Reva are now exposed.
+
+   The advertised max chunk size can be configured using the "--upload-max-chunk-size" CLI
+   switch or "REVA_FRONTEND_UPLOAD_MAX_CHUNK_SIZE" environment variable. The advertised
+   http method override can be configured using the "--upload-http-method-override" CLI
+   switch or "REVA_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE" environment variable.
+
+   https://github.com/owncloud/ocis-reva/issues/177
+   https://github.com/owncloud/ocis-reva/pull/228
+
 # Changelog for [0.4.0] (2020-05-29)
 
 The following sections list the changes in ocis-reva 0.4.0.
