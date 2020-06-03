@@ -1,0 +1,6 @@
+Bugfix: Accounts service response was ignored
+
+We fixed an error in the AccountUUID middleware that was responsible for ignoring an account uuid
+provided by the accounts service.
+
+https://github.com/owncloud/ocis-proxy/pull/43
