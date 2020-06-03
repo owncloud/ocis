@@ -28,19 +28,15 @@ func validateSaveSettingsBundle(req *proto.SaveSettingsBundleRequest) error {
 	if err := validateBundleIdentifier(req.SettingsBundle.Identifier); err != nil {
 		return err
 	}
-	bundleErrors := validation.ValidateStruct(
+	return validation.ValidateStruct(
 		req.SettingsBundle,
 		validation.Field(&req.SettingsBundle.DisplayName, validation.Required),
 		validation.Field(&req.SettingsBundle.Settings, validation.Required),
 	)
-	return bundleErrors
 }
 
 func validateGetSettingsBundle(req *proto.GetSettingsBundleRequest) error {
-	if err := validateBundleIdentifier(req.Identifier); err != nil {
-		return err
-	}
-	return nil
+	return validateBundleIdentifier(req.Identifier)
 }
 
 func validateListSettingsBundles(req *proto.ListSettingsBundlesRequest) error {
@@ -51,17 +47,11 @@ func validateListSettingsBundles(req *proto.ListSettingsBundlesRequest) error {
 }
 
 func validateSaveSettingsValue(req *proto.SaveSettingsValueRequest) error {
-	if err := validateValueIdentifier(req.SettingsValue.Identifier); err != nil {
-		return err
-	}
-	return nil
+	return validateValueIdentifier(req.SettingsValue.Identifier)
 }
 
 func validateGetSettingsValue(req *proto.GetSettingsValueRequest) error {
-	if err := validateValueIdentifier(req.Identifier); err != nil {
-		return err
-	}
-	return nil
+	return validateValueIdentifier(req.Identifier)
 }
 
 func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
