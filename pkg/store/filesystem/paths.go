@@ -10,41 +10,40 @@ import (
 const folderNameBundles = "bundles"
 const folderNameValues = "values"
 
-// Builds the folder path for storing settings bundles
-func (s Store) buildFolderPathBundles() string {
+// Builds the folder path for storing settings bundles. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFolderPathBundles(mkdir bool) string {
 	folderPath := path.Join(s.mountPath, folderNameBundles)
-	s.ensureFolderExists(folderPath)
+	if mkdir {
+		s.ensureFolderExists(folderPath)
+	}
 	return folderPath
 }
 
-// Builds a unique file name from the given settings bundle
-func (s Store) buildFilePathFromBundle(bundle *proto.SettingsBundle) string {
-	return s.buildFilePathFromBundleArgs(bundle.Identifier.Extension, bundle.Identifier.BundleKey)
+// Builds a unique file name from the given settings bundle. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFilePathFromBundle(bundle *proto.SettingsBundle, mkdir bool) string {
+	return s.buildFilePathFromBundleArgs(bundle.Identifier.Extension, bundle.Identifier.BundleKey, mkdir)
 }
 
-// Builds a unique file name from the given params
-func (s Store) buildFilePathFromBundleArgs(extension string, bundleKey string) string {
+// Builds a unique file name from the given params. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFilePathFromBundleArgs(extension string, bundleKey string, mkdir bool) string {
 	extensionFolder := path.Join(s.mountPath, folderNameBundles, extension)
-	s.ensureFolderExists(extensionFolder)
+	if mkdir {
+		s.ensureFolderExists(extensionFolder)
+	}
 	return path.Join(extensionFolder, bundleKey+".json")
 }
 
-// // Builds the folder path for storing settings values
-// func (s Store) buildFolderPathValues() string {
-// 	folderPath := path.Join(s.mountPath, folderNameValues)
-// 	s.ensureFolderExists(folderPath)
-// 	return folderPath
-// }
-
-// Builds a unique file name from the given settings value
-func (s Store) buildFilePathFromValue(value *proto.SettingsValue) string {
-	return s.buildFilePathFromValueArgs(value.Identifier.AccountUuid, value.Identifier.Extension, value.Identifier.BundleKey)
+// Builds a unique file name from the given settings value. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFilePathFromValue(value *proto.SettingsValue, mkdir bool) string {
+	return s.buildFilePathFromValueArgs(value.Identifier.AccountUuid, value.Identifier.Extension, value.Identifier.BundleKey, mkdir)
 }
 
-// Builds a unique file name from the given params
-func (s Store) buildFilePathFromValueArgs(accountUUID string, extension string, bundleKey string) string {
+// Builds a unique file name from the given params. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFilePathFromValueArgs(accountUUID string, extension string, bundleKey string, mkdir bool) string {
 	extensionFolder := path.Join(s.mountPath, folderNameValues, accountUUID, extension)
-	s.ensureFolderExists(extensionFolder)
+	if mkdir {
+		s.ensureFolderExists(extensionFolder)
+	}
 	return path.Join(extensionFolder, bundleKey+".json")
 }
 

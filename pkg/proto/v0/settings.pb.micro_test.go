@@ -279,6 +279,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 
 			cresponse, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
 			if err != nil || (CustomError{} != testCase.expectedError) {
+				assert.Error(t, err)
 				var errorData CustomError
 				_ = json.Unmarshal([]byte(err.Error()), &errorData)
 				assert.Equal(t, testCase.expectedError.ID, errorData.ID)
@@ -625,7 +626,7 @@ func TestGetSettingsBundleCreatesFolder(t *testing.T) {
 	getRequest := proto.GetSettingsBundleRequest{Identifier: &identifier}
 
 	_, _ = cl.GetSettingsBundle(context.Background(), &getRequest)
-	assert.DirExists(t, "ocis-settings-store/bundles/not-existing-extension")
+	assert.NoDirExists(t, "ocis-settings-store/bundles/not-existing-extension")
 	assert.NoFileExists(t, "ocis-settings-store/bundles/not-existing-extension/not-existing-bundle.json")
 	_ = os.RemoveAll("ocis-settings-store")
 }
@@ -901,7 +902,7 @@ func TestListSettingsBundlesOfNonExistingExtension(t *testing.T) {
 	response, err := cl.ListSettingsBundles(context.Background(), &listRequest)
 	assert.NoError(t, err)
 	assert.Empty(t, response.String())
-	assert.DirExists(t, "ocis-settings-store/bundles")
+	assert.NoDirExists(t, "ocis-settings-store/bundles")
 	assert.NoDirExists(t, "ocis-settings-store/bundles/does-not-exist")
 }
 

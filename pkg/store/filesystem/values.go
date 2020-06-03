@@ -14,7 +14,7 @@ import (
 // ReadValue tries to find a value by the given identifier attributes within the mountPath
 // All identifier fields are required.
 func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error) {
-	filePath := s.buildFilePathFromValueArgs(identifier.AccountUuid, identifier.Extension, identifier.BundleKey)
+	filePath := s.buildFilePathFromValueArgs(identifier.AccountUuid, identifier.Extension, identifier.BundleKey, false)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, er
 // WriteValue writes the given SettingsValue into a file within the mountPath
 // All identifier fields within the value are required.
 func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error) {
-	filePath := s.buildFilePathFromValue(value)
+	filePath := s.buildFilePathFromValue(value, true)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,6 @@ func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue,
 		return values, nil
 	}
 
-	// TODO: might be a good idea to do this non-hierarchical. i.e. allowing all fragments in the identifier being set or not.
 	// depending on the set values in the identifier arg, collect all SettingValues files for the account
 	var valueFilePaths []string
 	if len(identifier.Extension) < 1 {
@@ -62,7 +61,7 @@ func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue,
 			return nil
 		}); err != nil {
 			s.Logger.Err(err).Msgf("error reading %v", accountFolderPath)
-			return nil, err
+			return values, nil
 		}
 	} else if len(identifier.BundleKey) < 1 {
 		extensionPath := path.Join(accountFolderPath, identifier.Extension)
@@ -74,7 +73,7 @@ func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue,
 			return nil
 		}); err != nil {
 			s.Logger.Err(err).Msgf("error reading %v", extensionPath)
-			return nil, err
+			return values, nil
 		}
 	} else {
 		bundlePath := path.Join(accountFolderPath, identifier.Extension, identifier.BundleKey+".json")
