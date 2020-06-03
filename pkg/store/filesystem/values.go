@@ -14,11 +14,6 @@ import (
 // ReadValue tries to find a value by the given identifier attributes within the mountPath
 // All identifier fields are required.
 func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error) {
-	if len(identifier.AccountUuid) < 1 || len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 || len(identifier.SettingKey) < 1 {
-		s.Logger.Error().Msg("account-uuid, extension, bundle and setting are required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	filePath := s.buildFilePathFromValueArgs(identifier.AccountUuid, identifier.Extension, identifier.BundleKey)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
@@ -34,11 +29,6 @@ func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, er
 // WriteValue writes the given SettingsValue into a file within the mountPath
 // All identifier fields within the value are required.
 func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error) {
-	if len(value.Identifier.AccountUuid) < 1 || len(value.Identifier.Extension) < 1 || len(value.Identifier.BundleKey) < 1 || len(value.Identifier.SettingKey) < 1 {
-		s.Logger.Error().Msg("all identifier keys are required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	filePath := s.buildFilePathFromValue(value)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
@@ -54,11 +44,6 @@ func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, err
 // ListValues reads all values within the scope of the given identifier
 // AccountUuid is required.
 func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue, error) {
-	if len(identifier.AccountUuid) < 1 {
-		s.Logger.Error().Msg("account-uuid is required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	accountFolderPath := path.Join(s.mountPath, folderNameValues, identifier.AccountUuid)
 	var values []*proto.SettingsValue
 	if _, err := os.Stat(accountFolderPath); err != nil {

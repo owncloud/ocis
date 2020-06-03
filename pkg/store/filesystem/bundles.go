@@ -6,8 +6,6 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"google.golang.org/grpc/codes"
-	gstatus "google.golang.org/grpc/status"
 )
 
 // ListBundles returns all bundles in the mountPath folder belonging to the given extension
@@ -52,11 +50,6 @@ func (s Store) ListBundles(identifier *proto.Identifier) ([]*proto.SettingsBundl
 // ReadBundle tries to find a bundle by the given identifier within the mountPath.
 // Extension and BundleKey within the identifier are required.
 func (s Store) ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, error) {
-	if len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 {
-		s.Logger.Error().Msg("extension and bundleKey cannot be empty")
-		return nil, gstatus.Error(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	filePath := s.buildFilePathFromBundleArgs(identifier.Extension, identifier.BundleKey)
 	record := proto.SettingsBundle{}
 	if err := s.parseRecordFromFile(&record, filePath); err != nil {
@@ -70,11 +63,6 @@ func (s Store) ReadBundle(identifier *proto.Identifier) (*proto.SettingsBundle, 
 // WriteBundle writes the given record into a file within the mountPath
 // Extension and BundleKey within the record identifier are required.
 func (s Store) WriteBundle(record *proto.SettingsBundle) (*proto.SettingsBundle, error) {
-	if len(record.Identifier.Extension) < 1 || len(record.Identifier.BundleKey) < 1 {
-		s.Logger.Error().Msg("extension and bundleKey cannot be empty")
-		return nil, gstatus.Error(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	filePath := s.buildFilePathFromBundle(record)
 	if err := s.writeRecordToFile(record, filePath); err != nil {
 		return nil, err
