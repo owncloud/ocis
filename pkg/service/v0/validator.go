@@ -18,7 +18,7 @@ var (
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
-	accountUuidRule = []validation.Rule{
+	accountUUIDRule = []validation.Rule{
 		validation.Required,
 		is.UUID,
 	}
@@ -90,7 +90,7 @@ func validateValueIdentifier(identifier *proto.Identifier) error {
 		validation.Field(&identifier.Extension, keyRule...),
 		validation.Field(&identifier.BundleKey, keyRule...),
 		validation.Field(&identifier.SettingKey, settingKeyRule...),
-		validation.Field(&identifier.AccountUuid, accountUuidRule...),
+		validation.Field(&identifier.AccountUuid, accountUUIDRule...),
 	)
 }
 
