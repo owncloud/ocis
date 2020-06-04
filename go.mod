@@ -3,6 +3,7 @@ module github.com/owncloud/ocis-accounts
 go 1.13
 
 require (
+	github.com/CiscoM31/godata v0.0.0-20191007193734-c2c4ebb1b415
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.1

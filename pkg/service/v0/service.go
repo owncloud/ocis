@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/CiscoM31/godata"
 	"github.com/golang/protobuf/ptypes/empty"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis-accounts/pkg/provider"
 	olog "github.com/owncloud/ocis-pkg/v2/log"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/rs/zerolog/log"
@@ -31,9 +33,30 @@ type Service struct {
 }
 
 // ListAccounts implements the AccountsServiceHandler interface
-func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) error {
+func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) (err error) {
 
-	l, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", s.Config.LDAP.Hostname, s.Config.LDAP.Port), &tls.Config{InsecureSkipVerify: true})
+	log.Debug().Str("query", in.Query).Int32("page-size", in.PageSize).Str("page-token", in.PageToken).Msg("ListAccounts")
+
+	filter := "(&)" // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
+
+	if in.Query != "" {
+		// parse the query like an odata filter
+		var q *godata.GoDataFilterQuery
+		if q, err = godata.ParseFilterString(in.Query); err != nil {
+			return err
+		}
+
+		// convert to ldap filter
+		filter, err = provider.BuildLDAPFilter(q, &s.Config.LDAP.Schema)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Debug().Str("filter", filter).Msg("using filter")
+
+	var l *ldap.Conn
+	l, err = ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", s.Config.LDAP.Hostname, s.Config.LDAP.Port), &tls.Config{InsecureSkipVerify: true})
 	if err != nil {
 		return err
 	}
@@ -45,9 +68,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		return err
 	}
 
-	// TODO parse query using https://github.com/araddon/qlbridge
 	// TODO combine the parsed query with a query filter from the config, eg. fmt.Sprintf(s.Config.LDAP.UserFilter, clientID)
-	filter := "(&)" // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
 
 	// Search for the given clientID
 	searchRequest := ldap.NewSearchRequest(
