@@ -651,18 +651,7 @@ func TestGetSettingsBundleAccessOtherBundle(t *testing.T) {
 			BundleKey: "alice-bundle",
 		},
 		DisplayName: "alice settings bundle",
-		Settings: []*proto.Setting{
-			{
-				DisplayName: "dummy setting",
-				SettingKey:  "dummy-setting",
-				Value: &proto.Setting_IntValue{
-					IntValue: &proto.IntSetting{
-						Default: 42,
-					},
-				},
-				Description: "dummy setting",
-			},
-		},
+		Settings: dummySettings,
 	}
 	createRequest := proto.SaveSettingsBundleRequest{
 		SettingsBundle: &aliceBundle,
