@@ -7,6 +7,7 @@ The following sections list the changes in ocis-reva unreleased.
 ## Summary
 
 * Enhancement - Add TUS global capability: [#177](https://github.com/owncloud/ocis-reva/issues/177)
+* Enhancement - Update reva to v0.1.1-0.20200603071553-e05a87521618: [#244](https://github.com/owncloud/ocis-reva/issues/244)
 
 ## Details
 
@@ -21,6 +22,19 @@ The following sections list the changes in ocis-reva unreleased.
 
    https://github.com/owncloud/ocis-reva/issues/177
    https://github.com/owncloud/ocis-reva/pull/228
+
+
+* Enhancement - Update reva to v0.1.1-0.20200603071553-e05a87521618: [#244](https://github.com/owncloud/ocis-reva/issues/244)
+
+   - Updated reva to v0.1.1-0.20200603071553-e05a87521618 (#244) - Add option to disable TUS on
+   OC layer (#177, reva/#791) - Dataprovider now supports method override (#177, reva/#792) -
+   OCS fixes for create public link (reva/#798)
+
+   https://github.com/owncloud/ocis-reva/issues/244
+   https://github.com/owncloud/ocis-reva/issues/177
+   https://github.com/cs3org/reva/pull/791
+   https://github.com/cs3org/reva/pull/792
+   https://github.com/cs3org/reva/pull/798
 
 # Changelog for [0.4.0] (2020-05-29)
 
