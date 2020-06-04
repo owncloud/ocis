@@ -80,12 +80,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "settings: cannot be blank.",
-				Status: "Internal Server Error",
-			},
+			CustomError{},
 		},
 		{
 			"UTF",
@@ -220,12 +215,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "settings: cannot be blank.",
-				Status: "Internal Server Error",
-			},
+			CustomError{},
 		},
 		{
 			"display name missing",
@@ -237,7 +227,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "display_name: cannot be blank; settings: cannot be blank.",
+				Detail: "display_name: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -248,12 +238,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "settings: cannot be blank.",
-				Status: "Internal Server Error",
-			},
+			CustomError{},
 		},
 	}
 	for _, testCase := range tests {
@@ -268,7 +253,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			bundle := proto.SettingsBundle{
 				Identifier:  &identifier,
 				DisplayName: testCase.DisplayName,
-				Settings:    nil,
+				Settings:    dummySettings,
 			}
 			createRequest := proto.SaveSettingsBundleRequest{
 				SettingsBundle: &bundle,
