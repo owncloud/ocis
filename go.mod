@@ -31,7 +31,7 @@ require (
 	github.com/owncloud/ocis-glauth v0.4.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
-	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200207094758-c866cafca7e5
+	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-migration v0.1.1-0.20200519133726-4c6b7daff23c
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
