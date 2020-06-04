@@ -14,6 +14,7 @@ import (
 	settings "github.com/owncloud/ocis-settings/pkg/config"
 	thumbnails "github.com/owncloud/ocis-thumbnails/pkg/config"
 	webdav "github.com/owncloud/ocis-webdav/pkg/config"
+	pman "github.com/refs/pman/pkg/config"
 )
 
 // Log defines the available logging configuration.
@@ -73,6 +74,7 @@ type Config struct {
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
 	Settings      *settings.Config
+	Runtime       *pman.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -91,5 +93,6 @@ func New() *Config {
 		Proxy:         proxy.New(),
 		Thumbnails:    thumbnails.New(),
 		Settings:      settings.New(),
+		Runtime:       pman.NewConfig(),
 	}
 }
