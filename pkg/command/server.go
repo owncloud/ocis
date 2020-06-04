@@ -8,8 +8,8 @@ import (
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
-	"github.com/owncloud/ocis/pkg/micro/runtime"
 	"github.com/owncloud/ocis/pkg/register"
+	"github.com/owncloud/ocis/pkg/runtime"
 	"github.com/owncloud/ocis/pkg/tracing"
 )
 

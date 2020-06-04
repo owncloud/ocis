@@ -7,8 +7,8 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/flagset"
-	"github.com/owncloud/ocis/pkg/micro/runtime"
 	"github.com/owncloud/ocis/pkg/register"
+	"github.com/owncloud/ocis/pkg/runtime"
 	"github.com/owncloud/ocis/pkg/version"
 )
 
