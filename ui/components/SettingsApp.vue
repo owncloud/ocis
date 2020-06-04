@@ -89,7 +89,7 @@ export default {
          */
         const navItem = {
           name: this.getExtensionName(extension),
-          iconMaterial: 'application',
+          iconMaterial: this.getExtensionIcon(extension),
           route: {
             name: 'settings',
             path: `/${extension}`
@@ -106,7 +106,17 @@ export default {
       switch (extension) {
         case 'ocis-accounts': return this.$gettext('Account')
         case 'ocis-hello': return this.$gettext('Hello')
-        default: return extension
+        default: {
+          const shortenedName = extension.replace('ocis-', '')
+          return shortenedName.charAt(0).toUpperCase() + shortenedName.slice(1)
+        }
+      }
+    },
+    getExtensionIcon (extension) {
+      switch (extension) {
+        case 'ocis-accounts': return 'account_circle'
+        case 'ocis-hello': return 'tag_faces'
+        default: return 'application'
       }
     }
   },
