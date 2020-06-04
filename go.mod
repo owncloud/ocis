@@ -36,10 +36,10 @@ require (
 	github.com/owncloud/ocis-migration v0.1.1-0.20200519133726-4c6b7daff23c
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
 	github.com/owncloud/ocis-phoenix v0.7.0
-	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c
 	github.com/owncloud/ocis-proxy v0.3.2-0.20200529092045-bfe4790ab8cd
 	github.com/owncloud/ocis-reva v0.4.0
-	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
+	github.com/owncloud/ocis-settings v0.0.0-20200602115916-d10179c1aa59
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/refs/pman v0.0.0-20200527204655-c9ccd1c53cc3
