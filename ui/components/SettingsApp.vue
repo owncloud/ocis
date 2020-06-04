@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 import SettingsBundle from './SettingsBundle.vue'
 export default {
   name: 'SettingsApp',
@@ -49,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['settingsValuesLoaded']),
+    ...mapGetters(['settingsValuesLoaded', 'getNavItems']),
     ...mapGetters('Settings', [
       'extensions',
       'initialized',
@@ -59,13 +59,7 @@ export default {
       return this.$route.params.extension
     },
     selectedExtensionName () {
-      // TODO: extensions need to be registered with display names, separate from the settings bundles. until then: hardcoded translation
-      if (this.selectedExtension === 'ocis-accounts') {
-        return 'Account'
-      } else if (this.selectedExtension === 'ocis-test') {
-        return 'Test'
-      }
-      return this.selectedExtension
+      return this.getExtensionName(this.selectedExtension)
     },
     selectedSettingsBundles () {
       if (this.selectedExtension) {
@@ -76,6 +70,7 @@ export default {
   },
   methods: {
     ...mapActions('Settings', ['initialize']),
+    ...mapMutations(['ADD_NAV_ITEM']),
     resetSelectedExtension () {
       if (this.extensions.length > 0) {
         if (this.extensionRouteParam && this.extensions.includes(this.extensionRouteParam)) {
@@ -84,14 +79,43 @@ export default {
           this.selectedExtension = this.extensions[0]
         }
       }
+    },
+    resetMenuItems () {
+      this.extensions.forEach(extension => {
+        /*
+         * TODO:
+         * a) set up a map with possible extensions and icons?
+         * or b) let extensions register app info like displayName + icon?
+         */
+        const navItem = {
+          name: this.getExtensionName(extension),
+          iconMaterial: 'application',
+          route: {
+            name: 'settings',
+            path: `/${extension}`
+          }
+        }
+        this.ADD_NAV_ITEM({
+          extension: 'settings',
+          navItem
+        })
+      })
+      console.log(this.getNavItems('settings'))
+    },
+    getExtensionName (extension) {
+      switch (extension) {
+        case 'ocis-accounts': return this.$gettext('Account')
+        case 'ocis-hello': return this.$gettext('Hello')
+        default: return extension
+      }
     }
   },
   async created () {
     await this.initialize()
-    this.resetSelectedExtension()
   },
   watch: {
     initialized () {
+      this.resetMenuItems()
       this.resetSelectedExtension()
     },
     extensionRouteParam () {
