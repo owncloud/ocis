@@ -100,7 +100,6 @@ export default {
           navItem
         })
       })
-      console.log(this.getNavItems('settings'))
     },
     getExtensionName (extension) {
       switch (extension) {
