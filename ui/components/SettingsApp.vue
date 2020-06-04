@@ -86,6 +86,7 @@ export default {
          * TODO:
          * a) set up a map with possible extensions and icons?
          * or b) let extensions register app info like displayName + icon?
+         * https://github.com/owncloud/ocis-settings/issues/27
          */
         const navItem = {
           name: this.getExtensionName(extension),
@@ -102,6 +103,7 @@ export default {
       })
     },
     getExtensionName (extension) {
+      extension = extension || ''
       switch (extension) {
         case 'ocis-accounts': return this.$gettext('Account')
         case 'ocis-hello': return this.$gettext('Hello')
@@ -112,6 +114,7 @@ export default {
       }
     },
     getExtensionIcon (extension) {
+      extension = extension || ''
       switch (extension) {
         case 'ocis-accounts': return 'account_circle'
         case 'ocis-hello': return 'tag_faces'
@@ -121,6 +124,8 @@ export default {
   },
   async created () {
     await this.initialize()
+    this.resetMenuItems()
+    this.resetSelectedExtension()
   },
   watch: {
     initialized () {
