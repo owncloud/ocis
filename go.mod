@@ -57,5 +57,3 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
-
-replace github.com/owncloud/ocis-hello => ../ocis-hello
