@@ -83,7 +83,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			CustomError{},
 		},
 		{
-			"UTF",
+			"UTF disallowed on keys",
 			"सिम्प्ले-bundle-key",
 			"सिम्प्ले-key",
 			"सिम्प्ले-display-name",
@@ -95,6 +95,15 @@ func TestSettingsBundleProperties(t *testing.T) {
 				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
+		},
+		{
+			"UTF allowed on display name",
+			"simple-bundle-key",
+			"simple-key",
+			"सिम्प्ले-display-name",
+			"simple-extension-name",
+			"123e4567-e89b-12d3-a456-426652340000",
+			CustomError{},
 		},
 		{
 			"bundle key with ../ in the name",
