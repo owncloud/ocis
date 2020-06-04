@@ -92,7 +92,7 @@ export default {
           iconMaterial: this.getExtensionIcon(extension),
           route: {
             name: 'settings',
-            path: `/${extension}`
+            path: `/settings/${extension}`
           }
         }
         this.ADD_NAV_ITEM({
