@@ -11,7 +11,7 @@ import (
 	"github.com/owncloud/ocis/pkg/register"
 )
 
-// ListCommand is the entrypoint for the accounts command.
+// ListCommand is the entrypoint for the list command.
 func ListCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "list",

@@ -13,7 +13,7 @@ import (
 	"github.com/refs/pman/pkg/process"
 )
 
-// RunCommand is the entrypoint for the accounts command.
+// RunCommand is the entrypoint for the run command.
 func RunCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "run",

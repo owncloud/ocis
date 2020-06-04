@@ -12,7 +12,7 @@ import (
 	"github.com/owncloud/ocis/pkg/register"
 )
 
-// KillCommand is the entrypoint for the accounts command.
+// KillCommand is the entrypoint for the kill command.
 func KillCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "kill",
