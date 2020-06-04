@@ -176,7 +176,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			},
 		},
 		{
-			"spaces in values",
+			"spaces are disallowed in keys",
 			"simple bundle key",
 			"simple key",
 			"simple display name",
@@ -188,6 +188,15 @@ func TestSettingsBundleProperties(t *testing.T) {
 				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
+		},
+		{
+			"spaces are allowed in display names",
+			"simple-bundle-key",
+			"simple-key",
+			"simple display name",
+			"simple-extension-name",
+			"123e4567-e89b-12d3-a456-426652340000",
+			CustomError{},
 		},
 		{
 			"bundle key missing",
