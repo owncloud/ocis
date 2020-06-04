@@ -61,7 +61,7 @@ type CustomError struct {
 testing that saving a settings bundle and retrieving it again works correctly
 using various setting bundle properties
 */
-func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
+func TestSettingsBundleProperties(t *testing.T) {
 	type TestStruct struct {
 		testDataName  string
 		BundleKey     string
@@ -305,6 +305,31 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			_ = os.RemoveAll("ocis-settings-store")
 		})
 	}
+}
+
+func TestSettingsBundleWithoutSettings(t *testing.T) {
+	client := service.Client()
+	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+
+	createRequest := proto.SaveSettingsBundleRequest{
+		SettingsBundle: &proto.SettingsBundle{
+			Identifier: &proto.Identifier{
+				Extension: "great-extension",
+				BundleKey: "alices-bundle",
+			},
+			DisplayName: "Alice's Bundle",
+		},
+	}
+	response, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	var errorData CustomError
+	_ = json.Unmarshal([]byte(err.Error()), &errorData)
+	assert.Equal(t, "go.micro.client", errorData.ID)
+	assert.Equal(t, 500, errorData.Code)
+	assert.Equal(t, "settings: cannot be blank.", errorData.Detail)
+	assert.Equal(t, "Internal Server Error", errorData.Status)
+	_ = os.RemoveAll("ocis-settings-store")
 }
 
 /**
