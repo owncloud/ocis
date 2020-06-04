@@ -9,7 +9,6 @@ import (
 	"github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
-	"github.com/micro/micro/v2/client/proxy"
 	"github.com/micro/micro/v2/client/web"
 	"github.com/micro/micro/v2/service/registry"
 
@@ -137,9 +136,6 @@ func setDefaults() {
 	api.Name = OwncloudNamespace + "api"
 	api.Namespace = OwncloudNamespace + "api"
 	api.HeaderPrefix = "X-Micro-Owncloud-"
-
-	// proxy
-	proxy.Name = OwncloudNamespace + "proxy"
 
 	// web
 	web.Name = OwncloudNamespace + "web"
