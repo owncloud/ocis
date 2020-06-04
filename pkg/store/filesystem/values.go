@@ -14,12 +14,7 @@ import (
 // ReadValue tries to find a value by the given identifier attributes within the mountPath
 // All identifier fields are required.
 func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, error) {
-	if len(identifier.AccountUuid) < 1 || len(identifier.Extension) < 1 || len(identifier.BundleKey) < 1 || len(identifier.SettingKey) < 1 {
-		s.Logger.Error().Msg("account-uuid, extension, bundle and setting are required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
-	filePath := s.buildFilePathFromValueArgs(identifier.AccountUuid, identifier.Extension, identifier.BundleKey)
+	filePath := s.buildFilePathFromValueArgs(identifier.AccountUuid, identifier.Extension, identifier.BundleKey, false)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
 		return nil, err
@@ -34,12 +29,7 @@ func (s Store) ReadValue(identifier *proto.Identifier) (*proto.SettingsValue, er
 // WriteValue writes the given SettingsValue into a file within the mountPath
 // All identifier fields within the value are required.
 func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, error) {
-	if len(value.Identifier.AccountUuid) < 1 || len(value.Identifier.Extension) < 1 || len(value.Identifier.BundleKey) < 1 || len(value.Identifier.SettingKey) < 1 {
-		s.Logger.Error().Msg("all identifier keys are required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
-	filePath := s.buildFilePathFromValue(value)
+	filePath := s.buildFilePathFromValue(value, true)
 	values, err := s.readValuesMapFromFile(filePath)
 	if err != nil {
 		return nil, err
@@ -54,18 +44,12 @@ func (s Store) WriteValue(value *proto.SettingsValue) (*proto.SettingsValue, err
 // ListValues reads all values within the scope of the given identifier
 // AccountUuid is required.
 func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue, error) {
-	if len(identifier.AccountUuid) < 1 {
-		s.Logger.Error().Msg("account-uuid is required")
-		return nil, gstatus.Errorf(codes.InvalidArgument, "Missing a required identifier attribute")
-	}
-
 	accountFolderPath := path.Join(s.mountPath, folderNameValues, identifier.AccountUuid)
 	var values []*proto.SettingsValue
 	if _, err := os.Stat(accountFolderPath); err != nil {
 		return values, nil
 	}
 
-	// TODO: might be a good idea to do this non-hierarchical. i.e. allowing all fragments in the identifier being set or not.
 	// depending on the set values in the identifier arg, collect all SettingValues files for the account
 	var valueFilePaths []string
 	if len(identifier.Extension) < 1 {
@@ -77,7 +61,7 @@ func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue,
 			return nil
 		}); err != nil {
 			s.Logger.Err(err).Msgf("error reading %v", accountFolderPath)
-			return nil, err
+			return values, nil
 		}
 	} else if len(identifier.BundleKey) < 1 {
 		extensionPath := path.Join(accountFolderPath, identifier.Extension)
@@ -89,7 +73,7 @@ func (s Store) ListValues(identifier *proto.Identifier) ([]*proto.SettingsValue,
 			return nil
 		}); err != nil {
 			s.Logger.Err(err).Msgf("error reading %v", extensionPath)
-			return nil, err
+			return values, nil
 		}
 	} else {
 		bundlePath := path.Join(accountFolderPath, identifier.Extension, identifier.BundleKey+".json")

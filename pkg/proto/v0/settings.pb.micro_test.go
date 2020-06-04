@@ -16,6 +16,21 @@ import (
 
 var service = grpc.Service{}
 
+var (
+	dummySettings = []*proto.Setting{
+		{
+			DisplayName: "dummy setting",
+			SettingKey:  "dummy-setting",
+			Value: &proto.Setting_IntValue{
+				IntValue: &proto.IntSetting{
+					Default: 42,
+				},
+			},
+			Description: "dummy setting",
+		},
+	}
+)
+
 func init() {
 	service = grpc.NewService(
 		grpc.Namespace("com.owncloud.api"),
@@ -46,7 +61,7 @@ type CustomError struct {
 testing that saving a settings bundle and retrieving it again works correctly
 using various setting bundle properties
 */
-func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
+func TestSettingsBundleProperties(t *testing.T) {
 	type TestStruct struct {
 		testDataName  string
 		BundleKey     string
@@ -68,15 +83,28 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{},
 		},
 		{
-			"UTF",
+			"UTF disallowed on keys",
 			"सिम्प्ले-bundle-key",
 			"सिम्प्ले-key",
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
 			"सिम्प्ले",
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
+		},
+		{
+			"UTF allowed on display name",
+			"simple-bundle-key",
+			"simple-key",
+			"सिम्प्ले-display-name",
+			"simple-extension-name",
+			"123e4567-e89b-12d3-a456-426652340000",
 			CustomError{},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"bundle key with ../ in the name",
 			"../file-a-level-higher-up",
@@ -84,9 +112,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"bundle key in the root directory",
 			"/tmp/file",
@@ -97,11 +129,10 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "open ocis-settings-store/bundles/simple-extension-name/tmp/file.json: no such file or directory",
+				Detail: "bundle_key: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"extension name with ../ in the name",
 			"simple-bundle-key",
@@ -109,9 +140,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"../folder-a-level-higher-up",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/16
 		{
 			"extension name with \\ in the name",
 			"simple-bundle-key",
@@ -119,9 +154,13 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"\\",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/16
 		{
 			"bundle key with \\ as the name",
 			"\\",
@@ -129,13 +168,32 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
-			"spaces in values",
+			"spaces are disallowed in keys",
+			"simple bundle key",
+			"simple key",
+			"simple display name",
+			"simple extension name",
+			"123e4567-e89b-12d3-a456-426652340000",
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
+		},
+		{
+			"spaces are allowed in display names",
 			"simple-bundle-key",
 			"simple-key",
-			"simple-display-name",
+			"simple display name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
 			CustomError{},
@@ -150,7 +208,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "bundle_key: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -164,12 +222,12 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "extension: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
 		{
-			"setting key missing",
+			"setting key missing (omitted on bundles)",
 			"simple-bundle-key",
 			"",
 			"simple-display-name",
@@ -184,10 +242,15 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			"",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "display_name: cannot be blank.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
-			"UUID missing",
+			"UUID missing (omitted on bundles)",
 			"simple-bundle-key",
 			"simple-key",
 			"simple-display-name",
@@ -208,7 +271,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			bundle := proto.SettingsBundle{
 				Identifier:  &identifier,
 				DisplayName: testCase.DisplayName,
-				Settings:    nil,
+				Settings:    dummySettings,
 			}
 			createRequest := proto.SaveSettingsBundleRequest{
 				SettingsBundle: &bundle,
@@ -219,6 +282,7 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 
 			cresponse, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
 			if err != nil || (CustomError{} != testCase.expectedError) {
+				assert.Error(t, err)
 				var errorData CustomError
 				_ = json.Unmarshal([]byte(err.Error()), &errorData)
 				assert.Equal(t, testCase.expectedError.ID, errorData.ID)
@@ -244,6 +308,31 @@ func TestSaveGetSettingsBundleWithNoSettings(t *testing.T) {
 			_ = os.RemoveAll("ocis-settings-store")
 		})
 	}
+}
+
+func TestSettingsBundleWithoutSettings(t *testing.T) {
+	client := service.Client()
+	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+
+	createRequest := proto.SaveSettingsBundleRequest{
+		SettingsBundle: &proto.SettingsBundle{
+			Identifier: &proto.Identifier{
+				Extension: "great-extension",
+				BundleKey: "alices-bundle",
+			},
+			DisplayName: "Alice's Bundle",
+		},
+	}
+	response, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	var errorData CustomError
+	_ = json.Unmarshal([]byte(err.Error()), &errorData)
+	assert.Equal(t, "go.micro.client", errorData.ID)
+	assert.Equal(t, 500, errorData.Code)
+	assert.Equal(t, "settings: cannot be blank.", errorData.Detail)
+	assert.Equal(t, "Internal Server Error", errorData.Status)
+	_ = os.RemoveAll("ocis-settings-store")
 }
 
 /**
@@ -565,12 +654,11 @@ func TestGetSettingsBundleCreatesFolder(t *testing.T) {
 	getRequest := proto.GetSettingsBundleRequest{Identifier: &identifier}
 
 	_, _ = cl.GetSettingsBundle(context.Background(), &getRequest)
-	assert.DirExists(t, "ocis-settings-store/bundles/not-existing-extension")
+	assert.NoDirExists(t, "ocis-settings-store/bundles/not-existing-extension")
 	assert.NoFileExists(t, "ocis-settings-store/bundles/not-existing-extension/not-existing-bundle.json")
 	_ = os.RemoveAll("ocis-settings-store")
 }
 
-//https://github.com/owncloud/ocis-settings/issues/15
 func TestGetSettingsBundleAccessOtherBundle(t *testing.T) {
 	client := service.Client()
 	cl := proto.NewBundleService("com.owncloud.api.settings", client)
@@ -581,7 +669,7 @@ func TestGetSettingsBundleAccessOtherBundle(t *testing.T) {
 			BundleKey: "alice-bundle",
 		},
 		DisplayName: "alice settings bundle",
-		Settings:    nil,
+		Settings:    dummySettings,
 	}
 	createRequest := proto.SaveSettingsBundleRequest{
 		SettingsBundle: &aliceBundle,
@@ -597,9 +685,14 @@ func TestGetSettingsBundleAccessOtherBundle(t *testing.T) {
 	getRequest := proto.GetSettingsBundleRequest{Identifier: &bobIdentifier}
 
 	response, err := cl.GetSettingsBundle(context.Background(), &getRequest)
-	assert.NoError(t, err)
-	assert.Equal(t, response.SettingsBundle.Identifier.Extension, "alice-extension")
-	assert.Equal(t, response.SettingsBundle.Identifier.BundleKey, "alice-bundle")
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	var errorData CustomError
+	_ = json.Unmarshal([]byte(err.Error()), &errorData)
+	assert.Equal(t, "go.micro.client", errorData.ID)
+	assert.Equal(t, 500, errorData.Code)
+	assert.Equal(t, "extension: must be in a valid format.", errorData.Detail)
+	assert.Equal(t, "Internal Server Error", errorData.Status)
 	_ = os.RemoveAll("ocis-settings-store")
 }
 
@@ -619,18 +712,17 @@ func TestGetSettingsBundleWithInvalidIdentifier(t *testing.T) {
 	var tests = []TestStruct{
 		{
 			"not existing",
-			"this key should not exist",
-			"this key should not exist",
-			"this.extension.should.not.exist",
+			"this-key-should-not-exist",
+			"this-key-should-not-exist",
+			"this-extension-should-not-exist",
 			"123e4567-e89b-12d3-a456-426652340000",
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "open ocis-settings-store/bundles/this.extension.should.not.exist/this key should not exist.json: no such file or directory",
+				Detail: "open ocis-settings-store/bundles/this-extension-should-not-exist/this-key-should-not-exist.json: no such file or directory",
 				Status: "Internal Server Error",
 			},
 		},
-		//https://github.com/owncloud/ocis-settings/issues/15
 		{
 			"bundle key in the root directory",
 			"/tmp/file",
@@ -640,7 +732,7 @@ func TestGetSettingsBundleWithInvalidIdentifier(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "open ocis-settings-store/bundles/simple-extension-name/tmp/file.json: no such file or directory",
+				Detail: "bundle_key: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -653,7 +745,7 @@ func TestGetSettingsBundleWithInvalidIdentifier(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "bundle_key: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -666,7 +758,7 @@ func TestGetSettingsBundleWithInvalidIdentifier(t *testing.T) {
 			CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "extension: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -688,6 +780,7 @@ func TestGetSettingsBundleWithInvalidIdentifier(t *testing.T) {
 			getResponse, err := cl.GetSettingsBundle(context.Background(), &getRequest)
 			if err != nil || (CustomError{} != testCase.expectedError) {
 				var errorData CustomError
+				assert.Error(t, err)
 				assert.Empty(t, getResponse)
 				_ = json.Unmarshal([]byte(err.Error()), &errorData)
 				assert.Equal(t, testCase.expectedError.ID, errorData.ID)
@@ -710,8 +803,10 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "alice's-bundle",
+				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -721,8 +816,10 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -732,8 +829,10 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "an-other-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -744,10 +843,10 @@ func TestListMultipleSettingsBundlesOfSameExtension(t *testing.T) {
 	response, err := cl.ListSettingsBundles(context.Background(), &listRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, response.SettingsBundles[0].Identifier.Extension, "great-extension")
-	assert.Equal(t, response.SettingsBundles[0].Identifier.BundleKey, "alice's-bundle")
+	assert.Equal(t, response.SettingsBundles[0].Identifier.BundleKey, "alices-bundle")
 
 	assert.Equal(t, response.SettingsBundles[1].Identifier.Extension, "great-extension")
-	assert.Equal(t, response.SettingsBundles[1].Identifier.BundleKey, "bob's-bundle")
+	assert.Equal(t, response.SettingsBundles[1].Identifier.BundleKey, "bobs-bundle")
 	assert.Equal(t, 2, len(response.SettingsBundles))
 	_ = os.RemoveAll("ocis-settings-store")
 }
@@ -760,8 +859,10 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "alice's-bundle",
+				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -771,8 +872,10 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -782,8 +885,10 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "an-other-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -794,13 +899,13 @@ func TestListAllSettingsBundlesOfSameExtension(t *testing.T) {
 	response, err := cl.ListSettingsBundles(context.Background(), &listRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, response.SettingsBundles[0].Identifier.Extension, "an-other-extension")
-	assert.Equal(t, response.SettingsBundles[0].Identifier.BundleKey, "bob's-bundle")
+	assert.Equal(t, response.SettingsBundles[0].Identifier.BundleKey, "bobs-bundle")
 
 	assert.Equal(t, response.SettingsBundles[1].Identifier.Extension, "great-extension")
-	assert.Equal(t, response.SettingsBundles[1].Identifier.BundleKey, "alice's-bundle")
+	assert.Equal(t, response.SettingsBundles[1].Identifier.BundleKey, "alices-bundle")
 
 	assert.Equal(t, response.SettingsBundles[2].Identifier.Extension, "great-extension")
-	assert.Equal(t, response.SettingsBundles[2].Identifier.BundleKey, "bob's-bundle")
+	assert.Equal(t, response.SettingsBundles[2].Identifier.BundleKey, "bobs-bundle")
 	assert.Equal(t, 3, len(response.SettingsBundles))
 	_ = os.RemoveAll("ocis-settings-store")
 }
@@ -814,7 +919,7 @@ func TestListSettingsBundlesOfNonExistingExtension(t *testing.T) {
 	response, err := cl.ListSettingsBundles(context.Background(), &listRequest)
 	assert.NoError(t, err)
 	assert.Empty(t, response.String())
-	assert.DirExists(t, "ocis-settings-store/bundles")
+	assert.NoDirExists(t, "ocis-settings-store/bundles")
 	assert.NoDirExists(t, "ocis-settings-store/bundles/does-not-exist")
 }
 
@@ -825,8 +930,10 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "alice's-bundle",
+				BundleKey: "alices-bundle",
 			},
+			DisplayName: "Alice's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err := cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -836,8 +943,10 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "great-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -847,8 +956,10 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 		SettingsBundle: &proto.SettingsBundle{
 			Identifier: &proto.Identifier{
 				Extension: "an-other-extension",
-				BundleKey: "bob's-bundle",
+				BundleKey: "bobs-bundle",
 			},
+			DisplayName: "Bob's Bundle",
+			Settings:    dummySettings,
 		},
 	}
 	_, err = cl.SaveSettingsBundle(context.Background(), &createRequest)
@@ -857,8 +968,14 @@ func TestListSettingsBundlesInFoldersThatAreNotAccessible(t *testing.T) {
 	listRequest := proto.ListSettingsBundlesRequest{Identifier: &proto.Identifier{Extension: "../"}}
 
 	response, err := cl.ListSettingsBundles(context.Background(), &listRequest)
-	assert.NoError(t, err)
-	assert.Empty(t, response.String())
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	var errorData CustomError
+	_ = json.Unmarshal([]byte(err.Error()), &errorData)
+	assert.Equal(t, "go.micro.client", errorData.ID)
+	assert.Equal(t, 500, errorData.Code)
+	assert.Equal(t, "extension: must be in a valid format.", errorData.Detail)
+	assert.Equal(t, "Internal Server Error", errorData.Status)
 	_ = os.RemoveAll("ocis-settings-store")
 }
 
@@ -875,7 +992,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "age",
 				},
@@ -887,7 +1004,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "location",
 				},
@@ -899,7 +1016,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "locked",
 				},
@@ -911,7 +1028,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "currencies",
 				},
@@ -931,7 +1048,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "font-size",
 				},
@@ -952,9 +1069,9 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
-					SettingKey:  "apple and peaches",
+					SettingKey:  "apple-and-peaches",
 				},
 				Value: &proto.SettingsValue_ListValue{
 					ListValue: &proto.ListValue{
@@ -971,7 +1088,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "",
-					BundleKey:   "alice's-bundle",
+					BundleKey:   "alices-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "locked",
 				},
@@ -980,7 +1097,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "extension: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -998,7 +1115,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "bundle_key: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -1007,7 +1124,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "bob's bundle",
+					BundleKey:   "bobs-bundle",
 					AccountUuid: "",
 					SettingKey:  "locked",
 				},
@@ -1016,7 +1133,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "account_uuid: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -1025,7 +1142,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "bob's bundle",
+					BundleKey:   "bobs-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "",
 				},
@@ -1034,47 +1151,62 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "rpc error: code = InvalidArgument desc = Missing a required identifier attribute",
+				Detail: "setting_key: cannot be blank.",
 				Status: "Internal Server Error",
 			},
 		},
 		{
-			//https://github.com/owncloud/ocis-settings/issues/15
 			testDataName: "../ in bundle key",
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "../bob's bundle",
+					BundleKey:   "../bobs-bundle",
 					AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "should-not-be-possible",
 				},
 				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
 			},
+			expectedError: CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "bundle_key: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
-			//https://github.com/owncloud/ocis-settings/issues/15
 			testDataName: "../ in account uuid",
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "great-extension",
-					BundleKey:   "bob's bundle",
+					BundleKey:   "bobs-bundle",
 					AccountUuid: "../123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "should-not-be-possible",
 				},
 				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
 			},
+			expectedError: CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "account_uuid: must be a valid UUID.",
+				Status: "Internal Server Error",
+			},
 		},
 		{
-			//https://github.com/owncloud/ocis-settings/issues/16
 			testDataName: "\\ in fields that are used to create folder and file names",
 			SettingsValue: proto.SettingsValue{
 				Identifier: &proto.Identifier{
 					Extension:   "\\-extension",
-					BundleKey:   "\\ bundle",
+					BundleKey:   "\\-bundle",
 					AccountUuid: "\\123e4567-e89b-12d3-a456-426652340000",
 					SettingKey:  "should-not-be-possible",
 				},
 				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
+			},
+			expectedError: CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "account_uuid: must be a valid UUID; bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
 			},
 		},
 	}
@@ -1089,6 +1221,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			}
 			saveResponse, err := cl.SaveSettingsValue(context.Background(), &createRequest)
 			if err != nil || (CustomError{} != tests[index].expectedError) {
+				assert.Error(t, err)
 				var errorData CustomError
 				_ = json.Unmarshal([]byte(err.Error()), &errorData)
 				assert.Equal(t, tests[index].expectedError.ID, errorData.ID)
@@ -1122,54 +1255,4 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			_ = os.RemoveAll("ocis-settings-store")
 		})
 	}
-}
-
-//same as test above but List returns an empty array in case the extension name contains a `../`
-//https://github.com/owncloud/ocis-settings/issues/15
-func TestListSettingsValuesWithDotsInEntensionName(t *testing.T) {
-	type TestStruct struct {
-		testDataName  string
-		SettingsValue proto.SettingsValue
-	}
-
-	var test = TestStruct{
-		testDataName: "../ in extension name",
-		SettingsValue: proto.SettingsValue{
-			Identifier: &proto.Identifier{
-				Extension:   "../great-extension",
-				BundleKey:   "bob's bundle",
-				AccountUuid: "123e4567-e89b-12d3-a456-426652340000",
-				SettingKey:  "should-not-be-possible",
-			},
-			Value: &proto.SettingsValue_BoolValue{BoolValue: false},
-		},
-	}
-	client := service.Client()
-	cl := proto.NewValueService("com.owncloud.api.settings", client)
-
-	expectedSetting, _ := json.Marshal(&test.SettingsValue)
-	createRequest := proto.SaveSettingsValueRequest{
-		SettingsValue: &test.SettingsValue,
-	}
-	saveResponse, err := cl.SaveSettingsValue(context.Background(), &createRequest)
-	assert.NoError(t, err)
-	receivedSetting, _ := json.Marshal(saveResponse.SettingsValue)
-	assert.Equal(t, expectedSetting, receivedSetting)
-
-	getRequest := proto.GetSettingsValueRequest{
-		Identifier: test.SettingsValue.Identifier,
-	}
-	getResponse, err := cl.GetSettingsValue(context.Background(), &getRequest)
-	assert.NoError(t, err)
-	receivedSetting, _ = json.Marshal(getResponse.SettingsValue)
-	assert.Equal(t, expectedSetting, receivedSetting)
-
-	listRequest := proto.ListSettingsValuesRequest{
-		Identifier: test.SettingsValue.Identifier,
-	}
-	listResponse, err := cl.ListSettingsValues(context.Background(), &listRequest)
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(listResponse.SettingsValues))
-	_ = os.RemoveAll("ocis-settings-store")
-
 }
