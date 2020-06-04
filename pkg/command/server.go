@@ -32,8 +32,8 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			runtime := runtime.New()
-			return runtime.Start()
+			r := runtime.New()
+			return r.Start(append(runtime.Extensions, runtime.MicroServices...)...)
 		},
 	}
 }

@@ -42,8 +42,8 @@ func Simple(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			runtime := runtime.New()
-			runtime.Start()
+			r := runtime.New()
+			r.Start(append(SimpleRuntimeServices, runtime.MicroServices...)...)
 
 			return nil
 		},

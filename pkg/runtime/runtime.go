@@ -4,7 +4,6 @@ import (
 	"fmt"
 	golog "log"
 	"net/rpc"
-	"sync"
 	"time"
 
 	"github.com/micro/cli/v2"
@@ -66,37 +65,24 @@ var (
 )
 
 // Runtime represents an oCIS runtime environment.
-type Runtime struct {
-	extensions []string
-	dependants []string
-}
+type Runtime struct{}
 
 // New creates a new ocis + micro runtime
-func New(extensions ...string) Runtime {
-	r := Runtime{
-		extensions: append(Extensions, MicroServices...),
-		dependants: dependants,
-	}
-
-	if extensions != nil {
-		r.extensions = extensions
-	}
-
-	return r
+func New() Runtime {
+	return Runtime{}
 }
 
 // Start rpc runtime
-func (r *Runtime) Start() error {
-	go r.Launch()
+func (r *Runtime) Start(services ...string) error {
+	go r.Launch(services)
 	return service.Start()
 }
 
 // Launch ocis default ocis extensions.
-func (r *Runtime) Launch() {
+func (r *Runtime) Launch(services []string) {
 	var client *rpc.Client
 	var err error
 	var try int
-	wg := &sync.WaitGroup{}
 
 	for {
 		if try >= maxRetries {
@@ -113,7 +99,7 @@ func (r *Runtime) Launch() {
 	}
 
 OUT:
-	for _, v := range r.extensions {
+	for _, v := range services {
 		args := process.NewProcEntry(v, []string{v}...)
 		var reply int
 
@@ -122,32 +108,21 @@ OUT:
 		}
 	}
 
-	// ugly hack to avoid dependencies.
-	for _, v := range r.dependants {
-		args := process.NewProcEntry(v, []string{v}...)
-		wg.Add(len(r.dependants))
-		go delayedRun(client, &args, wg)
-	}
+	// TODO(refs) this should disappear and tackled at the runtime (pman) level.
+	// see https://github.com/cs3org/reva/issues/795 for race condition.
+	// dependants might not be needed on a ocis_simple build, therefore
+	// it should not be started under these circumstances.
+	if len(services) >= len(Extensions) { // it will not run for ocis_simple builds.
+		time.Sleep(2 * time.Second)
+		for _, v := range dependants {
+			args := process.NewProcEntry(v, []string{v}...)
+			var reply int
 
-	wg.Wait()
-}
-
-func delayedRun(c *rpc.Client, p *process.ProcEntry, wg *sync.WaitGroup) error {
-	var retries, reply int
-	for {
-		if retries >= maxRetries {
-			return fmt.Errorf("maximum number of retries on extension: `%v`", p.Extension)
+			if err := client.Call("Service.Start", args, &reply); err != nil {
+				golog.Fatal(err)
+			}
 		}
-		time.Sleep(1 * time.Second)
-		if err := c.Call("Service.Start", p, &reply); err == nil {
-			goto OUT
-		}
-		fmt.Printf("try %v #%v", p.Extension, retries)
-		retries++
 	}
-OUT:
-	wg.Done()
-	return nil
 }
 
 // AddMicroPlatform adds the micro subcommands to the cli app
