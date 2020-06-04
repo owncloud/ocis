@@ -102,10 +102,10 @@ func (r *Runtime) Launch() {
 OUT:
 	all := append(Extensions, MicroServices...)
 	for _, v := range all {
-		arg0 := process.NewProcEntry(v, []string{v}...)
-		var arg1 int
+		args := process.NewProcEntry(v, []string{v}...)
+		var reply int
 
-		if err := client.Call("Service.Start", arg0, &arg1); err != nil {
+		if err := client.Call("Service.Start", args, &reply); err != nil {
 			golog.Fatal(err)
 		}
 	}
@@ -113,10 +113,10 @@ OUT:
 	// ugly hack to avoid dependencies.
 	time.Sleep(2 * time.Second)
 	for _, v := range dependants {
-		arg0 := process.NewProcEntry(v, []string{v}...)
-		var arg1 int
+		args := process.NewProcEntry(v, []string{v}...)
+		var reply int
 
-		if err := client.Call("Service.Start", arg0, &arg1); err != nil {
+		if err := client.Call("Service.Start", args, &reply); err != nil {
 			golog.Fatal(err)
 		}
 	}
