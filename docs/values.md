@@ -7,24 +7,26 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: values.md
 ---
 
-A **Settings Value** is the value, an authenticated user has chosen for a specific setting, defined in a
-*settings bundle*. For choosing settings values as a user, the sole entry point is the ocis-web extension
+A **Settings Value** is the value an authenticated user has chosen for a specific setting, defined in a
+*settings bundle*. For choosing settings values as a user the sole entry point is the ocis-web extension
 provided by this service.
 
 ## Identifying settings values
 
-A *settings value* is uniquely identified by four attributes. Three of them are coming from the setting within
-it's settings bundle (see [Settings Bundles](https://owncloud.github.io/extensions/ocis_settings/bundles/) for
-an example). The fourth identifies the user.
+A *settings value* is uniquely identified by four attributes. Three of them are coming from the definition of
+the setting within it's settings bundle (see [Settings Bundles](https://owncloud.github.io/extensions/ocis_settings/bundles/)
+for an example). The fourth identifies the user.
 - extension: Key of the extension that registered the settings bundle,
 - bundleKey: Key of the settings bundle,
 - settingKey: Key of the setting as defined within the bundle,
 - accountUuid: The UUID of the authenticated user who has saved the setting.
 
+{{< hint info >}}
 When requests are going through `ocis-proxy`, the accountUuid attribute can be set to the static keyword `me`
 instead of using a real UUID. `ocis-proxy` will take care of minting the UUID of the authenticated user into
 a JWT, providing it in the HTTP header as `x-access-token`. That UUID is then used in this service, to replace
 `me` with the actual UUID of the authenticated user.
+{{< /hint >}}
 
 ## Example of stored settings values
 
