@@ -33,3 +33,10 @@ In the context of this extension and oCIS in general, we are using the following
 
 - Collection of related settings
 - Registered by an ocis extension
+
+### Settings Value
+
+- Manifestation of a setting for a specific user
+- E.g. used for customization (at runtime) in `ocis-web`
+- `ocis-web` extension for modifying settings values is provided by this service
+- Can be queried and modified by other ocis extensions
