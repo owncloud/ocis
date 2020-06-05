@@ -23,22 +23,24 @@ graph TD
         ows[ocis-web-settings]
         owc[ocis-web-core]
     end
-    ows ---|"listSettingsBundles(),<br>listSettingsValues(),<br>saveSettingsValue(value)"| os[ocis-settings]
-    owc ---|"listSettingsValues()<br>getSettingsValue(id)"| sdk[oC SDK]
+    ows ---|"listSettingsBundles(),<br>saveSettingsValue(value)"| os[ocis-settings]
+    owc ---|"listSettingsValues()"| sdk[oC SDK]
     sdk --- sdks{ocis-settings<br>available?}
     sdks ---|"yes"| os
     sdks ---|"no"| defaults[Use set of<br>default values]
-    oa[oCIS extensions<br>e.g. ocis-accounts] ---|"saveSettingsBundle(bundle),<br>getSettingsValue(id)"| os
+    oa[oCIS extensions<br>e.g. ocis-accounts] ---|"saveSettingsBundle(bundle)"| os
 {{< /mermaid >}}
 
 The diagram shows how the settings service integrates into oCIS:
+
 **Settings management:**
-- oCIS extensions can register settings bundles with the ocis-settings service.
-- The settings frontend can be plugged into ocis-web, showing generated forms for changing settings values as a user.
+- oCIS extensions can register *settings bundles* with the ocis-settings service.
+- The settings frontend can be plugged into ocis-web, showing forms for changing *settings values* as a user.
+The forms are generated from the registered *settings bundles*.
 
 **Settings usage:**
-- Extensions can query ocis-settings for settings values of a user.
-- The ownCloud SDK, used as a data abstraction layer for ocis-web, will query ocis-settings for settings values of a user,
+- Extensions can query ocis-settings for *settings values* of a user.
+- The ownCloud SDK, used as a data abstraction layer for ocis-web, will query ocis-settings for *settings values* of a user,
 if it's available. The SDK uses sensible defaults when ocis-settings is not part of the setup.
 
 For compatibility with ownCloud 10, a migration of ownCloud 10 settings into the storage of ocis-settings will be available.
