@@ -3761,10 +3761,10 @@ osenv@^0.1.4:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
-owncloud-design-system@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/owncloud-design-system/-/owncloud-design-system-1.2.2.tgz#e52459bcfc4004dba0e48b3d04c2703f544e15ec"
-  integrity sha512-kFmBURf4Q+MfjpDPPLfJTVKWkyL7VuGs4Bj6ik9+/DnrWzNAT4rgEqzW3ToBPovF/NGVP877mlvCa7DpxE4BQA==
+owncloud-design-system@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/owncloud-design-system/-/owncloud-design-system-1.6.0.tgz#3848745a4562109f6b1d697f27cd225063bbc2e8"
+  integrity sha512-DHJPqOpJq1JNdVJKFBWTM4+/AfVkMqlOK38P2DZ0Gx/2VOPHl90qhVcCJvLviv5pluK/qdY+YJbMSVaEmzMykg==
   dependencies:
     luxon "^1.22.0"
     mini-css-extract-plugin "^0.9.0"
