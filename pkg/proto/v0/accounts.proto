@@ -137,6 +137,10 @@ message ListAccountsRequest {
     // that indicates from where search should continue
     string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
 
+    // Optional. Used to specify a subset of fields that should be
+    // returned by a get operation or modified by an update operation.
+    google.protobuf.FieldMask field_mask = 3;
+
     // Optional. Search criteria used to select the accounts to return.
     // If no search criteria is specified then all accounts will be
     // returned
@@ -157,7 +161,7 @@ message ListAccountsRequest {
     // `email` set to `foo@example.com`
     // * Query `display_name=\\"Test String\\"` returns accounts with
     // display names that include both "Test" and "String"
-    string query = 3 [(google.api.field_behavior) = OPTIONAL];
+    string query = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message ListAccountsResponse {
@@ -496,6 +500,10 @@ message ListGroupsRequest {
     // that indicates from where search should continue
     string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
 
+    // Optional. Used to specify a subset of fields that should be
+    // returned by a get operation or modified by an update operation.
+    google.protobuf.FieldMask field_mask = 3;
+
     // Optional. Search criteria used to select the groups to return.
     // If no search criteria is specified then all groups will be
     // returned
@@ -514,7 +522,7 @@ message ListGroupsRequest {
     // starts with "Th"
     // * Query `display_name=\\"Test String\\"` returns groups with
     // display names that include both "Test" and "String"
-    string query = 3 [(google.api.field_behavior) = OPTIONAL];
+    string query = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message ListGroupsResponse {
