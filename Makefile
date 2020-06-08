@@ -74,10 +74,6 @@ fmt:
 vet:
 	go vet $(PACKAGES)
 
-.PHONY: staticcheck
-staticcheck:
-	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
-
 .PHONY: lint
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
@@ -109,6 +105,10 @@ $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 
 $(BIN)/$(EXECUTABLE)-linux: $(SOURCES)
 	GOOS=linux GOARCH=amd64 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+
+.PHONY: staticcheck
+staticcheck:
+	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check

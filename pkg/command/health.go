@@ -34,7 +34,7 @@ func Health(cfg *config.Config) *cli.Command {
 
 			defer resp.Body.Close()
 
-			if resp.StatusCode != 200 {
+			if resp.StatusCode != http.StatusOK {
 				logger.Fatal().
 					Int("code", resp.StatusCode).
 					Msg("Health seems to be in bad state")
