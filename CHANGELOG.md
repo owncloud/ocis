@@ -6,11 +6,20 @@ The following sections list the changes for ocis-proxy unreleased.
 
 ## Summary
 
+* Bugfix - Accounts service response was ignored: [#43](https://github.com/owncloud/ocis-proxy/pull/43)
 * Bugfix - Fix x-access-token in header: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
 * Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
 * Enhancement - Make jwt secret configurable: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
 
 ## Details
+
+* Bugfix - Accounts service response was ignored: [#43](https://github.com/owncloud/ocis-proxy/pull/43)
+
+   We fixed an error in the AccountUUID middleware that was responsible for ignoring an account
+   uuid provided by the accounts service.
+
+   https://github.com/owncloud/ocis-proxy/pull/43
+
 
 * Bugfix - Fix x-access-token in header: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
 
