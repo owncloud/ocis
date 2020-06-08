@@ -8,6 +8,7 @@ import "google/api/field_behavior.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 
 // Follow recommended Methods for rpc APIs https://cloud.google.com/apis/design/resources?hl=de#methods
 // https://cloud.google.com/apis/design/standard_methods?hl=de#list
@@ -23,7 +24,7 @@ service AccountsService {
     // Gets an account
     rpc GetAccount(GetAccountRequest) returns (Account) {
         option (google.api.http) = {
-            get: "/v0/accounts/{account_id=*}"
+            get: "/v0/accounts/{id=*}"
             body: "*"
         };
     }
@@ -41,7 +42,7 @@ service AccountsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            patch: "/v0/accounts/{account.account_id=*}"
+            patch: "/v0/accounts/{account.id=*}"
             body: "account"
         };
     };
@@ -50,10 +51,12 @@ service AccountsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            delete: "/v0/accounts/{account_id=*}"
+            delete: "/v0/accounts/{id=*}"
         };
     }
+}
 
+service GroupsService {
     // Lists groups
     rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
         // List method maps to HTTP GET
@@ -64,7 +67,7 @@ service AccountsService {
     // Gets an groups
     rpc GetGroup(GetGroupRequest) returns (Group) {
         option (google.api.http) = {
-            get: "/v0/groups/{group_id=*}"
+            get: "/v0/groups/{id=*}"
             body: "*"
         };
     }
@@ -82,7 +85,7 @@ service AccountsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            patch: "/v0/groups/{group.group_id=*}"
+            patch: "/v0/groups/{group.id=*}"
             body: "group"
         };
     };
@@ -91,9 +94,39 @@ service AccountsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            delete: "/v0/groups/{group_id=*}"
+            delete: "/v0/groups/{id=*}"
         };
     }
+
+    // additional group methods: https://docs.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#methods
+
+    // references are accessed using $ref, see http://docs.oasis-open.org/odata/odata/v4.0/cs01/part2-url-conventions/odata-v4.0-cs01-part2-url-conventions.html#_Toc365046422
+    // or the stack overflow question https://stackoverflow.com/questions/49362894/why-is-the-microsoft-graph-api-using-ref-in-the-uri
+
+    // group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http
+    rpc AddMember(AddMemberRequest) returns (Group) {
+        //  All request parameters go into body.
+        option (google.api.http) = {
+            post: "/v0/groups/{id=*}/members/$ref"
+            body: "*"
+        };
+    }
+    // group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0
+    rpc RemoveMember(RemoveMemberRequest) returns (Group) {
+        //  All request parameters go into body.
+        option (google.api.http) = {
+            delete: "/v0/groups/{id=*}/members/{account.id}/$ref"
+            body: "*"
+        };
+    }
+    // group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
+    rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {
+        //  All request parameters go into body.
+        option (google.api.http) = {
+            get: "/v0/groups/{id=*}/members/$ref"
+        };
+    }
+
 }
 
 message ListAccountsRequest {
@@ -139,12 +172,12 @@ message ListAccountsResponse {
 }
 
 message GetAccountRequest {
-    string account_id = 1;
+    string id = 1;
 }
 
 message CreateAccountRequest {
     // The account id to use for this account
-    string account_id = 1;
+    string id = 1;
 
     // The account resource to create
     Account account = 2;
@@ -160,29 +193,300 @@ message UpdateAccountRequest {
   }
 
 message DeleteAccountRequest {
-    string account_id = 1;
+    string id = 1;
 }
 
+// Account follows the properties of the ms graph api user resuorce.
+// See https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties
 message Account {
-    // the non reassignable and stable account_id of an account
-    string account_id = 1;
 
-    // The identities that are mapped to this account
-    repeated Identities identities = 2; // keep track of every identity of a given user
+    // A freeform text entry field for the user to describe themselves.
+    string about_me = 1;
 
-    string username = 3;
-    string display_name = 4;
-    string mail = 5;
-    // TODO avatar needed? because the standard claims contain it or our own avatar service will use the accountid or email to look up the avatar
+    // *true* if the account is enabled; otherwise, *false*. This property is required when a user is created. Supports $filter.
+    bool account_enabled = 2;
 
-    repeated Group groups = 6;
+    // Sets the age group of the user. Allowed values: null, minor, notAdult and adult. Refer to the legal age group property definitions for further information.
+    string age_group = 3;
+
+    // The licenses that are assigned to the account. Not nullable.
+    repeated AssignedLicense assigned_licenses = 4;
+
+    // The plans that are assigned to the account. Read-only. Not nullable.
+    repeated AssignedPlan assigned_plans = 5;
+
+    // The birthday of the user.
+    google.protobuf.Timestamp birthday = 6;
+
+    // The telephone numbers for the user. NOTE: Although this is a string collection, only one number can be set for this property.
+    repeated string business_phones = 7;
+
+    // The city in which the user is located. Supports $filter.
+    string city = 8;
+
+    // The company name which the user is associated. This property can be useful for describing the company that an external user comes from.
+    string company_name = 9;
+
+    // Sets whether consent has been obtained for minors. Allowed values: null, granted, denied and notRequired. Refer to the legal age group property definitions for further information.
+    string consent_provided_for_minor = 10;
+
+    // The country/region in which the user is located; for example, “US” or “UK”. Supports $filter.
+    string country = 11;
+
+    // The created date of the account object.
+    google.protobuf.Timestamp created_date_time = 12;
+
+    // Indicates whether the account was created as
+    // - a regular school or work account (null),
+    // - an external account (Invitation),
+    // - a local account for an Azure Active Directory B2C tenant (LocalAccount) or
+    // - self-service sign-up using email verification (EmailVerified). Read-only.
+    string creation_type = 13;
+
+    // The date and time the user was deleted. Returned only on $select.
+    google.protobuf.Timestamp deleted_date_time = 14;
+
+    // The name for the department in which the user works. Supports $filter.
+    string department = 15;
+
+    // The name displayed in the address book for the account.
+    // This is usually the combination of the user's first name, middle initial and last name.
+    // This property is required when a user is created and it cannot be cleared during updates.
+    // Supports $filter and $orderby.
+    string display_name = 16;
+
+    // The employee identifier assigned to the user by the organization. Supports $filter.
+    string employee_id = 17;
+
+    // For an external user invited to the tenant using the invitation API, this property represents the invited user's invitation status.
+    // For invited users, the state can be `PendingAcceptance` or `Accepted`, or emptystring / null for all other users.
+    // Returned only on $select. Supports $filter with the supported values. For example: $filter=externalUserState eq 'PendingAcceptance'.
+    string external_user_state = 18;
+
+    // Shows the timestamp for the latest change to the externalUserState property. Returned only on $select.
+    // note: in the ms graph beta this changed to a string ?!?
+    google.protobuf.Timestamp external_user_state_change_date_time = 19;
+
+    // The fax number of the account.
+    string fax_number = 20;
+
+    // The given name (first name) of the user. Supports $filter.
+    string given_name = 21;
+
+    // The hire date of the user.
+    google.protobuf.Timestamp hire_date = 22;
+
+    // The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only.
+    string id = 23;
+
+    // Represents the identities that can be used to sign in to this user account.
+    // An identity can be provided by OCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.
+    // May contain multiple items with the same signInType value. Supports $filter.
+    repeated Identities identities = 24;
+
+    // The instant message voice over IP (VOIP) session initiation protocol (SIP) addresses for the user. Read-only.
+    repeated string im_addresses = 25;
+
+    // 	A list for the user to describe their interests.
+    repeated string interests = 26;
+
+    // *true* if the user is a resource account; otherwise, *false*. Null value should be considered false.
+    bool is_resource_account = 27;
+
+    // The user’s job title. Supports $filter.
+    string job_title = 28;
+
+    // The time when this account last changed their password.
+    google.protobuf.Timestamp last_password_change_date_time = 29;
+
+    // Used by enterprise applications to determine the legal age group of the user.
+    // This property is read-only and calculated based on `ageGroup` and `consentProvidedForMinor` properties.
+    // Allowed values: `null`, `minorWithOutParentalConsent`, `minorWithParentalConsent`, `minorNoParentalConsentRequired`, `notAdult` and `adult`.
+    // Refer to the legal age group property definitions for further information.)
+    string legal_age_group_classification = 30;
+
+    // State of license assignments for this user. Read-only.
+    // licenseAssignmentState collection licenseAssignmentStates = 31
+
+    // The SMTP address for the user, for example, "jeff@contoso.onmicrosoft.com". Read-Only. Supports $filter.
+    string mail = 32;
+
+    // Settings for the primary mailbox of the signed-in user. You can get or update settings for sending automatic replies to incoming messages, locale and time zone.
+    // mailboxSettings mailboxSettings = 33
+
+    // The mail alias for the user. This property must be specified when a user is created. Supports $filter.
+    string mail_nickname = 34;
+
+    // The primary cellular telephone number for the user.
+    string mobile_phone = 35;
+
+    // The URL for the user's personal site.
+    string my_site = 36;
+
+    // The office location in the user's place of business.
+    string office_location = 37;
+
+    // Contains the on-premises LDAP `distinguished name` or `DN`.
+    // The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only.
+    string on_premises_distinguished_name = 38;
+
+    // Contains the on-premises `domainFQDN`, also called `dnsDomainName` synchronized from the on-premises directory
+    // The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only.
+    string on_premises_domain_name = 39;
+
+    // Contains extensionAttributes 1-15 for the user. Note that the individual extension attributes are neither selectable nor filterable.
+    // For an onPremisesSyncEnabled user, this set of properties is mastered on-premises and is read-only.
+    // For a cloud-only user (where onPremisesSyncEnabled is false), these properties may be set during creation or update.
+    //onPremisesExtensionAttributes onPremisesExtensionAttributes = 40
+
+    // This property is used to associate an on-premises LDAP user to the ocis account object.
+    // This property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.
+    // Important: The $ and _ characters cannot be used when specifying this property. Supports $filter.
+    string on_premises_immutable_id = 41;
+
+    // Indicates the last time at which the object was synced with the on-premises directory; Read-only.
+    google.protobuf.Timestamp on_premises_last_sync_date_time = 42;
+
+    // Errors when using synchronization during provisioning.
+    repeated OnPremisesProvisioningError on_premises_provisioning_errors = 43;
+
+    // Contains the on-premises `samAccountName` synchronized from the on-premises directory.
+    // The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only.
+    string on_premises_sam_account_name = 44;
+
+    // Contains the on-premises security identifier (SID) for the user that was synchronized from on-premises to the cloud. Read-only.
+    string on_premises_security_identifier = 45;
+
+    // *true* if this object is synced from an on-premises directory;
+    // *false* if this object was originally synced from an on-premises directory but is no longer synced;
+    // null if this object has never been synced from an on-premises directory (default). Read-only
+    bool on_premises_sync_enabled = 46;
+
+    // Contains the on-premises userPrincipalName synchronized from the on-premises directory.
+    // The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only.
+    string on_premises_user_principal_name = 47;
+
+    // A list of additional email addresses for the user; for example: ["bob@contoso.com", "Robert@fabrikam.com"]. Supports $filter.
+    // note: in ms graph v1.0 this is a string. in the beta api it is a string collection
+    repeated string other_mails = 48;
+
+    // Specifies password policies for the user. This value is an enumeration with one possible value being “DisableStrongPassword”, which allows weaker passwords than the default policy to be specified. “DisablePasswordExpiration” can also be specified. The two may be specified together; for example: "DisablePasswordExpiration, DisableStrongPassword".
+    string password_policies = 49;
+
+    // Specifies the password profile for the user. The profile contains the user’s password. This property is required when a user is created. The password in the profile must satisfy minimum requirements as specified by the passwordPolicies property. By default, a strong password is required.
+    // passwordProfile passwordProfile = 50
+
+    // A list for the user to enumerate their past projects.
+    repeated string past_projects = 51;
+
+    // The postal code for the user's postal address. The postal code is specific to the user's country/region. In the United States of America, this attribute contains the ZIP code.
+    string postal_code = 52;
+
+    // The preferred data location for the user. For more information, see OneDrive Online Multi-Geo. https://docs.microsoft.com/sharepoint/dev/solution-guidance/multigeo-introduction    string preferredDataLocation = 53;
+    string preferred_data_location = 53;
+
+    // The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
+    string preferred_language = 54;
+
+    // The preferred name for the user.
+    string preferred_name = 55;
+
+    // The plans that are provisioned for the user. Read-only. Not nullable.
+    // repeated provisionedPlans provisionedPlans = 56
+
+    // For example: ["SMTP: bob@contoso.com", "smtp: bob@sales.contoso.com"]
+    // The any operator is required for filter expressions on multi-valued properties. Read-only, Not nullable. Supports $filter.
+    repeated string proxy_addresses = 57;
+
+    // Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get
+    // an error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).
+    // If this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.
+    // Returned only on $select. Read-only. Use invalidateAllRefreshTokens to reset.
+    google.protobuf.Timestamp refresh_tokens_valid_from_date_time = 58;
+
+    // A list for the user to enumerate their responsibilities.
+    repeated string responsibilities = 59;
+
+    // A list for the user to enumerate the schools they have attended.
+    repeated string schools = 60;
+
+    // *true* if the Outlook global address list should contain this user, otherwise *false*. If not set, this will be treated as *true*.
+    // For users invited through the invitation manager, this property will be set to *false*.
+    bool show_in_address_list = 61;
+
+    // Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get
+    // an error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).
+    // If this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.
+    // Read-only. Use revokeSignInSessions to reset.
+    google.protobuf.Timestamp sign_in_sessions_valid_from_date_time = 62;
+
+    // Get the last signed-in date and request ID of the sign-in for a given user.
+    // Supports $filter, but not with any other filterable properties.
+    // Returned only on $select. Read-only.
+    //signInActivity signInActivity = 63
+
+    // A list for the user to enumerate their skills.
+    repeated string skills = 64;
+
+    // The state or province in the user's address. Supports $filter
+    string state = 65;
+
+    // The street address of the user's place of business.
+    string street_address = 66;
+
+    // The user's surname (family name or last name). Supports $filter.
+    string surname = 67;
+
+    // A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", and "GB". Not nullable. Supports $filter.
+    string usage_location = 68;
+
+    // The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822.
+    // By convention, this should map to the user's email name. The general format is alias@domain,
+    // where domain must be present in the tenant’s collection of verified domains.
+    // This property is required when a user is created. The verified domains for the tenant can be accessed
+    // from the verifiedDomains property of organization. Supports $filter and $orderby.
+    string user_principal_name = 69;
+
+    // A string value that can be used to classify user types in your directory, such as “Member” and “Guest”. Supports $filter.
+    string user_type = 70;
+
+    // Properties that are not part of the graph API:
+
+    // The users password. Used when updating the users password
+    // TODO: the username is stored as an identity?
+    string password = 71;
+
+
+    // relationships
+
+    // The groups, directory roles and administrative units that the user is a member of. Read-only. Nullable.
+    repeated Group memberOf = 100;
 }
 
 message Identities {
+    // Specifies the user sign-in types in your directory, such as `emailAddress`, `userName` or `federated`.
+    // Here, federated represents a unique identifier for a user from an issuer, that can be in any format chosen by the issuer.
+    // Additional validation is enforced on *issuerAssignedId* when the sign-in type is set to `emailAddress` or `userName`.
+    // This property can also be set to any custom string.
     string sign_in_type = 1;
+
+    // Specifies the issuer of the identity, for example facebook.com.
+    // For local accounts (where signInType is not federated), this property is
+    // the local B2C tenant default domain name, for example contoso.onmicrosoft.com.
+    // For external users from other Azure AD organization, this will be the domain of
+    //  the federated organization, for example contoso.com.
+    // Supports $filter. 512 character limit.
     string issuer = 2;
+
+    // Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).
+    // When *signInType* is set to:
+    // * `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) *issuerAssignedId* must be a valid email address
+    // * `userName`, issuerAssignedId must be a valid local part of an email address
+    // Supports $filter. 512 character limit.
     string issuer_assigned_id = 3;
 }
+
+// TODO additional user methods? https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#methods
 
 message ListGroupsRequest {
     // Optional. The maximum number of groups to return in the response
@@ -225,12 +529,12 @@ message ListGroupsResponse {
 }
 
 message GetGroupRequest {
-    string group_id = 1;
+    string id = 1;
 }
 
 message CreateGroupRequest {
     // The group id to use for this group
-    string group_id = 1;
+    string id = 1;
 
     // The account resource to create
     Group group = 2;
@@ -246,14 +550,274 @@ message UpdateGroupRequest {
   }
 
 message DeleteGroupRequest {
-    string group_id = 1;
+    string id = 1;
+}
+
+message AddMemberRequest {
+    // The account id to add
+    string id = 1;
+}
+
+message RemoveMemberRequest {
+    // The account id to remove
+    // TODO id in the body indt in the url? not necessary ... use empty?
+    string id = 1;
+}
+
+message ListMembersRequest {
+    int32 page_size = 1 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. A pagination token returned from a previous call to `Get`
+    // that indicates from where search should continue
+    string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
+
+    // Optional. Search criteria used to select the groups to return.
+    // If no search criteria is specified then all groups will be
+    // returned
+    //
+    // TODO update query language
+    // Query expressions can be used to restrict results based upon
+    // the account properties where the operators `=`, `NOT`, `AND` and `OR`
+    // can be used along with the suffix wildcard symbol `*`.
+    //
+    // The string properties in a query expression should use escaped quotes
+    // for values that include whitespace to prevent unexpected behavior.
+    //
+    // Some example queries are:
+    //
+    // * Query `display_name=Th*` returns accounts whose display_name
+    // starts with "Th"
+    // * Query `display_name=\\"Test String\\"` returns groups with
+    // display names that include both "Test" and "String"
+    string query = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message ListMembersResponse {
+    // The field name should match the noun "members" in the method name.  There
+    // will be a maximum number of items returned based on the page_size field
+    // in the request
+    repeated Account members = 1;
+
+    // Token to retrieve the next page of results, or empty if there are no
+    // more results in the list
+    string next_page_token = 2;
 }
 
 message Group {
-    // the non reassignable and stable group_id of a group
-    string group_id = 1;
+    // Indicates if people external to the organization can send messages to the group. Default value is false.
+    // Returned only on $select.
+    bool allow_external_senders = 1;
 
-    string groupname = 2;
+    // The list of sensitivity label pairs (label ID, label name) associated with an Office 365 group.
+    //Returned only on $select. Read-only.
+    repeated AssignedLabel assigned_labels = 2;
 
-    repeated Account accounts = 3;
+    // The licenses that are assigned to the group.
+    // Returned only on $select. Read-only.
+    repeated AssignedLicense assigned_licenses = 3;
+
+    // Indicates if new members added to the group will be auto-subscribed to receive email notifications. You can set this property in a PATCH request for the group; do not set it in the initial POST request that creates the group. Default value is false.
+    // Returned only on $select.
+    bool auto_subscribe_new_members = 4;
+
+    // Describes a classification for the group (such as low, medium or high business impact). Valid values for this property are defined by creating a ClassificationList setting value, based on the template definition.
+    // Returned by default.
+    string classification = 5;
+
+    // App ID of the app used to create the group. Can be null for some groups.
+    // Returned by default. Read-only. Supports $filter.
+    string created_by_app_id = 6;
+
+    // Timestamp of when the group was created. The value cannot be modified and is automatically populated when the group is created
+    // Returned by default. Read-only.
+    google.protobuf.Timestamp created_date_time = 7;
+
+    // For some Azure Active Directory objects (user, group, application), if the object is deleted, it is first logically deleted, and this property is updated with the date and time when the object was deleted. Otherwise this property is null. If the object is restored, this property is updated to null.
+    // Returned by default. Read-only.
+    google.protobuf.Timestamp deleted_date_time = 8;
+
+    // An optional description for the group. Returned by default.
+    string description = 9;
+
+    // The display name for the group. This property is required when a group is created and cannot be cleared during updates.
+    // Returned by default. Supports $filter and $orderby.
+    string display_name = 10;
+
+    // Timestamp of when the group is set to expire. The value cannot be modified and is automatically populated when the group is created.
+    // Returned by default. Read-only.
+    google.protobuf.Timestamp expiration_date_time = 11;
+
+    // Specifies the group type and its membership.
+    // If the collection contains `Unified` then the group is an Office 365 group; otherwise it's a security group.
+    // If the collection includes `DynamicMembership`, the group has dynamic membership; otherwise, membership is static.
+    // Returned by default. Supports $filter.
+    repeated string group_types = 12;
+
+    // Indicates whether there are members in this group that have license errors from its group-based license assignment.
+    // This property is never returned on a GET operation. You can use it as a $filter argument to get groups that have members with license errors (that is, filter for this property being true).
+    bool has_members_with_license_errors = 13;
+
+    // True if the group is not displayed in certain parts of the Outlook user interface:
+    // in the Address Book, in address lists for selecting message recipients, and in the Browse Groups dialog for searching groups; false otherwise. Default value is false.
+    // Returned only on $select.
+    bool hide_from_address_lists = 14;
+
+    // True if the group is not displayed in Outlook clients, such as Outlook for Windows and Outlook on the web, false otherwise. Default value is false.
+    // Returned only on $select.
+    bool hide_from_outlook_clients = 15;
+
+    // The unique identifier for the group.
+    // Returned by default. Inherited from directoryObject. Key. Not nullable. Read-only.
+    string id = 16;
+
+    // Indicates whether the signed-in user is subscribed to receive email conversations. Default value is true.
+    // Returned only on $select.
+    bool is_subscribed_by_mail = 17;
+
+    // Indicates status of the group license assignment to all members of the group.
+    // Possible values: `QueuedForProcessing`, `ProcessingInProgress`, and `ProcessingComplete`.
+    // Returned only on $select. Read-only.
+    string license_processing_state = 18;
+
+    // The SMTP address for the group, for example, "serviceadmins@contoso.onmicrosoft.com".
+    // Returned by default. Read-only. Supports $filter.
+    string mail = 19;
+
+    // Specifies whether the group is mail-enabled.
+    // Returned by default.
+    bool mail_enabled = 20;
+
+    // The mail alias for the group, unique in the organization. This property must be specified when a group is created.
+    // Returned by default. Supports $filter.
+    string mail_nickname = 21;
+
+    // The rule that determines members for this group if the group is a dynamic group (groupTypes contains DynamicMembership). For more information about the syntax of the membership rule, see Membership Rules syntax.
+    // Returned by default.
+    string membership_rule = 22;
+
+    // Indicates whether the dynamic membership processing is on or paused. Possible values are "On" or "Paused".
+    // Returned by default.
+    string membership_rule_processing_state = 23;
+
+    // Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.
+    // Returned by default. Read-only.
+    string on_premises_domain_name = 24;
+
+    // Indicates the last time at which the group was synced with the on-premises directory.
+    // Returned by default. Read-only. Supports $filter.
+    string on_premises_last_sync_date_time = 25;
+
+    // 	Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.
+    // Returned by default. Read-only.
+    string on_premises_net_bios_name = 26;
+
+    // Errors when using synchronization during provisioning.
+    repeated OnPremisesProvisioningError on_premises_provisioning_errors = 27;
+
+    // Contains the on-premises `samAccountName` synchronized from the on-premises directory.
+    // The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Returned by default. Read-only.
+    string on_premises_sam_account_name = 28;
+
+    // Contains the on-premises security identifier (SID) for the group that was synchronized from on-premises to the cloud. Returned by default. Read-only.
+    string on_premises_security_identifier = 29;
+
+    // *true* if this group is synced from an on-premises directory;
+    // *false* if this group was originally synced from an on-premises directory but is no longer synced;
+    // null if this object has never been synced from an on-premises directory (default).
+    // Returned by default. Read-only. Supports $filter.
+    bool on_premises_sync_enabled = 30;
+
+    // The preferred data location for the group. For more information, see OneDrive Online Multi-Geo. https://docs.microsoft.com/sharepoint/dev/solution-guidance/multigeo-introduction    string preferredDataLocation = 53;
+    string preferred_data_location = 31;
+
+    // The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
+    string preferred_language = 32;
+
+    // Email addresses for the group that direct to the same group mailbox.
+    // For example: ["SMTP: bob@contoso.com", "smtp: bob@sales.contoso.com"].
+    // The any operator is required for filter expressions on multi-valued properties.
+    // Returned by default. Read-only. Not nullable. Supports $filter.
+    repeated string proxy_addresses = 33;
+
+    // Timestamp of when the group was last renewed.
+    // This cannot be modified directly and is only updated via the renew service action.
+    // Returned by default. Read-only.
+    google.protobuf.Timestamp renewed_date_time = 34;
+
+    // Specifies the group behaviors that can be set for an Office 365 group during creation. This can be set only as part of creation (POST). Possible values are `AllowOnlyMembersToPost`, `HideGroupInOutlook`, `SubscribeNewGroupMembers`, `WelcomeEmailDisable`. For more information, see Set Microsoft 365 group behaviors and provisioning options. https://docs.microsoft.com/en-us/graph/group-set-options
+    repeated string resource_behavior_options = 35;
+
+    // Specifies the group resources that are provisioned as part of Office 365 group creation, that are not normally part of default group creation. Possible value is `Team`. For more information, see Set Microsoft 365 group behaviors and provisioning options. https://docs.microsoft.com/en-us/graph/group-set-options
+    repeated string resource_provisioning_options = 36;
+
+    // Specifies whether the group is a security group.
+    // Returned by default. Supports $filter.
+    bool security_enabled = 37;
+
+    // Security identifier of the group, used in Windows scenarios.
+    // Returned by default.
+    string security_identifier = 38;
+
+    // Specifies an Office 365 group's color theme. Possible values are Teal, Purple, Green, Blue, Pink, Orange or Red.
+    // Returned by default.
+    string theme = 39;
+
+    // Count of conversations that have been delivered one or more new posts since the signed-in user's last visit to the group. This property is the same as unseenCount.
+    // Returned only on $select.
+    //int unseenConversationsCount = 40;
+
+    // Count of conversations that have received new posts since the signed-in user last visited the group. This property is the same as unseenConversationsCount.
+    // Returned only on $select.
+    //int unseenCount = 41;
+
+    // Count of new posts that have been delivered to the group's conversations since the signed-in user's last visit to the group.
+    // Returned only on $select.
+    //int unseenMessagesCount = 42;
+
+    // 	Specifies the visibility of an Office 365 group. Possible values are: Private, Public, or Hiddenmembership; blank values are treated as public. See group visibility options to learn more.
+    // Visibility can be set only when a group is created; it is not editable.
+    // Visibility is supported only for unified groups; it is not supported for security groups.
+    // Returned by default.
+    string visibility = 43;
+
+    // relationships
+
+    // Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
+    // TODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later
+    repeated Account members = 100;
+
+}
+
+message AssignedLabel {
+    // The unique identifier of the label.
+    string label_id = 1;
+    // The display name of the label. Read-only.
+    string display_name = 2;
+}
+
+message AssignedLicense {
+    string sku_id = 1;
+    repeated string disabled_plans = 2;
+}
+
+message AssignedPlan {
+    // The date and time at which the plan was assigned; for example: 2013-01-02T19:32:30Z. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: '2014-01-01T00:00:00Z'
+    google.protobuf.Timestamp assigned_date_time = 1;
+    // For example, “Enabled”.
+    string capabilityStatus = 2;
+    // The name of the service; for example, “Exchange”.
+    string service = 3;
+    // A GUID that identifies the service plan.
+    string servicePlanId = 4;
+}
+
+message OnPremisesProvisioningError {
+    // Category of the provisioning error. Note: Currently, there is only one possible value. Possible value: PropertyConflict - indicates a property value is not unique. Other objects contain the same value for the property.
+    string category = 1;
+    // The date and time at which the error occurred.
+    google.protobuf.Timestamp occurred_date_time = 2;
+    // Name of the directory property causing the error. Current possible values: UserPrincipalName or ProxyAddress
+    string property_causing_error = 3;
+    // Value of the property causing the error.
+    string value = 4;
 }

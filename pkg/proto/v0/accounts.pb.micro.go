@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	_ "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	_ "google.golang.org/genproto/protobuf/field_mask"
 	math "math"
@@ -47,16 +48,6 @@ type AccountsService interface {
 	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...client.CallOption) (*Account, error)
 	// Deletes an account
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*empty.Empty, error)
-	// Lists groups
-	ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error)
-	// Gets an groups
-	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error)
-	// Creates a group
-	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error)
-	// Updates a group
-	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error)
-	// Deletes a group
-	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error)
 }
 
 type accountsService struct {
@@ -121,56 +112,6 @@ func (c *accountsService) DeleteAccount(ctx context.Context, in *DeleteAccountRe
 	return out, nil
 }
 
-func (c *accountsService) ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.ListGroups", in)
-	out := new(ListGroupsResponse)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountsService) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.GetGroup", in)
-	out := new(Group)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountsService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.CreateGroup", in)
-	out := new(Group)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountsService) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.UpdateGroup", in)
-	out := new(Group)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *accountsService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error) {
-	req := c.c.NewRequest(c.name, "AccountsService.DeleteGroup", in)
-	out := new(empty.Empty)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for AccountsService service
 
 type AccountsServiceHandler interface {
@@ -184,16 +125,6 @@ type AccountsServiceHandler interface {
 	UpdateAccount(context.Context, *UpdateAccountRequest, *Account) error
 	// Deletes an account
 	DeleteAccount(context.Context, *DeleteAccountRequest, *empty.Empty) error
-	// Lists groups
-	ListGroups(context.Context, *ListGroupsRequest, *ListGroupsResponse) error
-	// Gets an groups
-	GetGroup(context.Context, *GetGroupRequest, *Group) error
-	// Creates a group
-	CreateGroup(context.Context, *CreateGroupRequest, *Group) error
-	// Updates a group
-	UpdateGroup(context.Context, *UpdateGroupRequest, *Group) error
-	// Deletes a group
-	DeleteGroup(context.Context, *DeleteGroupRequest, *empty.Empty) error
 }
 
 func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler, opts ...server.HandlerOption) error {
@@ -203,11 +134,6 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 		CreateAccount(ctx context.Context, in *CreateAccountRequest, out *Account) error
 		UpdateAccount(ctx context.Context, in *UpdateAccountRequest, out *Account) error
 		DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error
-		ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error
-		GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error
-		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error
-		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error
-		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error
 	}
 	type AccountsService struct {
 		accountsService
@@ -240,22 +166,190 @@ func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAc
 	return h.AccountsServiceHandler.DeleteAccount(ctx, in, out)
 }
 
-func (h *accountsServiceHandler) ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error {
-	return h.AccountsServiceHandler.ListGroups(ctx, in, out)
+// Client API for GroupsService service
+
+type GroupsService interface {
+	// Lists groups
+	ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error)
+	// Gets an groups
+	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Creates a group
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Updates a group
+	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error)
+	// Deletes a group
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error)
+	// group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http
+	AddMember(ctx context.Context, in *AddMemberRequest, opts ...client.CallOption) (*Group, error)
+	// group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0
+	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...client.CallOption) (*Group, error)
+	// group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
+	ListMembers(ctx context.Context, in *ListMembersRequest, opts ...client.CallOption) (*ListMembersResponse, error)
 }
 
-func (h *accountsServiceHandler) GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error {
-	return h.AccountsServiceHandler.GetGroup(ctx, in, out)
+type groupsService struct {
+	c    client.Client
+	name string
 }
 
-func (h *accountsServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error {
-	return h.AccountsServiceHandler.CreateGroup(ctx, in, out)
+func NewGroupsService(name string, c client.Client) GroupsService {
+	return &groupsService{
+		c:    c,
+		name: name,
+	}
 }
 
-func (h *accountsServiceHandler) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error {
-	return h.AccountsServiceHandler.UpdateGroup(ctx, in, out)
+func (c *groupsService) ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...client.CallOption) (*ListGroupsResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.ListGroups", in)
+	out := new(ListGroupsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func (h *accountsServiceHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error {
-	return h.AccountsServiceHandler.DeleteGroup(ctx, in, out)
+func (c *groupsService) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.GetGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.CreateGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.UpdateGroup", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.DeleteGroup", in)
+	out := new(empty.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) AddMember(ctx context.Context, in *AddMemberRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.AddMember", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...client.CallOption) (*Group, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.RemoveMember", in)
+	out := new(Group)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupsService) ListMembers(ctx context.Context, in *ListMembersRequest, opts ...client.CallOption) (*ListMembersResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupsService.ListMembers", in)
+	out := new(ListMembersResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for GroupsService service
+
+type GroupsServiceHandler interface {
+	// Lists groups
+	ListGroups(context.Context, *ListGroupsRequest, *ListGroupsResponse) error
+	// Gets an groups
+	GetGroup(context.Context, *GetGroupRequest, *Group) error
+	// Creates a group
+	CreateGroup(context.Context, *CreateGroupRequest, *Group) error
+	// Updates a group
+	UpdateGroup(context.Context, *UpdateGroupRequest, *Group) error
+	// Deletes a group
+	DeleteGroup(context.Context, *DeleteGroupRequest, *empty.Empty) error
+	// group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http
+	AddMember(context.Context, *AddMemberRequest, *Group) error
+	// group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0
+	RemoveMember(context.Context, *RemoveMemberRequest, *Group) error
+	// group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
+	ListMembers(context.Context, *ListMembersRequest, *ListMembersResponse) error
+}
+
+func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, opts ...server.HandlerOption) error {
+	type groupsService interface {
+		ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error
+		GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error
+		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error
+		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error
+		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error
+		AddMember(ctx context.Context, in *AddMemberRequest, out *Group) error
+		RemoveMember(ctx context.Context, in *RemoveMemberRequest, out *Group) error
+		ListMembers(ctx context.Context, in *ListMembersRequest, out *ListMembersResponse) error
+	}
+	type GroupsService struct {
+		groupsService
+	}
+	h := &groupsServiceHandler{hdlr}
+	return s.Handle(s.NewHandler(&GroupsService{h}, opts...))
+}
+
+type groupsServiceHandler struct {
+	GroupsServiceHandler
+}
+
+func (h *groupsServiceHandler) ListGroups(ctx context.Context, in *ListGroupsRequest, out *ListGroupsResponse) error {
+	return h.GroupsServiceHandler.ListGroups(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error {
+	return h.GroupsServiceHandler.GetGroup(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error {
+	return h.GroupsServiceHandler.CreateGroup(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error {
+	return h.GroupsServiceHandler.UpdateGroup(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error {
+	return h.GroupsServiceHandler.DeleteGroup(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) AddMember(ctx context.Context, in *AddMemberRequest, out *Group) error {
+	return h.GroupsServiceHandler.AddMember(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) RemoveMember(ctx context.Context, in *RemoveMemberRequest, out *Group) error {
+	return h.GroupsServiceHandler.RemoveMember(ctx, in, out)
+}
+
+func (h *groupsServiceHandler) ListMembers(ctx context.Context, in *ListMembersRequest, out *ListMembersResponse) error {
+	return h.GroupsServiceHandler.ListMembers(ctx, in, out)
 }

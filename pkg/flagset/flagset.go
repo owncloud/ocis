@@ -121,8 +121,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		// ldap dn is always the dn
 		&cli.StringFlag{
-			Name:        "ldap-schema-account-id",
-			Value:       "ownclouduuid", // TODO write down LDAP schema & register OID
+			Name: "ldap-schema-account-id",
+			// TODO write down LDAP schema & register OID ownclouduuid
+			//... use 'sourceAnchor','immutableid' see https://docs.microsoft.com/en-us/azure/active-directory/hybrid/plan-connect-design-concepts#sourceanchor
+			// or 'ms-DS-ConsistencyGuid' see https://docs.microsoft.com/en-us/azure/active-directory/hybrid/plan-connect-design-concepts
+			// or build a scim schema for ldap? https://ldapwiki.com/wiki/SCIM%20Common%20Attribute
+			// glauth -> support id and externalid from scim
+			Value:       "uidNumber",
 			Usage:       "LDAP schema account id",
 			EnvVars:     []string{"ACCOUNTS_LDAP_SCHEMA_ACCOUNT_ID"},
 			Destination: &cfg.LDAP.Schema.AccountID,

@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/CiscoM31/godata"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -32,10 +33,84 @@ type Service struct {
 	Config *config.Config
 }
 
+func (s Service) getBoundConnection(binddn string, password string) (l *ldap.Conn, err error) {
+	l, err = ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", s.Config.LDAP.Hostname, s.Config.LDAP.Port), &tls.Config{InsecureSkipVerify: true})
+	if err != nil {
+		return nil, err
+	}
+
+	err = l.Bind(binddn, password)
+	if err != nil {
+		l.Close()
+		return nil, err
+	}
+
+	return
+}
+
+func (s Service) lookupDN(username string) (binddn string, err error) {
+	l, err := s.getBoundConnection(s.Config.LDAP.BindDN, s.Config.LDAP.BindPassword)
+	if err != nil {
+		return "", err
+	}
+	defer l.Close()
+
+	filter := fmt.Sprintf("(%s=%s)", s.Config.LDAP.Schema.Username, ldap.EscapeFilter(username))
+
+	// Search for the given username
+	searchRequest := ldap.NewSearchRequest(
+		s.Config.LDAP.BaseDN,
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+		filter,
+		[]string{"dn"},
+		nil,
+	)
+
+	sr, err := l.Search(searchRequest)
+	if err != nil {
+		return "", err
+	}
+
+	switch len(sr.Entries) {
+	case 0: // TODO return not found error
+	case 1:
+		return sr.Entries[0].DN, nil
+	default: // TODO return too many results error?
+	}
+	return "", fmt.Errorf("dn not found for %s", filter)
+}
+
+// the auth request is currently hardcoded and has to macth this regex
+// userName eq \"teddy\" and password eq \"F&1!b90t111!\"
+var authQuery = regexp.MustCompile(`^username eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
+
 // ListAccounts implements the AccountsServiceHandler interface
+// the query contains account properties
+// TODO id vs onpremiseimmutableid
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) (err error) {
 
-	log.Debug().Str("query", in.Query).Int32("page-size", in.PageSize).Str("page-token", in.PageToken).Msg("ListAccounts")
+	var binddn string
+	var password string
+
+	// check if this looks like an auth request
+	match := authQuery.FindStringSubmatch(in.Query)
+	if len(match) == 3 {
+
+		binddn, err = s.lookupDN(match[1])
+		if err != nil {
+			log.Error().Err(err).Msg("ListAccounts with auth request")
+			return
+		}
+		log.Debug().Str("username", match[1]).Str("binddn", binddn).Msg("ListAccounts with auth request")
+
+		password = match[2]
+		// remove password from query
+		in.Query = fmt.Sprintf("username eq '%s'", match[1])
+	} else {
+		log.Debug().Str("query", in.Query).Int32("page-size", in.PageSize).Str("page-token", in.PageToken).Msg("ListAccounts")
+		binddn = s.Config.LDAP.BindDN
+		password = s.Config.LDAP.BindPassword
+	}
 
 	filter := "(&)" // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
 
@@ -43,30 +118,24 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		// parse the query like an odata filter
 		var q *godata.GoDataFilterQuery
 		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			return err
+			return
 		}
 
 		// convert to ldap filter
 		filter, err = provider.BuildLDAPFilter(q, &s.Config.LDAP.Schema)
 		if err != nil {
-			return err
+			return
 		}
 	}
 
 	log.Debug().Str("filter", filter).Msg("using filter")
 
 	var l *ldap.Conn
-	l, err = ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", s.Config.LDAP.Hostname, s.Config.LDAP.Port), &tls.Config{InsecureSkipVerify: true})
+	l, err = s.getBoundConnection(binddn, password)
 	if err != nil {
-		return err
+		return
 	}
 	defer l.Close()
-
-	// First bind with a read only user
-	err = l.Bind(s.Config.LDAP.BindDN, s.Config.LDAP.BindPassword)
-	if err != nil {
-		return err
-	}
 
 	// TODO combine the parsed query with a query filter from the config, eg. fmt.Sprintf(s.Config.LDAP.UserFilter, clientID)
 
@@ -89,8 +158,9 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	res.Accounts = make([]*proto.Account, 0)
 	for i := range sr.Entries {
 		res.Accounts = append(res.Accounts, &proto.Account{
-			AccountId: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.AccountID),
+			Id: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.AccountID),
 			// TODO identities
+			// TODO Username is in the identities ... or in onpremisesamaccountname or in preferredname ...
 			Username:    sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Username),
 			DisplayName: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.DisplayName),
 			Mail:        sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Mail),
@@ -103,7 +173,46 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res *proto.Account) (err error) {
-	return errors.New("not implemented")
+
+	l, err := s.getBoundConnection(s.Config.LDAP.BindDN, s.Config.LDAP.BindPassword)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+
+	// TODO combine the parsed query with a query filter from the config, eg. fmt.Sprintf(s.Config.LDAP.UserFilter, clientID)
+	filter := fmt.Sprintf("(%s=%s)", s.Config.LDAP.Schema.AccountID, ldap.EscapeFilter(req.Id))
+
+	// Search for the given clientID
+	searchRequest := ldap.NewSearchRequest(
+		s.Config.LDAP.BaseDN,
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+		filter,
+		[]string{"dn", s.Config.LDAP.Schema.AccountID, s.Config.LDAP.Schema.Username, s.Config.LDAP.Schema.DisplayName, s.Config.LDAP.Schema.Mail, s.Config.LDAP.Schema.Groups}, // TODO Groups, Identities?
+		nil,
+	)
+
+	sr, err := l.Search(searchRequest)
+	if err != nil {
+		return err
+	}
+
+	log.Debug().Interface("entries", sr.Entries).Msg("entries")
+
+	switch len(sr.Entries) {
+	case 0: // TODO return not found error
+	case 1:
+		res.Id = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.AccountID)
+		// TODO identities?
+		// TODO Username is in the identities ... or in onpremisesamaccountname or in preferredname ...
+		res.Username = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.Username)
+		res.DisplayName = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.DisplayName)
+		res.Mail = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.Mail)
+		// TODO groups
+	default: // TODO return too many results error?
+	}
+
+	return nil
 }
 
 // CreateAccount implements the AccountsServiceHandler interface

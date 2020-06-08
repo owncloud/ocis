@@ -7,4 +7,15 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: _index.md
 ---
 
-This service provides an inter-operable accounts service that operates on the filesystem by default.
+[![GitHub](https://img.shields.io/github/license/owncloud/ocis-hello)](https://github.com/owncloud/ocis-hello/blob/master/LICENSE)
+
+## Abstract
+OCIS needs to be able to identify users. Whithout a non reassignable and persistend account ID share metadata cannot be reliably persisted. `ocis-accounts` allows exchanging oidc claims for a uuid. Using a uuid allows users to change the login, mail or even openid connect provider without breaking any persisted metadata that might have been attached to it.
+
+- persists accounts
+- uses graph api properties
+  -ldap can be synced using the onpremise* attributes
+
+## Table of Contents
+
+{{< toc-tree >}}
