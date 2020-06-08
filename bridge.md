@@ -81,10 +81,11 @@ This should give you a `bin/ocis-glauth` binary. Try listing the help with `bin/
 
 You need to point `ocis-glauth` to your owncloud domain:
 ```console
-$ bin/ocis-glauth --log-level debug server --backend-server https://cloud.example.com --backend-basedn dc=example,dc=com
+$ bin/ocis-glauth --log-level debug server --backend-datastore owncloud --backend-server https://cloud.example.com --backend-basedn dc=example,dc=com
 ```
 
 `--log-level debug` is only used to generate more verbose output
+`--backend-datastore owncloud` switches to tho owncloud datastore
 `--backend-server https://cloud.example.com` is the url to an ownCloud instance with an enabled graphapi app
 `--backend-basedn dc=example,dc=com` is used to construct the LDAP dn. The user `admin` will become `cn=admin,dc=example,dc=com`.
 
