@@ -28,8 +28,6 @@ func NewService(opts ...Option) Service {
 		logger: &options.Logger,
 	}
 
-	svc.logger.Info().Msg("Starting graph ....")
-
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1.0", func(r chi.Router) {
