@@ -5,6 +5,7 @@
 * Bugfix - Fix multiple submits on string and number form elements: [#745](https://github.com/owncloud/owncloud-design-system/issues/745)
 * Change - Introduce input validation: [#22](https://github.com/owncloud/ocis-settings/pull/22)
 * Change - Use account uuid from x-access-token: [#14](https://github.com/owncloud/ocis-settings/pull/14)
+* Enhancement - Extend the docs: [#11](https://github.com/owncloud/ocis-settings/issues/11)
 
 ## Details
 
@@ -39,4 +40,12 @@
    uuid, when the request comes through the proxy.
 
    https://github.com/owncloud/ocis-settings/pull/14
+
+
+* Enhancement - Extend the docs: [#11](https://github.com/owncloud/ocis-settings/issues/11)
+
+   We have extended the documentation by adding a chapter about settings values.
+
+   https://github.com/owncloud/ocis-settings/issues/11
+   https://github.com/owncloud/ocis-settings/pulls/28
 
