@@ -160,7 +160,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		res.Accounts = append(res.Accounts, &proto.Account{
 			Id: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.AccountID),
 			// TODO identities
-			// TODO Username is in the identities ... or in onpremisesamaccountname or in preferredname ...
 			Username:    sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Username),
 			DisplayName: sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.DisplayName),
 			Mail:        sr.Entries[i].GetAttributeValue(s.Config.LDAP.Schema.Mail),
@@ -204,7 +203,6 @@ func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res
 	case 1:
 		res.Id = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.AccountID)
 		// TODO identities?
-		// TODO Username is in the identities ... or in onpremisesamaccountname or in preferredname ...
 		res.Username = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.Username)
 		res.DisplayName = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.DisplayName)
 		res.Mail = sr.Entries[0].GetAttributeValue(s.Config.LDAP.Schema.Mail)
