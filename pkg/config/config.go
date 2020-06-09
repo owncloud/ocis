@@ -26,9 +26,10 @@ type LDAPSchema struct {
 
 // Server configures a server.
 type Server struct {
-	Name      string
-	Namespace string
-	Address   string
+	Name             string
+	Namespace        string
+	Address          string
+	AccountsDataPath string
 }
 
 // Log defines the available logging configuration.
