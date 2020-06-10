@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -132,7 +133,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"config": map[string]interface{}{
 									"version": "1.8",
 									"website": "reva",
-									"host":    "http://" + cfg.Reva.Frontend.URL, // TODO URLs should include the protocol
+									"host":    urlWithScheme(cfg.Reva.Frontend.URL),
 									"contact": "admin@localhost",
 									"ssl":     "false",
 								},
@@ -289,4 +290,14 @@ func Frontend(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// urlWithScheme checks if the given string is prefixed with "http". If it is not, "http://" will be added as prefix.
+// As we can't tell if http or https should be the preferred scheme, the correct approach would be to fail on urls
+// without scheme. As long as we have default urls in our flagsets which don't have a scheme, this is a feasible workaround.
+func urlWithScheme(str string) string {
+	if !strings.HasPrefix(str, "http") {
+		str = "http://" + str
+	}
+	return str
 }

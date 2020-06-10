@@ -108,7 +108,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"link_grants_file": cfg.Reva.Gateway.LinkGrants,
 								// other
 								"disable_home_creation_on_login": cfg.Reva.Gateway.DisableHomeCreationOnLogin,
-								"datagateway":                    cfg.Reva.Frontend.URL,
+								"datagateway":                    urlWithScheme(cfg.Reva.Frontend.URL),
 								"transfer_shared_secret":         cfg.Reva.TransferSecret,
 								"transfer_expires":               cfg.Reva.TransferExpires,
 							},
