@@ -146,7 +146,7 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "expose-data-server",
-			Value:       true,
+			Value:       false,
 			Usage:       "exposes a dedicated data server",
 			EnvVars:     []string{"REVA_STORAGE_OC_EXPOSE_DATA_SERVER"},
 			Destination: &cfg.Reva.StorageOC.ExposeDataServer,
