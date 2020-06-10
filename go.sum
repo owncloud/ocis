@@ -83,6 +83,7 @@ github.com/aws/aws-sdk-go v1.23.19/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpi
 github.com/aws/aws-sdk-go v1.31.1 h1:5tv3VtTS/IM1yZ6lxMQQVmH28SkkR3b3w+6u+9rcLx4=
 github.com/aws/aws-sdk-go v1.31.1/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.31.6/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.31.7 h1:TCA+pXKvzDMA3vVqhK21cCy5GarC8pTQb/DrVOWI3iY=
 github.com/aws/aws-sdk-go v1.31.7/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.32.3/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.32.5/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
@@ -649,6 +650,7 @@ github.com/mitchellh/mapstructure v1.0.0/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.3.0 h1:iDwIio/3gk2QtLLEsqU5lInaMzos0hDTz8a6lazSFVw=
 github.com/mitchellh/mapstructure v1.3.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
+github.com/mitchellh/mapstructure v1.3.1 h1:cCBH2gTD2K0OtLlv/Y5H01VQCqmlDxz30kS5Y5bqfLA=
 github.com/mitchellh/mapstructure v1.3.1/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mitchellh/mapstructure v1.3.2/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=
@@ -711,6 +713,7 @@ github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S
 github.com/ory/fosite v0.31.0/go.mod h1:lSSqjo8Kr/U1P3kJWxsNGHmq7TnH/7pS1ijvQRT7G+g=
 github.com/ory/fosite v0.31.3 h1:5WjLwfs+yUALZjzKUKGN/M+ddBJ5Ol6NawxuCO2TuAg=
 github.com/ory/fosite v0.31.3/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
+github.com/ory/fosite v0.32.0 h1:g89HkBt0dgm+HPrbsYZTmyks1NIw0BH/UlEaw84e1ss=
 github.com/ory/fosite v0.32.0/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
 github.com/ory/fosite v0.32.1/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
 github.com/ory/fosite v0.32.2/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
