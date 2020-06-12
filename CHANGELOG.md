@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-accounts unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.1.1...master
+
+## Summary
+
+* Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
+
+## Details
+
+* Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
+
+   We had a timezone setting in our profile settings bundle. As we're not dealing with a timezone
+   yet it would be confusing for the user to have a timezone setting available. We removed it, until
+   we have a timezone implementation available in ocis-web.
+
+   https://github.com/owncloud/ocis-accounts/pull/33
+
 # Changelog for [0.1.1] (2020-04-29)
 
 The following sections list the changes in ocis-accounts 0.1.1.
