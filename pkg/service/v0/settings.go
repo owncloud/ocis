@@ -12,33 +12,6 @@ func generateSettingsBundleProfileRequest() settings.SaveSettingsBundleRequest {
 			DisplayName: "Profile",
 			Settings: []*settings.Setting{
 				{
-					SettingKey:  "timezone",
-					DisplayName: "Timezone",
-					Description: "User timezone",
-					Value: &settings.Setting_SingleChoiceValue{
-						SingleChoiceValue: &settings.SingleChoiceListSetting{
-							Options: []*settings.ListOption{
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "Europe/Berlin",
-										},
-									},
-									DisplayValue: "Europe/Berlin",
-								},
-								{
-									Value: &settings.ListOptionValue{
-										Option: &settings.ListOptionValue_StringValue{
-											StringValue: "Asia/Kathmandu",
-										},
-									},
-									DisplayValue: "Asia/Kathmandu",
-								},
-							},
-						},
-					},
-				},
-				{
 					SettingKey:  "language",
 					DisplayName: "Language",
 					Description: "User language",
