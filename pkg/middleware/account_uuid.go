@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"context"
-	"github.com/owncloud/ocis-proxy/pkg/config"
 	"net/http"
+	"strings"
+
+	"github.com/owncloud/ocis-proxy/pkg/config"
 
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -103,13 +105,13 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 				}
 			}
 
-
 			l.Debug().Interface("claims", claims).Interface("uuid", uuid).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
 				Id: &revauser.UserId{
 					OpaqueId: uuid,
 				},
-				Username: claims.Email,
+				Username:    strings.ToLower(claims.Name),
+				DisplayName: claims.Name,
 			})
 
 			if err != nil {

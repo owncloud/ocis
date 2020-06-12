@@ -19,7 +19,9 @@ var (
 	ErrInvalidToken = errors.New("invalid or missing token")
 
 	// svcCache caches requests for given services to prevent round trips to the service
-	svcCache = cache.NewCache()
+	svcCache = cache.NewCache(
+		cache.Size(256),
+	)
 
 	// ClaimsKey works as a context key for user claims
 	ClaimsKey interface{} = "claims"
