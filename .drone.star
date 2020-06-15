@@ -23,7 +23,7 @@ def main(ctx):
 
   return before + stages + after
 
-def apiTests(ctx, coreBranch, coreCommit):
+def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -105,7 +105,9 @@ def apiTests(ctx, coreBranch, coreCommit):
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
           'cd /srv/app/testrunner',
-          'git checkout %s' % (coreCommit),
+		] + ([
+          'git checkout %s' % (coreCommit)
+		] if coreCommit != '' else []) + [
           'make test-acceptance-api'
         ],
         'volumes': [
