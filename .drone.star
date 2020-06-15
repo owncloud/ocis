@@ -100,20 +100,20 @@ def apiTests(ctx, coreBranch, coreCommit):
           'TEST_OCIS':'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton'
-         },
-         'commands': [
-           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
-           'cd /srv/app/testrunner',
-           'git checkout %s' % (coreCommit),
-           'make test-acceptance-api'
-          ],
-          'volumes': [
-            {
-              'name': 'gopath',
-              'path': '/srv/app',
-            },
-          ]
+        },
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+          'cd /srv/app/testrunner',
+          'git checkout %s' % (coreCommit),
+          'make test-acceptance-api'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
       },
     ],
     'services': [
@@ -321,7 +321,7 @@ def testing(ctx):
           'LITMUS_USERNAME': 'tu1',
           'LITMUS_PASSWORD': '1234',
           'TESTS': 'basic http copymove props'
-         },
+        },
       },
     ],
     'services': [
@@ -335,7 +335,7 @@ def testing(ctx):
           'LDAP_ADMIN_PASSWORD': 'admin',
           'LDAP_TLS_VERIFY_CLIENT': 'never',
           'HOSTNAME': 'ldap'
-         },
+        },
       },
       {
         'name': 'redis',
@@ -343,7 +343,7 @@ def testing(ctx):
         'pull': 'always',
         'environment': {
           'REDIS_DATABASES': 1
-         },
+        },
       },
     ],
     'volumes': [
