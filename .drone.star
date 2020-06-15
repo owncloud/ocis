@@ -195,7 +195,7 @@ def testing(ctx):
       },
       {
         'name': 'phoenixWebUIAcceptanceTests',
-        'image': 'owncloudci/nodejs:10',
+        'image': 'owncloudci/nodejs:11',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'http://ocis-server:9100',
