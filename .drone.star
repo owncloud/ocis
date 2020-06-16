@@ -184,7 +184,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+          'git clone -b testsPassingOnOcis --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',
           'cd /srv/app/testrunner',
 		] + ([
           'git checkout %s' % (coreCommit)
