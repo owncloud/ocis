@@ -147,8 +147,6 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
           'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
-          'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
-          'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
           'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
           'KONNECTD_ISS': 'https://ocis-server:9200',
           'KONNECTD_TLS': 'true',
@@ -179,7 +177,6 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
-          'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'LDAP_SERVER_URL': 'ldap://ldap',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads'
@@ -192,9 +189,6 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
 		] + ([
           'git checkout %s' % (phoenixCommit)
 		] if phoenixCommit != '' else []) + [
-          'yarn install-all',
-          'yarn dist',
-          'cp -r /drone/src/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
           'yarn run acceptance-tests-drone'
         ],
         'volumes': [{
