@@ -179,6 +179,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'LDAP_SERVER_URL': 'ldap://ldap',
+          'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads'
         },
