@@ -101,7 +101,7 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 		var userID string
 		if claims := ocisoidc.FromContext(r.Context()); claims != nil {
 			userID = claims.PreferredUsername
-			if _, err := acc.Get(ctx, &accounts.GetRequest{Uuid: userID}); err != nil {
+			if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
 				return cfg.AccNotFoundPolicy, nil
 			}
 

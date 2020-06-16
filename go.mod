@@ -27,3 +27,6 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+
+// remove after https://github.com/owncloud/ocis-accounts/pull/30 has been merged
+replace github.com/owncloud/ocis-accounts => ../ocis-accounts
