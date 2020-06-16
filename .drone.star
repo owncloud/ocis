@@ -147,6 +147,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
           'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+          'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
           'KONNECTD_ISS': 'https://ocis-server:9200',
           'KONNECTD_TLS': 'true',
