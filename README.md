@@ -31,6 +31,7 @@ make generate build
 ### Redis server
 
 You will need to start a redis server as a cache. The ownCloud storage driver currently will try to connect to the default port.
+A quick way to start one for testing is using this docker instance: `docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
 
 ### Root storage
 
