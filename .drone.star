@@ -1,6 +1,6 @@
 def main(ctx):
   before = [
-    testing(ctx, 'master', '158bd976047ea8abd137e2c61905d9dd63dc977d', 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
+    testing(ctx, 'testsPassingOnOcis', '158bd976047ea8abd137e2c61905d9dd63dc977d', 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
   ]
 
   stages = [
@@ -22,7 +22,7 @@ def main(ctx):
 
   return before + stages + after
 
-def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master', phoenixCommit = ''):
+def testing(ctx, coreBranch = 'testsPassingOnOcis', coreCommit = '', phoenixBranch = 'master', phoenixCommit = ''):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -184,7 +184,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b testsPassingOnOcis --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
           'cd /srv/app/testrunner',
 		] + ([
           'git checkout %s' % (coreCommit)
