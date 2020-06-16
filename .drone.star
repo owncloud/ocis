@@ -190,6 +190,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'git checkout %s' % (phoenixCommit)
 		] if phoenixCommit != '' else []) + [
           'yarn install-all',
+          'cp -r /drone/src/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
           'yarn run acceptance-tests-drone'
         ],
         'volumes': [{
