@@ -4,14 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search/query"
+	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/config"
@@ -20,6 +23,13 @@ import (
 	olog "github.com/owncloud/ocis-pkg/v2/log"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/rs/zerolog/log"
+	"github.com/tredoe/osutil/user/crypt"
+
+	// register crypt functions
+	_ "github.com/tredoe/osutil/user/crypt/apr1_crypt"
+	_ "github.com/tredoe/osutil/user/crypt/md5_crypt"
+	_ "github.com/tredoe/osutil/user/crypt/sha256_crypt"
+	_ "github.com/tredoe/osutil/user/crypt/sha512_crypt"
 )
 
 // New returns a new instance of Service
@@ -80,16 +90,29 @@ type Service struct {
 	index  bleve.Index
 }
 
-// the auth request is currently hardcoded and has to macth this regex
-// userName eq \"teddy\" and password eq \"F&1!b90t111!\"
-var authQuery = regexp.MustCompile(`^username eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
+// an auth request is currently hardcoded and has to match this regex
+// login eq \"teddy\" and password eq \"F&1!b90t111!\"
+var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
 
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 // TODO id vs onpremiseimmutableid
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) (err error) {
 
+	var password string
+
 	var query query.Query
+
+	// check if this looks like an auth request
+	match := authQuery.FindStringSubmatch(in.Query)
+	if len(match) == 3 {
+		in.Query = fmt.Sprintf("preferred_name eq '%s'", match[1]) // todo fetch email? make query configurable
+		password = match[2]
+		if password == "" {
+
+			return fmt.Errorf("password must not be empty")
+		}
+	}
 
 	if in.Query != "" {
 		// parse the query like an odata filter
@@ -112,7 +135,8 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	log.Debug().Interface("query", query).Msg("using query")
 
 	searchRequest := bleve.NewSearchRequest(query)
-	searchResult, err := s.index.Search(searchRequest)
+	var searchResult *bleve.SearchResult
+	searchResult, err = s.index.Search(searchRequest)
 	log.Debug().Interface("result", searchResult).Msg("result")
 
 	res.Accounts = make([]*proto.Account, 0)
@@ -120,7 +144,8 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	for _, hit := range searchResult.Hits {
 		path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", hit.ID)
 
-		data, err := ioutil.ReadFile(path)
+		var data []byte
+		data, err = ioutil.ReadFile(path)
 		if err != nil {
 			log.Error().Err(err).Str("path", path).Msg("could not read account")
 			continue
@@ -132,20 +157,106 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			continue
 		}
 		log.Debug().Interface("account", a).Msg("found account")
+
+		if password != "" {
+			if a.PasswordProfile == nil {
+				log.Debug().Interface("account", a).Msg("no password profile")
+				return fmt.Errorf("invalid password")
+			}
+			if !s.passwordIsValid(a.PasswordProfile.Password, password) {
+				return fmt.Errorf("invalid password")
+			}
+		}
+
 		res.Accounts = append(res.Accounts, &a)
 	}
 
 	return nil
 }
 
+func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
+		}
+	}()
+
+	c := crypt.NewFromHash(hash)
+	return c.Verify(hash, []byte(pwd)) == nil
+}
+
+func cleanupID(id string) (string, error) {
+	id = filepath.Clean(id)
+	if id == "." || strings.Contains(id, "/") {
+		return "", errors.New("bad request")
+	}
+	return id, nil
+}
+
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res *proto.Account) (err error) {
-	return errors.New("not implemented")
+	var id string
+	if id, err = cleanupID(req.Id); err != nil {
+		return
+	}
+	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
+
+	var data []byte
+	data, err = ioutil.ReadFile(path)
+	if err != nil {
+		log.Error().Err(err).Str("path", path).Msg("could not read account")
+		// TODO we need error handling ... eg Not Found
+		return fmt.Errorf("account not found")
+	}
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
+		return fmt.Errorf("internal server error")
+	}
+
+	log.Debug().Interface("account", res).Msg("found account")
+	return
 }
 
 // CreateAccount implements the AccountsServiceHandler interface
 func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountRequest, res *proto.Account) (err error) {
-	return errors.New("not implemented")
+	var id string
+	if req.Id == "" {
+		req.Id = uuid.Must(uuid.NewV4()).String()
+	}
+	// we are always ignoring the id in the account here ... hmm just do away with the extra id property?
+	req.Account.Id = req.Id
+
+	if id, err = cleanupID(req.Id); err != nil {
+		return
+	}
+	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
+
+	if req.Account.PasswordProfile != nil && req.Account.PasswordProfile.Password != "" {
+		// encrypt password
+		c := crypt.New(crypt.SHA512)
+		if req.Account.PasswordProfile.Password, err = c.Generate([]byte(req.Account.PasswordProfile.Password), nil); err != nil {
+			req.Account.PasswordProfile.Password = "***REMOVED***"
+			log.Error().Err(err).Str("id", id).Interface("account", req.Account).Msg("could not hash password")
+			return
+		}
+	}
+
+	var bytes []byte
+	bytes, err = json.Marshal(req.GetAccount)
+	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
+		req.Account.PasswordProfile.Password = "***REMOVED***"
+		log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not persist new account")
+		return
+	}
+
+	if err = s.index.Index(id, req.Account); err != nil {
+		req.Account.PasswordProfile.Password = "***REMOVED***"
+		log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not index new account")
+		return
+	}
+
+	return
 }
 
 // UpdateAccount implements the AccountsServiceHandler interface
@@ -155,7 +266,22 @@ func (s Service) UpdateAccount(c context.Context, req *proto.UpdateAccountReques
 
 // DeleteAccount implements the AccountsServiceHandler interface
 func (s Service) DeleteAccount(c context.Context, req *proto.DeleteAccountRequest, res *empty.Empty) (err error) {
-	return errors.New("not implemented")
+	var id string
+	if id, err = cleanupID(req.Id); err != nil {
+		return
+	}
+	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
+
+	if err = os.Remove(path); err != nil {
+		log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+		return
+	}
+
+	if err = s.index.Delete(id); err != nil {
+		log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
+		return
+	}
+	return os.Remove(path)
 }
 
 // ListGroups implements the AccountsServiceHandler interface

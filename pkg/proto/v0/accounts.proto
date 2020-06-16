@@ -242,8 +242,9 @@ message Account {
 
     // The username
     // posixaccount MUST uid
-    string username = 7;
+    string preferred_name = 7;
 
+    // TODO rename to on_premise_? or move to extension? see https://docs.microsoft.com/en-us/graph/extensibility-open-users
     // used for exposing the user using ldap
     // posixaccount MUST uidnumber
     int64 uid_number = 8;
