@@ -170,33 +170,6 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
         ]
       },
       {
-        'name': 'oC10APIAcceptanceTests',
-        'image': 'owncloudci/php:7.2',
-        'pull': 'always',
-        'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
-          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'REVA_LDAP_HOSTNAME':'ldap',
-          'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
-        },
-        'commands': [
-          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
-          'cd /srv/app/testrunner',
-		] + ([
-          'git checkout %s' % (coreCommit)
-		] if coreCommit != '' else []) + [
-          'make test-acceptance-api',
-        ],
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        }]
-      },
-      {
         'name': 'phoenixWebUIAcceptanceTests',
         'image': 'owncloudci/nodejs:11',
         'pull': 'always',
