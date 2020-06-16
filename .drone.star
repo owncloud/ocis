@@ -189,6 +189,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
 		] + ([
           'git checkout %s' % (phoenixCommit)
 		] if phoenixCommit != '' else []) + [
+          'yarn install-all',
           'yarn run acceptance-tests-drone'
         ],
         'volumes': [{
