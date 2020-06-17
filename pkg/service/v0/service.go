@@ -226,13 +226,14 @@ func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res
 // CreateAccount implements the AccountsServiceHandler interface
 func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountRequest, res *proto.Account) (err error) {
 	var id string
-	if req.Id == "" {
-		req.Id = uuid.Must(uuid.NewV4()).String()
+	if req.Account == nil {
+		return fmt.Errorf("account missing")
 	}
-	// we are always ignoring the id in the account here ... hmm just do away with the extra id property?
-	req.Account.Id = req.Id
+	if req.Account.Id == "" {
+		req.Account.Id = uuid.Must(uuid.NewV4()).String()
+	}
 
-	if id, err = cleanupID(req.Id); err != nil {
+	if id, err = cleanupID(req.Account.Id); err != nil {
 		return
 	}
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)

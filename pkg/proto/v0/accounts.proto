@@ -180,11 +180,8 @@ message GetAccountRequest {
 }
 
 message CreateAccountRequest {
-    // The account id to use for this account
-    string id = 1;
-
     // The account resource to create
-    Account account = 2;
+    Account account = 1;
 }
 
 message UpdateAccountRequest {
@@ -456,11 +453,8 @@ message GetGroupRequest {
 }
 
 message CreateGroupRequest {
-    // The group id to use for this group
-    string id = 1;
-
     // The account resource to create
-    Group group = 2;
+    Group group = 1;
 }
 
 message UpdateGroupRequest {
