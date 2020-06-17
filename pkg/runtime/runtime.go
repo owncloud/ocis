@@ -44,6 +44,7 @@ var (
 		// "reva-storage-root",
 		"reva-storage-home",
 		"reva-storage-public-link",
+		"reva-storage-public-link-data",
 		"reva-storage-home-data",
 		"reva-storage-eos",
 		"reva-storage-eos-data",
