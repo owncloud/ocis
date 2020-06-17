@@ -1,3 +1,4 @@
+run CI
 # ownCloud Infinite Scale
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis/status.svg)](https://cloud.drone.io/owncloud/ocis)
