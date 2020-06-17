@@ -52,7 +52,11 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 			if n.Children[1].Token.Type != godata.FilterTokenString {
 				return nil, errors.New("equality expected a string on the rhs")
 			}
-			q := bleve.NewTermQuery(n.Children[1].Token.Value)
+			// string tokens are enclosed with 'some string'
+			// ' is escaped as ''
+			// TODO unescape '' as '
+			// http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_URLComponents
+			q := bleve.NewTermQuery(n.Children[1].Token.Value[1 : len(n.Children[1].Token.Value)-1])
 			q.SetField(n.Children[0].Token.Value)
 			return q, nil
 		case "and":
