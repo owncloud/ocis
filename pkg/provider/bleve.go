@@ -44,13 +44,13 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 		switch n.Token.Value {
 		case "eq":
 			if len(n.Children) != 2 {
-				return nil, errors.New("Equality match must have two children")
+				return nil, errors.New("equality match must have two children")
 			}
 			if n.Children[0].Token.Type != godata.FilterTokenLiteral {
-				return nil, errors.New("Equality expected a literal on the lhs")
+				return nil, errors.New("equality expected a literal on the lhs")
 			}
 			if n.Children[1].Token.Type != godata.FilterTokenString {
-				return nil, errors.New("Equality expected a string on the rhs")
+				return nil, errors.New("equality expected a string on the rhs")
 			}
 			q := bleve.NewTermQuery(n.Children[1].Token.Value)
 			q.SetField(n.Children[0].Token.Value)
@@ -81,7 +81,7 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 			return q, nil
 		case "Not":
 			if len(n.Children) != 1 {
-				return nil, errors.New("Not filter must have only one child")
+				return nil, errors.New("not filter must have only one child")
 			}
 			subQuery, err := recursiveBuildQuery(n.Children[0])
 			if err != nil {

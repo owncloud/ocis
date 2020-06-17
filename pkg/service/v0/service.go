@@ -137,6 +137,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	searchRequest := bleve.NewSearchRequest(query)
 	var searchResult *bleve.SearchResult
 	searchResult, err = s.index.Search(searchRequest)
+	if err != nil {
+		log.Error().Err(err).Msg("could not execute bleve search")
+		return
+	}
+
 	log.Debug().Interface("result", searchResult).Msg("result")
 
 	res.Accounts = make([]*proto.Account, 0)
@@ -243,7 +248,10 @@ func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountReques
 	}
 
 	var bytes []byte
-	bytes, err = json.Marshal(req.GetAccount)
+	if bytes, err = json.Marshal(req.Account); err != nil {
+		log.Error().Err(err).Interface("account", req.Account).Msg("could not marshal account")
+		return
+	}
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		req.Account.PasswordProfile.Password = "***REMOVED***"
 		log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not persist new account")
