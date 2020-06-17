@@ -31,12 +31,6 @@ If you prefer to configure the service with environment variables you can see th
 
 #### Server
 
-OCIS_ACCOUNTS_MANAGER
-: Enable sending traces, defaults to `filesystem`
-
-OCIS_ACCOUNTS_MOUNT_PATH
-: Mounting point for the accounts service when running on the filesystem as manager.
-
 OCIS_ACCOUNTS_NAME
 : Name of the accounts service. It will be part of the namespace.
 

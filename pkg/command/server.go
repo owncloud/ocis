@@ -3,8 +3,9 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/owncloud/ocis-accounts/pkg/flagset"
 	"syscall"
+
+	"github.com/owncloud/ocis-accounts/pkg/flagset"
 
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
@@ -23,7 +24,7 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:        "server",
 		Usage:       "Start ocis accounts service",
-		Description: "an accounts backend manager (driver) needs to be specified. By default the service uses the filesystem as storage",
+		Description: "uses an LDAP server as the storage backend",
 		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			logger = oclog.NewLogger(

@@ -1,7 +1,9 @@
 package flagset
 
-import "github.com/micro/cli/v2"
-import "github.com/owncloud/ocis-accounts/pkg/config"
+import (
+	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis-accounts/pkg/config"
+)
 
 // RootWithConfig applies cfg to the root flagset
 func RootWithConfig(cfg *config.Config) []cli.Flag {
@@ -34,20 +36,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:        "manager",
-			DefaultText: "filesystem",
-			Usage:       "accounts backend manager",
-			Value:       "filesystem",
-			EnvVars:     []string{"ACCOUNTS_MANAGER"},
-			Destination: &cfg.Manager,
-		},
-		&cli.StringFlag{
-			Name:        "mount-path",
-			Usage:       "mounting point (necessary when manager=filesystem)",
-			EnvVars:     []string{"ACCOUNTS_MOUNT_PATH"},
-			Destination: &cfg.MountPath,
-		},
-		&cli.StringFlag{
 			Name:        "name",
 			Value:       "accounts",
 			DefaultText: "accounts",
@@ -58,8 +46,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "namespace",
 			Aliases:     []string{"ns"},
-			Value:       "com.owncloud",
-			DefaultText: "com.owncloud",
+			Value:       "com.owncloud.api",
+			DefaultText: "com.owncloud.api",
 			Usage:       "namespace",
 			EnvVars:     []string{"ACCOUNTS_NAMESPACE"},
 			Destination: &cfg.Server.Namespace,
@@ -72,6 +60,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "service endpoint",
 			EnvVars:     []string{"ACCOUNTS_ADDRESS"},
 			Destination: &cfg.Server.Address,
+		},
+		&cli.StringFlag{
+			Name:        "accounts-data-path",
+			Value:       "/var/tmp/ocis-accounts",
+			DefaultText: "/var/tmp/ocis-accounts",
+			Usage:       "accounts folder",
+			EnvVars:     []string{"ACCOUNTS_DATA_PATH"},
+			Destination: &cfg.Server.AccountsDataPath,
 		},
 	}
 }
