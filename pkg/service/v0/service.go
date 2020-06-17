@@ -13,6 +13,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
+	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/search/query"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -41,6 +42,8 @@ func New(cfg *config.Config) Service {
 	os.MkdirAll(filepath.Join(cfg.Server.AccountsDataPath, "accounts"), 0700)
 
 	mapping := bleve.NewIndexMapping()
+	mapping.DefaultAnalyzer = keyword.Name
+
 	// TODO don't bother to store fields as we will load the account from disk
 	index, err := bleve.New(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve"), mapping)
 	if err != nil {
