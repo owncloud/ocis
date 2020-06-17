@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -78,7 +77,7 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 			// TODO allow lookup by username?
 			// TODO allow lookup by custom claim, eg an id
 
-			var uuid string
+			var account *acc.Account
 			entry, err := svcCache.Get(AccountsKey, claims.Email)
 			if err != nil {
 				l.Debug().Msgf("No cache entry for %v", claims.Email)
@@ -105,31 +104,32 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 					return
 				}
 
-				err = svcCache.Set(AccountsKey, claims.Email, resp.Accounts[0].Id)
+				err = svcCache.Set(AccountsKey, claims.Email, *resp.Accounts[0])
 				if err != nil {
 					l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
 
-				uuid = resp.Accounts[0].Id
+				account = resp.Accounts[0]
 			} else {
-				uuid, ok = entry.V.(string)
+				a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
 				if !ok {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				account = &a
 			}
 
-			l.Debug().Interface("claims", claims).Interface("uuid", uuid).Msgf("Associated claims with uuid")
+			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
 				Id: &revauser.UserId{
-					OpaqueId: uuid,
+					OpaqueId: account.Id,
 				},
-				Username:     strings.ToLower(claims.Name),
-				DisplayName:  claims.Name,
-				Mail:         claims.Email,
-				MailVerified: claims.EmailVerified,
+				Username:     account.PreferredName,
+				DisplayName:  account.DisplayName,
+				Mail:         account.Mail,
+				MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
 				// TODO groups
 			})
 
