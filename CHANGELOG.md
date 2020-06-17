@@ -7,6 +7,7 @@ The following sections list the changes in ocis-accounts unreleased.
 ## Summary
 
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
+* Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 
 ## Details
 
@@ -17,6 +18,14 @@ The following sections list the changes in ocis-accounts unreleased.
    we have a timezone implementation available in ocis-web.
 
    https://github.com/owncloud/ocis-accounts/pull/33
+
+
+* Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
+
+   We updated the api to allow fetching users not onyl by UUID, but also by identity (OpenID issuer
+   and subject) email, username and optionally a password.
+
+   https://github.com/owncloud/ocis-accounts/pull/30
 
 # Changelog for [0.1.1] (2020-04-29)
 
