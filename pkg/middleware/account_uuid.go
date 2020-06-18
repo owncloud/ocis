@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	mclient "github.com/micro/go-micro/v2/client"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
@@ -23,6 +23,8 @@ type AccountMiddlewareOptions struct {
 	Logger log.Logger
 	// TokenManagerConfig for communicating with the reva token manager
 	TokenManagerConfig config.TokenManager
+	// AccountsClient for resolving accounts
+	AccountsClient acc.AccountsService
 }
 
 // Logger provides a function to set the logger option.
@@ -39,12 +41,67 @@ func TokenManagerConfig(cfg config.TokenManager) AccountMiddlewareOption {
 	}
 }
 
+// AccountsClient provides a function to set the accounts client config option.
+func AccountsClient(ac acc.AccountsService) AccountMiddlewareOption {
+	return func(o *AccountMiddlewareOptions) {
+		o.AccountsClient = ac
+	}
+}
+
 func newAccountUUIDOptions(opts ...AccountMiddlewareOption) AccountMiddlewareOptions {
 	opt := AccountMiddlewareOptions{}
 	for _, o := range opts {
 		o(&opt)
 	}
 	return opt
+}
+
+func getAccount(l log.Logger, claims ocisoidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
+	entry, err := svcCache.Get(AccountsKey, claims.Email)
+	if err != nil {
+		l.Debug().Msgf("No cache entry for %v", claims.Email)
+		resp, err := ac.ListAccounts(context.Background(), &acc.ListAccountsRequest{
+			Query:    fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")),
+			PageSize: 2,
+		})
+
+		if err != nil {
+			l.Error().Err(err).Str("email", claims.Email).Msgf("Error fetching from accounts-service")
+			status = http.StatusInternalServerError
+			return
+		}
+
+		if len(resp.Accounts) <= 0 {
+			l.Error().Str("email", claims.Email).Msgf("Account not found")
+			status = http.StatusNotFound
+			return
+		}
+
+		// TODO provision account
+
+		if len(resp.Accounts) > 1 {
+			l.Error().Str("email", claims.Email).Msgf("More than one account with this email found. Not logging user in.")
+			status = http.StatusForbidden
+			return
+		}
+
+		err = svcCache.Set(AccountsKey, claims.Email, *resp.Accounts[0])
+		if err != nil {
+			l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
+			status = http.StatusInternalServerError
+			return
+		}
+
+		account = resp.Accounts[0]
+	} else {
+		a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
+		if !ok {
+			status = http.StatusInternalServerError
+			return
+		}
+		account = &a
+	}
+	return
 }
 
 // AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
@@ -62,10 +119,6 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 			opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
 		}
 
-		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		// https://github.com/owncloud/ocis-proxy/issues/38
-		accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
-
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			l := opt.Logger
 			claims, ok := r.Context().Value(ClaimsKey).(ocisoidc.StandardClaims)
@@ -77,48 +130,10 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 			// TODO allow lookup by username?
 			// TODO allow lookup by custom claim, eg an id
 
-			var account *acc.Account
-			entry, err := svcCache.Get(AccountsKey, claims.Email)
-			if err != nil {
-				l.Debug().Msgf("No cache entry for %v", claims.Email)
-				resp, err := accounts.ListAccounts(context.Background(), &acc.ListAccountsRequest{
-					Query:    fmt.Sprintf("mail eq '%s'", claims.Email), // TODO encode mail
-					PageSize: 2,
-				})
-
-				if err != nil {
-					l.Error().Err(err).Str("email", claims.Email).Msgf("Error fetching from accounts-service")
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				if len(resp.Accounts) <= 0 {
-					l.Error().Str("email", claims.Email).Msgf("Account not found")
-					w.WriteHeader(http.StatusNotFound)
-					return
-				}
-
-				if len(resp.Accounts) > 1 {
-					l.Error().Str("email", claims.Email).Msgf("More than one account with this email found. Not logging user in.")
-					w.WriteHeader(http.StatusForbidden)
-					return
-				}
-
-				err = svcCache.Set(AccountsKey, claims.Email, *resp.Accounts[0])
-				if err != nil {
-					l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				account = resp.Accounts[0]
-			} else {
-				a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
-				if !ok {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				account = &a
+			account, status := getAccount(l, claims, opt.AccountsClient)
+			if status != 0 {
+				w.WriteHeader(status)
+				return
 			}
 
 			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")

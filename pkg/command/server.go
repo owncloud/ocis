@@ -16,9 +16,11 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli/v2"
+	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
@@ -247,9 +249,14 @@ func loadMiddlewares(cfg *config.Config, l log.Logger) alice.Chain {
 			oidc.Logger(l),
 		)
 
+		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		// https://github.com/owncloud/ocis-proxy/issues/38
+		accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
+
 		uuidMW := middleware.AccountUUID(
 			middleware.Logger(l),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.AccountsClient(accounts),
 		)
 
 		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW)

@@ -459,6 +459,7 @@ github.com/hashicorp/vault/api v1.0.4/go.mod h1:gDcqh3WGcR1cpF5AJz/B1UFheUEneMoI
 github.com/hashicorp/vault/sdk v0.1.13/go.mod h1:B+hVj7TpuQY1Y/GPbCpffmgd+tSEwvhkWnjtSYCaS2M=
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
+github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 h1:FdBGmSkD2QpQzRWup//SGObvWf2nq89zj9+ta9OvI3A=
 github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5/go.mod h1:0YZ2wQSuwviXXXGUiK6zXzskyBLAbLXhamxzcFHSLoM=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
@@ -687,8 +688,6 @@ github.com/ory/go-convenience v0.1.0/go.mod h1:uEY/a60PL5c12nYz4V5cHY03IBmwIAEm8
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/flaex v0.2.0 h1:3FLf8oyMgA6HLK7w4+VJ5N1oVA8G7MptLCVjfxxIaww=
 github.com/owncloud/flaex v0.2.0/go.mod h1:jip86t4OVURJTf8CM/0e2qcji/Y4NG3l2lR8kex4JWw=
-github.com/owncloud/ocis-accounts v0.1.2-0.20200617133119-d0bf39163038 h1:76YjytuLe+2YlTFxKXWVOpuq42fH67lzv5Df4DbcL7U=
-github.com/owncloud/ocis-accounts v0.1.2-0.20200617133119-d0bf39163038/go.mod h1:VuO6j5kWjRtgPk7i/ooWJyzrl8jG5OUjvkbBPr7ihWo=
 github.com/owncloud/ocis-accounts v0.1.2-0.20200617152311-02e759f95e82 h1:UgNhC6sxbwd3T4stBbRNRB2mLV8Gs/rD51O0zbXdJNs=
 github.com/owncloud/ocis-accounts v0.1.2-0.20200617152311-02e759f95e82/go.mod h1:VuO6j5kWjRtgPk7i/ooWJyzrl8jG5OUjvkbBPr7ihWo=
 github.com/owncloud/ocis-hello v0.1.0-alpha1/go.mod h1:tU2bOB7DjuXZ+ju+5A+7pUHmTfPIYUk3tMflqHTBTpE=
