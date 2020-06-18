@@ -5,7 +5,6 @@ import (
 
 	"github.com/GeertJohan/yubigo"
 	"github.com/glauth/glauth/pkg/config"
-	"github.com/glauth/glauth/pkg/handler"
 	"github.com/go-logr/logr"
 	"github.com/nmcclain/ldap"
 	"github.com/owncloud/ocis-glauth/pkg/mlogr"
@@ -34,15 +33,14 @@ func Server(opts ...Option) (*LdapSvc, error) {
 		s.yubiAuth, err = yubigo.NewYubiAuth(s.c.YubikeyClientID, s.c.YubikeySecret)
 
 		if err != nil {
-			return nil, errors.New("Yubikey Auth failed")
+			return nil, errors.New("yubikey auth failed")
 		}
 	}
 
 	// configure the backend
 	s.l = ldap.NewServer()
 	s.l.EnforceLDAP = true
-	var h handler.Handler
-	h = NewOCISHandler(
+	h := NewOCISHandler(
 		AccountsService(options.AccountsService),
 		Logger(options.Logger),
 		Config(s.c),

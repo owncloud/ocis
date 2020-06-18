@@ -2,7 +2,6 @@ package glauth
 
 import (
 	"context"
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"net"
@@ -12,6 +11,7 @@ import (
 	"github.com/glauth/glauth/pkg/config"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
+	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
 	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -78,53 +78,32 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 	if !strings.HasSuffix(searchBaseDN, h.cfg.Backend.BaseDN) {
 		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultInsufficientAccessRights}, fmt.Errorf("search error: search BaseDN %s is not in our BaseDN %s", searchBaseDN, h.cfg.Backend.BaseDN)
 	}
-	// return all users in the config file - the LDAP library will filter results for us
-	entries := []*ldap.Entry{}
-	filterEntity, err := ldap.GetFilterObjectClass(searchReq.Filter)
-	if err != nil {
-		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("search error: error parsing filter: %s", searchReq.Filter)
+
+	qtype := ""
+	query := ""
+	var err error
+	if searchReq.Filter == "(&)" { // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
+		query = ""
+	} else {
+		var cf *ber.Packet
+		cf, err = ldap.CompileFilter(searchReq.Filter)
+		if err != nil {
+			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+		}
+		qtype, query, err = parseFilter(cf)
+		if err != nil {
+			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+		}
 	}
 
-	switch filterEntity {
-	default:
-		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("search error: unhandled filter type: %s [%s]", filterEntity, searchReq.Filter)
-	case "posixgroup":
-		/*
-			groups, err := session.getGroups()
-			if err != nil {
-				return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, errors.New("search error: error getting groups")
-			}
-			for _, g := range groups {
-				attrs := []*ldap.EntryAttribute{}
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "cn", Values: []string{*g.ID}})
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "description", Values: []string{fmt.Sprintf("%s from ownCloud", *g.ID)}})
-				//			attrs = append(attrs, &ldap.EntryAttribute{"gidNumber", []string{fmt.Sprintf("%d", g.UnixID)}})
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "objectClass", Values: []string{"posixGroup"}})
-				if g.Members != nil {
-					members := make([]string, len(g.Members))
-					for i, v := range g.Members {
-						members[i] = *v.ID
-					}
-
-					attrs = append(attrs, &ldap.EntryAttribute{Name: "memberUid", Values: members})
-				}
-				dn := fmt.Sprintf("cn=%s,%s=groups,%s", *g.ID, h.cfg.Backend.GroupFormat, h.cfg.Backend.BaseDN)
-				entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
-			}
-		*/
-	case "posixaccount", "":
-		userName := ""
-		if searchBaseDN != strings.ToLower(h.cfg.Backend.BaseDN) {
-			parts := strings.Split(strings.TrimSuffix(searchBaseDN, baseDN), ",")
-			if len(parts) >= 1 {
-				userName = strings.TrimPrefix(parts[0], "cn=")
-			}
-		}
+	entries := []*ldap.Entry{}
+	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Str("qtype", qtype).Str("query", query).Msg("parsed query")
+	if qtype == "users" {
 		accounts, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
-			Query: fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(userName, "'", "''")),
+			Query: query,
 		})
 		if err != nil {
-			h.log.Error().Err(err).Str("username", userName).Interface("src", conn.RemoteAddr()).Msg("Could not list accounts")
+			h.log.Error().Err(err).Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Str("query", query).Interface("src", conn.RemoteAddr()).Msg("Could not list accounts")
 			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, errors.New("search error: error getting users")
 		}
 		for i := range accounts.Accounts {
@@ -154,9 +133,111 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 			entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
 		}
 	}
+
 	stats.Frontend.Add("search_successes", 1)
 	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Interface("src", conn.RemoteAddr()).Msg("AP: Search OK")
 	return ldap.ServerSearchResult{Entries: entries, Referrals: []string{}, Controls: []ldap.Control{}, ResultCode: ldap.LDAPResultSuccess}, nil
+}
+
+// LDAP filters might ask for grouips and users at the same time, eg.
+// (|
+//   (&(objectClass=posixaccount)(cn=einstein))
+//   (&(objectClass=posixgroup)(cn=users))
+// )
+
+// (&(objectClass=posixaccount)(objectClass=posixgroup))
+// qtype is one of
+// "" not determined
+// "users"
+// "groups"
+func parseFilter(f *ber.Packet) (qtype string, q string, err error) {
+	switch ldap.FilterMap[f.Tag] {
+	case "Equality Match":
+		if len(f.Children) != 2 {
+			return "", "", errors.New("equality match must have only two children")
+		}
+		attribute := strings.ToLower(f.Children[0].Value.(string))
+		value := f.Children[1].Value.(string)
+
+		// replace attributes
+		switch attribute {
+		case "objectclass":
+			switch value {
+			case "posixaccount", "shadowaccount", "users", "person", "inetorgperson", "organizationalperson":
+				qtype = "users"
+			case "posixgroup", "groups":
+				qtype = "groups"
+			default:
+				qtype = ""
+			}
+			return qtype, "", nil
+		case "cn", "uid":
+			return "", fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		case "mail":
+			return "", fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		case "displayname":
+			return "", fmt.Sprintf("display_name eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		case "uidnumber":
+			return "", fmt.Sprintf("uid_number eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		case "gidnumber":
+			return "", fmt.Sprintf("gid_number eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		case "description":
+			return "", fmt.Sprintf("description eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+		}
+
+		return "", "", fmt.Errorf("filter by %s not implmented", attribute)
+	case "And":
+		subQueries := []string{}
+		for _, child := range f.Children {
+			var subQuery string
+			var qt string
+			qt, subQuery, err = parseFilter(child)
+			if err != nil {
+				return "", "", err
+			}
+			if qtype == "" {
+				qtype = qt
+			} else if qt != "" && qt != qtype {
+				return "", "", fmt.Errorf("mixing user and group filters not supported")
+			}
+			if subQuery != "" {
+				subQueries = append(subQueries, subQuery)
+			}
+		}
+		return qtype, strings.Join(subQueries, " and "), nil
+	case "Or":
+		subQueries := []string{}
+		for _, child := range f.Children {
+			var subQuery string
+			var qt string
+			qt, subQuery, err = parseFilter(child)
+			if err != nil {
+				return "", "", err
+			}
+			if qtype == "" {
+				qtype = qt
+			} else if qt != "" && qt != qtype {
+				return "", "", fmt.Errorf("mixing user and group filters not supported")
+			}
+			if subQuery != "" {
+				subQueries = append(subQueries, subQuery)
+			}
+		}
+		return qtype, strings.Join(subQueries, " or "), nil
+	case "Not":
+		if len(f.Children) != 1 {
+			return "", "", errors.New("not filter must have only one child")
+		}
+		qtype, subQuery, err := parseFilter(f.Children[0])
+		if err != nil {
+			return "", "", err
+		}
+		if subQuery != "" {
+			q = fmt.Sprintf("not %s", subQuery)
+		}
+		return qtype, q, nil
+	}
+	return
 }
 
 func (h ocisHandler) Close(boundDN string, conn net.Conn) error {
@@ -164,14 +245,7 @@ func (h ocisHandler) Close(boundDN string, conn net.Conn) error {
 	return nil
 }
 
-// helper functions
-func connID(conn net.Conn) string {
-	h := sha256.New()
-	h.Write([]byte(conn.LocalAddr().String() + conn.RemoteAddr().String()))
-	sha := fmt.Sprintf("% x", h.Sum(nil))
-	return string(sha)
-}
-
+// NewOCISHandler implements a glauth backend with ocis-accounts as tdhe datasource
 func NewOCISHandler(opts ...Option) handler.Handler {
 	options := newOptions(opts...)
 
