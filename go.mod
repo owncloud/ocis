@@ -12,9 +12,9 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/go-test/deep v1.0.6 // indirect
-	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/golang/protobuf v1.4.1
+	github.com/golang/protobuf v1.4.2
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/joho/godotenv v1.3.0
@@ -25,8 +25,8 @@ require (
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
-	github.com/rs/zerolog v1.17.2
-	github.com/spf13/viper v1.6.3
+	github.com/rs/zerolog v1.19.0
+	github.com/spf13/viper v1.7.0
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tredoe/osutil v1.0.5
 	google.golang.org/genproto v0.0.0-20200420144010-e5e8543f8aeb
