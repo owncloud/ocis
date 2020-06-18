@@ -180,7 +180,7 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
