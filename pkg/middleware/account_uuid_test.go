@@ -4,25 +4,47 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/config"
 )
 
 // TODO testing the getAccount method should inject a cache
 func TestGetAccountSuccess(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "success")
-	if _, status := getAccount(log.NewLogger(), oidc.StandardClaims{Email: "success"}, mockAccSvc(false)); status != 0 {
+	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "success"}, mockAccSvc(false)); status != 0 {
 		t.Errorf("expected an account")
 	}
 }
 func TestGetAccountInternalError(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "failure")
-	if _, status := getAccount(log.NewLogger(), oidc.StandardClaims{Email: "failure"}, mockAccSvc(true)); status != http.StatusInternalServerError {
+	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "failure"}, mockAccSvc(true)); status != http.StatusInternalServerError {
 		t.Errorf("expected an internal server error")
+	}
+}
+
+func TestAccountUUIDHandler(t *testing.T) {
+	svcCache.Invalidate(AccountsKey, "success")
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	m := AccountUUID(
+		Logger(log.NewLogger()),
+		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
+		AccountsClient(mockAccSvc(false)),
+	)(next)
+
+	r := httptest.NewRequest(http.MethodGet, "http://www.example.com", nil)
+	w := httptest.NewRecorder()
+	ctx := oidc.NewContext(r.Context(), &oidc.StandardClaims{Email: "success"})
+	r = r.WithContext(ctx)
+	m.ServeHTTP(w, r)
+
+	if r.Header.Get("x-access-token") == "" {
+		t.Errorf("expected a token")
 	}
 }
 

@@ -22,9 +22,6 @@ var (
 	svcCache = cache.NewCache(
 		cache.Size(256),
 	)
-
-	// ClaimsKey works as a context key for user claims
-	ClaimsKey interface{} = "claims"
 )
 
 // newOIDCOptions initializes the available default options.
@@ -113,7 +110,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 			}
 
 			// inject claims to the request context for the account_uuid middleware.
-			ctxWithClaims := context.WithValue(r.Context(), ClaimsKey, claims)
+			ctxWithClaims := ocisoidc.NewContext(r.Context(), &claims)
 			r = r.WithContext(ctxWithClaims)
 
 			opt.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")

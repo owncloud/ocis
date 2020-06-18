@@ -10,7 +10,7 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	oidc "github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 )
 
@@ -56,7 +56,7 @@ func newAccountUUIDOptions(opts ...AccountMiddlewareOption) AccountMiddlewareOpt
 	return opt
 }
 
-func getAccount(l log.Logger, claims ocisoidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
+func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
 	entry, err := svcCache.Get(AccountsKey, claims.Email)
 	if err != nil {
 		l.Debug().Msgf("No cache entry for %v", claims.Email)
@@ -121,8 +121,8 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			l := opt.Logger
-			claims, ok := r.Context().Value(ClaimsKey).(ocisoidc.StandardClaims)
-			if !ok {
+			claims := oidc.FromContext(r.Context())
+			if claims == nil {
 				next.ServeHTTP(w, r)
 				return
 			}
