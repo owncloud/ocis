@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"syscall"
 
 	"github.com/owncloud/ocis-accounts/pkg/flagset"
@@ -53,8 +52,14 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Info().Str("service", service.Name()).Msg("Reporting settings bundle to account service")
 				go svc.RegisterSettingsBundles(&logger)
 				return service.Run()
-			}, func(_ error) {
-				fmt.Println("shutting down grpc server")
+			}, func(err error) {
+				if err != nil {
+					logger.Error().Err(err).Msg("account service died")
+				} else {
+					logger.Info().
+						Str("service", service.Name()).
+						Msg("Shutting down server")
+				}
 				cancel()
 			})
 
