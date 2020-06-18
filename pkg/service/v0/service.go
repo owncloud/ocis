@@ -34,57 +34,66 @@ import (
 )
 
 // New returns a new instance of Service
-func New(cfg *config.Config) Service {
+// TODO pass in logger as options
+func New(cfg *config.Config) (s *Service, err error) {
 	// read all user and group records
 
 	// for now recreate index on every start
-	os.RemoveAll(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve"))
-	os.MkdirAll(filepath.Join(cfg.Server.AccountsDataPath, "accounts"), 0700)
+	if err = os.RemoveAll(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve")); err != nil {
+		return nil, err
+	}
+
+	if err = os.MkdirAll(filepath.Join(cfg.Server.AccountsDataPath, "accounts"), 0700); err != nil {
+		return nil, err
+	}
 
 	mapping := bleve.NewIndexMapping()
+	// keep all symbols in terms to allow exact maching, eg. emails
 	mapping.DefaultAnalyzer = keyword.Name
-
 	// TODO don't bother to store fields as we will load the account from disk
-	index, err := bleve.New(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve"), mapping)
-	if err != nil {
-		panic(err)
+
+	s = &Service{
+		Config: cfg,
 	}
-	f, err := os.Open(filepath.Join(cfg.Server.AccountsDataPath, "accounts"))
-	if err != nil {
-		log.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not open acconts folder")
-		panic(err)
+
+	if s.index, err = bleve.New(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve"), mapping); err != nil {
+		return
+	}
+	var f *os.File
+	if f, err = os.Open(filepath.Join(cfg.Server.AccountsDataPath, "accounts")); err != nil {
+		log.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not open accounts folder")
+		return
 	}
 	list, err := f.Readdir(-1)
 	f.Close()
 	if err != nil {
 		log.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not list accounts folder")
-		panic(err)
+		return
 	}
+	var data []byte
 	for _, file := range list {
 		path := filepath.Join(cfg.Server.AccountsDataPath, "accounts", file.Name())
-		data, err := ioutil.ReadFile(path)
-		if err != nil {
+		if data, err = ioutil.ReadFile(path); err != nil {
 			log.Error().Err(err).Str("path", path).Msg("could not read account")
 			continue
 		}
 		a := proto.Account{}
-		err = json.Unmarshal(data, &a)
-		if err != nil {
+		if err = json.Unmarshal(data, &a); err != nil {
 			log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
 		log.Debug().Interface("account", a).Msg("found account")
-		index.Index(a.Id, a)
+		if err = s.index.Index(a.Id, a); err != nil {
+			log.Error().Err(err).Str("path", path).Interface("account", a).Msg("could not index account")
+			continue
+		}
 	}
 
 	// TODO watch folders for new records
 
-	s := Service{
-		Config: cfg,
-		index:  index,
-	}
+	s.Config = cfg
 
-	return s
+	return
 }
 
 // Service implements the AccountsServiceHandler interface
