@@ -58,24 +58,24 @@ func TestMigrationSelector(t *testing.T) {
 		{false, nil, "unauth"},
 	}
 
-	for k, tc := range tests {
-		t.Run(fmt.Sprintf("#%v", k), func(t *testing.T) {
-			t.Parallel()
-			tc := tc
-			sut := NewMigrationSelector(&cfg, mockAccSvc(tc.AccSvcShouldReturnError))
-			r := httptest.NewRequest("GET", "https://example.com", nil)
-			ctx := oidc.NewContext(r.Context(), tc.Claims)
-			nr := r.WithContext(ctx)
+	for _, tc := range tests {
+		//t.Run(fmt.Sprintf("#%v", k), func(t *testing.T) {
+		//	t.Parallel()
+		tc := tc
+		sut := NewMigrationSelector(&cfg, mockAccSvc(tc.AccSvcShouldReturnError))
+		r := httptest.NewRequest("GET", "https://example.com", nil)
+		ctx := oidc.NewContext(r.Context(), tc.Claims)
+		nr := r.WithContext(ctx)
 
-			got, err := sut(ctx, nr)
-			if err != nil {
-				t.Errorf("Unexpected error: %v", err)
-			}
+		got, err := sut(ctx, nr)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
 
-			if got != tc.Expected {
-				t.Errorf("Expected Policy %v got %v", tc.Expected, got)
-			}
-		})
+		if got != tc.Expected {
+			t.Errorf("Expected Policy %v got %v", tc.Expected, got)
+		}
+		//})
 	}
 }
 
