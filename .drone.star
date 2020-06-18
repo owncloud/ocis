@@ -94,7 +94,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'http://reva-server:9140',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'TEST_OCIS':'true',
