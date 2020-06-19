@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/bmatcuk/doublestar v1.3.0 // indirect
-	github.com/coreos/etcd v3.3.21+incompatible // indirect
+	github.com/coreos/etcd v3.3.22+incompatible // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
@@ -17,8 +17,7 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.8.0
-	github.com/micro/micro/v2 v2.8.0
+	github.com/micro/micro/v2 v2.9.1
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
@@ -40,12 +39,19 @@ require (
 	github.com/refs/pman v0.0.0-20200527204655-c9ccd1c53cc3
 	github.com/restic/calens v0.2.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
-	go.opencensus.io v0.22.3
-	go.uber.org/atomic v1.5.1 // indirect
-	go.uber.org/multierr v1.4.0 // indirect
+	go.etcd.io/etcd v3.3.22+incompatible // indirect
+	go.opencensus.io v0.22.4
+	google.golang.org/grpc v1.29.1 // indirect
+	google.golang.org/protobuf v1.24.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+replace (
 
-replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
+	github.com/coreos/etcd => go.etcd.io/etcd v0.5.0-alpha.5.0.20200425165423-262c93980547
+	github.com/cs3org/reva => ../reva
+	github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
+
+	github.com/owncloud/ocis-reva => ../ocis-reva
+	go.etcd.io/etcd => go.etcd.io/etcd v0.5.0-alpha.5.0.20200425165423-262c93980547
+)
