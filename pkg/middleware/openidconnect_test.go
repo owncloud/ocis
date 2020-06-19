@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/coreos/go-oidc"
 	"github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -20,7 +21,7 @@ func TestOpenIDConnectMiddleware(t *testing.T) {
 	m := OpenIDConnect(
 		Logger(log.NewLogger()),
 		OIDCProviderFunc(func() (OIDCProvider, error) {
-			return mockOP(false, mockUI(false)), nil
+			return mockOP(false), nil
 		}),
 	)(next)
 
@@ -29,17 +30,17 @@ func TestOpenIDConnectMiddleware(t *testing.T) {
 	w := httptest.NewRecorder()
 	m.ServeHTTP(w, r)
 
-	if r.Header.Get("x-access-token") == "" {
-		t.Errorf("expected a token")
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("expected an internal server error")
 	}
 }
 
 type mockOIDCProvider struct {
-	UserInfoFunc func(ctx context.Context, ts oauth2.TokenSource) (OIDCUserInfo, error)
+	UserInfoFunc func(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error)
 }
 
 // UserInfo will panic if the function has been called, but not mocked
-func (m mockOIDCProvider) UserInfo(ctx context.Context, ts oauth2.TokenSource) (OIDCUserInfo, error) {
+func (m mockOIDCProvider) UserInfo(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error) {
 	if m.UserInfoFunc != nil {
 		return m.UserInfoFunc(ctx, ts)
 	}
@@ -47,48 +48,21 @@ func (m mockOIDCProvider) UserInfo(ctx context.Context, ts oauth2.TokenSource) (
 	panic("UserInfo was called in test but not mocked")
 }
 
-func mockOP(retErr bool, ui OIDCUserInfo) OIDCProvider {
+func mockOP(retErr bool) OIDCProvider {
 	if retErr {
 		return &mockOIDCProvider{
-			UserInfoFunc: func(ctx context.Context, ts oauth2.TokenSource) (OIDCUserInfo, error) {
+			UserInfoFunc: func(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error) {
 				return nil, fmt.Errorf("error returned by mockOIDCProvider UserInfo")
 			},
 		}
 
 	}
 	return &mockOIDCProvider{
-		UserInfoFunc: func(ctx context.Context, ts oauth2.TokenSource) (OIDCUserInfo, error) {
+		UserInfoFunc: func(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error) {
+			ui := &oidc.UserInfo{
+				// claims: private ...
+			}
 			return ui, nil
-		},
-	}
-
-}
-
-type mockOIDCUserInfo struct {
-	ClaimsFunc func(v interface{}) error
-}
-
-// UserInfo will panic if the function has been called, but not mocked
-func (m mockOIDCUserInfo) Claims(v interface{}) error {
-	if m.ClaimsFunc != nil {
-		return m.ClaimsFunc(v)
-	}
-
-	panic("ClaimsFunc was called in test but not mocked")
-}
-func mockUI(retErr bool) OIDCUserInfo {
-	if retErr {
-		return &mockOIDCUserInfo{
-			ClaimsFunc: func(v interface{}) error {
-				return fmt.Errorf("error returned by mockOIDCProvider UserInfo")
-			},
-		}
-
-	}
-	return &mockOIDCUserInfo{
-		ClaimsFunc: func(v interface{}) error {
-			// TODO fill in claims
-			return nil
 		},
 	}
 

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/coreos/go-oidc"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/cache"
 	"golang.org/x/oauth2"
@@ -23,12 +24,7 @@ var (
 
 // OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
-	UserInfo(ctx context.Context, ts oauth2.TokenSource) (OIDCUserInfo, error)
-}
-
-// OIDCUserInfo used to mock the oidc user info during tests
-type OIDCUserInfo interface {
-	Claims(v interface{}) error
+	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error)
 }
 
 // OpenIDConnect provides a middleware to check access secured by a static token.
