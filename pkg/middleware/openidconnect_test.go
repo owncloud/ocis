@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/coreos/go-oidc"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"golang.org/x/oauth2"
 )
@@ -63,29 +61,6 @@ func mockOP(retErr bool) OIDCProvider {
 				// claims: private ...
 			}
 			return ui, nil
-		},
-	}
-
-}
-
-func mockOpenidConnectMiddlewareAccSvc(retErr bool) proto.AccountsService {
-	if retErr {
-		return &proto.MockAccountsService{
-			ListFunc: func(ctx context.Context, in *proto.ListAccountsRequest, opts ...client.CallOption) (out *proto.ListAccountsResponse, err error) {
-				return nil, fmt.Errorf("error returned by mockAccountsService LIST")
-			},
-		}
-	}
-
-	return &proto.MockAccountsService{
-		ListFunc: func(ctx context.Context, in *proto.ListAccountsRequest, opts ...client.CallOption) (out *proto.ListAccountsResponse, err error) {
-			return &proto.ListAccountsResponse{
-				Accounts: []*proto.Account{
-					{
-						Id: "yay",
-					},
-				},
-			}, nil
 		},
 	}
 
