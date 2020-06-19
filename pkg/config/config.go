@@ -71,6 +71,11 @@ var (
 	RouteTypes []RouteType = []RouteType{QueryRoute, RegexRoute, PrefixRoute}
 )
 
+// Reva defines all available REVA configuration.
+type Reva struct {
+	Address string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File           string
@@ -83,15 +88,14 @@ type Config struct {
 	OIDC           *OIDC
 	TokenManager   TokenManager
 	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
+	Reva           Reva
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Endpoint    string
-	Realm       string
-	SigningAlgs []string
-	Insecure    bool
+	Endpoint string
+	Insecure bool
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
