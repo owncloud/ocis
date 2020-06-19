@@ -2,25 +2,29 @@ package command
 
 import (
 	"context"
-	"github.com/owncloud/ocis-glauth/pkg/crypto"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis-glauth/pkg/crypto"
+
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	glauthcfg "github.com/glauth/glauth/pkg/config"
-	glauth "github.com/glauth/glauth/pkg/server"
+
 	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-glauth/pkg/config"
 	"github.com/owncloud/ocis-glauth/pkg/flagset"
-	"github.com/owncloud/ocis-glauth/pkg/mlogr"
 	"github.com/owncloud/ocis-glauth/pkg/server/debug"
+	"github.com/owncloud/ocis-glauth/pkg/server/glauth"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -35,8 +39,6 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-
-			cfg.Backend.Servers = c.StringSlice("backend-server")
 
 			return ParseConfig(c, cfg)
 		},
@@ -136,7 +138,6 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				log := mlogr.New(&logger)
 				cfg := glauthcfg.Config{
 					LDAP: glauthcfg.LDAP{
 						Enabled: cfg.Ldap.Enabled,
@@ -149,101 +150,11 @@ func Server(cfg *config.Config) *cli.Command {
 						Key:     cfg.Ldaps.Key,
 					},
 					Backend: glauthcfg.Backend{
-						Datastore:   cfg.Backend.Datastore,
 						BaseDN:      cfg.Backend.BaseDN,
 						Insecure:    cfg.Backend.Insecure,
 						NameFormat:  cfg.Backend.NameFormat,
 						GroupFormat: cfg.Backend.GroupFormat,
-						Servers:     cfg.Backend.Servers,
 						SSHKeyAttr:  cfg.Backend.SSHKeyAttr,
-						UseGraphAPI: cfg.Backend.UseGraphAPI,
-					},
-					// TODO read users for the config backend from config file
-					Users: []glauthcfg.User{
-						glauthcfg.User{
-							Name:         "einstein",
-							GivenName:    "Albert",
-							SN:           "Einstein",
-							UnixID:       20000,
-							PrimaryGroup: 30000,
-							OtherGroups:  []int{30001, 30002, 30007},
-							Mail:         "einstein@example.org",
-							PassSHA256:   "69bf3575281a970f46e37ecd28b79cfbee6a46e55c10dc91dd36a43410387ab8", // relativity
-						},
-						glauthcfg.User{
-							Name:         "marie",
-							GivenName:    "Marie",
-							SN:           "Curie",
-							UnixID:       20001,
-							PrimaryGroup: 30000,
-							OtherGroups:  []int{30003, 30004, 30007},
-							Mail:         "marie@example.org",
-							PassSHA256:   "149a807f82e22b796942efa1010063f4a278cf078ff56ef1d3fc6c156037cef9", // radioactivity
-						},
-						glauthcfg.User{
-							Name:         "feynman",
-							GivenName:    "Richard",
-							SN:           "Feynman",
-							UnixID:       20002,
-							PrimaryGroup: 30000,
-							OtherGroups:  []int{30005, 30006, 30007},
-							Mail:         "feynman@example.org",
-							PassSHA256:   "1e2183d3a6017bb01131e27204bb66d3c5fa273acf421c8f9bd4bd633e3d70a8", // superfluidity
-						},
-
-						// technical users for ocis
-						glauthcfg.User{
-							Name:         "konnectd",
-							UnixID:       10000,
-							PrimaryGroup: 15000,
-							Mail:         "idp@example.org",
-							PassSHA256:   "e1b6c4460fda166b70f77093f8a2f9b9e0055a5141ed8c6a67cf1105b1af23ca", // konnectd
-						},
-						glauthcfg.User{
-							Name:         "reva",
-							UnixID:       10001,
-							PrimaryGroup: 15000,
-							Mail:         "storage@example.org",
-							PassSHA256:   "60a43483d1a41327e689c3ba0451c42661d6a101151e041aa09206305c83e74b", // reva
-						},
-					},
-					Groups: []glauthcfg.Group{
-						glauthcfg.Group{
-							Name:   "users",
-							UnixID: 30000,
-						},
-						glauthcfg.Group{
-							Name:   "sailing-lovers",
-							UnixID: 30001,
-						},
-						glauthcfg.Group{
-							Name:   "violin-haters",
-							UnixID: 30002,
-						},
-						glauthcfg.Group{
-							Name:   "radium-lovers",
-							UnixID: 30003,
-						},
-						glauthcfg.Group{
-							Name:   "polonium-lovers",
-							UnixID: 30004,
-						},
-						glauthcfg.Group{
-							Name:   "quantum-lovers",
-							UnixID: 30005,
-						},
-						glauthcfg.Group{
-							Name:   "philosophy-haters",
-							UnixID: 30006,
-						},
-						glauthcfg.Group{
-							Name:   "physics-lovers",
-							UnixID: 30007,
-						},
-						glauthcfg.Group{
-							Name:   "sysusers",
-							UnixID: 15000,
-						},
 					},
 				}
 
@@ -254,8 +165,14 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 				}
 
-				server, err := glauth.NewServer(
-					glauth.Logger(log),
+				as, err := getAccountsService()
+				if err != nil {
+					return err
+				}
+
+				server, err := glauth.Server(
+					glauth.AccountsService(as),
+					glauth.Logger(logger),
 					glauth.Config(&cfg),
 				)
 
@@ -361,4 +278,20 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// getAccountsService returns an ocis-accounts service
+func getAccountsService() (accounts.AccountsService, error) {
+	service := micro.NewService()
+
+	// parse command line flags
+	service.Init()
+
+	err := service.Client().Init(
+		client.ContentType("application/json"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return accounts.NewAccountsService("com.owncloud.api.accounts", service.Client()), nil
 }

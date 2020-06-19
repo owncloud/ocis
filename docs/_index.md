@@ -8,3 +8,7 @@ geekdocFilePath: _index.md
 ---
 
 This service provides a simple glauth world API which can be used by clients or other extensions.
+
+- reiner proxy
+ldap für eos und firewall
+- backend ist der accounts service
