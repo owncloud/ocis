@@ -17,24 +17,24 @@ import (
 // TODO testing the getAccount method should inject a cache
 func TestGetAccountSuccess(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "success")
-	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "success"}, mockAccSvc(false)); status != 0 {
+	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "success"}, mockAccountUUIDMiddlewareAccSvc(false)); status != 0 {
 		t.Errorf("expected an account")
 	}
 }
 func TestGetAccountInternalError(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "failure")
-	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "failure"}, mockAccSvc(true)); status != http.StatusInternalServerError {
+	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "failure"}, mockAccountUUIDMiddlewareAccSvc(true)); status != http.StatusInternalServerError {
 		t.Errorf("expected an internal server error")
 	}
 }
 
-func TestAccountUUIDHandler(t *testing.T) {
+func TestAccountUUIDMiddleware(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "success")
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	m := AccountUUID(
 		Logger(log.NewLogger()),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
-		AccountsClient(mockAccSvc(false)),
+		AccountsClient(mockAccountUUIDMiddlewareAccSvc(false)),
 	)(next)
 
 	r := httptest.NewRequest(http.MethodGet, "http://www.example.com", nil)
@@ -48,7 +48,7 @@ func TestAccountUUIDHandler(t *testing.T) {
 	}
 }
 
-func mockAccSvc(retErr bool) proto.AccountsService {
+func mockAccountUUIDMiddlewareAccSvc(retErr bool) proto.AccountsService {
 	if retErr {
 		return &proto.MockAccountsService{
 			ListFunc: func(ctx context.Context, in *proto.ListAccountsRequest, opts ...client.CallOption) (out *proto.ListAccountsResponse, err error) {

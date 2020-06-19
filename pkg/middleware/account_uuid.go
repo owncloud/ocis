@@ -11,50 +11,7 @@ import (
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	oidc "github.com/owncloud/ocis-pkg/v2/oidc"
-	"github.com/owncloud/ocis-proxy/pkg/config"
 )
-
-// AccountMiddlewareOption defines a single option function.
-type AccountMiddlewareOption func(o *AccountMiddlewareOptions)
-
-// AccountMiddlewareOptions defines the available options for this package.
-type AccountMiddlewareOptions struct {
-	// Logger to use for logging, must be set
-	Logger log.Logger
-	// TokenManagerConfig for communicating with the reva token manager
-	TokenManagerConfig config.TokenManager
-	// AccountsClient for resolving accounts
-	AccountsClient acc.AccountsService
-}
-
-// Logger provides a function to set the logger option.
-func Logger(l log.Logger) AccountMiddlewareOption {
-	return func(o *AccountMiddlewareOptions) {
-		o.Logger = l
-	}
-}
-
-// TokenManagerConfig provides a function to set the token manger config option.
-func TokenManagerConfig(cfg config.TokenManager) AccountMiddlewareOption {
-	return func(o *AccountMiddlewareOptions) {
-		o.TokenManagerConfig = cfg
-	}
-}
-
-// AccountsClient provides a function to set the accounts client config option.
-func AccountsClient(ac acc.AccountsService) AccountMiddlewareOption {
-	return func(o *AccountMiddlewareOptions) {
-		o.AccountsClient = ac
-	}
-}
-
-func newAccountUUIDOptions(opts ...AccountMiddlewareOption) AccountMiddlewareOptions {
-	opt := AccountMiddlewareOptions{}
-	for _, o := range opts {
-		o(&opt)
-	}
-	return opt
-}
 
 func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
 	entry, err := svcCache.Get(AccountsKey, claims.Email)
@@ -106,8 +63,8 @@ func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsServic
 
 // AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
 // on the oidc-claims
-func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.Handler {
-	opt := newAccountUUIDOptions(opts...)
+func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
+	opt := newOptions(opts...)
 
 	return func(next http.Handler) http.Handler {
 		// TODO: handle error
