@@ -7,7 +7,7 @@ import (
 
 	"github.com/micro/go-micro/v2/client/grpc"
 	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 )
 
@@ -99,9 +99,9 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 	var acc = ss
 	return func(ctx context.Context, r *http.Request) (s string, err error) {
 		var userID string
-		if claims := ocisoidc.FromContext(r.Context()); claims != nil {
+		if claims := oidc.FromContext(r.Context()); claims != nil {
 			userID = claims.PreferredUsername
-			if _, err := acc.Get(ctx, &accounts.GetRequest{Uuid: userID}); err != nil {
+			if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
 				return cfg.AccNotFoundPolicy, nil
 			}
 

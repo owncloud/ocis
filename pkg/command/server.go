@@ -2,23 +2,28 @@ package command
 
 import (
 	"context"
+	"crypto/tls"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
+	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/middleware"
+	"golang.org/x/oauth2"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli/v2"
+	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-proxy/pkg/config"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
@@ -155,7 +160,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Metrics(metrics),
 					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
 					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
-					proxyHTTP.Middlewares(loadMiddlewares(cfg, logger)),
+					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
 				if err != nil {
@@ -235,21 +240,54 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(cfg *config.Config, l log.Logger) alice.Chain {
+func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
 	if cfg.OIDC != nil {
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
+
+		// set defaults
+		/*
+			if opt.Realm == "" {
+				opt.Realm = opt.Endpoint
+			}
+			if len(opt.SigningAlgs) < 1 {
+				opt.SigningAlgs = []string{"RS256", "PS256"}
+			}
+		*/
+
+		var oidcHTTPClient = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: cfg.OIDC.Insecure,
+				},
+				DisableKeepAlives: true,
+			},
+			Timeout: time.Second * 10,
+		}
+
+		customCtx := context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient)
+
+		// Initialize a provider by specifying the issuer URL.
+		// it will fetch the keys from the issuer using the .well-known
+		// endpoint
+		provider := func() (middleware.OIDCProvider, error) {
+			return oidc.NewProvider(customCtx, cfg.OIDC.Endpoint)
+		}
+
 		oidcMW := middleware.OpenIDConnect(
-			oidc.Endpoint(cfg.OIDC.Endpoint),
-			oidc.Insecure(cfg.OIDC.Insecure),
-			oidc.Realm(cfg.OIDC.Realm),
-			oidc.SigningAlgs(cfg.OIDC.SigningAlgs),
-			oidc.Logger(l),
+			middleware.Logger(l),
+			middleware.HTTPClient(oidcHTTPClient),
+			middleware.OIDCProviderFunc(provider),
 		)
+
+		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		// https://github.com/owncloud/ocis-proxy/issues/38
+		accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
 
 		uuidMW := middleware.AccountUUID(
 			middleware.Logger(l),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.AccountsClient(accounts),
 		)
 
 		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW)

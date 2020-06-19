@@ -2,11 +2,9 @@ package middleware
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/coreos/go-oidc"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
@@ -22,46 +20,20 @@ var (
 	svcCache = cache.NewCache(
 		cache.Size(256),
 	)
-
-	// ClaimsKey works as a context key for user claims
-	ClaimsKey interface{} = "claims"
 )
 
-// newOIDCOptions initializes the available default options.
-func newOIDCOptions(opts ...ocisoidc.Option) ocisoidc.Options {
-	opt := ocisoidc.Options{}
-
-	for _, o := range opts {
-		o(&opt)
-	}
-
-	return opt
+// OIDCProvider used to mock the oidc provider during tests
+type OIDCProvider interface {
+	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error)
 }
 
 // OpenIDConnect provides a middleware to check access secured by a static token.
-func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler {
-	opt := newOIDCOptions(opts...)
-
-	// set defaults
-	if opt.Realm == "" {
-		opt.Realm = opt.Endpoint
-	}
-	if len(opt.SigningAlgs) < 1 {
-		opt.SigningAlgs = []string{"RS256", "PS256"}
-	}
-
-	var oidcHTTPClient = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: opt.Insecure,
-			},
-			DisableKeepAlives: true,
-		},
-		Timeout: time.Second * 10,
-	}
-	var oidcProvider *oidc.Provider
+func OpenIDConnect(opts ...Option) func(next http.Handler) http.Handler {
+	opt := newOptions(opts...)
 
 	return func(next http.Handler) http.Handler {
+
+		var oidcProvider OIDCProvider
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
 			path := r.URL.Path
@@ -73,21 +45,22 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 				return
 			}
 
-			customCtx := context.WithValue(r.Context(), oauth2.HTTPClient, oidcHTTPClient)
+			customCtx := context.WithValue(r.Context(), oauth2.HTTPClient, opt.HTTPClient)
 
-			// use cached provider
+			// check if oidc provider is initialized
 			if oidcProvider == nil {
-				// Initialize a provider by specifying the issuer URL.
+				// Lazily initialize a provider
+
 				// provider needs to be cached as when it is created
 				// it will fetch the keys from the issuer using the .well-known
 				// endpoint
-				provider, err := oidc.NewProvider(customCtx, opt.Endpoint)
+				var err error
+				oidcProvider, err = opt.OIDCProviderFunc()
 				if err != nil {
 					opt.Logger.Error().Err(err).Msg("could not initialize oidc provider")
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				oidcProvider = provider
 			}
 
 			token := strings.TrimPrefix(header, "Bearer ")
@@ -113,7 +86,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(next http.Handler) http.Handler
 			}
 
 			// inject claims to the request context for the account_uuid middleware.
-			ctxWithClaims := context.WithValue(r.Context(), ClaimsKey, claims)
+			ctxWithClaims := ocisoidc.NewContext(r.Context(), &claims)
 			r = r.WithContext(ctxWithClaims)
 
 			opt.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")

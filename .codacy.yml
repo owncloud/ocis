@@ -4,5 +4,7 @@ exclude_paths:
   - changelog/**
   - docs/**
   - pkg/proto/**
+  - '**_test.go'
+  - .codacy.yml
 
 ...

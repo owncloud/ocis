@@ -2,56 +2,69 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/owncloud/ocis-proxy/pkg/config"
-
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	mclient "github.com/micro/go-micro/v2/client"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	oidc "github.com/owncloud/ocis-pkg/v2/oidc"
 )
 
-// AccountMiddlewareOption defines a single option function.
-type AccountMiddlewareOption func(o *AccountMiddlewareOptions)
+func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
+	entry, err := svcCache.Get(AccountsKey, claims.Email)
+	if err != nil {
+		l.Debug().Msgf("No cache entry for %v", claims.Email)
+		resp, err := ac.ListAccounts(context.Background(), &acc.ListAccountsRequest{
+			Query:    fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")),
+			PageSize: 2,
+		})
 
-// AccountMiddlewareOptions defines the available options for this package.
-type AccountMiddlewareOptions struct {
-	// Logger to use for logging, must be set
-	Logger log.Logger
-	// TokenManagerConfig for communicating with the reva token manager
-	TokenManagerConfig config.TokenManager
-}
+		if err != nil {
+			l.Error().Err(err).Str("email", claims.Email).Msgf("Error fetching from accounts-service")
+			status = http.StatusInternalServerError
+			return
+		}
 
-// Logger provides a function to set the logger option.
-func Logger(l log.Logger) AccountMiddlewareOption {
-	return func(o *AccountMiddlewareOptions) {
-		o.Logger = l
+		if len(resp.Accounts) <= 0 {
+			l.Error().Str("email", claims.Email).Msgf("Account not found")
+			status = http.StatusNotFound
+			return
+		}
+
+		// TODO provision account
+
+		if len(resp.Accounts) > 1 {
+			l.Error().Str("email", claims.Email).Msgf("More than one account with this email found. Not logging user in.")
+			status = http.StatusForbidden
+			return
+		}
+
+		err = svcCache.Set(AccountsKey, claims.Email, *resp.Accounts[0])
+		if err != nil {
+			l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
+			status = http.StatusInternalServerError
+			return
+		}
+
+		account = resp.Accounts[0]
+	} else {
+		a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
+		if !ok {
+			status = http.StatusInternalServerError
+			return
+		}
+		account = &a
 	}
-}
-
-// TokenManagerConfig provides a function to set the token manger config option.
-func TokenManagerConfig(cfg config.TokenManager) AccountMiddlewareOption {
-	return func(o *AccountMiddlewareOptions) {
-		o.TokenManagerConfig = cfg
-	}
-}
-
-func newAccountUUIDOptions(opts ...AccountMiddlewareOption) AccountMiddlewareOptions {
-	opt := AccountMiddlewareOptions{}
-	for _, o := range opts {
-		o(&opt)
-	}
-	return opt
+	return
 }
 
 // AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
 // on the oidc-claims
-func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.Handler {
-	opt := newAccountUUIDOptions(opts...)
+func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
+	opt := newOptions(opts...)
 
 	return func(next http.Handler) http.Handler {
 		// TODO: handle error
@@ -63,55 +76,33 @@ func AccountUUID(opts ...AccountMiddlewareOption) func(next http.Handler) http.H
 			opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
 		}
 
-		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		// https://github.com/owncloud/ocis-proxy/issues/38
-		accounts := acc.NewAccountsService("com.owncloud.accounts", mclient.DefaultClient)
-
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			l := opt.Logger
-			claims, ok := r.Context().Value(ClaimsKey).(ocisoidc.StandardClaims)
-			if !ok {
+			claims := oidc.FromContext(r.Context())
+			if claims == nil {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			var uuid string
-			entry, err := svcCache.Get(AccountsKey, claims.Email)
-			if err != nil {
-				l.Debug().Msgf("No cache entry for %v", claims.Email)
-				resp, err := accounts.Get(context.Background(), &acc.GetRequest{
-					Email: claims.Email,
-				})
+			// TODO allow lookup by username?
+			// TODO allow lookup by custom claim, eg an id
 
-				if err != nil {
-					l.Error().Err(err).Str("email", claims.Email).Msgf("Error fetching from accounts-service")
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				err = svcCache.Set(AccountsKey, claims.Email, resp.Payload.Account.Uuid)
-				if err != nil {
-					l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				uuid = resp.Payload.Account.Uuid
-			} else {
-				uuid, ok = entry.V.(string)
-				if !ok {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
+			account, status := getAccount(l, claims, opt.AccountsClient)
+			if status != 0 {
+				w.WriteHeader(status)
+				return
 			}
 
-			l.Debug().Interface("claims", claims).Interface("uuid", uuid).Msgf("Associated claims with uuid")
+			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
 				Id: &revauser.UserId{
-					OpaqueId: uuid,
+					OpaqueId: account.Id,
 				},
-				Username:    strings.ToLower(claims.Name),
-				DisplayName: claims.Name,
+				Username:     account.PreferredName,
+				DisplayName:  account.DisplayName,
+				Mail:         account.Mail,
+				MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
+				// TODO groups
 			})
 
 			if err != nil {
