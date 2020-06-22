@@ -47,12 +47,11 @@ require (
 )
 
 replace (
-
 	github.com/coreos/etcd => go.etcd.io/etcd v0.5.0-alpha.5.0.20200425165423-262c93980547
-	github.com/cs3org/reva => ../reva
+	//github.com/cs3org/reva => ../reva
 	github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
 
-	github.com/owncloud/ocis-reva => ../ocis-reva
+	//github.com/owncloud/ocis-reva => ../ocis-reva
 	go.etcd.io/etcd => go.etcd.io/etcd v0.5.0-alpha.5.0.20200425165423-262c93980547
 	google.golang.org/grpc => google.golang.org/grpc v1.29.0
 )
