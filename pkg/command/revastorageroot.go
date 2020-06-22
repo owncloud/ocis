@@ -34,6 +34,14 @@ func configureRevaStorageRoot(cfg *config.Config) *svcconfig.Config {
 	cfg.Reva.Log.Pretty = cfg.Log.Pretty
 	cfg.Reva.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Reva.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Reva.Tracing.Type = cfg.Tracing.Type
+		cfg.Reva.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Reva.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Reva.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.Reva
 }
 

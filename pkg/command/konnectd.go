@@ -34,6 +34,14 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Color = cfg.Log.Color
 	cfg.Konnectd.HTTP.TLS = false
 
+	if cfg.Tracing.Enabled {
+		cfg.Konnectd.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Konnectd.Tracing.Type = cfg.Tracing.Type
+		cfg.Konnectd.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Konnectd.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Konnectd.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.Konnectd
 }
 

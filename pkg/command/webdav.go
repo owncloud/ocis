@@ -35,6 +35,14 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 	cfg.WebDAV.Log.Pretty = cfg.Log.Pretty
 	cfg.WebDAV.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.WebDAV.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.WebDAV.Tracing.Type = cfg.Tracing.Type
+		cfg.WebDAV.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.WebDAV.Tracing.Collector = cfg.Tracing.Collector
+		cfg.WebDAV.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.WebDAV
 }
 

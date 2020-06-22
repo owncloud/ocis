@@ -31,6 +31,15 @@ func configureGLAuth(cfg *config.Config) *svcconfig.Config {
 	cfg.GLAuth.Log.Level = cfg.Log.Level
 	cfg.GLAuth.Log.Pretty = cfg.Log.Pretty
 	cfg.GLAuth.Log.Color = cfg.Log.Color
+
+	if cfg.Tracing.Enabled {
+		cfg.GLAuth.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.GLAuth.Tracing.Type = cfg.Tracing.Type
+		cfg.GLAuth.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.GLAuth.Tracing.Collector = cfg.Tracing.Collector
+		cfg.GLAuth.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.GLAuth
 }
 

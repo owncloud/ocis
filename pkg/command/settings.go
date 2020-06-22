@@ -35,6 +35,18 @@ func configureSettings(cfg *config.Config) *svcconfig.Config {
 	cfg.Settings.Log.Pretty = cfg.Log.Pretty
 	cfg.Settings.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Settings.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Settings.Tracing.Type = cfg.Tracing.Type
+		cfg.Settings.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Settings.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Settings.Tracing.Service = cfg.Tracing.Service
+	}
+
+	if cfg.Reva.Reva.JWTSecret != "" {
+		cfg.Settings.TokenManager.JWTSecret = cfg.Reva.Reva.JWTSecret
+	}
+
 	return cfg.Settings
 }
 
