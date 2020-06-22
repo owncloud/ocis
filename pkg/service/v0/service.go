@@ -87,7 +87,7 @@ func New(cfg *config.Config) (s *Service, err error) {
 						Password: "$6$rounds=5524$sa1u5Pmfo4cr23Vw$58bQVL/JeUlwM0RY21YKAFMvKvwKLLysGllYXox.vwKT5dHMwdzJjCxwTDMnB2o2pwexC8o/iOXyP2zrhALS40",
 					},
 				},
-				// technical users for kopao and reva
+				// technical users for kopano and reva
 				{
 					Id:            "820ba2a1-3f54-4538-80a4-2d73007e30bf",
 					PreferredName: "konnectd",
