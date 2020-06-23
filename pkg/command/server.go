@@ -11,11 +11,6 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/server/grpc"
 	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
-	oclog "github.com/owncloud/ocis-pkg/v2/log"
-)
-
-var (
-	logger oclog.Logger
 )
 
 // Server is the entry point for the server command.
@@ -26,15 +21,10 @@ func Server(cfg *config.Config) *cli.Command {
 		Description: "uses an LDAP server as the storage backend",
 		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			logger = oclog.NewLogger(
-				oclog.Name(cfg.Server.Name),
-				oclog.Level("info"),
-				oclog.Color(true),
-				oclog.Pretty(true),
-			)
 			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
+			logger := NewLogger(cfg)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 
@@ -46,6 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Name(cfg.Server.Name),
 				grpc.Namespace(cfg.Server.Namespace),
 				grpc.Address(cfg.Server.Address),
+				grpc.Flags(flagset.RootWithConfig(config.New())),
 			)
 
 			gr.Add(func() error {

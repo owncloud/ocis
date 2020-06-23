@@ -23,14 +23,16 @@ var (
 
 // Execute is the entry point for the ocis-accounts command.
 func Execute() error {
-	rootCfg := config.New()
+	cfg := config.New()
 	app := &cli.App{
-		Name:    "ocis-accounts",
-		Version: version.String,
-		Usage:   "Example service for Reva/oCIS",
-		Flags:   flagset.RootWithConfig(rootCfg),
+		Name:     "ocis-accounts",
+		Version:  version.String,
+		Usage:    "Example service for Reva/oCIS",
+		Compiled: version.Compiled(),
+		Flags:    flagset.RootWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			logger := NewLogger(config.New())
+			err := ParseConfig(c, cfg)
+			logger := NewLogger(cfg)
 			for _, v := range defaultConfigPaths {
 				// location is the user's home
 				if v[0] == '$' || v[0] == '~' {
@@ -46,7 +48,7 @@ func Execute() error {
 					}
 				}
 			}
-			return nil
+			return err
 		},
 
 		Authors: []*cli.Author{
@@ -57,7 +59,7 @@ func Execute() error {
 		},
 
 		Commands: []*cli.Command{
-			Server(rootCfg),
+			Server(cfg),
 		},
 	}
 

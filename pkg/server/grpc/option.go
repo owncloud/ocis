@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
@@ -18,6 +19,7 @@ type Options struct {
 	Context   context.Context
 	Config    *config.Config
 	Namespace string
+	Flags     []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -70,5 +72,12 @@ func Config(val *config.Config) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// Flags provides a function to set the flags option.
+func Flags(val []cli.Flag) Option {
+	return func(o *Options) {
+		o.Flags = append(o.Flags, val...)
 	}
 }
