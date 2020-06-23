@@ -6,10 +6,19 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 
 ## Details
+
+* Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
+
+   Pass around the logger to have consistent log formatting, log level, etc.
+
+   https://github.com/owncloud/ocis-accounts/issues/41
+   https://github.com/owncloud/ocis-accounts/pull/48
+
 
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 
