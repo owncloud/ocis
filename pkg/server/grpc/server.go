@@ -16,12 +16,13 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Address(options.Address),
 		grpc.Namespace(options.Namespace),
 		grpc.Logger(options.Logger),
+		grpc.Flags(options.Flags...),
 	)
 
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(options.Config); err != nil {
+	if hdlr, err = svc.New(svc.Logger(options.Logger), svc.Config(options.Config)); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not initialize service handler")
 	}
 	if err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr); err != nil {

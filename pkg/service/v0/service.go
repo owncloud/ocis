@@ -21,9 +21,8 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-accounts/pkg/provider"
-	olog "github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"github.com/rs/zerolog/log"
 	"github.com/tredoe/osutil/user/crypt"
 
 	// register crypt functions
@@ -35,7 +34,10 @@ import (
 
 // New returns a new instance of Service
 // TODO pass in logger as options
-func New(cfg *config.Config) (s *Service, err error) {
+func New(opts ...Option) (s *Service, err error) {
+	options := newOptions(opts...)
+	logger := options.Logger
+	cfg := options.Config
 	// read all user and group records
 
 	// for now recreate index on every start
@@ -115,13 +117,13 @@ func New(cfg *config.Config) (s *Service, err error) {
 			for i := range accounts {
 				var bytes []byte
 				if bytes, err = json.Marshal(accounts[i]); err != nil {
-					log.Error().Err(err).Interface("account", accounts[i]).Msg("could not marshal default account")
+					logger.Error().Err(err).Interface("account", accounts[i]).Msg("could not marshal default account")
 					return
 				}
 				path := filepath.Join(accountsDir, accounts[i].Id)
 				if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 					accounts[i].PasswordProfile.Password = "***REMOVED***"
-					log.Error().Err(err).Str("path", path).Interface("account", accounts[i]).Msg("could not persist default account")
+					logger.Error().Err(err).Str("path", path).Interface("account", accounts[i]).Msg("could not persist default account")
 					return
 				}
 			}
@@ -145,43 +147,42 @@ func New(cfg *config.Config) (s *Service, err error) {
 	}
 	var f *os.File
 	if f, err = os.Open(filepath.Join(cfg.Server.AccountsDataPath, "accounts")); err != nil {
-		log.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not open accounts folder")
+		logger.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not open accounts folder")
 		return
 	}
 	list, err := f.Readdir(-1)
 	f.Close()
 	if err != nil {
-		log.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not list accounts folder")
+		logger.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not list accounts folder")
 		return
 	}
 	var data []byte
 	for _, file := range list {
 		path := filepath.Join(cfg.Server.AccountsDataPath, "accounts", file.Name())
 		if data, err = ioutil.ReadFile(path); err != nil {
-			log.Error().Err(err).Str("path", path).Msg("could not read account")
+			logger.Error().Err(err).Str("path", path).Msg("could not read account")
 			continue
 		}
 		a := proto.Account{}
 		if err = json.Unmarshal(data, &a); err != nil {
-			log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
+			logger.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		log.Debug().Interface("account", a).Msg("found account")
+		logger.Debug().Interface("account", a).Msg("found account")
 		if err = s.index.Index(a.Id, a); err != nil {
-			log.Error().Err(err).Str("path", path).Interface("account", a).Msg("could not index account")
+			logger.Error().Err(err).Str("path", path).Interface("account", a).Msg("could not index account")
 			continue
 		}
 	}
 
 	// TODO watch folders for new records
 
-	s.Config = cfg
-
 	return
 }
 
 // Service implements the AccountsServiceHandler interface
 type Service struct {
+	log    log.Logger
 	Config *config.Config
 	index  bleve.Index
 }
@@ -214,31 +215,31 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		// parse the query like an odata filter
 		var q *godata.GoDataFilterQuery
 		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			log.Error().Err(err).Msg("could not parse query")
+			s.log.Error().Err(err).Msg("could not parse query")
 			return
 		}
 
 		// convert to bleve query
 		query, err = provider.BuildBleveQuery(q)
 		if err != nil {
-			log.Error().Err(err).Msg("could not build bleve query")
+			s.log.Error().Err(err).Msg("could not build bleve query")
 			return
 		}
 	} else {
 		query = bleve.NewMatchAllQuery()
 	}
 
-	log.Debug().Interface("query", query).Msg("using query")
+	s.log.Debug().Interface("query", query).Msg("using query")
 
 	searchRequest := bleve.NewSearchRequest(query)
 	var searchResult *bleve.SearchResult
 	searchResult, err = s.index.Search(searchRequest)
 	if err != nil {
-		log.Error().Err(err).Msg("could not execute bleve search")
+		s.log.Error().Err(err).Msg("could not execute bleve search")
 		return
 	}
 
-	log.Debug().Interface("result", searchResult).Msg("result")
+	s.log.Debug().Interface("result", searchResult).Msg("result")
 
 	res.Accounts = make([]*proto.Account, 0)
 
@@ -248,20 +249,20 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		var data []byte
 		data, err = ioutil.ReadFile(path)
 		if err != nil {
-			log.Error().Err(err).Str("path", path).Msg("could not read account")
+			s.log.Error().Err(err).Str("path", path).Msg("could not read account")
 			continue
 		}
 		a := proto.Account{}
 		err = json.Unmarshal(data, &a)
 		if err != nil {
-			log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
+			s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		log.Debug().Interface("account", a).Msg("found account")
+		s.log.Debug().Interface("account", a).Msg("found account")
 
 		if password != "" {
 			if a.PasswordProfile == nil {
-				log.Debug().Interface("account", a).Msg("no password profile")
+				s.log.Debug().Interface("account", a).Msg("no password profile")
 				return fmt.Errorf("invalid password")
 			}
 			if !s.passwordIsValid(a.PasswordProfile.Password, password) {
@@ -278,7 +279,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
+			s.log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
 		}
 	}()
 
@@ -305,17 +306,17 @@ func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res
 	var data []byte
 	data, err = ioutil.ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("could not read account")
+		s.log.Error().Err(err).Str("path", path).Msg("could not read account")
 		// TODO we need error handling ... eg Not Found
 		return fmt.Errorf("account not found")
 	}
 	err = json.Unmarshal(data, res)
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
+		s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 		return fmt.Errorf("internal server error")
 	}
 
-	log.Debug().Interface("account", res).Msg("found account")
+	s.log.Debug().Interface("account", res).Msg("found account")
 	return
 }
 
@@ -339,25 +340,25 @@ func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountReques
 		c := crypt.New(crypt.SHA512)
 		if req.Account.PasswordProfile.Password, err = c.Generate([]byte(req.Account.PasswordProfile.Password), nil); err != nil {
 			req.Account.PasswordProfile.Password = "***REMOVED***"
-			log.Error().Err(err).Str("id", id).Interface("account", req.Account).Msg("could not hash password")
+			s.log.Error().Err(err).Str("id", id).Interface("account", req.Account).Msg("could not hash password")
 			return
 		}
 	}
 
 	var bytes []byte
 	if bytes, err = json.Marshal(req.Account); err != nil {
-		log.Error().Err(err).Interface("account", req.Account).Msg("could not marshal account")
+		s.log.Error().Err(err).Interface("account", req.Account).Msg("could not marshal account")
 		return
 	}
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		req.Account.PasswordProfile.Password = "***REMOVED***"
-		log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not persist new account")
+		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not persist new account")
 		return
 	}
 
 	if err = s.index.Index(id, req.Account); err != nil {
 		req.Account.PasswordProfile.Password = "***REMOVED***"
-		log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not index new account")
+		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not index new account")
 		return
 	}
 
@@ -378,12 +379,12 @@ func (s Service) DeleteAccount(c context.Context, req *proto.DeleteAccountReques
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	if err = os.Remove(path); err != nil {
-		log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
 		return
 	}
 
 	if err = s.index.Delete(id); err != nil {
-		log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
+		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
 		return
 	}
 	return os.Remove(path)
@@ -415,7 +416,7 @@ func (s Service) DeleteGroup(c context.Context, req *proto.DeleteGroupRequest, r
 }
 
 // RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
-func RegisterSettingsBundles(l *olog.Logger) {
+func RegisterSettingsBundles(l *log.Logger) {
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis-proxy/issues/38
 	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)

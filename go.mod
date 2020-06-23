@@ -25,7 +25,6 @@ require (
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
-	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tredoe/osutil v1.0.5
