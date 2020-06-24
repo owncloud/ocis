@@ -61,6 +61,25 @@ func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsServic
 	return
 }
 
+func createAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsService) (*acc.Account, int) {
+	// TODO check if fields are missing.
+	req := &acc.CreateAccountRequest{
+		Account: &acc.Account{
+			DisplayName:   claims.DisplayName,
+			PreferredName: claims.PreferredUsername,
+			Mail:          claims.Email,
+			CreationType:  "LocalAccount",
+		},
+	}
+	created, err := ac.CreateAccount(context.Background(), req)
+	if err != nil {
+		l.Error().Err(err).Interface("account", req.Account).Msg("could not create account")
+		return nil, http.StatusInternalServerError
+	}
+
+	return created, 0
+}
+
 // AccountUUID provides a middleware which mints a jwt and adds it to the proxied request based
 // on the oidc-claims
 func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
@@ -89,8 +108,16 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 
 			account, status := getAccount(l, claims, opt.AccountsClient)
 			if status != 0 {
-				w.WriteHeader(status)
-				return
+				if status == http.StatusNotFound {
+					account, status = createAccount(l, claims, opt.AccountsClient)
+					if status != 0 {
+						w.WriteHeader(status)
+						return
+					}
+				} else {
+					w.WriteHeader(status)
+					return
+				}
 			}
 			if !account.AccountEnabled {
 				l.Debug().Interface("account", account).Msg("account is disabled")
