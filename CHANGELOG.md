@@ -10,6 +10,7 @@ The following sections list the changes for ocis-proxy unreleased.
 * Bugfix - Fix x-access-token in header: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
 * Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
 * Enhancement - Make jwt secret configurable: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
+* Enhancement - Respect account_enabled flag: [#53](https://github.com/owncloud/ocis-proxy/issues/53)
 
 ## Details
 
@@ -43,6 +44,14 @@ The following sections list the changes for ocis-proxy unreleased.
    configurable.
 
    https://github.com/owncloud/ocis-proxy/pull/41
+
+
+* Enhancement - Respect account_enabled flag: [#53](https://github.com/owncloud/ocis-proxy/issues/53)
+
+   If the account returned by the accounts service has the account_enabled flag set to false, the
+   proxy will return immediately with the status code unauthorized.
+
+   https://github.com/owncloud/ocis-proxy/issues/53
 
 # Changelog for [0.3.1] (2020-03-31)
 
