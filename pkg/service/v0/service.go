@@ -66,6 +66,7 @@ func New(opts ...Option) (s *Service, err error) {
 					PasswordProfile: &proto.PasswordProfile{
 						Password: "$6$rounds=35210$sa1u5Pmfo4cr23Vw$RJNGElaDB1D3xorWkfTEGm2Ko.o2QL3E0cimKx23MNxVWVFSkUUeRoC7FqC4RzYDNQBD6cKzovTEaDD.8TDkD.",
 					},
+					AccountEnabled: true,
 				},
 				{
 					Id:            "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
@@ -77,6 +78,7 @@ func New(opts ...Option) (s *Service, err error) {
 					PasswordProfile: &proto.PasswordProfile{
 						Password: "$6$rounds=81434$sa1u5Pmfo4cr23Vw$W78cyL884GmuvDpxYPvSRBVzEj02T5QhTTcI8Dv4IKvMooDFGv4bwaWMkH9HfJ0wgpEBW7Lp.4Cad0xE/MYSg1",
 					},
+					AccountEnabled: true,
 				},
 				{
 					Id:            "932b4540-8d16-481e-8ef4-588e4b6b151c",
@@ -88,6 +90,7 @@ func New(opts ...Option) (s *Service, err error) {
 					PasswordProfile: &proto.PasswordProfile{
 						Password: "$6$rounds=5524$sa1u5Pmfo4cr23Vw$58bQVL/JeUlwM0RY21YKAFMvKvwKLLysGllYXox.vwKT5dHMwdzJjCxwTDMnB2o2pwexC8o/iOXyP2zrhALS40",
 					},
+					AccountEnabled: true,
 				},
 				// technical users for kopano and reva
 				{
@@ -100,6 +103,7 @@ func New(opts ...Option) (s *Service, err error) {
 					PasswordProfile: &proto.PasswordProfile{
 						Password: "$6$rounds=9746$sa1u5Pmfo4cr23Vw$2hnwpkTvUkWX0v6mh8Aw1pbzEXa9EUJzmrey4g2W/8arwWCwhteqU//3aWnA3S0d5T21fOKYteoqlsN1IbTcN.",
 					},
+					AccountEnabled: true,
 				},
 				{
 					Id:            "bc596f3c-c955-4328-80a0-60d018b4ad57",
@@ -111,6 +115,7 @@ func New(opts ...Option) (s *Service, err error) {
 					PasswordProfile: &proto.PasswordProfile{
 						Password: "$6$rounds=91087$sa1u5Pmfo4cr23Vw$wPC3BbMTbP/ytlo0p.f99zJifyO70AUCdKIK9hkhwutBKGCirLmZs/MsWAG6xHjVvmnmHN5NoON7FUGv5pPaN.",
 					},
+					AccountEnabled: true,
 				},
 			}
 			// TODO groups
@@ -344,6 +349,7 @@ func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountReques
 			return
 		}
 	}
+	req.Account.AccountEnabled = true
 
 	var bytes []byte
 	if bytes, err = json.Marshal(req.Account); err != nil {
