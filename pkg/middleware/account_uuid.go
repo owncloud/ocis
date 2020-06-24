@@ -92,6 +92,11 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				w.WriteHeader(status)
 				return
 			}
+			if !account.AccountEnabled {
+				l.Debug().Interface("account", account).Msg("account is disabled")
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
 
 			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
