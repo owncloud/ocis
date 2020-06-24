@@ -28,6 +28,9 @@ func Server(opts ...Option) grpc.Service {
 	if err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register service handler")
 	}
+	if err = proto.RegisterGroupsServiceHandler(service.Server(), hdlr); err != nil {
+		options.Logger.Fatal().Err(err).Msg("could not register groups handler")
+	}
 
 	service.Init()
 	return service

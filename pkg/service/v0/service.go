@@ -1,36 +1,19 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
-	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
-	"github.com/blevesearch/bleve/search/query"
-	"github.com/gofrs/uuid"
-	"github.com/golang/protobuf/ptypes/empty"
-	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-accounts/pkg/provider"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"github.com/tredoe/osutil/user/crypt"
-
-	merrors "github.com/micro/go-micro/v2/errors"
-	// register crypt functions
-	_ "github.com/tredoe/osutil/user/crypt/apr1_crypt"
-	_ "github.com/tredoe/osutil/user/crypt/md5_crypt"
-	_ "github.com/tredoe/osutil/user/crypt/sha256_crypt"
-	_ "github.com/tredoe/osutil/user/crypt/sha512_crypt"
 )
 
 // New returns a new instance of Service
@@ -138,47 +121,33 @@ func New(opts ...Option) (s *Service, err error) {
 		return nil, fmt.Errorf("%s is not a directory", accountsDir)
 	}
 
+	if err = os.MkdirAll(filepath.Join(cfg.Server.AccountsDataPath, "groups"), 0700); err != nil {
+		return nil, err
+	}
+
 	mapping := bleve.NewIndexMapping()
 	// keep all symbols in terms to allow exact maching, eg. emails
 	mapping.DefaultAnalyzer = keyword.Name
 	// TODO don't bother to store fields as we will load the account from disk
+	//groupsFieldMapping := bleve.NewTextFieldMapping()
+	//blogMapping.AddFieldMappingsAt("memberOf", nameFieldMapping)
+	// TODO index groups and accounts as different types?
 
 	s = &Service{
 		id:     cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		log:    logger,
 		Config: cfg,
 	}
 
 	if s.index, err = bleve.New(filepath.Join(cfg.Server.AccountsDataPath, "index.bleve"), mapping); err != nil {
 		return
 	}
-	var f *os.File
-	if f, err = os.Open(filepath.Join(cfg.Server.AccountsDataPath, "accounts")); err != nil {
-		logger.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not open accounts folder")
-		return
+
+	if err = s.indexAccounts(filepath.Join(cfg.Server.AccountsDataPath, "accounts")); err != nil {
+		return nil, err
 	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		logger.Error().Err(err).Str("dir", filepath.Join(cfg.Server.AccountsDataPath, "accounts")).Msg("could not list accounts folder")
-		return
-	}
-	var data []byte
-	for _, file := range list {
-		path := filepath.Join(cfg.Server.AccountsDataPath, "accounts", file.Name())
-		if data, err = ioutil.ReadFile(path); err != nil {
-			logger.Error().Err(err).Str("path", path).Msg("could not read account")
-			continue
-		}
-		a := proto.Account{}
-		if err = json.Unmarshal(data, &a); err != nil {
-			logger.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
-			continue
-		}
-		logger.Debug().Interface("account", &a).Msg("found account")
-		if err = s.index.Index(a.Id, &a); err != nil {
-			logger.Error().Err(err).Str("path", path).Interface("account", &a).Msg("could not index account")
-			continue
-		}
+	if err = s.indexGroups(filepath.Join(cfg.Server.AccountsDataPath, "groups")); err != nil {
+		return nil, err
 	}
 
 	// TODO watch folders for new records
@@ -194,268 +163,10 @@ type Service struct {
 	index  bleve.Index
 }
 
-// an auth request is currently hardcoded and has to match this regex
-// login eq \"teddy\" and password eq \"F&1!b90t111!\"
-var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
-
-// ListAccounts implements the AccountsServiceHandler interface
-// the query contains account properties
-// TODO id vs onpremiseimmutableid
-func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, res *proto.ListAccountsResponse) error {
-
-	var password string
-
-	var query query.Query
-
-	// check if this looks like an auth request
-	match := authQuery.FindStringSubmatch(in.Query)
-	if len(match) == 3 {
-		in.Query = fmt.Sprintf("preferred_name eq '%s'", match[1]) // todo fetch email? make query configurable
-		password = match[2]
-		if password == "" {
-			return merrors.BadRequest(s.id, "password must not be empty")
-		}
-	}
-
-	if in.Query != "" {
-		// parse the query like an odata filter
-		q, err := godata.ParseFilterString(in.Query)
-		if err != nil {
-			s.log.Error().Err(err).Msg("could not parse query")
-			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
-		}
-
-		// convert to bleve query
-		query, err = provider.BuildBleveQuery(q)
-		if err != nil {
-			s.log.Error().Err(err).Msg("could not build bleve query")
-			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
-		}
-	} else {
-		query = bleve.NewMatchAllQuery()
-	}
-
-	s.log.Debug().Interface("query", query).Msg("using query")
-
-	searchRequest := bleve.NewSearchRequest(query)
-	var searchResult *bleve.SearchResult
-	searchResult, err := s.index.Search(searchRequest)
-	if err != nil {
-		s.log.Error().Err(err).Msg("could not execute bleve search")
-		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
-	}
-
-	s.log.Debug().Interface("result", searchResult).Msg("result")
-
-	res.Accounts = make([]*proto.Account, 0)
-
-	for _, hit := range searchResult.Hits {
-		path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", hit.ID)
-
-		var data []byte
-		data, err = ioutil.ReadFile(path)
-		if err != nil {
-			s.log.Error().Err(err).Str("path", path).Msg("could not read account")
-			continue
-		}
-		a := proto.Account{}
-		err = json.Unmarshal(data, &a)
-		if err != nil {
-			s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
-			continue
-		}
-		s.log.Debug().Interface("account", &a).Msg("found account")
-
-		if password != "" {
-			if a.PasswordProfile == nil {
-				s.log.Debug().Interface("account", &a).Msg("no password profile")
-				return merrors.BadRequest(s.id, "invalid password")
-			}
-			if !s.passwordIsValid(a.PasswordProfile.Password, password) {
-				return merrors.BadRequest(s.id, "invalid password")
-			}
-		}
-
-		res.Accounts = append(res.Accounts, &a)
-	}
-
-	return nil
-}
-
-func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
-	defer func() {
-		if r := recover(); r != nil {
-			s.log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
-		}
-	}()
-
-	c := crypt.NewFromHash(hash)
-	return c.Verify(hash, []byte(pwd)) == nil
-}
-
 func cleanupID(id string) (string, error) {
 	id = filepath.Clean(id)
 	if id == "." || strings.Contains(id, "/") {
-		return "", errors.New("invalid id")
+		return "", errors.New("invalid id " + id)
 	}
 	return id, nil
-}
-
-// GetAccount implements the AccountsServiceHandler interface
-func (s Service) GetAccount(c context.Context, req *proto.GetAccountRequest, res *proto.Account) error {
-	id, err := cleanupID(req.Id)
-	if err != nil {
-		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
-	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
-	var data []byte
-	data, err = ioutil.ReadFile(path)
-	if err != nil {
-		s.log.Error().Err(err).Str("path", path).Msg("could not read account")
-		return merrors.NotFound(s.id, "account not found")
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
-		s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
-		return merrors.InternalServerError(s.id, "could not unmarshal account: %v", err.Error())
-	}
-
-	s.log.Debug().Interface("account", res).Msg("found account")
-	return nil
-}
-
-// CreateAccount implements the AccountsServiceHandler interface
-func (s Service) CreateAccount(c context.Context, req *proto.CreateAccountRequest, res *proto.Account) error {
-	var id string
-	if req.Account == nil {
-		return merrors.BadRequest(s.id, "account missing")
-	}
-	if req.Account.Id == "" {
-		req.Account.Id = uuid.Must(uuid.NewV4()).String()
-	}
-
-	id, err := cleanupID(req.Account.Id)
-	if err != nil {
-		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
-	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
-	if req.Account.PasswordProfile != nil && req.Account.PasswordProfile.Password != "" {
-		// encrypt password
-		c := crypt.New(crypt.SHA512)
-		if req.Account.PasswordProfile.Password, err = c.Generate([]byte(req.Account.PasswordProfile.Password), nil); err != nil {
-			req.Account.PasswordProfile.Password = "***REMOVED***"
-			s.log.Error().Err(err).Str("id", id).Interface("account", req.Account).Msg("could not hash password")
-			return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
-		}
-	}
-	req.Account.AccountEnabled = true
-
-	bytes, err := json.Marshal(req.Account)
-	if err != nil {
-		s.log.Error().Err(err).Interface("account", req.Account).Msg("could not marshal account")
-		return merrors.InternalServerError(s.id, "could not marshal account: %v", err.Error())
-	}
-	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
-		req.Account.PasswordProfile.Password = "***REMOVED***"
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not persist new account")
-		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
-	}
-
-	if err = s.index.Index(id, req.Account); err != nil {
-		req.Account.PasswordProfile.Password = "***REMOVED***"
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", req.Account).Msg("could not index new account")
-		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
-	}
-
-	return nil
-}
-
-// UpdateAccount implements the AccountsServiceHandler interface
-func (s Service) UpdateAccount(c context.Context, req *proto.UpdateAccountRequest, res *proto.Account) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// DeleteAccount implements the AccountsServiceHandler interface
-func (s Service) DeleteAccount(c context.Context, req *proto.DeleteAccountRequest, res *empty.Empty) error {
-	id, err := cleanupID(req.Id)
-	if err != nil {
-		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
-	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
-	if err = os.Remove(path); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
-		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
-	}
-
-	if err = s.index.Delete(id); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
-		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
-	}
-	return nil
-}
-
-// ListGroups implements the AccountsServiceHandler interface
-func (s Service) ListGroups(c context.Context, req *proto.ListGroupsRequest, res *proto.ListGroupsResponse) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// GetGroup implements the AccountsServiceHandler interface
-func (s Service) GetGroup(c context.Context, req *proto.GetGroupRequest, res *proto.Group) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// CreateGroup implements the AccountsServiceHandler interface
-func (s Service) CreateGroup(c context.Context, req *proto.CreateGroupRequest, res *proto.Group) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// UpdateGroup implements the AccountsServiceHandler interface
-func (s Service) UpdateGroup(c context.Context, req *proto.UpdateGroupRequest, res *proto.Group) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// DeleteGroup implements the AccountsServiceHandler interface
-func (s Service) DeleteGroup(c context.Context, req *proto.DeleteGroupRequest, res *empty.Empty) (err error) {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// AddMember implements the AccountsServiceHandler interface
-func (s Service) AddMember(c context.Context, req *proto.AddMemberRequest, res *proto.Group) error {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// RemoveMember implements the AccountsServiceHandler interface
-func (s Service) RemoveMember(c context.Context, req *proto.RemoveMemberRequest, res *proto.Group) error {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// ListMembers implements the AccountsServiceHandler interface
-func (s Service) ListMembers(c context.Context, req *proto.ListMembersRequest, res *proto.ListMembersResponse) error {
-	return merrors.InternalServerError(s.id, "not implemented")
-}
-
-// RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
-func RegisterSettingsBundles(l *log.Logger) {
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
-	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)
-
-	requests := []settings.SaveSettingsBundleRequest{
-		generateSettingsBundleProfileRequest(),
-	}
-
-	for i := range requests {
-		res, err := service.SaveSettingsBundle(context.Background(), &requests[i])
-		if err != nil {
-			l.Err(err).
-				Msg("Error registering settings bundle")
-		} else {
-			l.Info().
-				Str("bundle key", res.SettingsBundle.Identifier.BundleKey).
-				Msg("Successfully registered settings bundle")
-		}
-	}
 }

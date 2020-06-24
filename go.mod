@@ -21,6 +21,7 @@ require (
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.6.0
+	github.com/micro/protoc-gen-micro/v2 v2.3.0 // indirect
 	github.com/oklog/run v1.1.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
 	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
@@ -30,8 +31,8 @@ require (
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tredoe/osutil v1.0.5
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
-	google.golang.org/genproto v0.0.0-20200420144010-e5e8543f8aeb
-	google.golang.org/protobuf v1.23.0
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+	google.golang.org/protobuf v1.25.0
 	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
 
