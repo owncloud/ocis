@@ -3,7 +3,6 @@ module github.com/owncloud/ocis-reva
 go 1.13
 
 require (
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cs3org/reva v0.1.1-0.20200624063447-db5e6635d5f0
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
@@ -11,7 +10,6 @@ require (
 	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-micro/v2 v2.0.0
-	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oklog/run v1.0.0
 	github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203
 	github.com/owncloud/ocis-pkg/v2 v2.2.1
