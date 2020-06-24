@@ -194,6 +194,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Frontend.URL,
 		},
 		&cli.StringFlag{
+			Name:        "datagateway-url",
+			Value:       "https://localhost:9200/data",
+			Usage:       "URL to use for the reva datagateway",
+			EnvVars:     []string{"REVA_DATAGATEWAY_URL"},
+			Destination: &cfg.Reva.DataGateway.URL,
+		},
+		&cli.StringFlag{
 			Name:        "users-url",
 			Value:       "localhost:9144",
 			Usage:       "URL to use for the reva service",
