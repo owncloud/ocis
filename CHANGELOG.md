@@ -1,13 +1,17 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.4.0] (2020-06-25)
 
-The following sections list the changes for ocis-proxy unreleased.
+The following sections list the changes for ocis-proxy 0.4.0.
 
-[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.3.1...master
+[0.4.0]: https://github.com/owncloud/ocis-proxy/compare/v0.3.1...v0.4.0
 
 ## Summary
 
 * Bugfix - Accounts service response was ignored: [#43](https://github.com/owncloud/ocis-proxy/pull/43)
 * Bugfix - Fix x-access-token in header: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
+* Change - Point /data endpoint to reva frontend: [#45](https://github.com/owncloud/ocis-proxy/pull/45)
+* Change - Send autocreate home request to reva gateway: [#51](https://github.com/owncloud/ocis-proxy/pull/51)
+* Change - Update to new accounts API: [#39](https://github.com/owncloud/ocis-proxy/issues/39)
+* Enhancement - Retrieve Account UUID From User Claims: [#36](https://github.com/owncloud/ocis-proxy/pull/36)
 * Enhancement - Create account if it doesn't exist in ocis-accounts: [#55](https://github.com/owncloud/ocis-proxy/issues/55)
 * Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
 * Enhancement - Make jwt secret configurable: [#41](https://github.com/owncloud/ocis-proxy/pull/41)
@@ -28,6 +32,38 @@ The following sections list the changes for ocis-proxy unreleased.
    We fixed setting the x-access-token in the request header, which was broken before.
 
    https://github.com/owncloud/ocis-proxy/pull/41
+   https://github.com/owncloud/ocis-proxy/pull/46
+
+
+* Change - Point /data endpoint to reva frontend: [#45](https://github.com/owncloud/ocis-proxy/pull/45)
+
+   Adjusted example config files to point /data to the reva frontend.
+
+   https://github.com/owncloud/ocis-proxy/pull/45
+
+
+* Change - Send autocreate home request to reva gateway: [#51](https://github.com/owncloud/ocis-proxy/pull/51)
+
+   Send autocreate home request to reva gateway
+
+   https://github.com/owncloud/ocis-proxy/pull/51
+
+
+* Change - Update to new accounts API: [#39](https://github.com/owncloud/ocis-proxy/issues/39)
+
+   Update to new accounts API
+
+   https://github.com/owncloud/ocis-proxy/issues/39
+
+
+* Enhancement - Retrieve Account UUID From User Claims: [#36](https://github.com/owncloud/ocis-proxy/pull/36)
+
+   OIDC Middleware can make use of uuidFromClaims to trade claims.Email for an account's UUID.
+   For this, a general purpose cache was added that caches on a per-request basis, meaning
+   whenever the request parameters match a set of keys, the cached value is returned, saving a
+   round trip to the accounts service that otherwise would happen in every single request.
+
+   https://github.com/owncloud/ocis-proxy/pull/36
 
 
 * Enhancement - Create account if it doesn't exist in ocis-accounts: [#55](https://github.com/owncloud/ocis-proxy/issues/55)
@@ -36,6 +72,7 @@ The following sections list the changes for ocis-proxy unreleased.
    there yet the proxy creates the account using the ocis-account api.
 
    https://github.com/owncloud/ocis-proxy/issues/55
+   https://github.com/owncloud/ocis-proxy/issues/58
 
 
 * Enhancement - Disable keep-alive on server-side OIDC requests: [#268](https://github.com/owncloud/ocis/issues/268)
@@ -84,7 +121,7 @@ The following sections list the changes for ocis-proxy 0.3.1.
 
 The following sections list the changes for ocis-proxy 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.3.0
 
 ## Summary
 
@@ -118,11 +155,27 @@ The following sections list the changes for ocis-proxy 0.3.0.
 
    https://github.com/owncloud/ocis-proxy/issues/4
 
+# Changelog for [0.2.1] (2020-03-25)
+
+The following sections list the changes for ocis-proxy 0.2.1.
+
+[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.2.1
+
+## Summary
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+## Details
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+   https://github.com/owncloud/ocis-proxy/pull/25
+
 # Changelog for [0.2.0] (2020-03-25)
 
 The following sections list the changes for ocis-proxy 0.2.0.
 
-[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.2.0
+[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.0
 
 ## Summary
 
@@ -152,22 +205,6 @@ The following sections list the changes for ocis-proxy 0.2.0.
    Before a generates certificates on every start was used for dev purposes.
 
    https://github.com/owncloud/ocis-proxy/pull/14
-
-# Changelog for [0.2.1] (2020-03-25)
-
-The following sections list the changes for ocis-proxy 0.2.1.
-
-[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.1
-
-## Summary
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-## Details
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-   https://github.com/owncloud/ocis-proxy/pull/25
 
 # Changelog for [0.1.0] (2020-03-18)
 
