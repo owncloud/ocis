@@ -6,11 +6,20 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 
 ## Details
+
+* Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
+
+   Accounts have been created with the account_enabled flag set to false. Now when they are
+   created accounts will be enabled per default.
+
+   https://github.com/owncloud/ocis-accounts/issues/43
+
 
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 
