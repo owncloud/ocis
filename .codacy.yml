@@ -3,6 +3,7 @@ exclude_paths:
   - CHANGELOG.md
   - changelog/**
   - docs/**
+  - config/**
   - pkg/proto/**
   - '**_test.go'
   - .codacy.yml
