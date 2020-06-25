@@ -164,5 +164,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       "127.0.0.1:9142",
+			Usage:       "REVA Gateway Endpoint",
+			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
+			Destination: &cfg.Reva.Address,
+		},
 	}
 }

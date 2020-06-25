@@ -12,6 +12,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-proxy/pkg/cs3"
 	"github.com/owncloud/ocis-proxy/pkg/middleware"
 	"golang.org/x/oauth2"
 
@@ -245,16 +246,6 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
 
-		// set defaults
-		/*
-			if opt.Realm == "" {
-				opt.Realm = opt.Endpoint
-			}
-			if len(opt.SigningAlgs) < 1 {
-				opt.SigningAlgs = []string{"RS256", "PS256"}
-			}
-		*/
-
 		var oidcHTTPClient = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -290,7 +281,20 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.AccountsClient(accounts),
 		)
 
-		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW)
+		// the connection will be established in a non blocking fashion
+		sc, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
+		if err != nil {
+			l.Error().Err(err).
+				Str("gateway", cfg.Reva.Address).
+				Msg("Failed to create reva gateway service client")
+		}
+
+		chMW := middleware.CreateHome(
+			middleware.Logger(l),
+			middleware.RevaGatewayClient(sc),
+		)
+
+		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW, chMW)
 	}
 
 	return alice.New(middleware.RedirectToHTTPS)
