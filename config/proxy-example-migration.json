@@ -58,6 +58,10 @@
         {
           "endpoint": "/index.php/",
           "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/data",
+          "backend": "http://localhost:9140"
         }
       ]
     },
@@ -107,6 +111,11 @@
         {
           "endpoint": "/index.php/",
           "backend": "https://demo.owncloud.com"
+        },
+        {
+          "endpoint": "/data",
+          "backend": "https://demo.owncloud.com",
+          "apache-vhost": true
         }
       ]
     }

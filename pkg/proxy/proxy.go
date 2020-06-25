@@ -261,6 +261,10 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/index.php/",
 					Backend:  "http://localhost:9140",
 				},
+				{
+					Endpoint: "/data",
+					Backend:  "http://localhost:9140",
+				},
 			},
 		},
 		{
@@ -309,6 +313,11 @@ func defaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint:    "/index.php/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/data",
 					Backend:     "https://demo.owncloud.com",
 					ApacheVHost: true,
 				},
