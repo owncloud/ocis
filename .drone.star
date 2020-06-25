@@ -279,6 +279,8 @@ def testing(ctx):
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
           'REVA_OIDC_ISSUER': 'https://konnectd:9130',
+          'REVA_FRONTEND_URL': 'http://localhost:9140',
+          'REVA_DATAGATEWAY_URL': 'http://localhost:9140/data',
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
