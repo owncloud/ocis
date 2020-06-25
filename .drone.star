@@ -65,7 +65,9 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
           'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
+          'REVA_FRONTEND_URL': 'http://reva-server:9140',
+          'REVA_DATAGATEWAY_URL': 'http://reva-server:9140/data',
         },
         'commands': [
           'apk add mailcap',
@@ -279,8 +281,8 @@ def testing(ctx):
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
           'REVA_OIDC_ISSUER': 'https://konnectd:9130',
-          'REVA_FRONTEND_URL': 'http://localhost:9140',
-          'REVA_DATAGATEWAY_URL': 'http://localhost:9140/data',
+          'REVA_FRONTEND_URL': 'http://reva-server:9140',
+          'REVA_DATAGATEWAY_URL': 'http://reva-server:9140/data',
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
