@@ -2,7 +2,7 @@ def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
-    apiTests(ctx, 'master', '158bd976047ea8abd137e2c61905d9dd63dc977d'),
+    apiTests(ctx, 'master', 'ad274cb7f2a20ffba7fb9c65726ae9ef9270e4c0'),
     acceptanceTests(ctx, 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
   ]
 
@@ -34,7 +34,7 @@ def linting(ctx):
       'os': 'linux',
       'arch': 'amd64',
     },
-    'steps': 
+    'steps':
       generate() + [
       {
         'name': 'vet',
@@ -202,7 +202,7 @@ def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
       'os': 'linux',
       'arch': 'amd64',
     },
-    'steps': 
+    'steps':
       generate() +
       build() +
       ocisServer() + [
@@ -276,7 +276,7 @@ def docker(ctx, arch):
       'os': 'linux',
       'arch': arch,
     },
-    'steps': 
+    'steps':
       generate() +
       build() + [
       {
