@@ -1,6 +1,6 @@
 def main(ctx):
   before = [
-    testing(ctx, 'tests-adjust-public-share-test-issues', '9d143b41bda3d5c2bb265a220d0c5dfe8eb584f9', 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
+    testing(ctx, 'master', 'ad274cb7f2a20ffba7fb9c65726ae9ef9270e4c0', 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
   ]
 
   stages = [
