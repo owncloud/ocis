@@ -1276,6 +1276,8 @@ github.com/owncloud/ocis-reva v0.3.1-0.20200528185917-b1aedb9f6095 h1:BfbWBzcH6z
 github.com/owncloud/ocis-reva v0.3.1-0.20200528185917-b1aedb9f6095/go.mod h1:9KcnJexYhUwOpmDvZncce2XVBuYhP/DNBqrXJP//k3g=
 github.com/owncloud/ocis-reva v0.4.0 h1:roOkKHDyQ0qUhCqhZj1UR95sKtT3NFWCRHAzZPVSE1M=
 github.com/owncloud/ocis-reva v0.4.0/go.mod h1:TX0wX2qaP1mAz3i0RzHCrmcr0BAZ3QPzKS0I0ayQca8=
+github.com/owncloud/ocis-reva v0.6.1-0.20200625152549-331790796b80 h1:KFrUuXEZLnY6eLazsh9YDKyoV9MhD/Aaj5D6ld6ScWU=
+github.com/owncloud/ocis-reva v0.6.1-0.20200625152549-331790796b80/go.mod h1:nnu6YFkdceIpJ3uVqadgXSwYm08QgZAehCT84w5i1oY=
 github.com/owncloud/ocis-settings v0.0.0-20200511093940-0fddb624d0da/go.mod h1:1PyfbVIZMTX21JxsRT+maRIjRFD3H+yhfpr1jMz3PeA=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363 h1:wk/7aAUITTrM192TFoIDq4fqzJQtFOQ0dDdSRkJ25SU=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363/go.mod h1:/h0ceztOoFc3KAnm8nqZI4zwsaaZK9q4MTgtintwsXc=
