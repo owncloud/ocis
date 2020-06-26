@@ -72,16 +72,17 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         'commands': [
           'apk add mailcap',
           'mkdir -p /srv/app/tmp/reva',
-          'bin/ocis-reva gateway &',
-          'bin/ocis-reva users &',
-          'bin/ocis-reva auth-basic &',
-          'bin/ocis-reva auth-bearer &',
-          'bin/ocis-reva sharing &',
-          'bin/ocis-reva storage-home &',
-          'bin/ocis-reva storage-home-data &',
-          'bin/ocis-reva storage-oc &',
-          'bin/ocis-reva storage-oc-data &',
-          'bin/ocis-reva frontend'
+          'bin/ocis-reva --log-level debug --log-pretty gateway &',
+          'bin/ocis-reva --log-level debug --log-pretty users &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-basic &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-bearer &',
+          'bin/ocis-reva --log-level debug --log-pretty sharing &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home-data &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc-data &',
+          'bin/ocis-reva --log-level debug --log-pretty frontend &',
+          'bin/ocis-reva --log-level debug --log-pretty reva-storage-public-link'
         ],
         'volumes': [
           {
@@ -295,7 +296,8 @@ def testing(ctx):
           'bin/ocis-reva --log-level debug --log-pretty storage-home-data &',
           'bin/ocis-reva --log-level debug --log-pretty storage-oc &',
           'bin/ocis-reva --log-level debug --log-pretty storage-oc-data &',
-          'bin/ocis-reva --log-level debug --log-pretty frontend'
+          'bin/ocis-reva --log-level debug --log-pretty frontend &',
+          'bin/ocis-reva --log-level debug --log-pretty reva-storage-public-link'
         ],
         'volumes': [
           {
