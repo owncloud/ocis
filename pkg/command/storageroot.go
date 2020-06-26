@@ -89,7 +89,7 @@ func StorageRoot(cfg *config.Config) *cli.Command {
 							"storageprovider": map[string]interface{}{
 								"driver": cfg.Reva.StorageRoot.Driver,
 								"drivers": map[string]interface{}{
-									"eoshome": map[string]interface{}{
+									"eos": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
 										"eos_binary":             cfg.Reva.Storages.EOS.EosBinary,
 										"xrdcopy_binary":         cfg.Reva.Storages.EOS.XrdcopyBinary,
@@ -103,21 +103,17 @@ func StorageRoot(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"user_layout":            cfg.Reva.Storages.EOS.UserLayout,
+										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
+										"user_layout":            cfg.Reva.Storages.EOS.Layout,
 									},
 									"local": map[string]interface{}{
-										"root":         cfg.Reva.Storages.Local.Root,
-										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
-									},
-									"localhome": map[string]interface{}{
-										"root":         cfg.Reva.Storages.Local.Root,
-										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
-										"user_layout":  cfg.Reva.Storages.Local.UserLayout,
+										"root": cfg.Reva.Storages.Local.Root,
 									},
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
+										"enable_home":   cfg.Reva.Storages.OwnCloud.EnableHome,
 										"user_layout":   cfg.Reva.Storages.OwnCloud.Layout,
 									},
 									"s3": map[string]interface{}{
@@ -129,10 +125,11 @@ func StorageRoot(cfg *config.Config) *cli.Command {
 										"prefix":     cfg.Reva.Storages.S3.Prefix,
 									},
 								},
-								"mount_path":         cfg.Reva.StorageRoot.MountPath,
-								"mount_id":           cfg.Reva.StorageRoot.MountID,
-								"expose_data_server": cfg.Reva.StorageRoot.ExposeDataServer,
-								"data_server_url":    cfg.Reva.StorageRoot.DataServerURL,
+								"mount_path":           cfg.Reva.StorageRoot.MountPath,
+								"mount_id":             cfg.Reva.StorageRoot.MountID,
+								"expose_data_server":   cfg.Reva.StorageRoot.ExposeDataServer,
+								"data_server_url":      cfg.Reva.StorageRoot.DataServerURL,
+								"enable_home_creation": cfg.Reva.StorageRoot.EnableHomeCreation,
 							},
 						},
 					},

@@ -91,7 +91,7 @@ func StorageEOSData(cfg *config.Config) *cli.Command {
 								"prefix": cfg.Reva.StorageEOSData.Prefix,
 								"driver": cfg.Reva.StorageEOSData.Driver,
 								"drivers": map[string]interface{}{
-									"eoshome": map[string]interface{}{
+									"eos": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
 										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
 										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
@@ -107,7 +107,8 @@ func StorageEOSData(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"user_layout":            cfg.Reva.Storages.EOS.UserLayout,
+										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
+										"user_layout":            cfg.Reva.Storages.EOS.Layout,
 									},
 								},
 								"temp_folder": cfg.Reva.StorageEOSData.TempFolder,

@@ -89,7 +89,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 							"storageprovider": map[string]interface{}{
 								"driver": cfg.Reva.StorageHome.Driver,
 								"drivers": map[string]interface{}{
-									"eoshome": map[string]interface{}{
+									"eos": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
 										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
 										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
@@ -106,16 +106,10 @@ func StorageHome(cfg *config.Config) *cli.Command {
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
 										"enable_home":            true,
-										"user_layout":            cfg.Reva.Storages.EOS.UserLayout,
+										"user_layout":            cfg.Reva.Storages.EOS.Layout,
 									},
 									"local": map[string]interface{}{
-										"root":         cfg.Reva.Storages.Local.Root,
-										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
-									},
-									"localhome": map[string]interface{}{
-										"root":         cfg.Reva.Storages.Local.Root,
-										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
-										"user_layout":  cfg.Reva.Storages.Local.UserLayout,
+										"root": cfg.Reva.Storages.Local.Root,
 									},
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
@@ -137,7 +131,8 @@ func StorageHome(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageHome.MountID,
 								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
 								// TODO use cfg.Reva.StorageHomeData.URL, ?
-								"data_server_url": cfg.Reva.StorageHome.DataServerURL,
+								"data_server_url":      cfg.Reva.StorageHome.DataServerURL,
+								"enable_home_creation": cfg.Reva.StorageHome.EnableHomeCreation,
 							},
 						},
 					},
