@@ -68,12 +68,11 @@ type Users struct {
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
-	Driver             string
-	MountPath          string
-	MountID            string
-	ExposeDataServer   bool
-	DataServerURL      string
-	EnableHomeCreation bool
+	Driver           string
+	MountPath        string
+	MountID          string
+	ExposeDataServer bool
+	DataServerURL    string
 
 	// for HTTP ports with only one http service
 	Prefix     string
@@ -85,9 +84,7 @@ type PublicStorage struct {
 	StoragePort
 
 	PublicShareProviderAddr string
-	StorageProviderAddr     string
 	UserProviderAddr        string
-	MountID                 string
 }
 
 // StorageConfig combines all available storage driver configuration parts.
@@ -145,9 +142,6 @@ type DriverEOS struct {
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
 	UseKeytab bool
 
-	// EnableHome enables the creation of home directories.
-	EnableHome bool
-
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
 	SecProtocol string
 
@@ -157,13 +151,15 @@ type DriverEOS struct {
 	// SingleUsername is the username to use when SingleUserMode is enabled
 	SingleUsername string
 
-	// Layout of the users home dir path
-	Layout string
+	// UserLayout of the users home dir path
+	UserLayout string
 }
 
 // DriverLocal defines the available local storage driver configuration.
 type DriverLocal struct {
-	Root string
+	Root        string
+	ShareFolder string
+	UserLayout  string
 }
 
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
@@ -172,7 +168,6 @@ type DriverOwnCloud struct {
 	Layout        string
 	Redis         string
 	Scan          bool
-	EnableHome    bool
 }
 
 // DriverS3 defines the available S3 storage driver configuration.

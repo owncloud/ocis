@@ -89,7 +89,7 @@ func StorageEOS(cfg *config.Config) *cli.Command {
 							"storageprovider": map[string]interface{}{
 								"driver": cfg.Reva.StorageEOS.Driver,
 								"drivers": map[string]interface{}{
-									"eos": map[string]interface{}{
+									"eoshome": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
 										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
 										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
@@ -105,16 +105,14 @@ func StorageEOS(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
-										"user_layout":            cfg.Reva.Storages.EOS.Layout,
+										"user_layout":            cfg.Reva.Storages.EOS.UserLayout,
 									},
 								},
 								"mount_path":         cfg.Reva.StorageEOS.MountPath,
 								"mount_id":           cfg.Reva.StorageEOS.MountID,
 								"expose_data_server": cfg.Reva.StorageEOS.ExposeDataServer,
 								// TODO use cfg.Reva.SStorageEOSData.URL, ?
-								"data_server_url":      cfg.Reva.StorageEOS.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageEOS.EnableHomeCreation,
+								"data_server_url": cfg.Reva.StorageEOS.DataServerURL,
 							},
 						},
 					},

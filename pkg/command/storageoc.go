@@ -89,7 +89,7 @@ func StorageOC(cfg *config.Config) *cli.Command {
 							"storageprovider": map[string]interface{}{
 								"driver": cfg.Reva.StorageOC.Driver,
 								"drivers": map[string]interface{}{
-									"eos": map[string]interface{}{
+									"eoshome": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
 										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
 										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
@@ -105,17 +105,21 @@ func StorageOC(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"enable_home":            cfg.Reva.Storages.EOS.EnableHome,
-										"user_layout":            cfg.Reva.Storages.EOS.Layout,
+										"user_layout":            cfg.Reva.Storages.EOS.UserLayout,
 									},
 									"local": map[string]interface{}{
-										"root": cfg.Reva.Storages.Local.Root,
+										"root":         cfg.Reva.Storages.Local.Root,
+										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
+									},
+									"localhome": map[string]interface{}{
+										"root":         cfg.Reva.Storages.Local.Root,
+										"share_folder": cfg.Reva.Storages.Local.ShareFolder,
+										"user_layout":  cfg.Reva.Storages.Local.UserLayout,
 									},
 									"owncloud": map[string]interface{}{
 										"datadirectory": cfg.Reva.Storages.OwnCloud.Datadirectory,
 										"scan":          cfg.Reva.Storages.OwnCloud.Scan,
 										"redis":         cfg.Reva.Storages.OwnCloud.Redis,
-										"enable_home":   cfg.Reva.Storages.OwnCloud.EnableHome,
 										"user_layout":   cfg.Reva.Storages.OwnCloud.Layout,
 									},
 									"s3": map[string]interface{}{
@@ -131,8 +135,7 @@ func StorageOC(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageOC.MountID,
 								"expose_data_server": cfg.Reva.StorageOC.ExposeDataServer,
 								// TODO use cfg.Reva.SStorageOCData.URL, ?
-								"data_server_url":      cfg.Reva.StorageOC.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageOC.EnableHomeCreation,
+								"data_server_url": cfg.Reva.StorageOC.DataServerURL,
 							},
 						},
 					},
