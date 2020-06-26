@@ -250,12 +250,12 @@ eos-ocis-storage-home:
 	# configure the home storage to use the eos driver and return the mount id of the eos driver in responses
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
-	--env REVA_STORAGE_HOME_DRIVER=eos \
-	--env REVA_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 \
+	--env REVA_STORAGE_HOME_DRIVER=eoshome \
+	--env REVA_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009154 \
 	eos-cli1 ocis reva-storage-home &
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
-	--env REVA_STORAGE_HOME_DATA_DRIVER=eos \
+	--env REVA_STORAGE_HOME_DATA_DRIVER=eoshome \
 	eos-cli1 ocis reva-storage-home-data &
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
@@ -279,6 +279,7 @@ eos-ocis:
 	bin/ocis reva-auth-basic & \
 	bin/ocis reva-auth-bearer & \
 	bin/ocis reva-frontend & \
+	bin/ocis reva-storage-public-link & \
 	bin/ocis reva-gateway & \
 	bin/ocis reva-sharing & \
 	bin/ocis reva-users & \
@@ -296,3 +297,8 @@ eos-clean:
 eos-stop: eos-docker
 	./eos-docker/scripts/shutdown_services.sh
 
+.PHONY: eos-install-go
+eos-install-go:
+	docker exec -i eos-cli1 curl https://dl.google.com/go/go1.14.4.linux-amd64.tar.gz -O
+	docker exec -i eos-cli1 tar -C /usr/local -xzf go1.14.4.linux-amd64.tar.gz
+	# export PATH=$PATH:/usr/local/go/bin

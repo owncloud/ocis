@@ -11,21 +11,25 @@ import (
 	"github.com/owncloud/ocis/pkg/register"
 )
 
-// RevaPublicLinkStorage is the entry point for the proxy command.
-func RevaPublicLinkStorage(cfg *config.Config) *cli.Command {
+// RevaStoragePublicLinkCommand is the entrypoint for the reva-storage-oc command.
+func RevaStoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "reva-storage-public-link",
-		Usage:    "Start public link storage driver",
+		Usage:    "Start reva public link storage",
 		Category: "Extensions",
 		Flags:    flagset.StoragePublicLink(cfg.Reva),
-		Action: func(ctx *cli.Context) error {
-			publicStorageCmd := command.StoragePublicLink(configurePublicStorage(cfg))
-			return cli.HandleAction(publicStorageCmd.Action, ctx)
+		Action: func(c *cli.Context) error {
+			scfg := configureRevaStoragePublicLink(cfg)
+
+			return cli.HandleAction(
+				command.StoragePublicLink(scfg).Action,
+				c,
+			)
 		},
 	}
 }
 
-func configurePublicStorage(cfg *config.Config) *svcconfig.Config {
+func configureRevaStoragePublicLink(cfg *config.Config) *svcconfig.Config {
 	cfg.Reva.Log.Level = cfg.Log.Level
 	cfg.Reva.Log.Pretty = cfg.Log.Pretty
 	cfg.Reva.Log.Color = cfg.Log.Color
@@ -34,5 +38,5 @@ func configurePublicStorage(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(RevaPublicLinkStorage)
+	register.AddCommand(RevaStorageOCCommand)
 }
