@@ -1,22 +1,24 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.7.0] (2020-06-26)
 
-The following sections list the changes in ocis-reva unreleased.
+The following sections list the changes in ocis-reva 0.7.0.
 
-[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.6.0...master
+[0.7.0]: https://github.com/owncloud/ocis-reva/compare/v0.6.0...v0.7.0
 
 ## Summary
 
-* Enhancement - Update reva to v0.1.1-0.20200625112940-6a2822cb3f15: [#261](https://github.com/owncloud/ocis-reva/pull/261)
+* Enhancement - Update reva to v0.1.1-0.20200626111234-e21c32db9614: [#261](https://github.com/owncloud/ocis-reva/pull/261)
 
 ## Details
 
-* Enhancement - Update reva to v0.1.1-0.20200625112940-6a2822cb3f15: [#261](https://github.com/owncloud/ocis-reva/pull/261)
+* Enhancement - Update reva to v0.1.1-0.20200626111234-e21c32db9614: [#261](https://github.com/owncloud/ocis-reva/pull/261)
 
-   - Updated reva to v0.1.1-0.20200625112940-6a2822cb3f15 (#261) - TUS upload support through
+   - Updated reva to v0.1.1-0.20200626111234-e21c32db9614 (#304) - TUS upload support through
    datagateway (#261, reva/#878, reva/#888) - Added support for differing metrics path for
    Prometheus to Mentix (reva/#875) - More data exported by Mentix (reva/#881) - Implementation
    of file operations in public folder shares (#49, #293, reva/#877) - Make httpclient trust
-   local certificates for now (reva/#880)
+   local certificates for now (reva/#880) - EOS homes are not configured with an enable-flag
+   anymore, but with a dedicated storage driver. We're using it now and adapted default configs of
+   storages (reva/#891, #304)
 
    https://github.com/owncloud/ocis-reva/issues/49
    https://github.com/owncloud/ocis-reva/issues/293
@@ -28,6 +30,8 @@ The following sections list the changes in ocis-reva unreleased.
    https://github.com/cs3org/reva/pull/881
    https://github.com/cs3org/reva/pull/880
    https://github.com/cs3org/reva/pull/888
+   https://github.com/owncloud/ocis-reva/pull/304
+   https://github.com/cs3org/reva/pull/891
 
 # Changelog for [0.6.0] (2020-06-24)
 
