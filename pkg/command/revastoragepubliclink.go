@@ -38,5 +38,5 @@ func configureRevaStoragePublicLink(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(RevaStorageOCCommand)
+	register.AddCommand(RevaStoragePublicLinkCommand)
 }
