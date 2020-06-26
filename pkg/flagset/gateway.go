@@ -265,7 +265,16 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_PATH"},
 			Destination: &cfg.Reva.StorageHome.MountPath,
 		},
-		// The home storage has no mount id. In responses it returns the mount id of the actual storage
+		&cli.StringFlag{
+			Name: "storage-home-mount-id",
+			// This is tho mount id of the /oc storage
+			// set it to 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
+			// Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", /os
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154", // /home
+			Usage:       "mount id",
+			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
+			Destination: &cfg.Reva.StorageHome.MountID,
+		},
 
 		&cli.StringFlag{
 			Name:        "storage-eos-url",

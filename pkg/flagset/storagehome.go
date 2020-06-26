@@ -141,7 +141,9 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Name: "mount-id",
 			// This is tho mount id of the /oc storage
 			// set it to 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
-			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162",
+			// Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", /os
+
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154", // /home
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageHome.MountID,
