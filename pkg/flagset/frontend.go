@@ -136,7 +136,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "url",
-			Value:       "localhost:9140",
+			Value:       "https://localhost:9200",
 			Usage:       "URL to use for the reva service",
 			EnvVars:     []string{"REVA_FRONTEND_URL"},
 			Destination: &cfg.Reva.Frontend.URL,

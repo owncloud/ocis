@@ -229,8 +229,9 @@ type Reva struct {
 	LDAP            LDAP
 	OCDav           OCDav
 	Storages        StorageConfig
-	// Ports are used configure which services to start on which port
+	// Ports are used to configure which services to start on which port
 	Frontend          Port
+	DataGateway       Port
 	Gateway           Gateway
 	Users             Users
 	AuthBasic         Port

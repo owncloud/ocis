@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    apiTests(ctx, 'master', '31dbb9ce87de35165edf85ce9eda8f004c73f9f8'),
+    apiTests(ctx, 'master', 'ad274cb7f2a20ffba7fb9c65726ae9ef9270e4c0'),
   ]
 
   stages = [
@@ -65,21 +65,24 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
           'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json'
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
+          'REVA_FRONTEND_URL': 'http://reva-server:9140',
+          'REVA_DATAGATEWAY_URL': 'http://reva-server:9140/data',
         },
         'commands': [
           'apk add mailcap',
           'mkdir -p /srv/app/tmp/reva',
-          'bin/ocis-reva gateway &',
-          'bin/ocis-reva users &',
-          'bin/ocis-reva auth-basic &',
-          'bin/ocis-reva auth-bearer &',
-          'bin/ocis-reva sharing &',
-          'bin/ocis-reva storage-home &',
-          'bin/ocis-reva storage-home-data &',
-          'bin/ocis-reva storage-oc &',
-          'bin/ocis-reva storage-oc-data &',
-          'bin/ocis-reva frontend'
+          'bin/ocis-reva --log-level debug --log-pretty gateway &',
+          'bin/ocis-reva --log-level debug --log-pretty users &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-basic &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-bearer &',
+          'bin/ocis-reva --log-level debug --log-pretty sharing &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home-data &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc-data &',
+          'bin/ocis-reva --log-level debug --log-pretty frontend &',
+          'bin/ocis-reva --log-level debug --log-pretty reva-storage-public-link'
         ],
         'volumes': [
           {
@@ -279,19 +282,22 @@ def testing(ctx):
           'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
           'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
           'REVA_OIDC_ISSUER': 'https://konnectd:9130',
+          'REVA_FRONTEND_URL': 'http://reva-server:9140',
+          'REVA_DATAGATEWAY_URL': 'http://reva-server:9140/data',
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
-          'bin/ocis-reva gateway &',
-          'bin/ocis-reva users &',
-          'bin/ocis-reva auth-basic &',
-          'bin/ocis-reva auth-bearer &',
-          'bin/ocis-reva sharing &',
-          'bin/ocis-reva storage-home &',
-          'bin/ocis-reva storage-home-data &',
-          'bin/ocis-reva storage-oc &',
-          'bin/ocis-reva storage-oc-data &',
-          'bin/ocis-reva frontend'
+          'bin/ocis-reva --log-level debug --log-pretty gateway &',
+          'bin/ocis-reva --log-level debug --log-pretty users &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-basic &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-bearer &',
+          'bin/ocis-reva --log-level debug --log-pretty sharing &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home-data &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc-data &',
+          'bin/ocis-reva --log-level debug --log-pretty frontend &',
+          'bin/ocis-reva --log-level debug --log-pretty reva-storage-public-link'
         ],
         'volumes': [
           {
