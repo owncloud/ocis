@@ -295,7 +295,6 @@ eos-ocis:
 	bin/ocis reva-users & \
 	bin/ocis proxy &
 
-
 .PHONY: eos-start
 eos-start: eos-deploy eos-setup eos-copy-ocis eos-ocis-storage-home eos-ocis
 
