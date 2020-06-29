@@ -18,7 +18,7 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.8.0
+	github.com/micro/go-micro/v2 v2.8.0 // indirect
 	github.com/micro/micro/v2 v2.8.0
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
@@ -31,7 +31,7 @@ require (
 	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-migration v0.2.0
 	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
-	github.com/owncloud/ocis-phoenix v0.8.0
+	github.com/owncloud/ocis-phoenix v0.8.1
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c
 	github.com/owncloud/ocis-proxy v0.4.0
 	github.com/owncloud/ocis-reva v0.8.0

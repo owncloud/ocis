@@ -211,15 +211,16 @@ def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
         'image': 'owncloudci/nodejs:11',
         'pull': 'always',
         'environment': {
-          'SERVER_HOST': 'http://ocis-server:9100',
-          'BACKEND_HOST': 'http://ocis-server:9140',
+          'SERVER_HOST': 'https://ocis-server:9200',
+          'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'LDAP_SERVER_URL': 'ldap://ldap',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
-          'LOCAL_UPLOAD_DIR': '/uploads'
+          'LOCAL_UPLOAD_DIR': '/uploads',
+          'NODE_TLS_REJECT_UNAUTHORIZED': 0,
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
@@ -848,6 +849,8 @@ def ocisServer():
         'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
         'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+        'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
+        'REVA_FRONTEND_URL': 'https://ocis-server:9200',
         'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
         'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
