@@ -5,7 +5,7 @@ BIN := bin
 DIST := dist
 HUGO := hugo
 PROTO_VERSION := v0
-PROTO_SRC := pkg/proto/$(PROTO_VERSION)/*.proto
+PROTO_SRC := pkg/proto/$(PROTO_VERSION)
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -169,29 +169,30 @@ $(GOPATH)/bin/protoc-gen-microweb:
 $(GOPATH)/bin/protoc-gen-swagger:
 	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
-pkg/proto/v0/settings.pb.go: pkg/proto/v0/settings.proto
+$(PROTO_SRC)/settings.pb.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--go_out=pkg/proto/v0 settings.proto
+		-I=$(PROTO_SRC)/ \
+		--go_out=$(PROTO_SRC) settings.proto
 
-pkg/proto/v0/settings.pb.micro.go: pkg/proto/v0/settings.proto
+$(PROTO_SRC)/settings.pb.micro.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--micro_out=pkg/proto/v0 settings.proto
+		-I=$(PROTO_SRC)/ \
+		--micro_out=$(PROTO_SRC) settings.proto
 
-pkg/proto/v0/settings.pb.web.go: pkg/proto/v0/settings.proto
+$(PROTO_SRC)/settings.pb.web.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--microweb_out=pkg/proto/v0 settings.proto
+		-I=$(PROTO_SRC)/ \
+		--microweb_out=$(PROTO_SRC) settings.proto
 
-pkg/proto/v0/settings.swagger.json: pkg/proto/v0/settings.proto
+$(PROTO_SRC)/settings.swagger.json: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
-		-I=pkg/proto/v0/ \
-		--swagger_out=pkg/proto/v0 settings.proto
+		-I=$(PROTO_SRC)/ \
+		--swagger_out=$(PROTO_SRC) settings.proto
 
 .PHONY: protobuf
-protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/settings.pb.go pkg/proto/v0/settings.pb.micro.go pkg/proto/v0/settings.pb.web.go pkg/proto/v0/settings.swagger.json
+protobuf: $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger \
+		  $(PROTO_SRC)/settings.pb.go $(PROTO_SRC)/settings.pb.micro.go $(PROTO_SRC)/settings.pb.web.go $(PROTO_SRC)/settings.swagger.json
