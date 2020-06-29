@@ -156,6 +156,44 @@ docs: docs-copy docs-build
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-.PHONY: pb
-pb:
-	protoc -I=$(PROTO_SRC) -I=third_party --go_out=. --micro_out=. $(PROTO_SRC)/*.proto
+$(GOPATH)/bin/protoc-gen-go:
+	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+
+$(GOPATH)/bin/protoc-gen-micro:
+	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
+
+$(GOPATH)/bin/protoc-gen-microweb:
+	GO111MODULE=off go get -v github.com/owncloud/protoc-gen-microweb
+
+$(GOPATH)/bin/protoc-gen-swagger:
+	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+
+$(PROTO_SRC)/accounts.pb.go: $(PROTO_SRC)/accounts.proto
+	protoc \
+		-I=third_party/ \
+		-I=$(PROTO_SRC)/ \
+		--go_out=. accounts.proto
+
+$(PROTO_SRC)/accounts.pb.micro.go: $(PROTO_SRC)/accounts.proto
+	protoc \
+		-I=third_party/ \
+		-I=$(PROTO_SRC)/ \
+		--micro_out=. accounts.proto
+
+$(PROTO_SRC)/accounts.pb.web.go: $(PROTO_SRC)/accounts.proto
+	protoc \
+		-I=third_party/ \
+		-I=$(PROTO_SRC)/ \
+		--microweb_out=. accounts.proto
+
+$(PROTO_SRC)/accounts.swagger.json: $(PROTO_SRC)/accounts.proto
+	# the other commands above respect the declared package in the .proto file for placement of the resulting file.
+	# `swagger_out` doesn't, so we have to specify the output path as `$(PROTO_SRC)` instead of `.`
+	protoc \
+		-I=third_party/ \
+		-I=$(PROTO_SRC)/ \
+		--swagger_out=$(PROTO_SRC) accounts.proto
+
+.PHONY: protobuf
+protobuf: $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger \
+		  $(PROTO_SRC)/accounts.pb.go $(PROTO_SRC)/accounts.pb.micro.go $(PROTO_SRC)/accounts.pb.web.go $(PROTO_SRC)/accounts.swagger.json

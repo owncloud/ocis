@@ -25,7 +25,6 @@ service AccountsService {
     rpc GetAccount(GetAccountRequest) returns (Account) {
         option (google.api.http) = {
             get: "/v0/accounts/{id=*}"
-            body: "*"
         };
     }
     // Creates an account
@@ -68,7 +67,6 @@ service GroupsService {
     rpc GetGroup(GetGroupRequest) returns (Group) {
         option (google.api.http) = {
             get: "/v0/groups/{id=*}"
-            body: "*"
         };
     }
     // Creates a group
@@ -115,8 +113,7 @@ service GroupsService {
     rpc RemoveMember(RemoveMemberRequest) returns (Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            delete: "/v0/groups/{id=*}/members/{account.id}/$ref"
-            body: "*"
+            delete: "/v0/groups/{id=*}/members/{account_id}/$ref"
         };
     }
     // group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
@@ -476,9 +473,11 @@ message AddMemberRequest {
 }
 
 message RemoveMemberRequest {
-    // The account id to remove
-    // TODO id in the body indt in the url? not necessary ... use empty?
+    // The group id
     string id = 1;
+
+    // The account id to remove
+    string account_id = 2;
 }
 
 message ListMembersRequest {
@@ -511,6 +510,9 @@ message ListMembersRequest {
     // * Query `display_name=\\"Test String\\"` returns groups with
     // display names that include both "Test" and "String"
     string query = 4 [(google.api.field_behavior) = OPTIONAL];
+
+    // The group id
+    string id = 5;
 }
 
 message ListMembersResponse {

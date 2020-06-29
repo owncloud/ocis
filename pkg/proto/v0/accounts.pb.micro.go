@@ -15,6 +15,7 @@ import (
 
 import (
 	context "context"
+	api "github.com/micro/go-micro/v2/api"
 	client "github.com/micro/go-micro/v2/client"
 	server "github.com/micro/go-micro/v2/server"
 )
@@ -31,9 +32,50 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Reference imports to suppress errors if they are not otherwise used.
+var _ api.Endpoint
 var _ context.Context
 var _ client.Option
 var _ server.Option
+
+// Api Endpoints for AccountsService service
+
+func NewAccountsServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "AccountsService.ListAccounts",
+			Path:    []string{"/v0/accounts"},
+			Method:  []string{"GET"},
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "AccountsService.GetAccount",
+			Path:    []string{"/v0/accounts/{id=*}"},
+			Method:  []string{"GET"},
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "AccountsService.CreateAccount",
+			Path:    []string{"/v0/accounts"},
+			Method:  []string{"POST"},
+			Body:    "account",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "AccountsService.UpdateAccount",
+			Path:    []string{"/v0/accounts/{account.id=*}"},
+			Method:  []string{"PATCH"},
+			Body:    "account",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "AccountsService.DeleteAccount",
+			Path:    []string{"/v0/accounts/{id=*}"},
+			Method:  []string{"DELETE"},
+			Body:    "",
+			Handler: "rpc",
+		},
+	}
+}
 
 // Client API for AccountsService service
 
@@ -139,6 +181,39 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 		accountsService
 	}
 	h := &accountsServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "AccountsService.ListAccounts",
+		Path:    []string{"/v0/accounts"},
+		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "AccountsService.GetAccount",
+		Path:    []string{"/v0/accounts/{id=*}"},
+		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "AccountsService.CreateAccount",
+		Path:    []string{"/v0/accounts"},
+		Method:  []string{"POST"},
+		Body:    "account",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "AccountsService.UpdateAccount",
+		Path:    []string{"/v0/accounts/{account.id=*}"},
+		Method:  []string{"PATCH"},
+		Body:    "account",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "AccountsService.DeleteAccount",
+		Path:    []string{"/v0/accounts/{id=*}"},
+		Method:  []string{"DELETE"},
+		Body:    "",
+		Handler: "rpc",
+	}))
 	return s.Handle(s.NewHandler(&AccountsService{h}, opts...))
 }
 
@@ -164,6 +239,66 @@ func (h *accountsServiceHandler) UpdateAccount(ctx context.Context, in *UpdateAc
 
 func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error {
 	return h.AccountsServiceHandler.DeleteAccount(ctx, in, out)
+}
+
+// Api Endpoints for GroupsService service
+
+func NewGroupsServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "GroupsService.ListGroups",
+			Path:    []string{"/v0/groups"},
+			Method:  []string{"GET"},
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.GetGroup",
+			Path:    []string{"/v0/groups/{id=*}"},
+			Method:  []string{"GET"},
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.CreateGroup",
+			Path:    []string{"/v0/groups"},
+			Method:  []string{"POST"},
+			Body:    "group",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.UpdateGroup",
+			Path:    []string{"/v0/groups/{group.id=*}"},
+			Method:  []string{"PATCH"},
+			Body:    "group",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.DeleteGroup",
+			Path:    []string{"/v0/groups/{id=*}"},
+			Method:  []string{"DELETE"},
+			Body:    "",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.AddMember",
+			Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.RemoveMember",
+			Path:    []string{"/v0/groups/{id=*}/members/{account_id}/$ref"},
+			Method:  []string{"DELETE"},
+			Body:    "",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "GroupsService.ListMembers",
+			Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+			Method:  []string{"GET"},
+			Handler: "rpc",
+		},
+	}
 }
 
 // Client API for GroupsService service
@@ -315,6 +450,59 @@ func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, op
 		groupsService
 	}
 	h := &groupsServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.ListGroups",
+		Path:    []string{"/v0/groups"},
+		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.GetGroup",
+		Path:    []string{"/v0/groups/{id=*}"},
+		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.CreateGroup",
+		Path:    []string{"/v0/groups"},
+		Method:  []string{"POST"},
+		Body:    "group",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.UpdateGroup",
+		Path:    []string{"/v0/groups/{group.id=*}"},
+		Method:  []string{"PATCH"},
+		Body:    "group",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.DeleteGroup",
+		Path:    []string{"/v0/groups/{id=*}"},
+		Method:  []string{"DELETE"},
+		Body:    "",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.AddMember",
+		Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.RemoveMember",
+		Path:    []string{"/v0/groups/{id=*}/members/{account_id}/$ref"},
+		Method:  []string{"DELETE"},
+		Body:    "",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "GroupsService.ListMembers",
+		Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+		Method:  []string{"GET"},
+		Handler: "rpc",
+	}))
 	return s.Handle(s.NewHandler(&GroupsService{h}, opts...))
 }
 
