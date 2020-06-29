@@ -1,6 +1,9 @@
 def main(ctx):
   before = [
-    testing(ctx, 'master', '158bd976047ea8abd137e2c61905d9dd63dc977d', 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
+    linting(ctx),
+    unitTests(ctx),
+    apiTests(ctx, 'master', '158bd976047ea8abd137e2c61905d9dd63dc977d'),
+    acceptanceTests(ctx, 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
   ]
 
   stages = [
@@ -22,30 +25,17 @@ def main(ctx):
 
   return before + stages + after
 
-def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master', phoenixCommit = ''):
+def linting(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'testing',
+    'name': 'linting',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
-    'steps': [
-      {
-        'name': 'generate',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make generate',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+    'steps': 
+      generate() + [
       {
         'name': 'vet',
         'image': 'webhippie/golang:1.13',
@@ -88,20 +78,28 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           },
         ],
       },
-      {
-        'name': 'build',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make build',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def unitTests(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'unitTests',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate() +
+      build() + [
       {
         'name': 'test',
         'image': 'webhippie/golang:1.13',
@@ -126,49 +124,29 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           },
         },
       },
-      {
-        'name': 'ocis-server',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'detach': True,
-        'environment' : {
-          'REVA_LDAP_HOSTNAME': 'ldap',
-          'REVA_LDAP_PORT': 636,
-          'REVA_LDAP_BIND_PASSWORD': 'admin',
-          'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
-          'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
-          'REVA_LDAP_SCHEMA_UID': 'uid',
-          'REVA_LDAP_SCHEMA_MAIL': 'mail',
-          'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayName',
-          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
-          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
-          'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
-          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
-          'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
-          'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
-          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
-          'KONNECTD_ISS': 'https://ocis-server:9200',
-          'KONNECTD_TLS': 'true',
-          'LDAP_URI': 'ldap://ldap',
-          'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
-          'LDAP_BINDPW': 'admin',
-          'LDAP_BASEDN': 'dc=owncloud,dc=com'
-        },
-        'commands': [
-          'apk add mailcap', # install /etc/mime.types
-          'mkdir -p /srv/app/tmp/reva',
-          'bin/ocis server'
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app'
-          },
-        ]
-      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'apiTests',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate() +
+      build() +
+      ocisServer() + [
       {
         'name': 'oC10APIAcceptanceTests',
         'image': 'owncloudci/php:7.2',
@@ -186,9 +164,9 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
           'cd /srv/app/testrunner',
-		] + ([
+        ] + ([
           'git checkout %s' % (coreCommit)
-		] if coreCommit != '' else []) + [
+        ] if coreCommit != '' else []) + [
           'make test-acceptance-api',
         ],
         'volumes': [{
@@ -196,6 +174,38 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'path': '/srv/app',
         }]
       },
+    ],
+    'services':
+      ldap() +
+      redis(),
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'acceptanceTests',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': 
+      generate() +
+      build() +
+      ocisServer() + [
       {
         'name': 'phoenixWebUIAcceptanceTests',
         'image': 'owncloudci/nodejs:11',
@@ -216,9 +226,9 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/phoenix.git /srv/app/phoenix' % (phoenixBranch),
           'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
           'cd /srv/app/phoenix',
-		] + ([
+        ] + ([
           'git checkout %s' % (phoenixCommit)
-		] if phoenixCommit != '' else []) + [
+        ] if phoenixCommit != '' else []) + [
           'yarn install-all',
           'yarn dist',
           'cp -r /drone/src/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
@@ -234,37 +244,10 @@ def testing(ctx, coreBranch = 'master', coreCommit = '', phoenixBranch = 'master
         }]
       },
     ],
-    'services': [
-      {
-        'name': 'ldap',
-        'image': 'osixia/openldap:1.3.0',
-        'pull': 'always',
-        'environment': {
-          'LDAP_DOMAIN': 'owncloud.com',
-          'LDAP_ORGANISATION': 'ownCloud',
-          'LDAP_ADMIN_PASSWORD': 'admin',
-          'LDAP_TLS_VERIFY_CLIENT': 'never',
-          'HOSTNAME': 'ldap'
-        },
-      },
-      {
-        'name': 'redis',
-        'image': 'webhippie/redis',
-        'pull': 'always',
-        'environment': {
-          'REDIS_DATABASES': 1
-        },
-      },
-      {
-        'name': 'selenium',
-        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
-        'pull': 'always',
-        'volumes': [{
-            'name': 'uploads',
-            'path': '/uploads'
-        }],
-      },
-    ],
+    'services':
+      ldap() +
+      redis() +
+      selenium(),
     'volumes': [
       {
         'name': 'gopath',
@@ -293,35 +276,9 @@ def docker(ctx, arch):
       'os': 'linux',
       'arch': arch,
     },
-    'steps': [
-      {
-        'name': 'generate',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make generate',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'build',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make build',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+    'steps': 
+      generate() +
+      build() + [
       {
         'name': 'dryrun',
         'image': 'plugins/docker:18.09',
@@ -372,7 +329,10 @@ def docker(ctx, arch):
       },
     ],
     'depends_on': [
-      'testing',
+      'linting',
+      'unitTests',
+      'apiTests',
+      'acceptanceTests',
     ],
     'trigger': {
       'ref': [
@@ -431,21 +391,8 @@ def binary(ctx, name):
       'os': 'linux',
       'arch': 'amd64',
     },
-    'steps': [
-      {
-        'name': 'generate',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make generate',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
+    'steps':
+      generate() + [
       {
         'name': 'build',
         'image': 'webhippie/golang:1.13',
@@ -529,7 +476,10 @@ def binary(ctx, name):
       },
     ],
     'depends_on': [
-      'testing',
+      'linting',
+      'unitTests',
+      'apiTests',
+      'acceptanceTests',
     ],
     'trigger': {
       'ref': [
@@ -838,3 +788,127 @@ def website(ctx):
       ],
     },
   }
+
+def generate():
+  return [
+    {
+      'name': 'generate',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'make generate',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+    }
+  ]
+
+def build():
+  return [
+    {
+      'name': 'build',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'make build',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+    },
+  ]
+
+def ocisServer():
+  return [
+    {
+      'name': 'ocis-server',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'detach': True,
+      'environment' : {
+        'REVA_LDAP_HOSTNAME': 'ldap',
+        'REVA_LDAP_PORT': 636,
+        'REVA_LDAP_BIND_PASSWORD': 'admin',
+        'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
+        'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
+        'REVA_LDAP_SCHEMA_UID': 'uid',
+        'REVA_LDAP_SCHEMA_MAIL': 'mail',
+        'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayName',
+        'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
+        'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
+        'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+        'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+        'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+        'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+        'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
+        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
+        'KONNECTD_ISS': 'https://ocis-server:9200',
+        'KONNECTD_TLS': 'true',
+        'LDAP_URI': 'ldap://ldap',
+        'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
+        'LDAP_BINDPW': 'admin',
+        'LDAP_BASEDN': 'dc=owncloud,dc=com'
+      },
+      'commands': [
+        'apk add mailcap', # install /etc/mime.types
+        'mkdir -p /srv/app/tmp/reva',
+        'bin/ocis server'
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app'
+        },
+      ]
+    },
+  ]
+
+def ldap():
+  return [
+    {
+      'name': 'ldap',
+      'image': 'osixia/openldap:1.3.0',
+      'pull': 'always',
+      'environment': {
+        'LDAP_DOMAIN': 'owncloud.com',
+        'LDAP_ORGANISATION': 'ownCloud',
+        'LDAP_ADMIN_PASSWORD': 'admin',
+        'LDAP_TLS_VERIFY_CLIENT': 'never',
+        'HOSTNAME': 'ldap'
+      },
+    }
+  ]
+
+def redis():
+  return [
+    {
+      'name': 'redis',
+      'image': 'webhippie/redis',
+      'pull': 'always',
+      'environment': {
+        'REDIS_DATABASES': 1
+      },
+    }
+  ]
+
+def selenium():
+  return [
+    {
+      'name': 'selenium',
+      'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+      'pull': 'always',
+      'volumes': [{
+          'name': 'uploads',
+          'path': '/uploads'
+      }],
+    }
+  ]
