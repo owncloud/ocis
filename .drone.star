@@ -3,7 +3,7 @@ def main(ctx):
     linting(ctx),
     unitTests(ctx),
     apiTests(ctx, 'master', 'ad274cb7f2a20ffba7fb9c65726ae9ef9270e4c0'),
-    acceptanceTests(ctx, 'master', '934606e8e1701dbdf433c0c55a6272ec1cc0b9aa'),
+    acceptanceTests(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6'),
   ]
 
   stages = [
