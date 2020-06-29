@@ -1,23 +1,27 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.8.0] (2020-06-29)
 
-The following sections list the changes in ocis-reva unreleased.
+The following sections list the changes in ocis-reva 0.8.0.
 
-[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.7.0...master
+[0.8.0]: https://github.com/owncloud/ocis-reva/compare/v0.7.0...v0.8.0
 
 ## Summary
 
-* Enhancement - Update reva to v0.1.1-0.20200629094927-e33d65230abc: [#309](https://github.com/owncloud/ocis-reva/pull/309)
+* Enhancement - Update reva to v0.1.1-0.20200629131207-04298ea1c088: [#309](https://github.com/owncloud/ocis-reva/pull/309)
 
 ## Details
 
-* Enhancement - Update reva to v0.1.1-0.20200629094927-e33d65230abc: [#309](https://github.com/owncloud/ocis-reva/pull/309)
+* Enhancement - Update reva to v0.1.1-0.20200629131207-04298ea1c088: [#309](https://github.com/owncloud/ocis-reva/pull/309)
 
    - Update reva to v0.1.1-0.20200629094927-e33d65230abc (#309) - Fix public link file share
-   (#278, reva/#895)
+   (#278, reva/#895, reva/#900) - Delete public share (reva/#899) - Updated reva to
+   v0.1.1-0.20200629131207-04298ea1c088 (#313)
 
    https://github.com/owncloud/ocis-reva/issues/278
    https://github.com/owncloud/ocis-reva/pull/309
    https://github.com/cs3org/reva/pull/895
+   https://github.com/cs3org/reva/pull/899
+   https://github.com/cs3org/reva/pull/900
+   https://github.com/owncloud/ocis-reva/pull/313
 
 # Changelog for [0.7.0] (2020-06-26)
 
