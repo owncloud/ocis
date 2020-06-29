@@ -248,6 +248,7 @@ eos-copy-ocis: build $(BIN)/$(EXECUTABLE)-linux
 .PHONY: eos-ocis-storage-home
 eos-ocis-storage-home:
 	# configure the home storage to use the eos driver and return the mount id of the eos driver in responses
+	# mount a set of eoshome storage drivers for requests to /webdav
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
 	--env REVA_STORAGE_HOME_DRIVER=eoshome \
@@ -258,11 +259,18 @@ eos-ocis-storage-home:
 	--env REVA_STORAGE_HOME_DATA_DRIVER=eoshome \
 	--env REVA_GATEWAY_URL=host.docker.internal:9142 \
 	eos-cli1 ocis reva-storage-home-data &
+	# mount a second set of eoshome storage drivers for requests to /dav/files
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
+	--env REVA_STORAGE_EOS_DRIVER=eoshome \
+	--env REVA_STORAGE_EOS_NAMESPACE="/eos/dockertest/reva/users" \
+	--env REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}" \
 	eos-cli1 ocis reva-storage-eos &
 	docker exec -i \
 	--env OCIS_LOG_LEVEL=debug \
+	--env REVA_STORAGE_EOS_DATA_DRIVER=eoshome \
+	--env REVA_STORAGE_EOS_NAMESPACE="/eos/dockertest/reva/users" \
+	--env REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}" \
 	--env REVA_GATEWAY_URL=host.docker.internal:9142 \
 	eos-cli1 ocis reva-storage-eos-data &
 
