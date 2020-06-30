@@ -3,7 +3,7 @@ def main(ctx):
     linting(ctx),
     unitTests(ctx),
     apiTests(ctx, 'public-link-mtime', ''),
-    acceptanceTests(ctx, 'pubic-link-mtime', ''),
+    acceptanceTests(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6'),
   ]
 
   stages = [
