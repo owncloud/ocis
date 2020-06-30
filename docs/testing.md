@@ -82,7 +82,7 @@ TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-BEHAT_FILTER_TAGS='~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage' \
+BEHAT_FILTER_TAGS='~@skipOnOcis' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
 
@@ -111,7 +111,7 @@ If you want to work on a specific issue
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
     OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-    BEHAT_FILTER_TAGS='~@skipOnOcV10&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage&&@issue-ocis-reva-122'
+    BEHAT_FILTER_TAGS='~@skipOnOcV10&&@issue-ocis-reva-122'
     ```
 
     Note that the `~@skipOnOcis` tag is replaced by `~@skipOnOcV10` and the issue tag `@issue-ocis-reva-122` is added.
