@@ -161,6 +161,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20200625121012-96e791152b14 h1:ORPIrxw/T33AL
 github.com/cs3org/go-cs3apis v0.0.0-20200625121012-96e791152b14/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v0.1.1-0.20200629131207-04298ea1c088 h1:oCRNwQ4M1JoROK/jlYK1Cj1ElXky7ubFO8AA/YKMNfA=
 github.com/cs3org/reva v0.1.1-0.20200629131207-04298ea1c088/go.mod h1:aTjgnI4OFVK+1Ed6EtyDw5Q7Ujs9sSbY74d3I4Ph/xY=
+github.com/cs3org/reva v0.1.1-0.20200630075923-39a90d431566 h1:U70hDCk1IUY8i/lHMMdS18AyLLcicyn/G8LTHMvT/rE=
+github.com/cs3org/reva v0.1.1-0.20200630075923-39a90d431566/go.mod h1:aTjgnI4OFVK+1Ed6EtyDw5Q7Ujs9sSbY74d3I4Ph/xY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/decker502/dnspod-go v0.2.0/go.mod h1:qsurYu1FgxcDwfSwXJdLt4kRsBLZeosEb9uq4Sy+08g=
