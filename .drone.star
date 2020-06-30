@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    apiTests(ctx, 'master', '0dc76b2452ef0c4388af765a738679097bd1491d'),
+    apiTests(ctx, 'master', 'f7bf41b725b8dac55748c1a090c0d6b3617c89e5'),
   ]
 
   stages = [
@@ -97,7 +97,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'http://reva-server:9140',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'TEST_OCIS':'true',
