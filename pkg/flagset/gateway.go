@@ -1,6 +1,8 @@
 package flagset
 
 import (
+	"time"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-reva/pkg/config"
 )
@@ -90,7 +92,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:        "transfer-expires",
-			Value:       10,
+			Value:       24 * int(time.Hour),
 			Usage:       "Transfer secret for datagateway",
 			EnvVars:     []string{"REVA_TRANSFER_EXPIRES"},
 			Destination: &cfg.Reva.TransferExpires,
