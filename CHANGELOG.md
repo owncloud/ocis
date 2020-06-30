@@ -17,6 +17,7 @@
 * Enhancement - Update extensions: [#290](https://github.com/owncloud/ocis/pull/290)
 * Enhancement - Update ocis-reva to 0.4.0: [#295](https://github.com/owncloud/ocis/pull/295)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
+* Enhancement - Update extensions 2020-06-29: [#334](https://github.com/owncloud/ocis/pull/334)
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
 ## Details
@@ -145,6 +146,13 @@
    v0.2.1 - ocis-pkg v2.2.1 - ocis-thumbnails v0.1.2
 
    https://github.com/owncloud/ocis/pull/209
+
+
+* Enhancement - Update extensions 2020-06-29: [#334](https://github.com/owncloud/ocis/pull/334)
+
+   - ocis-proxy 0.4.0 - ocis-migration 0.2.0 - ocis-reva 0.8.0 - ocis-phoenix 0.8.1
+
+   https://github.com/owncloud/ocis/pull/334
 
 
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
