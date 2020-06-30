@@ -77,7 +77,7 @@ TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-BEHAT_FILTER_TAGS='~@skipOnOcis&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage'
+BEHAT_FILTER_TAGS='~@skipOnOcis'
 ```
 
 Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment
@@ -105,7 +105,7 @@ If you want to work on a specific issue
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
     OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-    BEHAT_FILTER_TAGS='~@skipOnOcV10&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage&&@issue-ocis-20'
+    BEHAT_FILTER_TAGS='~@skipOnOcV10&&@issue-ocis-20'
     ```
 
     Note that the `~@skipOnOcis` tag is replaced by `~@skipOnOcV10` and the issue tag `@issue-ocis-20` is added.
