@@ -2,7 +2,7 @@ def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
-    apiTests(ctx, 'master', '0dc76b2452ef0c4388af765a738679097bd1491d'),
+    apiTests(ctx, 'master', 'f7bf41b725b8dac55748c1a090c0d6b3617c89e5'),
     acceptanceTests(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6'),
   ]
 
@@ -158,7 +158,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage&&~@skipOnLDAP&&@TestAlsoOnExternalUserBackend&&~@local_storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
