@@ -11,6 +11,7 @@
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
+* Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
@@ -97,6 +98,15 @@
    to use it.
 
    https://github.com/owncloud/ocis/pull/172
+
+
+* Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
+
+   With the default setup of running oCIS with ocis-proxy we need to set `REVA_DATAGATEWAY_URL`
+   and `REVA_FRONTEND_URL` environment variables. We added those to the configuration
+   instructions in the dev docs.
+
+   https://github.com/owncloud/ocis/pull/345
 
 
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
