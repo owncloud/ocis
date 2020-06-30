@@ -43,6 +43,11 @@ type Server struct {
 	AccountsDataPath string
 }
 
+// Asset defines the available asset configuration.
+type Asset struct {
+	Path string
+}
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -56,6 +61,7 @@ type Config struct {
 	HTTP   HTTP
 	GRPC   GRPC
 	Server Server
+	Asset  Asset
 	Log    Log
 }
 

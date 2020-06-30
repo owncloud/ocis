@@ -84,5 +84,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_DATA_PATH"},
 			Destination: &cfg.Server.AccountsDataPath,
 		},
+		&cli.StringFlag{
+			Name:        "asset-path",
+			Value:       "",
+			Usage:       "Path to custom assets",
+			EnvVars:     []string{"HELLO_ASSET_PATH"},
+			Destination: &cfg.Asset.Path,
+		},
 	}
 }

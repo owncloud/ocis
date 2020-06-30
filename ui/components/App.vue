@@ -1,8 +1,10 @@
 <template>
   <div>
-    <h1>
-      Accounts and stuff.
-    </h1>
+    <div class="uk-width-3-4@m uk-container uk-padding">
+      <h1>
+        Accounts
+      </h1>
+    </div>
   </div>
 </template>
 
