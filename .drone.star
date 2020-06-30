@@ -2,7 +2,7 @@ def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
-    apiTests(ctx, 'master', 'ad274cb7f2a20ffba7fb9c65726ae9ef9270e4c0'),
+    apiTests(ctx, 'master', '0dc76b2452ef0c4388af765a738679097bd1491d'),
     acceptanceTests(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6'),
   ]
 
