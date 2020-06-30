@@ -1,3 +1,27 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.8.0...master
+
+## Summary
+
+* Enhancement - Update reva to v0.1.1-0.20200630075923-39a90d431566: [#320](https://github.com/owncloud/ocis-reva/pull/320)
+
+## Details
+
+* Enhancement - Update reva to v0.1.1-0.20200630075923-39a90d431566: [#320](https://github.com/owncloud/ocis-reva/pull/320)
+
+   - Update reva to v0.1.1-0.20200630075923-39a90d431566 (#320) - Return special value for
+   public link password (#294, reva/#904) - Fix public stat and listcontainer response to
+   contain the correct prefix (#310, reva/#902)
+
+   https://github.com/owncloud/ocis-reva/issues/310
+   https://github.com/owncloud/ocis-reva/issues/294
+   https://github.com/owncloud/ocis-reva/pull/320
+   https://github.com/cs3org/reva/pull/902
+   https://github.com/cs3org/reva/pull/904
+
 # Changelog for [0.8.0] (2020-06-29)
 
 The following sections list the changes in ocis-reva 0.8.0.
