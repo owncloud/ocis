@@ -40,8 +40,6 @@ type GRPC struct {
 // Server configures a server.
 type Server struct {
 	Name             string
-	Namespace        string
-	Address          string
 	AccountsDataPath string
 }
 
