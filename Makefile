@@ -23,7 +23,7 @@ endif
 
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
-GENERATE ?= $(PACKAGES)
+GENERATE ?= $(PACKAGES) $(IMPORT)/pkg/assets
 
 TAGS ?=
 
