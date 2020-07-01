@@ -68,7 +68,7 @@ func (h *webAccountsServiceHandler) GetAccount(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -116,7 +116,7 @@ func (h *webAccountsServiceHandler) UpdateAccount(w http.ResponseWriter, r *http
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -150,10 +150,10 @@ func RegisterAccountsServiceWeb(r chi.Router, i AccountsServiceHandler, middlewa
 	}
 
 	r.MethodFunc("POST", "/api/v0/accounts/accounts-list", handler.ListAccounts)
-	r.MethodFunc("GET", "/v0/accounts/{id=*}", handler.GetAccount)
-	r.MethodFunc("POST", "/v0/accounts", handler.CreateAccount)
-	r.MethodFunc("PATCH", "/v0/accounts/{account.id=*}", handler.UpdateAccount)
-	r.MethodFunc("DELETE", "/v0/accounts/{id=*}", handler.DeleteAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-get", handler.GetAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-create", handler.CreateAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-update", handler.UpdateAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-delete", handler.DeleteAccount)
 }
 
 type webGroupsServiceHandler struct {

@@ -50,29 +50,30 @@ func NewAccountsServiceEndpoints() []*api.Endpoint {
 		},
 		&api.Endpoint{
 			Name:    "AccountsService.GetAccount",
-			Path:    []string{"/v0/accounts/{id=*}"},
-			Method:  []string{"GET"},
+			Path:    []string{"/api/v0/accounts/accounts-get"},
+			Method:  []string{"POST"},
+			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "AccountsService.CreateAccount",
-			Path:    []string{"/v0/accounts"},
+			Path:    []string{"/api/v0/accounts/accounts-create"},
 			Method:  []string{"POST"},
-			Body:    "account",
+			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "AccountsService.UpdateAccount",
-			Path:    []string{"/v0/accounts/{account.id=*}"},
-			Method:  []string{"PATCH"},
-			Body:    "account",
+			Path:    []string{"/api/v0/accounts/accounts-update"},
+			Method:  []string{"POST"},
+			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "AccountsService.DeleteAccount",
-			Path:    []string{"/v0/accounts/{id=*}"},
-			Method:  []string{"DELETE"},
-			Body:    "",
+			Path:    []string{"/api/v0/accounts/accounts-delete"},
+			Method:  []string{"POST"},
+			Body:    "*",
 			Handler: "rpc",
 		},
 	}
@@ -191,29 +192,30 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.GetAccount",
-		Path:    []string{"/v0/accounts/{id=*}"},
-		Method:  []string{"GET"},
+		Path:    []string{"/api/v0/accounts/accounts-get"},
+		Method:  []string{"POST"},
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.CreateAccount",
-		Path:    []string{"/v0/accounts"},
+		Path:    []string{"/api/v0/accounts/accounts-create"},
 		Method:  []string{"POST"},
-		Body:    "account",
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.UpdateAccount",
-		Path:    []string{"/v0/accounts/{account.id=*}"},
-		Method:  []string{"PATCH"},
-		Body:    "account",
+		Path:    []string{"/api/v0/accounts/accounts-update"},
+		Method:  []string{"POST"},
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.DeleteAccount",
-		Path:    []string{"/v0/accounts/{id=*}"},
-		Method:  []string{"DELETE"},
-		Body:    "",
+		Path:    []string{"/api/v0/accounts/accounts-delete"},
+		Method:  []string{"POST"},
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&AccountsService{h}, opts...))

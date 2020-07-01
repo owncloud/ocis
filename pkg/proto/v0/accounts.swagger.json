@@ -11,6 +11,105 @@
     "application/json"
   ],
   "paths": {
+    "/api/v0/accounts/accounts-create": {
+      "post": {
+        "summary": "Creates an account",
+        "operationId": "AccountsService_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/settingsAccount"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsCreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-delete": {
+      "post": {
+        "summary": "Deletes an account",
+        "operationId": "AccountsService_DeleteAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsDeleteAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-get": {
+      "post": {
+        "summary": "Gets an account",
+        "operationId": "AccountsService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/settingsAccount"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsGetAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
     "/api/v0/accounts/accounts-list": {
       "post": {
         "summary": "Lists accounts",
@@ -44,42 +143,8 @@
         ]
       }
     },
-    "/v0/accounts": {
+    "/api/v0/accounts/accounts-update": {
       "post": {
-        "summary": "Creates an account",
-        "operationId": "AccountsService_CreateAccount",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/settingsAccount"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "The account resource to create",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/settingsAccount"
-            }
-          }
-        ],
-        "tags": [
-          "AccountsService"
-        ]
-      }
-    },
-    "/v0/accounts/{account.id}": {
-      "patch": {
         "summary": "Updates an account",
         "operationId": "AccountsService_UpdateAccount",
         "responses": {
@@ -98,80 +163,12 @@
         },
         "parameters": [
           {
-            "name": "account.id",
-            "description": "The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "body",
-            "description": "The account resource which replaces the resource on the server",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/settingsAccount"
+              "$ref": "#/definitions/settingsUpdateAccountRequest"
             }
-          }
-        ],
-        "tags": [
-          "AccountsService"
-        ]
-      }
-    },
-    "/v0/accounts/{id}": {
-      "get": {
-        "summary": "Gets an account",
-        "operationId": "AccountsService_GetAccount",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/settingsAccount"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AccountsService"
-        ]
-      },
-      "delete": {
-        "summary": "Deletes an account",
-        "operationId": "AccountsService_DeleteAccount",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
           }
         ],
         "tags": [
@@ -707,6 +704,31 @@
         }
       }
     },
+    "settingsCreateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/settingsAccount",
+          "title": "The account resource to create"
+        }
+      }
+    },
+    "settingsDeleteAccountRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "settingsGetAccountRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
     "settingsGroup": {
       "type": "object",
       "properties": {
@@ -946,6 +968,19 @@
           "type": "boolean",
           "format": "boolean",
           "description": "If *true*, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false."
+        }
+      }
+    },
+    "settingsUpdateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/settingsAccount",
+          "title": "The account resource which replaces the resource on the server"
+        },
+        "update_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "title": "The update mask applies to the resource. For the `FieldMask` definition,\nsee https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"
         }
       }
     }

@@ -28,6 +28,144 @@ export const request = (method, url, body, queryParameters, form, config) => {
  *                    
  ==========================================================*/
 /**
+ * Creates an account
+ * request: AccountsService_CreateAccount
+ * url: AccountsService_CreateAccountURL
+ * method: AccountsService_CreateAccount_TYPE
+ * raw_url: AccountsService_CreateAccount_RAW_URL
+ * @param body - 
+ */
+export const AccountsService_CreateAccount = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/accounts/accounts-create'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const AccountsService_CreateAccount_RAW_URL = function() {
+  return '/api/v0/accounts/accounts-create'
+}
+export const AccountsService_CreateAccount_TYPE = function() {
+  return 'post'
+}
+export const AccountsService_CreateAccountURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/accounts/accounts-create'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * Deletes an account
+ * request: AccountsService_DeleteAccount
+ * url: AccountsService_DeleteAccountURL
+ * method: AccountsService_DeleteAccount_TYPE
+ * raw_url: AccountsService_DeleteAccount_RAW_URL
+ * @param body - 
+ */
+export const AccountsService_DeleteAccount = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/accounts/accounts-delete'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const AccountsService_DeleteAccount_RAW_URL = function() {
+  return '/api/v0/accounts/accounts-delete'
+}
+export const AccountsService_DeleteAccount_TYPE = function() {
+  return 'post'
+}
+export const AccountsService_DeleteAccountURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/accounts/accounts-delete'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * Gets an account
+ * request: AccountsService_GetAccount
+ * url: AccountsService_GetAccountURL
+ * method: AccountsService_GetAccount_TYPE
+ * raw_url: AccountsService_GetAccount_RAW_URL
+ * @param body - 
+ */
+export const AccountsService_GetAccount = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/accounts/accounts-get'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const AccountsService_GetAccount_RAW_URL = function() {
+  return '/api/v0/accounts/accounts-get'
+}
+export const AccountsService_GetAccount_TYPE = function() {
+  return 'post'
+}
+export const AccountsService_GetAccountURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/accounts/accounts-get'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
  * Lists accounts
  * request: AccountsService_ListAccounts
  * url: AccountsService_ListAccountsURL
@@ -74,17 +212,17 @@ export const AccountsService_ListAccountsURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * Creates an account
- * request: AccountsService_CreateAccount
- * url: AccountsService_CreateAccountURL
- * method: AccountsService_CreateAccount_TYPE
- * raw_url: AccountsService_CreateAccount_RAW_URL
- * @param body - The account resource to create
+ * Updates an account
+ * request: AccountsService_UpdateAccount
+ * url: AccountsService_UpdateAccountURL
+ * method: AccountsService_UpdateAccount_TYPE
+ * raw_url: AccountsService_UpdateAccount_RAW_URL
+ * @param body - 
  */
-export const AccountsService_CreateAccount = function(parameters = {}) {
+export const AccountsService_UpdateAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/accounts'
+  let path = '/api/v0/accounts/accounts-update'
   let body
   let queryParameters = {}
   let form = {}
@@ -101,158 +239,16 @@ export const AccountsService_CreateAccount = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const AccountsService_CreateAccount_RAW_URL = function() {
-  return '/v0/accounts'
-}
-export const AccountsService_CreateAccount_TYPE = function() {
-  return 'post'
-}
-export const AccountsService_CreateAccountURL = function(parameters = {}) {
-  let queryParameters = {}
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/accounts'
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    })
-  }
-  let keys = Object.keys(queryParameters)
-  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
-}
-/**
- * Updates an account
- * request: AccountsService_UpdateAccount
- * url: AccountsService_UpdateAccountURL
- * method: AccountsService_UpdateAccount_TYPE
- * raw_url: AccountsService_UpdateAccount_RAW_URL
- * @param accountId - The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only.
- * @param body - The account resource which replaces the resource on the server
- */
-export const AccountsService_UpdateAccount = function(parameters = {}) {
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  const config = parameters.$config
-  let path = '/v0/accounts/{account.id}'
-  let body
-  let queryParameters = {}
-  let form = {}
-  path = path.replace('{account.id}', `${parameters['accountId']}`)
-  if (parameters['accountId'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: accountId'))
-  }
-  if (parameters['body'] !== undefined) {
-    body = parameters['body']
-  }
-  if (parameters['body'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: body'))
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    });
-  }
-  return request('patch', domain + path, body, queryParameters, form, config)
-}
 export const AccountsService_UpdateAccount_RAW_URL = function() {
-  return '/v0/accounts/{account.id}'
+  return '/api/v0/accounts/accounts-update'
 }
 export const AccountsService_UpdateAccount_TYPE = function() {
-  return 'patch'
+  return 'post'
 }
 export const AccountsService_UpdateAccountURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/accounts/{account.id}'
-  path = path.replace('{account.id}', `${parameters['accountId']}`)
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    })
-  }
-  let keys = Object.keys(queryParameters)
-  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
-}
-/**
- * Gets an account
- * request: AccountsService_GetAccount
- * url: AccountsService_GetAccountURL
- * method: AccountsService_GetAccount_TYPE
- * raw_url: AccountsService_GetAccount_RAW_URL
- * @param id - 
- */
-export const AccountsService_GetAccount = function(parameters = {}) {
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  const config = parameters.$config
-  let path = '/v0/accounts/{id}'
-  let body
-  let queryParameters = {}
-  let form = {}
-  path = path.replace('{id}', `${parameters['id']}`)
-  if (parameters['id'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: id'))
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    });
-  }
-  return request('get', domain + path, body, queryParameters, form, config)
-}
-export const AccountsService_GetAccount_RAW_URL = function() {
-  return '/v0/accounts/{id}'
-}
-export const AccountsService_GetAccount_TYPE = function() {
-  return 'get'
-}
-export const AccountsService_GetAccountURL = function(parameters = {}) {
-  let queryParameters = {}
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/accounts/{id}'
-  path = path.replace('{id}', `${parameters['id']}`)
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    })
-  }
-  let keys = Object.keys(queryParameters)
-  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
-}
-/**
- * Deletes an account
- * request: AccountsService_DeleteAccount
- * url: AccountsService_DeleteAccountURL
- * method: AccountsService_DeleteAccount_TYPE
- * raw_url: AccountsService_DeleteAccount_RAW_URL
- * @param id - 
- */
-export const AccountsService_DeleteAccount = function(parameters = {}) {
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  const config = parameters.$config
-  let path = '/v0/accounts/{id}'
-  let body
-  let queryParameters = {}
-  let form = {}
-  path = path.replace('{id}', `${parameters['id']}`)
-  if (parameters['id'] === undefined) {
-    return Promise.reject(new Error('Missing required  parameter: id'))
-  }
-  if (parameters.$queryParameters) {
-    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
-      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
-    });
-  }
-  return request('delete', domain + path, body, queryParameters, form, config)
-}
-export const AccountsService_DeleteAccount_RAW_URL = function() {
-  return '/v0/accounts/{id}'
-}
-export const AccountsService_DeleteAccount_TYPE = function() {
-  return 'delete'
-}
-export const AccountsService_DeleteAccountURL = function(parameters = {}) {
-  let queryParameters = {}
-  const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/accounts/{id}'
-  path = path.replace('{id}', `${parameters['id']}`)
+  let path = '/api/v0/accounts/accounts-update'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]

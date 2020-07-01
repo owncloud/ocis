@@ -25,7 +25,8 @@ service AccountsService {
     // Gets an account
     rpc GetAccount(GetAccountRequest) returns (Account) {
         option (google.api.http) = {
-            get: "/v0/accounts/{id=*}"
+            post: "/api/v0/accounts/accounts-get",
+            body: "*"
         };
     }
     // Creates an account
@@ -33,8 +34,8 @@ service AccountsService {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
         option (google.api.http) = {
-            post: "/v0/accounts"
-            body: "account"
+            post: "/api/v0/accounts/accounts-create"
+            body: "*"
         };
     }
     // Updates an account
@@ -42,8 +43,8 @@ service AccountsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            patch: "/v0/accounts/{account.id=*}"
-            body: "account"
+            post: "/api/v0/accounts/accounts-update"
+            body: "*"
         };
     };
     // Deletes an account
@@ -51,7 +52,8 @@ service AccountsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            delete: "/v0/accounts/{id=*}"
+            post: "/api/v0/accounts/accounts-delete",
+            body: "*"
         };
     }
 }

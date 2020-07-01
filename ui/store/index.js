@@ -41,7 +41,7 @@ const actions = {
     commit('SET_INITIALIZED', true)
   },
 
-  async fetchAccounts ({ commit, dispatch, getters, rootGetters }) {
+  async fetchAccounts ({ commit, dispatch, rootGetters }) {
     injectAuthToken(rootGetters)
     const response = await AccountsService_ListAccounts({
       $domain: rootGetters.configuration.server,
