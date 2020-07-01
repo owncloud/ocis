@@ -28,82 +28,43 @@ export const request = (method, url, body, queryParameters, form, config) => {
  *                    
  ==========================================================*/
 /**
-* Lists accounts
-* request: AccountsService_ListAccounts
-* url: AccountsService_ListAccountsURL
-* method: AccountsService_ListAccounts_TYPE
-* raw_url: AccountsService_ListAccounts_RAW_URL
-     * @param pageSize - Optional. The maximum number of accounts to return in the response.
-     * @param pageToken - Optional. A pagination token returned from a previous call to `Get`
-that indicates from where search should continue.
-     * @param fieldMaskPaths - The set of field mask paths.
-     * @param query - Optional. Search criteria used to select the accounts to return.
-If no search criteria is specified then all accounts will be
-returned. TODO update query language
-Query expressions can be used to restrict results based upon
-the account properties where the operators `=`, `NOT`, `AND` and `OR`
-can be used along with the suffix wildcard symbol `*`.
-
-The string properties in a query expression should use escaped quotes
-for values that include whitespace to prevent unexpected behavior.
-
-Some example queries are:
-
-* Query `display_name=Th*` returns accounts whose display_name
-starts with "Th"
-* Query `email=foo@example.com` returns accounts with
-`email` set to `foo@example.com`
-* Query `display_name=\\"Test String\\"` returns accounts with
-display names that include both "Test" and "String"
-*/
+ * Lists accounts
+ * request: AccountsService_ListAccounts
+ * url: AccountsService_ListAccountsURL
+ * method: AccountsService_ListAccounts_TYPE
+ * raw_url: AccountsService_ListAccounts_RAW_URL
+ * @param body - 
+ */
 export const AccountsService_ListAccounts = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/accounts'
+  let path = '/api/v0/accounts/accounts-list'
   let body
   let queryParameters = {}
   let form = {}
-  if (parameters['pageSize'] !== undefined) {
-    queryParameters['page_size'] = parameters['pageSize']
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
   }
-  if (parameters['pageToken'] !== undefined) {
-    queryParameters['page_token'] = parameters['pageToken']
-  }
-  if (parameters['fieldMaskPaths'] !== undefined) {
-    queryParameters['field_mask.paths'] = parameters['fieldMaskPaths']
-  }
-  if (parameters['query'] !== undefined) {
-    queryParameters['query'] = parameters['query']
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
   }
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
     });
   }
-  return request('get', domain + path, body, queryParameters, form, config)
+  return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_ListAccounts_RAW_URL = function() {
-  return '/v0/accounts'
+  return '/api/v0/accounts/accounts-list'
 }
 export const AccountsService_ListAccounts_TYPE = function() {
-  return 'get'
+  return 'post'
 }
 export const AccountsService_ListAccountsURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/accounts'
-  if (parameters['pageSize'] !== undefined) {
-    queryParameters['page_size'] = parameters['pageSize']
-  }
-  if (parameters['pageToken'] !== undefined) {
-    queryParameters['page_token'] = parameters['pageToken']
-  }
-  if (parameters['fieldMaskPaths'] !== undefined) {
-    queryParameters['field_mask.paths'] = parameters['fieldMaskPaths']
-  }
-  if (parameters['query'] !== undefined) {
-    queryParameters['query'] = parameters['query']
-  }
+  let path = '/api/v0/accounts/accounts-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]

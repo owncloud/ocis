@@ -11,8 +11,8 @@
     "application/json"
   ],
   "paths": {
-    "/v0/accounts": {
-      "get": {
+    "/api/v0/accounts/accounts-list": {
+      "post": {
         "summary": "Lists accounts",
         "operationId": "AccountsService_ListAccounts",
         "responses": {
@@ -31,43 +31,20 @@
         },
         "parameters": [
           {
-            "name": "page_size",
-            "description": "Optional. The maximum number of accounts to return in the response.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "page_token",
-            "description": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "field_mask.paths",
-            "description": "The set of field mask paths.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "query",
-            "description": "Optional. Search criteria used to select the accounts to return.\nIf no search criteria is specified then all accounts will be\nreturned. TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `email=foo@example.com` returns accounts with\n`email` set to `foo@example.com`\n* Query `display_name=\\\\\"Test String\\\\\"` returns accounts with\ndisplay names that include both \"Test\" and \"String\"",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsListAccountsRequest"
+            }
           }
         ],
         "tags": [
           "AccountsService"
         ]
-      },
+      }
+    },
+    "/v0/accounts": {
       "post": {
         "summary": "Creates an account",
         "operationId": "AccountsService_CreateAccount",
@@ -847,6 +824,29 @@
         }
       },
       "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by ocis, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
+    },
+    "settingsListAccountsRequest": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional. The maximum number of accounts to return in the response"
+        },
+        "page_token": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+        },
+        "query": {
+          "type": "string",
+          "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `email=foo@example.com` returns accounts with\n`email` set to `foo@example.com`\n* Query `display_name=\\\\\"Test String\\\\\"` returns accounts with\ndisplay names that include both \"Test\" and \"String\"",
+          "title": "Optional. Search criteria used to select the accounts to return.\nIf no search criteria is specified then all accounts will be\nreturned"
+        }
+      }
     },
     "settingsListAccountsResponse": {
       "type": "object",

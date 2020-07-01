@@ -1,15 +1,13 @@
 import 'regenerator-runtime/runtime'
 import App from './components/App.vue'
+import store from './store'
 
 const appInfo = {
   name: 'Accounts',
   id: 'accounts',
   icon: 'text-vcard',
   isFileEditor: false,
-  extensions: [],
-  config: {
-    url: 'https://localhost:9200'
-  }
+  extensions: []
 }
 
 const routes = [
@@ -36,5 +34,6 @@ const navItems = [
 export default {
   appInfo,
   routes,
-  navItems
+  navItems,
+  store
 }
