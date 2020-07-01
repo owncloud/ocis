@@ -4,9 +4,10 @@ import (
 	"fmt"
 	golog "log"
 	"net/rpc"
+	"os"
 	"time"
 
-	"github.com/micro/cli/v2"
+	cli "github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
 	"github.com/micro/micro/v2/client/web"
@@ -99,7 +100,7 @@ func (r *Runtime) Launch(services []string) {
 
 OUT:
 	for _, v := range services {
-		args := process.NewProcEntry(v, []string{v}...)
+		args := process.NewProcEntry(v, os.Environ(), []string{v}...)
 		var reply int
 
 		if err := client.Call("Service.Start", args, &reply); err != nil {
@@ -114,7 +115,7 @@ OUT:
 	if len(services) >= len(Extensions) { // it will not run for ocis_simple builds.
 		time.Sleep(2 * time.Second)
 		for _, v := range dependants {
-			args := process.NewProcEntry(v, []string{v}...)
+			args := process.NewProcEntry(v, os.Environ(), []string{v}...)
 			var reply int
 
 			if err := client.Call("Service.Start", args, &reply); err != nil {

@@ -7,7 +7,8 @@ import (
 	"net/rpc"
 	"os"
 
-	"github.com/micro/cli/v2"
+	cli "github.com/micro/cli/v2"
+
 	"github.com/owncloud/ocis/pkg/config"
 	"github.com/owncloud/ocis/pkg/register"
 	"github.com/refs/pman/pkg/process"
@@ -39,7 +40,7 @@ func RunCommand(cfg *config.Config) *cli.Command {
 				log.Fatal("dialing:", err)
 			}
 
-			proc := process.NewProcEntry(os.Args[2], []string{os.Args[2]}...)
+			proc := process.NewProcEntry(os.Args[2], os.Environ(), []string{os.Args[2]}...)
 			var res int
 
 			if err := client.Call("Service.Start", proc, &res); err != nil {
