@@ -7,6 +7,12 @@ import (
 
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
+
+	// Fake the import to make the dep tree happy.
+	_ "golang.org/x/net/context"
+
+	// Fake the import to make the dep tree happy.
+	_ "golang.org/x/net/webdav"
 )
 
 //go:generate go run github.com/UnnoTed/fileb0x embed.yml
