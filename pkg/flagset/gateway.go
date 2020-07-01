@@ -90,8 +90,8 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:        "transfer-expires",
-			Value:       24 * 60 * 60,
-			Usage:       "Transfer secret for datagateway",
+			Value:       24 * 60 * 60, // one day
+			Usage:       "Transfer token ttl in seconds",
 			EnvVars:     []string{"REVA_TRANSFER_EXPIRES"},
 			Destination: &cfg.Reva.TransferExpires,
 		},

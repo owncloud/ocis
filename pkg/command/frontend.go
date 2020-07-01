@@ -121,12 +121,16 @@ func Frontend(cfg *config.Config) *cli.Command {
 						"services": map[string]interface{}{
 							"datagateway": map[string]interface{}{
 								"transfer_shared_secret": cfg.Reva.TransferSecret,
+								"timeout":                86400,
+								"insecure":               true,
 							},
 							"ocdav": map[string]interface{}{
 								"prefix":           "",
 								"chunk_folder":     "/var/tmp/reva/chunks",
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
+								"timeout":          86400,
+								"insecure":         true,
 								"disable_tus":      cfg.Reva.UploadDisableTus,
 							},
 							"ocs": map[string]interface{}{
