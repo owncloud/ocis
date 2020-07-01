@@ -15,7 +15,7 @@
       <oc-table-group>
         <oc-table-row v-for="account in accounts" :key="`account-list-row-${account.id}`">
           <oc-table-cell>
-            <oc-avatar :userName="account.displayName || account.preferredName" :width="35" />
+            <avatar :user-name="account.displayName || account.preferredName" :userid="account.id" :width="35" />
           </oc-table-cell>
           <oc-table-cell v-text="account.preferredName" />
           <oc-table-cell v-text="account.displayName || '-'" />
@@ -33,8 +33,10 @@
 </template>
 
 <script>
+import Avatar from './Avatar.vue'
 export default {
   name: 'AccountsList',
+  components: { Avatar },
   props: {
     accounts: {
       type: Array,
