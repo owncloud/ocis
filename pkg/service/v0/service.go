@@ -120,14 +120,14 @@ func New(opts ...Option) (s *Service, err error) {
 			// TODO groups
 			for i := range accounts {
 				var bytes []byte
-				if bytes, err = json.Marshal(accounts[i]); err != nil {
-					logger.Error().Err(err).Interface("account", accounts[i]).Msg("could not marshal default account")
+				if bytes, err = json.Marshal(&accounts[i]); err != nil {
+					logger.Error().Err(err).Interface("account", &accounts[i]).Msg("could not marshal default account")
 					return
 				}
 				path := filepath.Join(accountsDir, accounts[i].Id)
 				if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 					accounts[i].PasswordProfile.Password = "***REMOVED***"
-					logger.Error().Err(err).Str("path", path).Interface("account", accounts[i]).Msg("could not persist default account")
+					logger.Error().Err(err).Str("path", path).Interface("account", &accounts[i]).Msg("could not persist default account")
 					return
 				}
 			}
@@ -172,9 +172,9 @@ func New(opts ...Option) (s *Service, err error) {
 			logger.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		logger.Debug().Interface("account", a).Msg("found account")
-		if err = s.index.Index(a.Id, a); err != nil {
-			logger.Error().Err(err).Str("path", path).Interface("account", a).Msg("could not index account")
+		logger.Debug().Interface("account", &a).Msg("found account")
+		if err = s.index.Index(a.Id, &a); err != nil {
+			logger.Error().Err(err).Str("path", path).Interface("account", &a).Msg("could not index account")
 			continue
 		}
 	}
@@ -262,11 +262,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		s.log.Debug().Interface("account", a).Msg("found account")
+		s.log.Debug().Interface("account", &a).Msg("found account")
 
 		if password != "" {
 			if a.PasswordProfile == nil {
-				s.log.Debug().Interface("account", a).Msg("no password profile")
+				s.log.Debug().Interface("account", &a).Msg("no password profile")
 				return fmt.Errorf("invalid password")
 			}
 			if !s.passwordIsValid(a.PasswordProfile.Password, password) {
