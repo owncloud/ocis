@@ -1415,6 +1415,12 @@ github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c h1:RObWeoWH9jKuDr5XKdKIZ
 github.com/refs/pman v0.0.0-20200523070049-0e3e499ca44c/go.mod h1:0ivDlwrVfoxdAIbFV1RN1EDPJHMtUG8iJrhW3erRiwM=
 github.com/refs/pman v0.0.0-20200527204655-c9ccd1c53cc3 h1:yW8kN4AEKZGKIq1fEmROGLtWe5lwmMcI7usWTjexOf8=
 github.com/refs/pman v0.0.0-20200527204655-c9ccd1c53cc3/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
+github.com/refs/pman v0.0.0-20200602090702-79950bdf64d6 h1:jbqqRCNOV7TvIR6QA8f7PHoOF7yVnduM3ZOB120690g=
+github.com/refs/pman v0.0.0-20200602090702-79950bdf64d6/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
+github.com/refs/pman v0.0.0-20200701172222-73b4b2c4ea66 h1:lrJYtPUTIoVSlI2Axrok+LAeC1eHSukD4o+eDLQOW7Y=
+github.com/refs/pman v0.0.0-20200701172222-73b4b2c4ea66/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
+github.com/refs/pman v0.0.0-20200701173654-f05b8833071a h1:GCYFb7layULUl1HvZG97ur0zyqtEPo3VHcJCcBSvk7M=
+github.com/refs/pman v0.0.0-20200701173654-f05b8833071a/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/restic/calens v0.1.0/go.mod h1:u67f5msOjCTDYNzOf/NoAUSdmXP03YXPCwIQLYADy5M=
