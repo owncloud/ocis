@@ -1,10 +1,56 @@
+config = {
+  'acceptance': {
+    'suites': {
+      'phoenixWebUI1': [
+        'webUICreateFilesFolders',
+        'webUIDeleteFilesFolders',
+        'webUIFavorites',
+        'webUIFiles',
+        'webUILogin',
+        'webUINotifications',
+      ],
+      'phoenixWebUI2': [
+        'webUIPrivateLinks',
+        'webUIRenameFiles',
+        'webUIRenameFolders',
+        'webUITrashbin',
+        'webUIUpload',
+        'webUIAccount',
+        # All tests in the following suites are skipped currently
+        # so they won't run now but when they are enabled they will run
+        'webUIRestrictSharing',
+        'webUISharingAutocompletion',
+        'webUISharingInternalGroups',
+        'webUISharingInternalUsers',
+        'webUISharingPermissionsUsers',
+        'webUISharingFilePermissionsGroups',
+        'webUISharingFolderPermissionsGroups',
+        'webUISharingFolderAdvancedPermissionsGroups',
+        'webUIResharing',
+        'webUISharingPublic',
+        'webUISharingPublicDifferentRoles',
+        'webUISharingAcceptShares',
+        'webUISharingFilePermissionMultipleUsers',
+        'webUISharingFolderPermissionMultipleUsers',
+        'webUISharingFolderAdvancedPermissionMultipleUsers',
+        'webUISharingNotifications',
+      ],
+    }
+  }
+}
+
+def getUITestSuiteNames():
+  return config['acceptance']['suites'].keys()
+
+def getUITestSuites():
+  return config['acceptance']['suites']
+
 def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
     apiTests(ctx, 'master', 'f7bf41b725b8dac55748c1a090c0d6b3617c89e5'),
-    acceptanceTests(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6'),
-  ]
+  ] + acceptance(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6')
 
   stages = [
     docker(ctx, 'amd64'),
@@ -193,11 +239,20 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
     },
   }
 
-def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
+def acceptance(ctx, phoenixBranch, phoenixCommit):
+  names = getUITestSuiteNames()
+  return [acceptanceTests(name, phoenixBranch, phoenixCommit) for name in names]
+
+def acceptanceTests(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
+  suites = getUITestSuites()
+  paths = ""
+  for path in suites[suiteName]:
+    paths = paths + "tests/acceptance/features/" + path + " "
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'acceptanceTests',
+    'name': suiteName,
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -207,7 +262,7 @@ def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
       build() +
       ocisServer() + [
       {
-        'name': 'phoenixWebUIAcceptanceTests',
+        'name': 'webUITests',
         'image': 'owncloudci/nodejs:11',
         'pull': 'always',
         'environment': {
@@ -221,6 +276,7 @@ def acceptanceTests(ctx, phoenixBranch = 'master', phoenixCommit = ''):
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
+          'TEST_PATHS': paths,
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
@@ -333,8 +389,7 @@ def docker(ctx, arch):
       'linting',
       'unitTests',
       'apiTests',
-      'acceptanceTests',
-    ],
+    ] + getUITestSuiteNames(),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -480,8 +535,7 @@ def binary(ctx, name):
       'linting',
       'unitTests',
       'apiTests',
-      'acceptanceTests',
-    ],
+    ] + getUITestSuiteNames(),
     'trigger': {
       'ref': [
         'refs/heads/master',
