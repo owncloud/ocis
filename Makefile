@@ -79,7 +79,7 @@ lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: protobuf webapp
+generate: protobuf
 	go generate $(GENERATE)
 
 .PHONY: changelog
@@ -197,8 +197,3 @@ $(PROTO_SRC)/accounts.swagger.json: $(PROTO_SRC)/accounts.proto
 .PHONY: protobuf
 protobuf: $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger \
 		  $(PROTO_SRC)/accounts.pb.go $(PROTO_SRC)/accounts.pb.micro.go $(PROTO_SRC)/accounts.pb.web.go $(PROTO_SRC)/accounts.swagger.json
-
-.PHONY: webapp
-webapp:
-	yarn generate-api
-	yarn build
