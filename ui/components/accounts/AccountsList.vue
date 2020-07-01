@@ -7,8 +7,8 @@
           <oc-table-cell type="head" v-text="$gettext('Username')" />
           <oc-table-cell type="head" v-text="$gettext('Display name')" />
           <oc-table-cell type="head" v-text="$gettext('Email')" />
-          <oc-table-cell shrink type="head" v-text="$gettext('Uid number')" />
-          <oc-table-cell shrink type="head" v-text="$gettext('Gid number')" />
+          <oc-table-cell shrink type="head" class="uk-text-nowrap" v-text="$gettext('Uid number')" />
+          <oc-table-cell shrink type="head" class="uk-text-nowrap" v-text="$gettext('Gid number')" />
           <oc-table-cell shrink type="head" v-text="$gettext('Enabled')" />
         </oc-table-row>
       </oc-table-group>
