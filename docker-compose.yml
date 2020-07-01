@@ -26,7 +26,6 @@ services:
     environment:
       EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
-      KONNECTD_IDENTIFIER_REGISTRATION_CONF: /ocis/config/identifier-registration.yml
       KONNECTD_ISS: https://${OCIS_DOMAIN:-localhost}:9200
       KONNECTD_LOG_LEVEL: debug
       KONNECTD_TLS: '0'
@@ -36,15 +35,13 @@ services:
       PROXY_HTTP_ADDR: 0.0.0.0:9200
       REVA_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       OCIS_LOG_LEVEL: debug
-      REVA_STORAGE_HOME_DRIVER: eoshome
-      REVA_STORAGE_HOME_MOUNT_ID: 1284d238-aa92-42ce-bdc4-0b0000009154
-      REVA_STORAGE_HOME_DATA_DRIVER: eoshome
+      REVA_TRANSFER_EXPIRES: 86400
+      REVA_STORAGE_EOS_DRIVER: eoshome
+      REVA_STORAGE_EOS_DATA_DRIVER: eoshome
+      REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
       REVA_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       REVA_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
       REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Username}}"
-      REVA_GATEWAY_URL: host.docker.internal:9142
-      DAV_FILES_NAMESPACE: "/eos/"
 
   mgm-master:
     container_name: mgm-master
