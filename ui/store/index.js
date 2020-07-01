@@ -14,8 +14,12 @@ const getters = {
   config: state => state.config,
   isInitialized: state => state.initialized,
   getAccountsSorted: state => {
-    // FIXME: look at data fields for available sorting options
-    return Object.values(state.accounts)
+    return Object.values(state.accounts).sort((a1, a2) => {
+      if (a1.preferredName === a2.preferredName) {
+        return a1.id.localeCompare(a2.id)
+      }
+      return a1.preferredName.localeCompare(a2.preferredName)
+    })
   }
 }
 
