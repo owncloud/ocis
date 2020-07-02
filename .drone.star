@@ -49,7 +49,7 @@ def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
-    apiTests(ctx, 'master', 'f7bf41b725b8dac55748c1a090c0d6b3617c89e5'),
+    apiTests(ctx, 'master', 'a3cac3dad60348fc962d1d8743b202bc5f79596b'),
   ] + acceptance(ctx, 'master', 'f9a0874dc016ee0269c698914ef3f2c75ce3e2e6')
 
   stages = [
