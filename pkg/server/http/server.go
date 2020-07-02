@@ -46,7 +46,7 @@ func Server(opts ...Option) http.Service {
 	)
 
 	mux.Use(middleware.Version(
-		"settings",
+		options.Name,
 		version.String,
 	))
 
