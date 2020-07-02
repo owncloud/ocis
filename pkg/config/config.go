@@ -24,12 +24,28 @@ type LDAPSchema struct {
 	Groups      string
 }
 
+// HTTP defines the available http configuration.
+type HTTP struct {
+	Addr      string
+	Namespace string
+	Root      string
+}
+
+// GRPC defines the available grpc configuration.
+type GRPC struct {
+	Addr      string
+	Namespace string
+}
+
 // Server configures a server.
 type Server struct {
 	Name             string
-	Namespace        string
-	Address          string
 	AccountsDataPath string
+}
+
+// Asset defines the available asset configuration.
+type Asset struct {
+	Path string
 }
 
 // Log defines the available logging configuration.
@@ -42,7 +58,10 @@ type Log struct {
 // Config merges all Account config parameters.
 type Config struct {
 	LDAP   LDAP
+	HTTP   HTTP
+	GRPC   GRPC
 	Server Server
+	Asset  Asset
 	Log    Log
 }
 

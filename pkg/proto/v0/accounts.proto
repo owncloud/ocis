@@ -18,13 +18,14 @@ service AccountsService {
     rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {
         // List method maps to HTTP GET
         option (google.api.http) = {
-            get: "/v0/accounts"
+            post: "/api/v0/accounts/accounts-list",
+            body: "*"
         };
     }
     // Gets an account
     rpc GetAccount(GetAccountRequest) returns (Account) {
         option (google.api.http) = {
-            get: "/v0/accounts/{id=*}"
+            post: "/api/v0/accounts/accounts-get",
             body: "*"
         };
     }
@@ -33,8 +34,8 @@ service AccountsService {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
         option (google.api.http) = {
-            post: "/v0/accounts"
-            body: "account"
+            post: "/api/v0/accounts/accounts-create"
+            body: "*"
         };
     }
     // Updates an account
@@ -42,8 +43,8 @@ service AccountsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            patch: "/v0/accounts/{account.id=*}"
-            body: "account"
+            post: "/api/v0/accounts/accounts-update"
+            body: "*"
         };
     };
     // Deletes an account
@@ -51,7 +52,8 @@ service AccountsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            delete: "/v0/accounts/{id=*}"
+            post: "/api/v0/accounts/accounts-delete",
+            body: "*"
         };
     }
 }
@@ -68,7 +70,6 @@ service GroupsService {
     rpc GetGroup(GetGroupRequest) returns (Group) {
         option (google.api.http) = {
             get: "/v0/groups/{id=*}"
-            body: "*"
         };
     }
     // Creates a group
@@ -115,8 +116,7 @@ service GroupsService {
     rpc RemoveMember(RemoveMemberRequest) returns (Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            delete: "/v0/groups/{id=*}/members/{account.id}/$ref"
-            body: "*"
+            delete: "/v0/groups/{id=*}/members/{account_id}/$ref"
         };
     }
     // group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
@@ -476,9 +476,11 @@ message AddMemberRequest {
 }
 
 message RemoveMemberRequest {
-    // The account id to remove
-    // TODO id in the body indt in the url? not necessary ... use empty?
+    // The group id
     string id = 1;
+
+    // The account id to remove
+    string account_id = 2;
 }
 
 message ListMembersRequest {
@@ -511,6 +513,9 @@ message ListMembersRequest {
     // * Query `display_name=\\"Test String\\"` returns groups with
     // display names that include both "Test" and "String"
     string query = 4 [(google.api.field_behavior) = OPTIONAL];
+
+    // The group id
+    string id = 5;
 }
 
 message ListMembersResponse {

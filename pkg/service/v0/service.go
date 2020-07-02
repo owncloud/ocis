@@ -33,7 +33,6 @@ import (
 )
 
 // New returns a new instance of Service
-// TODO pass in logger as options
 func New(opts ...Option) (s *Service, err error) {
 	options := newOptions(opts...)
 	logger := options.Logger
@@ -121,14 +120,14 @@ func New(opts ...Option) (s *Service, err error) {
 			// TODO groups
 			for i := range accounts {
 				var bytes []byte
-				if bytes, err = json.Marshal(accounts[i]); err != nil {
-					logger.Error().Err(err).Interface("account", accounts[i]).Msg("could not marshal default account")
+				if bytes, err = json.Marshal(&accounts[i]); err != nil {
+					logger.Error().Err(err).Interface("account", &accounts[i]).Msg("could not marshal default account")
 					return
 				}
 				path := filepath.Join(accountsDir, accounts[i].Id)
 				if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 					accounts[i].PasswordProfile.Password = "***REMOVED***"
-					logger.Error().Err(err).Str("path", path).Interface("account", accounts[i]).Msg("could not persist default account")
+					logger.Error().Err(err).Str("path", path).Interface("account", &accounts[i]).Msg("could not persist default account")
 					return
 				}
 			}
@@ -173,9 +172,9 @@ func New(opts ...Option) (s *Service, err error) {
 			logger.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		logger.Debug().Interface("account", a).Msg("found account")
-		if err = s.index.Index(a.Id, a); err != nil {
-			logger.Error().Err(err).Str("path", path).Interface("account", a).Msg("could not index account")
+		logger.Debug().Interface("account", &a).Msg("found account")
+		if err = s.index.Index(a.Id, &a); err != nil {
+			logger.Error().Err(err).Str("path", path).Interface("account", &a).Msg("could not index account")
 			continue
 		}
 	}
@@ -263,11 +262,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			s.log.Error().Err(err).Str("path", path).Msg("could not unmarshal account")
 			continue
 		}
-		s.log.Debug().Interface("account", a).Msg("found account")
+		s.log.Debug().Interface("account", &a).Msg("found account")
 
 		if password != "" {
 			if a.PasswordProfile == nil {
-				s.log.Debug().Interface("account", a).Msg("no password profile")
+				s.log.Debug().Interface("account", &a).Msg("no password profile")
 				return fmt.Errorf("invalid password")
 			}
 			if !s.passwordIsValid(a.PasswordProfile.Password, password) {
@@ -418,6 +417,21 @@ func (s Service) UpdateGroup(c context.Context, req *proto.UpdateGroupRequest, r
 
 // DeleteGroup implements the AccountsServiceHandler interface
 func (s Service) DeleteGroup(c context.Context, req *proto.DeleteGroupRequest, res *empty.Empty) (err error) {
+	return errors.New("not implemented")
+}
+
+// AddMember implements the AccountsServiceHandler interface
+func (s Service) AddMember(c context.Context, req *proto.AddMemberRequest, res *proto.Group) error {
+	return errors.New("not implemented")
+}
+
+// RemoveMember implements the AccountsServiceHandler interface
+func (s Service) RemoveMember(c context.Context, req *proto.RemoveMemberRequest, res *proto.Group) error {
+	return errors.New("not implemented")
+}
+
+// ListMembers implements the AccountsServiceHandler interface
+func (s Service) ListMembers(c context.Context, req *proto.ListMembersRequest, res *proto.ListMembersResponse) error {
 	return errors.New("not implemented")
 }
 

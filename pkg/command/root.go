@@ -2,13 +2,10 @@ package command
 
 import (
 	"os"
-	"os/user"
-	"path"
 	"strings"
 
 	"github.com/owncloud/ocis-accounts/pkg/flagset"
 
-	"github.com/joho/godotenv"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/version"
@@ -27,35 +24,20 @@ func Execute() error {
 	app := &cli.App{
 		Name:     "ocis-accounts",
 		Version:  version.String,
-		Usage:    "Example service for Reva/oCIS",
+		Usage:    "Provide accounts and groups for oCIS",
 		Compiled: version.Compiled(),
-		Flags:    flagset.RootWithConfig(cfg),
-		Before: func(c *cli.Context) error {
-			err := ParseConfig(c, cfg)
-			logger := NewLogger(cfg)
-			for _, v := range defaultConfigPaths {
-				// location is the user's home
-				if v[0] == '$' || v[0] == '~' {
-					usr, _ := user.Current()
-					err := godotenv.Load(path.Join(usr.HomeDir, ".ocis", defaultFilename+".env"))
-					if err != nil {
-						logger.Debug().Msgf("ignoring missing env file on dir: %v", v)
-					}
-				} else {
-					err := godotenv.Load(path.Join(v, defaultFilename+".env"))
-					if err != nil {
-						logger.Debug().Msgf("ignoring missing env file on dir: %v", v)
-					}
-				}
-			}
-			return err
-		},
 
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
+		},
+
+		Flags: flagset.RootWithConfig(cfg),
+
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg)
 		},
 
 		Commands: []*cli.Command{

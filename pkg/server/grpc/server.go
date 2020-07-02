@@ -6,15 +6,15 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
 )
 
-// NewService initializes a new go-micro service ready to run
-func NewService(opts ...Option) grpc.Service {
+// Server initializes a new go-micro service ready to run
+func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
 	service := grpc.NewService(
-		grpc.Name(options.Name),
+		grpc.Name(options.Config.Server.Name),
 		grpc.Context(options.Context),
-		grpc.Address(options.Address),
-		grpc.Namespace(options.Namespace),
+		grpc.Address(options.Config.GRPC.Addr),
+		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
 	)
