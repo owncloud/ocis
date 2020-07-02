@@ -6,12 +6,22 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
+* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
 ## Details
+
+* Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
+
+   We aim to have a similar project structure for all our ocis extensions. This extension was
+   different with regard to the structure of the server command and naming of some flag names.
+
+   https://github.com/owncloud/ocis-accounts/pull/51
+
 
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
 
@@ -44,6 +54,13 @@ The following sections list the changes in ocis-accounts unreleased.
    and subject) email, username and optionally a password.
 
    https://github.com/owncloud/ocis-accounts/pull/30
+
+
+* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
+
+   We added an extension for ocis-web that shows a simple list of all existing users.
+
+   https://github.com/owncloud/ocis-accounts/pull/51
 
 # Changelog for [0.1.1] (2020-04-29)
 
