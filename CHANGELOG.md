@@ -1,3 +1,23 @@
+# Changelog for [0.9.1] (2020-07-02)
+
+The following sections list the changes in ocis-reva 0.9.1.
+
+[0.9.1]: https://github.com/owncloud/ocis-reva/compare/v0.9.0...v0.9.1
+
+## Summary
+
+* Enhancement - Add new config options for the http client: [#330](https://github.com/owncloud/ocis-reva/pull/330)
+
+## Details
+
+* Enhancement - Add new config options for the http client: [#330](https://github.com/owncloud/ocis-reva/pull/330)
+
+   The internal certificates are checked for validity after
+   https://github.com/cs3org/reva/pull/914, which causes the acceptance tests to fail. This
+   change sets new hardcoded defaults.
+
+   https://github.com/owncloud/ocis-reva/pull/330
+
 # Changelog for [0.9.0] (2020-07-01)
 
 The following sections list the changes in ocis-reva 0.9.0.
