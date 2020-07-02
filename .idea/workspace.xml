@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c738d7ab-cd67-4e13-983f-6c46c1ae807c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.drone.star" beforeDir="false" afterPath="$PROJECT_DIR$/.drone.star" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1aCRW1GCwsM6Es5n7ZyApfLoLt4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c738d7ab-cd67-4e13-983f-6c46c1ae807c" name="Default Changelist" comment="" />
+      <created>1586237617002</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586237617002</updated>
+      <workItem from="1586237618962" duration="777000" />
+      <workItem from="1586315437308" duration="1151000" />
+      <workItem from="1589963276429" duration="690000" />
+      <workItem from="1590381340916" duration="1019000" />
+      <workItem from="1590394892796" duration="604000" />
+      <workItem from="1590402957630" duration="599000" />
+      <workItem from="1592278171247" duration="18000" />
+      <workItem from="1592293798985" duration="5137000" />
+      <workItem from="1592364079192" duration="3570000" />
+      <workItem from="1592451160104" duration="7498000" />
+      <workItem from="1592537443336" duration="181000" />
+      <workItem from="1592537712989" duration="603000" />
+      <workItem from="1592543684064" duration="296000" />
+      <workItem from="1593419285823" duration="2611000" />
+      <workItem from="1593593170337" duration="1156000" />
+      <workItem from="1593603110642" duration="61000" />
+      <workItem from="1593603433203" duration="43000" />
+      <workItem from="1593659798250" duration="1224000" />
+      <workItem from="1593687965665" duration="2157000" />
+      <workItem from="1593746949698" duration="2639000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="776" y="351" width="424" height="484" key="FileChooserDialogImpl" timestamp="1589964755980">
+      <screen x="67" y="68" width="1853" height="1053" />
+    </state>
+    <state x="776" y="351" width="424" height="484" key="FileChooserDialogImpl/67.68.1853.1053/1920.0.1920.1080@67.68.1853.1053" timestamp="1589964755980" />
+    <state x="630" y="316" width="727" height="554" key="find.popup" timestamp="1592464135475">
+      <screen x="67" y="68" width="1853" height="1053" />
+    </state>
+    <state x="630" y="316" width="727" height="554" key="find.popup/67.68.1853.1053/1920.0.1920.1080@67.68.1853.1053" timestamp="1592464135475" />
+    <state x="656" y="298" width="672" height="678" key="search.everywhere.popup" timestamp="1592474618970">
+      <screen x="67" y="68" width="1853" height="1053" />
+    </state>
+    <state x="656" y="298" width="672" height="678" key="search.everywhere.popup/67.68.1853.1053/1920.0.1920.1080@67.68.1853.1053" timestamp="1592474618970" />
+    <state x="2605" y="449" width="540" height="180" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1593420641474">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2605" y="449" width="540" height="180" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/67.68.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1593420641474" />
+  </component>
+  <component name="simpleUML.UMLToolWindowPlugin">
+    <General>
+      <option name="birdViewUpdateDelay" value="2000" />
+      <option name="defaultFileLocation" value="file://$PROJECT_DIR$/.." />
+    </General>
+    <Classdiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="defaultFieldsExpanded" value="false" />
+      <option name="defaultContructorsExpanded" value="false" />
+      <option name="defaultMethodsExpanded" value="false" />
+      <option name="showParameters" value="true" />
+      <option name="showTooltip" value="true" />
+      <option name="showReturnValues" value="true" />
+      <option name="longModifier" value="true" />
+      <option name="implementsBehaviour" value="1" />
+      <option name="extendsBehaviour" value="1" />
+      <option name="compartmentBehaviour" value="1" />
+      <option name="interfaceBackgroundColor" value="-6494306" />
+      <option name="abstractClassBackgroundColor" value="-1580132" />
+      <option name="classBackgroundColor" value="-6508057" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="quickSourceLinkColor" value="-16776961" />
+      <option name="quickDiagramLinkColor" value="-8454144" />
+      <option name="drawDecorations" value="false" />
+      <option name="hideFieldList" value="" />
+      <option name="showFieldList" value="" />
+      <option name="hideConstructorList" value="" />
+      <option name="showConstructorList" value="" />
+      <option name="hideMethodList" value="" />
+      <option name="showMethodList" value="" />
+      <option name="minimumFigureSize" value="0,0" />
+    </Classdiagram>
+    <Dependencydiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="0" />
+    </Dependencydiagram>
+    <Packagediagram>
+      <option name="diagramTitleFont" value="SansSerif,0,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="packageBackgroundColor" value="-4144960" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="2" />
+    </Packagediagram>
+  </component>
+</project>
