@@ -12,10 +12,7 @@ const appInfo = {
   id: 'settings',
   icon: 'application',
   isFileEditor: false,
-  extensions: [],
-  config: {
-    url: 'https://localhost:9200'
-  }
+  extensions: []
 }
 
 const routes = [

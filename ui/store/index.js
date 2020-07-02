@@ -48,6 +48,7 @@ const mutations = {
 }
 
 const actions = {
+  // Used by ocis-web.
   loadConfig ({ commit }, config) {
     commit('LOAD_CONFIG', config)
   },
@@ -60,7 +61,7 @@ const actions = {
   async fetchSettingsBundles ({ commit, dispatch, getters, rootGetters }) {
     injectAuthToken(rootGetters)
     const response = await BundleService_ListSettingsBundles({
-      $domain: getters.config.url,
+      $domain: rootGetters.configuration.server,
       body: {}
     })
     if (response.status === 201) {
@@ -100,7 +101,7 @@ const actions = {
   async saveSettingsValue ({ commit, dispatch, getters, rootGetters }, payload) {
     injectAuthToken(rootGetters)
     const response = await ValueService_SaveSettingsValue({
-      $domain: getters.config.url,
+      $domain: rootGetters.configuration.server,
       body: {
         settingsValue: payload
       }
