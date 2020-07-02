@@ -13,6 +13,7 @@
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
+* Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 * Enhancement - Update extensions: [#290](https://github.com/owncloud/ocis/pull/290)
@@ -116,6 +117,13 @@
    ocis-webdav v0.1.0
 
    https://github.com/owncloud/ocis/pull/180
+
+
+* Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
+
+   - ocis-reva 0.9.0
+
+   https://github.com/owncloud/ocis/pull/357
 
 
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
