@@ -1,3 +1,28 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.9.1...master
+
+## Summary
+
+* Enhancement - Update reva to v0.1.1-0.20200701152626-2f6cc60e2f66: [#341](https://github.com/owncloud/ocis-reva/pull/341)
+
+## Details
+
+* Enhancement - Update reva to v0.1.1-0.20200701152626-2f6cc60e2f66: [#341](https://github.com/owncloud/ocis-reva/pull/341)
+
+   - Update reva to v0.1.1-0.20200701152626-2f6cc60e2f66 (#341) - Added country information
+   to Mentix (reva/#924) - Refactor metrics package to implement reader interface (reva/#934) -
+   Fix OCS public link share update values logic (#252, #288, reva/#930)
+
+   https://github.com/owncloud/ocis-reva/issues/252
+   https://github.com/owncloud/ocis-reva/issues/288
+   https://github.com/owncloud/ocis-reva/pull/341
+   https://github.com/cs3org/reva/pull/924
+   https://github.com/cs3org/reva/pull/934
+   https://github.com/cs3org/reva/pull/930
+
 # Changelog for [0.9.1] (2020-07-02)
 
 The following sections list the changes in ocis-reva 0.9.1.
