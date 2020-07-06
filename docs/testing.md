@@ -68,9 +68,14 @@ bin/ocis server
 ```
 
 ### Run the acceptance tests
+First we will need to clone the testing app in owncloud which contains the skeleton files required for running the tests.
+In the ownCloud 10 core clone testing app with following command
 
-In the ownCloud 10 core repo run
+```
+git clone https://github.com/owncloud/testing apps/testing
+```
 
+Then run the api acceptance tests with following command.
 ```
 make test-acceptance-api \
 TEST_SERVER_URL=http://localhost:9140 \
