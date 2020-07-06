@@ -25,6 +25,8 @@ PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
 GENERATE ?= $(IMPORT)/pkg/assets
 
+FEATURE_PATH ?= "ui/tests/acceptance/features"
+
 TAGS ?=
 
 ifndef OUTPUT
@@ -151,6 +153,10 @@ docs-build:
 
 .PHONY: docs
 docs: docs-copy docs-build
+
+.PHONY: test-acceptance-webui
+test-acceptance-webui:
+	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
 
 .PHONY: watch
 watch:
