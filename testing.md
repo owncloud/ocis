@@ -82,6 +82,7 @@ TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+SKELETON_DIR=apps/testing/data/apiSkeleton \
 BEHAT_FILTER_TAGS='~@skipOnOcis'
 ```
 
