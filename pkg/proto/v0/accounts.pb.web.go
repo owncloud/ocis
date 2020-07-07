@@ -362,14 +362,14 @@ func RegisterGroupsServiceWeb(r chi.Router, i GroupsServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/groups/groups-list", handler.ListGroups)
-	r.MethodFunc("POST", "/api/v0/groups/groups-get", handler.GetGroup)
-	r.MethodFunc("POST", "/api/v0/groups/groups-create", handler.CreateGroup)
-	r.MethodFunc("POST", "/api/v0/groups/groups-update", handler.UpdateGroup)
-	r.MethodFunc("POST", "/api/v0/groups/groups-delete", handler.DeleteGroup)
-	r.MethodFunc("POST", "/v0/groups/{group_id=*}/members/$ref", handler.AddMember)
-	r.MethodFunc("DELETE", "/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
-	r.MethodFunc("GET", "/v0/groups/{id=*}/members/$ref", handler.ListMembers)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-list", handler.ListGroups)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-get", handler.GetGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-create", handler.CreateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-update", handler.UpdateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-delete", handler.DeleteGroup)
+	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/$ref", handler.AddMember)
+	r.MethodFunc("DELETE", "/api/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
+	r.MethodFunc("GET", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
 }
 
 // ListAccountsRequestJSONMarshaler describes the default jsonpb.Marshaler used by all

@@ -251,56 +251,56 @@ func NewGroupsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		&api.Endpoint{
 			Name:    "GroupsService.ListGroups",
-			Path:    []string{"/api/v0/groups/groups-list"},
+			Path:    []string{"/api/v0/accounts/groups-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.GetGroup",
-			Path:    []string{"/api/v0/groups/groups-get"},
+			Path:    []string{"/api/v0/accounts/groups-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.CreateGroup",
-			Path:    []string{"/api/v0/groups/groups-create"},
+			Path:    []string{"/api/v0/accounts/groups-create"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.UpdateGroup",
-			Path:    []string{"/api/v0/groups/groups-update"},
+			Path:    []string{"/api/v0/accounts/groups-update"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.DeleteGroup",
-			Path:    []string{"/api/v0/groups/groups-delete"},
+			Path:    []string{"/api/v0/accounts/groups-delete"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.AddMember",
-			Path:    []string{"/v0/groups/{group_id=*}/members/$ref"},
+			Path:    []string{"/api/v0/groups/{group_id=*}/members/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.RemoveMember",
-			Path:    []string{"/v0/groups/{group_id=*}/members/{account_id}/$ref"},
+			Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
 			Method:  []string{"DELETE"},
-			Body:    "",
+			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.ListMembers",
-			Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+			Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
 			Method:  []string{"GET"},
 			Handler: "rpc",
 		},
@@ -458,56 +458,56 @@ func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, op
 	h := &groupsServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.ListGroups",
-		Path:    []string{"/api/v0/groups/groups-list"},
+		Path:    []string{"/api/v0/accounts/groups-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.GetGroup",
-		Path:    []string{"/api/v0/groups/groups-get"},
+		Path:    []string{"/api/v0/accounts/groups-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.CreateGroup",
-		Path:    []string{"/api/v0/groups/groups-create"},
+		Path:    []string{"/api/v0/accounts/groups-create"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.UpdateGroup",
-		Path:    []string{"/api/v0/groups/groups-update"},
+		Path:    []string{"/api/v0/accounts/groups-update"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.DeleteGroup",
-		Path:    []string{"/api/v0/groups/groups-delete"},
+		Path:    []string{"/api/v0/accounts/groups-delete"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.AddMember",
-		Path:    []string{"/v0/groups/{group_id=*}/members/$ref"},
+		Path:    []string{"/api/v0/groups/{group_id=*}/members/$ref"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.RemoveMember",
-		Path:    []string{"/v0/groups/{group_id=*}/members/{account_id}/$ref"},
+		Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
 		Method:  []string{"DELETE"},
-		Body:    "",
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.ListMembers",
-		Path:    []string{"/v0/groups/{id=*}/members/$ref"},
+		Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
 		Method:  []string{"GET"},
 		Handler: "rpc",
 	}))
