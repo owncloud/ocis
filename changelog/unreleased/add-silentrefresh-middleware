@@ -1,0 +1,6 @@
+Bugfix: allow silent refresh of access token
+
+Sets the `X-Frame-Options Header` to `SAMEORIGIN` so the oidc client can refresh the token in an iframe.
+
+https://github.com/owncloud/ocis-konnectd/issues/69
+https://github.com/owncloud/ocis-phoenix/pull/69
