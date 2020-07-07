@@ -86,7 +86,7 @@ func loggableAccount(a *proto.Account) *proto.Account {
 func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	// leave only the group id
-	s.inflateMemberOf(a)
+	s.deflateMemberOf(a)
 
 	var bytes []byte
 	if bytes, err = json.Marshal(a); err != nil {
@@ -119,21 +119,21 @@ func (s Service) expandMemberOf(a *proto.Account) {
 	a.MemberOf = expanded
 }
 
-// inflateGroups replaces the groups of a user with an instance that only contains the id
-func (s Service) inflateMemberOf(a *proto.Account) {
+// deflateMemberOf replaces the groups of a user with an instance that only contains the id
+func (s Service) deflateMemberOf(a *proto.Account) {
 	if a == nil {
 		return
 	}
-	inflated := []*proto.Group{}
+	deflated := []*proto.Group{}
 	for i := range a.MemberOf {
 		if a.MemberOf[i].Id != "" {
-			inflated = append(inflated, &proto.Group{Id: a.MemberOf[i].Id})
+			deflated = append(deflated, &proto.Group{Id: a.MemberOf[i].Id})
 		} else {
 			// TODO fetch and use an id when group only has a name but no id
 			s.log.Error().Str("id", a.Id).Interface("group", a.MemberOf[i]).Msg("resolving groups by name is not implemented yet")
 		}
 	}
-	a.MemberOf = inflated
+	a.MemberOf = deflated
 }
 
 func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {

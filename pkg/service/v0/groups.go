@@ -64,7 +64,7 @@ func (s Service) loadGroup(id string, g *proto.Group) (err error) {
 func (s Service) writeGroup(g *proto.Group) (err error) {
 
 	// leave only the member id
-	s.inflateMembers(g)
+	s.deflateMembers(g)
 
 	var bytes []byte
 	if bytes, err = json.Marshal(g); err != nil {
@@ -96,21 +96,21 @@ func (s Service) expandMembers(g *proto.Group) {
 	g.Members = expanded
 }
 
-// inflateGroups replaces the groups of a user with an instance that only contains the id
-func (s Service) inflateMembers(g *proto.Group) {
+// deflateMembers replaces the users of a group with an instance that only contains the id
+func (s Service) deflateMembers(g *proto.Group) {
 	if g == nil {
 		return
 	}
-	inflated := []*proto.Account{}
+	deflated := []*proto.Account{}
 	for i := range g.Members {
 		if g.Members[i].Id != "" {
-			inflated = append(inflated, &proto.Account{Id: g.Members[i].Id})
+			deflated = append(deflated, &proto.Account{Id: g.Members[i].Id})
 		} else {
 			// TODO fetch and use an id when group only has a name but no id
 			s.log.Error().Str("id", g.Id).Interface("account", g.Members[i]).Msg("resolving members by name is not implemented yet")
 		}
 	}
-	g.Members = inflated
+	g.Members = deflated
 }
 
 // ListGroups implements the GroupsServiceHandler interface
@@ -205,7 +205,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
 
 	// extract member id
-	s.inflateMembers(in.Group)
+	s.deflateMembers(in.Group)
 
 	if err = s.writeGroup(in.Group); err != nil {
 		s.log.Error().Err(err).Interface("group", in.Group).Msg("could not persist new group")
@@ -290,6 +290,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 	for i := range a.MemberOf {
 		if a.MemberOf[i].Id == g.Id {
 			alreadyRelated = true
+			break
 		}
 	}
 	if alreadyRelated == false {
