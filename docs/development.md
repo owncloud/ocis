@@ -60,7 +60,7 @@ docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
 
 ```
 docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome -d ocis ./bin/ocis run reva-storage-home
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome -d ocis ./bin/ocis run reva-storage-home-data
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome -d ocis ./bin/ocis run reva-storage-home-data
 ```
 
 - restart the reva frontend with a new namespace (pointing to the eos storage provider) for the dav files endpoint
