@@ -124,14 +124,13 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
     'services': [
       {
         'name': 'ldap',
-        'image': 'osixia/openldap:1.3.0',
+        'image': 'osixia/openldap',
         'pull': 'always',
         'environment': {
           'LDAP_DOMAIN': 'owncloud.com',
           'LDAP_ORGANISATION': 'owncloud',
           'LDAP_ADMIN_PASSWORD': 'admin',
           'LDAP_TLS_VERIFY_CLIENT': 'never',
-          'HOSTNAME': 'ldap'
          },
       },
       {
@@ -335,14 +334,13 @@ def testing(ctx):
     'services': [
       {
         'name': 'ldap',
-        'image': 'osixia/openldap:1.3.0',
+        'image': 'osixia/openldap',
         'pull': 'always',
         'environment': {
           'LDAP_DOMAIN': 'owncloud.com',
           'LDAP_ORGANISATION': 'owncloud',
           'LDAP_ADMIN_PASSWORD': 'admin',
           'LDAP_TLS_VERIFY_CLIENT': 'never',
-          'HOSTNAME': 'ldap'
         },
       },
       {
