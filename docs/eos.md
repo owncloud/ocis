@@ -13,65 +13,162 @@ OCIS can be configured to run on top of [eos](https://eos.web.cern.ch/). While t
 
 This document is a work in progress of the current setup.
 
-## Current status
+## Docker dev environment for eos storage
 
-Using ocis and eos it is possible today to manage folders. Sharing is [heavily](https://github.com/cs3org/reva/pull/523) [under](https://github.com/cs3org/reva/pull/585) [development](https://github.com/cs3org/reva/pull/482). File up and download needs proper configuration of the dataprovider to also use eos.
+### 1. Start eos & ocis containers
 
-## How to do it
-
-### Grab it!
+Start the eos cluster and ocis via the compose stack
 
 ```
-$ git clone git@github.com:owncloud/ocis.git
-$ cd ocis
+docker-compose up -d
 ```
 
+### 2. LDAP support
 
-### Run it!
-
-Preconditions
-* `go` (from golang.org/dl) and `gcc` (via e.g. `apt install build-essential`) are installed
-* No eos components are running. If in doubt, begin with `make eos-stop`
-
-We poured the nitty gritty details of setting up ocis into Makefile targets. After running
+Configure the os to resolve users and groups using ldap
 
 ```
-$ make eos-start
+docker-compose exec -d ocis /start-ldap
 ```
 
-the eos related docker containers will be created, started and setup to authenticate against the ocis-glauth service.
+Check that the os in the ocis container can now resolve einstein or the other demo users
 
-It will also copy the ocis binary to the `eos-cli1` container and start `ocis reva-storage-home` with the necessary environment variables to use the eos storage driver.
+```
+$ docker-compose exec ocis id einstein
+uid=20000(einstein) gid=30000(users) groups=30000(users),30001(sailing-lovers),30002(violin-haters),30007(physics-lovers)
+```
 
-For details have a look at the `Makefile`.
+We also need to restart the reva-users service so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
+```
+docker-compose exec ocis ./bin/ocis kill reva-users
+docker-compose exec ocis ./bin/ocis run reva-users
+```
 
+### 3. Home storage
 
-### Test it!
+Kill the home storage. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and a new layout:
 
-You should now be able to point your browser to https://localhost:9200 and login using the demo user credentials, eg `einstein:relativity`.
+```
+docker-compose exec ocis ./bin/ocis kill reva-storage-home
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
+```
+
+### 4. Home data provider
+
+Kill the home data provider. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and a new layout:
+
+```
+docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
+```
 
 {{< hint info >}}
-If you encounter an error when the IdP redirects you back to phoenix, just reload the page and it should be gone ... or debug it. PR welcome!
+The difference between the *home storage* and the *home data provider* are that the former is responsible for metadata changes while the latter is responsible for actual data transfer. The *home storage* uses the cs3 api to manage a folder hierarchy, while the *home data provider* is responsible for moving bytes to and from the storage.
 {{< /hint >}}
 
-Create a folder in the ui. Then check it was created in eos:
+### 4. Frontend files namespace
+
+Restart the reva frontend with a new namespace (pointing to the eos storage provider) for the dav files endpoint
 
 ```
-$ docker exec -it eos-mgm1 eos ls -l /eos/dockertest/reva/users/e/einstein
+docker-compose exec ocis ./bin/ocis kill reva-frontend
+docker-compose exec -e DAV_FILES_NAMESPACE="/eos/" ocis ./bin/ocis run reva-frontend
 ```
 
-Now create a new folder in eos (using eos-mgm1 you will be logged in as admin, see the `whoami`, which is why we `chown` the folder to the uid and gid of einstein afterwards):
+## Verification
+
+Login with `einstein / relativity`, upload a file to einsteins home and verify the file is there using
 
 ```
-$ docker exec -it eos-mgm1 eos whoami
-$ docker exec -it eos-mgm1 eos mkdir /eos/dockertest/reva/users/e/einstein/rocks
-$ docker exec -it eos-mgm1 eos chown 20000:30000 /eos/dockertest/reva/users/e/einstein/rocks
+docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/e/einstein/
+-rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
 ```
 
-Check that the folder exists in the web ui.
+## Further exploration
 
-## Next steps
+EOS has a built in shell that you can enter using
+```
+$ docker-compose exec mgm-master eos
+# ---------------------------------------------------------------------------
+# EOS  Copyright (C) 2011-2019 CERN/Switzerland
+# This program comes with ABSOLUTELY NO WARRANTY; for details type `license'.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; type `license' for details.
+# ---------------------------------------------------------------------------
+EOS_INSTANCE=eostest
+EOS_SERVER_VERSION=4.6.5 EOS_SERVER_RELEASE=1
+EOS_CLIENT_VERSION=4.6.5 EOS_CLIENT_RELEASE=1
+EOS Console [root://localhost] |/> help
+access               Access Interface
+accounting           Accounting Interface
+acl                  Acl Interface
+archive              Archive Interface
+attr                 Attribute Interface
+backup               Backup Interface
+clear                Clear the terminal
+cd                   Change directory
+chmod                Mode Interface
+chown                Chown Interface
+config               Configuration System
+console              Run Error Console
+cp                   Cp command
+debug                Set debug level
+exit                 Exit from EOS console
+file                 File Handling
+fileinfo             File Information
+find                 Find files/directories
+newfind              Find files/directories (new implementation)
+fs                   File System configuration
+fsck                 File System Consistency Checking
+fuse                 Fuse Mounting
+fusex                Fuse(x) Administration
+geosched             Geoscheduler Interface
+group                Group configuration
+health               Health information about system
+help                 Display this text
+info                 Retrieve file or directory information
+inspector            Interact with File Inspector
+io                   IO Interface
+json                 Toggle JSON output flag for stdout
+license              Display Software License
+ls                   List a directory
+ln                   Create a symbolic link
+map                  Path mapping interface
+member               Check Egroup membership
+mkdir                Create a directory
+motd                 Message of the day
+mv                   Rename file or directory
+node                 Node configuration
+ns                   Namespace Interface
+pwd                  Print working directory
+quit                 Exit from EOS console
+quota                Quota System configuration
+reconnect            Forces a re-authentication of the shell
+recycle              Recycle Bin Functionality
+rmdir                Remove a directory
+rm                   Remove a file
+role                 Set the client role
+route                Routing interface
+rtlog                Get realtime log output from mgm & fst servers
+silent               Toggle silent flag for stdout
+space                Space configuration
+stagerrm             Remove disk replicas of a file if it has tape replicas
+stat                 Run 'stat' on a file or directory
+squash               Run 'squashfs' utility function
+test                 Run performance test
+timing               Toggle timing flag for execution time measurement
+touch                Touch a file
+token                Token interface
+tracker              Interact with File Tracker
+transfer             Transfer Interface
+version              Verbose client/server version
+vid                  Virtual ID System Configuration
+whoami               Determine how we are mapped on server side
+who                  Statistics about connected users
+?                    Synonym for 'help'
+.q                   Exit from EOS console
+EOS Console [root://localhost] |/>
+```
 
-- configure storage-home-data to enable file upload, PRs against `ocis-reva` welcome
-- get sharing implemented, PRs against `reva` welcome
-- simplify home logic, see https://github.com/cs3org/reva/issues/601 and https://github.com/cs3org/reva/issues/578
+But this is a different adventure. See the links at the top of this page for other sources of information on eos.
+
