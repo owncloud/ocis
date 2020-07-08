@@ -56,6 +56,8 @@ export REVA_LDAP_SCHEMA_UID=uid
 export REVA_LDAP_SCHEMA_MAIL=mail
 export REVA_LDAP_SCHEMA_DISPLAYNAME=displayName
 export REVA_LDAP_SCHEMA_CN=cn
+export REVA_FRONTEND_URL=http://localhost:9140 # needed because the proxy is not started
+export REVA_DATAGATEWAY_URL=http://localhost:9140/data # needed because the proxy is not started
 ```
 
 Then you need to start the ocis-reva services
