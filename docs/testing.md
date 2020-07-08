@@ -84,13 +84,13 @@ TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-BEHAT_FILTER_TAGS='~@skipOnOcis' \
+BEHAT_FILTER_TAGS='~@skipOnOcis&&~@skipOnOcis-OC-Storage' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
 
 Make sure to adjust the settings `TEST_SERVER_URL`,`OCIS_REVA_DATA_ROOT` and `SKELETON_DIR` according to your environment
 
-This will run all tests that can work with LDAP and are not skipped on OCIS
+This will run all tests that can work with LDAP, and are not skipped on OCIS or on OCIS with OC Storage.
 
 To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to the feature file and an optional line number. For example: `BEHAT_FEATURE='tests/acceptance/features/apiWebdavUpload1/uploadFile.feature:12'`
 
@@ -101,6 +101,7 @@ Every scenario that does not work in OCIS, is tagged with `@skipOnOcis` and addi
 This tag means that this particular scenario is skipped because of [issue no 122 in the ocis-reva repository](https://github.com/owncloud/ocis-reva/issues/122).
 Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva) and are skipped on oC10.
 Have a look into the [documentation](https://doc.owncloud.com/server/developer_manual/testing/acceptance-tests.html#writing-scenarios-for-bugs) to understand why we are writing those tests.
+Also, ocis behaves partly differently with EOS-Storage and OC-Storage. There are scenarios that do not work in OCIS when run on EOS-storage, but works when on OC-Storage, and vice-versa. For those kind of scenarios, ` @skipOnOcis-EOS-Storage` and `@skipOnOcis-OC-Storage` tags are used. For instance, for a scenario that fails on EOS-Storage but passes on OC-Storage, we use `@skipOnOcis-EOS-Storage` tag to let it run on OC-Storage, where it works as expected, instead of skipping on ocis with `@skipOnOcis` tag.
 
 If you want to work on a specific issue
 
@@ -116,7 +117,7 @@ If you want to work on a specific issue
     BEHAT_FILTER_TAGS='~@skipOnOcV10&&@issue-ocis-reva-122'
     ```
 
-    Note that the `~@skipOnOcis` tag is replaced by `~@skipOnOcV10` and the issue tag `@issue-ocis-reva-122` is added.
+    Note that the `~@skipOnOcis` and `~@skipOnOcis-OC-Storage` tags are replaced by `~@skipOnOcV10` and the issue tag `@issue-ocis-reva-122` is added.
     We want to run all tests that are skipped in CI because of this particular bug, but we don't want to run the tests
     that demonstrate the current buggy behaviour.
 
