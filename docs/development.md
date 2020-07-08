@@ -11,68 +11,70 @@ geekdocFilePath: development.md
 
 ## Docker dev environment
 
+### Option 1: Plain docker
+
 To build and run your local ocis code with default storage driver
 
 ```
 docker run --rm -ti --name ocis -v $PWD:/ocis -p 9200:9200 owncloud/eos-ocis-dev
 ```
 
-ocis will use the owncloud storage driver and store files in the container at /var/tmp/reva/data/<username>/files
+The eos-ocis-dev container will build and run ocis using the owncloud storage driver and store files in the container at `/var/tmp/reva/data/<username>/files`
 
-Data is here: `docker exec -it ocis ll /var/tmp/reva/`
+To check the uploaded files start digging with: `docker exec -it ocis ls -l /var/tmp/reva/`
 
-Alternative: With the `docker-compose.yml` file in ocis repo you can also start ocis via compose:
+{{< hint info >}}
+On MacOS do not mount a local folder to the `/var/tmp/reva/` path. The fuse driver used by docker [does not support extended attributes](https://docs.docker.com/v18.09/docker-for-mac/osxfs/). See [#182](https://github.com/owncloud/ocis/issues/182) for more details.
+{{< /hint >}}
+
+
+### Option 2: Docker compose
+
+With the `docker-compose.yml` file in ocis repo you can also start ocis via compose:
 
 ```
 docker-compose up -d ocis
 ```
 
-Now try to list the running services
+{{< hint info >}}
+We are only starting the `ocis` container here.
+{{< /hint >}}
+
+## Verification
+
+Check the services are running
 
 ```
-docker-compose exec ocis ./bin/ocis list
-```
-
-## Docker dev environment for eos storage
-
-1. Start the eos cluster and ocis via the compose stack
-
-```
-docker-compose up -d
-```
-
-2. Start the ldap authentication
-
-```
-docker-compose exec -d ocis /start-ldap
-```
-
-3. Configure to use eos storage driver instead of default storage driver
-
-- kill the home storage and data providers. we need to switch them to the eoshome driver:
-
-```
-docker-compose exec ocis ./bin/ocis kill reva-storage-home
-docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
-```
-
-- restart them with the eoshome driver and a new layout:
-
-```
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome -d ocis ./bin/ocis run reva-storage-home
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome -d ocis ./bin/ocis run reva-storage-home-data
-```
-
-- restart the reva frontend with a new namespace (pointing to the eos storage provider) for the dav files endpoint
-
-```
-docker-compose exec ocis ./bin/ocis kill reva-frontend
-docker-compose exec -e DAV_FILES_NAMESPACE="/eos/" -d ocis ./bin/ocis run reva-frontend
-```
-
-- login with `einstein / relativity`, upload a file to einsteins home and verify the file is there using 
-
-```
-docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/e/einstein/
--rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
+$ docker-compose exec ocis ./bin/ocis list
++--------------------------+-----+
+|        EXTENSION         | PID |
++--------------------------+-----+
+| accounts                 | 172 |
+| api                      | 204 |
+| glauth                   | 187 |
+| graph                    |  41 |
+| graph-explorer           |  55 |
+| konnectd                 | 196 |
+| ocs                      |  59 |
+| phoenix                  |  29 |
+| proxy                    |  22 |
+| registry                 | 226 |
+| reva-auth-basic          |  96 |
+| reva-auth-bearer         | 104 |
+| reva-frontend            | 485 |
+| reva-gateway             |  78 |
+| reva-sharing             | 286 |
+| reva-storage-eos         | 129 |
+| reva-storage-eos-data    | 134 |
+| reva-storage-home        | 442 |
+| reva-storage-home-data   | 464 |
+| reva-storage-oc          | 149 |
+| reva-storage-oc-data     | 155 |
+| reva-storage-public-link | 168 |
+| reva-users               | 420 |
+| settings                 |  23 |
+| thumbnails               | 201 |
+| web                      | 218 |
+| webdav                   |  63 |
++--------------------------+-----+
 ```
