@@ -45,7 +45,7 @@ services:
 
   mgm-master:
     container_name: mgm-master
-    image: owncloud/eos-mgm
+    image: owncloud/eos-mgm:4.6.5
     tty: true
     privileged: true
     stdin_open: true
@@ -65,7 +65,7 @@ services:
 
   mq-master:
     container_name: mq-master
-    image: owncloud/eos-mq
+    image: owncloud/eos-mq:4.6.5
     tty: true
     privileged: true
     stdin_open: true
@@ -83,7 +83,7 @@ services:
 
   fst:
     container_name: fst
-    image: owncloud/eos-fst
+    image: owncloud/eos-fst:4.6.5
     tty: true
     privileged: true
     stdin_open: true
@@ -100,7 +100,7 @@ services:
 
   quark-1:
     container_name: quark-1
-    image: owncloud/eos-qdb
+    image: owncloud/eos-qdb:4.6.5
     tty: true
     privileged: true
     stdin_open: true
@@ -120,7 +120,7 @@ services:
 
   quark-2:
     container_name: quark-2
-    image: owncloud/eos-qdb
+    image: owncloud/eos-qdb:4.6.5
     tty: true
     privileged: true
     stdin_open: true
@@ -140,7 +140,7 @@ services:
 
   quark-3:
     container_name: quark-3
-    image: owncloud/eos-qdb
+    image: owncloud/eos-qdb:4.6.5
     tty: true
     privileged: true
     stdin_open: true
