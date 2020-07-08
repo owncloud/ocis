@@ -26,7 +26,7 @@ This file `identifier-registration.yml` will only be generated if there is no su
 
 Let us assume `your-host` is your remote domain name or IP adress. In this example we do not change the default port (`9200`). But this could be changed to another port.
 
-```yaml {linenos=table,hl_lines=["13-14",18]}
+```yaml {linenos=table,hl_lines=["15-17",21]}
 # OpenID Connect client registry.
 clients:
   - id: phoenix
@@ -35,16 +35,19 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - http://localhost:9100/oidc-callback.html
       - http://localhost:9100/
+      - http://localhost:9100/oidc-callback.html
+      - http://localhost:9100/oidc-silent-redirect.html
       - https://localhost:9200/
       - https://localhost:9200/oidc-callback.html
-      - https://your-host:9200/
-      - https://your-host:9200/oidc-callback.html
+      - https://localhost:9200/oidc-silent-redirect.html
+      - https://your-server:9200/
+      - https://your-server:9200/oidc-callback.html
+      - https://your-server:9200/oidc-silent-redirect.html
     origins:
       - http://localhost:9100
       - https://localhost:9200
-      - https://your-host:9200/
+      - https://your-server:9200
 ```
 
 ### Start the ocis fullstack server
@@ -53,11 +56,11 @@ You need to configure `your-host` in some services to provide the needed public 
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
-KONNECTD_ISS=https://your-host:9200 \
-REVA_OIDC_ISSUER=https://your-host:9200 \
-PHOENIX_OIDC_AUTHORITY=https://your-host:9200 \
-PHOENIX_WEB_CONFIG_SERVER=https://your-host:9200 \
-PHOENIX_OIDC_METADATA_URL=https://your-host:9200/.well-known/openid-configuration \
+KONNECTD_ISS=https://your-server:9200 \
+REVA_OIDC_ISSUER=https://your-server:9200 \
+PHOENIX_OIDC_AUTHORITY=https://your-server:9200 \
+PHOENIX_WEB_CONFIG_SERVER=https://your-server:9200 \
+PHOENIX_OIDC_METADATA_URL=https://your-server:9200/.well-known/openid-configuration \
 REVA_DATAGATEWAY_URL=https://your-server:9200/data \
 REVA_FRONTEND_URL=https://your-server:9200 \
 PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
