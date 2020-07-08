@@ -7,6 +7,7 @@ The following sections list the changes in ocis-accounts unreleased.
 ## Summary
 
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
+* Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
@@ -21,6 +22,13 @@ The following sections list the changes in ocis-accounts unreleased.
    different with regard to the structure of the server command and naming of some flag names.
 
    https://github.com/owncloud/ocis-accounts/pull/51
+
+
+* Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
+
+   Replaced the plain golang errors with the error model from the micro framework.
+
+   https://github.com/owncloud/ocis-accounts/issues/11
 
 
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
