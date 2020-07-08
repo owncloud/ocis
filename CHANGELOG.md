@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-phoenix unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.8.1...master
+
+## Summary
+
+* Bugfix - Allow silent refresh of access token: [#69](https://github.com/owncloud/ocis-konnectd/issues/69)
+
+## Details
+
+* Bugfix - Allow silent refresh of access token: [#69](https://github.com/owncloud/ocis-konnectd/issues/69)
+
+   Sets the `X-Frame-Options` header to `SAMEORIGIN` so the oidc client can refresh the token in
+   an iframe.
+
+   https://github.com/owncloud/ocis-konnectd/issues/69
+   https://github.com/owncloud/ocis-phoenix/pull/69
+
 # Changelog for [0.8.1] (2020-06-29)
 
 The following sections list the changes in ocis-phoenix 0.8.1.
