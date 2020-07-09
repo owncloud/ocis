@@ -147,7 +147,7 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 			Msgf("policy %v is not configured", pol)
 	}
 
-	var ctx context.Context
+	ctx := context.Background()
 	var span *trace.Span
 
 	// Start root span.
