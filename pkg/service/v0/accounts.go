@@ -158,7 +158,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	// check if this looks like an auth request
 	match := authQuery.FindStringSubmatch(in.Query)
 	if len(match) == 3 {
-		in.Query = fmt.Sprintf("preferred_name eq '%s'", match[1]) // todo fetch email? make query configurable
+		in.Query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", match[1]) // todo fetch email? make query configurable
 		password = match[2]
 		if password == "" {
 			return merrors.Unauthorized(s.id, "password must not be empty")
@@ -354,6 +354,7 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	// deleteDateTime read only
 
 	out.OnPremisesSyncEnabled = in.Account.OnPremisesSyncEnabled
+	out.OnPremisesSamAccountName = in.Account.OnPremisesSamAccountName
 	// ... TODO on prem for sync
 
 	if out.ExternalUserState != in.Account.ExternalUserState {
@@ -400,7 +401,7 @@ func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest
 			AccountId: id,
 		}, a.MemberOf[i])
 		if err != nil {
-			s.log.Error().Err(err).Str("accountid", id).Str("groupid", a.MemberOf[i].Id).Msg("could not remove group membership")
+			s.log.Error().Err(err).Str("accountid", id).Str("groupid", a.MemberOf[i].Id).Msg("could not remove group member, skipping")
 		}
 	}
 
