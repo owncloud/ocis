@@ -296,7 +296,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			alreadyRelated = true
 		}
 	}
-	if alreadyRelated == false {
+	if !alreadyRelated {
 		g.Members = append(g.Members, a)
 	}
 
@@ -308,7 +308,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			break
 		}
 	}
-	if alreadyRelated == false {
+	if !alreadyRelated {
 		a.MemberOf = append(a.MemberOf, g)
 	}
 
