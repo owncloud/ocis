@@ -166,7 +166,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "ocs",
 			Usage:       "open collaboration services endpoint prefix",
 			EnvVars:     []string{"REVA_FRONTEND_OCS_PREFIX"},
-			Destination: &cfg.Reva.Frontend.OCDavPrefix,
+			Destination: &cfg.Reva.Frontend.OCSPrefix,
 		},
 
 		// Gateway
