@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -233,6 +232,22 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 	}
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
 
+	g := &proto.Group{}
+	if err = s.loadGroup(id, g); err != nil {
+		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
+		return
+	}
+
+	// delete memberof relationship in users
+	for i := range g.Members {
+		err = s.RemoveMember(c, &proto.RemoveMemberRequest{
+			GroupId:   g.Members[i].Id,
+			AccountId: id,
+		}, g)
+		if err != nil {
+			s.log.Error().Err(err).Str("groupid", id).Str("accountid", g.Members[i].Id).Msg("could not remove account memberof, skipping")
+		}
+	}
 	if err = os.Remove(path); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
 		return merrors.InternalServerError(s.id, "could not remove group: %v", err.Error())
@@ -243,7 +258,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 		return merrors.InternalServerError(s.id, "could not remove group from index: %v", err.Error())
 	}
 
-	// TODO delete memberof relationship in users
+	s.log.Info().Str("id", id).Msg("deleted group")
 	return
 }
 
@@ -312,11 +327,84 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 }
 
 // RemoveMember implements the GroupsServiceHandler interface
-func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, out *proto.Group) error {
-	return errors.New("not implemented")
+func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, out *proto.Group) (err error) {
+
+	// cleanup ids
+	var groupID string
+	if groupID, err = cleanupID(in.GroupId); err != nil {
+		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
+	}
+
+	var accountID string
+	if accountID, err = cleanupID(in.AccountId); err != nil {
+		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
+	}
+
+	// load structs
+	a := &proto.Account{}
+	if err = s.loadAccount(accountID, a); err != nil {
+		s.log.Error().Err(err).Str("id", accountID).Msg("could not load account")
+		return
+	}
+
+	g := &proto.Group{}
+	if err = s.loadGroup(groupID, g); err != nil {
+		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
+		return
+	}
+
+	//remove the account from the group if it exists
+	newMembers := []*proto.Account{}
+	for i := range g.Members {
+		if g.Members[i].Id != a.Id {
+			newMembers = append(newMembers, g.Members[i])
+		}
+	}
+	g.Members = newMembers
+
+	// remove the group from the account if it exists
+	newGroups := []*proto.Group{}
+	for i := range a.MemberOf {
+		if a.MemberOf[i].Id != g.Id {
+			newGroups = append(newGroups, a.MemberOf[i])
+		}
+	}
+	a.MemberOf = newGroups
+
+	if err = s.writeAccount(a); err != nil {
+		s.log.Error().Err(err).Interface("account", a).Msg("could not persist account")
+		return
+	}
+	if err = s.writeGroup(g); err != nil {
+		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
+		return
+	}
+	// TODO rollback changes when only one of them failed?
+	// TODO store relation in another file?
+	// TODO return error if they are not related?
+	return nil
 }
 
 // ListMembers implements the GroupsServiceHandler interface
-func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, out *proto.ListMembersResponse) error {
-	return errors.New("not implemented")
+func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, out *proto.ListMembersResponse) (err error) {
+
+	// cleanup ids
+	var groupID string
+	if groupID, err = cleanupID(in.Id); err != nil {
+		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
+	}
+
+	g := &proto.Group{}
+	if err = s.loadGroup(groupID, g); err != nil {
+		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
+		return
+	}
+
+	// TODO only expand accounts if requested
+	// if in.FieldMask ...
+	s.expandMembers(g)
+
+	out.Members = g.Members
+
+	return
 }

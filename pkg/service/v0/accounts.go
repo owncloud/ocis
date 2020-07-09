@@ -387,6 +387,23 @@ func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest
 	}
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
+	a := &proto.Account{}
+	if err = s.loadAccount(id, a); err != nil {
+		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
+		return
+	}
+
+	// delete member relationship in groups
+	for i := range a.MemberOf {
+		err = s.RemoveMember(c, &proto.RemoveMemberRequest{
+			GroupId:   a.MemberOf[i].Id,
+			AccountId: id,
+		}, a.MemberOf[i])
+		if err != nil {
+			s.log.Error().Err(err).Str("accountid", id).Str("groupid", a.MemberOf[i].Id).Msg("could not remove group membership")
+		}
+	}
+
 	if err = os.Remove(path); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
 		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
@@ -396,6 +413,7 @@ func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
 		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
 	}
-	// TODO delete member relationship in groups
+
+	s.log.Info().Str("id", id).Msg("deleted account")
 	return
 }
