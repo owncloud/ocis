@@ -147,6 +147,27 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   "--service ocdav [--service ocs]",
 			EnvVars: []string{"REVA_FRONTEND_SERVICES"},
 		},
+		&cli.StringFlag{
+			Name:        "datagateway-prefix",
+			Value:       "data",
+			Usage:       "datagateway prefix",
+			EnvVars:     []string{"REVA_FRONTEND_DATAGATEWAY_PREFIX"},
+			Destination: &cfg.Reva.Frontend.DatagatewayPrefix,
+		},
+		&cli.StringFlag{
+			Name:        "ocdav-prefix",
+			Value:       "",
+			Usage:       "owncloud webdav endpoint prefix",
+			EnvVars:     []string{"REVA_FRONTEND_OCDAV_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCDavPrefix,
+		},
+		&cli.StringFlag{
+			Name:        "ocs-prefix",
+			Value:       "ocs",
+			Usage:       "open collaboration services endpoint prefix",
+			EnvVars:     []string{"REVA_FRONTEND_OCS_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCDavPrefix,
+		},
 
 		// Gateway
 
