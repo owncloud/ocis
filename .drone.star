@@ -206,21 +206,219 @@ def unitTests(ctx):
 def getEosSetup():
   return [
     {
-      'name': 'ocis-server',
-      'image': 'tiangolo/docker-with-compose',
+      'name': 'quark-1',
+      'image': 'owncloud/eos-qdb',
       'pull': 'always',
       'detach': True,
-      'commands': [
-        'sudo apt install git -y',
-        'git clone https://github.com/owncloud-docker/compose-playground.git',
-        'cd compose-playground/examples/eos-compose-acceptance-tests',
-        './build',
-        'docker-compose up -d'
-      ],
+      'environment': {
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_PORT': "7777",
+        'EOS_QDB_MODE': "raft",
+        'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
+        'EOS_QDB_NODES': "quark-1.testnet:7777,quark-2.testnet:7777,quark-3.testnet:7777",
+      },
+
       'volumes': [
         {
-          'name': 'gopath',
-          'path': '/srv/app'
+          'name': 'qdb1',
+          'path': '/var/lib/quarkdb'
+        },
+      ]
+    },
+    {
+      'name': 'quark-2',
+      'image': 'owncloud/eos-qdb',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_PORT': "7777",
+        'EOS_QDB_MODE': "raft",
+        'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
+        'EOS_QDB_NODES': "quark-1.testnet:7777,quark-2.testnet:7777,quark-3.testnet:7777",
+      },
+
+      'volumes': [
+        {
+          'name': 'qdb2',
+          'path': '/var/lib/quarkdb'
+        },
+      ]
+    },
+    {
+      'name': 'quark-3',
+      'image': 'owncloud/eos-qdb',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_PORT': "7777",
+        'EOS_QDB_MODE': "raft",
+        'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
+        'EOS_QDB_NODES': "quark-1.testnet:7777,quark-2.testnet:7777,quark-3.testnet:7777",
+      },
+
+      'volumes': [
+        {
+          'name': 'qdb3',
+          'path': '/var/lib/quarkdb'
+        },
+      ]
+    },
+    {
+      'name': 'mgm-master',
+      'image': 'owncloud/eos-mgm',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_SET_MASTER': 1,
+        'EOS_MQ_URL': 'mq-master.testnet',
+        'EOS_MGM_ALIAS': 'mgm-master.testnet',
+        'EOS_QDB_NODES': 'quark-1.testnet:7777 quark-2.testnet:7777 quark-3.testnet:7777',
+        'EOS_LDAP_HOST': 'ldap.testnet:389',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': 1,
+        'EOS_USE_QDB_MASTER': 1,
+        'EOS_NS_ACCOUNTING': 1,
+        'EOS_SYNCTIME_ACCOUNTING': 1,
+        'EOS_UTF8': 1,
+      },
+      'volumes': [
+        {
+          'name': 'eoslogs',
+          'path': '/var/eos/logs'
+        },
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eosnq',
+          'path': '/var/eos/ns-queue'
+        },
+      ]
+    },
+    {
+      'name': 'mq-master',
+      'image': 'owncloud/eos-mq',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_SET_MASTER': 1,
+        'EOS_MQ_URL': 'mq-master.testnet',
+        'EOS_MGM_ALIAS': 'mgm-master.testnet',
+        'EOS_QDB_NODES': 'quark-1.testnet:7777 quark-2.testnet:7777 quark-3.testnet:7777',
+        'EOS_LDAP_HOST': 'ldap.testnet:389',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': 1,
+        'EOS_USE_QDB_MASTER': 1,
+        'EOS_NS_ACCOUNTING': 1,
+        'EOS_SYNCTIME_ACCOUNTING': 1,
+        'EOS_UTF8': 1,
+      },
+      'volumes': [
+        {
+          'name': 'eoslogs',
+          'path': '/var/eos/logs'
+        },
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eosnq',
+          'path': '/var/eos/ns-queue'
+        },
+      ]
+    },
+    {
+      'name': 'eos-fst',
+      'image': 'owncloud/eos-fst',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_SET_MASTER': 1,
+        'EOS_MQ_URL': 'mq-master.testnet',
+        'EOS_MGM_ALIAS': 'mgm-master.testnet',
+        'EOS_QDB_NODES': 'quark-1.testnet:7777 quark-2.testnet:7777 quark-3.testnet:7777',
+        'EOS_LDAP_HOST': 'ldap.testnet:389',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': 1,
+        'EOS_USE_QDB_MASTER': 1,
+        'EOS_NS_ACCOUNTING': 1,
+        'EOS_SYNCTIME_ACCOUNTING': 1,
+        'EOS_UTF8': 1,
+        'EOS_MGM_URL': "root://mgm-master.testnet",
+        'LUKSPASSPHRASE': "just-some-rubbish-to-make-sure-fst-entrypoint-does-not-crash",
+      },
+      'volumes': [
+        {
+          'name': 'eoslogs',
+          'path': '/var/eos/logs'
+        },
+        {
+          'name': 'eosdisks',
+          'path': '/disks'
+        },
+      ]
+    },
+    {
+      'name': 'ocis',
+      'image': 'owncloud/eos-ocis',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_MGM_URL': "root://mgm-master.testnet:1094",
+        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': "/etc/ocis/identifier-registration.yml",
+        'KONNECTD_ISS': "https://ocis:9200",
+        'KONNECTD_LOG_LEVEL': "debug",
+        'KONNECTD_TLS': '0',
+        'PHOENIX_OIDC_AUTHORITY': "https://ocis:9200",
+        'PHOENIX_OIDC_METADATA_URL': "https://ocis:9200/.well-known/openid-configuration",
+        'PHOENIX_WEB_CONFIG_SERVER': "https://ocis:9200",
+        'PROXY_HTTP_ADDR': "0.0.0.0:9200",
+        'REVA_OIDC_ISSUER': "https://ocis:9200",
+        'OCIS_LOG_LEVEL': "debug",
+        'REVA_TRANSFER_EXPIRES': 86400,
+        #for reva-storage-eos use eos as storage driver the reason is that we cannot set REVA_STORAGE_EOS_LAYOUT to empty
+        #but also we don't want to have it set to anything to remove one layer in the eos folder structure
+        #default is `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}"` for reva-storage-home
+        #and `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}"` for reva-storage-eos
+        #but that gives us an extra layer in the eos file-system: /eos/dockertest/reva/users/e/einstein/file.txt
+        #and that again is annoying when the tests try to delete user data
+        'REVA_STORAGE_EOS_DRIVER': "eos",
+        'REVA_STORAGE_EOS_DATA_DRIVER': "eos",
+        'REVA_STORAGE_HOME_DRIVER': "eoshome",
+        'REVA_STORAGE_HOME_MOUNT_ID': "1284d238-aa92-42ce-bdc4-0b0000009158",
+        'REVA_STORAGE_HOME_DATA_DRIVER': "eoshome",
+        'REVA_STORAGE_EOS_MASTER_URL': "root://mgm-master.testnet:1094",
+        'REVA_STORAGE_EOS_SLAVE_URL': "root://mgm-master.testnet:1094",
+        'REVA_STORAGE_EOS_NAMESPACE': "/eos/dockertest/reva/users",
+        'REVA_STORAGE_EOS_LAYOUT': "{{.Username}}",
+        'DAV_FILES_NAMESPACE': "/eos/",
+        'REVA_LDAP_HOSTNAME': 'ldap',
+        'REVA_LDAP_PORT': 636,
+        'REVA_LDAP_BIND_PASSWORD': 'admin',
+        'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
+        'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
+        'REVA_LDAP_SCHEMA_UID': 'uid',
+        'REVA_LDAP_SCHEMA_MAIL': 'mail',
+        'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayname',
+        'LDAP_URI': 'ldap://ldap',
+        'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
+        'LDAP_BINDPW': 'admin',
+        'LDAP_BASEDN': 'dc=owncloud,dc=com'
+      },
+      'volumes': [
+        {
+          'name': 'config',
+          'path': '/config'
         },
       ]
     },
@@ -269,6 +467,47 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
       {
         'name': 'gopath',
         'temp': {},
+      },
+      {
+        'name': 'eoslogs',
+        'host': {
+          'path': '/e/master/var/log/eos'
+        }
+      },
+      {
+        'name': 'eosconfig',
+        'host': {
+          'path': '/e/master/var/eos/config'
+        }      
+      },
+      {
+        'name': 'eosnq',
+        'host': {
+          'path': '/e/master/var/eos/ns-queue'
+        } 
+      },
+      {
+        'name': 'eosdisks',
+        'host': {
+          'path': '/e/disks'
+        }
+      },
+      {
+        'name': 'qdb1',
+        'host': {
+          'path': '/e/quark-1/var/lib/quarkdb'
+        }
+      },
+      {
+        'name': 'qdb2',
+        'host': {
+          'path': '/e/quark-2/var/lib/quarkdb'
+        }      },
+      {
+        'name': 'qdb3',
+        'host': {
+          'path': '/e/quark-3/var/lib/quarkdb'
+        }
       },
     ],
     'trigger': {
