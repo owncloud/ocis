@@ -120,12 +120,13 @@ func Frontend(cfg *config.Config) *cli.Command {
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"datagateway": map[string]interface{}{
+								"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
 								"transfer_shared_secret": cfg.Reva.TransferSecret,
 								"timeout":                86400,
 								"insecure":               true,
 							},
 							"ocdav": map[string]interface{}{
-								"prefix":           "",
+								"prefix":           cfg.Reva.Frontend.OCDavPrefix,
 								"chunk_folder":     "/var/tmp/reva/chunks",
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
@@ -134,6 +135,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"disable_tus":      cfg.Reva.UploadDisableTus,
 							},
 							"ocs": map[string]interface{}{
+								"prefix": cfg.Reva.Frontend.OCSPrefix,
 								"config": map[string]interface{}{
 									"version": "1.8",
 									"website": "reva",

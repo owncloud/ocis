@@ -65,6 +65,15 @@ type Users struct {
 	JSON   string
 }
 
+// FrontendPort defines the available frontend configuration.
+type FrontendPort struct {
+	Port
+
+	DatagatewayPrefix string
+	OCDavPrefix       string
+	OCSPrefix         string
+}
+
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
@@ -230,7 +239,7 @@ type Reva struct {
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
-	Frontend          Port
+	Frontend          FrontendPort
 	DataGateway       Port
 	Gateway           Gateway
 	Users             Users
