@@ -1,12 +1,16 @@
 package proxy
 
 import (
-	"github.com/owncloud/ocis-proxy/pkg/proxy/policy"
+	"context"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/owncloud/ocis-proxy/pkg/proxy/policy"
+	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
+	"go.opencensus.io/trace"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
@@ -18,6 +22,8 @@ type MultiHostReverseProxy struct {
 	Directors      map[string]map[config.RouteType]map[string]func(req *http.Request)
 	PolicySelector policy.Selector
 	logger         log.Logger
+	propagator     tracecontext.HTTPFormat
+	config         *config.Config
 }
 
 // NewMultiHostReverseProxy undocummented
@@ -27,6 +33,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	rp := &MultiHostReverseProxy{
 		Directors: make(map[string]map[config.RouteType]map[string]func(req *http.Request)),
 		logger:    options.Logger,
+		config:    options.Config,
 	}
 
 	if options.Config.Policies == nil {
@@ -140,6 +147,16 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 			Msgf("policy %v is not configured", pol)
 	}
 
+	ctx := context.Background()
+	var span *trace.Span
+
+	// Start root span.
+	if p.config.Tracing.Enabled {
+		ctx, span = trace.StartSpan(context.Background(), r.URL.String())
+		defer span.End()
+		p.propagator.SpanContextToRequest(span.SpanContext(), r)
+	}
+
 Loop:
 	for _, rt := range config.RouteTypes {
 		var handler func(string, url.URL) bool
@@ -175,7 +192,7 @@ Loop:
 	}
 
 	// Call upstream ServeHTTP
-	p.ReverseProxy.ServeHTTP(w, r)
+	p.ReverseProxy.ServeHTTP(w, r.WithContext(ctx))
 }
 
 func (p MultiHostReverseProxy) queryRouteMatcher(endpoint string, target url.URL) bool {
