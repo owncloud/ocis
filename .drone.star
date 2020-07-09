@@ -316,21 +316,21 @@ def getEosSetup():
       ]
     },
     {
-      'name': 'ocis',
+      'name': 'ocis-server',
       'image': 'owncloud/eos-ocis',
       'pull': 'always',
       'detach': True,
       'environment': {
         'EOS_MGM_URL': "root://mgm-master:1094",
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': "/etc/ocis/identifier-registration.yml",
-        'KONNECTD_ISS': "https://ocis:9200",
+        'KONNECTD_ISS': "https://ocis-server:9200",
         'KONNECTD_LOG_LEVEL': "debug",
         'KONNECTD_TLS': '0',
-        'PHOENIX_OIDC_AUTHORITY': "https://ocis:9200",
-        'PHOENIX_OIDC_METADATA_URL': "https://ocis:9200/.well-known/openid-configuration",
-        'PHOENIX_WEB_CONFIG_SERVER': "https://ocis:9200",
+        'PHOENIX_OIDC_AUTHORITY': "https://ocis-server:9200",
+        'PHOENIX_OIDC_METADATA_URL': "https://ocis-server:9200/.well-known/openid-configuration",
+        'PHOENIX_WEB_CONFIG_SERVER': "https://ocis-server:9200",
         'PROXY_HTTP_ADDR': "0.0.0.0:9200",
-        'REVA_OIDC_ISSUER': "https://ocis:9200",
+        'REVA_OIDC_ISSUER': "https://ocis-server:9200",
         'OCIS_LOG_LEVEL': "debug",
         'REVA_TRANSFER_EXPIRES': 86400,
         #for reva-storage-eos use eos as storage driver the reason is that we cannot set REVA_STORAGE_EOS_LAYOUT to empty
@@ -416,6 +416,10 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
         ]
       },
     ],
+    'services':
+      ldap() +
+      redis() +
+      selenium(),
     'volumes': [
       {
         'name': 'gopath',
