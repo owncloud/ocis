@@ -71,6 +71,11 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(rsp.Thumbnail) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	w.Header().Set("Content-Type", rsp.GetMimetype())
 	w.WriteHeader(http.StatusOK)
 	w.Write(rsp.Thumbnail)
