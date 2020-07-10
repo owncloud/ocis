@@ -216,7 +216,7 @@ func testConfig(policy []config.Policy) *config.Config {
 		Tracing:        config.Tracing{},
 		Asset:          config.Asset{},
 		Policies:       policy,
-		OIDC:           nil,
+		OIDC:           config.OIDC{},
 		PolicySelector: nil,
 	}
 }

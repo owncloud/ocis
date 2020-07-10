@@ -245,7 +245,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
-	if cfg.OIDC != nil {
+	if cfg.OIDC.Issuer != "" {
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
 
@@ -265,7 +265,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		// it will fetch the keys from the issuer using the .well-known
 		// endpoint
 		provider := func() (middleware.OIDCProvider, error) {
-			return oidc.NewProvider(customCtx, cfg.OIDC.Endpoint)
+			return oidc.NewProvider(customCtx, cfg.OIDC.Issuer)
 		}
 
 		oidcMW := middleware.OpenIDConnect(

@@ -85,7 +85,7 @@ type Config struct {
 	Tracing        Tracing
 	Asset          Asset
 	Policies       []Policy
-	OIDC           *OIDC
+	OIDC           OIDC
 	TokenManager   TokenManager
 	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
 	Reva           Reva
@@ -94,7 +94,7 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Endpoint string
+	Issuer   string
 	Insecure bool
 }
 

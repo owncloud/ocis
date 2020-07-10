@@ -171,5 +171,23 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Address,
 		},
+
+		// OIDC
+
+		&cli.StringFlag{
+			Name:        "oidc-issuer",
+			Value:       "https://localhost:9200",
+			Usage:       "OIDC issuer",
+			EnvVars:     []string{"PROXY_OIDC_ISSUER"},
+			Destination: &cfg.OIDC.Issuer,
+		},
+		&cli.BoolFlag{
+			Name:        "oidc-insecure",
+			Value:       true,
+			Usage:       "OIDC allow insecure communication",
+			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
+			Destination: &cfg.OIDC.Insecure,
+		},
 	}
+
 }
