@@ -6,9 +6,19 @@ The following sections list the changes for ocis-proxy unreleased.
 
 ## Summary
 
+* Change - Mint new username property in the reva token: [#62](https://github.com/owncloud/ocis-proxy/pull/62)
 * Enhancement - Create a root span on proxy that propagates down to consumers: [#64](https://github.com/owncloud/ocis-proxy/pull/64)
 
 ## Details
+
+* Change - Mint new username property in the reva token: [#62](https://github.com/owncloud/ocis-proxy/pull/62)
+
+   An accounts username is now taken from the on_premises_sam_account_name property instead of
+   the preferred_name. Furthermore the group name (also from on_premises_sam_account_name
+   property) is now minted into the token as well.
+
+   https://github.com/owncloud/ocis-proxy/pull/62
+
 
 * Enhancement - Create a root span on proxy that propagates down to consumers: [#64](https://github.com/owncloud/ocis-proxy/pull/64)
 
