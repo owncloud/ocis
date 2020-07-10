@@ -4,7 +4,7 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
-PHOENIX_ASSETS_VERSION = 0.12.0
+PHOENIX_ASSETS_VERSION = v0.12.0
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -195,4 +195,4 @@ watch:
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
 
 assets:
-	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/v$(PHOENIX_ASSETS_VERSION)/phoenix.tar.gz | tar xvzf - -C assets/
+	mkdir assets/ && curl -slL -o- https://github.com/owncloud/phoenix/releases/download/$(PHOENIX_ASSETS_VERSION)/phoenix.tar.gz | tar xvzf - -C assets/
