@@ -134,11 +134,10 @@ def testing(ctx):
           'SONAR_TOKEN': {
             'from_secret': 'sonar_token',
           },
-          'SONAR_PULL_REQUEST_PROVIDER': 'GitHub' if ctx.build.event == 'pull_request' else None,
           'SONAR_PULL_REQUEST_REPO': 'owncloud/ocis-thumbnails' if ctx.build.event == 'pull_request' else None,
           'SONAR_PULL_REQUEST_BASE': 'master' if ctx.build.event == 'pull_request' else None,
           'SONAR_PULL_REQUEST_BRANCH': ctx.build.source if ctx.build.event == 'pull_request' else None,
-          'SONAR_PULL_REQUEST_KEY': ctx.build.ref if ctx.build.event == 'pull_request' else None,
+          'SONAR_PULL_REQUEST_KEY': ctx.build.ref.replace("refs/pull/", "").split("/")[0] if ctx.build.event == 'pull_request' else None,
         },
       },
     ],
