@@ -65,10 +65,11 @@ func createAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsSer
 	// TODO check if fields are missing.
 	req := &acc.CreateAccountRequest{
 		Account: &acc.Account{
-			DisplayName:   claims.DisplayName,
-			PreferredName: claims.PreferredUsername,
-			Mail:          claims.Email,
-			CreationType:  "LocalAccount",
+			DisplayName:              claims.DisplayName,
+			PreferredName:            claims.PreferredUsername,
+			OnPremisesSamAccountName: claims.PreferredUsername,
+			Mail:                     claims.Email,
+			CreationType:             "LocalAccount",
 		},
 	}
 	created, err := ac.CreateAccount(context.Background(), req)
@@ -125,16 +126,22 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
+			groups := make([]string, len(account.MemberOf))
+			for i := range account.MemberOf {
+				// reva needs the unix group name
+				groups[i] = account.MemberOf[i].OnPremisesSamAccountName
+			}
+
 			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
 				Id: &revauser.UserId{
 					OpaqueId: account.Id,
 				},
-				Username:     account.PreferredName,
+				Username:     account.OnPremisesSamAccountName,
 				DisplayName:  account.DisplayName,
 				Mail:         account.Mail,
 				MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
-				// TODO groups
+				Groups:       groups,
 			})
 
 			if err != nil {
