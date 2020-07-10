@@ -1,12 +1,13 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.9.0] (2020-07-10)
 
-The following sections list the changes in ocis-phoenix unreleased.
+The following sections list the changes in ocis-phoenix 0.9.0.
 
-[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.8.1...master
+[0.9.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.8.1...v0.9.0
 
 ## Summary
 
 * Bugfix - Allow silent refresh of access token: [#69](https://github.com/owncloud/ocis-konnectd/issues/69)
+* Change - Update Phoenix: [#70](https://github.com/owncloud/ocis-phoenix/pull/70)
 
 ## Details
 
@@ -17,6 +18,12 @@ The following sections list the changes in ocis-phoenix unreleased.
 
    https://github.com/owncloud/ocis-konnectd/issues/69
    https://github.com/owncloud/ocis-phoenix/pull/69
+
+* Change - Update Phoenix: [#70](https://github.com/owncloud/ocis-phoenix/pull/70)
+
+   Updated phoenix from v0.11.1 to v0.12.0
+
+   https://github.com/owncloud/ocis-phoenix/pull/70
 
 # Changelog for [0.8.1] (2020-06-29)
 
