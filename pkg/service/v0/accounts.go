@@ -12,7 +12,6 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/search/query"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
@@ -42,8 +41,10 @@ func (s Service) indexAccounts(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		a := &proto.Account{}
-		if err = s.loadAccount(file.Name(), a); err != nil {
+		a := &proto.BleveAccount{
+			BleveType: "account",
+		}
+		if err = s.loadAccount(file.Name(), &a.Account); err != nil {
 			s.log.Error().Err(err).Str("account", file.Name()).Msg("could not load account")
 			continue
 		}
@@ -153,8 +154,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	var password string
 
-	var query query.Query
-
 	// check if this looks like an auth request
 	match := authQuery.FindStringSubmatch(in.Query)
 	if len(match) == 3 {
@@ -165,6 +164,12 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		}
 	}
 
+	// only search for accounts
+	tq := bleve.NewTermQuery("account")
+	tq.SetField("bleve_type")
+
+	query := bleve.NewConjunctionQuery(tq)
+
 	if in.Query != "" {
 		// parse the query like an odata filter
 		var q *godata.GoDataFilterQuery
@@ -174,13 +179,12 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		}
 
 		// convert to bleve query
-		query, err = provider.BuildBleveQuery(q)
+		bq, err := provider.BuildBleveQuery(q)
 		if err != nil {
 			s.log.Error().Err(err).Msg("could not build bleve query")
 			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
 		}
-	} else {
-		query = bleve.NewMatchAllQuery()
+		query.AddQuery(bq)
 	}
 
 	s.log.Debug().Interface("query", query).Msg("using query")

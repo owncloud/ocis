@@ -9,7 +9,6 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/search/query"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
@@ -30,8 +29,10 @@ func (s Service) indexGroups(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		g := &proto.Group{}
-		if err = s.loadGroup(file.Name(), g); err != nil {
+		g := &proto.BleveGroup{
+			BleveType: "group",
+		}
+		if err = s.loadGroup(file.Name(), &g.Group); err != nil {
 			s.log.Error().Err(err).Str("group", file.Name()).Msg("could not load group")
 			continue
 		}
@@ -115,7 +116,11 @@ func (s Service) deflateMembers(g *proto.Group) {
 // ListGroups implements the GroupsServiceHandler interface
 func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
 
-	var query query.Query
+	// only search for groups
+	tq := bleve.NewTermQuery("group")
+	tq.SetField("bleve_type")
+
+	query := bleve.NewConjunctionQuery(tq)
 
 	if in.Query != "" {
 		// parse the query like an odata filter
@@ -126,13 +131,12 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 		}
 
 		// convert to bleve query
-		query, err = provider.BuildBleveQuery(q)
+		bq, err := provider.BuildBleveQuery(q)
 		if err != nil {
 			s.log.Error().Err(err).Msg("could not build bleve query")
 			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
 		}
-	} else {
-		query = bleve.NewMatchAllQuery()
+		query.AddQuery(bq)
 	}
 
 	s.log.Debug().Interface("query", query).Msg("using query")
@@ -320,6 +324,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
 		return
 	}
+	// FIXME update index!
 	// TODO rollback changes when only one of them failed?
 	// TODO store relation in another file?
 	// TODO return error if they are already related?
@@ -379,6 +384,7 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
 		return
 	}
+	// FIXME update index!
 	// TODO rollback changes when only one of them failed?
 	// TODO store relation in another file?
 	// TODO return error if they are not related?

@@ -11,6 +11,7 @@ import (
 
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
+	"github.com/blevesearch/bleve/analysis/analyzer/simple"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -208,13 +209,44 @@ func New(opts ...Option) (s *Service, err error) {
 		}
 	}
 
-	mapping := bleve.NewIndexMapping()
+	indexMapping := bleve.NewIndexMapping()
 	// keep all symbols in terms to allow exact maching, eg. emails
-	mapping.DefaultAnalyzer = keyword.Name
+	indexMapping.DefaultAnalyzer = keyword.Name
 	// TODO don't bother to store fields as we will load the account from disk
 	//groupsFieldMapping := bleve.NewTextFieldMapping()
 	//blogMapping.AddFieldMappingsAt("memberOf", nameFieldMapping)
-	// TODO index groups and accounts as different types?
+	// TODO index groups and accounts as different types!
+
+	// Reusable mapping for text, uses english stop word removal
+	simpleTextFieldMapping := bleve.NewTextFieldMapping()
+	simpleTextFieldMapping.Analyzer = simple.Name
+	simpleTextFieldMapping.Store = false
+
+	// Reusable mapping for keyword text
+	keywordFieldMapping := bleve.NewTextFieldMapping()
+	keywordFieldMapping.Analyzer = keyword.Name
+	keywordFieldMapping.Store = false
+
+	// accounts
+	accountMapping := bleve.NewDocumentMapping()
+	indexMapping.AddDocumentMapping("account", accountMapping)
+
+	// Text
+	accountMapping.AddFieldMappingsAt("display_name", simpleTextFieldMapping)
+	accountMapping.AddFieldMappingsAt("description", simpleTextFieldMapping)
+
+	// Keywords
+	accountMapping.AddFieldMappingsAt("mail", keywordFieldMapping)
+
+	// groups
+	groupMapping := bleve.NewDocumentMapping()
+	indexMapping.AddDocumentMapping("group", groupMapping)
+
+	// Text
+	groupMapping.AddFieldMappingsAt("display_name", simpleTextFieldMapping)
+	groupMapping.AddFieldMappingsAt("description", simpleTextFieldMapping)
+
+	indexMapping.TypeField = "bleve_type"
 
 	s = &Service{
 		id:     cfg.GRPC.Namespace + "." + cfg.Server.Name,
@@ -227,7 +259,7 @@ func New(opts ...Option) (s *Service, err error) {
 	if err = os.RemoveAll(indexDir); err != nil {
 		return nil, err
 	}
-	if s.index, err = bleve.New(indexDir, mapping); err != nil {
+	if s.index, err = bleve.New(indexDir, indexMapping); err != nil {
 		return
 	}
 	if err = s.indexAccounts(accountsDir); err != nil {
