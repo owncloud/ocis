@@ -25,12 +25,16 @@ func CreateHome(opts ...Option) func(next http.Handler) http.Handler {
 				"secret": opt.TokenManagerConfig.JWTSecret,
 			})
 			if err != nil {
-				opt.Logger.Err(err).Msg("error creating tokenManager")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 
 			token := r.Header.Get("x-access-token")
+			if token == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			user, err := tokenManager.DismantleToken(r.Context(), token)
 			if err != nil {
 				opt.Logger.Err(err).Msg("error getting user from access token")
