@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.10.0] (2020-07-10)
 
-The following sections list the changes in ocis-reva unreleased.
+The following sections list the changes in ocis-reva 0.10.0.
 
-[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.9.1...master
+[0.10.0]: https://github.com/owncloud/ocis-reva/compare/v0.9.1...v0.10.0
 
 ## Summary
 
