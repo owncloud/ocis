@@ -126,6 +126,16 @@ def testing(ctx):
           },
         },
       },
+      {
+        'name': 'sonarcloud',
+        'image': 'sonarsource/sonar-scanner-cli',
+        'pull': 'always',
+        'environment': {
+          'SONAR_TOKEN': {
+            'from_secret': 'sonar_token',
+          },
+        },
+      },
     ],
     'volumes': [
       {
