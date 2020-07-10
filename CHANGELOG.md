@@ -8,6 +8,7 @@ The following sections list the changes in ocis-thumbnails unreleased.
 
 * Change - Add more default resolutions: [#23](https://github.com/owncloud/ocis-thumbnails/issues/23)
 * Change - Refactor code to remove code smells: [#21](https://github.com/owncloud/ocis-thumbnails/issues/21)
+* Change - Use micro service error api: [#31](https://github.com/owncloud/ocis-thumbnails/issues/31)
 * Enhancement - Limit users to access own thumbnails: [#5](https://github.com/owncloud/ocis-thumbnails/issues/5)
 
 ## Details
@@ -25,6 +26,13 @@ The following sections list the changes in ocis-thumbnails unreleased.
    Scanning the code using a static code analyzer showed some code smells. This change fixes them.
 
    https://github.com/owncloud/ocis-thumbnails/issues/21
+
+
+* Change - Use micro service error api: [#31](https://github.com/owncloud/ocis-thumbnails/issues/31)
+
+   The service now also returns a status code when an error occurs.
+
+   https://github.com/owncloud/ocis-thumbnails/issues/31
 
 
 * Enhancement - Limit users to access own thumbnails: [#5](https://github.com/owncloud/ocis-thumbnails/issues/5)
