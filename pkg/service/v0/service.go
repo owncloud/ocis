@@ -2,10 +2,10 @@ package svc
 
 import (
 	"context"
-	"fmt"
 
 	"gopkg.in/square/go-jose.v2/jwt"
 
+	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
@@ -23,6 +23,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
+		serviceID: options.Config.Server.Namespace + "." + options.Config.Server.Name,
 		manager: thumbnail.NewSimpleManager(
 			options.ThumbnailStorage,
 			logger,
@@ -37,6 +38,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
+	serviceID   string
 	manager     thumbnail.Manager
 	resolutions resolution.Resolutions
 	source      imgsource.Source
@@ -47,17 +49,18 @@ type Thumbnail struct {
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
 	encoder := thumbnail.EncoderForType(req.Filetype.String())
 	if encoder == nil {
-		return fmt.Errorf("can't be encoded. filetype %s not supported", req.Filetype.String())
+		g.logger.Debug().Str("filetype", req.Filetype.String()).Msg("unsupported filetype")
+		return nil
 	}
 	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
 
 	auth := req.Authorization
 	if auth == "" {
-		return fmt.Errorf("authorization is missing")
+		return merrors.BadRequest(g.serviceID, "authorization is missing")
 	}
 	username, err := usernameFromAuthorization(auth)
 	if err != nil {
-		return err
+		return merrors.InternalServerError(g.serviceID, "could not get username: %v", err.Error())
 	}
 
 	tr := thumbnail.Request{
@@ -78,10 +81,10 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	sCtx := imgsource.WithAuthorization(ctx, auth)
 	img, err := g.source.Get(sCtx, tr.ImagePath)
 	if err != nil {
-		return err
+		return merrors.InternalServerError(g.serviceID, "could not get image from source: %v", err.Error())
 	}
 	if img == nil {
-		return fmt.Errorf("could not retrieve image")
+		return merrors.InternalServerError(g.serviceID, "could not get image from source")
 	}
 	thumbnail, err = g.manager.Get(tr, img)
 	if err != nil {
