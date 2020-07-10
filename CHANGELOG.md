@@ -16,6 +16,7 @@
 * Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
+* Enhancement - Update extensions 2020-07-10: [#376](https://github.com/owncloud/ocis/pull/376)
 * Enhancement - Update extensions: [#290](https://github.com/owncloud/ocis/pull/290)
 * Enhancement - Update ocis-reva to 0.4.0: [#295](https://github.com/owncloud/ocis/pull/295)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
@@ -141,6 +142,13 @@
    ocis-reva v0.1.0
 
    https://github.com/owncloud/ocis/pull/151
+
+
+* Enhancement - Update extensions 2020-07-10: [#376](https://github.com/owncloud/ocis/pull/376)
+
+   - ocis-reva 0.10.0 - ocis-phoenix 0.9.0
+
+   https://github.com/owncloud/ocis/pull/376
 
 
 * Enhancement - Update extensions: [#290](https://github.com/owncloud/ocis/pull/290)
