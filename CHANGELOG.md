@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Change - Mint new username property in the reva token: [#62](https://github.com/owncloud/ocis-proxy/pull/62)
+* Enhancement - Add Accounts UI routes: [#65](https://github.com/owncloud/ocis-proxy/pull/65)
 * Enhancement - Only send create home request if an account has been migrated: [#52](https://github.com/owncloud/ocis-proxy/issues/52)
 * Enhancement - Create a root span on proxy that propagates down to consumers: [#64](https://github.com/owncloud/ocis-proxy/pull/64)
 
@@ -19,6 +20,15 @@ The following sections list the changes for ocis-proxy unreleased.
    property) is now minted into the token as well.
 
    https://github.com/owncloud/ocis-proxy/pull/62
+
+
+* Enhancement - Add Accounts UI routes: [#65](https://github.com/owncloud/ocis-proxy/pull/65)
+
+   The accounts service has a ui that requires routing - `/api/v0/accounts` and - `/accounts.js`
+
+   To http://localhost:9181
+
+   https://github.com/owncloud/ocis-proxy/pull/65
 
 
 * Enhancement - Only send create home request if an account has been migrated: [#52](https://github.com/owncloud/ocis-proxy/issues/52)
