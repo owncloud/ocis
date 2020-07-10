@@ -63,13 +63,15 @@ service GroupsService {
     rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
         // List method maps to HTTP GET
         option (google.api.http) = {
-            get: "/v0/groups"
+            post: "/api/v0/accounts/groups-list",
+            body: "*"
         };
     }
     // Gets an groups
     rpc GetGroup(GetGroupRequest) returns (Group) {
         option (google.api.http) = {
-            get: "/v0/groups/{id=*}"
+            post: "/api/v0/accounts/groups-get",
+            body: "*"
         };
     }
     // Creates a group
@@ -77,8 +79,8 @@ service GroupsService {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
         option (google.api.http) = {
-            post: "/v0/groups"
-            body: "group"
+            post: "/api/v0/accounts/groups-create"
+            body: "*"
         };
     }
     // Updates a group
@@ -86,8 +88,8 @@ service GroupsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            patch: "/v0/groups/{group.id=*}"
-            body: "group"
+            post: "/api/v0/accounts/groups-update"
+            body: "*"
         };
     };
     // Deletes a group
@@ -95,7 +97,8 @@ service GroupsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            delete: "/v0/groups/{id=*}"
+            post: "/api/v0/accounts/groups-delete",
+            body: "*"
         };
     }
 
@@ -108,7 +111,7 @@ service GroupsService {
     rpc AddMember(AddMemberRequest) returns (Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            post: "/v0/groups/{id=*}/members/$ref"
+            post: "/api/v0/groups/{group_id=*}/members/$ref"
             body: "*"
         };
     }
@@ -116,14 +119,16 @@ service GroupsService {
     rpc RemoveMember(RemoveMemberRequest) returns (Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            delete: "/v0/groups/{id=*}/members/{account_id}/$ref"
+            delete: "/api/v0/groups/{group_id=*}/members/{account_id}/$ref"
+            body: "*"
         };
     }
     // group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0
     rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            get: "/v0/groups/{id=*}/members/$ref"
+            get: "/api/v0/groups/{id=*}/members/$ref"
+            body: "*"
         };
     }
 
@@ -471,14 +476,15 @@ message DeleteGroupRequest {
 }
 
 message AddMemberRequest {
+    // The id of the group to add a member to
+    string group_id = 1;
     // The account id to add
-    string id = 1;
+    string account_id = 2;
 }
 
 message RemoveMemberRequest {
-    // The group id
-    string id = 1;
-
+    // The id of the group to remove a member from
+    string group_id = 1;
     // The account id to remove
     string account_id = 2;
 }
@@ -514,7 +520,7 @@ message ListMembersRequest {
     // display names that include both "Test" and "String"
     string query = 4 [(google.api.field_behavior) = OPTIONAL];
 
-    // The group id
+    // The id of the group to list members from
     string id = 5;
 }
 

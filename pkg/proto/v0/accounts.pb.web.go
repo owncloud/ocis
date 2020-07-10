@@ -185,7 +185,7 @@ func (h *webGroupsServiceHandler) ListGroups(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -209,7 +209,7 @@ func (h *webGroupsServiceHandler) GetGroup(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -257,7 +257,7 @@ func (h *webGroupsServiceHandler) UpdateGroup(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -362,14 +362,14 @@ func RegisterGroupsServiceWeb(r chi.Router, i GroupsServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("GET", "/v0/groups", handler.ListGroups)
-	r.MethodFunc("GET", "/v0/groups/{id=*}", handler.GetGroup)
-	r.MethodFunc("POST", "/v0/groups", handler.CreateGroup)
-	r.MethodFunc("PATCH", "/v0/groups/{group.id=*}", handler.UpdateGroup)
-	r.MethodFunc("DELETE", "/v0/groups/{id=*}", handler.DeleteGroup)
-	r.MethodFunc("POST", "/v0/groups/{id=*}/members/$ref", handler.AddMember)
-	r.MethodFunc("DELETE", "/v0/groups/{id=*}/members/{account_id}/$ref", handler.RemoveMember)
-	r.MethodFunc("GET", "/v0/groups/{id=*}/members/$ref", handler.ListMembers)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-list", handler.ListGroups)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-get", handler.GetGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-create", handler.CreateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-update", handler.UpdateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-delete", handler.DeleteGroup)
+	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/$ref", handler.AddMember)
+	r.MethodFunc("DELETE", "/api/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
+	r.MethodFunc("GET", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
 }
 
 // ListAccountsRequestJSONMarshaler describes the default jsonpb.Marshaler used by all

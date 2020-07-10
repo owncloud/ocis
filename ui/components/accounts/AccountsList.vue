@@ -15,9 +15,9 @@
       <oc-table-group>
         <oc-table-row v-for="account in accounts" :key="`account-list-row-${account.id}`">
           <oc-table-cell>
-            <avatar :user-name="account.displayName || account.preferredName" :userid="account.id" :width="35" />
+            <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
           </oc-table-cell>
-          <oc-table-cell v-text="account.preferredName" />
+          <oc-table-cell v-text="account.onPremisesSamAccountName" />
           <oc-table-cell v-text="account.displayName || '-'" />
           <oc-table-cell v-text="account.mail" />
           <oc-table-cell v-text="account.uidNumber || '-'" />

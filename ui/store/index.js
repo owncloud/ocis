@@ -15,10 +15,10 @@ const getters = {
   isInitialized: state => state.initialized,
   getAccountsSorted: state => {
     return Object.values(state.accounts).sort((a1, a2) => {
-      if (a1.preferredName === a2.preferredName) {
+      if (a1.onPremisesSamAccountName === a2.onPremisesSamAccountName) {
         return a1.id.localeCompare(a2.id)
       }
-      return a1.preferredName.localeCompare(a2.preferredName)
+      return a1.onPremisesSamAccountName.localeCompare(a2.onPremisesSamAccountName)
     })
   }
 }
