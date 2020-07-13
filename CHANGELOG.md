@@ -6,6 +6,7 @@ The following sections list the changes for ocis-proxy unreleased.
 
 ## Summary
 
+* Bugfix - Provide token configuration from config: [#69](https://github.com/owncloud/ocis-proxy/pull/69)
 * Change - Add OIDC config flags: [#66](https://github.com/owncloud/ocis-proxy/pull/66)
 * Change - Mint new username property in the reva token: [#62](https://github.com/owncloud/ocis-proxy/pull/62)
 * Enhancement - Add Accounts UI routes: [#65](https://github.com/owncloud/ocis-proxy/pull/65)
@@ -13,6 +14,14 @@ The following sections list the changes for ocis-proxy unreleased.
 * Enhancement - Create a root span on proxy that propagates down to consumers: [#64](https://github.com/owncloud/ocis-proxy/pull/64)
 
 ## Details
+
+* Bugfix - Provide token configuration from config: [#69](https://github.com/owncloud/ocis-proxy/pull/69)
+
+   Fixed a bug that causes the createHome middleware to crash if no configuration for the
+   TokenManager is propagated.
+
+   https://github.com/owncloud/ocis-proxy/pull/69
+
 
 * Change - Add OIDC config flags: [#66](https://github.com/owncloud/ocis-proxy/pull/66)
 
