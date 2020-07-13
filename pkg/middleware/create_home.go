@@ -25,6 +25,7 @@ func CreateHome(opts ...Option) func(next http.Handler) http.Handler {
 				"secret": opt.TokenManagerConfig.JWTSecret,
 			})
 			if err != nil {
+				opt.Logger.Error().Err(err).Msg("error creating a token manager")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
