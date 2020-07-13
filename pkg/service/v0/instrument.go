@@ -24,7 +24,7 @@ func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	i.next.ServeHTTP(w, r)
 }
 
-// Dummy implements the Service interface.
-func (i instrument) Dummy(w http.ResponseWriter, r *http.Request) {
-	i.next.Dummy(w, r)
+// GetConfig implements the Service interface.
+func (i instrument) GetConfig(w http.ResponseWriter, r *http.Request) {
+	i.next.GetConfig(w, r)
 }
