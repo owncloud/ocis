@@ -6,6 +6,36 @@ networks:
     name: testnet
 
 services:
+  ldap:
+    container_name: ldap
+    image: osixia/openldap:latest
+    tty: true
+    privileged: true
+    stdin_open: true
+    ports:
+      - 389:389
+      - 636:636
+    hostname: ldap.testnet
+    networks:
+      - testnet
+    environment:
+      LDAP_TLS_VERIFY_CLIENT: "never"
+      LDAP_DOMAIN: "example.org"
+      LDAP_ORGANISATION: "example"
+      LDAP_ADMIN_PASSWORD: "admin"
+
+  phpldapadmin:
+    container_name: ldapadmin
+    image: osixia/phpldapadmin
+    ports:
+      - 8443:443
+    networks:
+      - testnet
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "ldap.testnet"
+      LDAP_BASE: "dc=example,dc=org"
+      LDAP_LOGIN_DN: "cn=admin,dc=example,dc=org"
+
   ocis:
     container_name: ocis
     image: owncloud/eos-ocis-dev:latest
@@ -14,6 +44,8 @@ services:
     stdin_open: true
     ports:
       - 9200:9200
+      - 9160:9160
+      - 9140:9140
     env_file:
       - ./config/eos-docker.env
     hostname: ocis
@@ -42,6 +74,19 @@ services:
       REVA_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       REVA_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Username}}"
+      DAV_FILES_NAMESPACE: "/eos/"
+      REVA_LDAP_HOSTNAME: 'ldap.testnet'
+      REVA_LDAP_PORT: 636
+      REVA_LDAP_BIND_PASSWORD: 'admin'
+      REVA_LDAP_BIND_DN: 'cn=admin,dc=example,dc=org'
+      REVA_LDAP_BASE_DN: 'dc=example,dc=org'
+      REVA_LDAP_SCHEMA_UID: 'uid'
+      REVA_LDAP_SCHEMA_MAIL: 'mail'
+      REVA_LDAP_SCHEMA_DISPLAYNAME: 'displayname'
+      LDAP_URI: 'ldap://ldap.testnet'
+      LDAP_BINDDN: 'cn=admin,dc=example,dc=org'
+      LDAP_BINDPW: 'admin'
+      LDAP_BASEDN: 'dc=example,dc=org'
 
   mgm-master:
     container_name: mgm-master
