@@ -296,6 +296,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.Logger(l),
 			middleware.RevaGatewayClient(sc),
 			middleware.AccountsClient(accounts),
+			middleware.TokenManagerConfig(cfg.TokenManager),
 		)
 
 		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW, chMW)
