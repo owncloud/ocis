@@ -1,3 +1,28 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.10.0...master
+
+## Summary
+
+* Enhancement - Update reva to v0.1.1-0.20200710143425-cf38a45220c5: [#920](https://github.com/cs3org/reva/pull/920)
+
+## Details
+
+* Enhancement - Update reva to v0.1.1-0.20200710143425-cf38a45220c5: [#920](https://github.com/cs3org/reva/pull/920)
+
+   - Update reva to v0.1.1-0.20200710143425-cf38a45220c5 (#371) - Add wopi open (reva/#920) -
+   Added a CS3API compliant data exporter to Mentix (reva/#955) - Read SMTP password from env if
+   not set in config (reva/#953) - OCS share fix including file info after update (reva/#958) - Add
+   flag to smtpclient for for unauthenticated SMTP (reva/#963)
+
+   https://github.com/cs3org/reva/pull/920
+   https://github.com/cs3org/reva/pull/953
+   https://github.com/cs3org/reva/pull/955
+   https://github.com/cs3org/reva/pull/958
+   https://github.com/cs3org/reva/pull/963
+
 # Changelog for [0.10.0] (2020-07-10)
 
 The following sections list the changes in ocis-reva 0.10.0.
