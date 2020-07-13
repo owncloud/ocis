@@ -368,9 +368,10 @@ def binary(ctx, name):
           'files': [
             'dist/release/*',
           ],
-          'title': ctx.build.ref.replace("refs/tags/", ""),
+          'title': ctx.build.ref.replace("refs/tags/v", ""),
           'note': 'dist/CHANGELOG.md',
           'overwrite': True,
+          'prerelease': len(ctx.build.ref.split("-")) > 1,
         },
         'when': {
           'ref': [
@@ -441,6 +442,7 @@ def manifest(ctx):
   }
 
 def changelog(ctx):
+  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -461,8 +463,8 @@ def changelog(ctx):
           'actions': [
             'clone',
           ],
-          'remote': 'https://github.com/%s' % (ctx.repo.slug),
-          'branch': ctx.build.branch if ctx.build.event == 'pull_request' else 'master',
+          'remote': 'https://github.com/%s' % (repo_slug),
+          'branch': ctx.build.source if ctx.build.event == 'pull_request' else 'master',
           'path': '/drone/src',
           'netrc_machine': 'github.com',
           'netrc_username': {
@@ -482,8 +484,16 @@ def changelog(ctx):
         ],
       },
       {
+        'name': 'diff',
+        'image': 'owncloud/alpine:latest',
+        'pull': 'always',
+        'commands': [
+          'git diff',
+        ],
+      },
+      {
         'name': 'output',
-        'image': 'webhippie/golang:1.13',
+        'image': 'owncloud/alpine:latest',
         'pull': 'always',
         'commands': [
           'cat CHANGELOG.md',
@@ -525,7 +535,7 @@ def changelog(ctx):
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/pull/**',
       ],
     },
   }
@@ -612,11 +622,25 @@ def website(ctx):
     },
     'steps': [
       {
-        'name': 'generate',
-        'image': 'webhippie/hugo:latest',
-        'pull': 'always',
+        'name': 'prepare',
+        'image': 'owncloudci/alpine:latest',
         'commands': [
-          'make docs',
+          'make docs-copy'
+        ],
+      },
+      {
+        'name': 'test',
+        'image': 'webhippie/hugo:latest',
+        'commands': [
+          'cd hugo',
+          'hugo',
+        ],
+      },
+      {
+        'name': 'list',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'tree hugo/public',
         ],
       },
       {
@@ -630,8 +654,28 @@ def website(ctx):
           'password': {
             'from_secret': 'github_token',
           },
-          'pages_directory': 'docs/public/',
-          'temporary_base': 'tmp/',
+          'pages_directory': 'docs/',
+          'target_branch': 'docs',
+        },
+        'when': {
+          'ref': {
+            'exclude': [
+              'refs/pull/**',
+            ],
+          },
+        },
+      },
+      {
+        'name': 'downstream',
+        'image': 'plugins/downstream',
+        'settings': {
+          'server': 'https://cloud.drone.io/',
+          'token': {
+            'from_secret': 'drone_token',
+          },
+          'repositories': [
+            'owncloud/owncloud.github.io@source',
+          ],
         },
         'when': {
           'ref': {
