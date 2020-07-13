@@ -1,3 +1,21 @@
+# Changelog for unreleased
+
+The following sections list the changes for unreleased.
+
+## Summary
+
+ * Chg #20: Change status not found on missing thumbnail
+
+## Details
+
+ * Change #20: Change status not found on missing thumbnail
+
+   The service returned a bad request when no thumbnail was generated. It is now changed to not
+   found.
+
+   https://github.com/owncloud/ocis-webdav/issues/20
+
+
 # Changelog for 0.1.0
 
 The following sections list the changes for 0.1.0.
