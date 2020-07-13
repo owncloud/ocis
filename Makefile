@@ -3,6 +3,7 @@ NAME := ocis-ocs
 IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
+HUGO := hugo
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -45,6 +46,7 @@ ifndef DATE
 endif
 
 LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
 GCFLAGS += all=-N -l
 
 .PHONY: all
@@ -57,7 +59,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST)
+	rm -rf $(BIN) $(DIST) $(HUGO)
 
 .PHONY: fmt
 fmt:
@@ -98,7 +100,7 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
@@ -130,9 +132,24 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
+.PHONY: docs-copy
+docs-copy:
+	mkdir -p $(HUGO); \
+	mkdir -p $(HUGO)/content/extensions; \
+	cd $(HUGO); \
+	git init; \
+	git remote rm origin; \
+	git remote add origin https://github.com/owncloud/owncloud.github.io; \
+	git fetch; \
+	git checkout origin/source -f; \
+	rsync --delete -ax ../docs/ content/extensions/$(NAME)
+
+.PHONY: docs-build
+docs-build:
+	cd $(HUGO); hugo
+
 .PHONY: docs
-docs:
-	cd docs; hugo
+docs: docs-copy docs-build
 
 .PHONY: watch
 watch:
@@ -154,25 +171,25 @@ watch:
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--go_out=pkg/proto/v0 example.proto
+# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--micro_out=pkg/proto/v0 example.proto
+# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--microweb_out=pkg/proto/v0 example.proto
+# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--swagger_out=pkg/proto/v0 example.proto
+# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
 
 # .PHONY: protobuf
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
