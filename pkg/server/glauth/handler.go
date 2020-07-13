@@ -26,6 +26,7 @@ const (
 
 type ocisHandler struct {
 	as  accounts.AccountsService
+	gs  accounts.GroupsService
 	log log.Logger
 	cfg *config.Config
 }
@@ -162,9 +163,28 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 
 			return ldap.ServerSearchResult{
 				ResultCode: ldap.LDAPResultOperationsError,
-			}, errors.New("search error: error getting users")
+			}, errors.New("search error: error listing users")
 		}
 		entries = append(entries, h.mapAccounts(accounts.Accounts)...)
+	case groupsQuery:
+		groups, err := h.gs.ListGroups(context.TODO(), &accounts.ListGroupsRequest{
+			Query: query,
+		})
+		if err != nil {
+			h.log.Error().
+				Err(err).
+				Str("binddn", bindDN).
+				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("filter", searchReq.Filter).
+				Str("query", query).
+				Interface("src", conn.RemoteAddr()).
+				Msg("Could not list groups")
+
+			return ldap.ServerSearchResult{
+				ResultCode: ldap.LDAPResultOperationsError,
+			}, errors.New("search error: error listing groups")
+		}
+		entries = append(entries, h.mapGroups(groups.Groups)...)
 	}
 
 	stats.Frontend.Add("search_successes", 1)
@@ -192,36 +212,71 @@ func attribute(name string, values ...string) *ldap.EntryAttribute {
 
 func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 	var entries []*ldap.Entry
-	for _, acc := range accounts {
+	for i := range accounts {
 		attrs := []*ldap.EntryAttribute{
 			attribute("objectClass", "posixAccount", "inetOrgPerson", "organizationalPerson", "Person", "top"),
-			attribute("cn", acc.PreferredName),
-			attribute("uid", acc.PreferredName),
-			attribute("sn", acc.PreferredName),
+			attribute("cn", accounts[i].PreferredName),
+			attribute("uid", accounts[i].PreferredName),
+			attribute("sn", accounts[i].PreferredName),
 		}
-		if acc.DisplayName != "" {
-			attrs = append(attrs, attribute("displayName", acc.DisplayName))
+		if accounts[i].DisplayName != "" {
+			attrs = append(attrs, attribute("displayName", accounts[i].DisplayName))
 		}
-		if acc.Mail != "" {
-			attrs = append(attrs, attribute("mail", acc.Mail))
+		if accounts[i].Mail != "" {
+			attrs = append(attrs, attribute("mail", accounts[i].Mail))
 		}
-		if acc.UidNumber != 0 { // TODO no root?
-			attrs = append(attrs, attribute("uidnumber", strconv.FormatInt(acc.UidNumber, 10)))
+		if accounts[i].UidNumber != 0 { // TODO no root?
+			attrs = append(attrs, attribute("uidnumber", strconv.FormatInt(accounts[i].UidNumber, 10)))
 		}
-		if acc.GidNumber != 0 {
-			attrs = append(attrs, attribute("gidnumber", strconv.FormatInt(acc.GidNumber, 10)))
+		if accounts[i].GidNumber != 0 {
+			attrs = append(attrs, attribute("gidnumber", strconv.FormatInt(accounts[i].GidNumber, 10)))
 		}
-		if acc.Description != "" {
-			attrs = append(attrs, attribute("description", acc.Description))
+		if accounts[i].Description != "" {
+			attrs = append(attrs, attribute("description", accounts[i].Description))
 		}
 
 		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
 			h.cfg.Backend.NameFormat,
-			acc.PreferredName,
+			accounts[i].PreferredName,
 			h.cfg.Backend.GroupFormat,
 			"users",
 			h.cfg.Backend.BaseDN,
 		)
+		entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
+	}
+	return entries
+}
+
+func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
+	var entries []*ldap.Entry
+	for i := range groups {
+		attrs := []*ldap.EntryAttribute{
+			attribute("objectClass", "posixGroup", "groupOfNames", "top"),
+			attribute("cn", groups[i].OnPremisesSamAccountName),
+		}
+		if groups[i].DisplayName != "" {
+			attrs = append(attrs, attribute("displayName", groups[i].DisplayName))
+		}
+		if groups[i].GidNumber != 0 {
+			attrs = append(attrs, attribute("gidnumber", strconv.FormatInt(groups[i].GidNumber, 10)))
+		}
+		if groups[i].Description != "" {
+			attrs = append(attrs, attribute("description", groups[i].Description))
+		}
+
+		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
+			h.cfg.Backend.NameFormat,
+			groups[i].OnPremisesSamAccountName,
+			h.cfg.Backend.GroupFormat,
+			"groups",
+			h.cfg.Backend.BaseDN,
+		)
+
+		memberUids := make([]string, len(groups[i].Members))
+		for j := range groups[i].Members {
+			memberUids[j] = groups[i].Members[j].PreferredName
+		}
+		attrs = append(attrs, attribute("memberuid", memberUids...))
 		entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
 	}
 	return entries
@@ -259,7 +314,7 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 				qtype = ""
 			}
 		case "cn", "uid":
-			q = fmt.Sprintf("preferred_name eq '%s'", escapeValue(value))
+			q = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(value))
 		case "mail":
 			q = fmt.Sprintf("mail eq '%s'", escapeValue(value))
 		case "displayname":
@@ -275,12 +330,12 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		}
 
 		return
-	case "And":
+	case "And", "Or":
 		subQueries := []string{}
-		for _, child := range f.Children {
+		for i := range f.Children {
 			var subQuery string
 			var qt queryType
-			qt, subQuery, err = parseFilter(child)
+			qt, subQuery, err = parseFilter(f.Children[i])
 			if err != nil {
 				return "", "", err
 			}
@@ -293,26 +348,7 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 				subQueries = append(subQueries, subQuery)
 			}
 		}
-		return qtype, strings.Join(subQueries, " and "), nil
-	case "Or":
-		subQueries := []string{}
-		for _, child := range f.Children {
-			var subQuery string
-			var qt queryType
-			qt, subQuery, err = parseFilter(child)
-			if err != nil {
-				return "", "", err
-			}
-			if qtype == "" {
-				qtype = qt
-			} else if qt != "" && qt != qtype {
-				return "", "", fmt.Errorf("mixing user and group filters not supported")
-			}
-			if subQuery != "" {
-				subQueries = append(subQueries, subQuery)
-			}
-		}
-		return qtype, strings.Join(subQueries, " or "), nil
+		return qtype, strings.Join(subQueries, " "+strings.ToLower(ldap.FilterMap[f.Tag])+" "), nil
 	case "Not":
 		if len(f.Children) != 1 {
 			return "", "", errors.New("not filter must have only one child")
@@ -347,6 +383,7 @@ func NewOCISHandler(opts ...Option) handler.Handler {
 		log: options.Logger,
 		cfg: options.Config,
 		as:  options.AccountsService,
+		gs:  options.GroupsService,
 	}
 	return handler
 }
