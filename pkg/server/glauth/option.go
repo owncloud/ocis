@@ -17,6 +17,7 @@ type Options struct {
 	Context         context.Context
 	Config          *config.Config
 	AccountsService accounts.AccountsService
+	GroupsService   accounts.GroupsService
 }
 
 // newOptions initializes the available default options.
@@ -55,5 +56,12 @@ func Config(val *config.Config) Option {
 func AccountsService(val accounts.AccountsService) Option {
 	return func(o *Options) {
 		o.AccountsService = val
+	}
+}
+
+// GroupsService provides an GroupsService client to set the GroupsService option.
+func GroupsService(val accounts.GroupsService) Option {
+	return func(o *Options) {
+		o.GroupsService = val
 	}
 }

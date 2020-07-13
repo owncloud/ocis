@@ -165,13 +165,14 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 				}
 
-				as, err := getAccountsService()
+				as, gs, err := getAccountsServices()
 				if err != nil {
 					return err
 				}
 
 				server, err := glauth.Server(
 					glauth.AccountsService(as),
+					glauth.GroupsService(gs),
 					glauth.Logger(logger),
 					glauth.Config(&cfg),
 				)
@@ -280,8 +281,8 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-// getAccountsService returns an ocis-accounts service
-func getAccountsService() (accounts.AccountsService, error) {
+// getAccountsServices returns an ocis-accounts service
+func getAccountsServices() (accounts.AccountsService, accounts.GroupsService, error) {
 	service := micro.NewService()
 
 	// parse command line flags
@@ -291,7 +292,9 @@ func getAccountsService() (accounts.AccountsService, error) {
 		client.ContentType("application/json"),
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return accounts.NewAccountsService("com.owncloud.api.accounts", service.Client()), nil
+	return accounts.NewAccountsService("com.owncloud.api.accounts", service.Client()),
+		accounts.NewGroupsService("com.owncloud.api.accounts", service.Client()),
+		nil
 }

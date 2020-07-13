@@ -17,8 +17,16 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
+type queryType string
+
+const (
+	usersQuery  queryType = "users"
+	groupsQuery queryType = "groups"
+)
+
 type ocisHandler struct {
 	as  accounts.AccountsService
+	gs  accounts.GroupsService
 	log log.Logger
 	cfg *config.Config
 }
@@ -27,18 +35,30 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	bindDN = strings.ToLower(bindDN)
 	baseDN := strings.ToLower("," + h.cfg.Backend.BaseDN)
 
-	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Interface("src", conn.RemoteAddr()).Msg("Bind request")
+	h.log.Debug().
+		Str("binddn", bindDN).
+		Str("basedn", h.cfg.Backend.BaseDN).
+		Interface("src", conn.RemoteAddr()).
+		Msg("Bind request")
 
 	stats.Frontend.Add("bind_reqs", 1)
 
 	// parse the bindDN - ensure that the bindDN ends with the BaseDN
 	if !strings.HasSuffix(bindDN, baseDN) {
-		h.log.Error().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Interface("src", conn.RemoteAddr()).Msg("BindDN not part of our BaseDN")
+		h.log.Error().
+			Str("binddn", bindDN).
+			Str("basedn", h.cfg.Backend.BaseDN).
+			Interface("src", conn.RemoteAddr()).
+			Msg("BindDN not part of our BaseDN")
 		return ldap.LDAPResultInvalidCredentials, nil
 	}
 	parts := strings.Split(strings.TrimSuffix(bindDN, baseDN), ",")
 	if len(parts) > 2 {
-		h.log.Error().Str("binddn", bindDN).Int("numparts", len(parts)).Interface("src", conn.RemoteAddr()).Msg("BindDN should have only one or two parts")
+		h.log.Error().
+			Str("binddn", bindDN).
+			Int("numparts", len(parts)).
+			Interface("src", conn.RemoteAddr()).
+			Msg("BindDN should have only one or two parts")
 		return ldap.LDAPResultInvalidCredentials, nil
 	}
 	userName := strings.TrimPrefix(parts[0], "cn=")
@@ -52,12 +72,19 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 		Query: fmt.Sprintf("login eq '%s' and password eq '%s'", userName, bindSimplePw),
 	})
 	if err != nil {
-		h.log.Error().Str("username", userName).Str("binddn", bindDN).Interface("src", conn.RemoteAddr()).Msg("Login failed")
+		h.log.Error().
+			Str("username", userName).
+			Str("binddn", bindDN).
+			Interface("src", conn.RemoteAddr()).
+			Msg("Login failed")
 		return ldap.LDAPResultInvalidCredentials, nil
 	}
 
 	stats.Frontend.Add("bind_successes", 1)
-	h.log.Debug().Str("binddn", bindDN).Interface("src", conn.RemoteAddr()).Msg("Bind success")
+	h.log.Debug().
+		Str("binddn", bindDN).
+		Interface("src", conn.RemoteAddr()).
+		Msg("Bind success")
 	return ldap.LDAPResultSuccess, nil
 }
 
@@ -65,21 +92,32 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 	bindDN = strings.ToLower(bindDN)
 	baseDN := strings.ToLower("," + h.cfg.Backend.BaseDN)
 	searchBaseDN := strings.ToLower(searchReq.BaseDN)
-	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Interface("src", conn.RemoteAddr()).Msg("Search request")
+	h.log.Debug().
+		Str("binddn", bindDN).
+		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("filter", searchReq.Filter).
+		Interface("src", conn.RemoteAddr()).
+		Msg("Search request")
 	stats.Frontend.Add("search_reqs", 1)
 
 	// validate the user is authenticated and has appropriate access
 	if len(bindDN) < 1 {
-		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultInsufficientAccessRights}, fmt.Errorf("search error: Anonymous BindDN not allowed %s", bindDN)
+		return ldap.ServerSearchResult{
+			ResultCode: ldap.LDAPResultInsufficientAccessRights,
+		}, fmt.Errorf("search error: Anonymous BindDN not allowed %s", bindDN)
 	}
 	if !strings.HasSuffix(bindDN, baseDN) {
-		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultInsufficientAccessRights}, fmt.Errorf("search error: BindDN %s not in our BaseDN %s", bindDN, h.cfg.Backend.BaseDN)
+		return ldap.ServerSearchResult{
+			ResultCode: ldap.LDAPResultInsufficientAccessRights,
+		}, fmt.Errorf("search error: BindDN %s not in our BaseDN %s", bindDN, h.cfg.Backend.BaseDN)
 	}
 	if !strings.HasSuffix(searchBaseDN, h.cfg.Backend.BaseDN) {
-		return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultInsufficientAccessRights}, fmt.Errorf("search error: search BaseDN %s is not in our BaseDN %s", searchBaseDN, h.cfg.Backend.BaseDN)
+		return ldap.ServerSearchResult{
+			ResultCode: ldap.LDAPResultInsufficientAccessRights,
+		}, fmt.Errorf("search error: search BaseDN %s is not in our BaseDN %s", searchBaseDN, h.cfg.Backend.BaseDN)
 	}
 
-	qtype := ""
+	var qtype queryType = ""
 	query := ""
 	var err error
 	if searchReq.Filter == "(&)" { // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
@@ -88,55 +126,160 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		var cf *ber.Packet
 		cf, err = ldap.CompileFilter(searchReq.Filter)
 		if err != nil {
-			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+			return ldap.ServerSearchResult{
+				ResultCode: ldap.LDAPResultOperationsError,
+			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
 		}
 		qtype, query, err = parseFilter(cf)
 		if err != nil {
-			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+			return ldap.ServerSearchResult{
+				ResultCode: ldap.LDAPResultOperationsError,
+			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
 		}
 	}
 
 	entries := []*ldap.Entry{}
-	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Str("qtype", qtype).Str("query", query).Msg("parsed query")
-	if qtype == "users" {
+	h.log.Debug().
+		Str("binddn", bindDN).
+		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("filter", searchReq.Filter).
+		Str("qtype", string(qtype)).
+		Str("query", query).
+		Msg("parsed query")
+	switch qtype {
+	case usersQuery:
 		accounts, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
 			Query: query,
 		})
 		if err != nil {
-			h.log.Error().Err(err).Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Str("query", query).Interface("src", conn.RemoteAddr()).Msg("Could not list accounts")
-			return ldap.ServerSearchResult{ResultCode: ldap.LDAPResultOperationsError}, errors.New("search error: error getting users")
-		}
-		for i := range accounts.Accounts {
-			attrs := []*ldap.EntryAttribute{
-				{Name: "objectClass", Values: []string{"posixAccount", "inetOrgPerson", "organizationalPerson", "Person", "top"}},
-				{Name: "cn", Values: []string{accounts.Accounts[i].PreferredName}},
-				{Name: "uid", Values: []string{accounts.Accounts[i].PreferredName}},
-				{Name: "sn", Values: []string{accounts.Accounts[i].PreferredName}}, // must be set for a valid person
-			}
-			if accounts.Accounts[i].DisplayName != "" {
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "displayName", Values: []string{accounts.Accounts[i].DisplayName}})
-			}
-			if accounts.Accounts[i].Mail != "" {
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "mail", Values: []string{accounts.Accounts[i].Mail}})
-			}
-			if accounts.Accounts[i].UidNumber != 0 { // TODO no root?
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "uidnumber", Values: []string{strconv.FormatInt(accounts.Accounts[i].UidNumber, 10)}})
-			}
-			if accounts.Accounts[i].GidNumber != 0 {
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "gidnumber", Values: []string{strconv.FormatInt(accounts.Accounts[i].GidNumber, 10)}})
-			}
-			if accounts.Accounts[i].Description != "" {
-				attrs = append(attrs, &ldap.EntryAttribute{Name: "description", Values: []string{accounts.Accounts[i].Description}})
-			}
+			h.log.Error().
+				Err(err).
+				Str("binddn", bindDN).
+				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("filter", searchReq.Filter).
+				Str("query", query).
+				Interface("src", conn.RemoteAddr()).
+				Msg("Could not list accounts")
 
-			dn := fmt.Sprintf("%s=%s,%s=%s,%s", h.cfg.Backend.NameFormat, accounts.Accounts[i].PreferredName, h.cfg.Backend.GroupFormat, "users", h.cfg.Backend.BaseDN)
-			entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
+			return ldap.ServerSearchResult{
+				ResultCode: ldap.LDAPResultOperationsError,
+			}, errors.New("search error: error listing users")
 		}
+		entries = append(entries, h.mapAccounts(accounts.Accounts)...)
+	case groupsQuery:
+		groups, err := h.gs.ListGroups(context.TODO(), &accounts.ListGroupsRequest{
+			Query: query,
+		})
+		if err != nil {
+			h.log.Error().
+				Err(err).
+				Str("binddn", bindDN).
+				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("filter", searchReq.Filter).
+				Str("query", query).
+				Interface("src", conn.RemoteAddr()).
+				Msg("Could not list groups")
+
+			return ldap.ServerSearchResult{
+				ResultCode: ldap.LDAPResultOperationsError,
+			}, errors.New("search error: error listing groups")
+		}
+		entries = append(entries, h.mapGroups(groups.Groups)...)
 	}
 
 	stats.Frontend.Add("search_successes", 1)
-	h.log.Debug().Str("binddn", bindDN).Str("basedn", h.cfg.Backend.BaseDN).Str("filter", searchReq.Filter).Interface("src", conn.RemoteAddr()).Msg("AP: Search OK")
-	return ldap.ServerSearchResult{Entries: entries, Referrals: []string{}, Controls: []ldap.Control{}, ResultCode: ldap.LDAPResultSuccess}, nil
+	h.log.Debug().
+		Str("binddn", bindDN).
+		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("filter", searchReq.Filter).
+		Interface("src", conn.RemoteAddr()).
+		Msg("AP: Search OK")
+
+	return ldap.ServerSearchResult{
+		Entries:    entries,
+		Referrals:  []string{},
+		Controls:   []ldap.Control{},
+		ResultCode: ldap.LDAPResultSuccess,
+	}, nil
+}
+
+func attribute(name string, values ...string) *ldap.EntryAttribute {
+	return &ldap.EntryAttribute{
+		Name:   name,
+		Values: values,
+	}
+}
+
+func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
+	var entries []*ldap.Entry
+	for i := range accounts {
+		attrs := []*ldap.EntryAttribute{
+			attribute("objectClass", "posixAccount", "inetOrgPerson", "organizationalPerson", "Person", "top"),
+			attribute("cn", accounts[i].PreferredName),
+			attribute("uid", accounts[i].PreferredName),
+			attribute("sn", accounts[i].PreferredName),
+		}
+		if accounts[i].DisplayName != "" {
+			attrs = append(attrs, attribute("displayName", accounts[i].DisplayName))
+		}
+		if accounts[i].Mail != "" {
+			attrs = append(attrs, attribute("mail", accounts[i].Mail))
+		}
+		if accounts[i].UidNumber != 0 { // TODO no root?
+			attrs = append(attrs, attribute("uidnumber", strconv.FormatInt(accounts[i].UidNumber, 10)))
+		}
+		if accounts[i].GidNumber != 0 {
+			attrs = append(attrs, attribute("gidnumber", strconv.FormatInt(accounts[i].GidNumber, 10)))
+		}
+		if accounts[i].Description != "" {
+			attrs = append(attrs, attribute("description", accounts[i].Description))
+		}
+
+		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
+			h.cfg.Backend.NameFormat,
+			accounts[i].PreferredName,
+			h.cfg.Backend.GroupFormat,
+			"users",
+			h.cfg.Backend.BaseDN,
+		)
+		entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
+	}
+	return entries
+}
+
+func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
+	var entries []*ldap.Entry
+	for i := range groups {
+		attrs := []*ldap.EntryAttribute{
+			attribute("objectClass", "posixGroup", "groupOfNames", "top"),
+			attribute("cn", groups[i].OnPremisesSamAccountName),
+		}
+		if groups[i].DisplayName != "" {
+			attrs = append(attrs, attribute("displayName", groups[i].DisplayName))
+		}
+		if groups[i].GidNumber != 0 {
+			attrs = append(attrs, attribute("gidnumber", strconv.FormatInt(groups[i].GidNumber, 10)))
+		}
+		if groups[i].Description != "" {
+			attrs = append(attrs, attribute("description", groups[i].Description))
+		}
+
+		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
+			h.cfg.Backend.NameFormat,
+			groups[i].OnPremisesSamAccountName,
+			h.cfg.Backend.GroupFormat,
+			"groups",
+			h.cfg.Backend.BaseDN,
+		)
+
+		memberUids := make([]string, len(groups[i].Members))
+		for j := range groups[i].Members {
+			memberUids[j] = groups[i].Members[j].PreferredName
+		}
+		attrs = append(attrs, attribute("memberuid", memberUids...))
+		entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
+	}
+	return entries
 }
 
 // LDAP filters might ask for grouips and users at the same time, eg.
@@ -150,7 +293,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 // "" not determined
 // "users"
 // "groups"
-func parseFilter(f *ber.Packet) (qtype string, q string, err error) {
+func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 	switch ldap.FilterMap[f.Tag] {
 	case "Equality Match":
 		if len(f.Children) != 2 {
@@ -164,34 +307,35 @@ func parseFilter(f *ber.Packet) (qtype string, q string, err error) {
 		case "objectclass":
 			switch value {
 			case "posixaccount", "shadowaccount", "users", "person", "inetorgperson", "organizationalperson":
-				qtype = "users"
+				qtype = usersQuery
 			case "posixgroup", "groups":
-				qtype = "groups"
+				qtype = groupsQuery
 			default:
 				qtype = ""
 			}
-			return qtype, "", nil
 		case "cn", "uid":
-			return "", fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(value))
 		case "mail":
-			return "", fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("mail eq '%s'", escapeValue(value))
 		case "displayname":
-			return "", fmt.Sprintf("display_name eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("display_name eq '%s'", escapeValue(value))
 		case "uidnumber":
-			return "", fmt.Sprintf("uid_number eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("uid_number eq '%s'", escapeValue(value))
 		case "gidnumber":
-			return "", fmt.Sprintf("gid_number eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("gid_number eq '%s'", escapeValue(value))
 		case "description":
-			return "", fmt.Sprintf("description eq '%s'", strings.ReplaceAll(value, "'", "''")), nil
+			q = fmt.Sprintf("description eq '%s'", escapeValue(value))
+		default:
+			err = fmt.Errorf("filter by %s not implmented", attribute)
 		}
 
-		return "", "", fmt.Errorf("filter by %s not implmented", attribute)
-	case "And":
+		return
+	case "And", "Or":
 		subQueries := []string{}
-		for _, child := range f.Children {
+		for i := range f.Children {
 			var subQuery string
-			var qt string
-			qt, subQuery, err = parseFilter(child)
+			var qt queryType
+			qt, subQuery, err = parseFilter(f.Children[i])
 			if err != nil {
 				return "", "", err
 			}
@@ -204,26 +348,7 @@ func parseFilter(f *ber.Packet) (qtype string, q string, err error) {
 				subQueries = append(subQueries, subQuery)
 			}
 		}
-		return qtype, strings.Join(subQueries, " and "), nil
-	case "Or":
-		subQueries := []string{}
-		for _, child := range f.Children {
-			var subQuery string
-			var qt string
-			qt, subQuery, err = parseFilter(child)
-			if err != nil {
-				return "", "", err
-			}
-			if qtype == "" {
-				qtype = qt
-			} else if qt != "" && qt != qtype {
-				return "", "", fmt.Errorf("mixing user and group filters not supported")
-			}
-			if subQuery != "" {
-				subQueries = append(subQueries, subQuery)
-			}
-		}
-		return qtype, strings.Join(subQueries, " or "), nil
+		return qtype, strings.Join(subQueries, " "+strings.ToLower(ldap.FilterMap[f.Tag])+" "), nil
 	case "Not":
 		if len(f.Children) != 1 {
 			return "", "", errors.New("not filter must have only one child")
@@ -240,6 +365,11 @@ func parseFilter(f *ber.Packet) (qtype string, q string, err error) {
 	return
 }
 
+// escapeValue escapes all special characters in the value
+func escapeValue(value string) string {
+	return strings.ReplaceAll(value, "'", "''")
+}
+
 func (h ocisHandler) Close(boundDN string, conn net.Conn) error {
 	stats.Frontend.Add("closes", 1)
 	return nil
@@ -253,6 +383,7 @@ func NewOCISHandler(opts ...Option) handler.Handler {
 		log: options.Logger,
 		cfg: options.Config,
 		as:  options.AccountsService,
+		gs:  options.GroupsService,
 	}
 	return handler
 }

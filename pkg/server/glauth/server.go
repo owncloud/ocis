@@ -42,6 +42,7 @@ func Server(opts ...Option) (*LdapSvc, error) {
 	s.l.EnforceLDAP = true
 	h := NewOCISHandler(
 		AccountsService(options.AccountsService),
+		GroupsService(options.GroupsService),
 		Logger(options.Logger),
 		Config(s.c),
 	)

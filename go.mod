@@ -16,12 +16,13 @@ require (
 	github.com/nmcclain/ldap v0.0.0-20191021200707-3b3b69a7e9e3
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200617152311-02e759f95e82
-	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200710152724-fa35a81beb2f
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
 	go.opencensus.io v0.22.4
+	golang.org/x/tools v0.0.0-20200427214658-4697a2867c88 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
