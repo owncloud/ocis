@@ -15,7 +15,7 @@ So far we are offering two different variants for the installation. You can choo
 
 ### Docker
 
-Docker images for ocis-reva are hosted on https://hub.docker.com/r/owncloud/ocis-ocs.
+Docker images for ocis-ocs are hosted on https://hub.docker.com/r/owncloud/ocis-ocs.
 
 The `latest` tag always reflects the current master branch.
 
