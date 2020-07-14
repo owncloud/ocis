@@ -50,7 +50,7 @@ def main(ctx):
     linting(ctx),
     unitTests(ctx),
     apiTests(ctx, 'master', 'a3cac3dad60348fc962d1d8743b202bc5f79596b'),
-  ] + acceptance(ctx, 'master', '604e8b5e083c835308f147e51a850df643374107')
+ ] + acceptance(ctx, 'accessPublicLink', '')
 
   stages = [
     docker(ctx, 'amd64'),
