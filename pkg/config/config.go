@@ -22,6 +22,7 @@ type HTTP struct {
 	Root      string
 	TLSCert   string
 	TLSKey    string
+	TLS       bool
 }
 
 // Tracing defines the available tracing configuration.

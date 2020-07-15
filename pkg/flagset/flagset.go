@@ -157,6 +157,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
 		},
+		&cli.BoolFlag{
+			Name:        "tls",
+			Usage:       "Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).",
+			EnvVars:     []string{"PROXY_TLS"},
+			Value:       true,
+			Destination: &cfg.HTTP.TLS,
+		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
