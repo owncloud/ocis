@@ -9,6 +9,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
+* Change - Fix index update on create/update: [#57](https://github.com/owncloud/ocis-accounts/issues/57)
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
@@ -37,6 +38,15 @@ The following sections list the changes in ocis-accounts unreleased.
    created accounts will be enabled per default.
 
    https://github.com/owncloud/ocis-accounts/issues/43
+
+
+* Change - Fix index update on create/update: [#57](https://github.com/owncloud/ocis-accounts/issues/57)
+
+   We fixed a bug in creating/updating accounts and groups, that caused new entities not to show up
+   in list queries.
+
+   https://github.com/owncloud/ocis-accounts/issues/57
+   https://github.com/owncloud/ocis-accounts/pull/59
 
 
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
