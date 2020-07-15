@@ -41,21 +41,26 @@ func (s Service) indexAccounts(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		a := &proto.BleveAccount{
-			BleveType: "account",
-		}
-		if err = s.loadAccount(file.Name(), &a.Account); err != nil {
-			s.log.Error().Err(err).Str("account", file.Name()).Msg("could not load account")
-			continue
-		}
-		s.log.Debug().Interface("account", a).Msg("found account")
-		if err = s.index.Index(a.Id, a); err != nil {
-			s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
-			continue
-		}
+		_ = s.indexAccount(file.Name())
 	}
 
 	return
+}
+
+func (s Service) indexAccount(id string) error {
+	a := &proto.BleveAccount{
+		BleveType: "account",
+	}
+	if err := s.loadAccount(id, &a.Account); err != nil {
+		s.log.Error().Err(err).Str("account", id).Msg("could not load account")
+		return err
+	}
+	s.log.Debug().Interface("account", a).Msg("found account")
+	if err := s.index.Index(a.Id, a); err != nil {
+		s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
+		return err
+	}
+	return nil
 }
 
 // an auth request is currently hardcoded and has to match this regex
@@ -272,7 +277,6 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 	if id, err = cleanupID(in.Account.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	if in.Account.PasswordProfile != nil && in.Account.PasswordProfile.Password != "" {
 		// encrypt password
@@ -290,8 +294,7 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 		return
 	}
 
-	if err = s.index.Index(id, in.Account); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", loggableAccount(in.Account)).Msg("could not index new account")
+	if err = s.indexAccount(in.Account.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 
@@ -373,7 +376,7 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 		return
 	}
 
-	if err = s.index.Index(id, out); err != nil {
+	if err = s.indexAccount(id); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", loggableAccount(out)).Msg("could not index new account")
 		return merrors.InternalServerError(s.id, "could not index updated account: %v", err.Error())
 	}

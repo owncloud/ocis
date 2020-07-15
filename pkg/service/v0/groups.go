@@ -29,21 +29,26 @@ func (s Service) indexGroups(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		g := &proto.BleveGroup{
-			BleveType: "group",
-		}
-		if err = s.loadGroup(file.Name(), &g.Group); err != nil {
-			s.log.Error().Err(err).Str("group", file.Name()).Msg("could not load group")
-			continue
-		}
-		s.log.Debug().Interface("group", g).Msg("found group")
-		if err = s.index.Index(g.Id, g); err != nil {
-			s.log.Error().Err(err).Interface("group", g).Msg("could not index group")
-			continue
-		}
+		_ = s.indexGroup(file.Name())
 	}
 
 	return
+}
+
+func (s Service) indexGroup(id string) error {
+	g := &proto.BleveGroup{
+		BleveType: "group",
+	}
+	if err := s.loadGroup(id, &g.Group); err != nil {
+		s.log.Error().Err(err).Str("group", id).Msg("could not load group")
+		return err
+	}
+	s.log.Debug().Interface("group", g).Msg("found group")
+	if err := s.index.Index(g.Id, g); err != nil {
+		s.log.Error().Err(err).Interface("group", g).Msg("could not index group")
+		return err
+	}
+	return nil
 }
 
 func (s Service) loadGroup(id string, g *proto.Group) (err error) {
@@ -205,7 +210,6 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 	if id, err = cleanupID(in.Group.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
 
 	// extract member id
 	s.deflateMembers(in.Group)
@@ -215,8 +219,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		return
 	}
 
-	if err = s.index.Index(id, in.Group); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("group", in.Group).Msg("could not index new group")
+	if err = s.indexGroup(id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
 	}
 
