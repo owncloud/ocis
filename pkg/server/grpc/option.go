@@ -1,4 +1,4 @@
-package http
+package grpc
 
 import (
 	"context"
@@ -14,12 +14,12 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Namespace string
-	Logger    log.Logger
-	Context   context.Context
-	Config    *config.Config
-	Metrics   *metrics.Metrics
-	Flags     []cli.Flag
+	Name    string
+	Logger  log.Logger
+	Context context.Context
+	Config  *config.Config
+	Metrics *metrics.Metrics
+	Flags   []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -31,6 +31,13 @@ func newOptions(opts ...Option) Options {
 	}
 
 	return opt
+}
+
+// Name provides a name for the service.
+func Name(val string) Option {
+	return func(o *Options) {
+		o.Name = val
+	}
 }
 
 // Logger provides a function to set the logger option.
@@ -65,12 +72,5 @@ func Metrics(val *metrics.Metrics) Option {
 func Flags(val []cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, val...)
-	}
-}
-
-// Namespace provides a function to set the Namespace option.
-func Namespace(val string) Option {
-	return func(o *Options) {
-		o.Namespace = val
 	}
 }

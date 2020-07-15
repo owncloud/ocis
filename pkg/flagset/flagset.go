@@ -44,7 +44,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9199",
+			Value:       "0.0.0.0:9460",
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -91,7 +91,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9199",
+			Value:       "0.0.0.0:9460",
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -116,25 +116,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Debug.Zpages,
 		},
 		&cli.StringFlag{
-			Name:        "http-addr",
-			Value:       "0.0.0.0:9195",
-			Usage:       "Address to bind http server",
-			EnvVars:     []string{"STORE_HTTP_ADDR"},
-			Destination: &cfg.HTTP.Addr,
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
+			Destination: &cfg.GRPC.Namespace,
 		},
 		&cli.StringFlag{
-			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
-			Usage:       "Set the base namespace for the http namespace",
-			EnvVars:     []string{"STORE_HTTP_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
-		},
-		&cli.StringFlag{
-			Name:        "http-root",
-			Value:       "/",
-			Usage:       "Root path of http server",
-			EnvVars:     []string{"STORE_HTTP_ROOT"},
-			Destination: &cfg.HTTP.Root,
+			Name:        "data-path",
+			Value:       "/var/tmp/ocis-store",
+			Usage:       "location of the store data path",
+			EnvVars:     []string{"STORE_DATA_PATH"},
+			Destination: &cfg.Datapath,
 		},
 	}
 }

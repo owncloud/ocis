@@ -48,4 +48,3 @@ func Config(val *config.Config) Option {
 		o.Config = val
 	}
 }
-

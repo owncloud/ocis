@@ -8,4 +8,3 @@ geekdocFilePath: license.md
 ---
 
 This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis-store/blob/master/LICENSE) license. For the license of the used libraries you have to check the respective sources.
-.

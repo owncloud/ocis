@@ -38,5 +38,21 @@ Apache-2.0
 ```console
 Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
 ```
->
+
+## Design
+
+```
+/var/tmp
+    /ocis-store
+        /index.bleve
+        /databases
+            /ocs
+                /users
+            /settings
+                /bundles
+                /values
+                /assignments
+            /accounts
+                /accounts
+                /groups
 ```
