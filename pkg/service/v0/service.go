@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
@@ -15,6 +16,13 @@ import (
 	"github.com/owncloud/ocis-store/pkg/proto/v0"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+// BleveDocument wraps the generated Record.Metadata and adds a property that is used to distinguish documents in the index.
+type BleveDocument struct {
+	Metadata map[string]*proto.Field
+	Database string `json:"database"`
+	Table    string `json:"table"`
+}
 
 // New returns a new instance of Service
 func New(opts ...Option) (s *Service, err error) {
@@ -40,8 +48,6 @@ func New(opts ...Option) (s *Service, err error) {
 	indexMapping := bleve.NewIndexMapping()
 	// keep all symbols in terms to allow exact matching, eg. emails
 	indexMapping.DefaultAnalyzer = keyword.Name
-
-	indexMapping.TypeField = "bleve_type"
 
 	s = &Service{
 		id:     cfg.GRPC.Namespace + "." + "store",
@@ -73,21 +79,72 @@ type Service struct {
 
 // Read implements the StoreHandler interface.
 func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.ReadResponse) error {
-	file := filepath.Join(s.Config.Datapath, "databases", rreq.Options.Database, rreq.Options.Table, rreq.Key)
+	if len(rreq.Key) != 0 {
+		file := filepath.Join(s.Config.Datapath, "databases", rreq.Options.Database, rreq.Options.Table, rreq.Key)
 
-	var data []byte
-	rec := &proto.Record{}
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return merrors.NotFound(s.id, "could not read record")
+		var data []byte
+		rec := &proto.Record{}
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			return merrors.NotFound(s.id, "could not read record")
+		}
+
+		if err = protojson.Unmarshal(data, rec); err != nil {
+			return merrors.InternalServerError(s.id, "could not unmarshal record")
+		}
+
+		rres.Records = append(rres.Records, rec)
+		return nil
 	}
 
-	if err = protojson.Unmarshal(data, rec); err != nil {
-		return merrors.InternalServerError(s.id, "could not unmarshal record")
+	s.log.Info().Interface("requeest", rreq).Msg("read request")
+	if rreq.Options.Where != nil {
+		// build bleve query
+		// execute search
+		// fetch the actual record if there's a hit
+		dtq := bleve.NewTermQuery(rreq.Options.Database)
+		ttq := bleve.NewTermQuery(rreq.Options.Table)
+		dtq.SetField("database")
+		ttq.SetField("table")
+
+		query := bleve.NewConjunctionQuery(dtq, ttq)
+		for k, v := range rreq.Options.Where {
+			ntq := bleve.NewTermQuery(v.Value)
+			ntq.SetField("metadata." + k + ".value")
+			query.AddQuery(ntq)
+		}
+
+		searchRequest := bleve.NewSearchRequest(query)
+		var searchResult *bleve.SearchResult
+		searchResult, err := s.index.Search(searchRequest)
+		if err != nil {
+			s.log.Error().Err(err).Msg("could not execute bleve search")
+			return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
+		}
+
+		for _, hit := range searchResult.Hits {
+			rec := &proto.Record{}
+
+			dest := filepath.Join(s.Config.Datapath, "databases", hit.ID)
+
+			var data []byte
+			data, err := ioutil.ReadFile(dest)
+			s.log.Info().Str("path", dest).Interface("hit", hit).Msgf("hit info")
+			if err != nil {
+				s.log.Info().Str("path", dest).Interface("hit", hit).Msgf("file not found")
+				return merrors.NotFound(s.id, "could not read record")
+			}
+
+			if err = protojson.Unmarshal(data, rec); err != nil {
+				return merrors.InternalServerError(s.id, "could not unmarshal record")
+			}
+
+			rres.Records = append(rres.Records, rec)
+		}
+		return nil
 	}
 
-	rres.Records = append(rres.Records, rec)
-	return nil
+	return merrors.InternalServerError(s.id, "neither id nor metadata present")
 }
 
 // Write implements the StoreHandler interface.
@@ -109,6 +166,17 @@ func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto
 	err = ioutil.WriteFile(file, bytes, 0600)
 	if err != nil {
 		return merrors.InternalServerError(s.id, "could not write record")
+	}
+
+	doc := BleveDocument{
+		Metadata: wreq.Record.Metadata,
+		Database: wreq.Options.Database,
+		Table:    wreq.Options.Table,
+	}
+	// TODO sanitize input.
+	if err := s.index.Index(strings.Join([]string{wreq.Options.Database, wreq.Options.Table, wreq.Record.Key}, "/"), doc); err != nil {
+		s.log.Error().Err(err).Interface("document", doc).Msg("could not index record metadata")
+		return err
 	}
 
 	return nil

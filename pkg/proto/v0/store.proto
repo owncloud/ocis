@@ -36,6 +36,7 @@ message ReadOptions {
 	bool suffix   = 4;
 	uint64 limit  = 5;
 	uint64 offset = 6;
+	map<string,Field> where = 7;
 }
 
 message ReadRequest {
