@@ -61,31 +61,10 @@ def testing(ctx):
         ],
       },
       {
-        'name': 'staticcheck',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make staticcheck',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
         'name': 'lint',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
+        'image': 'golangci/golangci-lint:v1.26',
         'commands': [
-          'make lint',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
+          'golangci-lint run --timeout 2m0s',
         ],
       },
       {

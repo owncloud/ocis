@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
@@ -40,7 +38,7 @@ func New(opts ...Option) (s *Service, err error) {
 	}
 
 	indexMapping := bleve.NewIndexMapping()
-	// keep all symbols in terms to allow exact maching, eg. emails
+	// keep all symbols in terms to allow exact matching, eg. emails
 	indexMapping.DefaultAnalyzer = keyword.Name
 
 	indexMapping.TypeField = "bleve_type"
@@ -71,14 +69,6 @@ type Service struct {
 	log    log.Logger
 	Config *config.Config
 	index  bleve.Index
-}
-
-func cleanupID(id string) (string, error) {
-	id = filepath.Clean(id)
-	if id == "." || strings.Contains(id, "/") {
-		return "", errors.New("invalid id " + id)
-	}
-	return id, nil
 }
 
 // Read implements the StoreHandler interface.

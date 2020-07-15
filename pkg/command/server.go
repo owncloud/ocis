@@ -139,9 +139,7 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
+				gr.Add(server.Run, func(_ error) {
 					logger.Info().
 						Str("server", "grpc").
 						Msg("Shutting down server")
@@ -166,9 +164,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
+				gr.Add(server.ListenAndServe, func(_ error) {
 					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
 
 					defer timeout()

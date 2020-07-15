@@ -4,9 +4,9 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/owncloud/ocis-pkg/v2/service/debug"
 	"github.com/owncloud/ocis-store/pkg/config"
 	"github.com/owncloud/ocis-store/pkg/version"
-	"github.com/owncloud/ocis-pkg/v2/service/debug"
 )
 
 // Server initializes the debug service and server.
@@ -34,7 +34,7 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 
 		// TODO(tboerger): check if services are up and running
 
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		_, _ = io.WriteString(w, http.StatusText(http.StatusOK))
 	}
 }
 
@@ -46,6 +46,6 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 
 		// TODO(tboerger): check if services are up and running
 
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		_, _ = io.WriteString(w, http.StatusText(http.StatusOK))
 	}
 }
