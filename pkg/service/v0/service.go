@@ -19,9 +19,9 @@ import (
 
 // BleveDocument wraps the generated Record.Metadata and adds a property that is used to distinguish documents in the index.
 type BleveDocument struct {
-	Metadata map[string]*proto.Field
-	Database string `json:"database"`
-	Table    string `json:"table"`
+	Metadata map[string]*proto.Field `json:"metadata"`
+	Database string                  `json:"database"`
+	Table    string                  `json:"table"`
 }
 
 // New returns a new instance of Service
