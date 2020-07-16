@@ -6,6 +6,7 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
@@ -16,6 +17,16 @@ The following sections list the changes in ocis-accounts unreleased.
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
 ## Details
+
+* Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
+
+   We've fixed a bug in deleting the groups.
+
+   The accountId and GroupId were swapped when removing the member from a group after deleting the
+   group.
+
+   https://github.com/owncloud/ocis-accounts/pull/60
+
 
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
