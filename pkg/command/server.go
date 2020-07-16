@@ -161,7 +161,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 				gr.Add(server.Run, func(_ error) {
 					logger.Info().
-						Str("server", "http").
+						Str("server", "grpc").
 						Msg("Shutting down server")
 
 					cancel()

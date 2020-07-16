@@ -59,9 +59,11 @@
     "> 1%",
     "not dead"
   ],
+  "peerDependencies": {
+    "owncloud-design-system": "^1.7.0"
+  },
   "dependencies": {
     "lodash": "^4.17.15",
-    "owncloud-design-system": "^1.6.0",
     "vuex": "^3.2.0"
   }
 }
