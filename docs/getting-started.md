@@ -61,7 +61,7 @@ STORE_TRACING_SERVICE
 : Service name for tracing, defaults to `store`
 
 STORE_DEBUG_ADDR
-: Address to bind debug server, defaults to `0.0.0.0:9199`
+: Address to bind debug server
 
 STORE_DEBUG_TOKEN
 : Token to grant metrics access, empty default value
@@ -73,7 +73,7 @@ STORE_DEBUG_ZPAGES
 : Enable zpages debugging, defaults to `false`
 
 STORE_HTTP_ADDR
-: Address to bind http server, defaults to `0.0.0.0:9195`
+: Address to bind http server, defaults to `0.0.0.0:9461`
 
 STORE_HTTP_NAMESPACE
 : The http namespace
@@ -84,7 +84,7 @@ STORE_HTTP_ROOT
 #### Health
 
 STORE_DEBUG_ADDR
-: Address to debug endpoint, defaults to `0.0.0.0:9199`
+: Address to debug endpoint
 
 ### Commandline flags
 
@@ -122,7 +122,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Service name for tracing, defaults to `store`
 
 --debug-addr
-: Address to bind debug server, defaults to `0.0.0.0:9199`
+: Address to bind debug server
 
 --debug-token
 : Token to grant metrics access, empty default value
@@ -134,7 +134,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Enable zpages debugging, defaults to `false`
 
 --http-addr
-: Address to bind http server, defaults to `0.0.0.0:9195`
+: Address to bind http server, defaults to `0.0.0.0:9461`
 
 --http-namespace
 : Namespace for internal services communication, defaults to `com.owncloud.web`
@@ -145,7 +145,7 @@ If you prefer to configure the service with commandline flags you can see the av
 #### Health
 
 --debug-addr
-: Address to debug endpoint, defaults to `0.0.0.0:9199`
+: Address to debug endpoint
 
 ### Configuration file
 
@@ -173,7 +173,7 @@ ocis-store health --help
 
 ## Metrics
 
-This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `STORE_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9199/metrics`.
+This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `STORE_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9460/metrics`.
 
 go_gc_duration_seconds
 : A summary of the GC invocation durations
@@ -270,4 +270,3 @@ promhttp_metric_handler_requests_in_flight
 
 promhttp_metric_handler_requests_total
 : Total number of scrapes by HTTP status code
-scrapes by HTTP status code

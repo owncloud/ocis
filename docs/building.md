@@ -26,4 +26,3 @@ make build
 {{< / highlight >}}
 
 Finally you should have the binary within the `bin/` folder now, give it a try with `./bin/ocis-store -h` to see all available options.
-ns.

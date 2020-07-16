@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -18,7 +17,8 @@ import (
 	"github.com/owncloud/ocis-store/pkg/flagset"
 	"github.com/owncloud/ocis-store/pkg/metrics"
 	"github.com/owncloud/ocis-store/pkg/server/debug"
-	"github.com/owncloud/ocis-store/pkg/server/http"
+	"github.com/owncloud/ocis-store/pkg/server/grpc"
+
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -30,17 +30,12 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
 			// When running on single binary mode the before hook from the root command won't get called. We manually
 			// call this before hook from ocis command, so the configuration can be loaded.
 			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
@@ -135,30 +130,18 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				server, err := http.Server(
-					http.Logger(logger),
-					http.Namespace(httpNamespace),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
+				server := grpc.Server(
+					grpc.Logger(logger),
+					grpc.Context(ctx),
+					grpc.Config(cfg),
+					grpc.Metrics(metrics),
+					grpc.Flags(flagset.RootWithConfig(config.New())),
+					grpc.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
-				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "http").
-						Msg("Failed to initialize server")
-
-					return err
-				}
-
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
+				gr.Add(server.Run, func(_ error) {
 					logger.Info().
-						Str("server", "http").
+						Str("server", "grpc").
 						Msg("Shutting down server")
 
 					cancel()
@@ -181,9 +164,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
+				gr.Add(server.ListenAndServe, func(_ error) {
 					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
 
 					defer timeout()

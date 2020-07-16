@@ -11,10 +11,9 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.label-schema.vendor="ownCloud GmbH" \
   org.label-schema.schema-version="1.0"
 
-EXPOSE 9195 9199
+EXPOSE 9460
 
 ENTRYPOINT ["/usr/bin/ocis-store"]
 CMD ["server"]
 
 COPY bin/ocis-store /usr/bin/ocis-store
-rre

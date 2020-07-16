@@ -30,4 +30,3 @@ func New() *Metrics {
 
 	return m
 }
-

@@ -15,8 +15,8 @@ type Debug struct {
 	Zpages bool
 }
 
-// HTTP defines the available http configuration.
-type HTTP struct {
+// GRPC defines the available grpc configuration.
+type GRPC struct {
 	Addr      string
 	Namespace string
 	Root      string
@@ -33,11 +33,13 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
+	File     string
+	Log      Log
+	Debug    Debug
+	GRPC     GRPC
+	Tracing  Tracing
+	Datapath string
+	Name     string
 }
 
 // New initializes a new configuration with or without defaults.
