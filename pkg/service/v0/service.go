@@ -7,10 +7,14 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
+
+	//"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/owncloud/ocis-ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis-ocs/pkg/middleware"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 )
 
 // Service defines the extension handlers.
@@ -99,22 +103,34 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 
 	// TODO move token marshaling to ocis-proxy
-	u, ok := user.ContextGetUser(r.Context())
+	_, ok := user.ContextGetUser(r.Context())
 	if !ok {
-		render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
-		return
+		//	render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
+		//	return
 	}
-
-	signingKey := "TODO fetch from settings" // TODO fetch from settings
-	/*
-		if ($signingKey === null) {
-				$signingKey = \OC::$server->getSecureRandom()->generate(64);
-				\OC::$server->getConfig()->setUserValue($userId, 'core', 'signing-key', $signingKey, null);
-		}
+	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
+	res, err := c.Read(r.Context(), &storepb.ReadRequest{
+		Key: "TODO replace with user from ctx",
+		Options: &storepb.ReadOptions{
+			Database: "ocs",
+			Table:    "signing-keys",
+		}})
+	if err != nil {
+		// TODO check return code, if 404 / not found error continue and try to create it
+		o.logger.Error().Err(err).Msg("error reading key")
+	}
+	o.logger.Info().Interface("release", res).Msg("read key")
+	// TODO check if signing key empty
+	signingKey := string(res.Records[0].Value)
+	/* TODO create key if it is missing
+	if ($signingKey === null) {
+			$signingKey = \OC::$server->getSecureRandom()->generate(64);
+			\OC::$server->getConfig()->setUserValue($userId, 'core', 'signing-key', $signingKey, null);
+	}
 	*/
 
 	render.Render(w, r, DataRender(&data.SigningKey{
-		User:       u.Username, // TODO userid vs username?
+		//	User:       u.Username, // TODO userid vs username?
 		SigningKey: signingKey,
 	}))
 }

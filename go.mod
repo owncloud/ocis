@@ -11,13 +11,15 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
-	github.com/micro/cli/v2 v2.1.1
+	github.com/micro/cli/v2 v2.1.2
+	github.com/micro/go-micro/v2 v2.6.0
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.3-0.20200309150924-5c659fd4b0ad
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c
+	github.com/owncloud/ocis-store v0.0.0-20200716140351-f9670592fb7b
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.2.2 // indirect
-	github.com/spf13/viper v1.5.0
+	github.com/spf13/viper v1.6.3
 	go.opencensus.io v0.22.3
 )
 
