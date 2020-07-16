@@ -34,24 +34,28 @@ func Logger(val log.Logger) Option {
 	}
 }
 
+// Database configures the database option.
 func Database(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
 	}
 }
 
+// Table configures the Table option.
 func Table(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
 	}
 }
 
+// Nodes configures the Nodes option.
 func Nodes(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
 	}
 }
 
+// Config configures the Config option.
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
