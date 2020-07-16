@@ -62,9 +62,9 @@ func New(opts ...Option) (s *Service, err error) {
 	if s.index, err = bleve.New(indexDir, indexMapping); err != nil {
 		return
 	}
-	// if err = s.indexRecords(recordsDir); err != nil {
-	// 	return nil, err
-	// }
+	if err = s.indexRecords(recordsDir); err != nil {
+		return nil, err
+	}
 	return
 }
 
@@ -97,7 +97,7 @@ func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.R
 		return nil
 	}
 
-	s.log.Info().Interface("requeest", rreq).Msg("read request")
+	s.log.Info().Interface("request", rreq).Msg("read request")
 	if rreq.Options.Where != nil {
 		// build bleve query
 		// execute search
@@ -246,4 +246,87 @@ func (s *Service) Tables(ctx context.Context, in *proto.TablesRequest, out *prot
 func getID(database string, table string, key string) string {
 	// TODO sanitize input.
 	return filepath.Join(database, table, key)
+}
+
+func (s Service) indexRecords(recordsDir string) (err error) {
+
+	// TODO use filepath.Walk to clean up code
+	rh, err := os.Open(recordsDir)
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not open database directory")
+	}
+	defer rh.Close()
+
+	dbs, err := rh.Readdirnames(0)
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not read databases directory")
+	}
+
+	for i := range dbs {
+		tp := filepath.Join(s.Config.Datapath, "databases", dbs[i])
+		th, err := os.Open(tp)
+		if err != nil {
+			s.log.Error().Err(err).Str("database", dbs[i]).Msg("could not open database directory")
+			continue
+		}
+		defer th.Close()
+
+		tables, err := th.Readdirnames(0)
+		if err != nil {
+			s.log.Error().Err(err).Str("database", dbs[i]).Msg("could not read database directory")
+			continue
+		}
+
+		for j := range tables {
+
+			tp := filepath.Join(s.Config.Datapath, "databases", dbs[i], tables[j])
+			kh, err := os.Open(tp)
+			if err != nil {
+				s.log.Error().Err(err).Str("database", dbs[i]).Str("table", tables[i]).Msg("could not open table directory")
+				continue
+			}
+			defer kh.Close()
+
+			keys, err := kh.Readdirnames(0)
+			if err != nil {
+				s.log.Error().Err(err).Str("database", dbs[i]).Str("table", tables[i]).Msg("could not read table directory")
+				continue
+			}
+
+			for k := range keys {
+
+				id := getID(dbs[i], tables[j], keys[k])
+				kp := filepath.Join(s.Config.Datapath, "databases", id)
+
+				// read record
+				var data []byte
+				rec := &proto.Record{}
+				data, err = ioutil.ReadFile(kp)
+				if err != nil {
+					s.log.Error().Err(err).Str("id", id).Msg("could not read record")
+					continue
+				}
+
+				if err = protojson.Unmarshal(data, rec); err != nil {
+					s.log.Error().Err(err).Str("id", id).Msg("could not unmarshal record")
+					continue
+				}
+
+				// index record
+				doc := BleveDocument{
+					Metadata: rec.Metadata,
+					Database: dbs[i],
+					Table:    tables[j],
+				}
+				if err := s.index.Index(id, doc); err != nil {
+					s.log.Error().Err(err).Interface("document", doc).Str("id", id).Msg("could not index record metadata")
+					continue
+				}
+
+				s.log.Debug().Str("id", id).Msg("indexed record")
+			}
+		}
+	}
+
+	return
 }
