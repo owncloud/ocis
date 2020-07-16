@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
@@ -80,7 +79,8 @@ type Service struct {
 // Read implements the StoreHandler interface.
 func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.ReadResponse) error {
 	if len(rreq.Key) != 0 {
-		file := filepath.Join(s.Config.Datapath, "databases", rreq.Options.Database, rreq.Options.Table, rreq.Key)
+		id := getID(rreq.Options.Database, rreq.Options.Table, rreq.Key)
+		file := filepath.Join(s.Config.Datapath, "databases", id)
 
 		var data []byte
 		rec := &proto.Record{}
@@ -149,9 +149,8 @@ func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.R
 
 // Write implements the StoreHandler interface.
 func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto.WriteResponse) error {
-	// TODO sanitize key. As it may contain invalid characters, such as slashes.
-	// file: /var/tmp/ocis-store/databases/{database}/{table}/{record.key}.
-	file := filepath.Join(s.Config.Datapath, "databases", wreq.Options.Database, wreq.Options.Table, wreq.Record.Key)
+	id := getID(wreq.Options.Database, wreq.Options.Table, wreq.Record.Key)
+	file := filepath.Join(s.Config.Datapath, "databases", id)
 
 	var bytes []byte
 	bytes, err := protojson.Marshal(wreq.Record)
@@ -173,8 +172,7 @@ func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto
 		Database: wreq.Options.Database,
 		Table:    wreq.Options.Table,
 	}
-	// TODO sanitize input.
-	if err := s.index.Index(strings.Join([]string{wreq.Options.Database, wreq.Options.Table, wreq.Record.Key}, "/"), doc); err != nil {
+	if err := s.index.Index(id, doc); err != nil {
 		s.log.Error().Err(err).Interface("document", doc).Msg("could not index record metadata")
 		return err
 	}
@@ -184,7 +182,8 @@ func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto
 
 // Delete implements the StoreHandler interface.
 func (s *Service) Delete(c context.Context, dreq *proto.DeleteRequest, dres *proto.DeleteResponse) error {
-	file := filepath.Join(s.Config.Datapath, "databases", dreq.Options.Database, dreq.Options.Table, dreq.Key)
+	id := getID(dreq.Options.Database, dreq.Options.Table, dreq.Key)
+	file := filepath.Join(s.Config.Datapath, "databases", id)
 	if err := os.Remove(file); err != nil {
 		if os.IsNotExist(err) {
 			return merrors.NotFound(s.id, "could not find record")
@@ -192,6 +191,12 @@ func (s *Service) Delete(c context.Context, dreq *proto.DeleteRequest, dres *pro
 
 		return merrors.InternalServerError(s.id, "could not delete record")
 	}
+
+	if err := s.index.Delete(id); err != nil {
+		s.log.Error().Err(err).Str("id", id).Msg("could not remove record from index")
+		return merrors.InternalServerError(s.id, "could not remove record from index")
+	}
+
 	return nil
 }
 
@@ -234,4 +239,11 @@ func (s *Service) Tables(ctx context.Context, in *proto.TablesRequest, out *prot
 
 	out.Tables = tnames
 	return nil
+}
+
+// TODO sanitize key. As it may contain invalid characters, such as slashes.
+// file: /var/tmp/ocis-store/databases/{database}/{table}/{record.key}.
+func getID(database string, table string, key string) string {
+	// TODO sanitize input.
+	return filepath.Join(database, table, key)
 }
