@@ -248,8 +248,8 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 	// delete memberof relationship in users
 	for i := range g.Members {
 		err = s.RemoveMember(c, &proto.RemoveMemberRequest{
-			GroupId:   g.Members[i].Id,
-			AccountId: id,
+			AccountId: g.Members[i].Id,
+			GroupId:   id,
 		}, g)
 		if err != nil {
 			s.log.Error().Err(err).Str("groupid", id).Str("accountid", g.Members[i].Id).Msg("could not remove account memberof, skipping")
