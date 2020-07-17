@@ -1,6 +1,8 @@
 package svc
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/user"
@@ -39,6 +41,10 @@ func NewService(opts ...Option) Service {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.NotFound(svc.NotFound)
 		r.Use(middleware.StripSlashes)
+		r.Use(ocsm.AccessToken(
+			ocsm.Logger(options.Logger),
+			ocsm.TokenManagerConfig(options.Config.TokenManager),
+		))
 		r.Use(ocsm.OCSFormatCtx) // updates request Accept header according to format=(json|xml) query parameter
 		r.Route("/v{version:(1|2)}.php", func(r chi.Router) {
 			r.Use(svc.VersionCtx) // stores version in context
@@ -102,35 +108,60 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 // TODO middleware for the proxy
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 
-	// TODO move token marshaling to ocis-proxy
-	_, ok := user.ContextGetUser(r.Context())
+	// TODO the x access token is set but not unparsed
+	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
-		//	render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
-		//	return
+		o.logger.Error().Msg("missing user in context")
+		render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
+		return
 	}
 	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
 	res, err := c.Read(r.Context(), &storepb.ReadRequest{
-		Key: "TODO replace with user from ctx",
 		Options: &storepb.ReadOptions{
-			Database: "ocs",
+			Database: "proxy",
 			Table:    "signing-keys",
-		}})
+		},
+		Key: u.GetUsername(), // TODO username or id?
+	})
+	if err == nil && len(res.Records) > 0 {
+		render.Render(w, r, DataRender(&data.SigningKey{
+			User:       u.Username, // TODO userid vs username?
+			SigningKey: string(res.Records[0].Value),
+		}))
+		return
+	}
+	// TODO check return code, if 404 / not found error continue and try to create it
+	o.logger.Debug().Err(err).Msg("error reading key")
+
+	// try creating it
+	key := make([]byte, 64)
+	_, err = rand.Read(key[:])
 	if err != nil {
-		// TODO check return code, if 404 / not found error continue and try to create it
-		o.logger.Error().Err(err).Msg("error reading key")
+		o.logger.Error().Err(err).Msg("could not generate signing key")
+		render.Render(w, r, ErrRender(MetaServerError.StatusCode, "could not generate signing key"))
+		return
 	}
-	o.logger.Info().Interface("release", res).Msg("read key")
-	// TODO check if signing key empty
-	signingKey := string(res.Records[0].Value)
-	/* TODO create key if it is missing
-	if ($signingKey === null) {
-			$signingKey = \OC::$server->getSecureRandom()->generate(64);
-			\OC::$server->getConfig()->setUserValue($userId, 'core', 'signing-key', $signingKey, null);
+	signingKey := hex.EncodeToString(key)
+
+	_, err = c.Write(r.Context(), &storepb.WriteRequest{
+		Options: &storepb.WriteOptions{
+			Database: "proxy",
+			Table:    "signing-keys",
+		},
+		Record: &storepb.Record{
+			Key:   u.GetUsername(), // TODO username or id?
+			Value: []byte(signingKey),
+			// TODO Expiry?
+		},
+	})
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error writing key")
+		render.Render(w, r, ErrRender(MetaServerError.StatusCode, "could not persist signing key"))
+		return
 	}
-	*/
 
 	render.Render(w, r, DataRender(&data.SigningKey{
-		//	User:       u.Username, // TODO userid vs username?
+		User:       u.Username, // TODO userid vs username?
 		SigningKey: signingKey,
 	}))
 }

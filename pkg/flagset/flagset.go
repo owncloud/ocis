@@ -132,10 +132,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       "/",
+			Value:       "/ocs",
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"OCS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
+		},
+
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to dismantle the access token, should equal reva's jwt-secret",
+			EnvVars:     []string{"OCS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
 		},
 	}
 }
