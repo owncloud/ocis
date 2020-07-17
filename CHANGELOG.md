@@ -1,3 +1,21 @@
+# Changelog for [0.10.0] (2020-07-17)
+
+The following sections list the changes in ocis-phoenix 0.10.0.
+
+[0.10.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.9.0...v0.10.0
+
+## Summary
+
+* Change - Update Phoenix: [#72](https://github.com/owncloud/ocis-phoenix/pull/72)
+
+## Details
+
+* Change - Update Phoenix: [#72](https://github.com/owncloud/ocis-phoenix/pull/72)
+
+   Updated phoenix from v0.12.0 to v0.13.0
+
+   https://github.com/owncloud/ocis-phoenix/pull/72
+
 # Changelog for [0.9.0] (2020-07-10)
 
 The following sections list the changes in ocis-phoenix 0.9.0.
