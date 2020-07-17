@@ -7,6 +7,7 @@ import (
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
+	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 )
 
 // Option defines a single option function.
@@ -26,9 +27,11 @@ type Options struct {
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// RevaGatewayClient to send requests to the reva gateway
 	RevaGatewayClient gateway.GatewayAPIClient
+	// Store for persisting data
+	Store storepb.StoreService
 }
 
-// newOIDCOptions initializes the available default options.
+// newOptions initializes the available default options.
 func newOptions(opts ...Option) Options {
 	opt := Options{}
 
@@ -75,8 +78,15 @@ func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 }
 
 // RevaGatewayClient provides a function to set the the reva gateway service client option.
-func RevaGatewayClient(sc gateway.GatewayAPIClient) Option {
+func RevaGatewayClient(gc gateway.GatewayAPIClient) Option {
 	return func(o *Options) {
-		o.RevaGatewayClient = sc
+		o.RevaGatewayClient = gc
+	}
+}
+
+// Store provides a function to set the store option.
+func Store(sc storepb.StoreService) Option {
+	return func(o *Options) {
+		o.Store = sc
 	}
 }
