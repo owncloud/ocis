@@ -8,11 +8,12 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect
 	github.com/micro/cli/v2 v2.1.1
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-pkg v1.3.0 // indirect
-	github.com/owncloud/ocis-pkg/v2 v2.2.0
+	github.com/owncloud/ocis-pkg/v2 v2.2.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.2
