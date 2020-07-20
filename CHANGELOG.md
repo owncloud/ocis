@@ -10,6 +10,7 @@ The following sections list the changes for ocis-proxy unreleased.
 * Change - Add OIDC config flags: [#66](https://github.com/owncloud/ocis-proxy/pull/66)
 * Change - Mint new username property in the reva token: [#62](https://github.com/owncloud/ocis-proxy/pull/62)
 * Enhancement - Add Accounts UI routes: [#65](https://github.com/owncloud/ocis-proxy/pull/65)
+* Enhancement - Add option to disable TLS: [#71](https://github.com/owncloud/ocis-proxy/issues/71)
 * Enhancement - Only send create home request if an account has been migrated: [#52](https://github.com/owncloud/ocis-proxy/issues/52)
 * Enhancement - Create a root span on proxy that propagates down to consumers: [#64](https://github.com/owncloud/ocis-proxy/pull/64)
 
@@ -52,6 +53,15 @@ The following sections list the changes for ocis-proxy unreleased.
    To http://localhost:9181
 
    https://github.com/owncloud/ocis-proxy/pull/65
+
+
+* Enhancement - Add option to disable TLS: [#71](https://github.com/owncloud/ocis-proxy/issues/71)
+
+   Can be used to disable TLS when the ocis-proxy is behind an TLS-Terminating reverse proxy.
+
+   Env PROXY_TLS=false or --tls=false
+
+   https://github.com/owncloud/ocis-proxy/issues/71
 
 
 * Enhancement - Only send create home request if an account has been migrated: [#52](https://github.com/owncloud/ocis-proxy/issues/52)
