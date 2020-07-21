@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	fieldmask_utils "github.com/mennanov/fieldmask-utils"
+	"github.com/rs/zerolog"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -28,7 +31,6 @@ import (
 )
 
 func (s Service) indexAccounts(path string) (err error) {
-
 	var f *os.File
 	if f, err = os.Open(path); err != nil {
 		s.log.Error().Err(err).Str("dir", path).Msg("could not open accounts folder")
@@ -79,14 +81,6 @@ func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 		return merrors.InternalServerError(s.id, "could not unmarshal account: %v", err.Error())
 	}
 	return
-}
-
-// loggableAccount redacts the password from the account
-func loggableAccount(a *proto.Account) *proto.Account {
-	if a != nil && a.PasswordProfile != nil {
-		a.PasswordProfile.Password = "***REMOVED***"
-	}
-	return a
 }
 
 func (s Service) writeAccount(a *proto.Account) (err error) {
@@ -207,7 +201,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	out.Accounts = make([]*proto.Account, 0)
 
 	for _, hit := range searchResult.Hits {
-
 		a := &proto.Account{}
 		if err = s.loadAccount(hit.ID, a); err != nil {
 			s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
@@ -217,11 +210,12 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		if a.PasswordProfile != nil {
 			currentHash = a.PasswordProfile.Password
 		}
-		s.log.Debug().Interface("account", loggableAccount(a)).Msg("found account")
+
+		s.debugLogAccount(a).Msg("found account")
 
 		if password != "" {
 			if a.PasswordProfile == nil {
-				s.log.Debug().Interface("account", loggableAccount(a)).Msg("no password profile")
+				s.debugLogAccount(a).Msg("no password profile")
 				return merrors.Unauthorized(s.id, "invalid password")
 			}
 			if !s.passwordIsValid(currentHash, password) {
@@ -233,7 +227,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		s.expandMemberOf(a)
 
 		// remove password before returning
-
 		if a.PasswordProfile != nil {
 			a.PasswordProfile.Password = ""
 		}
@@ -255,7 +248,8 @@ func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out 
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
 		return
 	}
-	s.log.Debug().Interface("account", loggableAccount(out)).Msg("found account")
+
+	s.debugLogAccount(out).Msg("found account")
 
 	// TODO add groups if requested
 	// if in.FieldMask ...
@@ -272,40 +266,48 @@ func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out 
 // CreateAccount implements the AccountsServiceHandler interface
 func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
 	var id string
-	if in.Account == nil {
+	var acc = in.Account
+	if acc == nil {
 		return merrors.BadRequest(s.id, "account missing")
 	}
-	if in.Account.Id == "" {
-		in.Account.Id = uuid.Must(uuid.NewV4()).String()
+	if acc.Id == "" {
+		acc.Id = uuid.Must(uuid.NewV4()).String()
 	}
-	if !s.isValidUsername(in.Account.PreferredName) {
-		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", in.Account.PreferredName)
+	if !s.isValidUsername(acc.PreferredName) {
+		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", acc.PreferredName)
 	}
-	if !s.isValidEmail(in.Account.Mail) {
-		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", in.Account.Mail)
+	if !s.isValidEmail(acc.Mail) {
+		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", acc.Mail)
 	}
 
-	if id, err = cleanupID(in.Account.Id); err != nil {
+	if id, err = cleanupID(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	if in.Account.PasswordProfile != nil && in.Account.PasswordProfile.Password != "" {
-		// encrypt password
-		c := crypt.New(crypt.SHA512)
-		if in.Account.PasswordProfile.Password, err = c.Generate([]byte(in.Account.PasswordProfile.Password), nil); err != nil {
-			s.log.Error().Err(err).Str("id", id).Interface("account", loggableAccount(in.Account)).Msg("could not hash password")
-			return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
+	if acc.PasswordProfile != nil {
+		if acc.PasswordProfile.Password != "" {
+			// encrypt password
+			c := crypt.New(crypt.SHA512)
+			if acc.PasswordProfile.Password, err = c.Generate([]byte(acc.PasswordProfile.Password), nil); err != nil {
+				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
+				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
+			}
+		}
+
+		if err := passwordPoliciesValid(acc.PasswordProfile.PasswordPolicies); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
 		}
 	}
 
 	// extract group id
 	// TODO groups should be ignored during create, use groups.AddMember? return error?
-	if err = s.writeAccount(in.Account); err != nil {
-		s.log.Error().Err(err).Interface("account", loggableAccount(in.Account)).Msg("could not persist new account")
+	if err = s.writeAccount(acc); err != nil {
+		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
+		s.debugLogAccount(acc).Msg("could not persist new account")
 		return
 	}
 
-	if err = s.indexAccount(in.Account.Id); err != nil {
+	if err = s.indexAccount(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 
@@ -323,23 +325,19 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	if in.Account.Id == "" {
 		return merrors.BadRequest(s.id, "account id missing")
 	}
-	if !s.isValidUsername(in.Account.PreferredName) {
-		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", in.Account.PreferredName)
-	}
-	if !s.isValidEmail(in.Account.Mail) {
-		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", in.Account.Mail)
-	}
 
 	if id, err = cleanupID(in.Account.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
+
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	if err = s.loadAccount(id, out); err != nil {
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
 		return
 	}
-	s.log.Debug().Interface("account", loggableAccount(out)).Msg("found account")
+
+	s.debugLogAccount(out).Msg("found account")
 
 	t := time.Now()
 	tsnow := &timestamppb.Timestamp{
@@ -347,17 +345,14 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 		Nanos:   int32(t.Nanosecond()),
 	}
 
-	// id read-only
-	out.AccountEnabled = in.Account.AccountEnabled
-	out.IsResourceAccount = in.Account.IsResourceAccount
-	// creation-type read only
-	out.Identities = in.Account.Identities
-	out.DisplayName = in.Account.DisplayName
-	out.PreferredName = in.Account.PreferredName
-	out.UidNumber = in.Account.UidNumber
-	out.GidNumber = in.Account.GidNumber
-	out.Mail = in.Account.Mail // read only?
-	out.Description = in.Account.Description
+	validMask, err := validateUpdate(in.UpdateMask, updatableAccountPaths)
+	if err != nil {
+		return merrors.BadRequest(s.id, "%s", err)
+	}
+
+	if err := fieldmask_utils.StructToStruct(validMask, in.Account, out); err != nil {
+		return merrors.InternalServerError(s.id, "%s", err)
+	}
 
 	if in.Account.PasswordProfile != nil {
 		if out.PasswordProfile == nil {
@@ -367,39 +362,39 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 			// encrypt password
 			c := crypt.New(crypt.SHA512)
 			if out.PasswordProfile.Password, err = c.Generate([]byte(in.Account.PasswordProfile.Password), nil); err != nil {
-				s.log.Error().Err(err).Str("id", id).Interface("account", loggableAccount(in.Account)).Msg("could not hash password")
+				in.Account.PasswordProfile.Password = ""
+				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
 				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
 			}
+
+			in.Account.PasswordProfile.Password = ""
 		}
+
+		if err := passwordPoliciesValid(in.Account.PasswordProfile.PasswordPolicies); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
+		}
+
 		// lastPasswordChangeDateTime calculated, see password
-		out.PasswordProfile.PasswordPolicies = in.Account.PasswordProfile.PasswordPolicies
-		out.PasswordProfile.ForceChangePasswordNextSignIn = in.Account.PasswordProfile.ForceChangePasswordNextSignIn
-		out.PasswordProfile.ForceChangePasswordNextSignInWithMfa = in.Account.PasswordProfile.ForceChangePasswordNextSignInWithMfa
 		out.PasswordProfile.LastPasswordChangeDateTime = tsnow
 	}
 
-	// memberOf read only
-	// createdDateTime read only
-	// deleteDateTime read only
+	// out.RefreshTokensValidFromDateTime TODO use to invalidate all existing sessions
+	// out.SignInSessionsValidFromDateTime TODO use to invalidate all existing sessions
 
-	out.OnPremisesSyncEnabled = in.Account.OnPremisesSyncEnabled
-	out.OnPremisesSamAccountName = in.Account.OnPremisesSamAccountName
 	// ... TODO on prem for sync
 
 	if out.ExternalUserState != in.Account.ExternalUserState {
 		out.ExternalUserState = in.Account.ExternalUserState
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
-	// out.RefreshTokensValidFromDateTime TODO use to invalidate all existing sessions
-	// out.SignInSessionsValidFromDateTime TODO use to invalidate all existing sessions
 
 	if err = s.writeAccount(out); err != nil {
-		s.log.Error().Err(err).Interface("account", loggableAccount(out)).Msg("could not persist updated account")
+		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
 		return
 	}
 
 	if err = s.indexAccount(id); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Interface("account", loggableAccount(out)).Msg("could not index new account")
+		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not index new account")
 		return merrors.InternalServerError(s.id, "could not index updated account: %v", err.Error())
 	}
 
@@ -409,6 +404,25 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	}
 
 	return
+}
+
+// whitelist of all paths/fields which can be updated by clients
+var updatableAccountPaths = map[string]struct{}{
+	"AccountEnabled":                   {},
+	"IsResourceAccount":                {},
+	"Identities":                       {},
+	"DisplayName":                      {},
+	"PreferredName":                    {},
+	"UidNumber":                        {},
+	"GidNumber":                        {},
+	"Description":                      {},
+	"Mail":                             {}, // read only?,
+	"PasswordProfile.Password":         {},
+	"PasswordProfile.PasswordPolicies": {},
+	"PasswordProfile.ForceChangePasswordNextSignIn":        {},
+	"PasswordProfile.ForceChangePasswordNextSignInWithMfa": {},
+	"OnPremisesSyncEnabled":                                {},
+	"OnPremisesSamAccountName":                             {},
 }
 
 // DeleteAccount implements the AccountsServiceHandler interface
@@ -470,4 +484,73 @@ func (s Service) isValidEmail(e string) bool {
 		return false
 	}
 	return emailRegex.MatchString(e)
+}
+
+const (
+	policyDisableStrongPassword     = "DisableStrongPassword"
+	policyDisablePasswordExpiration = "DisablePasswordExpiration"
+)
+
+func passwordPoliciesValid(policies []string) error {
+	for _, v := range policies {
+		if v != policyDisableStrongPassword && v != policyDisablePasswordExpiration {
+			return fmt.Errorf("invalid password-policy %s", v)
+		}
+	}
+
+	return nil
+}
+
+// validateUpdate takes a update field-mask and validates it against a whitelist of updatable paths.
+// Returns a FieldFilter on success which can be passed to the fieldmask_utils..StructToStruct. An error is returned
+// if the mask tries to update no whitelisted fields.
+//
+// Given an empty or nil mask we assume that the client wants to update all whitelisted fields.
+//
+func validateUpdate(mask *field_mask.FieldMask, updatablePaths map[string]struct{}) (fieldmask_utils.FieldFilterContainer, error) {
+	nop := func(s string) string { return s }
+	// Assume that the client wants to update all updatable path if
+	// no field-mask is given, so we create a mask with all paths
+	if mask == nil || len(mask.Paths) == 0 {
+		paths := make([]string, 0, len(updatablePaths))
+		for fieldName := range updatablePaths {
+			paths = append(paths, fieldName)
+		}
+
+		return fieldmask_utils.MaskFromPaths(paths, nop)
+	}
+
+	// Check that only allowed fields are updated
+	for _, v := range mask.Paths {
+		if _, ok := updatablePaths[v]; !ok {
+			return nil, fmt.Errorf("can not update field %s, either unknown or readonly", v)
+		}
+	}
+
+	return fieldmask_utils.MaskFromPaths(mask.Paths, nop)
+}
+
+// debugLogAccount returns a debug-log event with detailed account-info, and filtered password data
+func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
+	return s.log.Debug().Fields(map[string]interface{}{
+		"Id":                           a.Id,
+		"Mail":                         a.Mail,
+		"DisplayName":                  a.DisplayName,
+		"AccountEnabled":               a.AccountEnabled,
+		"IsResourceAccount":            a.IsResourceAccount,
+		"Identities":                   a.Identities,
+		"PreferredName":                a.PreferredName,
+		"UidNumber":                    a.UidNumber,
+		"GidNumber":                    a.GidNumber,
+		"Description":                  a.Description,
+		"OnPremisesSyncEnabled":        a.OnPremisesSyncEnabled,
+		"OnPremisesSamAccountName":     a.OnPremisesSamAccountName,
+		"OnPremisesUserPrincipalName":  a.OnPremisesUserPrincipalName,
+		"OnPremisesSecurityIdentifier": a.OnPremisesSecurityIdentifier,
+		"OnPremisesDistinguishedName":  a.OnPremisesDistinguishedName,
+		"OnPremisesLastSyncDateTime":   a.OnPremisesLastSyncDateTime,
+		"MemberOf":                     a.MemberOf,
+		"CreatedDateTime":              a.CreatedDateTime,
+		"DeletedDateTime":              a.DeletedDateTime,
+	})
 }

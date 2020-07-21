@@ -2,7 +2,10 @@ package proto_test
 
 import (
 	context "context"
+	"errors"
 	"fmt"
+	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	merrors "github.com/micro/go-micro/v2/errors"
 )
 
 var service = grpc.Service{}
@@ -946,6 +950,58 @@ func TestListMembersEmptyGroup(t *testing.T) {
 
 	checkError(t, err)
 	assert.Empty(t, res.Members)
+
+	cleanUp(t)
+}
+
+func TestAccountUpdateMask(t *testing.T) {
+	createAccount(t, "user1")
+	user1 := getAccount("user1")
+	client := service.Client()
+	req := &proto.UpdateAccountRequest{
+		// We only want to update the display-name, rest should be ignored
+		UpdateMask: &field_mask.FieldMask{Paths: []string{"DisplayName"}},
+		Account: &proto.Account{
+			Id:            user1.Id,
+			DisplayName:   "ShouldBeUpdated",
+			PreferredName: "ShouldStaySame",
+		}}
+
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
+	res, err := cl.UpdateAccount(context.Background(), req)
+	checkError(t, err)
+
+	assert.Equal(t, "ShouldBeUpdated", res.DisplayName)
+	assert.Equal(t, user1.PreferredName, res.PreferredName)
+
+	cleanUp(t)
+}
+
+func TestAccountUpdateReadOnlyField(t *testing.T) {
+	createAccount(t, "user1")
+	user1 := getAccount("user1")
+	client := service.Client()
+	req := &proto.UpdateAccountRequest{
+		// We only want to update the display-name, rest should be ignored
+		UpdateMask: &field_mask.FieldMask{Paths: []string{"CreatedDateTime"}},
+		Account: &proto.Account{
+			Id:              user1.Id,
+			CreatedDateTime: timestamppb.Now(),
+		}}
+
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
+	res, err := cl.UpdateAccount(context.Background(), req)
+	assert.Nil(t, res)
+	assert.Error(t, err)
+
+	var e *merrors.Error
+
+	if errors.As(err, &e) {
+		assert.EqualValues(t, 400, e.Code)
+		assert.Equal(t, "Bad Request", e.Status)
+	} else {
+		t.Fatal("Unexpected error type")
+	}
 
 	cleanUp(t)
 }
