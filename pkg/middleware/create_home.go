@@ -66,11 +66,9 @@ func CreateHome(opts ...Option) func(next http.Handler) http.Handler {
 
 			if err != nil {
 				opt.Logger.Err(err).Msg("error calling CreateHome")
-			}
-
-			if createHomeRes.Status.Code != rpc.Code_CODE_OK {
+			} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
 				err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-				opt.Logger.Err(err).Msg("error calling Createhome")
+				opt.Logger.Err(err).Msg("error when calling Createhome")
 			}
 
 			next.ServeHTTP(w, r)
