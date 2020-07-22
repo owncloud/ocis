@@ -17,13 +17,13 @@ import (
 // TODO testing the getAccount method should inject a cache
 func TestGetAccountSuccess(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "success")
-	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "success"}, mockAccountUUIDMiddlewareAccSvc(false, true)); status != 0 {
+	if _, status := getAccount(log.NewLogger(), mockAccountUUIDMiddlewareAccSvc(false, true), "mail eq 'success'"); status != 0 {
 		t.Errorf("expected an account")
 	}
 }
 func TestGetAccountInternalError(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "failure")
-	if _, status := getAccount(log.NewLogger(), &oidc.StandardClaims{Email: "failure"}, mockAccountUUIDMiddlewareAccSvc(true, false)); status != http.StatusInternalServerError {
+	if _, status := getAccount(log.NewLogger(), mockAccountUUIDMiddlewareAccSvc(true, false), "mail eq 'failure'"); status != http.StatusInternalServerError {
 		t.Errorf("expected an internal server error")
 	}
 }

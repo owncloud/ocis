@@ -22,6 +22,7 @@ import (
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli/v2"
 	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -32,6 +33,7 @@ import (
 	"github.com/owncloud/ocis-proxy/pkg/proxy"
 	"github.com/owncloud/ocis-proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis-proxy/pkg/server/http"
+	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -245,6 +247,37 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
+
+	psMW := middleware.PresignedURL(
+		middleware.Logger(l),
+		middleware.Store(storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())),
+	)
+
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
+
+	uuidMW := middleware.AccountUUID(
+		middleware.Logger(l),
+		middleware.TokenManagerConfig(cfg.TokenManager),
+		middleware.AccountsClient(accounts),
+	)
+
+	// the connection will be established in a non blocking fashion
+	sc, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
+	if err != nil {
+		l.Error().Err(err).
+			Str("gateway", cfg.Reva.Address).
+			Msg("Failed to create reva gateway service client")
+	}
+
+	chMW := middleware.CreateHome(
+		middleware.Logger(l),
+		middleware.RevaGatewayClient(sc),
+		middleware.AccountsClient(accounts),
+		middleware.TokenManagerConfig(cfg.TokenManager),
+	)
+
 	if cfg.OIDC.Issuer != "" {
 		l.Info().Msg("Loading OIDC-Middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
@@ -274,33 +307,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.OIDCProviderFunc(provider),
 		)
 
-		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		// https://github.com/owncloud/ocis-proxy/issues/38
-		accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
-
-		uuidMW := middleware.AccountUUID(
-			middleware.Logger(l),
-			middleware.TokenManagerConfig(cfg.TokenManager),
-			middleware.AccountsClient(accounts),
-		)
-
-		// the connection will be established in a non blocking fashion
-		sc, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
-		if err != nil {
-			l.Error().Err(err).
-				Str("gateway", cfg.Reva.Address).
-				Msg("Failed to create reva gateway service client")
-		}
-
-		chMW := middleware.CreateHome(
-			middleware.Logger(l),
-			middleware.RevaGatewayClient(sc),
-			middleware.AccountsClient(accounts),
-			middleware.TokenManagerConfig(cfg.TokenManager),
-		)
-
-		return alice.New(middleware.RedirectToHTTPS, oidcMW, uuidMW, chMW)
+		return alice.New(middleware.RedirectToHTTPS, oidcMW, psMW, uuidMW, chMW)
 	}
 
-	return alice.New(middleware.RedirectToHTTPS)
+	return alice.New(middleware.RedirectToHTTPS, psMW, uuidMW, chMW)
 }
