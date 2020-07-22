@@ -143,6 +143,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a h1:idn718Q4B6AGu/h5Sxe66HYVdqdGu2l9Iebqhi/AEoA=
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
+github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 h1:zV3ejI06GQ59hwDQAvmK1qxOQGB3WuVTRoY0okPTAv0=
+github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee h1:3T/l+vMotQ7cDSLWNAn2Vg1SAQ3mdyLgBWWBitSS3uU=
 github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee/go.mod h1:u7Wtt4WATGGgae9mURNGQQqxAudPKrxfsbSDSGOso+g=
 github.com/asim/go-awsxray v0.0.0-20161209120537-0d8a60b6e205/go.mod h1:frVmN4PtXUuL1EbZn0uL4PHSTKNKFnbMpBIhngqMuNQ=
@@ -172,6 +174,8 @@ github.com/aws/aws-sdk-go v1.32.13 h1:zzyXF7SUxJcJa3hTcYCl1/Ey+kh2N8TjK5tWnL0wie
 github.com/aws/aws-sdk-go v1.32.13/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.33.1 h1:yz9XmNzPshz/lhfAZvLfMnIS9HPo8+boGRcWqDVX+T0=
 github.com/aws/aws-sdk-go v1.33.1/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.33.7 h1:vOozL5hmWHHriRviVTQnUwz8l05RS0rehmEFymI+/x8=
+github.com/aws/aws-sdk-go v1.33.7/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-xray-sdk-go v0.9.4/go.mod h1:XtMKdBQfpVut+tJEwI7+dJFRxxRdxHDyVNp2tHXRq04=
 github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f/go.mod h1:AuiFmCCPBSrqvVMvuqFuk0qogytodnVFVSN5CeJB8Gc=
 github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
@@ -191,6 +195,7 @@ github.com/blevesearch/bleve v1.0.9 h1:kqw/Ank/61UV9/Bx9kCcnfH6qWPgmS8O5LNfpsgzA
 github.com/blevesearch/bleve v1.0.9/go.mod h1:tb04/rbU29clbtNgorgFd8XdJea4x3ybYaOjWKr+UBU=
 github.com/blevesearch/blevex v0.0.0-20190916190636-152f0fe5c040 h1:SjYVcfJVZoCfBlg+fkaq2eoZHTf5HaJfaTeTkOtyfHQ=
 github.com/blevesearch/blevex v0.0.0-20190916190636-152f0fe5c040/go.mod h1:WH+MU2F4T0VmSdaPX+Wu5GYoZBrYWdOZWSjzvYcDmqQ=
+github.com/blevesearch/cld2 v0.0.0-20200327141045-8b5f551d37f5/go.mod h1:PN0QNTLs9+j1bKy3d/GB/59wsNBFC4sWLWG3k69lWbc=
 github.com/blevesearch/go-porterstemmer v1.0.3 h1:GtmsqID0aZdCSNiY8SkuPJ12pD4jI+DdXTAn4YRcHCo=
 github.com/blevesearch/go-porterstemmer v1.0.3/go.mod h1:angGc5Ht+k2xhJdZi511LtmxuEf0OVpvUUNrwmM1P7M=
 github.com/blevesearch/mmap-go v1.0.2 h1:JtMHb+FgQCTTYIhtMvimw15dJwu1Y5lrZDMOFXVWPk0=
@@ -347,6 +352,8 @@ github.com/cs3org/reva v0.1.1-0.20200701152626-2f6cc60e2f66 h1:0FEaqg/OF1wci6uVs
 github.com/cs3org/reva v0.1.1-0.20200701152626-2f6cc60e2f66/go.mod h1:umXd+gBuq0t1hiR8f+EplUxeWPcBnAIKPNKbXtA9EWU=
 github.com/cs3org/reva v0.1.1-0.20200709064551-91eed007038f h1:wsQOmNJGqxiXC3uTYHy1IPi39lO+UKD1adu2V3+8YtE=
 github.com/cs3org/reva v0.1.1-0.20200709064551-91eed007038f/go.mod h1:VUBjQP8XCiWwFTPhE9P4I47k0NbdczQa2q6JsJN2PqY=
+github.com/cs3org/reva v0.1.1-0.20200722125752-6dea7936f9d1 h1:f/XZNSkCpS0ndLzMq/IRA0k2P1B/04Qvgf7s4qtQoGQ=
+github.com/cs3org/reva v0.1.1-0.20200722125752-6dea7936f9d1/go.mod h1:yPtGZIud+QVWLN7lxPwZLNj2/BCx3xu2DNUcTJE1Mkk=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 h1:iwZdTE0PVqJCos1vaoKsclOGD3ADKpshg3SRtYBbwso=
@@ -455,6 +462,8 @@ github.com/go-chi/chi v4.1.0+incompatible h1:ETj3cggsVIY2Xao5ExCu6YhEh5MD6JTfcBz
 github.com/go-chi/chi v4.1.0+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
 github.com/go-chi/chi v4.1.1+incompatible h1:MmTgB0R8Bt/jccxp+t6S/1VGIKdJw5J74CK/c9tTfA4=
 github.com/go-chi/chi v4.1.1+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
+github.com/go-chi/chi v4.1.2+incompatible h1:fGFk2Gmi/YKXk0OmGfBh0WgmN3XB8lVnEyNz34tQRec=
+github.com/go-chi/chi v4.1.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
 github.com/go-chi/render v1.0.1 h1:4/5tis2cKaNdnv9zFLfXzcquC9HbeZgCnxGnKrltBS8=
 github.com/go-chi/render v1.0.1/go.mod h1:pq4Rr7HbnsdaeHagklXub+p6Wd16Af5l9koip1OvJns=
 github.com/go-cmd/cmd v1.0.5/go.mod h1:y8q8qlK5wQibcw63djSl/ntiHUHXHGdCkPk0j4QeW4s=
@@ -493,6 +502,8 @@ github.com/go-openapi/jsonreference v0.0.0-20160704190145-13c6e3589ad9/go.mod h1
 github.com/go-openapi/spec v0.0.0-20160808142527-6aced65f8501/go.mod h1:J8+jY1nAiCcj+friV/PDoE1/3eeccG9LYBs0tYvLOWc=
 github.com/go-openapi/strfmt v0.19.2/go.mod h1:0yX7dbo8mKIvc3XSKp7MNfxw4JytCfCD6+bY1AVL9LU=
 github.com/go-openapi/swag v0.0.0-20160704191624-1d0bd113de87/go.mod h1:DXUve3Dpr1UfpPtxFw+EFuQ41HhCWZfha5jSVRG7C7I=
+github.com/go-ozzo/ozzo-validation/v4 v4.2.1 h1:XALUNshPYumA7UShB7iM3ZVlqIBn0jfwjqAMIoyE1N0=
+github.com/go-ozzo/ozzo-validation/v4 v4.2.1/go.mod h1:2NKgrcHl3z6cJs+3Oo940FPRiTzuqKbvfrL2RxCj6Ew=
 github.com/go-playground/locales v0.12.1/go.mod h1:IUMDtCfWo/w/mtMfIE/IG2K+Ey3ygWanZIBtBW0W2TM=
 github.com/go-playground/locales v0.13.0/go.mod h1:taPMhCMXrRLJO55olJkUXHZBHCxTMfnGwq/HNwmWNS8=
 github.com/go-playground/universal-translator v0.16.0/go.mod h1:1AnU7NaIRDWWzGEKwgtJRd2xk99HeFyHw3yid4rvQIY=
@@ -743,6 +754,7 @@ github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMyw
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+umXrS52loVEgC2AApnigrVQ=
 github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
@@ -874,6 +886,7 @@ github.com/hudl/fargo v1.3.0/go.mod h1:y3CKSmjA+wD2gak7sUSXTAoopbhU08POFhmITJgmK
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/iij/doapi v0.0.0-20190504054126-0bbf12d6d7df/go.mod h1:QMZY7/J/KSQEhKWFeDesPjMj+wCHReeknARU3wqlyN4=
 github.com/ijc/Gotty v0.0.0-20170406111628-a8b993ba6abd/go.mod h1:3LVOLeyx9XVvwPgrt2be44XgSqndprz1G18rSk8KD84=
+github.com/ikawaha/kagome.ipadic v1.1.2/go.mod h1:DPSBbU0czaJhAb/5uKQZHMc9MTVRpDugJfX+HddPHHg=
 github.com/imdario/mergo v0.3.7/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/imdario/mergo v0.3.8/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/imdario/mergo v0.3.9 h1:UauaLniWCFHWd+Jp9oCEkTBj8VO/9DKg3PV3VCNMDIg=
@@ -1077,11 +1090,13 @@ github.com/micro/micro v1.16.0/go.mod h1:TO5Ng0KidbfRYIxVM4Q3deZ0A+qwRyP9WeXp+k2
 github.com/micro/micro v1.18.0 h1:v+xiQOXbT9xxotLwu1nJM81t4FbruBxZSSyIdhUfujM=
 github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348 h1:iV75DZfKGKulOxaRehmzV6NMa0Aevtk5jKcVdv90vJQ=
 github.com/micro/micro/v2 v2.0.1-0.20200210100719-f38a1d8d5348/go.mod h1:MQBt/cBC7vKP6JMebU5982Umd5GIrVdhPbOGieXowyY=
+github.com/micro/micro/v2 v2.5.1-0.20200418121137-24e9b206767c/go.mod h1:fqqaYbJGYzSBi7Ms2Adly7Xzw9+WIRBAucUjwGmYeFY=
 github.com/micro/micro/v2 v2.7.0 h1:8gF0SIHMkdsXWt4ItmnUKvEuYF4U8BSkcAXp+Li+4O8=
 github.com/micro/micro/v2 v2.7.0/go.mod h1:J91wOxMkyGM8q74+HUM9A47NmAPOMX+rU1IbUpwbyEw=
 github.com/micro/micro/v2 v2.8.0 h1:AMqpnKsOBnuGHjU0jVmTL17BRdsOx0FbvI/Gkl2uLrA=
 github.com/micro/micro/v2 v2.8.0/go.mod h1:VTIGqEBLAMh22q72DnGd95iJSQY/3yvXd9GIIooQ69c=
 github.com/micro/protoc-gen-micro v1.0.0/go.mod h1:C8ij4DJhapBmypcT00AXdb0cZ675/3PqUO02buWWqbE=
+github.com/micro/protoc-gen-micro/v2 v2.3.0/go.mod h1:gcsUvKSTTTalq+pqdUbFS40OTsURpYgL5+yUguR1djk=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
@@ -1263,6 +1278,8 @@ github.com/owncloud/ocis-accounts v0.1.2-0.20200522103104-a5d5eac711c1 h1:VWZumx
 github.com/owncloud/ocis-accounts v0.1.2-0.20200522103104-a5d5eac711c1/go.mod h1:Rl7zh777O7IwEHceHFSshy/tgNpNKcitCJ7VGSNz/1s=
 github.com/owncloud/ocis-accounts v0.1.2-0.20200618163128-aa8ae58dd95e h1:FRD1/lH/6IaaWWzBXCeM4hUAoN86zQAz68nOnvCLqsY=
 github.com/owncloud/ocis-accounts v0.1.2-0.20200618163128-aa8ae58dd95e/go.mod h1:ohb58AUSUgq+kPOFAjy1s1k5Bi33YtPg45qOOPsepeM=
+github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171 h1:FWEs/MMLMnuo+gFKLhHVs4ZCIdCCCWcHWhfYUOPHPpo=
+github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171/go.mod h1:NCjk5xgHaGWSbaC34qSLCTMqUWyQGRUEtwGA/+yA2/8=
 github.com/owncloud/ocis-glauth v0.4.0 h1:L+S2UzkJJv5NWBVnTIZObdFz5zvKz8L0crIWbXtTF8o=
 github.com/owncloud/ocis-glauth v0.4.0/go.mod h1:dZzZdRkssaEiDg3UdlQL+kozVfpyVUhdUd0uGcTdCH8=
 github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7 h1:gT0GyIOoR7XtpZ7sIxVJSckcz/nueGB1Cm1xNaflXQ0=
@@ -1283,6 +1300,8 @@ github.com/owncloud/ocis-migration v0.2.0 h1:AmfXKIRlGDNkqhC4AetZ0RNNgcH3cHRl8iK
 github.com/owncloud/ocis-migration v0.2.0/go.mod h1:U6DCcHLuogHvAXg1aAyIlzJPtERIqyuigXU1BjUpu5g=
 github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7 h1:AHKA5xrnSBOdFjVTkaXzCyJl7vhOVklJD/b/T6Ky/oI=
 github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7/go.mod h1:W0ry/qPP85Yw/KKd0IoOdjOI914bvzOaEeM9bzRuwaQ=
+github.com/owncloud/ocis-ocs v0.0.0-20200722134709-2f3332a55b81 h1:Jgje5GjSIM8qg58DQW3KGhvc8d/D6fgYLBNMXrn3Wxs=
+github.com/owncloud/ocis-ocs v0.0.0-20200722134709-2f3332a55b81/go.mod h1:Ze46Jk5dlWtfAlxkRmdx0XbyLOHJet+PzUrSRmEwMjw=
 github.com/owncloud/ocis-phoenix v0.6.0 h1:p++botHH6WizAiMXELBTDRw9oVqcjyMliLf5BLgrDxw=
 github.com/owncloud/ocis-phoenix v0.6.0/go.mod h1:uTJsJV9mTnWmMOgg1YaxUaqmAjH5P+sikp9tZQKSwpM=
 github.com/owncloud/ocis-phoenix v0.7.0 h1:yJkWUm2SR55bjfOUoDhfkGhbjaXmgAA72vgcEF1H0M4=
@@ -1303,6 +1322,8 @@ github.com/owncloud/ocis-pkg/v2 v2.2.1 h1:LK7WxHYugEFQ9NHTOz0EP8DRjbt51wXhyqruV0
 github.com/owncloud/ocis-pkg/v2 v2.2.1/go.mod h1:MXv7QzsYsu4YWuyJxhq1kLLmJa/r5gbqHe1FXulMHaw=
 github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c h1:hYhKSfMkPO4kRLrKqRHPmePGTCpGDGji+s4yW30+tmM=
 github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c/go.mod h1:s894msGwDsULmsROHkbsXFCP/eSqDcteDFUntZOiJdc=
+github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170 h1:MYfyffPyTZbTofJjAz3LSQUIaKKcjjBBBIJGaEAkP8g=
+github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170/go.mod h1:s894msGwDsULmsROHkbsXFCP/eSqDcteDFUntZOiJdc=
 github.com/owncloud/ocis-proxy v0.3.1 h1:49weyxHNQjOeWTaf31LlQp5uul8ZoJenfe9o4P4fetU=
 github.com/owncloud/ocis-proxy v0.3.1/go.mod h1:HwsIKM9etps19bBVwjOX+Jrv9pfDvw3azvaHaxMiBCI=
 github.com/owncloud/ocis-proxy v0.3.2-0.20200526160332-ea254d603659 h1:zWDmNSbhfZB5NiW63a0wCbeugH70SnlQABaRJf7WbR8=
@@ -1311,6 +1332,8 @@ github.com/owncloud/ocis-proxy v0.3.2-0.20200529092045-bfe4790ab8cd h1:wsU+VOGO7
 github.com/owncloud/ocis-proxy v0.3.2-0.20200529092045-bfe4790ab8cd/go.mod h1:XPqctXYxoXPmqtxuXRQ8RJ9StVrbilFLkwsWh9bcdsE=
 github.com/owncloud/ocis-proxy v0.4.0 h1:xPCctmBKtXEKhazh7RurursSCPEtIOkUVCkTypMYoao=
 github.com/owncloud/ocis-proxy v0.4.0/go.mod h1:2ZKZ7q5JMvDEoosWp9MaOYp+EkQP0ZsQV8o2gSw0PHM=
+github.com/owncloud/ocis-proxy v0.4.1-0.20200722150807-7ee05765b5c0 h1:VEwmTJOn5ym44oYcuMLCj+m2N2LAL5MjHNVXEXPtaTY=
+github.com/owncloud/ocis-proxy v0.4.1-0.20200722150807-7ee05765b5c0/go.mod h1:HW9fg2pVnZmtlKduHHuVFSTXylDl5seKuZWkz7M0+7s=
 github.com/owncloud/ocis-reva v0.2.1 h1:4aOOJT7tn9GCeNCM+qr33de2xobW4nAKJUvbb0BpL2k=
 github.com/owncloud/ocis-reva v0.2.1/go.mod h1:Ew9XgScQzFbdpSZySq1PHVISgd4y03Ms62lFy+mAx2s=
 github.com/owncloud/ocis-reva v0.2.2-0.20200513073117-ee9cd9b8d3ab h1:WNIv1WkJi5JiLEEf8OzSZXUjiad9pqYk9+EUKklwq9k=
@@ -1337,11 +1360,18 @@ github.com/owncloud/ocis-reva v0.9.1 h1:FlcGcOGAZ5hseGcUuCb8Q2yxfWmJmiOQHHw7B+yj
 github.com/owncloud/ocis-reva v0.9.1/go.mod h1:XubCqrJYNhYONNHBo7Q6XgH1HHTdaOf7nA9IdFJNY88=
 github.com/owncloud/ocis-reva v0.10.0 h1:zBcbP17SZU1AEqnFW2G90PNcH68Fdie5vwvaIqSpQfg=
 github.com/owncloud/ocis-reva v0.10.0/go.mod h1:rPZptSdecdT0bXAGIIGXhNHkzX4y4wgm0/LDGAZZVrk=
+github.com/owncloud/ocis-reva v0.10.1-0.20200722150615-8627042603e9 h1:el0O00ULNheJTX+QJXjEHPywHAmXkTHkUYGhgwSC6gw=
+github.com/owncloud/ocis-reva v0.10.1-0.20200722150615-8627042603e9/go.mod h1:xsGko5By4YtXmZdFjK8nT958XPjZX7pAQpxwGkMfFCI=
 github.com/owncloud/ocis-settings v0.0.0-20200511093940-0fddb624d0da/go.mod h1:1PyfbVIZMTX21JxsRT+maRIjRFD3H+yhfpr1jMz3PeA=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363 h1:wk/7aAUITTrM192TFoIDq4fqzJQtFOQ0dDdSRkJ25SU=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363/go.mod h1:/h0ceztOoFc3KAnm8nqZI4zwsaaZK9q4MTgtintwsXc=
 github.com/owncloud/ocis-settings v0.0.0-20200602115916-d10179c1aa59 h1:/zvpEMfJYa136WCdspaX/zMu78ueXZlVIpmgoG0IWvg=
 github.com/owncloud/ocis-settings v0.0.0-20200602115916-d10179c1aa59/go.mod h1:xSf/8ccV12M05xVMnvJ7do3g8ZEsdqKr2Qp0GINPhxM=
+github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43 h1:IekDKhkoaOhUnpIHSG5d02hGMOW5u4tZEEfxVC1KGgk=
+github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43/go.mod h1:AeXZVHKEU+9Xt4+/lkHE5rx+sJH2if9dIrUGLhe+JOY=
+github.com/owncloud/ocis-store v0.0.0-20200716140351-f9670592fb7b/go.mod h1:7WRMnx4ffwtckNl4qD2Gj/d5fvl84jyydOV2FbUUu3A=
+github.com/owncloud/ocis-store v0.0.0-20200722111021-8fa9c07ae95c h1:4IOgcTMme4SEzp2bKNKZ/vfdgAcSlLGk8vD0/PSb5xY=
+github.com/owncloud/ocis-store v0.0.0-20200722111021-8fa9c07ae95c/go.mod h1:7WRMnx4ffwtckNl4qD2Gj/d5fvl84jyydOV2FbUUu3A=
 github.com/owncloud/ocis-thumbnails v0.0.0-20200318131505-e0ab0b37a5a4/go.mod h1:VmCoxwitTs6oRxIaGz6xridLPwA6ReRMej22jBhkRIM=
 github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb h1:eLvwnJ88x0erIsjMEa2b6dI1pBTEz52eMKrBPJfIOLM=
 github.com/owncloud/ocis-thumbnails v0.1.2-0.20200422124828-f92a40879feb/go.mod h1:N9zPXTyUmQ7vi19Y5EO94MRw19up/3SK3SSX5P3PvFw=
@@ -1589,6 +1619,7 @@ github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
+github.com/tebeka/snowball v0.4.2/go.mod h1:4IfL14h1lvwZcp1sfXuuc7/7yCsvVffTWxWxCLfFpYg=
 github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c h1:g+WoO5jjkqGAzHWCjJB1zZfXPIAaDpzXIEJ0eS6B5Ok=
 github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c/go.mod h1:ahpPrc7HpcfEWDQRZEmnXMzHY03mLDYMCxeDzy46i+8=
 github.com/technoweenie/multipartstreamer v1.0.1 h1:XRztA5MXiR1TIRHxH2uNxXxaIkKQDeX7m2XsSOlQEnM=
@@ -2114,6 +2145,8 @@ google.golang.org/protobuf v1.23.0/go.mod h1:EGpADcykh3NcUnDUJcl1+ZksZNG86OlYog2
 google.golang.org/protobuf v1.23.1-0.20200526195155-81db48ad09cc/go.mod h1:EGpADcykh3NcUnDUJcl1+ZksZNG86OlYog2l/sGQquU=
 google.golang.org/protobuf v1.24.0 h1:UhZDfRO8JRQru4/+LlLE0BRKGF8L+PICnvYZmx/fEGA=
 google.golang.org/protobuf v1.24.0/go.mod h1:r/3tXBNzIEhYS9I1OUVjXDlt8tc493IdKGjtUeSXeh4=
+google.golang.org/protobuf v1.25.0 h1:Ejskq+SyPohKW+1uil0JJMtmHCgJPJ/qWTxr8qp+R4c=
+google.golang.org/protobuf v1.25.0/go.mod h1:9JNX74DMeImyA3h4bdi1ymwjUzf21/xIlbajtzgsN7c=
 gopkg.in/Acconut/lockfile.v1 v1.1.0/go.mod h1:6UCz3wJ8tSFUsPR6uP/j8uegEtDuEEqFxlpi0JI4Umw=
 gopkg.in/DataDog/dd-trace-go.v1 v1.19.0/go.mod h1:DVp8HmDh8PuTu2Z0fVVlBsyWaC++fzwVCaGWylTe3tg=
 gopkg.in/airbrake/gobrake.v2 v2.0.9/go.mod h1:/h5ZAUhDkGaJfjzjKLSjv6zCL6O0LLBxU4K+aSYdM/U=
