@@ -159,6 +159,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 												"productname":    "reva",
 												"hostname":       "",
 											},
+											"support_url_signing": true,
 										},
 										"checksums": map[string]interface{}{
 											"supported_types":       []string{"SHA256"},
