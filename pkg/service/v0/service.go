@@ -115,13 +115,8 @@ func getFailsafeIdentifier(c context.Context, identifier *proto.Identifier) *pro
 		identifier = &proto.Identifier{}
 	}
 	if identifier.AccountUuid == "me" {
-		ownAccountUUID := c.Value(middleware.UUIDKey).(string)
-		if len(ownAccountUUID) > 0 {
+		if ownAccountUUID, ok := c.Value(middleware.UUIDKey).(string); ok {
 			identifier.AccountUuid = ownAccountUUID
-		} else {
-			// might be valid for the request not having an AccountUuid in the identifier.
-			// but clear it, instead of passing on `me`.
-			identifier.AccountUuid = ""
 		}
 	}
 	identifier.AccountUuid = strings.ToLower(identifier.AccountUuid)
