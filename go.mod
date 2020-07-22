@@ -23,19 +23,20 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200618163128-aa8ae58dd95e
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171
 	github.com/owncloud/ocis-glauth v0.4.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.1
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.0.0-20200318181133-cc66a0531da7
+	github.com/owncloud/ocis-ocs v0.0.0-20200722134709-2f3332a55b81
 	github.com/owncloud/ocis-phoenix v0.9.0
-	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200527082518-5641fa4a4c8c
-	github.com/owncloud/ocis-proxy v0.4.0
-	github.com/owncloud/ocis-reva v0.10.0
-	github.com/owncloud/ocis-settings v0.0.0-20200602115916-d10179c1aa59
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
+	github.com/owncloud/ocis-proxy v0.4.1-0.20200722150807-7ee05765b5c0
+	github.com/owncloud/ocis-reva v0.10.1-0.20200722150615-8627042603e9
+	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
+	github.com/owncloud/ocis-store v0.0.0-20200722111021-8fa9c07ae95c
 	github.com/owncloud/ocis-thumbnails v0.1.2
 	github.com/owncloud/ocis-webdav v0.1.0
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
@@ -44,7 +45,6 @@ require (
 	go.opencensus.io v0.22.4
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
-	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
 	golang.org/x/text v0.3.3 // indirect
