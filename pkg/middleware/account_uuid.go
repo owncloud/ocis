@@ -13,23 +13,23 @@ import (
 	oidc "github.com/owncloud/ocis-pkg/v2/oidc"
 )
 
-func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsService) (account *acc.Account, status int) {
-	entry, err := svcCache.Get(AccountsKey, claims.Email)
+func getAccount(l log.Logger, ac acc.AccountsService, query string) (account *acc.Account, status int) {
+	entry, err := svcCache.Get(AccountsKey, query)
 	if err != nil {
-		l.Debug().Msgf("No cache entry for %v", claims.Email)
+		l.Debug().Msgf("No cache entry for %s", query)
 		resp, err := ac.ListAccounts(context.Background(), &acc.ListAccountsRequest{
-			Query:    fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")),
+			Query:    query,
 			PageSize: 2,
 		})
 
 		if err != nil {
-			l.Error().Err(err).Str("email", claims.Email).Msgf("Error fetching from accounts-service")
+			l.Error().Err(err).Str("query", query).Msgf("Error fetching from accounts-service")
 			status = http.StatusInternalServerError
 			return
 		}
 
 		if len(resp.Accounts) <= 0 {
-			l.Error().Str("email", claims.Email).Msgf("Account not found")
+			l.Error().Str("query", query).Msgf("Account not found")
 			status = http.StatusNotFound
 			return
 		}
@@ -37,20 +37,21 @@ func getAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsServic
 		// TODO provision account
 
 		if len(resp.Accounts) > 1 {
-			l.Error().Str("email", claims.Email).Msgf("More than one account with this email found. Not logging user in.")
+			l.Error().Str("query", query).Msgf("More than one account found. Not logging user in.")
 			status = http.StatusForbidden
 			return
 		}
 
-		err = svcCache.Set(AccountsKey, claims.Email, *resp.Accounts[0])
+		err = svcCache.Set(AccountsKey, query, *resp.Accounts[0])
 		if err != nil {
-			l.Err(err).Str("email", claims.Email).Msgf("Could not cache user")
+			l.Err(err).Str("query", query).Msgf("Could not cache user")
 			status = http.StatusInternalServerError
 			return
 		}
 
 		account = resp.Accounts[0]
 	} else {
+		l.Debug().Msgf("using cache entry for %s", query)
 		a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
 		if !ok {
 			status = http.StatusInternalServerError
@@ -104,10 +105,17 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			// TODO allow lookup by username?
-			// TODO allow lookup by custom claim, eg an id
-
-			account, status := getAccount(l, claims, opt.AccountsClient)
+			var account *acc.Account
+			var status int
+			if claims.Email != "" {
+				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")))
+			} else if claims.PreferredUsername != "" {
+				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(claims.PreferredUsername, "'", "''")))
+			} else {
+				// TODO allow lookup by custom claim, eg an id ... or sub
+				l.Error().Err(err).Msgf("Could not lookup account, no mail or preferred_username claim set")
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			if status != 0 {
 				if status == http.StatusNotFound {
 					account, status = createAccount(l, claims, opt.AccountsClient)

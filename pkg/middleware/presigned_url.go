@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis-pkg/v2/log"
+	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -15,38 +17,24 @@ import (
 // PresignedURL provides a middleware to check access secured by a presigned URL.
 func PresignedURL(opts ...Option) func(next http.Handler) http.Handler {
 	opt := newOptions(opts...)
-
-	/*tokenManager, err := jwt.New(map[string]interface{}{
-		"secret":  opt.TokenManagerConfig.JWTSecret,
-		"expires": int64(60),
-	})
-	if err != nil {
-		opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
-	}
-	*/
+	l := opt.Logger
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			/* commented, because moving the ocs specific unmarshaling and statuscode mangling here seems wrong
-			if isGetSigningKeyRequest(r) {
-				claims := oidc.FromContext(r.Context())
-				if claims == nil {
-					http.Error(w, "No claims in context", http.StatusUnauthorized)
-					return
-				}
-
-				signingKey, _ := getSigningKey(r.Context(), opt.Store, claims.Email)
-				if len(signingKey) == 0 {
-					http.Error(w, "No signing key", http.StatusInternalServerError)
-					return
-				}
-				// TODO render as json or xml?
-				return
-			}
-			*/
 			if isSignedRequest(r) {
-				if signedRequestIsValid(r, opt.Store) {
-					// TODO store user in context, let account middleware lookup the id?
+				if signedRequestIsValid(l, r, opt.Store) {
+
+					l.Debug().Str("credential", r.URL.Query().Get("OC-Credential")).Msgf("valid signed request")
+
+					// use openid claims to let the account_uuid middleware do a lookup by username
+					claims := ocisoidc.StandardClaims{
+						PreferredUsername: r.URL.Query().Get("OC-Credential"),
+					}
+
+					// inject claims to the request context for the account_uuid middleware
+					ctxWithClaims := ocisoidc.NewContext(r.Context(), &claims)
+					r = r.WithContext(ctxWithClaims)
+
 					next.ServeHTTP(w, r)
 				} else {
 					http.Error(w, "Invalid url signature", http.StatusUnauthorized)
@@ -58,19 +46,13 @@ func PresignedURL(opts ...Option) func(next http.Handler) http.Handler {
 	}
 }
 
-/*
-func isGetSigningKeyRequest(r *http.Request) bool {
-	return r.URL.Path == "/ocs/v1.php/cloud/user/signing-key" || r.URL.Path == "/ocs/v2.php/cloud/user/signing-key"
-}
-*/
-
 func isSignedRequest(r *http.Request) bool {
 	return r.URL.Query().Get("OC-Signature") != ""
 }
 
-func signedRequestIsValid(r *http.Request, s storepb.StoreService) bool {
+func signedRequestIsValid(l log.Logger, r *http.Request, s storepb.StoreService) bool {
 	// cheap checks first
-	// TODO OC-Algorythm - defined the used algo (e.g. sha256 or sha512 - we should agree on one default algo and make this parameter optional)
+	// TODO OC-Algorithm - defined the used algo (e.g. sha256 or sha512 - we should agree on one default algo and make this parameter optional)
 	// OC-Credential - defines the user scope (shall we use the owncloud user id here - this might leak internal data ....) REQUIRED
 	// OC-Date - defined the date the url was signed (ISO 8601 UTC) REQUIRED
 	// OC-Expires - defines the expiry interval in seconds (between 1 and 604800 = 7 days) REQUIRED
@@ -91,19 +73,34 @@ func signedRequestIsValid(r *http.Request, s storepb.StoreService) bool {
 	} else {
 		t.Add(expires)
 		if t.After(time.Now()) { // TODO now client time and server time must be in sync
+			l.Debug().Msgf("signed url expired")
 			return false
 		}
 	}
 
-	signingKey, _ := getSigningKey(r.Context(), s, r.URL.Query().Get("OC-Credential"))
+	signingKey, err := getSigningKey(r.Context(), s, r.URL.Query().Get("OC-Credential"))
 	if len(signingKey) == 0 {
+		l.Debug().Err(err).Msgf("signing key empty")
 		return false
 	}
 
-	signature := r.URL.Query().Get("OC-Signature")
-	r.URL.Query().Del("OC-Signature")
+	q := r.URL.Query()
+	signature := q.Get("OC-Signature")
+	q.Del("OC-Signature")
+	r.URL.RawQuery = q.Encode()
 	url := r.URL.String()
-	hash := pbkdf2.Key([]byte(url), signingKey, 10000, sha512.Size, sha512.New)
+	if !r.URL.IsAbs() {
+		url = "https://" + r.Host + url // TODO where do we get the scheme from
+	}
+	// the oc10 signature check: $hash = \hash_pbkdf2("sha512", $url, $signingKey, 10000, 64, false);
+	// - sets the length of the output string to 64
+	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).
+	// TODO change to length 128 in oc10?
+	// fo golangs pbkdf2.Key we need to use 32 because it will be encoded into 64 hexits later
+	hash := pbkdf2.Key([]byte(url), signingKey, 10000, 32, sha512.New)
+
+	l.Debug().Interface("request", r).Str("url", url).Str("signature", signature).Bytes("signingkey", signingKey).Bytes("hash", hash).Str("hexencodedhash", hex.EncodeToString(hash)).Msgf("signature check")
+
 	if hex.EncodeToString(hash) != signature {
 		return false
 	}
@@ -120,28 +117,6 @@ func getSigningKey(ctx context.Context, s storepb.StoreService, credential strin
 	})
 	if err != nil || len(res.Records) < 1 {
 		return []byte{}, err
-		/* no need to create the key if that is handlead by ocs / a dedicated url-signer service
-		key := make([]byte, 64)
-		_, err := rand.Read(key[:])
-		if err != nil {
-			return []byte{}, err
-		}
-		_, err = s.Write(ctx, &storepb.WriteRequest{
-			Options: &storepb.WriteOptions{
-				Database: "proxy",
-				Table:    "signing-keys",
-			},
-			Record: &storepb.Record{
-				Key:   credential, // TODO username or id?
-				Value: key,
-				// TODO Expiry?
-			},
-		})
-		if err != nil {
-			return []byte{}, err
-		}
-		return key, nil
-		*/
 	}
 
 	return res.Records[0].Value, nil
