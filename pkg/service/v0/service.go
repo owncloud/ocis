@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 
-	//"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/owncloud/ocis-ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis-ocs/pkg/middleware"
