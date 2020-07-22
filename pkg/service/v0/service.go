@@ -1,16 +1,22 @@
 package svc
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
+
+	"github.com/micro/go-micro/v2/client/grpc"
+	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis-ocs/pkg/middleware"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 )
 
 // Service defines the extension handlers.
@@ -35,6 +41,10 @@ func NewService(opts ...Option) Service {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.NotFound(svc.NotFound)
 		r.Use(middleware.StripSlashes)
+		r.Use(ocsm.AccessToken(
+			ocsm.Logger(options.Logger),
+			ocsm.TokenManagerConfig(options.Config.TokenManager),
+		))
 		r.Use(ocsm.OCSFormatCtx) // updates request Accept header according to format=(json|xml) query parameter
 		r.Route("/v{version:(1|2)}.php", func(r chi.Router) {
 			r.Use(svc.VersionCtx) // stores version in context
@@ -78,8 +88,6 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 
 // GetUser returns the currently logged in user
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
-
-	// TODO move token marshaling to ocis-proxy
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
 		render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
@@ -95,26 +103,70 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // GetSigningKey returns the signing key for the current user. It will create it on the fly if it does not exist
 // The signing key is part of the user settings and is used by the proxy to authenticate requests
-// TODO middleware for the proxy
+// Currently, the username is used as the OC-Credential
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
-
-	// TODO move token marshaling to ocis-proxy
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
+		o.logger.Error().Msg("missing user in context")
 		render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
 		return
 	}
-
-	signingKey := "TODO fetch from settings" // TODO fetch from settings
-	/*
-		if ($signingKey === null) {
-				$signingKey = \OC::$server->getSecureRandom()->generate(64);
-				\OC::$server->getConfig()->setUserValue($userId, 'core', 'signing-key', $signingKey, null);
+	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
+	res, err := c.Read(r.Context(), &storepb.ReadRequest{
+		Options: &storepb.ReadOptions{
+			Database: "proxy",
+			Table:    "signing-keys",
+		},
+		Key: u.Username,
+	})
+	if err == nil && len(res.Records) > 0 {
+		render.Render(w, r, DataRender(&data.SigningKey{
+			User:       u.Username,
+			SigningKey: string(res.Records[0].Value),
+		}))
+		return
+	}
+	if err != nil {
+		e := merrors.Parse(err.Error())
+		if e.Code == http.StatusNotFound {
+			o.logger.Debug().Str("username", u.Username).Msg("signing key not found")
+			// not found is ok, so we can continue and generate the key on the fly
+		} else {
+			o.logger.Err(err).Msg("error reading from store")
+			render.Render(w, r, ErrRender(MetaServerError.StatusCode, "error reading from store"))
+			return
 		}
-	*/
+	}
+
+	// try creating it
+	key := make([]byte, 64)
+	_, err = rand.Read(key[:])
+	if err != nil {
+		o.logger.Error().Err(err).Msg("could not generate signing key")
+		render.Render(w, r, ErrRender(MetaServerError.StatusCode, "could not generate signing key"))
+		return
+	}
+	signingKey := hex.EncodeToString(key)
+
+	_, err = c.Write(r.Context(), &storepb.WriteRequest{
+		Options: &storepb.WriteOptions{
+			Database: "proxy",
+			Table:    "signing-keys",
+		},
+		Record: &storepb.Record{
+			Key:   u.Username,
+			Value: []byte(signingKey),
+			// TODO Expiry?
+		},
+	})
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error writing key")
+		render.Render(w, r, ErrRender(MetaServerError.StatusCode, "could not persist signing key"))
+		return
+	}
 
 	render.Render(w, r, DataRender(&data.SigningKey{
-		User:       u.Username, // TODO userid vs username?
+		User:       u.Username,
 		SigningKey: signingKey,
 	}))
 }
