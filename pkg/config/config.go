@@ -12,6 +12,7 @@ import (
 	proxy "github.com/owncloud/ocis-proxy/pkg/config"
 	reva "github.com/owncloud/ocis-reva/pkg/config"
 	settings "github.com/owncloud/ocis-settings/pkg/config"
+	store "github.com/owncloud/ocis-store/pkg/config"
 	thumbnails "github.com/owncloud/ocis-thumbnails/pkg/config"
 	webdav "github.com/owncloud/ocis-webdav/pkg/config"
 	pman "github.com/refs/pman/pkg/config"
@@ -74,6 +75,7 @@ type Config struct {
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
 	Settings      *settings.Config
+	Store         *store.Config
 	Runtime       *pman.Config
 }
 
@@ -93,6 +95,7 @@ func New() *Config {
 		Proxy:         proxy.New(),
 		Thumbnails:    thumbnails.New(),
 		Settings:      settings.New(),
+		Store:         store.New(),
 		Runtime:       pman.NewConfig(),
 	}
 }
