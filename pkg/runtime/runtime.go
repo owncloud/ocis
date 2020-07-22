@@ -31,6 +31,7 @@ var (
 	// Extensions are ocis extension services
 	Extensions = []string{
 		"proxy",
+		"store",
 		"settings",
 		"phoenix",
 		"graph",
