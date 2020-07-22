@@ -23,9 +23,6 @@ func PresignedURL(opts ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if isSignedRequest(r) {
 				if signedRequestIsValid(l, r, opt.Store) {
-
-					l.Debug().Str("credential", r.URL.Query().Get("OC-Credential")).Msgf("valid signed request")
-
 					// use openid claims to let the account_uuid middleware do a lookup by username
 					claims := ocisoidc.StandardClaims{
 						PreferredUsername: r.URL.Query().Get("OC-Credential"),
@@ -72,15 +69,18 @@ func signedRequestIsValid(l log.Logger, r *http.Request, s storepb.StoreService)
 		return false
 	} else {
 		t.Add(expires)
-		if t.After(time.Now()) { // TODO now client time and server time must be in sync
-			l.Debug().Msgf("signed url expired")
+		if t.After(time.Now()) {
 			return false
 		}
 	}
 
 	signingKey, err := getSigningKey(r.Context(), s, r.URL.Query().Get("OC-Credential"))
+	if err != nil {
+		l.Error().Err(err).Msg("could not retrieve signing key")
+		return false
+	}
 	if len(signingKey) == 0 {
-		l.Debug().Err(err).Msgf("signing key empty")
+		l.Error().Err(err).Msg("signing key empty")
 		return false
 	}
 
@@ -99,12 +99,7 @@ func signedRequestIsValid(l log.Logger, r *http.Request, s storepb.StoreService)
 	// fo golangs pbkdf2.Key we need to use 32 because it will be encoded into 64 hexits later
 	hash := pbkdf2.Key([]byte(url), signingKey, 10000, 32, sha512.New)
 
-	l.Debug().Interface("request", r).Str("url", url).Str("signature", signature).Bytes("signingkey", signingKey).Bytes("hash", hash).Str("hexencodedhash", hex.EncodeToString(hash)).Msgf("signature check")
-
-	if hex.EncodeToString(hash) != signature {
-		return false
-	}
-	return true
+	return hex.EncodeToString(hash) == signature
 }
 
 func getSigningKey(ctx context.Context, s storepb.StoreService, credential string) ([]byte, error) {
