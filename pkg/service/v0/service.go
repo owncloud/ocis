@@ -105,10 +105,8 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // GetSigningKey returns the signing key for the current user. It will create it on the fly if it does not exist
 // The signing key is part of the user settings and is used by the proxy to authenticate requests
-// TODO middleware for the proxy
+// Currently, the username is used as the OC-Credential
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
-
-	// TODO the x access token is set but not unparsed
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
 		o.logger.Error().Msg("missing user in context")
@@ -121,11 +119,11 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Key: u.GetUsername(), // TODO username or id?
+		Key: u.Username,
 	})
 	if err == nil && len(res.Records) > 0 {
 		render.Render(w, r, DataRender(&data.SigningKey{
-			User:       u.Username, // TODO userid vs username?
+			User:       u.Username,
 			SigningKey: string(res.Records[0].Value),
 		}))
 		return
@@ -149,7 +147,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			Table:    "signing-keys",
 		},
 		Record: &storepb.Record{
-			Key:   u.GetUsername(), // TODO username or id?
+			Key:   u.Username,
 			Value: []byte(signingKey),
 			// TODO Expiry?
 		},
@@ -161,7 +159,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, DataRender(&data.SigningKey{
-		User:       u.Username, // TODO userid vs username?
+		User:       u.Username,
 		SigningKey: signingKey,
 	}))
 }
