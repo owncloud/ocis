@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/render"
 
 	"github.com/micro/go-micro/v2/client/grpc"
+	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis-ocs/pkg/middleware"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
@@ -87,8 +88,6 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 
 // GetUser returns the currently logged in user
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
-
-	// TODO move token marshaling to ocis-proxy
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
 		render.Render(w, r, ErrRender(MetaBadRequest.StatusCode, "missing user in context"))
@@ -127,8 +126,17 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		}))
 		return
 	}
-	// TODO check return code, if 404 / not found error continue and try to create it
-	o.logger.Debug().Err(err).Msg("error reading key")
+	if err != nil {
+		e := merrors.Parse(err.Error())
+		if e.Code == http.StatusNotFound {
+			o.logger.Debug().Str("username", u.Username).Msg("signing key not found")
+			// not found is ok, so we can continue and generate the key on the fly
+		} else {
+			o.logger.Err(err).Msg("error reading from store")
+			render.Render(w, r, ErrRender(MetaServerError.StatusCode, "error reading from store"))
+			return
+		}
+	}
 
 	// try creating it
 	key := make([]byte, 64)
