@@ -389,6 +389,11 @@ func TestCreateExistingUser(t *testing.T) {
 // All tests fail after running this
 // https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateAccountInvalidUserName(t *testing.T) {
+
+	resp, err := listAccounts(t)
+	checkError(t, err)
+	numAccounts := len(resp.GetAccounts())
+
 	testData := []string{
 		"",
 		"0",
@@ -403,11 +408,11 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 		checkError(t, err)
 	}
 
-	// This throws a error in server
-	// resp contains no accounts
-	resp, _ := listAccounts(t)
+	// resp should have the same number of accounts
+	resp, err = listAccounts(t)
+	checkError(t, err)
 
-	assert.Equal(t, 0, len(resp.GetAccounts()))
+	assert.Equal(t, numAccounts, len(resp.GetAccounts()))
 
 	cleanUp(t)
 }
