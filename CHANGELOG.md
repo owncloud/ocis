@@ -1,6 +1,6 @@
-# Changelog for unreleased
+# Changelog for 0.1.1
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 0.1.1.
 
 ## Summary
 
@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
    found.
 
    https://github.com/owncloud/ocis-webdav/issues/20
+   https://github.com/owncloud/ocis-webdav/pull/21
 
 
 # Changelog for 0.1.0
