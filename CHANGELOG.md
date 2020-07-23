@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.3.2] (2020-07-23)
 
-The following sections list the changes in ocis-konnectd unreleased.
+The following sections list the changes in ocis-konnectd 0.3.2.
 
-[unreleased]: https://github.com/owncloud/ocis-konnectd/compare/v0.3.1...master
+[0.3.2]: https://github.com/owncloud/ocis-konnectd/compare/v0.3.1...v0.3.2
 
 ## Summary
 
