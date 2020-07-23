@@ -4,10 +4,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+ * Fix #32: Build docker images with alpine:latest instead of alpine:edge
  * Chg #7: Initial release of basic version
  * Enh #27: Configuration
 
 ## Details
+
+ * Bugfix #32: Build docker images with alpine:latest instead of alpine:edge
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-graph/pull/32
 
  * Change #7: Initial release of basic version
 
