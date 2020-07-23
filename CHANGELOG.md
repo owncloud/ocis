@@ -6,10 +6,19 @@ The following sections list the changes in ocis-glauth unreleased.
 
 ## Summary
 
+* Bugfix - Ignore case when comparing objectclass values: [#26](https://github.com/owncloud/ocis-glauth/pull/26)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#24](https://github.com/owncloud/ocis-glauth/pull/24)
 * Enhancement - Implement group queries: [#22](https://github.com/owncloud/ocis-glauth/issues/22)
 
 ## Details
+
+* Bugfix - Ignore case when comparing objectclass values: [#26](https://github.com/owncloud/ocis-glauth/pull/26)
+
+   The LDAP equality comparison is specified as case insensitive. We fixed the comparison for
+   objectclass properties.
+
+   https://github.com/owncloud/ocis-glauth/pull/26
+
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#24](https://github.com/owncloud/ocis-glauth/pull/24)
 
