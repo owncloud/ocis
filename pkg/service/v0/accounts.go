@@ -233,7 +233,10 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		s.expandMemberOf(a)
 
 		// remove password before returning
-		a.PasswordProfile.Password = ""
+
+		if a.PasswordProfile != nil {
+			a.PasswordProfile.Password = ""
+		}
 
 		out.Accounts = append(out.Accounts, a)
 	}
@@ -259,7 +262,9 @@ func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out 
 	s.expandMemberOf(out)
 
 	// remove password
-	out.PasswordProfile.Password = ""
+	if out.PasswordProfile != nil {
+		out.PasswordProfile.Password = ""
+	}
 
 	return
 }
@@ -342,19 +347,24 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	out.Mail = in.Account.Mail // read only?
 	out.Description = in.Account.Description
 
-	if in.Account.PasswordProfile != nil && in.Account.PasswordProfile.Password != "" {
-		// encrypt password
-		c := crypt.New(crypt.SHA512)
-		if out.PasswordProfile.Password, err = c.Generate([]byte(in.Account.PasswordProfile.Password), nil); err != nil {
-			s.log.Error().Err(err).Str("id", id).Interface("account", loggableAccount(in.Account)).Msg("could not hash password")
-			return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
+	if in.Account.PasswordProfile != nil {
+		if out.PasswordProfile == nil {
+			out.PasswordProfile = &proto.PasswordProfile{}
 		}
+		if in.Account.PasswordProfile.Password != "" {
+			// encrypt password
+			c := crypt.New(crypt.SHA512)
+			if out.PasswordProfile.Password, err = c.Generate([]byte(in.Account.PasswordProfile.Password), nil); err != nil {
+				s.log.Error().Err(err).Str("id", id).Interface("account", loggableAccount(in.Account)).Msg("could not hash password")
+				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
+			}
+		}
+		// lastPasswordChangeDateTime calculated, see password
+		out.PasswordProfile.PasswordPolicies = in.Account.PasswordProfile.PasswordPolicies
+		out.PasswordProfile.ForceChangePasswordNextSignIn = in.Account.PasswordProfile.ForceChangePasswordNextSignIn
+		out.PasswordProfile.ForceChangePasswordNextSignInWithMfa = in.Account.PasswordProfile.ForceChangePasswordNextSignInWithMfa
 		out.PasswordProfile.LastPasswordChangeDateTime = tsnow
 	}
-	// lastPasswordChangeDateTime calculated, see password
-	out.PasswordProfile.PasswordPolicies = in.Account.PasswordProfile.PasswordPolicies
-	out.PasswordProfile.ForceChangePasswordNextSignIn = in.Account.PasswordProfile.ForceChangePasswordNextSignIn
-	out.PasswordProfile.ForceChangePasswordNextSignInWithMfa = in.Account.PasswordProfile.ForceChangePasswordNextSignInWithMfa
 
 	// memberOf read only
 	// createdDateTime read only
@@ -382,7 +392,9 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	}
 
 	// remove password
-	out.PasswordProfile.Password = ""
+	if out.PasswordProfile != nil {
+		out.PasswordProfile.Password = ""
+	}
 
 	return
 }
