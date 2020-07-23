@@ -1,4 +1,4 @@
-FROM amd64/alpine:edge
+FROM amd64/alpine:latest
 
 RUN apk update && \
 	apk upgrade && \
