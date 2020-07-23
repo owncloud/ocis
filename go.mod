@@ -24,7 +24,7 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171
-	github.com/owncloud/ocis-glauth v0.4.1-0.20200713102750-17986ac2d9a2
+	github.com/owncloud/ocis-glauth v0.4.1-0.20200723141434-ec6fc5ad32a8
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
