@@ -7,6 +7,7 @@ The following sections list the changes in ocis-konnectd unreleased.
 ## Summary
 
 * Bugfix - Add silent redirect url: [#69](https://github.com/owncloud/ocis-konnectd/issues/69)
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis-konnectd/pull/71)
 
 ## Details
 
@@ -17,6 +18,13 @@ The following sections list the changes in ocis-konnectd unreleased.
 
    https://github.com/owncloud/ocis-konnectd/issues/69
    https://github.com/owncloud/ocis-konnectd/pull/70
+
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis-konnectd/pull/71)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-konnectd/pull/71
 
 # Changelog for [0.3.1] (2020-04-14)
 
