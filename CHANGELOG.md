@@ -6,9 +6,17 @@ The following sections list the changes in ocis-glauth unreleased.
 
 ## Summary
 
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#24](https://github.com/owncloud/ocis-glauth/pull/24)
 * Enhancement - Implement group queries: [#22](https://github.com/owncloud/ocis-glauth/issues/22)
 
 ## Details
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#24](https://github.com/owncloud/ocis-glauth/pull/24)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-glauth/pull/24
+
 
 * Enhancement - Implement group queries: [#22](https://github.com/owncloud/ocis-glauth/issues/22)
 
