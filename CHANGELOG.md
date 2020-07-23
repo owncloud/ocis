@@ -7,6 +7,7 @@ The following sections list the changes in ocis-accounts unreleased.
 ## Summary
 
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
 * Change - Enable accounts on creation: [#43](https://github.com/owncloud/ocis-accounts/issues/43)
@@ -26,6 +27,13 @@ The following sections list the changes in ocis-accounts unreleased.
    group.
 
    https://github.com/owncloud/ocis-accounts/pull/60
+
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-accounts/pull/64
 
 
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
