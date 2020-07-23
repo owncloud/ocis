@@ -2,6 +2,7 @@
 
 ## Summary
 
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
@@ -24,6 +25,13 @@
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
 ## Details
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis/pull/416
+
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
