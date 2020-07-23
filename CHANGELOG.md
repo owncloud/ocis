@@ -6,9 +6,18 @@ The following sections list the changes in ocis-reva unreleased.
 
 ## Summary
 
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#393](https://github.com/owncloud/ocis-reva/pull/393)
 * Enhancement - Update reva to v0.1.1-0.20200710143425-cf38a45220c5: [#920](https://github.com/cs3org/reva/pull/920)
+* Enhancement - Update reva to v0.1.1-0.20200722125752-6dea7936f9d1: [#392](https://github.com/owncloud/ocis-reva/pull/392)
 
 ## Details
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#393](https://github.com/owncloud/ocis-reva/pull/393)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-reva/pull/393
+
 
 * Enhancement - Update reva to v0.1.1-0.20200710143425-cf38a45220c5: [#920](https://github.com/cs3org/reva/pull/920)
 
@@ -22,6 +31,20 @@ The following sections list the changes in ocis-reva unreleased.
    https://github.com/cs3org/reva/pull/955
    https://github.com/cs3org/reva/pull/958
    https://github.com/cs3org/reva/pull/963
+
+
+* Enhancement - Update reva to v0.1.1-0.20200722125752-6dea7936f9d1: [#392](https://github.com/owncloud/ocis-reva/pull/392)
+
+   - Update reva to v0.1.1-0.20200722125752-6dea7936f9d1 - Added signing key capability
+   (reva/#986) - Add functionality to create webdav references for OCM shares (reva/#974) -
+   Added a site locations exporter to Mentix (reva/#972) - Add option to config to allow requests
+   to hosts with unverified certificates (reva/#969)
+
+   https://github.com/owncloud/ocis-reva/pull/392
+   https://github.com/cs3org/reva/pull/986
+   https://github.com/cs3org/reva/pull/974
+   https://github.com/cs3org/reva/pull/972
+   https://github.com/cs3org/reva/pull/969
 
 # Changelog for [0.10.0] (2020-07-10)
 
