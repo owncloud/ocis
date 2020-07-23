@@ -305,7 +305,7 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		// replace attributes
 		switch attribute {
 		case "objectclass":
-			switch value {
+			switch strings.ToLower(value) {
 			case "posixaccount", "shadowaccount", "users", "person", "inetorgperson", "organizationalperson":
 				qtype = usersQuery
 			case "posixgroup", "groups":
