@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-phoenix unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.10.0...master
+
+## Summary
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
+
+## Details
+
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-phoenix/pull/73
+
 # Changelog for [0.10.0] (2020-07-17)
 
 The following sections list the changes in ocis-phoenix 0.10.0.
