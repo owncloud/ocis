@@ -278,6 +278,12 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 	if in.Account.Id == "" {
 		in.Account.Id = uuid.Must(uuid.NewV4()).String()
 	}
+	if !s.isValidUsername(in.Account.PreferredName) {
+		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", in.Account.PreferredName)
+	}
+	if !s.isValidEmail(in.Account.Mail) {
+		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", in.Account.Mail)
+	}
 
 	if id, err = cleanupID(in.Account.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
@@ -316,6 +322,12 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 	}
 	if in.Account.Id == "" {
 		return merrors.BadRequest(s.id, "account id missing")
+	}
+	if !s.isValidUsername(in.Account.PreferredName) {
+		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", in.Account.PreferredName)
+	}
+	if !s.isValidEmail(in.Account.Mail) {
+		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", in.Account.Mail)
 	}
 
 	if id, err = cleanupID(in.Account.Id); err != nil {
@@ -436,4 +448,26 @@ func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest
 
 	s.log.Info().Str("id", id).Msg("deleted account")
 	return
+}
+
+// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow intergration with our glauth LDAP service
+// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
+// names should not start with numbers
+var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
+
+func (s Service) isValidUsername(e string) bool {
+	if len(e) < 1 && len(e) > 254 {
+		return false
+	}
+	return usernameRegex.MatchString(e)
+}
+
+// regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
+var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+func (s Service) isValidEmail(e string) bool {
+	if len(e) < 3 && len(e) > 254 {
+		return false
+	}
+	return emailRegex.MatchString(e)
 }

@@ -405,7 +405,9 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 		_, err := createAccount(t, userName)
 
 		// Should give error
-		checkError(t, err)
+		if err == nil {
+			t.Fatalf("Expected an Error when creating user '%s' but got nil", userName)
+		}
 	}
 
 	// resp should have the same number of accounts
