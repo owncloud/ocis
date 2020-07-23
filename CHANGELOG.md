@@ -4,9 +4,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+ * Fix #22: Build docker images with alpine:latest instead of alpine:edge
  * Chg #20: Change status not found on missing thumbnail
 
 ## Details
+
+ * Bugfix #22: Build docker images with alpine:latest instead of alpine:edge
+
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+
+   https://github.com/owncloud/ocis-webdav/pull/22
 
  * Change #20: Change status not found on missing thumbnail
 
