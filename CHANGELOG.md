@@ -7,6 +7,7 @@ The following sections list the changes in ocis-phoenix unreleased.
 ## Summary
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
+* Change - Hide searchbar by default: [#116](https://github.com/owncloud/product/issues/116)
 
 ## Details
 
@@ -15,6 +16,13 @@ The following sections list the changes in ocis-phoenix unreleased.
    ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
 
    https://github.com/owncloud/ocis-phoenix/pull/73
+
+* Change - Hide searchbar by default: [#116](https://github.com/owncloud/product/issues/116)
+
+   Since file search is not working at the moment we decided to hide the search bar by default.
+
+   https://github.com/owncloud/product/issues/116
+   https://github.com/owncloud/ocis-phoenix/pull/74
 
 # Changelog for [0.10.0] (2020-07-17)
 
