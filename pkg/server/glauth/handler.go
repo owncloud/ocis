@@ -224,6 +224,7 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 			attribute("cn", accounts[i].PreferredName),
 			attribute("uid", accounts[i].PreferredName),
 			attribute("sn", accounts[i].PreferredName),
+			attribute("homeDirectory", ""),
 			attribute("ownCloudUUID", accounts[i].Id), // see https://github.com/butonic/owncloud-ldap-schema/blob/master/owncloud.schema#L28-L34
 		}
 		if accounts[i].DisplayName != "" {
@@ -330,9 +331,9 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		case "displayname":
 			q = fmt.Sprintf("display_name eq '%s'", escapeValue(value))
 		case "uidnumber":
-			q = fmt.Sprintf("uid_number eq '%s'", escapeValue(value))
+			q = fmt.Sprintf("uid_number eq %s", value) // TODO check it is a number?
 		case "gidnumber":
-			q = fmt.Sprintf("gid_number eq '%s'", escapeValue(value))
+			q = fmt.Sprintf("gid_number eq %s", value) // TODO check it is a number?
 		case "description":
 			q = fmt.Sprintf("description eq '%s'", escapeValue(value))
 		default:
