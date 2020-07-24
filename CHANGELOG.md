@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.5.0] (2020-07-23)
 
-The following sections list the changes in ocis-glauth unreleased.
+The following sections list the changes in ocis-glauth 0.5.0.
 
-[unreleased]: https://github.com/owncloud/ocis-glauth/compare/v0.4.0...master
+[0.5.0]: https://github.com/owncloud/ocis-glauth/compare/v0.4.0...v0.5.0
 
 ## Summary
 
@@ -41,12 +41,13 @@ The following sections list the changes in ocis-glauth unreleased.
    Refactored the handler and implemented group queries.
 
    https://github.com/owncloud/ocis-glauth/issues/22
+   https://github.com/owncloud/ocis-glauth/pull/23
 
 # Changelog for [0.4.0] (2020-03-18)
 
 The following sections list the changes in ocis-glauth 0.4.0.
 
-[0.4.0]: https://github.com/owncloud/ocis-glauth/compare/v0.2.0...v0.4.0
+[0.4.0]: https://github.com/owncloud/ocis-glauth/compare/v0.3.0...v0.4.0
 
 ## Summary
 
@@ -86,33 +87,11 @@ The following sections list the changes in ocis-glauth 0.4.0.
 
    https://github.com/owncloud/ocis-glauth/pull/12
 
-# Changelog for [0.2.0] (2020-03-17)
-
-The following sections list the changes in ocis-glauth 0.2.0.
-
-[0.2.0]: https://github.com/owncloud/ocis-glauth/compare/v0.3.0...v0.2.0
-
-## Summary
-
-* Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
-
-## Details
-
-* Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
-
-   We changed the default configuration to use the config file backend instead of the ownCloud
-   backend.
-
-   The config backend currently only has two hard coded users: demo and admin. To switch back to the
-   ownCloud backend use `GLAUTH_BACKEND_DATASTORE=owncloud`
-
-   https://github.com/owncloud/ocis-glauth/pull/6
-
 # Changelog for [0.3.0] (2020-03-17)
 
 The following sections list the changes in ocis-glauth 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-glauth/compare/v0.1.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-glauth/compare/v0.2.0...v0.3.0
 
 ## Summary
 
@@ -129,6 +108,28 @@ The following sections list the changes in ocis-glauth 0.3.0.
    technical purposes, eg. to allow konnectd and reva to bind to glauth.
 
    https://github.com/owncloud/ocis-glauth/issues/5
+
+# Changelog for [0.2.0] (2020-03-17)
+
+The following sections list the changes in ocis-glauth 0.2.0.
+
+[0.2.0]: https://github.com/owncloud/ocis-glauth/compare/v0.1.0...v0.2.0
+
+## Summary
+
+* Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
+
+## Details
+
+* Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
+
+   We changed the default configuration to use the config file backend instead of the ownCloud
+   backend.
+
+   The config backend currently only has two hard coded users: demo and admin. To switch back to the
+   ownCloud backend use `GLAUTH_BACKEND_DATASTORE=owncloud`
+
+   https://github.com/owncloud/ocis-glauth/pull/6
 
 # Changelog for [0.1.0] (2020-02-28)
 
