@@ -38,13 +38,13 @@ type Asset struct {
 
 // PhoenixConfig defines the available phoenix configuration for a dynamically rendered config.json.
 type PhoenixConfig struct {
-	Server        string `json:"server,omitempty"`
-	Theme         string `json:"theme,omitempty"`
-	Version       string `json:"version,omitempty"` // TODO what is version used for?
-	OpenIDConnect OIDC   `json:"openIdConnect,omitempty"`
-	// TODO add nilasempty when https://go-review.googlesource.com/c/go/+/205897/ is released
-	Apps         []string      `json:"apps"`
-	ExternalApps []ExternalApp `json:"external_apps,omitempty"`
+	Server        string                 `json:"server,omitempty"`
+	Theme         string                 `json:"theme,omitempty"`
+	Version       string                 `json:"version,omitempty"` // TODO what is version used for?
+	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty"`
+	Apps          []string               `json:"apps"` // TODO add nilasempty when https://go-review.googlesource.com/c/go/+/205897/ is released
+	ExternalApps  []ExternalApp          `json:"external_apps,omitempty"`
+	Options       map[string]interface{} `json:"options,omitempty"`
 }
 
 // OIDC defines the available oidc configuration

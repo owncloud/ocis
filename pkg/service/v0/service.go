@@ -62,6 +62,12 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 	if p.config.Phoenix.Path == "" {
 		// render dynamically using config
 
+		// provide default ocis-web options
+		if p.config.Phoenix.Config.Options == nil {
+			p.config.Phoenix.Config.Options = make(map[string]interface{})
+			p.config.Phoenix.Config.Options["hideSearchBar"] = true
+		}
+
 		// make apps render as empty array if it is empty
 		// TODO remove once https://github.com/golang/go/issues/27589 is fixed
 		if len(p.config.Phoenix.Config.Apps) == 0 {
