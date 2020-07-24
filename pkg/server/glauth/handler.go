@@ -126,6 +126,12 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		var cf *ber.Packet
 		cf, err = ldap.CompileFilter(searchReq.Filter)
 		if err != nil {
+			h.log.Debug().
+				Str("binddn", bindDN).
+				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("filter", searchReq.Filter).
+				Interface("src", conn.RemoteAddr()).
+				Msg("could not compile filter")
 			return ldap.ServerSearchResult{
 				ResultCode: ldap.LDAPResultOperationsError,
 			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
@@ -218,6 +224,7 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 			attribute("cn", accounts[i].PreferredName),
 			attribute("uid", accounts[i].PreferredName),
 			attribute("sn", accounts[i].PreferredName),
+			attribute("ownCloudUUID", accounts[i].Id), // see https://github.com/butonic/owncloud-ldap-schema/blob/master/owncloud.schema#L28-L34
 		}
 		if accounts[i].DisplayName != "" {
 			attrs = append(attrs, attribute("displayName", accounts[i].DisplayName))
@@ -253,6 +260,7 @@ func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
 		attrs := []*ldap.EntryAttribute{
 			attribute("objectClass", "posixGroup", "groupOfNames", "top"),
 			attribute("cn", groups[i].OnPremisesSamAccountName),
+			attribute("ownCloudUUID", groups[i].Id), // see https://github.com/butonic/owncloud-ldap-schema/blob/master/owncloud.schema#L28-L34
 		}
 		if groups[i].DisplayName != "" {
 			attrs = append(attrs, attribute("displayName", groups[i].DisplayName))
@@ -313,6 +321,8 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 			default:
 				qtype = ""
 			}
+		case "ownclouduuid":
+			q = fmt.Sprintf("id eq '%s'", escapeValue(value))
 		case "cn", "uid":
 			q = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(value))
 		case "mail":
@@ -326,7 +336,7 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		case "description":
 			q = fmt.Sprintf("description eq '%s'", escapeValue(value))
 		default:
-			err = fmt.Errorf("filter by %s not implmented", attribute)
+			err = fmt.Errorf("filter by %s not implemented", attribute)
 		}
 
 		return
