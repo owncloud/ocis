@@ -176,6 +176,8 @@ github.com/aws/aws-sdk-go v1.32.13 h1:zzyXF7SUxJcJa3hTcYCl1/Ey+kh2N8TjK5tWnL0wie
 github.com/aws/aws-sdk-go v1.32.13/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.33.1 h1:yz9XmNzPshz/lhfAZvLfMnIS9HPo8+boGRcWqDVX+T0=
 github.com/aws/aws-sdk-go v1.33.1/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.33.6 h1:YLoUeMSx05kHwhS+HLDSpdYYpPzJMyp6hn1cWsJ6a+U=
+github.com/aws/aws-sdk-go v1.33.6/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.33.7 h1:vOozL5hmWHHriRviVTQnUwz8l05RS0rehmEFymI+/x8=
 github.com/aws/aws-sdk-go v1.33.7/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.33.11 h1:A7b3mNKbh/0zrhnNN/KxWD0YZJw2RImnjFXWOquYKB4=
