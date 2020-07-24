@@ -64,7 +64,7 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 
 		// provide default ocis-web options
 		if p.config.Phoenix.Config.Options == nil {
-			p.config.Phoenix.Config.Options = make(map[string]interface{}, 0)
+			p.config.Phoenix.Config.Options = make(map[string]interface{})
 			p.config.Phoenix.Config.Options["hideSearchBar"] = true
 		}
 
