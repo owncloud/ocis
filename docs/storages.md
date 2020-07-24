@@ -13,7 +13,7 @@ geekdocFilePath: storages.md
 
 ## Storage providers
 
-To manage the file tree ocis uses reva *storage providers* that are accessing the underlying storage using a *storage driver*. The driver can be used to change the implementation of a storage aspect to better reflect the actual underlying storage capabilities. As an example a move operation on a POSIX filesystem ([theoretically](https://danluu.com/deconstruct-files/)) is an atomic operation. When trying to implement a file tree on top S3 there is no native move operation that can be used. A naive implementation might fall bak on a COPY and DELETE. Some S3 implementations provide a COPY operation that uses an existing key as the source, so the file at least does not need to be reuploaded. In the worst case scenario, the rename of a folder with hundreds of thousands of objects, a reupload for every file has to be made. Instead of hiding this complexity a better choice might be to disable renaming of files or at least folders on S3. There are however implementations of filesystems on top of S3 that store the tree metadata in dedicated objects or use a completely different persistance mechanism like a distributed key value store to implement the file tree aspect of a storage.
+To manage the file tree ocis uses reva *storage providers* that are accessing the underlying storage using a *storage driver*. The driver can be used to change the implementation of a storage aspect to better reflect the actual underlying storage capabilities. As an example a move operation on a POSIX filesystem ([theoretically](https://danluu.com/deconstruct-files/)) is an atomic operation. When trying to implement a file tree on top of S3 there is no native move operation that can be used. A naive implementation might fall back on a COPY and DELETE. Some S3 implementations provide a COPY operation that uses an existing key as the source, so the file at least does not need to be reuploaded. In the worst case scenario, which is renaming a folder with hundreds of thousands of objects, a reupload for every file has to be made. Instead of hiding this complexity a better choice might be to disable renaming of files or at least folders on S3. There are however implementations of filesystems on top of S3 that store the tree metadata in dedicated objects or use a completely different persistence mechanism like a distributed key value store to implement the file tree aspect of a storage.
 
 
 {{< hint info >}}
@@ -45,7 +45,7 @@ The tree can keep track of how many bytes are stored in a folder. Similar to ETa
 
 {{< hint info >}}
 **ETag and Size propagation**
-When propagating the ETag (mtime) and size changes up the tree the question is where to stop. If all changes need to be propagated to the root of a storage then the root or busy folders will become a hotspot. There are two things to keep in mind: 1. propagation only happens until the root of a single space (a user private drive or a single group drive), 2. no cross storage propagation. The latter was used in oc10 to let clients detect when a file in a received shared folder changed. This functionality is moving to the storage registry which caches the ETag for every root so clients can discover if and which storage changed.
+When propagating the ETag (mtime) and size changes up the tree the question is where to stop. If all changes need to be propagated to the root of a storage then the root or busy folders will become a hotspot. There are two things to keep in mind: 1. propagation only happens up to the root of a single space (a user private drive or a single group drive), 2. no cross storage propagation. The latter was used in oc10 to let clients detect when a file in a received shared folder changed. This functionality is moving to the storage registry which caches the ETag for every root so clients can discover if and which storage changed.
 {{< /hint >}}
 
 #### Rename
@@ -60,7 +60,7 @@ Technically, [S3 has no rename operation at all](https://docs.aws.amazon.com/sdk
 In addition to well known metadata like name size and mtime, users might be able to add arbitrary metadata like tags, comments or [dublin core](https://en.wikipedia.org/wiki/Dublin_Core). In POSIX filesystems this maps to extended attributes.
 
 ### Grant persistence
-The CS3 API uses grants to describe access permissions. Storage systems have a wide range of permissions granularity and not all grants may be supported by every storage driver. POSIX ACLs for example have no expiry. If the storage system does not support certain grant properties, eg. expiry, then the storage driver may choose to implement them in a different way. Expiries could be persisted in a different way and checked periodically to remove the grants. Again: every decision is a tradeoff.
+The CS3 API uses grants to describe access permissions. Storage systems have a wide range of permissions granularity and not all grants may be supported by every storage driver. POSIX ACLs for example have no expiry. If the storage system does not support certain grant properties, e.g. expiry, then the storage driver may choose to implement them in a different way. Expiries could be persisted in a different way and checked periodically to remove the grants. Again: every decision is a tradeoff.
 
 ### Trash persistence
 After deleting a node the storage allows listing the deleted nodes and has an undo mechanism for them.
@@ -70,7 +70,7 @@ A user can restore a previous version of a file.
 
 {{< hint info >}}
 **Snapshots are not versions**
-Modern POSIX filesystems support snapshotting of volumes. This is different from keeping track of versions to a file or folder, but might be another implementation strategy for a storage driver allow users to restore content.
+Modern POSIX filesystems support snapshotting of volumes. This is different from keeping track of versions to a file or folder, but might be another implementation strategy for a storage driver to allow users to restore content.
 {{< /hint >}}
 
 ### Activity History
@@ -90,7 +90,7 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
   - no native ETag propagation, five options are available:
     - built in propagation (changes bypassing ocis are not picked up until a rescan)
     - built in inotify (requires 48 bytes of RAM per file, needs to keep track of every file and folder)
-    - external inotify (same RAM requirement, but could be triggered by external tools, eg. a workflow engine)
+    - external inotify (same RAM requirement, but could be triggered by external tools, e.g. a workflow engine)
     - kernel audit log (use the linux kernel audit to capture file events on the storage and offload them to a queue)
     - fuse filesystem overlay
   - no subtree accounting, same options as for ETag propagation
