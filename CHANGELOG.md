@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-reva unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-reva/compare/v0.11.0...master
+
+## Summary
+
+* Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
+
+## Details
+
+* Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
+
+   We added details to the documentation about storage requirements known from ownCloud 10, the
+   local storage driver and the ownCloud storage driver.
+
+   https://github.com/owncloud/ocis-reva/pull/384
+   https://github.com/owncloud/ocis-reva/pull/390
+
 # Changelog for [0.11.0] (2020-07-23)
 
 The following sections list the changes in ocis-reva 0.11.0.
