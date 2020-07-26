@@ -18,13 +18,13 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.8.0
+	github.com/micro/go-micro/v2 v2.8.0 // indirect
 	github.com/micro/micro/v2 v2.8.0
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171
-	github.com/owncloud/ocis-glauth v0.4.1-0.20200723141434-ec6fc5ad32a8
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200727100845-bf5f4dee3b76 // TODO: Points to/requires https://github.com/owncloud/ocis-accounts/pull/69
+	github.com/owncloud/ocis-glauth v0.5.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
