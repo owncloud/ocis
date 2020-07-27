@@ -107,15 +107,24 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-userfilter",
-			Value:       "(&(objectclass=posixAccount)(cn=%s*))",
-			Usage:       "LDAP userfilter",
+			Value:       "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
+			Usage:       "LDAP filter used when getting a user. The CS3 userid properties {{.OpaqueId}} and {{.Idp}} are available.",
 			EnvVars:     []string{"REVA_LDAP_USERFILTER"},
 			Destination: &cfg.Reva.LDAP.UserFilter,
 		},
 		&cli.StringFlag{
-			Name:        "ldap-groupfilter",
-			Value:       "(&(objectclass=posixGroup)(cn=%s*))",
-			Usage:       "LDAP groupfilter",
+			Name:        "ldap-findfilter",
+			Value:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
+			Usage:       "LDAP filter used when searching for recipients. {{query}} will be replaced with the search query",
+			EnvVars:     []string{"REVA_LDAP_FINDFILTER"},
+			Destination: &cfg.Reva.LDAP.FindFilter,
+		},
+		&cli.StringFlag{
+			Name: "ldap-groupfilter",
+			// FIXME the reva implementation needs to use the memberof overlay to get the cn when it only has the uuid,
+			// because the ldap schema either uses the dn or the member(of) attributes to establish membership
+			Value:       "(&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*))", // This filter will never work
+			Usage:       "LDAP filter used when getting the groups of a user. The CS3 userid properties {{.OpaqueId}} and {{.Idp}} are available.",
 			EnvVars:     []string{"REVA_LDAP_GROUPFILTER"},
 			Destination: &cfg.Reva.LDAP.GroupFilter,
 		},
@@ -143,7 +152,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		// ldap dn is always the dn
 		&cli.StringFlag{
 			Name:        "ldap-schema-uid",
-			Value:       "uid",
+			Value:       "ownclouduuid",
 			Usage:       "LDAP schema uid",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_UID"},
 			Destination: &cfg.Reva.LDAP.Schema.UID,
@@ -157,7 +166,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-schema-displayName",
-			Value:       "sn",
+			Value:       "displayname",
 			Usage:       "LDAP schema displayName",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_DISPLAYNAME"},
 			Destination: &cfg.Reva.LDAP.Schema.DisplayName,

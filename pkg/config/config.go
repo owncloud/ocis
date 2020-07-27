@@ -206,7 +206,9 @@ type LDAP struct {
 	Hostname     string
 	Port         int
 	BaseDN       string
+	LoginFilter  string
 	UserFilter   string
+	FindFilter   string
 	GroupFilter  string
 	BindDN       string
 	BindPassword string

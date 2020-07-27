@@ -123,18 +123,11 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.LDAP.BaseDN,
 		},
 		&cli.StringFlag{
-			Name:        "ldap-userfilter",
-			Value:       "(&(objectclass=posixAccount)(cn=%s))",
-			Usage:       "LDAP userfilter",
-			EnvVars:     []string{"REVA_LDAP_USERFILTER"},
-			Destination: &cfg.Reva.LDAP.UserFilter,
-		},
-		&cli.StringFlag{
-			Name:        "ldap-groupfilter",
-			Value:       "(&(objectclass=posixGroup)(cn=%s))",
-			Usage:       "LDAP groupfilter",
-			EnvVars:     []string{"REVA_LDAP_GROUPFILTER"},
-			Destination: &cfg.Reva.LDAP.GroupFilter,
+			Name:        "ldap-loginfilter",
+			Value:       "(&(objectclass=posixAccount)(|(cn={{login}})(mail={{login}})))",
+			Usage:       "LDAP login filter",
+			EnvVars:     []string{"REVA_LDAP_LOGINFILTER"},
+			Destination: &cfg.Reva.LDAP.LoginFilter,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
@@ -160,7 +153,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		// ldap dn is always the dn
 		&cli.StringFlag{
 			Name:        "ldap-schema-uid",
-			Value:       "uid",
+			Value:       "ownclouduuid",
 			Usage:       "LDAP schema uid",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_UID"},
 			Destination: &cfg.Reva.LDAP.Schema.UID,
@@ -174,7 +167,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-schema-displayName",
-			Value:       "sn",
+			Value:       "displayname",
 			Usage:       "LDAP schema displayName",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_DISPLAYNAME"},
 			Destination: &cfg.Reva.LDAP.Schema.DisplayName,

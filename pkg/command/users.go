@@ -97,6 +97,7 @@ func Users(cfg *config.Config) *cli.Command {
 										"port":          cfg.Reva.LDAP.Port,
 										"base_dn":       cfg.Reva.LDAP.BaseDN,
 										"userfilter":    cfg.Reva.LDAP.UserFilter,
+										"findfilter":    cfg.Reva.LDAP.FindFilter,
 										"groupfilter":   cfg.Reva.LDAP.GroupFilter,
 										"bind_username": cfg.Reva.LDAP.BindDN,
 										"bind_password": cfg.Reva.LDAP.BindPassword,
