@@ -6,9 +6,29 @@ The following sections list the changes in ocis-reva unreleased.
 
 ## Summary
 
+* Bugfix - Update LDAP filters: [#399](https://github.com/owncloud/ocis-reva/pull/399)
 * Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
+* Enhancement - Update reva to v0.1.1-0.20200724135750-b46288b375d6: [#399](https://github.com/owncloud/ocis-reva/pull/399)
 
 ## Details
+
+* Bugfix - Update LDAP filters: [#399](https://github.com/owncloud/ocis-reva/pull/399)
+
+   With the separation of use and find filters we can now use a filter that taken into account a users
+   uuid as well as his username. This is necessary to make sharing work with the new account service
+   which assigns accounts an immutable account id that is different from the username.
+   Furthermore, the separate find filters now allows searching users by their displayname or
+   email as well.
+
+   ``` userfilter =
+   "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))"
+   findfilter =
+   "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))"
+   ```
+
+   https://github.com/owncloud/ocis-reva/pull/399
+   https://github.com/cs3org/reva/pull/996
+
 
 * Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
 
@@ -17,6 +37,20 @@ The following sections list the changes in ocis-reva unreleased.
 
    https://github.com/owncloud/ocis-reva/pull/384
    https://github.com/owncloud/ocis-reva/pull/390
+
+
+* Enhancement - Update reva to v0.1.1-0.20200724135750-b46288b375d6: [#399](https://github.com/owncloud/ocis-reva/pull/399)
+
+   - Update reva to v0.1.1-0.20200724135750-b46288b375d6 - Split LDAP user filters
+   (reva/#996) - meshdirectory: Add invite forward API to provider links (reva/#1000) - OCM:
+   Pass the link to the meshdirectory service in token mail (reva/#1002) - Update
+   github.com/go-ldap/ldap to v3 (reva/#1004)
+
+   https://github.com/owncloud/ocis-reva/pull/399
+   https://github.com/cs3org/reva/pull/996
+   https://github.com/cs3org/reva/pull/1000
+   https://github.com/cs3org/reva/pull/1002
+   https://github.com/cs3org/reva/pull/1004
 
 # Changelog for [0.11.0] (2020-07-23)
 
