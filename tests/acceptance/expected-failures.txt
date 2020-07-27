@@ -1,0 +1,1 @@
+# this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
