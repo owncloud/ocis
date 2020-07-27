@@ -71,6 +71,8 @@ func createAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsSer
 			OnPremisesSamAccountName: claims.PreferredUsername,
 			Mail:                     claims.Email,
 			CreationType:             "LocalAccount",
+			AccountEnabled:           true,
+			// TODO assign uidnumber and gidnumber? better do that in ocis-accounts as it can keep track of the next numbers
 		},
 	}
 	created, err := ac.CreateAccount(context.Background(), req)
