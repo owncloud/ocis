@@ -42,6 +42,11 @@ func Execute() error {
 
 		Commands: []*cli.Command{
 			Server(cfg),
+			AddAccount(cfg),
+			UpdateAccount(cfg),
+			ListAccounts(cfg),
+			InspectAccount(cfg),
+			RemoveAccount(cfg),
 		},
 	}
 
