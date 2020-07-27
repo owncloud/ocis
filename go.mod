@@ -35,7 +35,7 @@ require (
 	github.com/owncloud/ocis-proxy v0.5.0
 	github.com/owncloud/ocis-reva v0.10.1-0.20200724115318-ef92a0b3ffed
 	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
-	github.com/owncloud/ocis-store v0.1.0
+	github.com/owncloud/ocis-store v0.1.1-0.20200727080653-706a465a07c6
 	github.com/owncloud/ocis-thumbnails v0.2.0
 	github.com/owncloud/ocis-webdav v0.1.1
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
