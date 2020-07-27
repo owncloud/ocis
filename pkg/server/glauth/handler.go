@@ -119,6 +119,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 
 	var qtype queryType = ""
 	query := ""
+	var code ldap.LDAPResultCode
 	var err error
 	if searchReq.Filter == "(&)" { // see Absolute True and False Filters in https://tools.ietf.org/html/rfc4526#section-2
 		query = ""
@@ -136,10 +137,10 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 				ResultCode: ldap.LDAPResultOperationsError,
 			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
 		}
-		qtype, query, err = parseFilter(cf)
+		qtype, query, code, err = parseFilter(cf)
 		if err != nil {
 			return ldap.ServerSearchResult{
-				ResultCode: ldap.LDAPResultOperationsError,
+				ResultCode: code,
 			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
 		}
 	}
@@ -224,6 +225,7 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 			attribute("cn", accounts[i].PreferredName),
 			attribute("uid", accounts[i].PreferredName),
 			attribute("sn", accounts[i].PreferredName),
+			attribute("homeDirectory", ""),
 			attribute("ownCloudUUID", accounts[i].Id), // see https://github.com/butonic/owncloud-ldap-schema/blob/master/owncloud.schema#L28-L34
 		}
 		if accounts[i].DisplayName != "" {
@@ -301,11 +303,11 @@ func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
 // "" not determined
 // "users"
 // "groups"
-func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
+func parseFilter(f *ber.Packet) (qtype queryType, q string, code ldap.LDAPResultCode, err error) {
 	switch ldap.FilterMap[f.Tag] {
 	case "Equality Match":
 		if len(f.Children) != 2 {
-			return "", "", errors.New("equality match must have only two children")
+			return "", "", ldap.LDAPResultOperationsError, errors.New("equality match must have exactly two children")
 		}
 		attribute := strings.ToLower(f.Children[0].Value.(string))
 		value := f.Children[1].Value.(string)
@@ -330,13 +332,22 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		case "displayname":
 			q = fmt.Sprintf("display_name eq '%s'", escapeValue(value))
 		case "uidnumber":
-			q = fmt.Sprintf("uid_number eq '%s'", escapeValue(value))
+			if i, err := strconv.ParseUint(value, 10, 64); err != nil {
+				code = ldap.LDAPResultInvalidAttributeSyntax
+			} else {
+				q = fmt.Sprintf("uid_number eq %d", i)
+			}
 		case "gidnumber":
-			q = fmt.Sprintf("gid_number eq '%s'", escapeValue(value))
+			if i, err := strconv.ParseUint(value, 10, 64); err != nil {
+				code = ldap.LDAPResultInvalidAttributeSyntax
+			} else {
+				q = fmt.Sprintf("gid_number eq %d", i)
+			}
 		case "description":
 			q = fmt.Sprintf("description eq '%s'", escapeValue(value))
 		default:
-			err = fmt.Errorf("filter by %s not implemented", attribute)
+			code = ldap.LDAPResultUndefinedAttributeType
+			err = fmt.Errorf("unrecognized assertion type '%s' in filter item", attribute)
 		}
 
 		return
@@ -345,32 +356,32 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, err error) {
 		for i := range f.Children {
 			var subQuery string
 			var qt queryType
-			qt, subQuery, err = parseFilter(f.Children[i])
+			qt, subQuery, code, err = parseFilter(f.Children[i])
 			if err != nil {
-				return "", "", err
+				return "", "", code, err
 			}
 			if qtype == "" {
 				qtype = qt
 			} else if qt != "" && qt != qtype {
-				return "", "", fmt.Errorf("mixing user and group filters not supported")
+				return "", "", ldap.LDAPResultUnwillingToPerform, fmt.Errorf("mixing user and group filters not supported")
 			}
 			if subQuery != "" {
 				subQueries = append(subQueries, subQuery)
 			}
 		}
-		return qtype, strings.Join(subQueries, " "+strings.ToLower(ldap.FilterMap[f.Tag])+" "), nil
+		return qtype, strings.Join(subQueries, " "+strings.ToLower(ldap.FilterMap[f.Tag])+" "), ldap.LDAPResultSuccess, nil
 	case "Not":
 		if len(f.Children) != 1 {
-			return "", "", errors.New("not filter must have only one child")
+			return "", "", ldap.LDAPResultOperationsError, errors.New("not filter match must have exactly one child")
 		}
-		qtype, subQuery, err := parseFilter(f.Children[0])
+		qtype, subQuery, code, err := parseFilter(f.Children[0])
 		if err != nil {
-			return "", "", err
+			return "", "", code, err
 		}
 		if subQuery != "" {
 			q = fmt.Sprintf("not %s", subQuery)
 		}
-		return qtype, q, nil
+		return qtype, q, code, nil
 	}
 	return
 }
