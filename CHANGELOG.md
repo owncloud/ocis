@@ -17,6 +17,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Change - Tighten screws on usernames and email addresses: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
+* Enhancement - Add early version of cli tools for user-management: [#69](https://github.com/owncloud/ocis-accounts/pull/69)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
@@ -120,6 +121,23 @@ The following sections list the changes in ocis-accounts unreleased.
    and used in ACLs when integrating the os with the glauth LDAP service of ocis.
 
    https://github.com/owncloud/ocis-accounts/pull/65
+
+
+* Enhancement - Add early version of cli tools for user-management: [#69](https://github.com/owncloud/ocis-accounts/pull/69)
+
+   Following commands are available:
+
+   List, ls List existing accounts add, create, Create a new account update Make changes to an
+   existing account remove, rm Removes an existing account inspect Show detailed data on an
+   existing account
+
+   See --help for details.
+
+   Note that not all account-attributes have an effect yet. This is due to ocis being in an early
+   development stage.
+
+   https://github.com/owncloud/product/issues/115
+   https://github.com/owncloud/ocis-accounts/pull/69
 
 
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
