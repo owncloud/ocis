@@ -16,7 +16,7 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "store",
 		Usage:    "Start a go-micro store",
-		Category: "Runtime",
+		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Store),
 		Action: func(ctx *cli.Context) error {
 			storeCommand := command.Server(configureStore(cfg))
