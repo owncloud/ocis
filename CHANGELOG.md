@@ -1,4 +1,27 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-store unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-store/compare/v0.1.0...master
+
+## Summary
+
+* Bugfix - Removed code from other service: [#7](https://github.com/owncloud/ocis-store/pull/7)
+
+## Details
+
+* Bugfix - Removed code from other service: [#7](https://github.com/owncloud/ocis-store/pull/7)
+
+   We had code copied over from another repository which doesn't belong in here and now removed it
+   again.
+
+   https://github.com/owncloud/ocis-store/pull/7
+
+# Changelog for [0.1.0] (2020-07-23)
+
+The following sections list the changes in ocis-store 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-store/compare/a57983ac33e65bcd73702eb1d74f56d36a94ef6c...v0.1.0
 
 ## Summary
 
