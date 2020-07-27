@@ -18,13 +18,12 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.8.0
 	github.com/micro/micro/v2 v2.8.0
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200721035523-7af05fb19171
-	github.com/owncloud/ocis-glauth v0.4.1-0.20200723141434-ec6fc5ad32a8
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200727073302-229e5e01d7f6
+	github.com/owncloud/ocis-glauth v0.5.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
@@ -34,7 +33,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.9.0
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
 	github.com/owncloud/ocis-proxy v0.5.0
-	github.com/owncloud/ocis-reva v0.10.1-0.20200722150615-8627042603e9
+	github.com/owncloud/ocis-reva v0.10.1-0.20200724115318-ef92a0b3ffed
 	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
 	github.com/owncloud/ocis-store v0.1.0
 	github.com/owncloud/ocis-thumbnails v0.2.0
