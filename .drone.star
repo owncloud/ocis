@@ -963,6 +963,7 @@ def ocisServer():
       'pull': 'always',
       'detach': True,
       'environment' : {
+        'OCIS_LOG_LEVEL': 'debug',
         'REVA_LDAP_HOSTNAME': 'ldap',
         'REVA_LDAP_PORT': 636,
         'REVA_LDAP_BIND_PASSWORD': 'admin',
