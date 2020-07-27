@@ -2,6 +2,8 @@ package provider
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
@@ -49,16 +51,25 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 			if n.Children[0].Token.Type != godata.FilterTokenLiteral {
 				return nil, errors.New("equality expected a literal on the lhs")
 			}
-			if n.Children[1].Token.Type != godata.FilterTokenString {
-				return nil, errors.New("equality expected a string on the rhs")
+			if n.Children[1].Token.Type == godata.FilterTokenString {
+				// string tokens are enclosed with 'some string'
+				// ' is escaped as ''
+				// TODO unescape '' as '
+				// http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_URLComponents
+				q := bleve.NewTermQuery(n.Children[1].Token.Value[1 : len(n.Children[1].Token.Value)-1])
+				q.SetField(n.Children[0].Token.Value)
+				return q, nil
+			} else if n.Children[1].Token.Type == godata.FilterTokenInteger {
+				v, err := strconv.ParseFloat(n.Children[1].Token.Value, 64)
+				if err != nil {
+					return nil, err
+				}
+				incl := true
+				q := bleve.NewNumericRangeInclusiveQuery(&v, &v, &incl, &incl)
+				q.SetField(n.Children[0].Token.Value)
+				return q, nil
 			}
-			// string tokens are enclosed with 'some string'
-			// ' is escaped as ''
-			// TODO unescape '' as '
-			// http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_URLComponents
-			q := bleve.NewTermQuery(n.Children[1].Token.Value[1 : len(n.Children[1].Token.Value)-1])
-			q.SetField(n.Children[0].Token.Value)
-			return q, nil
+			return nil, fmt.Errorf("equality expected a string or int on the rhs, got %d", n.Children[1].Token.Type)
 		case "and":
 			q := query.NewConjunctionQuery([]query.Query{})
 			for _, child := range n.Children {
