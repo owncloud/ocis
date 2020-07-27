@@ -7,6 +7,8 @@ The following sections list the changes in ocis-accounts unreleased.
 ## Summary
 
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
+* Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
+* Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
@@ -14,6 +16,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Fix index update on create/update: [#57](https://github.com/owncloud/ocis-accounts/issues/57)
 * Change - Pass around the correct logger throughout the code: [#41](https://github.com/owncloud/ocis-accounts/issues/41)
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
+* Change - Tighten screws on usernames and email addresses: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
@@ -27,6 +30,29 @@ The following sections list the changes in ocis-accounts unreleased.
    group.
 
    https://github.com/owncloud/ocis-accounts/pull/60
+
+
+* Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
+
+   Some LDAP properties like `uidnumber` and `gidnumber` are numeric. When an OS tries to look up a
+   user it will not only try to lookup the user by username, but also by the `uidnumber`:
+   `(&(objectclass=posixAccount)(uidnumber=20000))`. The accounts backend for glauth was
+   sending that as a string query `uid_number eq '20000'` and has been changed to send it as
+   `uid_number eq 20000`. The removed quotes allow the parser in ocis-accounts to identify the
+   numeric literal and use the NewNumericRangeInclusiveQuery instead of a TermQuery.
+
+   https://github.com/owncloud/ocis-glauth/issues/28
+   https://github.com/owncloud/ocis-accounts/pull/68
+   https://github.com/owncloud/ocis-glauth/pull/29
+
+
+* Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
+
+   Passwords are stored in a dedicated child struct of an account. We fixed several segfault
+   conditions where the methods would try to unset a password when that child struct was not
+   existing.
+
+   https://github.com/owncloud/ocis-accounts/pull/65
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
@@ -83,6 +109,17 @@ The following sections list the changes in ocis-accounts unreleased.
    we have a timezone implementation available in ocis-web.
 
    https://github.com/owncloud/ocis-accounts/pull/33
+
+
+* Change - Tighten screws on usernames and email addresses: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
+
+   In order to match accounts to the OIDC claims we currently rely on the email address or username
+   to be present. We force both to match the [W3C recommended
+   regex](https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address)
+   with usernames having to start with a character or `_`. This allows the username to be presented
+   and used in ACLs when integrating the os with the glauth LDAP service of ocis.
+
+   https://github.com/owncloud/ocis-accounts/pull/65
 
 
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
