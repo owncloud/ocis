@@ -1,4 +1,27 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-ocs unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-ocs/compare/v0.1.0...master
+
+## Summary
+
+* Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
+
+## Details
+
+* Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
+
+   We added support for a basic set of API calls for the user provisioning API.
+   [Reference](https://doc.owncloud.com/server/admin_manual/configuration/user/user_provisioning_api.html)
+
+   https://github.com/owncloud/ocis-ocs/pull/23
+
+# Changelog for [0.1.0] (2020-07-23)
+
+The following sections list the changes in ocis-ocs 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-ocs/compare/acd6d6e7f59d1a44bcedb4dd60564910b474c38a...v0.1.0
 
 ## Summary
 
