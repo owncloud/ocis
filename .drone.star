@@ -59,7 +59,6 @@ def getCoreApiTestPipelineNames():
   return names
 
 def main(ctx):
-
   before = testPipelines(ctx)
 
   stages = [
