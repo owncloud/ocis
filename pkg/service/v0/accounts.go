@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	fieldmask_utils "github.com/mennanov/fieldmask-utils"
-	"github.com/rs/zerolog"
-	"google.golang.org/genproto/protobuf/field_mask"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"time"
+
+	fieldmask_utils "github.com/mennanov/fieldmask-utils"
+	"github.com/rs/zerolog"
+	"google.golang.org/genproto/protobuf/field_mask"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
@@ -310,6 +311,14 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 	if err = s.indexAccount(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
+
+	s.log.Debug().Interface("account", acc).Msg("account after indexing")
+
+	if acc.PasswordProfile != nil {
+		acc.PasswordProfile.Password = ""
+	}
+
+	*out = *acc
 
 	return
 }
