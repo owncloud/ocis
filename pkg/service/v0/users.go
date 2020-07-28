@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
-	"strconv"
 
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
@@ -60,11 +59,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
-	enabled, err := strconv.ParseBool(r.PostFormValue("enabled"))
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, err.Error()))
-		return
-	}
 
 	accSvc := accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
 	account, err := accSvc.CreateAccount(r.Context(), &accounts.CreateAccountRequest{
@@ -77,9 +71,13 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 			},
 			Id:             userid,
 			Mail:           email,
-			AccountEnabled: enabled,
+			AccountEnabled: true,
 		},
 	})
+	if err != nil {
+		render.Render(w, r, response.DataRender(data.MetaServerError))
+		return
+	}
 
 	o.logger.Debug().Interface("account", account).Msg("add user: account info")
 
