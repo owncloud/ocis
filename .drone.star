@@ -198,7 +198,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
