@@ -362,6 +362,7 @@ github.com/cs3org/reva v0.1.1-0.20200722125752-6dea7936f9d1 h1:f/XZNSkCpS0ndLzMq
 github.com/cs3org/reva v0.1.1-0.20200722125752-6dea7936f9d1/go.mod h1:yPtGZIud+QVWLN7lxPwZLNj2/BCx3xu2DNUcTJE1Mkk=
 github.com/cs3org/reva v0.1.1-0.20200724135750-b46288b375d6 h1:xTJzgtusJvbz08fYVnxlxNu4BhyGCS46uwiD4QrYnOI=
 github.com/cs3org/reva v0.1.1-0.20200724135750-b46288b375d6/go.mod h1:qwW0YfYf6JaAcTxBXsPpa8JIn2wHxqt5j/bjH7myI1k=
+github.com/cs3org/reva v0.1.1-0.20200728071211-c948977dd3a0/go.mod h1:hpkioVUPS+7USJq1cW1ikT22fxeMbVvHfonQVYcix4g=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 h1:iwZdTE0PVqJCos1vaoKsclOGD3ADKpshg3SRtYBbwso=
@@ -418,6 +419,7 @@ github.com/evanphx/json-patch/v5 v5.0.0 h1:dKTrUeykyQwKb/kx7Z+4ukDs6l+4L41HqG1XH
 github.com/evanphx/json-patch/v5 v5.0.0/go.mod h1:G79N1coSVB93tBe7j6PhzjmR3/2VvlbKOFpnXhI9Bw4=
 github.com/eventials/go-tus v0.0.0-20190617130015-9db47421f6a0 h1:iJijjXGuAFvYA8rTypGm7xMcl3QKlhuNn+nn5dNGA/k=
 github.com/eventials/go-tus v0.0.0-20190617130015-9db47421f6a0/go.mod h1:CfBfpEHiX55nX/EXkG3bOskUPrYe51D/guFiBupNSik=
+github.com/eventials/go-tus v0.0.0-20200718001131-45c7ec8f5d59/go.mod h1:XYuK1S5+kS6FGhlIUFuZFPvWiSrOIoLk6+ro33Xce3Y=
 github.com/exoscale/egoscale v0.18.1/go.mod h1:Z7OOdzzTOz1Q1PjQXumlz9Wn/CddH0zSYdCF3rnBKXE=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c h1:8ISkoahWXwZR41ois5lSJBSVw4D0OV19Ht/JSTzvSv0=
 github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c/go.mod h1:Yg+htXGokKKdzcwhuNDwVvN+uBxDGXJ7G/VN1d8fa64=
@@ -1404,6 +1406,8 @@ github.com/owncloud/ocis-reva v0.10.1-0.20200724115318-ef92a0b3ffed h1:K2Ny7V/PJ
 github.com/owncloud/ocis-reva v0.10.1-0.20200724115318-ef92a0b3ffed/go.mod h1:xsGko5By4YtXmZdFjK8nT958XPjZX7pAQpxwGkMfFCI=
 github.com/owncloud/ocis-reva v0.10.1-0.20200727120238-cd3009a1c042 h1:sADjncr5kwWChl89vanfBVLnBvsrWai+4Mp804wwcp4=
 github.com/owncloud/ocis-reva v0.10.1-0.20200727120238-cd3009a1c042/go.mod h1:CCmM7nzFBymJg+oQKrwAynOEzIBSFnCKSegkX6Tk2hg=
+github.com/owncloud/ocis-reva v0.10.1-0.20200728084033-8de1129e7790 h1:5luq6XGh9YsbKWQw3EiekgKoL7QC27QYWvkdNLRknrY=
+github.com/owncloud/ocis-reva v0.10.1-0.20200728084033-8de1129e7790/go.mod h1:oztN2xHWREqKvVZjIACSE/o3PBLkliiQhYr4NOrkts8=
 github.com/owncloud/ocis-settings v0.0.0-20200511093940-0fddb624d0da/go.mod h1:1PyfbVIZMTX21JxsRT+maRIjRFD3H+yhfpr1jMz3PeA=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363 h1:wk/7aAUITTrM192TFoIDq4fqzJQtFOQ0dDdSRkJ25SU=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363/go.mod h1:/h0ceztOoFc3KAnm8nqZI4zwsaaZK9q4MTgtintwsXc=
@@ -1694,6 +1698,7 @@ github.com/tredoe/fileutil v1.0.0/go.mod h1:PBayWPFCURwkmW0u6E8E8C6Jtd9ZzWq/U1iM
 github.com/tredoe/goutil v0.0.0-20200111155331-68cefb6d3cdc/go.mod h1:dp4VPOLeEFYbsf1ikgd+uytWDnpCdMiTHMg6mh7hHuQ=
 github.com/tredoe/osutil v1.0.5 h1:mfXjHBJU46GoJDOUcHyV895fauUuVikR9U8yRbGBrqw=
 github.com/tredoe/osutil v1.0.5/go.mod h1:DDO4G4Mwys6NJi5JmEVLnfFbQWIfVVri8L6HuXb/v98=
+github.com/tus/tusd v1.1.0/go.mod h1:3DWPOdeCnjBwKtv98y5dSws3itPqfce5TVa0s59LRiA=
 github.com/tus/tusd v1.1.1-0.20200416115059-9deabf9d80c2 h1:rcji4q9wMuSrz0tZt3kgIr/3WsB5kUqFja6RrgeCGEo=
 github.com/tus/tusd v1.1.1-0.20200416115059-9deabf9d80c2/go.mod h1:ygrT4B9ZSb27dx3uTnobX5nOFDnutBL6iWKLH4+KpA0=
 github.com/tus/tusd v1.3.0 h1:fGxm7iCUHHP2fxmV+3u7ZQcGMBWR23Y/Suxiri66+hA=
