@@ -29,11 +29,11 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.1.0
-	github.com/owncloud/ocis-phoenix v0.10.1-0.20200728053952-4473d4a679b0
+	github.com/owncloud/ocis-ocs v0.1.1-0.20200728151153-8a2cbd98a7f5
+	github.com/owncloud/ocis-phoenix v0.10.1-0.20200728190226-2508a066ba8f
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
-	github.com/owncloud/ocis-proxy v0.5.1-0.20200727201341-d0d85fe67a42
-	github.com/owncloud/ocis-reva v0.10.1-0.20200728084033-8de1129e7790
+	github.com/owncloud/ocis-proxy v0.5.1-0.20200728185721-ac164bed70f8
+	github.com/owncloud/ocis-reva v0.10.1-0.20200728121716-b05b139f0a8b
 	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
 	github.com/owncloud/ocis-store v0.1.1-0.20200727080653-706a465a07c6
 	github.com/owncloud/ocis-thumbnails v0.2.0
