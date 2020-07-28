@@ -42,9 +42,10 @@ type Capabilities struct {
 
 // CapabilitiesCore holds webdav config
 type CapabilitiesCore struct {
-	PollInterval int     `json:"pollinterval" xml:"pollinterval" mapstructure:"poll_interval"`
-	WebdavRoot   string  `json:"webdav-root,omitempty" xml:"webdav-root,omitempty" mapstructure:"webdav_root"`
-	Status       *Status `json:"status" xml:"status"`
+	PollInterval      int     `json:"pollinterval" xml:"pollinterval" mapstructure:"poll_interval"`
+	WebdavRoot        string  `json:"webdav-root,omitempty" xml:"webdav-root,omitempty" mapstructure:"webdav_root"`
+	Status            *Status `json:"status" xml:"status" mapstructure:"status"`
+	SupportURLSigning ocsBool `json:"support-url-signing,omitempty" xml:"support-url-signing,omitempty" mapstructure:"support-url-signing"`
 }
 
 // Status holds basic status information
