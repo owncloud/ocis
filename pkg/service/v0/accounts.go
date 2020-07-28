@@ -318,7 +318,14 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 		acc.PasswordProfile.Password = ""
 	}
 
-	*out = *acc
+	{
+		out.Id = acc.Id
+		out.Mail = acc.Mail
+		out.PreferredName = acc.PreferredName
+		out.AccountEnabled = acc.AccountEnabled
+		out.DisplayName = acc.DisplayName
+		out.OnPremisesSamAccountName = acc.OnPremisesSamAccountName
+	}
 
 	return
 }
