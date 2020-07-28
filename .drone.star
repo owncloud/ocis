@@ -49,7 +49,7 @@ def main(ctx):
   before = [
     linting(ctx),
     unitTests(ctx),
-    apiTests(ctx, 'master', 'd24667f9b0918b0744f8e706893286c2434f23f4'),
+    apiTests(ctx, 'fixTestsForOCISWithProxy', ''),
   ] + acceptance(ctx, 'master', '16fbb1bf0657adc1f1991f94977935b4cdcbf952')
 
   stages = [
