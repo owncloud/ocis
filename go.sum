@@ -1344,6 +1344,8 @@ github.com/owncloud/ocis-phoenix v0.8.1 h1:ZV8UhCNCHmaoNtve6/7yKM09lFopDvYATmqxx
 github.com/owncloud/ocis-phoenix v0.8.1/go.mod h1:uTJsJV9mTnWmMOgg1YaxUaqmAjH5P+sikp9tZQKSwpM=
 github.com/owncloud/ocis-phoenix v0.9.0 h1:XiKKm8nzcpJMSx0V+xLCsLQRyWjtZI3vHguMBGtznxM=
 github.com/owncloud/ocis-phoenix v0.9.0/go.mod h1:uTJsJV9mTnWmMOgg1YaxUaqmAjH5P+sikp9tZQKSwpM=
+github.com/owncloud/ocis-phoenix v0.10.1-0.20200728053952-4473d4a679b0 h1:VYrI484zaBdNJA5x4W8j1oenVaRlgap04kSvSCBiA+o=
+github.com/owncloud/ocis-phoenix v0.10.1-0.20200728053952-4473d4a679b0/go.mod h1:1pwRccQdRJGOdZeC3yO+/ujPMGPBAJcIVYFYZHajbt8=
 github.com/owncloud/ocis-pkg v1.2.1-0.20191217084055-eab942498596/go.mod h1:Wo0QfOmhadh2vNcUoQIsw2yaOT3zeftk+xaOOwP3y88=
 github.com/owncloud/ocis-pkg v1.3.0 h1:2fkgvfd/spTjschuulYMHRuzxkCGGXae9ocebVYkm74=
 github.com/owncloud/ocis-pkg v1.3.0/go.mod h1:Wo0QfOmhadh2vNcUoQIsw2yaOT3zeftk+xaOOwP3y88=
