@@ -53,7 +53,10 @@ func NewService(opts ...Option) Service {
 				})
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", svc.ListUsers)
+					r.Post("/", svc.AddUser)
 					r.Get("/{userid}", svc.GetUser)
+					r.Put("/{userid}", svc.EditUser)
+					r.Delete("/{userid}", svc.DeleteUser)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {

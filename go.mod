@@ -23,6 +23,7 @@ require (
 	github.com/rs/zerolog v1.19.0 // indirect
 	github.com/spf13/viper v1.7.0
 	go.opencensus.io v0.22.4
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/square/go-jose.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
