@@ -11,6 +11,7 @@ import (
 
 	"github.com/micro/go-micro/v2/client/grpc"
 	merrors "github.com/micro/go-micro/v2/errors"
+	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/response"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
@@ -22,22 +23,30 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 
 	if userid == "" {
-		u, ok := user.ContextGetUser(r.Context()) // TODO HERE
-		if !ok {
+		u, ok := user.ContextGetUser(r.Context())
+		if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
 			return
 		}
-	}
-	/*
 
-		accSvcID := "com.owncloud.api.accounts" // TODO query the registry and filter using labels
-		accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
-		resp, err := accSvc.ListAccounts(c.Context, &accounts.ListAccountsRequest{})
-	*/
+		userid = u.Id.OpaqueId
+	}
+
+	accSvc := accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+	account, err := accSvc.GetAccount(r.Context(), &accounts.GetAccountRequest{
+		Id: userid,
+	})
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		return
+	}
+
 	render.Render(w, r, response.DataRender(&data.User{
-		ID:          u.Username, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
-		DisplayName: u.DisplayName,
-		Email:       u.Mail,
+		UserID:      account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
+		Username:    account.PreferredName,
+		DisplayName: account.DisplayName,
+		Email:       account.Mail,
+		Enabled:     account.AccountEnabled,
 	}))
 }
 
