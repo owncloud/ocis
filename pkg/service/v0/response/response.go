@@ -1,4 +1,4 @@
-package svc
+package response
 
 import (
 	"encoding/xml"
@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/go-chi/render"
+	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
 )
 
 // Response is the top level response structure
@@ -23,7 +24,7 @@ var (
 // Payload combines response metadata and data
 type Payload struct {
 	XMLName struct{}    `json:"-" xml:"ocs"`
-	Meta    Meta        `json:"meta" xml:"meta"`
+	Meta    data.Meta   `json:"meta" xml:"meta"`
 	Data    interface{} `json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -83,7 +84,7 @@ func (p *Payload) Render(w http.ResponseWriter, r *http.Request) error {
 // DataRender creates an OK Payload for the given data
 func DataRender(d interface{}) render.Renderer {
 	return &Payload{
-		Meta: MetaOK,
+		Meta: data.MetaOK,
 		Data: d,
 	}
 }
@@ -92,12 +93,12 @@ func DataRender(d interface{}) render.Renderer {
 // The httpcode will be determined using the API version stored in the context
 func ErrRender(c int, m string) render.Renderer {
 	return &Payload{
-		Meta: Meta{Status: "error", StatusCode: c, Message: m},
+		Meta: data.Meta{Status: "error", StatusCode: c, Message: m},
 	}
 }
 
-func statusCodeMapper(version string) func(Meta) int {
-	var mapper func(Meta) int
+func statusCodeMapper(version string) func(data.Meta) int {
+	var mapper func(data.Meta) int
 	switch version {
 	case ocsVersion1:
 		mapper = OcsV1StatusCodes
