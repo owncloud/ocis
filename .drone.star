@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    apiTests(ctx, 'master', '9db442250583d3b71e633cf77fbcf643ed67e994'),
+    apiTests(ctx, 'master', 'e33cfcb2816abd07ec97a244ee41e92af2267ad9'),
   ]
 
   stages = [
