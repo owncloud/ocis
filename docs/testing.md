@@ -135,13 +135,18 @@ If you want to work on a specific issue
 8.  make a PR to ocis-reva running the adjusted tests
 
     To confirm that all tests (old and changed) run fine make a PR to ocis-reva with your code changes and point drone to your branch in core to get the changed tests.
-    For that change this line in the `acceptance-tests` section
+    For that change this line in the `main` function.
 
-    `'git clone -b master --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',`
+    `apiTests(ctx, 'master', '9db442250583d3b71e633cf77fbcf643ed67e994'),`
 
-    to clone your core branch e.g.
+    In place of master use your branch name. If you dont specify the commit ID, you will run the tests using the HEAD of the branch you specified.
 
-    `'git clone -b fixRevaIssue122 --depth=1 https://github.com/owncloud/core.git /srv/app/testrunner',`
+    `apiTests(ctx, 'my-new-tests', '')`
+
+    Also make sure to change the commit ID if you want to run tests on any other commit. eg:
+
+    `apiTests(ctx, 'my-new-tests', '7d468c05414b1dc745ca713d9deb443bc4e5f333')`
+
 
 9.  merge PRs
 
