@@ -7,7 +7,9 @@
     "insecure": true
   },
   "policy_selector": {
-    "static": {"policy" : "reva"}
+    "static": {
+      "policy": "reva"
+    }
   },
   "policies": [
     {
@@ -34,6 +36,11 @@
           "backend": "http://localhost:9140"
         },
         {
+          "type": "regex",
+          "endpoint": "/ocs/v[12].php/cloud/user",
+          "backend": "http://localhost:9110"
+        },
+        {
           "endpoint": "/remote.php/",
           "backend": "http://localhost:9140"
         },
@@ -58,13 +65,13 @@
           "backend": "http://localhost:9140"
         },
         {
-					"endpoint": "/api/v0/accounts",
-					"backend":  "http://localhost:9181"
-				},
-				{
+          "endpoint": "/api/v0/accounts",
+          "backend": "http://localhost:9181"
+        },
+        {
           "endpoint": "/accounts.js",
-					"backend":  "http://localhost:9181"
-				}
+          "backend": "http://localhost:9181"
+        }
       ]
     },
     {

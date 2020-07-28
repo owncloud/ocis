@@ -255,7 +255,7 @@ func defaultPolicies() []config.Policy {
 				},
 				{
 					Type:     config.RegexRoute,
-					Endpoint: "/ocs/v[12].php/cloud/user/signing-key",
+					Endpoint: "/ocs/v[12].php/cloud/user",// we have `user` and `users` in ocis-ocs
 					Backend:  "http://localhost:9110",
 				},
 				{
