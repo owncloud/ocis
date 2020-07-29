@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis-thumbnails/pkg/config"
 	"github.com/owncloud/ocis-thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis-thumbnails/pkg/metrics"
+	"github.com/owncloud/ocis-thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis-thumbnails/pkg/server/grpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -143,6 +144,40 @@ func Server(cfg *config.Config) *cli.Command {
 			}, func(_ error) {
 				fmt.Println("shutting down grpc server")
 				cancel()
+			})
+
+			server, err := debug.Server(
+				debug.Logger(logger),
+				debug.Config(cfg),
+			)
+
+			if err != nil {
+				logger.Info().
+					Err(err).
+					Str("transport", "debug").
+					Msg("Failed to initialize server")
+
+				return err
+			}
+
+			gr.Add(func() error {
+				return server.ListenAndServe()
+			}, func(_ error) {
+				ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
+
+				defer timeout()
+				defer cancel()
+
+				if err := server.Shutdown(ctx); err != nil {
+					logger.Info().
+						Err(err).
+						Str("transport", "debug").
+						Msg("Failed to shutdown server")
+				} else {
+					logger.Info().
+						Str("transport", "debug").
+						Msg("Shutting down server")
+				}
 			})
 
 			{
