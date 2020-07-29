@@ -1,4 +1,38 @@
 # this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
+#
+# test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
+#
+apiFavorites/favorites.feature:39
+apiFavorites/favorites.feature:40
+apiShareManagementBasic/createShare.feature:121
+apiShareManagementBasic/createShare.feature:122
+apiShareManagementBasic/createShare.feature:124
+apiShareManagementBasic/createShare.feature:125
+apiShareManagementBasic/createShare.feature:127
+apiShareManagementBasic/createShare.feature:128
+apiShareManagementBasic/createShare.feature:130
+apiShareManagementBasic/createShare.feature:131
+apiShareManagementBasic/createShare.feature:223
+apiShareManagementBasic/createShare.feature:224
+apiShareManagementBasic/createShare.feature:447
+apiShareManagementBasic/createShare.feature:589
+apiShareManagementBasic/createShare.feature:604
+apiShareManagementBasic/createShare.feature:619
+apiShareOperations/gettingShares.feature:155
+apiShareOperations/gettingShares.feature:156
+apiSharePublicLink2/multilinkSharing.feature:181
+apiWebdavMove2/moveFile.feature:316
+apiWebdavProperties1/setFileProperties.feature:32
+apiWebdavProperties1/setFileProperties.feature:33
+apiWebdavProperties2/getFileProperties.feature:84
+apiWebdavProperties2/getFileProperties.feature:85
+apiWebdavProperties2/getFileProperties.feature:166
+apiWebdavProperties2/getFileProperties.feature:167
+apiWebdavUpload1/uploadFile.feature:63
+apiWebdavUpload1/uploadFile.feature:64
+#
+# test scenarios that fail for various reasons (to be specified)
+#
 apiMain/checksums.feature:24
 apiMain/checksums.feature:25
 apiMain/checksums.feature:35
