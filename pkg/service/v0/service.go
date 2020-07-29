@@ -6,7 +6,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
+	"github.com/micro/go-micro/v2/client/grpc"
 
+	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis-ocs/pkg/middleware"
 	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
@@ -57,6 +59,18 @@ func NewService(opts ...Option) Service {
 					r.Get("/{userid}", svc.GetUser)
 					r.Put("/{userid}", svc.EditUser)
 					r.Delete("/{userid}", svc.DeleteUser)
+
+					r.Route("/{userid}/groups", func(r chi.Router) {
+						r.Get("/", svc.ListUserGroups)
+						r.Post("/", svc.AddToGroup)
+						r.Delete("/", svc.RemoveFromGroup)
+					})
+				})
+				r.Route("/groups", func(r chi.Router) {
+					r.Get("/", svc.ListGroups)
+					r.Post("/", svc.AddGroup)
+					r.Delete("/{groupid}", svc.DeleteGroup)
+					r.Get("/{groupid}", svc.GetGroupMembers)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
@@ -82,5 +96,13 @@ func (o Ocs) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // NotFound uses ErrRender to always return a proper OCS payload
 func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "please check the syntax. API specifications are here: http://www.freedesktop.org/wiki/Specifications/open-collaboration-services"))
+	render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found"))
+}
+
+func (o Ocs) getAccountService() accounts.AccountsService {
+	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+}
+
+func (o Ocs) getGroupsService() accounts.GroupsService {
+	return accounts.NewGroupsService("com.owncloud.api.accounts", grpc.NewClient())
 }

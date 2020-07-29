@@ -10,6 +10,11 @@ type User struct {
 	Enabled     bool   `json:"enabled" xml:"enabled"`
 }
 
+// Users holds user ids for the user listing
+type Users struct {
+	Users []string `json:"users" xml:"users>element"`
+}
+
 // SigningKey holds the Payload for a GetSigningKey response
 type SigningKey struct {
 	User       string `json:"user" xml:"user"`

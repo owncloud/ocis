@@ -3,7 +3,9 @@ package svc
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
@@ -264,10 +266,29 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 
 // ListUsers lists the users
 func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
+	search := r.URL.Query().Get("search")
+	query := ""
+	if search != "" {
+		query = fmt.Sprintf("id eq '%s' or on_premises_sam_account_name eq '%s'", escapeValue(search), escapeValue(search))
+	}
+	accSvc := o.getAccountService()
+	res, err := accSvc.ListAccounts(r.Context(), &accounts.ListAccountsRequest{
+		Query: query,
+	})
+	if err != nil {
+		o.logger.Err(err).Msg("could not list users")
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users"))
+		return
+	}
+	users := []string{}
+	for i := range res.Accounts {
+		users = append(users, res.Accounts[i].Id)
+	}
 
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "please check the syntax. API specifications are here: http://www.freedesktop.org/wiki/Specifications/open-collaboration-services"))
+	render.Render(w, r, response.DataRender(&data.Users{Users: users}))
 }
 
-func (o Ocs) getAccountService() accounts.AccountsService {
-	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+// escapeValue escapes all special characters in the value
+func escapeValue(value string) string {
+	return strings.ReplaceAll(value, "'", "''")
 }
