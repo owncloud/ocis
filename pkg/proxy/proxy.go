@@ -250,13 +250,13 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9130",
 				},
 				{
-					Endpoint: "/ocs/",
-					Backend:  "http://localhost:9140",
+					Type:     config.RegexRoute,
+					Endpoint: "/ocs/v[12].php/cloud/user", // we have `user` and `users` in ocis-ocs
+					Backend:  "http://localhost:9110",
 				},
 				{
-					Type:     config.RegexRoute,
-					Endpoint: "/ocs/v[12].php/cloud/user",// we have `user` and `users` in ocis-ocs
-					Backend:  "http://localhost:9110",
+					Endpoint: "/ocs/",
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Type:     config.QueryRoute,
@@ -296,6 +296,14 @@ func defaultPolicies() []config.Policy {
 				{
 					Endpoint: "/accounts.js",
 					Backend:  "http://localhost:9181",
+				},
+				{
+					Endpoint: "/api/v0/settings",
+					Backend:  "http://localhost:9190",
+				},
+				{
+					Endpoint: "/settings.js",
+					Backend:  "http://localhost:9190",
 				},
 			},
 		},
