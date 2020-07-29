@@ -22,7 +22,7 @@ import (
 
 // GetUser returns the currently logged in user
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication
+	// TODO this endpoint needs authentication using the roles and permissions
 	userid := chi.URLParam(r, "userid")
 
 	if userid == "" {
@@ -35,8 +35,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		userid = u.Id.OpaqueId
 	}
 
-	accSvc := o.getAccountService()
-	account, err := accSvc.GetAccount(r.Context(), &accounts.GetAccountRequest{
+	account, err := o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
 		Id: userid,
 	})
 	if err != nil {
@@ -67,15 +66,26 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // AddUser creates a new user account
 func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication
+	// TODO this endpoint needs authentication using the roles and permissions
 	userid := r.PostFormValue("userid")
 	password := r.PostFormValue("password")
 	username := r.PostFormValue("username")
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
 
-	accSvc := o.getAccountService()
-	account, err := accSvc.CreateAccount(r.Context(), &accounts.CreateAccountRequest{
+	// fallbacks
+	/* TODO decide if we want to make these fallbacks. Keep in mind:
+	  - ocis requires a username and email
+	  - the username should really be different from the userid
+	if username == "" {
+		username = userid
+	}
+	if displayname == "" {
+		displayname = username
+	}
+	*/
+
+	account, err := o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
 		Account: &accounts.Account{
 			DisplayName:              displayname,
 			PreferredName:            username,
@@ -148,8 +158,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accSvc := o.getAccountService()
-	account, err := accSvc.UpdateAccount(r.Context(), &req)
+	account, err := o.getAccountService().UpdateAccount(r.Context(), &req)
 	if err != nil {
 		merr := merrors.FromError(err)
 		switch merr.Code {
@@ -168,6 +177,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	if account.PasswordProfile != nil {
 		account.PasswordProfile.Password = ""
 	}
+
 	o.logger.Debug().Interface("account", account).Msg("updated user")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
@@ -177,8 +187,8 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	req := accounts.DeleteAccountRequest{
 		Id: chi.URLParam(r, "userid"),
 	}
-	accSvc := o.getAccountService()
-	_, err := accSvc.DeleteAccount(r.Context(), &req)
+
+	_, err := o.getAccountService().DeleteAccount(r.Context(), &req)
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -189,6 +199,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		o.logger.Error().Err(err).Str("userid", req.Id).Msg("could not delete user")
 		return
 	}
+
 	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
@@ -203,6 +214,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
 		return
 	}
+
 	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
 	res, err := c.Read(r.Context(), &storepb.ReadRequest{
 		Options: &storepb.ReadOptions{
@@ -251,6 +263,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			// TODO Expiry?
 		},
 	})
+
 	if err != nil {
 		//o.logger.Error().Err(err).Msg("error writing key")
 		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not persist signing key"))
@@ -270,8 +283,8 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	if search != "" {
 		query = fmt.Sprintf("id eq '%s' or on_premises_sam_account_name eq '%s'", escapeValue(search), escapeValue(search))
 	}
-	accSvc := o.getAccountService()
-	res, err := accSvc.ListAccounts(r.Context(), &accounts.ListAccountsRequest{
+
+	res, err := o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
 		Query: query,
 	})
 	if err != nil {
@@ -279,6 +292,7 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users"))
 		return
 	}
+
 	users := []string{}
 	for i := range res.Accounts {
 		users = append(users, res.Accounts[i].Id)
