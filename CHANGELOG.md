@@ -6,9 +6,18 @@ The following sections list the changes in ocis-ocs unreleased.
 
 ## Summary
 
+* Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
 * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
 
 ## Details
+
+* Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
+
+   We added support for the group management related set of API calls of the provisioning API.
+   [Reference](https://doc.owncloud.com/server/admin_manual/configuration/user/user_provisioning_api.html)
+
+   https://github.com/owncloud/ocis-ocs/pull/25
+
 
 * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
 
