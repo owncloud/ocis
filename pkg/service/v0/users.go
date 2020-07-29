@@ -191,7 +191,6 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
 	render.Render(w, r, response.DataRender(struct{}{}))
-	return
 }
 
 // GetSigningKey returns the signing key for the current user. It will create it on the fly if it does not exist
