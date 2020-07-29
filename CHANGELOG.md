@@ -9,6 +9,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
 * Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
 * Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
+* Bugfix - Update account return value not used: [#70](https://github.com/owncloud/ocis-accounts/pull/70)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
 * Change - Align structure of this extension with other extensions: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Change - Change api errors: [#11](https://github.com/owncloud/ocis-accounts/issues/11)
@@ -54,6 +55,13 @@ The following sections list the changes in ocis-accounts unreleased.
    existing.
 
    https://github.com/owncloud/ocis-accounts/pull/65
+
+
+* Bugfix - Update account return value not used: [#70](https://github.com/owncloud/ocis-accounts/pull/70)
+
+   In order to return a value using the micro go code we need to override the `out` value.
+
+   https://github.com/owncloud/ocis-accounts/pull/70
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
