@@ -7,6 +7,7 @@ The following sections list the changes in ocis-thumbnails unreleased.
 ## Summary
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#35](https://github.com/owncloud/ocis-thumbnails/pull/35)
+* Enhancement - Serve the metrics endpoint: [#37](https://github.com/owncloud/ocis-thumbnails/issues/37)
 
 ## Details
 
@@ -15,6 +16,13 @@ The following sections list the changes in ocis-thumbnails unreleased.
    ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
 
    https://github.com/owncloud/ocis-thumbnails/pull/35
+
+
+* Enhancement - Serve the metrics endpoint: [#37](https://github.com/owncloud/ocis-thumbnails/issues/37)
+
+   Added the metrics endpoint to be able to monitor this service like the other services
+
+   https://github.com/owncloud/ocis-thumbnails/issues/37
 
 # Changelog for [0.2.0] (2020-07-10)
 
