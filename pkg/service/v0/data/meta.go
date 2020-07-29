@@ -9,8 +9,14 @@ type Meta struct {
 	ItemsPerPage string `json:"itemsperpage,omitempty" xml:"itemsperpage,omitempty"`
 }
 
-// MetaOK is the default ok response
+// MetaOK is the default ok response with code 100
 var MetaOK = Meta{Status: "ok", StatusCode: 100, Message: "OK"}
+
+// MetaFailure is a failure response with code 101
+var MetaFailure = Meta{Status: "", StatusCode: 101, Message: "Failure"}
+
+// MetaInvalidInput is an error response with code 102
+var MetaInvalidInput = Meta{Status: "", StatusCode: 102, Message: "Invalid Input"}
 
 // MetaBadRequest is used for unknown errors
 var MetaBadRequest = Meta{Status: "error", StatusCode: 400, Message: "Bad Request"}

@@ -33,14 +33,26 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		userid = u.Id.OpaqueId
 	}
 
-	accSvc := accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+	accSvc := o.getAccountService()
 	account, err := accSvc.GetAccount(r.Context(), &accounts.GetAccountRequest{
 		Id: userid,
 	})
 	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not get user")
 		return
 	}
+
+	// remove password from log if it is set
+	if account.PasswordProfile != nil {
+		account.PasswordProfile.Password = ""
+	}
+	o.logger.Debug().Interface("account", account).Msg("got user")
 
 	render.Render(w, r, response.DataRender(&data.User{
 		UserID:      account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
@@ -60,7 +72,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
 
-	accSvc := accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+	accSvc := o.getAccountService()
 	account, err := accSvc.CreateAccount(r.Context(), &accounts.CreateAccountRequest{
 		Account: &accounts.Account{
 			DisplayName:              displayname,
@@ -75,11 +87,22 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		render.Render(w, r, response.DataRender(data.MetaServerError))
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusBadRequest {
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not add user")
+		// TODO check error if account already existed
 		return
 	}
 
-	o.logger.Debug().Interface("account", account).Msg("add user: account info")
+	// remove password from log if it is set
+	if account.PasswordProfile != nil {
+		account.PasswordProfile.Password = ""
+	}
+	o.logger.Debug().Interface("account", account).Msg("added user")
 
 	render.Render(w, r, response.DataRender(&data.User{
 		UserID:      account.Id,
@@ -118,26 +141,55 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		req.Account.DisplayName = value
 		req.UpdateMask = &fieldmaskpb.FieldMask{Paths: []string{"DisplayName"}}
 	default:
-		render.Render(w, r, response.DataRender(data.MetaServerError))
+		// https://github.com/owncloud/core/blob/24b7fa1d2604a208582055309a5638dbd9bda1d1/apps/provisioning_api/lib/Users.php#L321
+		render.Render(w, r, response.ErrRender(103, "unknown key '"+key+"'"))
 		return
 	}
 
-	accSvc := accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+	accSvc := o.getAccountService()
 	account, err := accSvc.UpdateAccount(r.Context(), &req)
 	if err != nil {
-		// TODO to be compliant with the spec, check whether the user exists or not
-		// https://doc.owncloud.com/server/admin_manual/configuration/user/user_provisioning_api.html#edit-user
-		render.Render(w, r, response.DataRender(data.MetaServerError))
+		merr := merrors.FromError(err)
+		switch merr.Code {
+		case http.StatusNotFound:
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		case http.StatusBadRequest:
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+		default:
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", req.Account.Id).Msg("could not edit user")
 		return
 	}
 
-	o.logger.Debug().Interface("account", account).Msg("update user: account info")
+	// remove password from log if it is set
+	if account.PasswordProfile != nil {
+		account.PasswordProfile.Password = ""
+	}
+	o.logger.Debug().Interface("account", account).Msg("updated user")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
-
+	req := accounts.DeleteAccountRequest{
+		Id: chi.URLParam(r, "userid"),
+	}
+	accSvc := o.getAccountService()
+	_, err := accSvc.DeleteAccount(r.Context(), &req)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", req.Id).Msg("could not delete user")
+		return
+	}
+	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
+	render.Render(w, r, response.DataRender(struct{}{}))
+	return
 }
 
 // GetSigningKey returns the signing key for the current user. It will create it on the fly if it does not exist
@@ -214,4 +266,8 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 
 	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "please check the syntax. API specifications are here: http://www.freedesktop.org/wiki/Specifications/open-collaboration-services"))
+}
+
+func (o Ocs) getAccountService() accounts.AccountsService {
+	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
 }
