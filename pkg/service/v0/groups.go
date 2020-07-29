@@ -13,7 +13,7 @@ import (
 
 // ListUserGroups lists a users groups
 func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "not implemented"))
+	render.Render(w, r, response.DataRender(&data.Groups{Groups: []string{}}))
 }
 
 // AddToGroup adds a user to a group
