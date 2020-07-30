@@ -1013,6 +1013,7 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0j
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 h1:Z/i1e+gTZrmcGeZyWckaLfucYG6KYOXLWo4co8pZYNY=
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103/go.mod h1:o9YPB5aGP8ob35Vy6+vyq3P3bWe7NQWzf+JLiXCiMaE=
+github.com/mennanov/fieldmask-utils v0.3.2 h1:AkHXYBEOoyvocl8YhzoStATRnto5OH1PY4Rj78I5Cuc=
 github.com/mennanov/fieldmask-utils v0.3.2/go.mod h1:JpaanSp6Ql5A8dGktEFxTmA9uBXmz3F+2LAXDZwiimU=
 github.com/mholt/certmagic v0.7.5/go.mod h1:91uJzK5K8IWtYQqTi5R2tsxV1pCde+wdGfaRaOZi6aQ=
 github.com/mholt/certmagic v0.8.3/go.mod h1:91uJzK5K8IWtYQqTi5R2tsxV1pCde+wdGfaRaOZi6aQ=
@@ -1247,6 +1248,8 @@ github.com/owncloud/ocis-ocs v0.1.1-0.20200729130121-69c414865868 h1:nVGXTRQyKvB
 github.com/owncloud/ocis-ocs v0.1.1-0.20200729130121-69c414865868/go.mod h1:xk7iq7qczDfLgVG6DWFnCq8We9bWinsLnFDJ3y67HVM=
 github.com/owncloud/ocis-ocs v0.1.1-0.20200729151744-16ae852a590f h1:3NM6lI3xwXPsNNVkkn8TNP4L3EJ9nav7opzIIPKENxM=
 github.com/owncloud/ocis-ocs v0.1.1-0.20200729151744-16ae852a590f/go.mod h1:xk7iq7qczDfLgVG6DWFnCq8We9bWinsLnFDJ3y67HVM=
+github.com/owncloud/ocis-ocs v0.1.1-0.20200730085317-8933b604e96b h1:7QPuE38OVYXw5BxpehjJwmjp5hKayn1psr4E02uQ8Ww=
+github.com/owncloud/ocis-ocs v0.1.1-0.20200730085317-8933b604e96b/go.mod h1:xk7iq7qczDfLgVG6DWFnCq8We9bWinsLnFDJ3y67HVM=
 github.com/owncloud/ocis-phoenix v0.10.1-0.20200728053952-4473d4a679b0 h1:VYrI484zaBdNJA5x4W8j1oenVaRlgap04kSvSCBiA+o=
 github.com/owncloud/ocis-phoenix v0.10.1-0.20200728053952-4473d4a679b0/go.mod h1:1pwRccQdRJGOdZeC3yO+/ujPMGPBAJcIVYFYZHajbt8=
 github.com/owncloud/ocis-phoenix v0.10.1-0.20200728190226-2508a066ba8f h1:Cv0X5OP7Cx4iE7rxSMnuql49trdn7bVQMIrB5oKhqEI=
