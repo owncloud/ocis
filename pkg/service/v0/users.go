@@ -61,6 +61,15 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		DisplayName: account.DisplayName,
 		Email:       account.Mail,
 		Enabled:     account.AccountEnabled,
+		// FIXME only return quota for users/{userid} endpoint (not /user)
+		// TODO query storage registry for free space? of home storage, maybe...
+		Quota: &data.Quota{
+			Free:       2840756224000,
+			Used:       5059416668,
+			Total:      2845815640668,
+			Relative:   0.18,
+			Definition: "default",
+		},
 	}))
 }
 
