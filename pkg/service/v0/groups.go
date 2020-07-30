@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
@@ -67,8 +66,6 @@ func (s Service) loadGroup(id string, g *proto.Group) (err error) {
 	return
 }
 
-var groupMutex sync.Mutex
-
 func (s Service) writeGroup(g *proto.Group) (err error) {
 
 	// leave only the member id
@@ -81,8 +78,8 @@ func (s Service) writeGroup(g *proto.Group) (err error) {
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", g.Id)
 
-	groupMutex.Lock()
-	defer groupMutex.Unlock()
+	M.Lock()
+	defer M.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write group: %v", err.Error())
 	}

@@ -32,6 +32,9 @@ import (
 	_ "github.com/tredoe/osutil/user/crypt/sha512_crypt"
 )
 
+// M synchronizes access to account files to readers and writers
+var M sync.RWMutex
+
 func (s Service) indexAccounts(path string) (err error) {
 	var f *os.File
 	if f, err = os.Open(path); err != nil {
@@ -85,8 +88,6 @@ func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 	return
 }
 
-var accountMutex sync.Mutex
-
 func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	// leave only the group id
@@ -99,8 +100,8 @@ func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", a.Id)
 
-	accountMutex.Lock()
-	defer accountMutex.Unlock()
+	M.Lock()
+	defer M.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write account: %v", err.Error())
 	}
