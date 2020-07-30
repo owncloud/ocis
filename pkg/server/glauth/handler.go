@@ -64,14 +64,14 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	userName := strings.TrimPrefix(parts[0], "cn=")
 
 	// check password
-	_, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
+	res, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
 		//Query: fmt.Sprintf("username eq '%s'", username),
 		// TODO this allows lookung up users when you know the username using basic auth
 		// adding the password to the query is an option but sending the sover the wira a la scim seems ugly
 		// but to set passwords our accounts need it anyway
 		Query: fmt.Sprintf("login eq '%s' and password eq '%s'", userName, bindSimplePw),
 	})
-	if err != nil {
+	if err != nil || len(res.Accounts) == 0 {
 		h.log.Error().
 			Str("username", userName).
 			Str("binddn", bindDN).
