@@ -6,6 +6,7 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Bugfix - Add write mutexes: [#71](https://github.com/owncloud/ocis-accounts/pull/71)
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
 * Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
 * Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
@@ -23,6 +24,17 @@ The following sections list the changes in ocis-accounts unreleased.
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
 ## Details
+
+* Bugfix - Add write mutexes: [#71](https://github.com/owncloud/ocis-accounts/pull/71)
+
+   Concurrent account or groups writes would corrupt the json file on disk, because the different
+   goroutines would be treated as a single thread from the os. We introduce a mutex for account and
+   group file writes each. This locks the update frequency for all accounts/groups and could be
+   further improved by using a concurrent map of mutexes with a mutex per account / group. PR
+   welcome.
+
+   https://github.com/owncloud/ocis-accounts/pull/71
+
 
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
 
