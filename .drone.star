@@ -92,6 +92,47 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         ]
       },
       {
+        'name': 'clone-test-repos',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+          'cd /srv/app/testrunner',
+		] + ([
+          'git checkout %s' % (coreCommit)
+		] if coreCommit != '' else []),
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
+        'name': 'local-acceptance-tests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://reva-server:9140',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'TEST_OCIS':'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'PATH_TO_CORE': '/srv/app/testrunner'
+        },
+        'commands': [
+          'make test-acceptance-api'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
         'name': 'core-acceptance-tests',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
@@ -106,12 +147,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
         },
         'commands': [
-          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
           'cd /srv/app/testrunner',
-		] + ([
-          'git checkout %s' % (coreCommit)
-		] if coreCommit != '' else []) + [
           'make test-acceptance-api'
         ],
         'volumes': [
