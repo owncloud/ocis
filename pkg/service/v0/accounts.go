@@ -32,6 +32,9 @@ import (
 	_ "github.com/tredoe/osutil/user/crypt/sha512_crypt"
 )
 
+// accLock mutually exclude readers from writers on account files
+var accLock sync.RWMutex
+
 func (s Service) indexAccounts(path string) (err error) {
 	var f *os.File
 	if f, err = os.Open(path); err != nil {
@@ -74,6 +77,9 @@ var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) /
 func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
+	accLock.Lock()
+	defer accLock.Unlock()
+
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
 		return merrors.NotFound(s.id, "could not read account: %v", err.Error())
@@ -84,8 +90,6 @@ func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 	}
 	return
 }
-
-var accountMutex sync.Mutex
 
 func (s Service) writeAccount(a *proto.Account) (err error) {
 
@@ -99,8 +103,8 @@ func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", a.Id)
 
-	accountMutex.Lock()
-	defer accountMutex.Unlock()
+	accLock.Lock()
+	defer accLock.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write account: %v", err.Error())
 	}
