@@ -22,7 +22,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200728145817-b6ab351c0b94
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200730072515-0d8d2e9abbc3
 	github.com/owncloud/ocis-glauth v0.5.1-0.20200727093706-c01ce162774e
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
