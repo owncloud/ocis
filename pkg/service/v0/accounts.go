@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sync"
 	"time"
 
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
@@ -84,6 +85,8 @@ func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 	return
 }
 
+var accountMutex sync.Mutex
+
 func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	// leave only the group id
@@ -95,6 +98,9 @@ func (s Service) writeAccount(a *proto.Account) (err error) {
 	}
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", a.Id)
+
+	accountMutex.Lock()
+	defer accountMutex.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write account: %v", err.Error())
 	}
