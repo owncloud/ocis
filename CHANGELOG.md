@@ -6,9 +6,19 @@ The following sections list the changes in ocis-glauth unreleased.
 
 ## Summary
 
+* Bugfix - Return invalid credentials when user was not found: [#30](https://github.com/owncloud/ocis-glauth/pull/30)
 * Bugfix - Query numeric attribute values without quotes: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
 
 ## Details
+
+* Bugfix - Return invalid credentials when user was not found: [#30](https://github.com/owncloud/ocis-glauth/pull/30)
+
+   We were relying on an error code of the ListAccounts call when the username and password was
+   wrong. But the list will be empty if no user with the given login was found. So we also need to check
+   if the list of accounts is empty.
+
+   https://github.com/owncloud/ocis-glauth/pull/30
+
 
 * Bugfix - Query numeric attribute values without quotes: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
 
