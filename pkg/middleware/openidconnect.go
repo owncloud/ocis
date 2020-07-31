@@ -85,6 +85,9 @@ func OpenIDConnect(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
+			//TODO: This should be read from the token instead of config
+			claims.Iss = opt.OIDCIss
+
 			// inject claims to the request context for the account_uuid middleware.
 			ctxWithClaims := ocisoidc.NewContext(r.Context(), &claims)
 			r = r.WithContext(ctxWithClaims)

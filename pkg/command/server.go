@@ -305,6 +305,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.Logger(l),
 			middleware.HTTPClient(oidcHTTPClient),
 			middleware.OIDCProviderFunc(provider),
+			middleware.OIDCIss(cfg.OIDC.Issuer),
 		)
 
 		return alice.New(middleware.RedirectToHTTPS, oidcMW, psMW, uuidMW, chMW)

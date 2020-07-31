@@ -25,6 +25,8 @@ type Options struct {
 	AccountsClient acc.AccountsService
 	// OIDCProviderFunc to lazily initialize a provider, must be set for the oidcProvider middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
+	// OIDCIss is the oidc-issuer
+	OIDCIss string
 	// RevaGatewayClient to send requests to the reva gateway
 	RevaGatewayClient gateway.GatewayAPIClient
 	// Store for persisting data
@@ -74,6 +76,13 @@ func AccountsClient(ac acc.AccountsService) Option {
 func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 	return func(o *Options) {
 		o.OIDCProviderFunc = f
+	}
+}
+
+// OIDCIss sets the oidc issuer url
+func OIDCIss(iss string) Option {
+	return func(o *Options) {
+		o.OIDCIss = iss
 	}
 }
 

@@ -146,6 +146,7 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
 				Id: &revauser.UserId{
 					OpaqueId: account.Id,
+					Idp:      claims.Iss,
 				},
 				Username:     account.OnPremisesSamAccountName,
 				DisplayName:  account.DisplayName,
