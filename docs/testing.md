@@ -106,9 +106,15 @@ Have a look into the [documentation](https://doc.owncloud.com/server/developer_m
 If you want to work on a specific issue
 
 1.  adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
-    For that change this line in the `main` function:
+    For that change `coreCommit` in the `config` section:
 
-        apiTests(ctx, 'master', 'a3cac3dad60348fc962d1d8743b202bc5f79596b')
+        config = {
+          'apiTests': {
+            'coreBranch': 'master',
+            'coreCommit': 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa',
+            'numberOfParts': 2
+          }
+        }
 
 2.  locally run each of the tests marked with that issue in the expected failures file
 

@@ -1,5 +1,12 @@
 config = {
-  'acceptance': {
+  'apiTests': {
+    'coreBranch': 'master',
+    'coreCommit': 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa',
+    'numberOfParts': 2
+  },
+  'uiTests': {
+    'phoenixBranch': 'master',
+    'phoenixCommit': 'ccdca163c7e9e6ecc57e08a298b08b1d1175f1d5',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -40,17 +47,19 @@ config = {
 }
 
 def getUITestSuiteNames():
-  return config['acceptance']['suites'].keys()
+  return config['uiTests']['suites'].keys()
 
 def getUITestSuites():
-  return config['acceptance']['suites']
+  return config['uiTests']['suites']
+
+def getCoreApiTestPipelineNames():
+  names = []
+  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    names.append('coreApiTests-%s' % runPart)
+  return names
 
 def main(ctx):
-  before = [
-    linting(ctx),
-    unitTests(ctx),
-    apiTests(ctx, 'master', 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa'),
-  ] + acceptance(ctx, 'master', 'ccdca163c7e9e6ecc57e08a298b08b1d1175f1d5')
+  before = testPipelines(ctx)
 
   stages = [
     docker(ctx, 'amd64'),
@@ -70,6 +79,20 @@ def main(ctx):
   ]
 
   return before + stages + after
+
+def testPipelines(ctx):
+
+  pipelines = [
+    linting(ctx),
+    unitTests(ctx),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'])
+  ]
+
+  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+
+  pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
+  return pipelines
 
 def linting(ctx):
   return {
@@ -180,11 +203,11 @@ def unitTests(ctx):
     },
   }
 
-def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = ''):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'apiTests',
+    'name': 'localApiTests',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -192,35 +215,10 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
     'steps':
       generate() +
       build() +
-      ocisServer() + [
+      ocisServer() +
+      cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'clone-test-repos',
-        'image': 'owncloudci/php:7.2',
-        'pull': 'always',
-        'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
-          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'REVA_LDAP_HOSTNAME':'ldap',
-          'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
-        },
-        'commands': [
-          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
-          'cd /srv/app/testrunner',
-        ] + ([
-          'git checkout %s' % (coreCommit)
-        ] if coreCommit != '' else []),
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        }]
-      },
-      {
-        'name': 'LocalAcceptanceTests',
+        'name': 'LocalApiTests',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -240,8 +238,41 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'path': '/srv/app',
         }]
       },
+    ],
+    'services':
+      ldap() +
+      redis(),
+    'volumes': [
       {
-        'name': 'oC10APIAcceptanceTests',
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'coreApiTests-%s' % (part_number),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate() +
+      build() +
+      ocisServer() +
+      cloneCoreRepos(coreBranch, coreCommit) + [
+      {
+        'name': 'oC10ApiTests-%s' % (part_number),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -252,6 +283,8 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
+          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
         },
         'commands': [
@@ -282,11 +315,11 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
     },
   }
 
-def acceptance(ctx, phoenixBranch, phoenixCommit):
-  names = getUITestSuiteNames()
-  return [acceptanceTests(name, phoenixBranch, phoenixCommit) for name in names]
+def uiTests(ctx, phoenixBranch, phoenixCommit):
+  suiteNames = getUITestSuiteNames()
+  return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
 
-def acceptanceTests(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
+def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
   suites = getUITestSuites()
   paths = ""
   for path in suites[suiteName]:
@@ -429,8 +462,8 @@ def docker(ctx, arch):
     'depends_on': [
       'linting',
       'unitTests',
-      'apiTests',
-    ] + getUITestSuiteNames(),
+      'localApiTests',
+    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -575,8 +608,8 @@ def binary(ctx, name):
     'depends_on': [
       'linting',
       'unitTests',
-      'apiTests',
-    ] + getUITestSuiteNames(),
+      'localApiTests',
+    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -967,6 +1000,26 @@ def ocisServer():
         },
       ]
     },
+  ]
+
+def cloneCoreRepos(coreBranch, coreCommit):
+  return [
+    {
+      'name': 'clone-core-repos',
+      'image': 'owncloudci/php:7.2',
+      'pull': 'always',
+      'commands': [
+        'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
+        'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+        'cd /srv/app/testrunner',
+      ] + ([
+        'git checkout %s' % (coreCommit)
+      ] if coreCommit != '' else []),
+      'volumes': [{
+        'name': 'gopath',
+        'path': '/srv/app',
+      }]
+    }
   ]
 
 def ldap():
