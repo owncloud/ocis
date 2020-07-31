@@ -20,6 +20,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Change - Tighten screws on usernames and email addresses: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Enhancement - Add early version of cli tools for user-management: [#69](https://github.com/owncloud/ocis-accounts/pull/69)
+* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
@@ -158,6 +159,13 @@ The following sections list the changes in ocis-accounts unreleased.
 
    https://github.com/owncloud/product/issues/115
    https://github.com/owncloud/ocis-accounts/pull/69
+
+
+* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
+
+   We added an extension for ocis-web that shows a simple list of all existing users.
+
+   https://github.com/owncloud/ocis-accounts/pull/51
 
 
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
