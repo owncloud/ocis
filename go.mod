@@ -3,7 +3,7 @@ module github.com/owncloud/ocis
 go 1.13
 
 require (
-	contrib.go.opencensus.io/exporter/jaeger v0.2.0
+	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
@@ -22,7 +22,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200730085641-556dc8029045
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200731100349-e7082d364791
 	github.com/owncloud/ocis-glauth v0.5.1-0.20200727093706-c01ce162774e
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
