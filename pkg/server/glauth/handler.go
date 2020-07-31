@@ -303,7 +303,11 @@ func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
 // "" not determined
 // "users"
 // "groups"
-func parseFilter(f *ber.Packet) (qtype queryType, q string, code ldap.LDAPResultCode, err error) {
+func parseFilter(f *ber.Packet) (queryType, string, ldap.LDAPResultCode, error) {
+	var qtype queryType
+	var q string
+	var code ldap.LDAPResultCode
+	var err error
 	switch ldap.FilterMap[f.Tag] {
 	case "Equality Match":
 		if len(f.Children) != 2 {
@@ -326,6 +330,8 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, code ldap.LDAPResult
 		case "ownclouduuid":
 			q = fmt.Sprintf("id eq '%s'", escapeValue(value))
 		case "cn", "uid":
+			// on_premises_sam_account_name is indexed using the lowercase analyzer in ocis-accounts
+			// TODO use "tolower(on_premises_sam_account_name) eq '%s'" to be clear about the case insensitive comparison
 			q = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(value))
 		case "mail":
 			q = fmt.Sprintf("mail eq '%s'", escapeValue(value))
@@ -349,8 +355,45 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, code ldap.LDAPResult
 			code = ldap.LDAPResultUndefinedAttributeType
 			err = fmt.Errorf("unrecognized assertion type '%s' in filter item", attribute)
 		}
+		return qtype, q, code, err
+	case "Substrings":
+		if len(f.Children) != 2 {
+			return "", "", ldap.LDAPResultOperationsError, errors.New("substrings filter must have exactly two children")
+		}
+		attribute := strings.ToLower(f.Children[0].Value.(string))
+		if len(f.Children[1].Children) != 1 {
+			return "", "", ldap.LDAPResultUnwillingToPerform, fmt.Errorf("substrings filter only supports prefix match")
+		}
+		value := f.Children[1].Children[0].Value.(string)
 
-		return
+		// replace attributes
+		switch attribute {
+		case "objectclass":
+			switch strings.ToLower(value) {
+			case "posixaccount", "shadowaccount", "users", "person", "inetorgperson", "organizationalperson":
+				qtype = usersQuery
+			case "posixgroup", "groups":
+				qtype = groupsQuery
+			default:
+				qtype = ""
+			}
+		case "ownclouduuid":
+			q = fmt.Sprintf("startswith(id,'%s')", escapeValue(value))
+		case "cn", "uid":
+			// on_premises_sam_account_name is indexed using the lowercase analyzer in ocis-accounts
+			// TODO use "tolower(on_premises_sam_account_name) eq '%s'" to be clear about the case insensitive comparison
+			q = fmt.Sprintf("startswith(on_premises_sam_account_name,'%s')", escapeValue(value))
+		case "mail":
+			q = fmt.Sprintf("startswith(mail,'%s')", escapeValue(value))
+		case "displayname":
+			q = fmt.Sprintf("startswith(display_name,'%s')", escapeValue(value))
+		case "description":
+			q = fmt.Sprintf("startswith(description,'%s')", escapeValue(value))
+		default:
+			code = ldap.LDAPResultUndefinedAttributeType
+			err = fmt.Errorf("unrecognized assertion type '%s' in filter item", attribute)
+		}
+		return qtype, q, code, err
 	case "And", "Or":
 		subQueries := []string{}
 		for i := range f.Children {
@@ -383,7 +426,7 @@ func parseFilter(f *ber.Packet) (qtype queryType, q string, code ldap.LDAPResult
 		}
 		return qtype, q, code, nil
 	}
-	return
+	return qtype, q, ldap.LDAPResultUnwillingToPerform, fmt.Errorf("%s filter not implemented", ldap.FilterMap[f.Tag])
 }
 
 // escapeValue escapes all special characters in the value
