@@ -118,7 +118,7 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				l.Error().Err(err).Msgf("Could not lookup account, no mail or preferred_username claim set")
 				w.WriteHeader(http.StatusInternalServerError)
 			}
-			if status != 0 {
+			if status != 0 || account == nil {
 				if status == http.StatusNotFound {
 					account, status = createAccount(l, claims, opt.AccountsClient)
 					if status != 0 {
