@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { AccountsService_ListAccounts } from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
-/* eslint-disable camelcase */
+/* eslint-enable camelcase */
 import { injectAuthToken } from '../helpers/auth'
 
 const state = {
