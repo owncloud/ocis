@@ -10,8 +10,13 @@ import (
 	"strings"
 
 	"github.com/blevesearch/bleve"
+	"github.com/blevesearch/bleve/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/analysis/analyzer/simple"
+	"github.com/blevesearch/bleve/analysis/analyzer/standard"
+	"github.com/blevesearch/bleve/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
+
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -213,9 +218,11 @@ func New(opts ...Option) (s *Service, err error) {
 	// keep all symbols in terms to allow exact maching, eg. emails
 	indexMapping.DefaultAnalyzer = keyword.Name
 	// TODO don't bother to store fields as we will load the account from disk
-	//groupsFieldMapping := bleve.NewTextFieldMapping()
-	//blogMapping.AddFieldMappingsAt("memberOf", nameFieldMapping)
-	// TODO index groups and accounts as different types!
+
+	// Reusable mapping for text
+	standardTextFieldMapping := bleve.NewTextFieldMapping()
+	standardTextFieldMapping.Analyzer = standard.Name
+	standardTextFieldMapping.Store = false
 
 	// Reusable mapping for text, uses english stop word removal
 	simpleTextFieldMapping := bleve.NewTextFieldMapping()
@@ -227,13 +234,33 @@ func New(opts ...Option) (s *Service, err error) {
 	keywordFieldMapping.Analyzer = keyword.Name
 	keywordFieldMapping.Store = false
 
+	// Reusable mapping for lowercase text
+	err = indexMapping.AddCustomAnalyzer("lowercase",
+		map[string]interface{}{
+			"type":      custom.Name,
+			"tokenizer": unicode.Name,
+			"token_filters": []string{
+				lowercase.Name,
+			},
+		})
+	if err != nil {
+		return nil, err
+	}
+	lowercaseTextFieldMapping := bleve.NewTextFieldMapping()
+	lowercaseTextFieldMapping.Analyzer = "lowercase"
+	lowercaseTextFieldMapping.Store = true
+
 	// accounts
 	accountMapping := bleve.NewDocumentMapping()
 	indexMapping.AddDocumentMapping("account", accountMapping)
 
 	// Text
-	accountMapping.AddFieldMappingsAt("display_name", simpleTextFieldMapping)
-	accountMapping.AddFieldMappingsAt("description", simpleTextFieldMapping)
+	accountMapping.AddFieldMappingsAt("display_name", standardTextFieldMapping)
+	accountMapping.AddFieldMappingsAt("description", standardTextFieldMapping)
+
+	// Lowercase
+	accountMapping.AddFieldMappingsAt("on_premises_sam_account_name", lowercaseTextFieldMapping)
+	accountMapping.AddFieldMappingsAt("preferred_name", lowercaseTextFieldMapping)
 
 	// Keywords
 	accountMapping.AddFieldMappingsAt("mail", keywordFieldMapping)
@@ -243,10 +270,18 @@ func New(opts ...Option) (s *Service, err error) {
 	indexMapping.AddDocumentMapping("group", groupMapping)
 
 	// Text
-	groupMapping.AddFieldMappingsAt("display_name", simpleTextFieldMapping)
-	groupMapping.AddFieldMappingsAt("description", simpleTextFieldMapping)
+	groupMapping.AddFieldMappingsAt("display_name", standardTextFieldMapping)
+	groupMapping.AddFieldMappingsAt("description", standardTextFieldMapping)
 
-	indexMapping.TypeField = "bleve_type"
+	// Lowercase
+	groupMapping.AddFieldMappingsAt("on_premises_sam_account_name", lowercaseTextFieldMapping)
+
+	// Tell blevesearch how to determine the type of the structs that are indexed.
+	// The referenced field needs to match the struct field exactly and it must be public.
+	// See pkg/proto/v0/bleve.go how we wrap the generated Account and Group to add a
+	// BleveType property which is indexed as `bleve_type` so we can also distinguish the
+	// documents in the index by querying for that property.
+	indexMapping.TypeField = "BleveType"
 
 	s = &Service{
 		id:     cfg.GRPC.Namespace + "." + cfg.Server.Name,

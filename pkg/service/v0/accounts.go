@@ -48,7 +48,10 @@ func (s Service) indexAccounts(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		_ = s.indexAccount(file.Name())
+		err = s.indexAccount(file.Name())
+		if err != nil {
+			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
+		}
 	}
 
 	return

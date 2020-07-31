@@ -30,7 +30,10 @@ func (s Service) indexGroups(path string) (err error) {
 		return
 	}
 	for _, file := range list {
-		_ = s.indexGroup(file.Name())
+		err = s.indexGroup(file.Name())
+		if err != nil {
+			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
+		}
 	}
 
 	return
