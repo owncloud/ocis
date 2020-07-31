@@ -2,6 +2,7 @@ import {
   // eslint-disable-next-line camelcase
   AccountsService_ListAccounts
 } from '../client/accounts'
+import { RoleService_ListRoles } from '../client/settings'
 import axios from 'axios'
 
 const state = {
@@ -68,22 +69,22 @@ const actions = {
     }
   },
 
-  async fetchRoles ({ commit, rootGetters }) {
-    const headers = new Headers()
-
-    headers.append('Authorization', 'Bearer ' + rootGetters.getToken)
-
-    let roles = await fetch(`${rootGetters.configuration.server}/api/v0/settings/roles-list`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: this.headers,
-      body: JSON.stringify({
-        account_uuid: rootGetters.user.id
-      })
+  async fetchRoles ({ commit, dispatch, rootGetters }) {
+    injectAuthToken(rootGetters)
+    const response = await RoleService_ListRoles({
+      $domain: rootGetters.configuration.server,
+      body: {}
     })
-
-    roles = await roles.json()
-    commit('SET_ROLES', roles.bundles)
+    if (response.status === 201) {
+      const roles = response.data.bundles
+      commit('SET_ROLES', roles || [])
+    } else {
+      dispatch('showMessage', {
+        title: 'Failed to fetch roles.',
+        desc: response.statusText,
+        status: 'danger'
+      }, { root: true })
+    }
   }
 }
 
