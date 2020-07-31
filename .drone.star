@@ -1,8 +1,5 @@
 def main(ctx):
-  before = [
-    testing(ctx),
-    apiTests(ctx, 'master', '7f1c384e8027b17f89427a1dd430ab273c15c7ef'),
-  ]
+  before = testPipelines(ctx, 'master', 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa')
 
   stages = [
     docker(ctx, 'amd64'),
@@ -23,11 +20,19 @@ def main(ctx):
 
   return before + stages + after
 
-def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
+def testPipelines(ctx, coreBranch = 'master', coreCommit = ''):
+  return [
+    testing(ctx),
+    localApiTests(ctx, coreBranch, coreCommit),
+    coreApiTests(ctx, coreBranch, coreCommit, 1, 2),
+    coreApiTests(ctx, coreBranch, coreCommit, 2, 2),
+  ]
+
+def localApiTests(ctx, coreBranch = 'master', coreCommit = ''):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'API-Tests',
+    'name': 'Local-API-Tests',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -92,25 +97,187 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         ]
       },
       {
-        'name': 'acceptance-tests',
+        'name': 'clone-test-repos',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
-        'environment' : {
-          'TEST_SERVER_URL': 'http://reva-server:9140',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
-          'REVA_LDAP_HOSTNAME':'ldap',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'TEST_OCIS':'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
-          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton'
-        },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
           'cd /srv/app/testrunner',
 		] + ([
           'git checkout %s' % (coreCommit)
-		] if coreCommit != '' else []) + [
+		] if coreCommit != '' else []),
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
+        'name': 'local-acceptance-tests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://reva-server:9140',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'TEST_OCIS':'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'PATH_TO_CORE': '/srv/app/testrunner'
+        },
+        'commands': [
+          'make test-acceptance-api'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+    ],
+    'services': [
+      {
+        'name': 'ldap',
+        'image': 'osixia/openldap',
+        'pull': 'always',
+        'environment': {
+          'LDAP_DOMAIN': 'owncloud.com',
+          'LDAP_ORGANISATION': 'owncloud',
+          'LDAP_ADMIN_PASSWORD': 'admin',
+          'LDAP_TLS_VERIFY_CLIENT': 'never',
+         },
+      },
+      {
+        'name': 'redis',
+        'image': 'webhippie/redis',
+        'pull': 'always',
+        'environment': {
+          'REDIS_DATABASES': 1
+         },
+      },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'Core-API-Tests-%s' % (part_number),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'build',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'commands': [
+          'make build',
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ],
+      },
+      {
+        'name': 'reva-server',
+        'image': 'webhippie/golang:1.13',
+        'pull': 'always',
+        'detach': True,
+        'environment' : {
+          'REVA_LDAP_HOSTNAME': 'ldap',
+          'REVA_LDAP_PORT': 636,
+          'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
+          'REVA_LDAP_BIND_PASSWORD': 'admin',
+          'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
+          'REVA_LDAP_SCHEMA_UID': 'uid',
+          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
+          'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
+          'REVA_STORAGE_OC_DATA_URL': 'reva-server:9164',
+          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+          'REVA_SHARING_USER_JSON_FILE': '/srv/app/tmp/reva/shares.json',
+          'REVA_FRONTEND_URL': 'http://reva-server:9140',
+          'REVA_DATAGATEWAY_URL': 'http://reva-server:9140/data',
+        },
+        'commands': [
+          'apk add mailcap',
+          'mkdir -p /srv/app/tmp/reva',
+          'bin/ocis-reva --log-level debug --log-pretty gateway &',
+          'bin/ocis-reva --log-level debug --log-pretty users &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-basic &',
+          'bin/ocis-reva --log-level debug --log-pretty auth-bearer &',
+          'bin/ocis-reva --log-level debug --log-pretty sharing &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-home-data &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc &',
+          'bin/ocis-reva --log-level debug --log-pretty storage-oc-data &',
+          'bin/ocis-reva --log-level debug --log-pretty frontend &',
+          'bin/ocis-reva --log-level debug --log-pretty reva-storage-public-link'
+        ],
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
+        'name': 'clone-test-repos',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+          'cd /srv/app/testrunner',
+		] + ([
+          'git checkout %s' % (coreCommit)
+		] if coreCommit != '' else []),
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
+        ]
+      },
+      {
+        'name': 'core-acceptance-tests-%s' % (part_number),
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://reva-server:9140',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'TEST_OCIS':'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          'RUN_PART':  part_number,
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
+        },
+        'commands': [
+          'cd /srv/app/testrunner',
           'make test-acceptance-api'
         ],
         'volumes': [

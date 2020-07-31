@@ -84,28 +84,36 @@ TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-BEHAT_FILTER_TAGS='~@skipOnOcis&&~@skipOnOcis-OC-Storage' \
+BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL`,`OCIS_REVA_DATA_ROOT` and `SKELETON_DIR` according to your environment
+Make sure to adjust the settings `TEST_SERVER_URL`,`OCIS_REVA_DATA_ROOT` and `SKELETON_DIR` according to your environment.
 
-This will run all tests that can work with LDAP, and are not skipped on OCIS or on OCIS with OC Storage.
+This will run all tests that are relevant to OCIS.
 
 To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to the feature file and an optional line number. For example: `BEHAT_FEATURE='tests/acceptance/features/apiWebdavUpload1/uploadFile.feature:12'`
 
 ### use existing tests for BDD
 
 As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in ocis.
-Every scenario that does not work in OCIS, is tagged with `@skipOnOcis` and additionally should be marked with an issue number e.g. `@issue-ocis-reva-122`.
-This tag means that this particular scenario is skipped because of [issue no 122 in the ocis-reva repository](https://github.com/owncloud/ocis-reva/issues/122).
-Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva) and are skipped on oC10.
+Every scenario that does not work in OCIS, is listed in `tests/acceptance/expected-failures.txt` with a link to the related issue.
+Those scenarios are run in the ordinary acceptance test pipeline in CI. The sccenarios that fail are checked against the
+expected failures. If there are any differences then the CI pipeline fails.
+
+Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva).
+Those scenarios are in this ocis-reva repository in `tests/acceptance/features/apiOcisSpecific`.
 Have a look into the [documentation](https://doc.owncloud.com/server/developer_manual/testing/acceptance-tests.html#writing-scenarios-for-bugs) to understand why we are writing those tests.
-Also, ocis behaves partly differently with EOS-Storage and OC-Storage. There are scenarios that do not work in OCIS when run on EOS-storage, but works when on OC-Storage, and vice-versa. For those kind of scenarios, ` @skipOnOcis-EOS-Storage` and `@skipOnOcis-OC-Storage` tags are used. For instance, for a scenario that fails on EOS-Storage but passes on OC-Storage, we use `@skipOnOcis-EOS-Storage` tag to let it run on OC-Storage, where it works as expected, instead of skipping on ocis with `@skipOnOcis` tag.
+Also, ocis behaves partly differently with EOS-Storage and OC-Storage. There are scenarios that do not work in OCIS when run on EOS-storage, but works when on OC-Storage, and vice-versa. For those kind of scenarios, ` @skipOnOcis-EOS-Storage` and `@skipOnOcis-OC-Storage` tags are used. For instance, for a scenario that fails on EOS-Storage but passes on OC-Storage, we use `@skipOnOcis-EOS-Storage` tag to let it run on OC-Storage, where it works as expected, instead of skipping the test completely.
 
 If you want to work on a specific issue
 
-1.  run the tests marked with that issue tag
+1.  adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
+    For that change this line in the `main` function:
+
+        apiTests(ctx, 'master', 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa')
+
+2.  locally run each of the tests marked with that issue in the expected failures file:
 
     E.g.:
     ```
@@ -114,45 +122,19 @@ If you want to work on a specific issue
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
     OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
-    BEHAT_FILTER_TAGS='~@skipOnOcV10&&@issue-ocis-reva-122'
+    BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
-    Note that the `~@skipOnOcis` and `~@skipOnOcis-OC-Storage` tags are replaced by `~@skipOnOcV10` and the issue tag `@issue-ocis-reva-122` is added.
-    We want to run all tests that are skipped in CI because of this particular bug, but we don't want to run the tests
-    that demonstrate the current buggy behaviour.
+3.  the tests will fail, try to understand how and why they are failing
+4.  fix the code
+5.  go back to 2. and repeat till the tests are passing.
+6.  remove those tests from the expected failures file.
+7.  run each of the local tests that were demonstrating the **buggy** behavior. They should fail.
+8.  delete each of the local tests that were demonstrating the **buggy** behavior.
+9.  make a PR that has the fixed code, relevant lines removed from the expected failures file and bug demonstration tests deleted.
 
-2.  the tests will fail, try to understand how and why they are failing
-3.  fix the code
-4.  go back to 1. and repeat till the tests are passing.
-5.  adjust tests that demonstrate the **buggy** behaviour
-
-    delete the tests in core that are tagged with that particular issue and `@skipOnOcV10`, but be careful because a lot of tests are tagged with multiple issues.
-    Only delete tests that demonstrate the buggy behaviour if you fixed all bugs related to that test. If not you might have to adjust the test.
-6.  unskip tests that demonstrate the **correct** behaviour
-
-    The `@skipOnOcis` tag should not be needed now, so delete it, but leave the issue tag for future reference.
-7.  make a PR to core with the changed tests
-8.  make a PR to ocis-reva running the adjusted tests
-
-    To confirm that all tests (old and changed) run fine make a PR to ocis-reva with your code changes and point drone to your branch in core to get the changed tests.
-    For that change this line in the `main` function.
-
-    `apiTests(ctx, 'master', '9db442250583d3b71e633cf77fbcf643ed67e994'),`
-
-    In place of master use your branch name. If you dont specify the commit ID, you will run the tests using the HEAD of the branch you specified.
-
-    `apiTests(ctx, 'my-new-tests', '')`
-
-    Also make sure to change the commit ID if you want to run tests on any other commit. eg:
-
-    `apiTests(ctx, 'my-new-tests', '7d468c05414b1dc745ca713d9deb443bc4e5f333')`
-
-
-9.  merge PRs
-
-    After you have confirmed that the tests pass everywhere merge the core PR and immediately revert the change in 8. and merge the ocis-reva PR
-
-    If the changes also affect the `ocis` repository make sure the changes get ported over there immediately, otherwise the tests will start failing there.
+    If the changes also affect the `ocis` repository make sure the changes get ported over there.
+    That will need the fixed code in `ocis-reva` to be applied to `ocis` along with the test-related changes.
 
 ### Notes
 - in a normal case the test-code cleans up users after the test-run, but if a test-run is interrupted (e.g. by CTRL+C) users might have been left on the LDAP server. In that case rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users. This can be done by simply running `docker stop docker-slapd && docker rm docker-slapd` and [restarting the LDAP server container](#run-a-ldap-server-in-a-docker-container)
