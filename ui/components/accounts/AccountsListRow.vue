@@ -57,8 +57,7 @@ export default {
 
   data () {
     return {
-      currentRole: null,
-      currentAssignment: null
+      currentRole: null
     }
   },
 
@@ -81,25 +80,6 @@ export default {
 
   methods: {
     changeRole (roleId) {
-      this.removeAssignment().then(() => this.addAssignment(roleId))
-    },
-
-    removeAssignment () {
-      if (this.currentAssignment === null) {
-        return Promise.resolve()
-      }
-
-      return fetch(`${this.configuration.server}/api/v0/settings/assignments-remove`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: this.headers,
-        body: JSON.stringify({
-          id: this.currentAssignment.id
-        })
-      })
-    },
-
-    addAssignment (roleId) {
       fetch(`${this.configuration.server}/api/v0/settings/assignments-add`, {
         method: 'POST',
         mode: 'cors',
@@ -129,7 +109,6 @@ export default {
         return
       }
 
-      this.currentAssignment = assignedRole.assignments[0]
       this.currentRole = this.roles.find(role => {
         return role.id === assignedRole.assignments[0].roleId
       })
