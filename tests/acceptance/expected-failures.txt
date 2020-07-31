@@ -1,5 +1,23 @@
 # this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
 #
+# These scenarios are failing because owncloud/ocis code is out-of-date
+# They should start passing when owncloud/ocis is next updated from owncloud/ocis-reva
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:118
+apiSharePublicLink2/updatePublicLinkShare.feature:119
+apiSharePublicLink2/updatePublicLinkShare.feature:183
+apiSharePublicLink2/updatePublicLinkShare.feature:184
+apiSharePublicLink2/updatePublicLinkShare.feature:214
+apiSharePublicLink2/updatePublicLinkShare.feature:215
+apiSharePublicLink2/updatePublicLinkShare.feature:245
+apiSharePublicLink2/updatePublicLinkShare.feature:246
+apiSharePublicLink2/updatePublicLinkShare.feature:276
+apiSharePublicLink2/updatePublicLinkShare.feature:277
+apiSharePublicLink2/updatePublicLinkShare.feature:307
+apiSharePublicLink2/updatePublicLinkShare.feature:308
+apiShareUpdate/updateShare.feature:335
+apiShareUpdate/updateShare.feature:336
+#
 # test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
 #
 apiFavorites/favorites.feature:39
