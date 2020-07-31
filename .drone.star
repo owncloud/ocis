@@ -194,7 +194,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
       build() +
       ocisServer() + [
       {
-        'name': 'oC10APIAcceptanceTests',
+        'name': 'clone-test-repos',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -213,7 +213,49 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'cd /srv/app/testrunner',
         ] + ([
           'git checkout %s' % (coreCommit)
-        ] if coreCommit != '' else []) + [
+        ] if coreCommit != '' else []),
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+      {
+        'name': 'LocalAcceptanceTests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_OCIS':'true',
+          'PATH_TO_CORE': '/srv/app/testrunner'
+        },
+        'commands': [
+          'make test-acceptance-api',
+        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+      {
+        'name': 'oC10APIAcceptanceTests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'TEST_EXTERNAL_USER_BACKENDS':'true',
+          'REVA_LDAP_HOSTNAME':'ldap',
+          'TEST_OCIS':'true',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
+        },
+        'commands': [
+          'cd /srv/app/testrunner',
           'make test-acceptance-api',
         ],
         'volumes': [{
