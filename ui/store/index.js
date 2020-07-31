@@ -7,7 +7,8 @@ import axios from 'axios'
 const state = {
   config: null,
   initialized: false,
-  accounts: {}
+  accounts: {},
+  roles: null
 }
 
 const getters = {
@@ -32,6 +33,9 @@ const mutations = {
   },
   SET_ACCOUNTS (state, accounts) {
     state.accounts = accounts
+  },
+  SET_ROLES (state, roles) {
+    state.roles = roles
   }
 }
 
@@ -42,6 +46,7 @@ const actions = {
 
   async initialize ({ commit, dispatch }) {
     await dispatch('fetchAccounts')
+    await dispatch('fetchRoles')
     commit('SET_INITIALIZED', true)
   },
 
@@ -61,6 +66,24 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+  },
+
+  async fetchRoles ({ commit, rootGetters }) {
+    const headers = new Headers()
+
+    headers.append('Authorization', 'Bearer ' + rootGetters.getToken)
+
+    let roles = await fetch(`${rootGetters.configuration.server}/api/v0/settings/roles-list`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: this.headers,
+      body: JSON.stringify({
+        account_uuid: rootGetters.user.id
+      })
+    })
+
+    roles = await roles.json()
+    commit('SET_ROLES', roles.bundles)
   }
 }
 
