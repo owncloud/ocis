@@ -8,6 +8,7 @@ The following sections list the changes in ocis-glauth unreleased.
 
 * Bugfix - Return invalid credentials when user was not found: [#30](https://github.com/owncloud/ocis-glauth/pull/30)
 * Bugfix - Query numeric attribute values without quotes: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
+* Bugfix - Fix LDAP substring startswith filters: [#31](https://github.com/owncloud/ocis-glauth/pull/31)
 
 ## Details
 
@@ -32,6 +33,15 @@ The following sections list the changes in ocis-glauth unreleased.
    https://github.com/owncloud/ocis-glauth/issues/28
    https://github.com/owncloud/ocis-glauth/pull/29
    https://github.com/owncloud/ocis-accounts/pull/68
+
+
+* Bugfix - Fix LDAP substring startswith filters: [#31](https://github.com/owncloud/ocis-glauth/pull/31)
+
+   Filters like `(mail=mar*)` are currentld not parsed correctly, but they are used when
+   searching for recipients. This PR correctly converts them to odata filters like
+   `startswith(mail,'mar')`.
+
+   https://github.com/owncloud/ocis-glauth/pull/31
 
 # Changelog for [0.5.0] (2020-07-23)
 
