@@ -39,8 +39,11 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import { isObjectEmpty } from '../../helpers/utils'
+import { injectAuthToken } from '../../helpers/auth'
+// eslint-disable-next-line camelcase
+import { RoleService_AssignRoleToUser, RoleService_ListRoleAssignments } from '../../client/settings'
 import Avatar from './Avatar.vue'
 
 export default {
@@ -62,16 +65,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['getToken', 'configuration']),
-    ...mapState('Accounts', ['roles']),
-
-    headers () {
-      const headers = new Headers()
-
-      headers.append('Authorization', 'Bearer ' + this.getToken)
-
-      return headers
-    }
+    ...mapGetters(['user', 'configuration']),
+    ...mapState('Accounts', ['roles'])
   },
 
   created () {
@@ -79,39 +74,51 @@ export default {
   },
 
   methods: {
-    changeRole (roleId) {
-      fetch(`${this.configuration.server}/api/v0/settings/assignments-add`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: this.headers,
-        body: JSON.stringify({
+    ...mapActions(['showMessage']),
+
+    async changeRole (roleId) {
+      injectAuthToken(this.user.token)
+
+      const response = await RoleService_AssignRoleToUser({
+        $domain: this.configuration.server,
+        body: {
           account_uuid: this.account.id,
           role_id: roleId
-        })
-      }).then(() => {
-        this.getUsersCurrentRole()
+        }
       })
+
+      if (response.status === 201) {
+        this.getUsersCurrentRole()
+      } else {
+        this.showMessage({
+          title: 'Failed to change role.',
+          desc: response.statusText,
+          status: 'danger'
+        })
+      }
     },
 
     async getUsersCurrentRole () {
-      let assignedRole = await fetch(`${this.configuration.server}/api/v0/settings/assignments-list`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: this.headers,
-        body: JSON.stringify({
+      injectAuthToken(this.user.token)
+
+      const response = await RoleService_ListRoleAssignments({
+        $domain: this.configuration.server,
+        body: {
           account_uuid: this.account.id
+        }
+      })
+
+      if (response.status === 201) {
+        const assignedRole = response.data
+
+        if (isObjectEmpty(assignedRole)) {
+          return
+        }
+
+        this.currentRole = this.roles.find(role => {
+          return role.id === assignedRole.assignments[0].roleId
         })
-      })
-
-      assignedRole = await assignedRole.json()
-
-      if (isObjectEmpty(assignedRole)) {
-        return
       }
-
-      this.currentRole = this.roles.find(role => {
-        return role.id === assignedRole.assignments[0].roleId
-      })
     }
   }
 }

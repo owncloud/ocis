@@ -1,9 +1,8 @@
-import {
-  // eslint-disable-next-line camelcase
-  AccountsService_ListAccounts
-} from '../client/accounts'
+/* eslint-disable camelcase */
+import { AccountsService_ListAccounts } from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
-import axios from 'axios'
+/* eslint-disable camelcase */
+import { injectAuthToken } from '../helpers/auth'
 
 const state = {
   config: null,
@@ -52,7 +51,7 @@ const actions = {
   },
 
   async fetchAccounts ({ commit, dispatch, rootGetters }) {
-    injectAuthToken(rootGetters)
+    injectAuthToken(rootGetters.user.token)
     const response = await AccountsService_ListAccounts({
       $domain: rootGetters.configuration.server,
       body: {}
@@ -70,13 +69,16 @@ const actions = {
   },
 
   async fetchRoles ({ commit, dispatch, rootGetters }) {
-    injectAuthToken(rootGetters)
+    injectAuthToken(rootGetters.user.token)
+
     const response = await RoleService_ListRoles({
       $domain: rootGetters.configuration.server,
       body: {}
     })
+
     if (response.status === 201) {
       const roles = response.data.bundles
+
       commit('SET_ROLES', roles || [])
     } else {
       dispatch('showMessage', {
@@ -94,16 +96,4 @@ export default {
   getters,
   actions,
   mutations
-}
-
-function injectAuthToken (rootGetters) {
-  axios.interceptors.request.use(config => {
-    if (typeof config.headers.Authorization === 'undefined') {
-      const token = rootGetters.user.token
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    }
-    return config
-  })
 }
