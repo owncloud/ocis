@@ -11,3 +11,11 @@ Then('user {string} should be displayed in the accounts list on the WebUI', asyn
   const userListed = await client.page.accountsPage().isUserListed(username)
   return assert.strictEqual(userListed, username)
 })
+
+When('the users changes the role of user {string} to {string} using the WebUI', function (username, role) {
+  return client.page.accountsPage().selectRole(username, role)
+})
+
+Then('the displayed role of user {string} should be {string} on the WebUI', function (username, role) {
+  return client.page.accountsPage().checkUsersRole(username, role)
+})

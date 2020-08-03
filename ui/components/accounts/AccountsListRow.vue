@@ -7,22 +7,22 @@
     <oc-table-cell v-text="account.displayName || '-'" />
     <oc-table-cell v-text="account.mail" />
     <oc-table-cell>
-      <oc-button :class="`accounts-roles-select-trigger-${account.id}`" variation="raw">
-        <span class="uk-flex uk-flex-middle">
+      <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" variation="raw">
+        <span class="uk-flex uk-flex-middle accounts-roles-current-role">
           {{ currentRole ? currentRole.displayName : $gettext('Select role') }}
           <oc-icon name="expand_more" aria-hidden="true" />
         </span>
       </oc-button>
       <oc-drop
         :drop-id="`accounts-roles-select-dropdown-${account.id}`"
-        :toggle="`.accounts-roles-select-trigger-${account.id}`"
+        :toggle="`#accounts-roles-select-trigger-${account.id}`"
         mode="click"
         close-on-click
         :options="{ delayHide: 0 }"
       >
         <ul class="uk-list">
           <li v-for="role in roles" :key="role.id">
-            <label>
+            <label class="accounts-roles-dropdown-role">
               <input
                 type="radio"
                 class="oc-radiobutton"
