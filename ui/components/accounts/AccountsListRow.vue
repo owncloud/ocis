@@ -20,11 +20,18 @@
         close-on-click
         :options="{ delayHide: 0 }"
       >
-        <ul class="uk-nav">
-          <li v-for="role in roles" :key="role.id" class="uk-margin-small">
-            <oc-button variation="raw" @click="changeRole(role.id)">
-              <span v-text="role.displayName" :class="{ 'uk-text-bold': role === currentRole }" />
-            </oc-button>
+        <ul class="uk-list">
+          <li v-for="role in roles" :key="role.id">
+            <label>
+              <input
+                type="radio"
+                class="oc-radiobutton"
+                v-model="currentRole"
+                :value="role"
+                @change="changeRole(role.id)"
+              />
+              {{ role.displayName }}
+            </label>
           </li>
         </ul>
       </oc-drop>
