@@ -486,6 +486,8 @@ func TestUpdateAccount(t *testing.T) {
 				OnPremisesDistinguishedName: "54321",
 				UidNumber:                   1000,
 				GidNumber:                   1000,
+				// No email validation
+				// https://github.com/owncloud/ocis-accounts/issues/77
 				Mail:                        "1.2@3.c_@",
 			},
 		},
@@ -575,6 +577,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 			if errors.As(err, &e) {
 				assert.EqualValues(t, 400, e.Code)
 				assert.Equal(t, "Bad Request", e.Status)
+
 				errMsg := fmt.Sprintf("can not update field %s, either unknown or readonly", tt.updateMask[0])
 				assert.Equal(t, errMsg, e.Detail)
 			} else {
