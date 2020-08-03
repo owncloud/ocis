@@ -8,6 +8,7 @@ The following sections list the changes in ocis-accounts unreleased.
 
 * Bugfix - Add write mutexes: [#71](https://github.com/owncloud/ocis-accounts/pull/71)
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
+* Bugfix - Fix index mapping: [#73](https://github.com/owncloud/ocis-accounts/issues/73)
 * Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
 * Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Bugfix - Update account return value not used: [#70](https://github.com/owncloud/ocis-accounts/pull/70)
@@ -20,7 +21,6 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Remove timezone setting: [#33](https://github.com/owncloud/ocis-accounts/pull/33)
 * Change - Tighten screws on usernames and email addresses: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Enhancement - Add early version of cli tools for user-management: [#69](https://github.com/owncloud/ocis-accounts/pull/69)
-* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
 * Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
 
@@ -45,6 +45,15 @@ The following sections list the changes in ocis-accounts unreleased.
    group.
 
    https://github.com/owncloud/ocis-accounts/pull/60
+
+
+* Bugfix - Fix index mapping: [#73](https://github.com/owncloud/ocis-accounts/issues/73)
+
+   The index mapping was not being used because we were not using the right blevesearch TypeField,
+   leading to username like properties like `preferred_name` and
+   `on_premises_sam_account_name` to be case sensitive.
+
+   https://github.com/owncloud/ocis-accounts/issues/73
 
 
 * Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
@@ -159,13 +168,6 @@ The following sections list the changes in ocis-accounts unreleased.
 
    https://github.com/owncloud/product/issues/115
    https://github.com/owncloud/ocis-accounts/pull/69
-
-
-* Enhancement - Add simple user listing UI: [#51](https://github.com/owncloud/ocis-accounts/pull/51)
-
-   We added an extension for ocis-web that shows a simple list of all existing users.
-
-   https://github.com/owncloud/ocis-accounts/pull/51
 
 
 * Enhancement - Update accounts API: [#30](https://github.com/owncloud/ocis-accounts/pull/30)
