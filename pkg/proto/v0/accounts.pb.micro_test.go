@@ -244,6 +244,8 @@ func assertAccountsSame(t *testing.T, acc1, acc2 *proto.Account) {
 	assert.Equal(t, acc1.DisplayName, acc2.DisplayName)
 	assert.Equal(t, acc1.PreferredName, acc2.PreferredName)
 	assert.Equal(t, acc1.UidNumber, acc2.UidNumber)
+	assert.Equal(t, acc1.OnPremisesSamAccountName, acc2.OnPremisesSamAccountName)
+	assert.Equal(t, acc1.GidNumber, acc2.GidNumber)
 	assert.Equal(t, acc1.Mail, acc2.Mail)
 }
 
@@ -318,6 +320,19 @@ func createGroup(t *testing.T, group *proto.Group) (*proto.Group, error) {
 	if err == nil {
 		newCreatedGroups = append(newCreatedGroups, group.Id)
 	}
+	return res, err
+}
+
+func updateAccount(t *testing.T, account *proto.Account, updateArray []string) (*proto.Account, error) {
+	client := service.Client()
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
+
+	updateMask := &field_mask.FieldMask{
+		Paths: updateArray,
+	}
+	request := &proto.UpdateAccountRequest{Account: account, UpdateMask: updateMask}
+	res, err := cl.UpdateAccount(context.Background(), request)
+
 	return res, err
 }
 
@@ -421,6 +436,152 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 	assert.Equal(t, numAccounts, len(resp.GetAccounts()))
 
 	cleanUp(t)
+}
+
+func TestUpdateAccount(t *testing.T) {
+	_, _ = createAccount(t, "user1")
+
+	tests := []struct {
+		name        string
+		userAccount *proto.Account
+	}{
+		{
+			"Update user (demonstration of updatable fields)",
+			&proto.Account{
+				DisplayName:                 "Alice Hansen",
+				PreferredName:               "Wonderful Alice",
+				OnPremisesDistinguishedName: "Alice",
+				UidNumber:                   20010,
+				GidNumber:                   30001,
+				Mail:                        "alice@example.com",
+			},
+		},
+		{
+			"Update user with unicode data",
+			&proto.Account{
+				DisplayName:                 "एलिस हेन्सेन",
+				PreferredName:               "अद्भुत एलिस",
+				OnPremisesDistinguishedName: "एलिस",
+				UidNumber:                   20010,
+				GidNumber:                   30001,
+				Mail:                        "एलिस@उदाहरण.com",
+			},
+		},
+		{
+			"Update user with empty data values",
+			&proto.Account{
+				DisplayName:                 "",
+				PreferredName:               "",
+				OnPremisesDistinguishedName: "",
+				UidNumber:                   0,
+				GidNumber:                   0,
+				Mail:                        "",
+			},
+		},
+		{
+			"Update user with strange data",
+			&proto.Account{
+				DisplayName:                 "12345",
+				PreferredName:               "12345",
+				OnPremisesDistinguishedName: "54321",
+				UidNumber:                   1000,
+				GidNumber:                   1000,
+				Mail:                        "1.2@3.c_@",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		// updatable fields for type Account
+		updateMask := []string{
+			"AccountEnabled",
+			"IsResourceAccount",
+			"DisplayName",
+			"PreferredName",
+			"OnPremisesSamAccountName",
+			"UidNumber",
+			"GidNumber",
+			"Mail",
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
+			tt.userAccount.AccountEnabled = false
+			tt.userAccount.IsResourceAccount = false
+			resp, err := updateAccount(t, tt.userAccount, updateMask)
+
+			checkError(t, err)
+
+			assert.IsType(t, &proto.Account{}, resp)
+			assertAccountsSame(t, tt.userAccount, resp)
+			assertUserExists(t, tt.userAccount)
+		})
+	}
+
+	cleanUp(t)
+}
+
+func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
+	_, _ = createAccount(t, "user1")
+
+	tests := []struct {
+		name        string
+		updateMask  []string
+		userAccount *proto.Account
+	}{
+		{
+			"Try to update creation type",
+			[]string{
+				"CreationType",
+			},
+			&proto.Account{
+				CreationType: "Type Test",
+			},
+		},
+		{
+			"Try to update password profile",
+			[]string{
+				"PasswordProfile",
+			},
+			&proto.Account{
+				PasswordProfile: &proto.PasswordProfile{Password: "new password"},
+			},
+		},
+		{
+			"Try to update member of",
+			[]string{
+				"MemberOf",
+			},
+			&proto.Account{
+				MemberOf: []*proto.Group{
+					{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
+			res, err := updateAccount(t, tt.userAccount, tt.updateMask)
+			if err == nil {
+				t.Fatalf("Expected error while updating non updatable field, but found none.")
+			}
+			assert.IsType(t, &proto.Account{}, res)
+			assert.Empty(t, res)
+			assert.Error(t, err)
+
+			var e *merrors.Error
+
+			if errors.As(err, &e) {
+				assert.EqualValues(t, 400, e.Code)
+				assert.Equal(t, "Bad Request", e.Status)
+				errMsg := fmt.Sprintf("can not update field %s, either unknown or readonly", tt.updateMask[0])
+				assert.Equal(t, errMsg, e.Detail)
+			} else {
+				t.Fatal("Expected merror errors but found something else.")
+			}
+		})
+	}
 }
 
 func TestListAccounts(t *testing.T) {
