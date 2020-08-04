@@ -59,7 +59,7 @@ sequenceDiagram
 
                 opt oc10 endpoint is configured
                 Note over proxy,oc10: Check if user exists in oc10
-                    proxy->>+oc10: GET /apps/graphapi/v1.0/users/<uuid>
+                    proxy->>+oc10: GET /apps/graphapi/v1.0/users/&lt;uuid&gt;
                     opt user exists in oc10
                         oc10-->>-proxy: 200
                         %% TODO auth using internal token
