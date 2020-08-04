@@ -16,6 +16,8 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
+var defaultClient = grpc.NewClient()
+
 // Service defines the extension handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
@@ -100,9 +102,9 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o Ocs) getAccountService() accounts.AccountsService {
-	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.NewClient())
+	return accounts.NewAccountsService("com.owncloud.api.accounts", defaultClient)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {
-	return accounts.NewGroupsService("com.owncloud.api.accounts", grpc.NewClient())
+	return accounts.NewGroupsService("com.owncloud.api.accounts", defaultClient)
 }
