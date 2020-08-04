@@ -148,9 +148,10 @@ docs-copy:
 	git init; \
 	git remote rm origin; \
 	git remote add origin https://github.com/owncloud/owncloud.github.io; \
-	git fetch; \
+	git fetch --depth=1; \
 	git checkout origin/source -f; \
-	rsync --delete -ax ../docs/ content/$(NAME)
+	rsync --delete -ax --exclude 'static' ../docs/ content/$(NAME); \
+	rsync --delete -ax ../docs/static/ static/$(NAME); \
 
 .PHONY: config-docs-generate
 config-docs-generate:
