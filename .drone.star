@@ -31,7 +31,7 @@ def main(ctx):
 def testPipelines(ctx):
   pipelines = [
     testing(ctx),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'])
+    localApiTestsOcStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'])
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
@@ -39,11 +39,11 @@ def testPipelines(ctx):
 
   return pipelines
 
-def localApiTests(ctx, coreBranch = 'master', coreCommit = ''):
+def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'localApiTests',
+    'name': 'localApiTestsOcStorage',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -53,7 +53,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = ''):
       revaServer() +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'LocalApiTests',
+        'name': 'localApiTestsOcStorage',
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -63,6 +63,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
