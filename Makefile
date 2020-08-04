@@ -24,6 +24,7 @@ endif
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
 GENERATE ?= $(PACKAGES)
+FEATURE_PATH ?= "ui/tests/acceptance/features"
 
 TAGS ?=
 
@@ -133,6 +134,10 @@ release-check:
 
 .PHONY: release-finish
 release-finish: release-copy release-check
+
+.PHONY: test-acceptance-webui
+test-acceptance-webui:
+	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
 
 .PHONY: docs-copy
 docs-copy:
