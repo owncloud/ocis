@@ -35,8 +35,11 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 			}
 			if n.Children[1].Token.Type != godata.FilterTokenString {
 				return nil, errors.New("startswith expected a string as the second param")
-			}
-			q := bleve.NewPrefixQuery(n.Children[1].Token.Value)
+			} // remove enclosing ' of string tokens (looks like 'some ol'' string')
+			value := n.Children[1].Token.Value[1 : len(n.Children[1].Token.Value)-1]
+			// unescape '' as '
+			unescaped := strings.ReplaceAll(value, "''", "'")
+			q := bleve.NewPrefixQuery(unescaped)
 			q.SetField(n.Children[0].Token.Value)
 			return q, nil
 			// TODO contains as regex?
@@ -59,7 +62,7 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 				// remove enclosing ' of string tokens (looks like 'some ol'' string')
 				value := n.Children[1].Token.Value[1 : len(n.Children[1].Token.Value)-1]
 				// unescape '' as '
-				unascaped := strings.ReplaceAll(value, "''", "'")
+				unescaped := strings.ReplaceAll(value, "''", "'")
 				// use a match query, so the field mapping, e.g. lowercase is applied to the value
 				// remember we defined the field mapping for `preferred_name` to be lowercase
 				// a term query like `preferred_name eq 'Artur'` would use `Artur` to search in the index and come up empty
@@ -68,7 +71,7 @@ func recursiveBuildQuery(n *godata.ParseNode) (query.Query, error) {
 				// - LDAP matching rules depend on the attribute: see https://ldapwiki.com/wiki/MatchingRule
 				// - odata has functions like `startswith`, `contains`, `tolower`, `toupper`, `matchesPattern` andy more: see http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_BuiltinQueryFunctions
 				// - ocis-glauth should do the mapping between LDAP and odata filter
-				q := bleve.NewMatchQuery(unascaped)
+				q := bleve.NewMatchQuery(unescaped)
 				q.SetField(n.Children[0].Token.Value)
 				return q, nil
 			} else if n.Children[1].Token.Type == godata.FilterTokenInteger {
