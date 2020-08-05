@@ -63,7 +63,7 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage&&~@preview-extension-required',
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
