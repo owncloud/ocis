@@ -61,7 +61,6 @@ def getCoreApiTestPipelineNames():
 def main(ctx):
   before = testPipelines(ctx)
 
-
   stages = [
     docker(ctx, 'amd64'),
     docker(ctx, 'arm64'),
