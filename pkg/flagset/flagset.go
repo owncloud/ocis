@@ -148,7 +148,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "webdavsource-baseurl",
-			Value:       "http://localhost:9140/remote.php/webdav/",
+			Value:       "https://localhost:9200/remote.php/webdav/",
 			Usage:       "Base url for a webdav api",
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
 			Destination: &cfg.Thumbnail.WebDavSource.BaseURL,
