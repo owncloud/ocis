@@ -85,7 +85,7 @@ THUMBNAILS_FILESYSTEMSTORAGE_ROOT
 : Root path of the filesystem storage directory, defaults to `<os tempdir>/ocis-thumbnails/`
 
 THUMBNAILS_WEBDAVSOURCE_BASEURL
-: Base url for a webdav api, defaults to `htp://localhost:9140/remote.php/webdav/`
+: Base url for a webdav api, defaults to `https://localhost:9200/remote.php/webdav/`
 
 THUMBNAILS_RESOLUTIONS
 : List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
@@ -155,7 +155,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Root path of the filesystem storage directory, defaults to `<os tempdir>/ocis-thumbnails/`
 
 --webdavsource-baseurl
-: Base url for a webdav api, defaults to `htp://localhost:9140/remote.php/webdav/`
+: Base url for a webdav api, defaults to `https://localhost:9200/remote.php/webdav/`
 
 --thumbnail-resolution
 : List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
