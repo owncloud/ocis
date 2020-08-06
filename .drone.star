@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '1bee9ca8bc5ca37d3ceeb1f22f89ff8fb9690d83',
+    'coreCommit': 'a5a25faab347ae7006093ac3472d287e0ebd16f6',
     'numberOfParts': 2
   }
 }
@@ -63,7 +63,7 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage&&~@preview-extension-required',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
@@ -119,7 +119,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART':  part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
