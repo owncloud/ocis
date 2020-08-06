@@ -153,6 +153,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
 			Destination: &cfg.Thumbnail.WebDavSource.BaseURL,
 		},
+		&cli.BoolFlag{
+			Name:        "webdavsource-insecure",
+			Value:       true,
+			Usage:       "Whether to skip certificate checks",
+			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_INSECURE"},
+			Destination: &cfg.Thumbnail.WebDavSource.Insecure,
+		},
 		&cli.StringSliceFlag{
 			Name:    "thumbnail-resolution",
 			Value:   cli.NewStringSlice("16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320"),

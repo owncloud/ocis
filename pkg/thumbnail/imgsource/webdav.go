@@ -15,30 +15,29 @@ import (
 // NewWebDavSource creates a new webdav instance.
 func NewWebDavSource(cfg config.WebDavSource) WebDav {
 	return WebDav{
-		baseURL: cfg.BaseURL,
+		baseURL:  cfg.BaseURL,
+		insecure: cfg.Insecure,
 	}
 }
 
 // WebDav implements the Source interface for webdav services
 type WebDav struct {
-	baseURL string
+	baseURL  string
+	insecure bool
 }
 
 // Get downloads the file from a webdav service
 func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	u, _ := url.Parse(s.baseURL)
 	u.Path = path.Join(u.Path, file)
-	fmt.Printf("url: %s", u.String())
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
 	}
 
-	// FIXME: make this configurable!!
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure}
 
 	auth := authorization(ctx)
-	fmt.Printf("auth: %s", auth)
 	if auth == "" {
 		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
 	}

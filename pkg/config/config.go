@@ -48,7 +48,8 @@ type FileSystemStorage struct {
 
 // WebDavSource defines the available webdav source configuration.
 type WebDavSource struct {
-	BaseURL string
+	BaseURL  string
+	Insecure bool
 }
 
 // FileSystemSource defines the available filesystem source configuration.
