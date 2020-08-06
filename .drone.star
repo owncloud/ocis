@@ -205,6 +205,9 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
+          'INITIAL_FILE_DESCRIPTOR_STORE': '/srv/app/initial.txt',
+          'CURRENT_FILE_DESCRIPTOR_STORE': '/srv/app/final.txt',
+          'BEHAT_SUITE': 'apiMain'
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
@@ -213,6 +216,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
         ] + ([
           'git checkout %s' % (coreCommit)
         ] if coreCommit != '' else []) + [
+          '/drone/src/tests/file_descriptor.sh &',
           'make test-acceptance-api',
         ],
         'volumes': [{
@@ -910,11 +914,14 @@ def ocisServer():
         'LDAP_URI': 'ldap://ldap',
         'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
         'LDAP_BINDPW': 'admin',
-        'LDAP_BASEDN': 'dc=owncloud,dc=com'
+        'LDAP_BASEDN': 'dc=owncloud,dc=com',
+        'INITIAL_FILE_DESCRIPTOR_STORE': '/srv/app/initial.txt',
+        'CURRENT_FILE_DESCRIPTOR_STORE': '/srv/app/final.txt'
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/reva',
+        'tests/record_file_descriptor.sh &',
         'bin/ocis server'
       ],
       'volumes': [
