@@ -60,9 +60,6 @@ func (s Service) indexGroup(id string) error {
 
 func (s Service) loadGroup(id string, g *proto.Group) (err error) {
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
-
-	groupLock.Lock()
-	defer groupLock.Unlock()
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
 		return merrors.NotFound(s.id, "could not read group: %v", err.Error())
@@ -84,11 +81,7 @@ func (s Service) writeGroup(g *proto.Group) (err error) {
 	if bytes, err = json.Marshal(g); err != nil {
 		return merrors.InternalServerError(s.id, "could not marshal group: %v", err.Error())
 	}
-
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", g.Id)
-
-	groupLock.Lock()
-	defer groupLock.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write group: %v", err.Error())
 	}
@@ -132,7 +125,8 @@ func (s Service) deflateMembers(g *proto.Group) {
 
 // ListGroups implements the GroupsServiceHandler interface
 func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
-
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	// only search for groups
 	tq := bleve.NewTermQuery("group")
 	tq.SetField("bleve_type")
@@ -191,6 +185,8 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 
 // GetGroup implements the GroupsServiceHandler interface
 func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *proto.Group) (err error) {
+	groupLock.Lock()
+	defer groupLock.Unlock()s
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
@@ -211,6 +207,8 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 
 // CreateGroup implements the GroupsServiceHandler interface
 func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	var id string
 	if in.Group == nil {
 		return merrors.BadRequest(s.id, "account missing")
@@ -245,6 +243,8 @@ func (s Service) UpdateGroup(c context.Context, in *proto.UpdateGroupRequest, ou
 
 // DeleteGroup implements the GroupsServiceHandler interface
 func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, out *empty.Empty) (err error) {
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
@@ -283,7 +283,8 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 
 // AddMember implements the GroupsServiceHandler interface
 func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *proto.Group) (err error) {
-
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.GroupId); err != nil {
@@ -348,7 +349,8 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 
 // RemoveMember implements the GroupsServiceHandler interface
 func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, out *proto.Group) (err error) {
-
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.GroupId); err != nil {
@@ -408,7 +410,8 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 
 // ListMembers implements the GroupsServiceHandler interface
 func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, out *proto.ListMembersResponse) (err error) {
-
+	groupLock.Lock()
+	defer groupLock.Unlock()
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.Id); err != nil {

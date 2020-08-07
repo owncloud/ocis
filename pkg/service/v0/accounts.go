@@ -416,10 +416,6 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
 
-	//fmt.Printf("---------")
-	//fmt.Printf("\n\nRECEIVED: %+v\n\n", in.Account)
-	//fmt.Printf("\n\nUPDATING ACCOUNT INFO: %+v\n\n", out)
-	//fmt.Printf("---------")
 	if err = s.writeAccount(out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
 		return
