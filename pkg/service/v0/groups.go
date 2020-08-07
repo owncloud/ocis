@@ -40,7 +40,7 @@ func (s Service) indexGroups(path string) (err error) {
 }
 
 // accLock mutually exclude readers from writers on group files
-var groupLock sync.RWMutex
+var groupLock sync.Mutex
 
 func (s Service) indexGroup(id string) error {
 	g := &proto.BleveGroup{

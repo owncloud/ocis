@@ -33,7 +33,7 @@ import (
 )
 
 // accLock mutually exclude readers from writers on account files
-var accLock sync.RWMutex
+var accLock sync.Mutex
 
 func (s Service) indexAccounts(path string) (err error) {
 	var f *os.File
@@ -80,9 +80,6 @@ var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) /
 func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
-	accLock.Lock()
-	defer accLock.Unlock()
-
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
 		return merrors.NotFound(s.id, "could not read account: %v", err.Error())
@@ -95,7 +92,6 @@ func (s Service) loadAccount(id string, a *proto.Account) (err error) {
 }
 
 func (s Service) writeAccount(a *proto.Account) (err error) {
-
 	// leave only the group id
 	s.deflateMemberOf(a)
 
@@ -106,8 +102,6 @@ func (s Service) writeAccount(a *proto.Account) (err error) {
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", a.Id)
 
-	accLock.Lock()
-	defer accLock.Unlock()
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(s.id, "could not write account: %v", err.Error())
 	}
@@ -164,7 +158,8 @@ func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
-
+	accLock.Lock()
+	defer accLock.Unlock()
 	var password string
 
 	// check if this looks like an auth request
@@ -253,6 +248,8 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
+	accLock.Lock()
+	defer accLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
@@ -279,6 +276,8 @@ func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out 
 
 // CreateAccount implements the AccountsServiceHandler interface
 func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
+	accLock.Lock()
+	defer accLock.Unlock()
 	var id string
 	var acc = in.Account
 	if acc == nil {
@@ -347,6 +346,8 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
 func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
+	accLock.Lock()
+	defer accLock.Unlock()
 	var id string
 	if in.Account == nil {
 		return merrors.BadRequest(s.id, "account missing")
@@ -365,8 +366,6 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
 		return
 	}
-
-	s.debugLogAccount(out).Msg("found account")
 
 	t := time.Now()
 	tsnow := &timestamppb.Timestamp{
@@ -417,6 +416,10 @@ func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
 
+	//fmt.Printf("---------")
+	//fmt.Printf("\n\nRECEIVED: %+v\n\n", in.Account)
+	//fmt.Printf("\n\nUPDATING ACCOUNT INFO: %+v\n\n", out)
+	//fmt.Printf("---------")
 	if err = s.writeAccount(out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
 		return
@@ -456,6 +459,8 @@ var updatableAccountPaths = map[string]struct{}{
 
 // DeleteAccount implements the AccountsServiceHandler interface
 func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest, out *empty.Empty) (err error) {
+	accLock.Lock()
+	defer accLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
