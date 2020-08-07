@@ -186,7 +186,7 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 // GetGroup implements the GroupsServiceHandler interface
 func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *proto.Group) (err error) {
 	groupLock.Lock()
-	defer groupLock.Unlock()s
+	defer groupLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
