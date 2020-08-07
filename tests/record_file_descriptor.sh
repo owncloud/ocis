@@ -12,12 +12,15 @@ do
   PID=$(echo $trimmed | cut -d" " -f 1)
   SERVICE=$(echo $trimmed | cut -d" " -f 3)
   COUNT_DESCRIPTORS=`lsof -p $PID 2> /dev/null | wc -l`
+  echo $SERVICE $COUNT_DESCRIPTORS
   echo $SERVICE $COUNT_DESCRIPTORS >> $INITIAL_FILE_DESCRIPTOR_STORE
-  cat $INITIAL_FILE_DESCRIPTOR_STORE > $CURRENT_FILE_DESCRIPTOR_STORE
 done
+cat $INITIAL_FILE_DESCRIPTOR_STORE
+cat $INITIAL_FILE_DESCRIPTOR_STORE > $CURRENT_FILE_DESCRIPTOR_STORE
+cat $CURRENT_FILE_DESCRIPTOR_STORE
 while :
 do
-  sleep 15
+  sleep 5
   cat /dev/null > $CURRENT_FILE_DESCRIPTOR_STORE
   for i in `ps xao pid,cmd | grep ocis | grep -v grep`
   do
@@ -28,3 +31,4 @@ do
     echo $SERVICE $COUNT_DESCRIPTORS >> $CURRENT_FILE_DESCRIPTOR_STORE
   done
 done
+

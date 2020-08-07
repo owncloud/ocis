@@ -33,5 +33,5 @@ do
       exit 1
     fi
   done < $CURRENT_FILE_DESCRIPTOR_STORE
-  sleep 15
+  sleep 5
 done

@@ -207,7 +207,7 @@ def apiTests(ctx, coreBranch = 'master', coreCommit = ''):
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
           'INITIAL_FILE_DESCRIPTOR_STORE': '/srv/app/initial.txt',
           'CURRENT_FILE_DESCRIPTOR_STORE': '/srv/app/final.txt',
-          'BEHAT_SUITE': 'apiMain'
+          'BEHAT_SUITE': 'apiWebdavUpload1'
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
