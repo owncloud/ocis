@@ -261,17 +261,20 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// use the user's UUID
+	userID := u.Id.OpaqueId
+
 	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
 	res, err := c.Read(r.Context(), &storepb.ReadRequest{
 		Options: &storepb.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Key: u.Username,
+		Key: userID,
 	})
 	if err == nil && len(res.Records) > 0 {
 		render.Render(w, r, response.DataRender(&data.SigningKey{
-			User:       u.Username,
+			User:       userID,
 			SigningKey: string(res.Records[0].Value),
 		}))
 		return
@@ -279,10 +282,8 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		e := merrors.Parse(err.Error())
 		if e.Code == http.StatusNotFound {
-			//o.logger.Debug().Str("username", u.Username).Msg("signing key not found")
 			// not found is ok, so we can continue and generate the key on the fly
 		} else {
-			//o.logger.Err(err).Msg("error reading from store")
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "error reading from store"))
 			return
 		}
@@ -292,7 +293,6 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	key := make([]byte, 64)
 	_, err = rand.Read(key[:])
 	if err != nil {
-		//o.logger.Error().Err(err).Msg("could not generate signing key")
 		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not generate signing key"))
 		return
 	}
@@ -304,7 +304,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			Table:    "signing-keys",
 		},
 		Record: &storepb.Record{
-			Key:   u.Username,
+			Key:   userID,
 			Value: []byte(signingKey),
 			// TODO Expiry?
 		},
@@ -317,7 +317,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, response.DataRender(&data.SigningKey{
-		User:       u.Username,
+		User:       userID,
 		SigningKey: signingKey,
 	}))
 }
