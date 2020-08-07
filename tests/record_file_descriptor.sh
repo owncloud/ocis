@@ -11,7 +11,8 @@ do
   trimmed=$(echo $i | xargs)
   echo $trimmed
   PID=$(echo $trimmed | cut -d" " -f 1)
-  SERVICE=$(echo $trimmed | cut -d" " -f 3)
+  echo $PID
+  SERVICE=$(echo $trimmed | cut -d" " -f 5)
   COUNT_DESCRIPTORS=`lsof -p $PID 2> /dev/null | wc -l`
   echo $SERVICE $COUNT_DESCRIPTORS
   echo $SERVICE $COUNT_DESCRIPTORS >> $INITIAL_FILE_DESCRIPTOR_STORE
