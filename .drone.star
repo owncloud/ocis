@@ -366,17 +366,8 @@ def getEosSetup():
         'cd /ocis',
         'cp -r /drone/src/* .',
         'make build',
-        'bin/ocis server &',
         '/start-ldap &',
-        'bin/ocis kill reva-users',
-        'bin/ocis run reva-users',
-        'bin/ocis kill reva-storage-home',
-        'bin/ocis run reva-storage-home',
-        'bin/ocis kill reva-storage-home-data',
-        'bin/ocis run reva-storage-home-data',
-        'bin/ocis kill reva-frontend',
-        'bin/ocis run reva-frontend',
-        'sleep infinity'
+        'bin/ocis server'
       ],
       'volumes': [
         {
