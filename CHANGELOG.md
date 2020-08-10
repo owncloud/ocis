@@ -7,6 +7,7 @@ The following sections list the changes in ocis-ocs unreleased.
 ## Summary
 
 * Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+* Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
 * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
 * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
 
@@ -19,6 +20,13 @@ The following sections list the changes in ocis-ocs unreleased.
 
    https://github.com/owncloud/ocis-accounts/issues/79
    https://github.com/owncloud/ocis-ocs/pull/29
+
+
+* Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
+
+   We have added an option to pass uidnumber and gidnumber to the ocis api while creating a new user
+
+   https://github.com/owncloud/ocis-ocs/pull/34
 
 
 * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
