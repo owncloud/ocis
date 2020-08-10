@@ -211,7 +211,7 @@ def getEosSetup():
       'pull': 'always',
       'detach': True,
       'environment': {
-        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -224,7 +224,7 @@ def getEosSetup():
       'pull': 'always',
       'detach': True,
       'environment': {
-        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -237,7 +237,7 @@ def getEosSetup():
       'pull': 'always',
       'detach': True,
       'environment': {
-        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -363,11 +363,11 @@ def getEosSetup():
         'LDAP_BASEDN': 'dc=owncloud,dc=com'
       },
       'commands': [
+        '/start-ldap &',
+        'sleep 10',
         'cd /ocis',
         'cp -r /drone/src/* .',
         'make build',
-        '/start-ldap &',
-        'bin/ocis server'
       ],
       'volumes': [
         {
