@@ -375,7 +375,8 @@ def getEosSetup():
         'bin/ocis kill reva-storage-home-data',
         'bin/ocis run reva-storage-home-data',
         'bin/ocis kill reva-frontend',
-        'bin/ocis run reva-frontend'
+        'bin/ocis run reva-frontend',
+        'sleep infinity'
       ],
       'volumes': [
         {
@@ -417,6 +418,7 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
         ] + ([
           'git checkout %s' % (coreCommit)
         ] if coreCommit != '' else []) + [
+          'sleep 200',
           'make test-acceptance-api',
         ],
         'volumes': [
