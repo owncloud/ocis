@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/cs3org/reva v1.0.1-0.20200810113514-38919badfcc7
 	github.com/gofrs/uuid v3.3.0+incompatible
-	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/micro/cli/v2 v2.1.1
 	github.com/micro/go-micro v1.18.0
