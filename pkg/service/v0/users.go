@@ -84,20 +84,27 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
-	uid := r.PostFormValue("uidNumber")
-	gid := r.PostFormValue("gidNumber")
+	uid := r.PostFormValue("uidnumber")
+	gid := r.PostFormValue("gidnumber")
 
-	uidNumber, err := strconv.ParseInt(uid, 10, 64)
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the uidNumber provided"))
-		o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the uidNumber provided")
-		return
+	var uidNumber, gidNumber int64
+	var err error
+
+	if uid != "" {
+		uidNumber, err = strconv.ParseInt(uid, 10, 64)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the uidnumber provided"))
+			o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the uidnumber provided")
+			return
+		}
 	}
-	gidNumber, err := strconv.ParseInt(gid, 10, 64)
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidNumber provided"))
-		o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the gidNumber provided")
-		return
+	if gid != "" {
+		gidNumber, err = strconv.ParseInt(gid, 10, 64)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidnumber provided"))
+			o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the gidnumber provided")
+			return
+		}
 	}
 
 	// fallbacks
@@ -112,20 +119,28 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	*/
 
-	account, err := o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
-		Account: &accounts.Account{
-			DisplayName:              displayname,
-			PreferredName:            username,
-			OnPremisesSamAccountName: username,
-			UidNumber:                uidNumber,
-			GidNumber:                gidNumber,
-			PasswordProfile: &accounts.PasswordProfile{
-				Password: password,
-			},
-			Id:             userid,
-			Mail:           email,
-			AccountEnabled: true,
+	newAccount := &accounts.Account{
+		DisplayName:              displayname,
+		PreferredName:            username,
+		OnPremisesSamAccountName: username,
+		PasswordProfile: &accounts.PasswordProfile{
+			Password: password,
 		},
+		Id:             userid,
+		Mail:           email,
+		AccountEnabled: true,
+	}
+
+	if uidNumber != 0 {
+		newAccount.UidNumber = uidNumber
+	}
+
+	if gidNumber != 0 {
+		newAccount.GidNumber = gidNumber
+	}
+
+	account, err := o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
+		Account: newAccount,
 	})
 	if err != nil {
 		merr := merrors.FromError(err)
@@ -150,6 +165,8 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		Username:    account.PreferredName,
 		DisplayName: account.DisplayName,
 		Email:       account.Mail,
+		UIDNumber:   account.UidNumber,
+		GIDNumber:   account.UidNumber,
 		Enabled:     account.AccountEnabled,
 	}))
 }
