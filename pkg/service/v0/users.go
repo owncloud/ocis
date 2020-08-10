@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/cs3org/reva/pkg/user"
@@ -60,6 +61,8 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		Username:    account.PreferredName,
 		DisplayName: account.DisplayName,
 		Email:       account.Mail,
+		UIDNumber:   account.UidNumber,
+		GIDNumber:   account.GidNumber,
 		Enabled:     account.AccountEnabled,
 		// FIXME only return quota for users/{userid} endpoint (not /user)
 		// TODO query storage registry for free space? of home storage, maybe...
@@ -81,6 +84,21 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
+	uid := r.PostFormValue("uidNumber")
+	gid := r.PostFormValue("gidNumber")
+
+	uidNumber, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the uidNumber provided"))
+		o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the uidNumber provided")
+		return
+	}
+	gidNumber, err := strconv.ParseInt(gid, 10, 64)
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidNumber provided"))
+		o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the gidNumber provided")
+		return
+	}
 
 	// fallbacks
 	/* TODO decide if we want to make these fallbacks. Keep in mind:
@@ -99,6 +117,8 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 			DisplayName:              displayname,
 			PreferredName:            username,
 			OnPremisesSamAccountName: username,
+			UidNumber:                uidNumber,
+			GidNumber:                gidNumber,
 			PasswordProfile: &accounts.PasswordProfile{
 				Password: password,
 			},

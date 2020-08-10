@@ -14,6 +14,8 @@ type User struct {
 	DisplayName string `json:"displayname" xml:"displayname"`
 	Email       string `json:"email" xml:"email"`
 	Quota       *Quota `json:"quota" xml:"quota"`
+	UIDNumber   int64  `json:"uidNumber" xml:"uidNumber"`
+	GIDNumber   int64  `json:"gidNumber" xml:"gidNumber"`
 }
 
 // Quota holds quota information
