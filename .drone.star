@@ -329,7 +329,7 @@ def getEosSetup():
         'PHOENIX_OIDC_AUTHORITY': "https://ocis-server:9200",
         'PHOENIX_OIDC_METADATA_URL': "https://ocis-server:9200/.well-known/openid-configuration",
         'PHOENIX_WEB_CONFIG_SERVER': "https://ocis-server:9200",
-        'PROXY_HTTP_ADDR': "0.0.0.0:9200",
+        'PROXY_HTTP_ADDR': "ocis-server:9200",
         'REVA_OIDC_ISSUER': "https://ocis-server:9200",
         'OCIS_LOG_LEVEL': "debug",
         'REVA_TRANSFER_EXPIRES': 86400,
