@@ -317,7 +317,7 @@ def getEosSetup():
     },
     {
       'name': 'ocis-server',
-      'image': 'owncloud/eos-ocis',
+      'image': 'dpakach/eos-ocis-dev',
       'pull': 'always',
       'detach': True,
       'environment': {
@@ -362,6 +362,21 @@ def getEosSetup():
         'LDAP_BINDPW': 'admin',
         'LDAP_BASEDN': 'dc=owncloud,dc=com'
       },
+      'commands': [
+        'cd /ocis',
+        'cp -r /drone/src/* .',
+        'make build',
+        'bin/ocis server &',
+        '/start-ldap &',
+        'bin/ocis kill reva-users',
+        'bin/ocis run reva-users',
+        'bin/ocis kill reva-storage-home',
+        'bin/ocis run reva-storage-home',
+        'bin/ocis kill reva-storage-home-data',
+        'bin/ocis run reva-storage-home-data',
+        'bin/ocis kill reva-frontend',
+        'bin/ocis run reva-frontend'
+      ],
       'volumes': [
         {
           'name': 'config',
@@ -1183,6 +1198,25 @@ def build():
     },
   ]
 
+def buildEos():
+  return [
+    {
+      'name': 'build',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'make build',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+    },
+  ]
+
+
 def ocisServer():
   return [
     {
@@ -1265,5 +1299,20 @@ def selenium():
           'name': 'uploads',
           'path': '/uploads'
       }],
+    }
+  ]
+
+def ldap():
+  return [
+    {
+      'name': 'ldap',
+      'image': 'osixia/openldap',
+      'pull': 'always',
+      'environment': {
+        'LDAP_DOMAIN': 'owncloud.com',
+        'LDAP_ORGANISATION': 'ownCloud',
+        'LDAP_ADMIN_PASSWORD': 'admin',
+        'LDAP_TLS_VERIFY_CLIENT': 'never',
+      },
     }
   ]
