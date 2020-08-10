@@ -10,7 +10,6 @@ require (
 	github.com/bmatcuk/doublestar v1.3.1 // indirect
 	github.com/coreos/etcd v3.3.21+incompatible // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
-	github.com/creack/pty v1.1.11 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -31,7 +30,7 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.1.1-0.20200806061232-43514cd1725f
+	github.com/owncloud/ocis-ocs v0.1.1-0.20200810093052-0938dbcaf501
 	github.com/owncloud/ocis-phoenix v0.10.1-0.20200728190226-2508a066ba8f
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
 	github.com/owncloud/ocis-proxy v0.5.1-0.20200731211838-9470b36c61d7
@@ -50,7 +49,6 @@ require (
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200806125547-5acd03effb82 // indirect
 	golang.org/x/text v0.3.3 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
