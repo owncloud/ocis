@@ -322,6 +322,7 @@ def getEosSetup():
       'detach': True,
       'environment': {
         'EOS_MGM_URL': "root://mgm-master:1094",
+        'OCIS_DOMAIN': "ocis-server",
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': "/etc/ocis/identifier-registration.yml",
         'KONNECTD_ISS': "https://ocis-server:9200",
         'KONNECTD_LOG_LEVEL': "debug",
@@ -339,28 +340,15 @@ def getEosSetup():
         #and `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}"` for reva-storage-eos
         #but that gives us an extra layer in the eos file-system: /eos/dockertest/reva/users/e/einstein/file.txt
         #and that again is annoying when the tests try to delete user data
-        'REVA_STORAGE_EOS_DRIVER': "eos",
-        'REVA_STORAGE_EOS_DATA_DRIVER': "eos",
+        'REVA_STORAGE_EOS_DRIVER': "eoshome",
+        'REVA_STORAGE_EOS_DATA_DRIVER': "eoshome",
         'REVA_STORAGE_HOME_DRIVER': "eoshome",
-        'REVA_STORAGE_HOME_MOUNT_ID': "1284d238-aa92-42ce-bdc4-0b0000009158",
         'REVA_STORAGE_HOME_DATA_DRIVER': "eoshome",
         'REVA_STORAGE_EOS_MASTER_URL': "root://mgm-master:1094",
         'REVA_STORAGE_EOS_SLAVE_URL': "root://mgm-master:1094",
         'REVA_STORAGE_EOS_NAMESPACE': "/eos/dockertest/reva/users",
         'REVA_STORAGE_EOS_LAYOUT': "{{.Username}}",
         'DAV_FILES_NAMESPACE': "/eos/",
-        'REVA_LDAP_HOSTNAME': 'ldap',
-        'REVA_LDAP_PORT': 636,
-        'REVA_LDAP_BIND_PASSWORD': 'admin',
-        'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
-        'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
-        'REVA_LDAP_SCHEMA_UID': 'uid',
-        'REVA_LDAP_SCHEMA_MAIL': 'mail',
-        'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayname',
-        'LDAP_URI': 'ldap://ldap',
-        'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
-        'LDAP_BINDPW': 'admin',
-        'LDAP_BASEDN': 'dc=owncloud,dc=com'
       },
       'commands': [
         '/start-ldap &',
@@ -368,6 +356,7 @@ def getEosSetup():
         'cd /ocis',
         'cp -r /drone/src/* .',
         'make build',
+        'bin/ocis server'
       ],
       'volumes': [
         {
@@ -425,7 +414,6 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
       },
     ],
     'services':
-      ldap() +
       redis() +
       selenium(),
     'volumes': [
