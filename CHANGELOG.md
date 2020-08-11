@@ -7,6 +7,7 @@ The following sections list the changes in ocis-ocs unreleased.
 ## Summary
 
 * Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+* Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
 * Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
 * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
 * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
@@ -20,6 +21,15 @@ The following sections list the changes in ocis-ocs unreleased.
 
    https://github.com/owncloud/ocis-accounts/issues/79
    https://github.com/owncloud/ocis-ocs/pull/29
+
+
+* Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
+
+   OCIS switched from user the user's opaque ID (UUID) everywhere, so to keep compatible we have
+   adjusted the signing keys endpoint to also use the UUID when storing and generating the keys.
+
+   https://github.com/owncloud/ocis/issues/436
+   https://github.com/owncloud/ocis-ocs/pull/32
 
 
 * Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
