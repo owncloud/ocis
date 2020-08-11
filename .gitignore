@@ -7,3 +7,10 @@ coverage.out
 *crt
 
 /eos-docker
+
+# API acceptance tests
+composer.lock
+/vendor
+vendor-bin/**/vendor
+vendor-bin/**/composer.lock
+tests/acceptance/output

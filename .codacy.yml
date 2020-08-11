@@ -4,5 +4,6 @@ exclude_paths:
   - changelog/**
   - docs/**
   - pkg/proto/**
+  - tests/acceptance/features/bootstrap/*
 
 ...
