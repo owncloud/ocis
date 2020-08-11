@@ -14,7 +14,7 @@ require (
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
-	github.com/karrick/godirwalk v1.15.6 // indirect
+	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
@@ -23,17 +23,17 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.1.2-0.20200805084037-bb03734c3851
+	github.com/owncloud/ocis-accounts v0.1.2-0.20200811150802-01ede72397e8
 	github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.1.1-0.20200810093052-0938dbcaf501
+	github.com/owncloud/ocis-ocs v0.1.1-0.20200811143120-5b2ce794900c
 	github.com/owncloud/ocis-phoenix v0.10.1-0.20200728190226-2508a066ba8f
-	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
-	github.com/owncloud/ocis-proxy v0.5.1-0.20200731211838-9470b36c61d7
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200811112833-49a2b6fd10ea
+	github.com/owncloud/ocis-proxy v0.5.1-0.20200811152237-99c1dba7c091
 	github.com/owncloud/ocis-reva v0.10.1-0.20200728121716-b05b139f0a8b
 	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
 	github.com/owncloud/ocis-store v0.1.1-0.20200727080653-706a465a07c6
@@ -47,8 +47,11 @@ require (
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
-	golang.org/x/sys v0.0.0-20200806125547-5acd03effb82 // indirect
+	golang.org/x/sys v0.0.0-20200810151505-1b9f1253b3ed // indirect
 	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/tools v0.0.0-20200811032001-fd80f4dbb3ea // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
