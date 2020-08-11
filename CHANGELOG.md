@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Bugfix - Enable new accounts by default: [#79](https://github.com/owncloud/ocis-proxy/pull/79)
+* Bugfix - Lookup user by id for presigned URLs: [#85](https://github.com/owncloud/ocis-proxy/pull/85)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#78](https://github.com/owncloud/ocis-proxy/pull/78)
 * Change - Add settings and ocs group routes: [#81](https://github.com/owncloud/ocis-proxy/pull/81)
 * Change - Add route for user provisioning API in ocis-ocs: [#80](https://github.com/owncloud/ocis-proxy/pull/80)
@@ -18,6 +19,17 @@ The following sections list the changes for ocis-proxy unreleased.
    When new accounts are created, they also need to be enabled to be useable.
 
    https://github.com/owncloud/ocis-proxy/pull/79
+
+
+* Bugfix - Lookup user by id for presigned URLs: [#85](https://github.com/owncloud/ocis-proxy/pull/85)
+
+   Phoenix will send the `userid`, not the `username` as the `OC-Credential` for presigned URLs.
+   This PR uses the new `ocisid` claim in the OIDC userinfo to pass the userid to the account
+   middleware.
+
+   https://github.com/owncloud/ocis/issues/436
+   https://github.com/owncloud/ocis-proxy/pull/85
+   https://github.com/owncloud/ocis-pkg/pull/50
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#78](https://github.com/owncloud/ocis-proxy/pull/78)
@@ -268,7 +280,7 @@ The following sections list the changes for ocis-proxy 0.3.1.
 
 The following sections list the changes for ocis-proxy 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.3.0
 
 ## Summary
 
@@ -302,11 +314,27 @@ The following sections list the changes for ocis-proxy 0.3.0.
 
    https://github.com/owncloud/ocis-proxy/issues/4
 
+# Changelog for [0.2.1] (2020-03-25)
+
+The following sections list the changes for ocis-proxy 0.2.1.
+
+[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.2.1
+
+## Summary
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+## Details
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+   https://github.com/owncloud/ocis-proxy/pull/25
+
 # Changelog for [0.2.0] (2020-03-25)
 
 The following sections list the changes for ocis-proxy 0.2.0.
 
-[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.2.0
+[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.0
 
 ## Summary
 
@@ -336,22 +364,6 @@ The following sections list the changes for ocis-proxy 0.2.0.
    Before a generates certificates on every start was used for dev purposes.
 
    https://github.com/owncloud/ocis-proxy/pull/14
-
-# Changelog for [0.2.1] (2020-03-25)
-
-The following sections list the changes for ocis-proxy 0.2.1.
-
-[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.1
-
-## Summary
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-## Details
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-   https://github.com/owncloud/ocis-proxy/pull/25
 
 # Changelog for [0.1.0] (2020-03-18)
 
