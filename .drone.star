@@ -1282,18 +1282,3 @@ def selenium():
       }],
     }
   ]
-
-def ldap():
-  return [
-    {
-      'name': 'ldap',
-      'image': 'osixia/openldap',
-      'pull': 'always',
-      'environment': {
-        'LDAP_DOMAIN': 'owncloud.com',
-        'LDAP_ORGANISATION': 'ownCloud',
-        'LDAP_ADMIN_PASSWORD': 'admin',
-        'LDAP_TLS_VERIFY_CLIENT': 'never',
-      },
-    }
-  ]
