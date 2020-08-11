@@ -112,8 +112,9 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			if claims.Email != "" {
 				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")))
 			} else if claims.PreferredUsername != "" {
-				usernameOrID := strings.ReplaceAll(claims.PreferredUsername, "'", "''")
-				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("preferred_name eq '%s' or id eq '%s'", usernameOrID, usernameOrID))
+				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(claims.PreferredUsername, "'", "''")))
+			} else if claims.OcisID != "" {
+				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("id eq '%s'", strings.ReplaceAll(claims.OcisID, "'", "''")))
 			} else {
 				// TODO allow lookup by custom claim, eg an id ... or sub
 				l.Error().Err(err).Msgf("Could not lookup account, no mail or preferred_username claim set")
