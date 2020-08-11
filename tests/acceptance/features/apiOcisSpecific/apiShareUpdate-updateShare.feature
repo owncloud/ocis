@@ -101,14 +101,14 @@ Feature: sharing
       | additional_info_owner      |                      |
       | additional_info_file_owner |                      |
       | state                      | 0                    |
-      | item_type                  | folder               |
-      | item_source                | A_STRING             |
-      | path                       | /Alice-folder        |
-      | mimetype                   | httpd/unix-directory |
-      | storage_id                 | A_STRING             |
+      | item_type                  |                      |
+      | item_source                |                      |
+      | path                       |                      |
+      | mimetype                   |                      |
+      | storage_id                 |                      |
       | storage                    | 0                    |
-      | file_source                | A_STRING             |
-      | file_target                | /Alice-folder        |
+      | file_source                |                      |
+      | file_target                |                      |
       | share_with                 | %username%           |
       | share_with_displayname     | %displayname%        |
       | share_with_additional_info |                      |
