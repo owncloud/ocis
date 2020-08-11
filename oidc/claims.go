@@ -170,4 +170,14 @@ type StandardClaims struct {
 	// TODO add address claim https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim
 	Address    map[string]interface{} `json:"address,omitempty"`
 	KCIdentity map[string]string      `json:"kc.identity,omitempty"`
+
+	// To integrate with an existing LDAP server the IdP can send the numeric user and group id:
+
+	// UIDNumber is a unique numerical id that will be used when setting acls on a storage that integrates with the OS/LDAP
+	UIDNumber string `json:"uidnumber,omitempty"`
+	// GIDNumber is a unique numerical id that will be used when setting acls on a storage that integrates with the OS/LDAP
+	GIDNumber string `json:"gidnumber,omitempty"`
+
+	// OcisID is a unique, persistent, non reassignable user id
+	OcisID string `json:"ocis.id,omitempty"`
 }
