@@ -7,6 +7,7 @@ The following sections list the changes in ocis-pkg unreleased.
 ## Summary
 
 * Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
+* Enhancement - Add `ocis.id` and numeric id claims: [#50](https://github.com/owncloud/ocis-pkg/pull/50)
 
 ## Details
 
@@ -16,6 +17,18 @@ The following sections list the changes in ocis-pkg unreleased.
    it available in the context.
 
    https://github.com/owncloud/ocis-pkg/pull/46
+
+
+* Enhancement - Add `ocis.id` and numeric id claims: [#50](https://github.com/owncloud/ocis-pkg/pull/50)
+
+   We added an `ocis.id` claim to the OIDC standard claims. It allows the idp to send a stable
+   identifier that can be exposed to the outside world (in contrast to sub, which might change
+   whens the IdP changes).
+
+   In addition we added `uidnumber` and `gidnumber` claims, which can be used by the IdP as well.
+   They will be used by storage providers that integrate with an existing LDAP server.
+
+   https://github.com/owncloud/ocis-pkg/pull/50
 
 # Changelog for [2.2.1] (2020-04-21)
 
