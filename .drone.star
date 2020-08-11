@@ -223,7 +223,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -247,7 +247,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -271,7 +271,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-         # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -297,6 +297,16 @@ def getEosSetup():
         'EOS_UTF8': '1',
         'EOS_SET_MASTER': 1,
       },
+      'volumes': [
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eos-ns-queue',
+          'path': '/var/eos/ns-queue'
+        }
+      ]
     },
     {
       'name': 'mq-master',
@@ -318,6 +328,16 @@ def getEosSetup():
         'EOS_UTF8': '1',
         'EOS_SET_MASTER': 1,
       },
+      'volumes': [
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eos-ns-queue',
+          'path': '/var/eos/ns-queue'
+        }
+      ]
     },
     {
       'name': 'eos-fst',
@@ -453,6 +473,14 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
             'name': 'eosdisks',
             'path': '/e/disks',
           },
+          {
+            'name': 'eosconfig',
+            'path': '/e/master/var/eos/config'
+          },
+          {
+            'name': 'eos-ns-queue',
+            'path': '/e/master/var/eos/ns-queue'
+          }
         ]
       },
     ],
