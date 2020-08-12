@@ -19,7 +19,8 @@ Feature: upload file
       | old         | "file ?2.txt"       |
       | new         | "file ?2.txt"       |
 
-  @issue-product-127
+  @skipOnOcis-OC-Storage @issue-product-127
+  # this scenario passes/fails intermittently on OC storage, so do not run it in CI
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: uploading a file inside a folder changes its etag
     Given using <dav_version> DAV path
