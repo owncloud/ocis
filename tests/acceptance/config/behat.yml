@@ -21,7 +21,11 @@ default:
             adminPassword: admin
             regularUserPassword: 123456
             ocPath: apps/testing/api/v1/occ
+        - CapabilitiesContext:
+        - ChecksumContext:
         - FavoritesContext:
+        - FilesVersionsContext:
+        - PublicWebDavContext:
         - WebDavPropertiesContext:
 
   extensions:
