@@ -13,10 +13,6 @@ var (
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
-	settingKeyRule = []validation.Rule{
-		validation.Required,
-		validation.Match(regexForKeys),
-	}
 )
 
 func validateSaveSettingsBundle(req *proto.SaveSettingsBundleRequest) error {
@@ -52,6 +48,7 @@ func validateGetSettingsValue(req *proto.GetSettingsValueRequest) error {
 func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
 	return validation.ValidateStruct(
 		req.Identifier,
+		validation.Field(&req.Identifier.AccountUuid, keyRule...),
 		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
 		validation.Field(&req.Identifier.Extension, validation.When(req.Identifier.BundleKey != "", validation.Required)),
 		validation.Field(&req.Identifier.BundleKey, validation.Match(regexForKeys)),
@@ -73,6 +70,7 @@ func validateValueIdentifier(identifier *proto.Identifier) error {
 		identifier,
 		validation.Field(&identifier.Extension, keyRule...),
 		validation.Field(&identifier.BundleKey, keyRule...),
-		validation.Field(&identifier.SettingKey, settingKeyRule...),
+		validation.Field(&identifier.SettingKey, keyRule...),
+		validation.Field(&identifier.AccountUuid, keyRule...),
 	)
 }
