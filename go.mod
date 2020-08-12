@@ -3,22 +3,24 @@ module github.com/owncloud/ocis-graph
 go 1.13
 
 require (
-	contrib.go.opencensus.io/exporter/jaeger v0.2.0
-	contrib.go.opencensus.io/exporter/ocagent v0.6.0
-	contrib.go.opencensus.io/exporter/zipkin v0.1.1
-	github.com/cs3org/go-cs3apis v0.0.0-20191128165347-19746c015c83
-	github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5
-	github.com/go-chi/chi v4.0.2+incompatible
+	contrib.go.opencensus.io/exporter/jaeger v0.2.1
+	contrib.go.opencensus.io/exporter/ocagent v0.7.0
+	contrib.go.opencensus.io/exporter/zipkin v0.1.2
+	github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666
+	github.com/cs3org/reva v1.1.0
+	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
-	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
-	github.com/micro/cli/v2 v2.1.1
-	github.com/oklog/run v1.0.0
+	github.com/go-ldap/ldap/v3 v3.2.3
+	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/micro/cli/v2 v2.1.2
+	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.0.1
-	github.com/spf13/afero v1.2.2 // indirect
-	github.com/spf13/viper v1.5.0
-	github.com/yaegashi/msgraph.go v0.0.0-20191104022859-3f9096c750b2
-	go.opencensus.io v0.22.2
-	google.golang.org/grpc v1.26.0
-	gopkg.in/ldap.v3 v3.1.0
+	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/spf13/afero v1.3.4 // indirect
+	github.com/spf13/viper v1.7.1
+	github.com/yaegashi/msgraph.go v0.1.4
+	go.opencensus.io v0.22.4
+	google.golang.org/grpc v1.31.0
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

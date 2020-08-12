@@ -3,8 +3,8 @@ package svc
 import (
 	"errors"
 
+	"github.com/go-ldap/ldap/v3"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
-	"gopkg.in/ldap.v3"
 )
 
 func (g Graph) ldapGetSingleEntry(baseDn string, filter string) (*ldap.Entry, error) {
