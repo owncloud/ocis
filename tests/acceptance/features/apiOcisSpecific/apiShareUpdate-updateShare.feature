@@ -74,7 +74,7 @@ Feature: sharing
     And as "Alice" folder "/Alice-folder/folder2" should exist
     And as "Carol" folder "/Carol-folder/folder2" should not exist
 
-  @toFixOnOCIS @toFixOnOcV10 @issue-ocis-reva-243 @issue-ocis-reva-349 @issue-ocis-reva-350 @issue-ocis-reva-352 @issue-37653
+  @toFixOnOCIS @toFixOnOcV10 @issue-ocis-reva-350 @issue-ocis-reva-352 @issue-37653
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: API responds with a full set of parameters when owner changes the permission of a share
     Given using OCS API version "<ocs_api_version>"
@@ -101,14 +101,14 @@ Feature: sharing
       | additional_info_owner      |                      |
       | additional_info_file_owner |                      |
       | state                      | 0                    |
-      | item_type                  |                      |
-      | item_source                |                      |
-      | path                       |                      |
-      | mimetype                   |                      |
-      | storage_id                 |                      |
+      | item_type                  | folder               |
+      | item_source                | A_STRING             |
+      | path                       | /Alice-folder        |
+      | mimetype                   | httpd/unix-directory |
+      | storage_id                 | A_STRING             |
       | storage                    | 0                    |
-      | file_source                |                      |
-      | file_target                |                      |
+      | file_source                | A_STRING             |
+      | file_target                | /Alice-folder        |
       | share_with                 | %username%           |
       | share_with_displayname     | %displayname%        |
       | share_with_additional_info |                      |
