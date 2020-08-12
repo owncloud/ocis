@@ -35,6 +35,14 @@ func configureGraphExplorer(cfg *config.Config) *svcconfig.Config {
 	cfg.GraphExplorer.Log.Pretty = cfg.Log.Pretty
 	cfg.GraphExplorer.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.GraphExplorer.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.GraphExplorer.Tracing.Type = cfg.Tracing.Type
+		cfg.GraphExplorer.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.GraphExplorer.Tracing.Collector = cfg.Tracing.Collector
+		cfg.GraphExplorer.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.GraphExplorer
 }
 

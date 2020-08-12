@@ -36,6 +36,14 @@ func configureThumbnails(cfg *config.Config) *svcconfig.Config {
 	cfg.Thumbnails.Log.Pretty = cfg.Log.Pretty
 	cfg.Thumbnails.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Thumbnails.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Thumbnails.Tracing.Type = cfg.Tracing.Type
+		cfg.Thumbnails.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Thumbnails.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Thumbnails.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.Thumbnails
 }
 

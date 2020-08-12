@@ -35,6 +35,14 @@ func configureGraph(cfg *config.Config) *svcconfig.Config {
 	cfg.Graph.Log.Pretty = cfg.Log.Pretty
 	cfg.Graph.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Graph.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Graph.Tracing.Type = cfg.Tracing.Type
+		cfg.Graph.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Graph.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Graph.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.Graph
 }
 
