@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"fmt"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -51,7 +50,6 @@ func validateGetSettingsValue(req *proto.GetSettingsValueRequest) error {
 }
 
 func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
-	fmt.Println(req.Identifier)
 	return validation.ValidateStruct(
 		req.Identifier,
 		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
