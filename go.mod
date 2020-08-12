@@ -12,6 +12,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
+	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
@@ -32,10 +33,10 @@ require (
 	github.com/owncloud/ocis-migration v0.2.0
 	github.com/owncloud/ocis-ocs v0.1.1-0.20200811143120-5b2ce794900c
 	github.com/owncloud/ocis-phoenix v0.10.1-0.20200812122242-a1b14f0a4d3b
-	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200811112833-49a2b6fd10ea
+	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200812103920-db41b5a3d14d
 	github.com/owncloud/ocis-proxy v0.5.1-0.20200811152237-99c1dba7c091
 	github.com/owncloud/ocis-reva v0.10.1-0.20200811144731-53a4180d0aad
-	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
+	github.com/owncloud/ocis-settings v0.0.0-20200812135211-ec86c9ac93c6
 	github.com/owncloud/ocis-store v0.1.1-0.20200727080653-706a465a07c6
 	github.com/owncloud/ocis-thumbnails v0.2.1-0.20200806144633-c15d98b30832
 	github.com/owncloud/ocis-webdav v0.1.1
@@ -49,7 +50,6 @@ require (
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200810151505-1b9f1253b3ed // indirect
 	golang.org/x/text v0.3.3 // indirect
-	golang.org/x/tools v0.0.0-20200811032001-fd80f4dbb3ea // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 )
