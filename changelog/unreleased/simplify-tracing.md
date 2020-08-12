@@ -5,3 +5,4 @@ to set one tracing config for all services at the same time.
 
 https://github.com/owncloud/product/issues/92
 https://github.com/owncloud/ocis/pull/329
+https://github.com/owncloud/ocis/pull/409
