@@ -35,6 +35,14 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 	cfg.OCS.Log.Pretty = cfg.Log.Pretty
 	cfg.OCS.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.OCS.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.OCS.Tracing.Type = cfg.Tracing.Type
+		cfg.OCS.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.OCS.Tracing.Collector = cfg.Tracing.Collector
+		cfg.OCS.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.OCS
 }
 

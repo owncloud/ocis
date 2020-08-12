@@ -35,6 +35,14 @@ func configureStore(cfg *config.Config) *svcconfig.Config {
 	cfg.Store.Log.Pretty = cfg.Log.Pretty
 	cfg.Store.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Store.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Store.Tracing.Type = cfg.Tracing.Type
+		cfg.Store.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Store.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Store.Tracing.Service = cfg.Tracing.Service
+	}
+
 	return cfg.Store
 }
 
