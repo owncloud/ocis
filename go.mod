@@ -13,7 +13,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
-	github.com/imdario/mergo v0.3.10 // indirect
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
@@ -34,7 +34,7 @@ require (
 	github.com/owncloud/ocis-phoenix v0.10.1-0.20200728190226-2508a066ba8f
 	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200811112833-49a2b6fd10ea
 	github.com/owncloud/ocis-proxy v0.5.1-0.20200811152237-99c1dba7c091
-	github.com/owncloud/ocis-reva v0.10.1-0.20200728121716-b05b139f0a8b
+	github.com/owncloud/ocis-reva v0.10.1-0.20200811144731-53a4180d0aad
 	github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43
 	github.com/owncloud/ocis-store v0.1.1-0.20200727080653-706a465a07c6
 	github.com/owncloud/ocis-thumbnails v0.2.1-0.20200806144633-c15d98b30832
