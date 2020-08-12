@@ -1173,6 +1173,54 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 				Status: "Internal Server Error",
 			},
 		},
+		{
+			testDataName: "../ in account uuid",
+			SettingsValue: proto.SettingsValue{
+				Identifier: &proto.Identifier{
+					Extension:   "great-extension",
+					BundleKey:   "bobs-bundle",
+					AccountUuid: "../123e4567-e89b-12d3-a456-426652340000",
+					SettingKey:  "should-not-be-possible",
+				},
+				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
+			},
+			expectedError: CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "account_uuid: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
+		},
+		{
+			testDataName: "\\ in fields that are used to create folder and file names",
+			SettingsValue: proto.SettingsValue{
+				Identifier: &proto.Identifier{
+					Extension:   "\\-extension",
+					BundleKey:   "\\-bundle",
+					AccountUuid: "\\123e4567-e89b-12d3-a456-426652340000",
+					SettingKey:  "should-not-be-possible",
+				},
+				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
+			},
+			expectedError: CustomError{
+				ID:     "go.micro.client",
+				Code:   500,
+				Detail: "account_uuid: must be in a valid format; bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Status: "Internal Server Error",
+			},
+		},
+		{
+			testDataName: "account uuid allows alphanumeric and +_.-@",
+			SettingsValue: proto.SettingsValue{
+				Identifier: &proto.Identifier{
+					Extension:   "extension",
+					BundleKey:   "bundle",
+					AccountUuid: "123-abc-ABC-+_.-@",
+					SettingKey:  "setting",
+				},
+				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
+			},
+		},
 	}
 	client := service.Client()
 	cl := proto.NewValueService("com.owncloud.api.settings", client)

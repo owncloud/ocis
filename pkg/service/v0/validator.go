@@ -8,8 +8,13 @@ import (
 )
 
 var (
-	regexForKeys = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
-	keyRule      = []validation.Rule{
+	regexForAccountUUID = regexp.MustCompile(`^[A-Za-z0-9\-_.+@]+$`)
+	accountUUIDRule     = []validation.Rule{
+		validation.Required,
+		validation.Match(regexForAccountUUID),
+	}
+	regexForKeys        = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
+	keyRule             = []validation.Rule{
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
@@ -48,7 +53,7 @@ func validateGetSettingsValue(req *proto.GetSettingsValueRequest) error {
 func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
 	return validation.ValidateStruct(
 		req.Identifier,
-		validation.Field(&req.Identifier.AccountUuid, keyRule...),
+		validation.Field(&req.Identifier.AccountUuid, accountUUIDRule...),
 		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
 		validation.Field(&req.Identifier.Extension, validation.When(req.Identifier.BundleKey != "", validation.Required)),
 		validation.Field(&req.Identifier.BundleKey, validation.Match(regexForKeys)),
@@ -71,6 +76,6 @@ func validateValueIdentifier(identifier *proto.Identifier) error {
 		validation.Field(&identifier.Extension, keyRule...),
 		validation.Field(&identifier.BundleKey, keyRule...),
 		validation.Field(&identifier.SettingKey, keyRule...),
-		validation.Field(&identifier.AccountUuid, keyRule...),
+		validation.Field(&identifier.AccountUuid, accountUUIDRule...),
 	)
 }
