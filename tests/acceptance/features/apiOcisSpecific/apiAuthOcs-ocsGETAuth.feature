@@ -128,7 +128,7 @@ Feature: auth
   @issue-ocis-accounts-73
   @issue-ocis-ocs-26
   @smokeTest
-  #after fixing all issues delete this Scenario and use the one above
+  # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS as normal user (username has a capital letter) with wrong password
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
@@ -147,7 +147,7 @@ Feature: auth
   @issue-ocis-accounts-73
   @issue-ocis-ocs-26
   @smokeTest
-  #after fixing all issues delete this Scenario and use the one above
+  # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS as normal user (username does not have a capital letter) with wrong password
     Given user "brian" has been created with default attributes and skeleton files
     When user "brian" requests these endpoints with "GET" using password "invalid"
@@ -177,7 +177,7 @@ Feature: auth
   @issue-ocis-accounts-73
   @issue-ocis-ocs-26
   @smokeTest
-  #after fixing all issues delete this Scenario and use the one above
+  # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS as normal user (username does not have a capital letter) with wrong password
     Given user "brian" has been created with default attributes and skeleton files
     When user "brian" requests these endpoints with "GET" using password "invalid"
