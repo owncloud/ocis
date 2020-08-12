@@ -12,6 +12,7 @@
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
+* Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
@@ -108,6 +109,15 @@
    to use it.
 
    https://github.com/owncloud/ocis/pull/172
+
+
+* Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+
+   We now apply the oCIS tracing config to all services which have tracing. With this it is possible
+   to set one tracing config for all services at the same time.
+
+   https://github.com/owncloud/product/issues/92
+   https://github.com/owncloud/ocis/pull/329
 
 
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
