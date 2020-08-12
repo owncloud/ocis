@@ -213,7 +213,7 @@ def getEosSetup():
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_QDB_NODES': 'quark-1:7777,quark-2:7777,quark-3:7777',
         'EOS_LDAP_HOST': 'ocis-server:9125',
         'EOS_GEOTAG': 'test',
         'EOS_INSTANCE_NAME': 'eostest',
@@ -237,7 +237,7 @@ def getEosSetup():
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_QDB_NODES': 'quark-1:7777,quark-2:7777,quark-3:7777',
         'EOS_LDAP_HOST': 'ocis-server:9125',
         'EOS_GEOTAG': 'test',
         'EOS_INSTANCE_NAME': 'eostest',
@@ -261,7 +261,7 @@ def getEosSetup():
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_QDB_NODES': 'quark-1:7777,quark-2:7777,quark-3:7777',
         'EOS_LDAP_HOST': 'ocis-server:9125',
         'EOS_GEOTAG': 'test',
         'EOS_INSTANCE_NAME': 'eostest',
