@@ -16,10 +16,8 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
-	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
-	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mholt/certmagic v0.9.3 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro v1.18.0 // indirect
@@ -37,7 +35,6 @@ require (
 	go.opencensus.io v0.22.4
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
-	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/net v0.0.0-20200625001655-4c5254603344
 	golang.org/x/tools v0.0.0-20200811215021-48a8ffc5b207
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
