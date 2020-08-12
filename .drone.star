@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '5e6593b9ed1124b815039c9efb943ba23d9e457c',
+    'coreCommit': 'e59a1700f3fc4ae309d0e30d2500d0de32173f5c',
     'numberOfParts': 2
   },
   'uiTests': {
