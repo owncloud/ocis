@@ -239,7 +239,6 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
       },
     ],
     'services':
-      ldap() +
       redis(),
     'volumes': [
       {
@@ -275,11 +274,9 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
