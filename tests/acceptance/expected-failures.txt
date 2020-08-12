@@ -799,11 +799,6 @@ apiWebdavProperties2/getFileProperties.feature:455
 apiWebdavUpload1/uploadFile.feature:112
 apiWebdavUpload1/uploadFile.feature:113
 #
-apiWebdavUpload1/uploadFile.feature:197
-apiWebdavUpload1/uploadFile.feature:198
-apiWebdavUpload1/uploadFile.feature:199
-apiWebdavUpload1/uploadFile.feature:200
-#
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:14
 apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:31
