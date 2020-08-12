@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -55,7 +54,6 @@ func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
 	fmt.Println(req.Identifier)
 	return validation.ValidateStruct(
 		req.Identifier,
-		validation.Field(&req.Identifier.AccountUuid, is.UUID),
 		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
 		validation.Field(&req.Identifier.Extension, validation.When(req.Identifier.BundleKey != "", validation.Required)),
 		validation.Field(&req.Identifier.BundleKey, validation.Match(regexForKeys)),
