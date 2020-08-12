@@ -1,20 +1,3 @@
-# this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
-#
-# These scenarios are failing because owncloud/ocis code is out-of-date
-# They should start passing when owncloud/ocis is next updated from owncloud/ocis-reva
-#
-apiSharePublicLink2/updatePublicLinkShare.feature:77
-apiSharePublicLink2/updatePublicLinkShare.feature:78
-apiSharePublicLink2/updatePublicLinkShare.feature:142
-apiSharePublicLink2/updatePublicLinkShare.feature:143
-apiSharePublicLink2/updatePublicLinkShare.feature:173
-apiSharePublicLink2/updatePublicLinkShare.feature:174
-apiSharePublicLink2/updatePublicLinkShare.feature:204
-apiSharePublicLink2/updatePublicLinkShare.feature:205
-apiSharePublicLink2/updatePublicLinkShare.feature:235
-apiSharePublicLink2/updatePublicLinkShare.feature:236
-apiSharePublicLink2/updatePublicLinkShare.feature:266
-apiSharePublicLink2/updatePublicLinkShare.feature:267
 #
 # test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
 #
@@ -417,9 +400,6 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:9
 #
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:23
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:48
-apiSharePublicLink2/uploadToPublicLinkShare.feature:49
 #
 # https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
 apiSharePublicLink2/uploadToPublicLinkShare.feature:62
