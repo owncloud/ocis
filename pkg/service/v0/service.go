@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"

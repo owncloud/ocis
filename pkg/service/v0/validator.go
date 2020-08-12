@@ -13,8 +13,8 @@ var (
 		validation.Required,
 		validation.Match(regexForAccountUUID),
 	}
-	regexForKeys        = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
-	keyRule             = []validation.Rule{
+	regexForKeys = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
+	keyRule      = []validation.Rule{
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
