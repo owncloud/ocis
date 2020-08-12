@@ -945,3 +945,11 @@ apiWebdavPreviews/previews.feature:164
 apiWebdavPreviews/previews.feature:165
 apiWebdavPreviews/previews.feature:177
 apiWebdavPreviews/previews.feature:178
+#
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:83
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:84
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:102
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:103
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:104
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:105
