@@ -50,7 +50,7 @@ Kill the home storage. By default it uses the `owncloud` storage driver. We need
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
 ```
 
 ### 4. Home data provider
@@ -59,7 +59,7 @@ Kill the home data provider. By default it uses the `owncloud` storage driver. W
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
 ```
 
 {{< hint info >}}
@@ -80,7 +80,7 @@ docker-compose exec -e DAV_FILES_NAMESPACE="/eos/" ocis ./bin/ocis run reva-fron
 Login with `einstein / relativity`, upload a file to einsteins home and verify the file is there using
 
 ```
-docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/e/einstein/
+docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/4/4c510ada-c86b-4815-8820-42cdf82c3d51/
 -rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
 ```
 

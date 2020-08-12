@@ -41,7 +41,7 @@ services:
       REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
       REVA_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       REVA_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Username}}"
+      REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}"
 
   mgm-master:
     container_name: mgm-master
