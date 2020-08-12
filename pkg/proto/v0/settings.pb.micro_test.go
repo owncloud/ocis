@@ -1187,7 +1187,7 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "account_uuid: must be a valid UUID.",
+				Detail: "account_uuid: must be in a valid format.",
 				Status: "Internal Server Error",
 			},
 		},
@@ -1205,8 +1205,20 @@ func TestSaveGetListSettingsValues(t *testing.T) {
 			expectedError: CustomError{
 				ID:     "go.micro.client",
 				Code:   500,
-				Detail: "account_uuid: must be a valid UUID; bundle_key: must be in a valid format; extension: must be in a valid format.",
+				Detail: "account_uuid: must be in a valid format; bundle_key: must be in a valid format; extension: must be in a valid format.",
 				Status: "Internal Server Error",
+			},
+		},
+		{
+			testDataName: "account uuid allows alphanumeric and +_.-@",
+			SettingsValue: proto.SettingsValue{
+				Identifier: &proto.Identifier{
+					Extension:   "extension",
+					BundleKey:   "bundle",
+					AccountUuid: "123-abc-ABC-+_.-@",
+					SettingKey:  "setting",
+				},
+				Value: &proto.SettingsValue_BoolValue{BoolValue: false},
 			},
 		},
 	}
