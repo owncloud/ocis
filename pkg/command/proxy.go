@@ -35,6 +35,18 @@ func configureProxy(cfg *config.Config) *svcconfig.Config {
 	cfg.Proxy.Log.Pretty = cfg.Log.Pretty
 	cfg.Proxy.Log.Color = cfg.Log.Color
 
+	if cfg.Tracing.Enabled {
+		cfg.Proxy.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Proxy.Tracing.Type = cfg.Tracing.Type
+		cfg.Proxy.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Proxy.Tracing.Collector = cfg.Tracing.Collector
+		cfg.Proxy.Tracing.Service = cfg.Tracing.Service
+	}
+
+	if cfg.Reva.Reva.JWTSecret != "" {
+		cfg.Proxy.TokenManager.JWTSecret = cfg.Reva.Reva.JWTSecret
+	}
+
 	return cfg.Proxy
 }
 
