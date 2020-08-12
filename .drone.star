@@ -223,7 +223,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -247,7 +247,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -271,7 +271,7 @@ def getEosSetup():
         'EOS_NS_ACCOUNTING': '1',
         'EOS_SYNCTIME_ACCOUNTING': '1',
         'EOS_UTF8': '1',
-        # 'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
+        'EOS_QDB_DIR': "/var/lib/quarkdb/eosns",
         'EOS_QDB_PORT': "7777",
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
@@ -485,7 +485,6 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
       },
     ],
     'services':
-      redis() +
       selenium(),
     'volumes': [
       {
