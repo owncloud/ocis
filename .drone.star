@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'master', '787c2443dd4ab977f69a2e34751dc27a8928da1e', 'master', 'b990689a83630baa83f4311718ff8c819fb95ef9')
+    UITests(ctx, 'master', 'd6ed9f3e60f5cfc4eeb261d91a6d1607045904ee', 'master', '0ba693cea50cafdb7e6b4e3f559a70cbd4d04bbe')
   ]
 
   stages = [
@@ -368,6 +368,7 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'SERVER_HOST': 'https://ocis-server:9200',
          'BACKEND_HOST': 'https://ocis-server:9200',
          'RUN_ON_OCIS': 'true',
+         'RUN_WITH_LDAP': 'true',
          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
          'PHOENIX_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
