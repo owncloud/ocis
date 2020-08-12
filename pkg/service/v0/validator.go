@@ -19,10 +19,6 @@ var (
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
-	accountUUIDRule = []validation.Rule{
-		validation.Required,
-		is.UUID,
-	}
 )
 
 func validateSaveSettingsBundle(req *proto.SaveSettingsBundleRequest) error {
@@ -82,6 +78,5 @@ func validateValueIdentifier(identifier *proto.Identifier) error {
 		validation.Field(&identifier.Extension, keyRule...),
 		validation.Field(&identifier.BundleKey, keyRule...),
 		validation.Field(&identifier.SettingKey, settingKeyRule...),
-		validation.Field(&identifier.AccountUuid, accountUUIDRule...),
 	)
 }

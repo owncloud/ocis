@@ -8,3 +8,4 @@ coverage.out
 /node_modules
 /assets
 /ocis-settings-store
+pkg/proto/v0/ocis-settings-store/
