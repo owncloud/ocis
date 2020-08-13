@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -145,7 +147,7 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			}
 
 			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
-			token, err := tokenManager.MintToken(r.Context(), &revauser.User{
+			user := &revauser.User{
 				Id: &revauser.UserId{
 					OpaqueId: account.Id,
 					Idp:      claims.Iss,
@@ -155,7 +157,21 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				Mail:         account.Mail,
 				MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
 				Groups:       groups,
-			})
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{},
+				},
+			}
+
+			user.Opaque.Map["uid"] = &types.OpaqueEntry{
+				Decoder: "plain",
+				Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
+			}
+			user.Opaque.Map["gid"] = &types.OpaqueEntry{
+				Decoder: "plain",
+				Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
+			}
+
+			token, err := tokenManager.MintToken(r.Context(), user)
 
 			if err != nil {
 				l.Error().Err(err).Msgf("Could not mint token")
