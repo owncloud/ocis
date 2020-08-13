@@ -173,6 +173,11 @@ apiShareManagementBasic/createShare.feature:195
 apiShareManagementBasic/createShare.feature:417
 apiShareManagementBasic/createShare.feature:418
 #
+# https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
+# https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
+apiShareManagementBasic/createShare.feature:269
+apiShareManagementBasic/createShare.feature:270
+#
 # https://github.com/owncloud/ocis-reva/issues/356 Fields missing in delete share OCS response
 apiShareManagementBasic/deleteShare.feature:36
 apiShareManagementBasic/deleteShare.feature:37
