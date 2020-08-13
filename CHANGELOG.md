@@ -6,20 +6,23 @@ The following sections list the changes in ocis-phoenix unreleased.
 
 ## Summary
 
-* Bugfix - Exit when assets are not found: [#76](https://github.com/owncloud/ocis-phoenix/pull/76)
+* Bugfix - Exit when assets or config are not found: [#76](https://github.com/owncloud/ocis-phoenix/pull/76)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
 * Change - Hide searchbar by default: [#116](https://github.com/owncloud/product/issues/116)
 
 ## Details
 
-* Bugfix - Exit when assets are not found: [#76](https://github.com/owncloud/ocis-phoenix/pull/76)
+* Bugfix - Exit when assets or config are not found: [#76](https://github.com/owncloud/ocis-phoenix/pull/76)
 
-   When a non-existing assets folders is specified, there was only a warning log statement and the
+   When a non-existing assets folder is specified, there was only a warning log statement and the
    service served the builtin assets instead. It is safe to exit the service in such a scenario,
    instead of serving other assets than specified. We changed the log level to `Fatal` on
-   non-existing assets.
+   non-existing assets. Similar for the web config, it was not failing on service level, but only
+   showing an error in the web ui, wenn the specified config file could not be found. We changed the
+   log level to `Fatal` as well.
 
    https://github.com/owncloud/ocis-phoenix/pull/76
+   https://github.com/owncloud/ocis-phoenix/pull/77
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
 
