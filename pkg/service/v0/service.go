@@ -79,21 +79,19 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 
 	// try loading from file
 	if _, err = os.Stat(p.config.Phoenix.Path); os.IsNotExist(err) {
-		p.logger.Error().
+		p.logger.Fatal().
 			Err(err).
 			Str("config", p.config.Phoenix.Path).
-			Msg("Phoenix config doesn't exist")
-		return
+			Msg("phoenix config doesn't exist")
 	}
 
 	payload, err = ioutil.ReadFile(p.config.Phoenix.Path)
 
 	if err != nil {
-		p.logger.Error().
+		p.logger.Fatal().
 			Err(err).
 			Str("config", p.config.Phoenix.Path).
-			Msg("Failed to read custom config")
-
+			Msg("failed to read custom config")
 	}
 	return
 }
