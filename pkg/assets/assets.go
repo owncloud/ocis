@@ -36,9 +36,9 @@ func (a assets) Open(original string) (http.File, error) {
 				return f, nil
 			}
 		} else {
-			a.logger.Warn().
+			a.logger.Fatal().
 				Str("path", a.config.Asset.Path).
-				Msg("Assets directory doesn't exist")
+				Msg("assets directory doesn't exist")
 		}
 	}
 
