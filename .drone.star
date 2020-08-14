@@ -34,7 +34,6 @@ config = {
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
         'webUIResharing',
-        'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
         'webUISharingAcceptShares',
         'webUISharingFilePermissionMultipleUsers',
@@ -42,6 +41,9 @@ config = {
         'webUISharingFolderAdvancedPermissionMultipleUsers',
         'webUISharingNotifications',
       ],
+      'phoenixWebUI3': [
+        'webUISharingPublic',
+      ]
     }
   }
 }
