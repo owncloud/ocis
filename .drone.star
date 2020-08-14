@@ -42,7 +42,7 @@ config = {
         'webUISharingNotifications',
       ],
       'phoenixWebUI3': [
-        'webUISharingPublic',
+        'webUISharingPublic/shareByPublicLink.feature:49',
       ]
     }
   }
