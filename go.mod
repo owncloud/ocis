@@ -12,7 +12,6 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
-	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
@@ -54,3 +53,5 @@ replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
 
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
+
+replace github.com/cs3org/reva => github.com/refs/reva v0.0.0-20200814132521-2547e4f7d24b
