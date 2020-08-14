@@ -305,8 +305,8 @@ func StorageOCDataWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",
-			Value:       "{{.Username}}",
-			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
+			Value:       "{{.Id.OpaqueId}}",
+			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.Mail}}, {{.Id.OpaqueId}}, {{.Id.Idp}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_LAYOUT"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Layout,
 		},
@@ -319,6 +319,16 @@ func StorageOCDataWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "URL to use for the reva gateway service",
 			EnvVars:     []string{"REVA_GATEWAY_URL"},
 			Destination: &cfg.Reva.Gateway.URL,
+		},
+
+		// User provider
+
+		&cli.StringFlag{
+			Name:        "users-url",
+			Value:       "localhost:9144",
+			Usage:       "URL to use for the reva service",
+			EnvVars:     []string{"REVA_USERS_URL"},
+			Destination: &cfg.Reva.Users.URL,
 		},
 	}
 }

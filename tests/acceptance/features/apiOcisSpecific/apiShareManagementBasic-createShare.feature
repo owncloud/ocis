@@ -101,17 +101,17 @@ Feature: sharing
     And user "Alice" has shared folder "/folder1/folder2" with user "Emily"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares"
     Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "<http_status_code>"
-    # On OCIS and reva the response is currently not there
-#    And the response should contain 4 entries
-#    And folder "/folder1" should be included as path in the response
-#    And folder "/folder1/folder2" should be included as path in the response
+    And the HTTP status code should be "200"
+    And the response should contain 4 entries
+    And folder "/folder1" should be included as path in the response
+    # And folder "/folder1/folder2" should be included as path in the response
+    And folder "/folder2" should be included as path in the response
     And user "Alice" sends HTTP method "GET" to OCS API endpoint "/apps/files_sharing/api/v1/shares?path=/folder1/folder2"
     And the response should contain 2 entries
     And folder "/folder1" should not be included as path in the response
+    # And folder "/folder1/folder2" should be included as path in the response
     And folder "/folder2" should be included as path in the response
-#    And folder "/folder1/folder2" should be included as path in the response
     Examples:
-      | ocs_api_version | http_status_code | ocs_status_code |
-      | 1               | 200              | 996             |
-      | 2               | 500              | 996             |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
