@@ -1366,6 +1366,8 @@ github.com/refs/pman v0.0.0-20200701173654-f05b8833071a h1:GCYFb7layULUl1HvZG97u
 github.com/refs/pman v0.0.0-20200701173654-f05b8833071a/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
 github.com/refs/reva v0.0.0-20200814132521-2547e4f7d24b h1:VQs19a3Ak6AWD8I6N+rfsxAeuCzTOO6yK6SdWsMBllI=
 github.com/refs/reva v0.0.0-20200814132521-2547e4f7d24b/go.mod h1:XpslyNQPPVszKD6D8bel1KicZ+/ZhKyp3q+pnLjLtJQ=
+github.com/refs/reva v0.0.0-20200816192417-13ba442a31b0 h1:K68v5NAvvU+HhojX9TFJPAOculP3+B+YuGO3z0cpvz0=
+github.com/refs/reva v0.0.0-20200816192417-13ba442a31b0/go.mod h1:XpslyNQPPVszKD6D8bel1KicZ+/ZhKyp3q+pnLjLtJQ=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/restic/calens v0.1.0/go.mod h1:u67f5msOjCTDYNzOf/NoAUSdmXP03YXPCwIQLYADy5M=

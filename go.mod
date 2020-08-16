@@ -54,4 +54,4 @@ replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/q
 
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 
-replace github.com/cs3org/reva => github.com/refs/reva v0.0.0-20200814132521-2547e4f7d24b
+replace github.com/cs3org/reva => github.com/refs/reva v0.0.0-20200816192417-13ba442a31b0
