@@ -1,15 +1,23 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [2.3.0] (2020-08-17)
 
-The following sections list the changes in ocis-pkg unreleased.
+The following sections list the changes in ocis-pkg 2.3.0.
 
-[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.2.1...master
+[2.3.0]: https://github.com/owncloud/ocis-pkg/compare/v2.2.1...v2.3.0
 
 ## Summary
 
+* Bugfix - Remove redigo 2.0.0+incompatible dependency: [#33](https://github.com/owncloud/ocis-graph/pull/33)
 * Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
 * Enhancement - Add `ocis.id` and numeric id claims: [#50](https://github.com/owncloud/ocis-pkg/pull/50)
 
 ## Details
+
+* Bugfix - Remove redigo 2.0.0+incompatible dependency: [#33](https://github.com/owncloud/ocis-graph/pull/33)
+
+   Get rid of redigo v2.0.0
+
+   https://github.com/owncloud/ocis-graph/pull/33
+
 
 * Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
 
