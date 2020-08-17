@@ -359,11 +359,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
           'git checkout %s' % (phoenixCommit)
         ] if phoenixCommit != '' else []) + [
           'yarn install-all',
-          'yarn run acceptance-tests-drone || echo OK',
-          'ls -lha /srv/app/tmp/reva',
-          'ls -lha /var/tmp/reva',
-          'cat /srv/app/tmp/reva/publicshares',
-          'cat /var/tmp/reva/publicshares',
+          'yarn run acceptance-tests-drone'
         ],
         'volumes': [{
           'name': 'gopath',
