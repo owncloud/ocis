@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.1.1] (2020-08-17)
 
-The following sections list the changes in ocis-store unreleased.
+The following sections list the changes in ocis-store 0.1.1.
 
-[unreleased]: https://github.com/owncloud/ocis-store/compare/v0.1.0...master
+[0.1.1]: https://github.com/owncloud/ocis-store/compare/v0.1.0...v0.1.1
 
 ## Summary
 
