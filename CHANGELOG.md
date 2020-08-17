@@ -1,14 +1,15 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.11.0] (2020-08-17)
 
-The following sections list the changes in ocis-phoenix unreleased.
+The following sections list the changes in ocis-phoenix 0.11.0.
 
-[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.10.0...master
+[0.11.0]: https://github.com/owncloud/ocis-phoenix/compare/v0.10.0...v0.11.0
 
 ## Summary
 
 * Bugfix - Exit when assets or config are not found: [#76](https://github.com/owncloud/ocis-phoenix/pull/76)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#73](https://github.com/owncloud/ocis-phoenix/pull/73)
 * Change - Hide searchbar by default: [#116](https://github.com/owncloud/product/issues/116)
+* Change - Update Phoenix: [#78](https://github.com/owncloud/ocis-phoenix/pull/78)
 
 ## Details
 
@@ -36,6 +37,12 @@ The following sections list the changes in ocis-phoenix unreleased.
 
    https://github.com/owncloud/product/issues/116
    https://github.com/owncloud/ocis-phoenix/pull/74
+
+* Change - Update Phoenix: [#78](https://github.com/owncloud/ocis-phoenix/pull/78)
+
+   Updated phoenix from v0.13.0 to v0.14.0
+
+   https://github.com/owncloud/ocis-phoenix/pull/78
 
 # Changelog for [0.10.0] (2020-07-17)
 
