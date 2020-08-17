@@ -361,9 +361,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
           'yarn install-all',
           'yarn run acceptance-tests-drone || echo OK',
           'ls -lha /srv/app/tmp/reva',
-          'ls -lha /var/tmp/reva',
           'cat /srv/app/tmp/reva/publicshares',
-          'cat /var/tmp/reva/publicshares',
         ],
         'volumes': [{
           'name': 'gopath',
