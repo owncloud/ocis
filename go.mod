@@ -12,7 +12,6 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
-	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
