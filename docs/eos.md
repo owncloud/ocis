@@ -172,3 +172,15 @@ EOS Console [root://localhost] |/>
 
 But this is a different adventure. See the links at the top of this page for other sources of information on eos.
 
+
+## Troubleshooting
+
+Q: When running `docker-compose up -d` ocis exits right away.
+A: You can check the error code using `docker-compose ps` and investigate further by running only ocis again using `docker-compose up ocis` (without `-d` so you can see whet is going on in the foreground).
+One reason might be that the binary was already built and but does not match the container env. Try running `make clean` before running `docker-compose up ocis` so it gets built inside the container.
+
+Q: How do I update a service in the ocis container?
+A: 1. `docker-compose exec ocis make clean build` to update the binary
+   2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
+   3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
+      `docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home`
