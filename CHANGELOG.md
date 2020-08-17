@@ -2,26 +2,14 @@
 
 The following sections list the changes in ocis-ocs unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis-ocs/compare/v0.1.0...master
+[unreleased]: https://github.com/owncloud/ocis-ocs/compare/v0.2.0...master
 
 ## Summary
 
-* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
 * Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
 * Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
-* Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
-* Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
 
 ## Details
-
-* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
-
-   Only use a single instance of go-micro's GRPC client as it already does connection pooling.
-   This prevents connection and file descriptor leaks.
-
-   https://github.com/owncloud/ocis-accounts/issues/79
-   https://github.com/owncloud/ocis-ocs/pull/29
-
 
 * Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
 
@@ -37,6 +25,28 @@ The following sections list the changes in ocis-ocs unreleased.
    We have added an option to pass uidnumber and gidnumber to the ocis api while creating a new user
 
    https://github.com/owncloud/ocis-ocs/pull/34
+
+# Changelog for [0.2.0] (2020-08-17)
+
+The following sections list the changes in ocis-ocs 0.2.0.
+
+[0.2.0]: https://github.com/owncloud/ocis-ocs/compare/v0.1.0...v0.2.0
+
+## Summary
+
+* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+* Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
+* Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
+
+## Details
+
+* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+
+   Only use a single instance of go-micro's GRPC client as it already does connection pooling.
+   This prevents connection and file descriptor leaks.
+
+   https://github.com/owncloud/ocis-accounts/issues/79
+   https://github.com/owncloud/ocis-ocs/pull/29
 
 
 * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
