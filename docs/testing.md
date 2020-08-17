@@ -97,8 +97,9 @@ To run a single test add `BEHAT_FEATURE=<feature file>` and specify the path to 
 ### use existing tests for BDD
 
 As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in ocis.
-Every scenario that does not work in OCIS, is listed in `tests/acceptance/expected-failures.txt` with a link to the related issue.
-Those scenarios are run in the ordinary acceptance test pipeline in CI. The sccenarios that fail are checked against the
+Every scenario that does not work in OCIS with OC storage, is listed in `tests/acceptance/expected-failures-on-OC-storage.txt` with a link to the related issue.
+Similarly, scenarios that do not work in OCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.txt`.
+Scenarios from the oC10 API acceptance tests are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
 
 Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva).

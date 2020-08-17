@@ -122,7 +122,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART':  part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
         },
         'commands': [
           'cd /srv/app/testrunner',
