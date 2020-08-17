@@ -5,8 +5,8 @@ config = {
     'numberOfParts': 2
   },
   'uiTests': {
-    'phoenixBranch': 'master',
-    'phoenixCommit': 'bf3bb5d9c678264449cfbacc1c0d0d262ad6f5f5',
+    'phoenixBranch': 'waitBeforeCheckingShares',
+    'phoenixCommit': '',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
