@@ -7,6 +7,7 @@ The following sections list the changes in ocis-reva unreleased.
 ## Summary
 
 * Bugfix - Update LDAP filters: [#399](https://github.com/owncloud/ocis-reva/pull/399)
+* Change - Environment updates for the username userid split: [#420](https://github.com/owncloud/ocis-reva/pull/420)
 * Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
 * Enhancement - Update reva to v0.1.1-0.20200724135750-b46288b375d6: [#399](https://github.com/owncloud/ocis-reva/pull/399)
 * Enhancement - Update reva to v0.1.1-0.20200728071211-c948977dd3a0: [#407](https://github.com/owncloud/ocis-reva/pull/407)
@@ -29,6 +30,17 @@ The following sections list the changes in ocis-reva unreleased.
 
    https://github.com/owncloud/ocis-reva/pull/399
    https://github.com/cs3org/reva/pull/996
+
+
+* Change - Environment updates for the username userid split: [#420](https://github.com/owncloud/ocis-reva/pull/420)
+
+   We updated the owncloud storage driver in reva to properly look up users by userid or username
+   using the userprovider instead of taking the path segment as is. This requires the user service
+   address as well as changing the default layout to the userid instead of the username. The latter
+   is not considered a stable and persistent identifier.
+
+   https://github.com/owncloud/ocis-reva/pull/420
+   https://github.com/cs3org/reva/pull/1033
 
 
 * Enhancement - Update storage documentation: [#384](https://github.com/owncloud/ocis-reva/pull/384)
