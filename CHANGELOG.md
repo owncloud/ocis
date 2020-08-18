@@ -6,6 +6,7 @@
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
+* Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
@@ -53,6 +54,15 @@
    the context of the ownCloud Infinite Scale project.
 
    https://github.com/owncloud/ocis/issues/2
+
+
+* Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
+
+   COMMANDS: - list, ls List existing accounts - add, create Create a new account - update Make
+   changes to an existing account - remove, rm Removes an existing account - inspect Show detailed
+   data on an existing account - help, h Shows a list of commands or help for one command
+
+   https://github.com/owncloud/product/issues/115
 
 
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
