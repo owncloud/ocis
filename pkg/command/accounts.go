@@ -18,6 +18,13 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start accounts server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Accounts),
+		Subcommands: []*cli.Command{
+			command.ListAccounts(cfg.Accounts),
+			command.AddAccount(cfg.Accounts),
+			command.UpdateAccount(cfg.Accounts),
+			command.RemoveAccount(cfg.Accounts),
+			command.InspectAccount(cfg.Accounts),
+		},
 		Action: func(c *cli.Context) error {
 			accountsCommand := command.Server(configureAccounts(cfg))
 			if err := accountsCommand.Before(c); err != nil {
