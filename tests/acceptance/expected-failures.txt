@@ -1,3 +1,4 @@
+# this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
 #
 # test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
 #
@@ -913,7 +914,7 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
-# https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fails on OCIS
+# https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 apiWebdavPreviews/previews.feature:15
 apiWebdavPreviews/previews.feature:16
 apiWebdavPreviews/previews.feature:17
