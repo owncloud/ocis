@@ -118,6 +118,7 @@
 
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
+   https://github.com/owncloud/ocis/pull/409
 
 
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
