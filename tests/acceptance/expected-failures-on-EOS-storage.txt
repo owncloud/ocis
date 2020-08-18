@@ -1,4 +1,7 @@
 # this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
+# when run with EOS storage
+#
+# ToDo: enable testing with EOS in CI and adjust this list to match what actually fails
 #
 # test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
 #
