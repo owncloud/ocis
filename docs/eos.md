@@ -50,7 +50,7 @@ Kill the home storage. By default it uses the `owncloud` storage driver. We need
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
 ```
 
 ### 4. Home data provider
@@ -59,7 +59,7 @@ Kill the home data provider. By default it uses the `owncloud` storage driver. W
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
+docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
 ```
 
 {{< hint info >}}
@@ -80,7 +80,7 @@ docker-compose exec -e DAV_FILES_NAMESPACE="/eos/" ocis ./bin/ocis run reva-fron
 Login with `einstein / relativity`, upload a file to einsteins home and verify the file is there using
 
 ```
-docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/e/einstein/
+docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/4/4c510ada-c86b-4815-8820-42cdf82c3d51/
 -rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
 ```
 
@@ -172,3 +172,15 @@ EOS Console [root://localhost] |/>
 
 But this is a different adventure. See the links at the top of this page for other sources of information on eos.
 
+
+## Troubleshooting
+
+Q: When running `docker-compose up -d` ocis exits right away.
+A: You can check the error code using `docker-compose ps` and investigate further by running only ocis again using `docker-compose up ocis` (without `-d` so you can see what is going on in the foreground).
+One reason might be that the binary was already built but does not match the container env. Try running `make clean` before running `docker-compose up ocis` so it gets built inside the container.
+
+Q: How do I update a service in the ocis container?
+A: 1. `docker-compose exec ocis make clean build` to update the binary
+   2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
+   3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
+      `docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home`

@@ -1,21 +1,5 @@
 # this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
 #
-# These scenarios are failing because owncloud/ocis code is out-of-date
-# They should start passing when owncloud/ocis is next updated from owncloud/ocis-reva
-#
-apiSharePublicLink2/updatePublicLinkShare.feature:77
-apiSharePublicLink2/updatePublicLinkShare.feature:78
-apiSharePublicLink2/updatePublicLinkShare.feature:142
-apiSharePublicLink2/updatePublicLinkShare.feature:143
-apiSharePublicLink2/updatePublicLinkShare.feature:173
-apiSharePublicLink2/updatePublicLinkShare.feature:174
-apiSharePublicLink2/updatePublicLinkShare.feature:204
-apiSharePublicLink2/updatePublicLinkShare.feature:205
-apiSharePublicLink2/updatePublicLinkShare.feature:235
-apiSharePublicLink2/updatePublicLinkShare.feature:236
-apiSharePublicLink2/updatePublicLinkShare.feature:266
-apiSharePublicLink2/updatePublicLinkShare.feature:267
-#
 # test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
 #
 apiShareManagementBasic/createShare.feature:336
@@ -253,8 +237,11 @@ apiSharePublicLink1/changingPublicLinkShare.feature:63
 apiSharePublicLink1/changingPublicLinkShare.feature:85
 apiSharePublicLink1/changingPublicLinkShare.feature:96
 apiSharePublicLink1/changingPublicLinkShare.feature:107
+apiSharePublicLink1/changingPublicLinkShare.feature:128
 apiSharePublicLink1/changingPublicLinkShare.feature:151
+apiSharePublicLink1/changingPublicLinkShare.feature:174
 apiSharePublicLink1/changingPublicLinkShare.feature:197
+apiSharePublicLink1/changingPublicLinkShare.feature:221
 apiSharePublicLink1/changingPublicLinkShare.feature:244
 apiSharePublicLink1/changingPublicLinkShare.feature:267
 apiSharePublicLink1/changingPublicLinkShare.feature:278
@@ -422,9 +409,6 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:9
 #
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:23
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:48
-apiSharePublicLink2/uploadToPublicLinkShare.feature:49
 #
 # https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
 apiSharePublicLink2/uploadToPublicLinkShare.feature:62
@@ -929,3 +913,52 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
+#
+# https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
+apiWebdavPreviews/previews.feature:15
+apiWebdavPreviews/previews.feature:16
+apiWebdavPreviews/previews.feature:17
+apiWebdavPreviews/previews.feature:18
+apiWebdavPreviews/previews.feature:19
+apiWebdavPreviews/previews.feature:29
+apiWebdavPreviews/previews.feature:30
+apiWebdavPreviews/previews.feature:31
+apiWebdavPreviews/previews.feature:32
+apiWebdavPreviews/previews.feature:33
+apiWebdavPreviews/previews.feature:34
+apiWebdavPreviews/previews.feature:35
+apiWebdavPreviews/previews.feature:46
+apiWebdavPreviews/previews.feature:47
+apiWebdavPreviews/previews.feature:48
+apiWebdavPreviews/previews.feature:49
+apiWebdavPreviews/previews.feature:50
+apiWebdavPreviews/previews.feature:51
+apiWebdavPreviews/previews.feature:52
+apiWebdavPreviews/previews.feature:55
+apiWebdavPreviews/previews.feature:70
+apiWebdavPreviews/previews.feature:71
+apiWebdavPreviews/previews.feature:72
+apiWebdavPreviews/previews.feature:82
+apiWebdavPreviews/previews.feature:83
+apiWebdavPreviews/previews.feature:86
+apiWebdavPreviews/previews.feature:94
+apiWebdavPreviews/previews.feature:103
+apiWebdavPreviews/previews.feature:112
+apiWebdavPreviews/previews.feature:119
+apiWebdavPreviews/previews.feature:126
+apiWebdavPreviews/previews.feature:134
+apiWebdavPreviews/previews.feature:143
+apiWebdavPreviews/previews.feature:162
+apiWebdavPreviews/previews.feature:163
+apiWebdavPreviews/previews.feature:164
+apiWebdavPreviews/previews.feature:165
+apiWebdavPreviews/previews.feature:177
+apiWebdavPreviews/previews.feature:178
+#
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:83
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:84
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:102
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:103
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:104
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:105

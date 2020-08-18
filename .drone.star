@@ -6,7 +6,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'ccdca163c7e9e6ecc57e08a298b08b1d1175f1d5',
+    'phoenixCommit': '06cefd5348ee34b80e066827ce530277ecd91991',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -222,11 +222,9 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
           'PATH_TO_CORE': '/srv/app/testrunner'
@@ -241,7 +239,6 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
       },
     ],
     'services':
-      ldap() +
       redis(),
     'volumes': [
       {
@@ -277,13 +274,11 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
-          'TEST_SERVER_URL': 'http://ocis-server:9140',
+          'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'TEST_EXTERNAL_USER_BACKENDS':'true',
-          'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures.txt'
@@ -299,7 +294,6 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       },
     ],
     'services':
-      ldap() +
       redis(),
     'volumes': [
       {
@@ -349,7 +343,6 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
-          'LDAP_SERVER_URL': 'ldap://ldap',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
@@ -377,7 +370,6 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
       },
     ],
     'services':
-      ldap() +
       redis() +
       selenium(),
     'volumes': [
@@ -963,20 +955,15 @@ def ocisServer():
       'pull': 'always',
       'detach': True,
       'environment' : {
-        'REVA_LDAP_HOSTNAME': 'ldap',
-        'REVA_LDAP_PORT': 636,
-        'REVA_LDAP_BIND_PASSWORD': 'admin',
-        'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
-        'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
-        'REVA_LDAP_SCHEMA_UID': 'uid',
-        'REVA_LDAP_SCHEMA_MAIL': 'mail',
-        'REVA_LDAP_SCHEMA_DISPLAYNAME': 'displayName',
+        'OCIS_LOG_LEVEL': 'debug',
+
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
         'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+        'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
         'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
         'REVA_FRONTEND_URL': 'https://ocis-server:9200',
@@ -984,10 +971,6 @@ def ocisServer():
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
-        'LDAP_URI': 'ldap://ldap',
-        'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
-        'LDAP_BINDPW': 'admin',
-        'LDAP_BASEDN': 'dc=owncloud,dc=com'
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
@@ -1020,21 +1003,6 @@ def cloneCoreRepos(coreBranch, coreCommit):
         'name': 'gopath',
         'path': '/srv/app',
       }]
-    }
-  ]
-
-def ldap():
-  return [
-    {
-      'name': 'ldap',
-      'image': 'osixia/openldap',
-      'pull': 'always',
-      'environment': {
-        'LDAP_DOMAIN': 'owncloud.com',
-        'LDAP_ORGANISATION': 'ownCloud',
-        'LDAP_ADMIN_PASSWORD': 'admin',
-        'LDAP_TLS_VERIFY_CLIENT': 'never',
-      },
     }
   ]
 
