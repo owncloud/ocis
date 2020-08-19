@@ -11,7 +11,7 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
-	github.com/go-chi/chi v4.1.0+incompatible
+	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible
@@ -21,23 +21,23 @@ require (
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/mennanov/fieldmask-utils v0.3.2
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.6.0
+	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200602070144-cd0620668170
-	github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363
+	github.com/onsi/ginkgo v1.10.1 // indirect
+	github.com/onsi/gomega v1.7.0 // indirect
+	github.com/owncloud/ocis-pkg/v2 v2.3.0
+	github.com/owncloud/ocis-settings v0.1.1-0.20200819091309-d59cdd5469ac
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
-	github.com/rs/zerolog v1.18.0
+	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.6.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tredoe/osutil v1.0.5
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
-	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344
 	google.golang.org/genproto v0.0.0-20200527145253-8367513e4ece
 	google.golang.org/protobuf v1.25.0
-	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
