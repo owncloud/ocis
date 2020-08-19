@@ -104,9 +104,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-extension-name",
 			"सिम्प्ले",
 			merrors.New("", "extension: must be in a valid format; name: must be in a valid format.", 0),
-			//CustomError{
-			//	Detail: "extension: must be in a valid format; name: must be in a valid format.",
-			//},
 		},
 		{
 			"UTF validation on display name",
