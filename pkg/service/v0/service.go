@@ -86,7 +86,39 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	res.Bundles = bundles
+
+	// fetch roles of the user
+	rolesResponse := &proto.ListRoleAssignmentsResponse{}
+	err = g.ListRoleAssignments(c, &proto.ListRoleAssignmentsRequest{AccountUuid: req.AccountUuid}, rolesResponse)
+	if err != nil {
+		return err
+	}
+
+	// filter settings in bundles that are allowed according to roles
+	var filteredBundles []*proto.Bundle
+	for _, bundle := range bundles {
+		var filteredSettings []*proto.Setting
+		for _, setting := range bundle.Settings {
+			settingResource := &proto.Resource{
+				Type: proto.Resource_TYPE_SETTING,
+				Id:   setting.Id,
+			}
+			if g.hasPermission(
+				rolesResponse.Assignments,
+				settingResource,
+				proto.Permission_OPERATION_UPDATE,
+				proto.Permission_CONSTRAINT_OWN,
+			) {
+				filteredSettings = append(filteredSettings, setting)
+			}
+		}
+		bundle.Settings = filteredSettings
+		if len(filteredSettings) > 0 {
+			filteredBundles = append(filteredBundles, bundle)
+		}
+	}
+
+	res.Bundles = filteredBundles
 	return nil
 }
 
