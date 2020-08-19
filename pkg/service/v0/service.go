@@ -2,8 +2,8 @@ package svc
 
 import (
 	"context"
-	"github.com/golang/protobuf/ptypes/empty"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"

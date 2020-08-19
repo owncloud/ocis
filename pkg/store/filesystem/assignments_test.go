@@ -14,7 +14,7 @@ import (
 
 var (
 	einstein = "a4d07560-a670-4be9-8d60-9b547751a208"
-	marie    = "3c054db3-eec1-4ca4-b985-bc56dcf560cb"
+	//marie    = "3c054db3-eec1-4ca4-b985-bc56dcf560cb"
 
 	s = Store{
 		dataPath: dataRoot,
