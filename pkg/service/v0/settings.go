@@ -35,11 +35,11 @@ func RegisterSettingsBundles(l *olog.Logger) {
 	permissionRequests := generateProfilePermissionsRequests()
 	for i := range permissionRequests {
 		res, err := service.AddSettingToBundle(context.Background(), &permissionRequests[i])
-		bundleId := permissionRequests[i].BundleId
+		bundleID := permissionRequests[i].BundleId
 		if err != nil {
-			l.Err(err).Str("bundle", bundleId).Str("setting", permissionRequests[i].Setting.Id).Msg("Error adding setting to bundle")
+			l.Err(err).Str("bundle", bundleID).Str("setting", permissionRequests[i].Setting.Id).Msg("Error adding setting to bundle")
 		} else {
-			l.Info().Str("bundle", bundleId).Str("setting", res.Setting.Id).Msg("Successfully added setting to bundle")
+			l.Info().Str("bundle", bundleID).Str("setting", res.Setting.Id).Msg("Successfully added setting to bundle")
 		}
 	}
 }
