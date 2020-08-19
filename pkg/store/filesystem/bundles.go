@@ -117,9 +117,12 @@ func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error 
 	if err != nil {
 		return nil
 	}
-	removeSetting(bundle, settingID)
-	_, err = s.WriteBundle(bundle)
-	return err
+	if ok := removeSetting(bundle, settingID); ok {
+		if _, err := s.WriteBundle(bundle); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // indexOfSetting finds the index of the given setting within the given bundle.
