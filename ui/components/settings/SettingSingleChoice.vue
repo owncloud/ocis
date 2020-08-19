@@ -63,15 +63,15 @@ export default {
   },
   computed: {
     dropElementId () {
-      return `single-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
+      return `single-choice-drop-${this.setting.id}`
     },
     buttonElementId () {
-      return `single-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
+      return `single-choice-toggle-${this.setting.id}`
     }
   },
   methods: {
     getOptionElementId (index) {
-      return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
+      return `${this.setting.id}-${index}`
     },
     async onSelectedOption () {
       const values = []
@@ -83,14 +83,18 @@ export default {
           values.push({ stringValue: this.selectedOption.value.stringValue })
         }
       }
+      const payload = {
+        listValue: {
+          values
+        }
+      }
+      if (!isNil(this.persistedValue)) {
+        payload.id = this.persistedValue.id
+      }
       await this.$emit('onSave', {
         bundle: this.bundle,
         setting: this.setting,
-        value: {
-          listValue: {
-            values
-          }
-        }
+        payload
       })
       // TODO: show a spinner while the request for saving the value is running!
     }

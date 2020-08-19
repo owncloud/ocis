@@ -65,15 +65,15 @@ export default {
       return Array.from(this.selectedOptions).map(option => option.displayValue).join(', ')
     },
     dropElementId () {
-      return `multi-choice-drop-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
+      return `multi-choice-drop-${this.setting.id}`
     },
     buttonElementId () {
-      return `multi-choice-toggle-${this.bundle.identifier.bundleKey}-${this.setting.settingKey}`
+      return `multi-choice-toggle-${this.setting.id}`
     }
   },
   methods: {
     getOptionElementId (index) {
-      return `${this.bundle.identifier.bundleKey}-${this.setting.settingKey}-${index}`
+      return `${this.setting.id}-${index}`
     },
     async onSelectedOption () {
       const values = []
@@ -87,14 +87,18 @@ export default {
           }
         })
       }
+      const payload = {
+        listValue: {
+          values
+        }
+      }
+      if (!isNil(this.persistedValue)) {
+        payload.id = this.persistedValue.id
+      }
       await this.$emit('onSave', {
         bundle: this.bundle,
         setting: this.setting,
-        value: {
-          listValue: {
-            values
-          }
-        }
+        payload
       })
       // TODO: show a spinner while the request for saving the value is running!
     }

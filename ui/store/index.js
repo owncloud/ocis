@@ -1,30 +1,30 @@
 import {
   // eslint-disable-next-line camelcase
-  BundleService_ListSettingsBundles,
+  BundleService_ListBundles,
   // eslint-disable-next-line camelcase
-  ValueService_SaveSettingsValue
+  ValueService_SaveValue
 } from '../client/settings'
 import axios from 'axios'
+import keyBy from 'lodash/keyBy'
 
 const state = {
   config: null,
   initialized: false,
-  settingsBundles: {}
+  bundles: {}
 }
 
 const getters = {
   config: state => state.config,
   initialized: state => state.initialized,
   extensions: state => {
-    return Array.from(state.settingsBundles.keys()).sort()
+    return [...new Set(Object.values(state.bundles).map(bundle => bundle.extension))].sort()
   },
-  getSettingsBundlesByExtension: state => extension => {
-    if (state.settingsBundles.has(extension)) {
-      return Array.from(state.settingsBundles.get(extension).values()).sort((b1, b2) => {
-        return b1.identifier.bundleKey.localeCompare(b2.identifier.bundleKey)
+  getBundlesByExtension: state => extension => {
+    return Object.values(state.bundles)
+      .filter(bundle => bundle.extension === extension)
+      .sort((b1, b2) => {
+        return b1.name.localeCompare(b2.name)
       })
-    }
-    return []
   }
 }
 
@@ -32,15 +32,8 @@ const mutations = {
   SET_INITIALIZED (state, value) {
     state.initialized = value
   },
-  SET_SETTINGS_BUNDLES (state, settingsBundles) {
-    const map = new Map()
-    Array.from(settingsBundles).forEach(bundle => {
-      if (!map.has(bundle.identifier.extension)) {
-        map.set(bundle.identifier.extension, new Map())
-      }
-      map.get(bundle.identifier.extension).set(bundle.identifier.bundleKey, bundle)
-    })
-    state.settingsBundles = map
+  SET_BUNDLES (state, bundles) {
+    state.bundles = keyBy(bundles, 'id')
   },
   LOAD_CONFIG (state, config) {
     state.config = config
@@ -54,66 +47,68 @@ const actions = {
   },
 
   async initialize ({ commit, dispatch }) {
-    await dispatch('fetchSettingsBundles')
+    await dispatch('fetchBundles')
     commit('SET_INITIALIZED', true)
   },
 
-  async fetchSettingsBundles ({ commit, dispatch, getters, rootGetters }) {
+  async fetchBundles ({ commit, dispatch, rootGetters }) {
     injectAuthToken(rootGetters)
-    const response = await BundleService_ListSettingsBundles({
-      $domain: rootGetters.configuration.server,
-      body: {}
-    })
-    if (response.status === 201) {
-      // the settings markup has implicit typing. inject an explicit type variable here
-      const settingsBundles = response.data.settingsBundles
-      if (settingsBundles) {
-        settingsBundles.forEach(bundle => {
-          bundle.settings.forEach(setting => {
-            if (setting.intValue) {
-              setting.type = 'number'
-            } else if (setting.stringValue) {
-              setting.type = 'string'
-            } else if (setting.boolValue) {
-              setting.type = 'boolean'
-            } else if (setting.singleChoiceValue) {
-              setting.type = 'singleChoice'
-            } else if (setting.multiChoiceValue) {
-              setting.type = 'multiChoice'
-            } else {
-              setting.type = 'unknown'
-            }
+    try {
+      const response = await BundleService_ListBundles({
+        $domain: rootGetters.configuration.server,
+        body: {
+          accountUuid: 'me'
+        }
+      })
+      if (response.status === 201) {
+        // the settings markup has implicit typing. inject an explicit type variable here
+        const bundles = response.data.bundles
+        if (bundles) {
+          bundles.forEach(bundle => {
+            bundle.settings.forEach(setting => {
+              if (setting.intValue) {
+                setting.type = 'number'
+              } else if (setting.stringValue) {
+                setting.type = 'string'
+              } else if (setting.boolValue) {
+                setting.type = 'boolean'
+              } else if (setting.singleChoiceValue) {
+                setting.type = 'singleChoice'
+              } else if (setting.multiChoiceValue) {
+                setting.type = 'multiChoice'
+              } else {
+                setting.type = 'unknown'
+              }
+            })
           })
-        })
-        commit('SET_SETTINGS_BUNDLES', settingsBundles)
-      } else {
-        commit('SET_SETTINGS_BUNDLES', [])
+          commit('SET_BUNDLES', bundles)
+        } else {
+          commit('SET_BUNDLES', [])
+        }
       }
-    } else {
+    } catch (err) {
       dispatch('showMessage', {
-        title: 'Failed to fetch settings bundles.',
-        desc: response.statusText,
+        title: 'Failed to fetch bundles.',
         status: 'danger'
       }, { root: true })
     }
   },
 
-  async saveSettingsValue ({ commit, dispatch, getters, rootGetters }, payload) {
+  async saveValue ({ commit, dispatch, getters, rootGetters }, { setting, payload }) {
     injectAuthToken(rootGetters)
-    const response = await ValueService_SaveSettingsValue({
-      $domain: rootGetters.configuration.server,
-      body: {
-        settingsValue: payload
+    try {
+      const response = await ValueService_SaveValue({
+        $domain: rootGetters.configuration.server,
+        body: {
+          value: payload
+        }
+      })
+      if (response.status === 201 && response.data.value) {
+        commit('SET_SETTINGS_VALUE', response.data.value, { root: true })
       }
-    })
-    if (response.status === 201) {
-      if (response.data.settingsValue) {
-        commit('SET_SETTINGS_VALUE', response.data.settingsValue, { root: true })
-      }
-    } else {
+    } catch (e) {
       dispatch('showMessage', {
-        title: 'Failed to save settings value.',
-        desc: response.statusText,
+        title: `Failed to save »${setting.displayName}«.`,
         status: 'danger'
       }, { root: true })
     }

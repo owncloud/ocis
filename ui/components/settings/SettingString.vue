@@ -51,13 +51,16 @@ export default {
   },
   methods: {
     async applyValue () {
-      const value = {
+      const payload = {
         stringValue: this.value
+      }
+      if (!isNil(this.persistedValue)) {
+        payload.id = this.persistedValue.id
       }
       await this.$emit('onSave', {
         bundle: this.bundle,
         setting: this.setting,
-        value
+        payload
       })
       // TODO: show a spinner while the request for saving the value is running!
       this.initialValue = this.value
