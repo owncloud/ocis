@@ -45,7 +45,6 @@ func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
 func (s Store) ReadBundle(bundleID string) (*proto.Bundle, error) {
-	// FIXME: locking should happen on the file here, not globally.
 	m.RLock()
 	defer m.RUnlock()
 
@@ -61,7 +60,6 @@ func (s Store) ReadBundle(bundleID string) (*proto.Bundle, error) {
 
 // ReadSetting tries to find a setting by the given id within the dataPath.
 func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
-	// FIXME: locking should happen on the file here, not globally.
 	m.RLock()
 	defer m.RUnlock()
 
