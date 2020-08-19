@@ -5,6 +5,7 @@ option go_package = "pkg/proto/v0;proto";
 
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
+import "google/protobuf/empty.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
   info: {
@@ -49,18 +50,30 @@ service BundleService {
       body: "*"
     };
   }
+  rpc AddSettingToBundle(AddSettingToBundleRequest) returns (AddSettingToBundleResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundles-add-setting",
+      body: "*"
+    };
+  }
+  rpc RemoveSettingFromBundle(RemoveSettingFromBundleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/bundles-remove-setting",
+      body: "*"
+    };
+  }
 }
 
 service ValueService {
   rpc SaveValue(SaveValueRequest) returns (SaveValueResponse) {
     option (google.api.http) = {
-      post: "/api/v0/settings/value-save",
+      post: "/api/v0/settings/values-save",
       body: "*"
     };
   }
   rpc GetValue(GetValueRequest) returns (GetValueResponse) {
     option (google.api.http) = {
-      post: "/api/v0/settings/value-get",
+      post: "/api/v0/settings/values-get",
       body: "*"
     };
   }
@@ -73,6 +86,33 @@ service ValueService {
   rpc GetValueByUniqueIdentifiers(GetValueByUniqueIdentifiersRequest) returns (GetValueResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/values-get-by-unique-identifiers",
+      body: "*"
+    };
+  }
+}
+
+service RoleService {
+  rpc ListRoles(ListBundlesRequest) returns (ListBundlesResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/roles-list",
+      body: "*"
+    };
+  }
+  rpc ListRoleAssignments(ListRoleAssignmentsRequest) returns (ListRoleAssignmentsResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/assignments-list",
+      body: "*"
+    };
+  }
+  rpc AssignRoleToUser(AssignRoleToUserRequest) returns (AssignRoleToUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/assignments-add",
+      body: "*"
+    };
+  }
+  rpc RemoveRoleFromUser(RemoveRoleFromUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/assignments-remove",
       body: "*"
     };
   }
@@ -105,7 +145,24 @@ message ListBundlesResponse {
   repeated Bundle bundles = 1;
 }
 
+message AddSettingToBundleRequest {
+  string bundle_id = 1;
+  Setting setting = 2;
+}
+
+message AddSettingToBundleResponse {
+  Setting setting = 1;
+}
+
+message RemoveSettingFromBundleRequest {
+  string bundle_id = 1;
+  string setting_id = 2;
+}
+
+// ---
 // requests and responses for settings values
+// ---
+
 message SaveValueRequest {
   Value value = 1;
 }
@@ -145,6 +202,40 @@ message Identifier {
   string extension = 1;
   string bundle = 2;
   string setting = 3;
+}
+
+// --
+// requests and responses for role assignments
+// ---
+
+message ListRoleAssignmentsRequest {
+  string account_uuid = 1;
+}
+
+message ListRoleAssignmentsResponse {
+  repeated UserRoleAssignment assignments = 1;
+}
+
+message AssignRoleToUserRequest {
+  string account_uuid = 1;
+  // the role_id is a bundle_id internally
+  string role_id = 2;
+}
+
+message AssignRoleToUserResponse {
+  UserRoleAssignment assignment = 1;
+}
+
+message RemoveRoleFromUserRequest {
+  string id = 1;
+}
+
+message UserRoleAssignment {
+  // id is generated upon saving the assignment
+  string id = 1;
+  string account_uuid = 2;
+  // the role_id is a bundle_id internally
+  string role_id = 3;
 }
 
 // ---
@@ -196,6 +287,7 @@ message Setting {
     Bool bool_value = 7;
     SingleChoiceList single_choice_value = 8;
     MultiChoiceList multi_choice_value = 9;
+    Permission permission_value = 10;
   }
   Resource resource = 11;
 }
@@ -233,6 +325,24 @@ message ListOption {
   ListOptionValue value = 1;
   bool default = 2;
   string display_value = 3;
+}
+
+message Permission {
+  enum Operation {
+    OPERATION_UNKNOWN = 0;
+    OPERATION_CREATE = 1;
+    OPERATION_READ = 2;
+    OPERATION_UPDATE = 3;
+    OPERATION_DELETE = 4;
+  }
+  Operation operation = 1;
+  enum Constraint {
+    CONSTRAINT_UNKNOWN = 0;
+    CONSTRAINT_OWN = 1;
+    CONSTRAINT_SHARED = 2;
+    CONSTRAINT_ALL = 3;
+  }
+  Constraint constraint = 2;
 }
 
 // ---

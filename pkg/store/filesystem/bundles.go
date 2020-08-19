@@ -95,3 +95,67 @@ func (s Store) WriteBundle(record *proto.Bundle) (*proto.Bundle, error) {
 	s.Logger.Debug().Msgf("request contents written to file: %v", filePath)
 	return record, nil
 }
+
+// AddSettingToBundle adds the given setting to the bundle with the given bundleID.
+func (s Store) AddSettingToBundle(bundleID string, setting *proto.Setting) (*proto.Setting, error) {
+	bundle, err := s.ReadBundle(bundleID)
+	if err != nil {
+		return nil, err
+	}
+	if setting.Id == "" {
+		setting.Id = uuid.Must(uuid.NewV4()).String()
+	}
+	setSetting(bundle, setting)
+	_, err = s.WriteBundle(bundle)
+	if err != nil {
+		return nil, err
+	}
+	return setting, nil
+}
+
+// RemoveSettingFromBundle removes the setting from the bundle with the given ids.
+func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error {
+	bundle, err := s.ReadBundle(bundleID)
+	if err != nil {
+		return nil
+	}
+	removeSetting(bundle, settingID)
+	_, err = s.WriteBundle(bundle)
+	return err
+}
+
+// indexOfSetting finds the index of the given setting within the given bundle.
+// returns -1 if the setting was not found.
+func indexOfSetting(bundle *proto.Bundle, settingID string) int {
+	for index := range bundle.Settings {
+		s := bundle.Settings[index]
+		if s.Id == settingID {
+			return index
+		}
+	}
+	return -1
+}
+
+// setSetting will append or overwrite the given setting within the given bundle
+func setSetting(bundle *proto.Bundle, setting *proto.Setting) {
+	m.Lock()
+	defer m.Unlock()
+	index := indexOfSetting(bundle, setting.Id)
+	if index == -1 {
+		bundle.Settings = append(bundle.Settings, setting)
+	} else {
+		bundle.Settings[index] = setting
+	}
+}
+
+// removeSetting will remove the given setting from the given bundle
+func removeSetting(bundle *proto.Bundle, settingID string) bool {
+	m.Lock()
+	defer m.Unlock()
+	index := indexOfSetting(bundle, settingID)
+	if index == -1 {
+		return false
+	}
+	bundle.Settings = append(bundle.Settings[:index], bundle.Settings[index+1:]...)
+	return true
+}

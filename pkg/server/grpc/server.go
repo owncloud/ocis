@@ -28,6 +28,9 @@ func Server(opts ...Option) grpc.Service {
 	if err := proto.RegisterValueServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register SettingsValues service handler")
 	}
+	if err := proto.RegisterRoleServiceHandler(service.Server(), handle); err != nil {
+		options.Logger.Fatal().Err(err).Msg("could not register SettingsRoles service handler")
+	}
 
 	service.Init()
 	return service

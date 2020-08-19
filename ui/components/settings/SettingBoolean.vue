@@ -38,7 +38,7 @@ export default {
       await this.$emit('onSave', {
         bundle: this.bundle,
         setting: this.setting,
-        value: payload
+        payload
       })
       // TODO: show a spinner while the request for saving the value is running!
     }

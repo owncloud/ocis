@@ -7,6 +7,7 @@ import (
 
 const folderNameBundles = "bundles"
 const folderNameValues = "values"
+const folderNameAssignments = "assignments"
 
 // buildFolderPathForBundles builds the folder path for storing settings bundles. If mkdir is true, folders in the path will be created if necessary.
 func (s Store) buildFolderPathForBundles(mkdir bool) string {
@@ -36,6 +37,21 @@ func (s Store) buildFolderPathForValues(mkdir bool) string {
 func (s Store) buildFilePathForValue(valueID string, mkdir bool) string {
 	extensionFolder := s.buildFolderPathForValues(mkdir)
 	return filepath.Join(extensionFolder, valueID+".json")
+}
+
+// buildFolderPathForRoleAssignments builds the folder path for storing role assignments. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFolderPathForRoleAssignments(mkdir bool) string {
+	roleAssignmentsFolder := filepath.Join(s.dataPath, folderNameAssignments)
+	if mkdir {
+		s.ensureFolderExists(roleAssignmentsFolder)
+	}
+	return roleAssignmentsFolder
+}
+
+// buildFilePathForRoleAssignment builds a unique file name from the given params. If mkdir is true, folders in the path will be created if necessary.
+func (s Store) buildFilePathForRoleAssignment(assignmentID string, mkdir bool) string {
+	roleAssignmentsFolder := s.buildFolderPathForRoleAssignments(mkdir)
+	return filepath.Join(roleAssignmentsFolder, assignmentID+".json")
 }
 
 // ensureFolderExists checks if the given path is an existing folder and creates one if not existing

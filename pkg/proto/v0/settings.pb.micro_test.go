@@ -3,10 +3,12 @@ package proto_test
 import (
 	"context"
 	"encoding/json"
+	fmt "fmt"
 	"log"
 	"os"
 	"testing"
 
+	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	ocislog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -58,6 +60,10 @@ func init() {
 	err = proto.RegisterValueServiceHandler(service.Server(), svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true))))
 	if err != nil {
 		log.Fatalf("could not register ValueServiceHandler: %v", err)
+	}
+	err = proto.RegisterRoleServiceHandler(service.Server(), svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true))))
+	if err != nil {
+		log.Fatalf("could not register RegisterRoleServiceHandler: %v", err)
 	}
 
 	if err = service.Server().Start(); err != nil {
@@ -624,6 +630,52 @@ func TestGetSettingsBundleCreatesFolder(t *testing.T) {
 	_, _ = cl.GetBundle(context.Background(), &getRequest)
 	assert.NoDirExists(t, store.Name+"/bundles/non-existing-bundle")
 	assert.NoFileExists(t, store.Name+"/bundles/non-existing-bundle/not-existing-bundle.json")
+	os.RemoveAll(dataStore)
+}
+
+// TODO non-deterministic. Fix.
+func TestCreateRoleAndAssign(t *testing.T) {
+	c := mgrpc.NewClient()
+	bundleC := proto.NewBundleService("com.owncloud.api.settings", c)
+
+	res, err := bundleC.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+		Bundle: &proto.Bundle{
+			// Id:          "f36db5e6-a03c-40df-8413-711c67e40b47", // bug: providing the ID ignores its value for the filename.
+			Type:        proto.Bundle_TYPE_ROLE,
+			DisplayName: "test role - update",
+			Name:        "TEST_ROLE",
+			Extension:   "ocis-settings",
+			Settings: []*proto.Setting{
+				{
+					Name: "settingName",
+					Resource: &proto.Resource{
+						Id:   settingsStub[0].Id,
+						Type: proto.Resource_TYPE_SETTING,
+					},
+					Value: &proto.Setting_PermissionValue{
+						&proto.Permission{
+							Operation:  proto.Permission_OPERATION_UPDATE,
+							Constraint: proto.Permission_CONSTRAINT_OWN,
+						},
+					},
+				},
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_SYSTEM,
+			},
+		},
+	})
+	if err == nil {
+		rolesC := proto.NewRoleService("com.owncloud.api.settings", c)
+		_, err = rolesC.AssignRoleToUser(context.Background(), &proto.AssignRoleToUserRequest{
+			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
+			RoleId:      res.Bundle.Id,
+		})
+		if err != nil {
+			fmt.Println(err)
+		}
+		assert.NoError(t, err)
+	}
 	os.RemoveAll(dataStore)
 }
 

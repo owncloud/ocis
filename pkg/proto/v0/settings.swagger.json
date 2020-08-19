@@ -24,6 +24,102 @@
     "application/json"
   ],
   "paths": {
+    "/api/v0/settings/assignments-add": {
+      "post": {
+        "operationId": "RoleService_AssignRoleToUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoAssignRoleToUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoAssignRoleToUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-list": {
+      "post": {
+        "operationId": "RoleService_ListRoleAssignments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListRoleAssignmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListRoleAssignmentsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-remove": {
+      "post": {
+        "operationId": "RoleService_RemoveRoleFromUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoRemoveRoleFromUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
     "/api/v0/settings/bundle-get": {
       "post": {
         "operationId": "BundleService_GetBundle",
@@ -88,6 +184,38 @@
         ]
       }
     },
+    "/api/v0/settings/bundles-add-setting": {
+      "post": {
+        "operationId": "BundleService_AddSettingToBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoAddSettingToBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoAddSettingToBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
     "/api/v0/settings/bundles-list": {
       "post": {
         "operationId": "BundleService_ListBundles",
@@ -120,7 +248,71 @@
         ]
       }
     },
-    "/api/v0/settings/value-get": {
+    "/api/v0/settings/bundles-remove-setting": {
+      "post": {
+        "operationId": "BundleService_RemoveSettingFromBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoRemoveSettingFromBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/roles-list": {
+      "post": {
+        "operationId": "RoleService_ListRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get": {
       "post": {
         "operationId": "ValueService_GetValue",
         "responses": {
@@ -144,38 +336,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/protoGetValueRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ValueService"
-        ]
-      }
-    },
-    "/api/v0/settings/value-save": {
-      "post": {
-        "operationId": "ValueService_SaveValue",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/protoSaveValueResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/protoSaveValueRequest"
             }
           }
         ],
@@ -247,9 +407,90 @@
           "ValueService"
         ]
       }
+    },
+    "/api/v0/settings/values-save": {
+      "post": {
+        "operationId": "ValueService_SaveValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
     }
   },
   "definitions": {
+    "PermissionConstraint": {
+      "type": "string",
+      "enum": [
+        "CONSTRAINT_UNKNOWN",
+        "CONSTRAINT_OWN",
+        "CONSTRAINT_SHARED",
+        "CONSTRAINT_ALL"
+      ],
+      "default": "CONSTRAINT_UNKNOWN"
+    },
+    "protoAddSettingToBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/protoSetting"
+        }
+      }
+    },
+    "protoAddSettingToBundleResponse": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/protoSetting"
+        }
+      }
+    },
+    "protoAssignRoleToUserRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        },
+        "role_id": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "protoAssignRoleToUserResponse": {
+      "type": "object",
+      "properties": {
+        "assignment": {
+          "$ref": "#/definitions/protoUserRoleAssignment"
+        }
+      }
+    },
     "protoBool": {
       "type": "object",
       "properties": {
@@ -427,6 +668,25 @@
         }
       }
     },
+    "protoListRoleAssignmentsRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListRoleAssignmentsResponse": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoUserRoleAssignment"
+          }
+        }
+      }
+    },
     "protoListValue": {
       "type": "object",
       "properties": {
@@ -468,6 +728,47 @@
           "items": {
             "$ref": "#/definitions/protoListOption"
           }
+        }
+      }
+    },
+    "protoPermission": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "$ref": "#/definitions/protoPermissionOperation"
+        },
+        "constraint": {
+          "$ref": "#/definitions/PermissionConstraint"
+        }
+      }
+    },
+    "protoPermissionOperation": {
+      "type": "string",
+      "enum": [
+        "OPERATION_UNKNOWN",
+        "OPERATION_CREATE",
+        "OPERATION_READ",
+        "OPERATION_UPDATE",
+        "OPERATION_DELETE"
+      ],
+      "default": "OPERATION_UNKNOWN"
+    },
+    "protoRemoveRoleFromUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoRemoveSettingFromBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string"
         }
       }
     },
@@ -519,8 +820,7 @@
         "value": {
           "$ref": "#/definitions/protoValue"
         }
-      },
-      "title": "requests and responses for settings values"
+      }
     },
     "protoSaveValueResponse": {
       "type": "object",
@@ -560,6 +860,9 @@
         "multi_choice_value": {
           "$ref": "#/definitions/protoMultiChoiceList"
         },
+        "permission_value": {
+          "$ref": "#/definitions/protoPermission"
+        },
         "resource": {
           "$ref": "#/definitions/protoResource"
         }
@@ -596,6 +899,22 @@
         },
         "placeholder": {
           "type": "string"
+        }
+      }
+    },
+    "protoUserRoleAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is generated upon saving the assignment"
+        },
+        "account_uuid": {
+          "type": "string"
+        },
+        "role_id": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
         }
       }
     },
