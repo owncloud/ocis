@@ -8,6 +8,8 @@ import (
 	"os"
 	"testing"
 
+	merrors "github.com/micro/go-micro/v2/errors"
+
 	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	ocislog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
@@ -71,13 +73,6 @@ func init() {
 	}
 }
 
-type CustomError struct {
-	ID     string
-	Code   int
-	Detail string
-	Status string
-}
-
 /**
 testing that saving a settings bundle and retrieving it again works correctly
 using various setting bundle properties
@@ -92,7 +87,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 		displayName   string
 		extensionName string
 		UUID          string
-		expectedError CustomError
+		expectedError error
 	}{
 		{
 			"ASCII",
@@ -100,7 +95,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-bundle-key",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			nil,
 		},
 		{
 			"UTF validation on bundle name",
@@ -108,12 +103,10 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
 			"सिम्प्ले",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "extension: must be in a valid format; name: must be in a valid format.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "extension: must be in a valid format; name: must be in a valid format.", 0),
+			//CustomError{
+			//	Detail: "extension: must be in a valid format; name: must be in a valid format.",
+			//},
 		},
 		{
 			"UTF validation on display name",
@@ -121,12 +114,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "name: must be in a valid format.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "name: must be in a valid format.", 0),
 		},
 		{
 			"extension name with ../ in the name",
@@ -134,12 +122,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"../folder-a-level-higher-up",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "extension: must be in a valid format.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "extension: must be in a valid format.", 0),
 		},
 		{
 			"extension name with \\ in the name",
@@ -147,12 +130,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"\\",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "extension: must be in a valid format.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "extension: must be in a valid format.", 0),
 		},
 		{
 			"spaces are disallowed in bundle names",
@@ -160,9 +138,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple display name",
 			"simple extension name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				Detail: "extension: must be in a valid format; name: must be in a valid format.",
-			},
+			merrors.New("", "extension: must be in a valid format; name: must be in a valid format.", 0),
 		},
 		{
 			"spaces are allowed in display names",
@@ -170,7 +146,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple display name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{},
+			nil,
 		},
 		{
 			"extension missing",
@@ -178,12 +154,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "extension: cannot be blank.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "extension: cannot be blank.", 0),
 		},
 		{
 			"display name missing",
@@ -191,12 +162,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "display_name: cannot be blank.",
-				Status: "Internal Server Error",
-			},
+			merrors.New("", "display_name: cannot be blank.", 0),
 		},
 		{
 			"UUID missing (omitted on bundles)",
@@ -204,7 +170,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"simple-extension-name",
 			"",
-			CustomError{},
+			nil,
 		},
 	}
 	for _, scenario := range scenarios {
@@ -225,14 +191,9 @@ func TestSettingsBundleProperties(t *testing.T) {
 			}
 
 			cresponse, err := cl.SaveBundle(context.Background(), &createRequest)
-			if err != nil || (CustomError{} != scenario.expectedError) {
-				assert.Error(t, err)
-				var errorData CustomError
-				err = json.Unmarshal([]byte(err.Error()), &errorData)
-				if err != nil {
-					t.Log(err)
-				}
-				assert.Equal(t, scenario.expectedError.Detail, errorData.Detail)
+			if err != nil || scenario.expectedError != nil {
+				t.Log(err)
+				assert.Equal(t, scenario.expectedError, err)
 			} else {
 				assert.Equal(t, scenario.extensionName, cresponse.Bundle.Extension)
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
@@ -258,9 +219,7 @@ func TestSettingsBundleWithoutSettings(t *testing.T) {
 	response, err := cl.SaveBundle(context.Background(), &createRequest)
 	assert.Error(t, err)
 	assert.Nil(t, response)
-	var errorData CustomError
-	_ = json.Unmarshal([]byte(err.Error()), &errorData)
-	assert.Equal(t, "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", errorData.Detail)
+	assert.Equal(t, merrors.New("", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 0), err)
 	os.RemoveAll(dataStore)
 }
 
