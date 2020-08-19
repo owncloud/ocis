@@ -113,6 +113,13 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.LDAP.UserFilter,
 		},
 		&cli.StringFlag{
+			Name:        "ldap-attributefilter",
+			Value:       "(&(objectclass=posixAccount)({{attr}}={{value}}))",
+			Usage:       "LDAP filter used when searching for a user by claim/attribute. {{attr}} will be replaced with the attribute, {{value}} with the value.",
+			EnvVars:     []string{"REVA_LDAP_ATTRIBUTEFILTER"},
+			Destination: &cfg.Reva.LDAP.AttributeFilter,
+		},
+		&cli.StringFlag{
 			Name:        "ldap-findfilter",
 			Value:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
 			Usage:       "LDAP filter used when searching for recipients. {{query}} will be replaced with the search query",
@@ -177,6 +184,20 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "LDAP schema cn",
 			EnvVars:     []string{"REVA_LDAP_SCHEMA_CN"},
 			Destination: &cfg.Reva.LDAP.Schema.CN,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-schema-uidnumber",
+			Value:       "uidnumber",
+			Usage:       "LDAP schema uidnumber",
+			EnvVars:     []string{"REVA_LDAP_SCHEMA_UID_NUMBER"},
+			Destination: &cfg.Reva.LDAP.Schema.UIDNumber,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-schema-gidnumber",
+			Value:       "gidnumber",
+			Usage:       "LDAP schema gidnumber",
+			EnvVars:     []string{"REVA_LDAP_SCHEMA_GIDNUMBER"},
+			Destination: &cfg.Reva.LDAP.Schema.GIDNumber,
 		},
 
 		// Services

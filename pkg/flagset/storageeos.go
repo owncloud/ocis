@@ -281,6 +281,13 @@ func StorageEOSWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.EOS.Layout,
 		},
+		&cli.StringFlag{
+			Name:        "storage-eos-gatewaysvc",
+			Value:       "localhost:9142",
+			Usage:       "URL to use for the reva gateway service",
+			EnvVars:     []string{"REVA_STORAGE_EOS_GATEWAYSVC"},
+			Destination: &cfg.Reva.Storages.EOS.GatewaySVC,
+		},
 
 		// local
 

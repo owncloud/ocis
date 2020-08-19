@@ -105,7 +105,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"user_layout":            cfg.Reva.Storages.EOS.Layout,
+										"gatewaysvc":             cfg.Reva.Storages.EOS.GatewaySVC,
 									},
 									"eoshome": map[string]interface{}{
 										"namespace":              cfg.Reva.Storages.EOS.Namespace,
@@ -124,6 +124,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
 										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
 										"user_layout":            cfg.Reva.Storages.EOS.Layout,
+										"gatewaysvc":             cfg.Reva.Storages.EOS.GatewaySVC,
 									},
 									"local": map[string]interface{}{
 										"root": cfg.Reva.Storages.Local.Root,
