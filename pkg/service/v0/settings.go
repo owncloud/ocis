@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	settingUuidProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
+	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 )
 
 // RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
@@ -108,7 +108,7 @@ func generateBundleProfileRequest() settings.SaveBundleRequest {
 			DisplayName: "Profile",
 			Settings: []*settings.Setting{
 				{
-					Id:          settingUuidProfileLanguage,
+					Id:          settingUUIDProfileLanguage,
 					Name:        "language",
 					DisplayName: "Language",
 					Description: "User language",
