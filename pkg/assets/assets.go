@@ -3,7 +3,7 @@ package assets
 import (
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -27,7 +27,7 @@ type assets struct {
 func (a assets) Open(original string) (http.File, error) {
 	if a.config.Asset.Path != "" {
 		if stat, err := os.Stat(a.config.Asset.Path); err == nil && stat.IsDir() {
-			custom := path.Join(
+			custom := filepath.Join(
 				a.config.Asset.Path,
 				original,
 			)

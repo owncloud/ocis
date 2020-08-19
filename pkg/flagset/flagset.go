@@ -158,10 +158,11 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.GRPC.Namespace,
 		},
 		&cli.StringFlag{
-			Name:        "mount-path",
+			Name:        "data-path",
+			Value:       "/var/tmp/ocis-settings",
 			Usage:       "Mount path for the storage",
-			EnvVars:     []string{"SETTINGS_ROOT_MOUNT_PATH"},
-			Destination: &cfg.Storage.RootMountPath,
+			EnvVars:     []string{"SETTINGS_DATA_PATH"},
+			Destination: &cfg.Storage.DataPath,
 		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",

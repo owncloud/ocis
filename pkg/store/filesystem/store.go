@@ -3,7 +3,6 @@ package store
 
 import (
 	"os"
-	"path"
 
 	olog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -18,8 +17,8 @@ var (
 
 // Store interacts with the filesystem to manage settings information
 type Store struct {
-	mountPath string
-	Logger    olog.Logger
+	dataPath string
+	Logger   olog.Logger
 }
 
 // New creates a new store
@@ -32,16 +31,16 @@ func New(cfg *config.Config) settings.Manager {
 		),
 	}
 
-	dest := path.Join(cfg.Storage.RootMountPath, Name)
-	if _, err := os.Stat(dest); err != nil {
-		s.Logger.Info().Msgf("creating container on %v", dest)
-		err := os.MkdirAll(dest, 0700)
+	if _, err := os.Stat(cfg.Storage.DataPath); err != nil {
+		s.Logger.Info().Msgf("creating container on %v", cfg.Storage.DataPath)
+		err := os.MkdirAll(cfg.Storage.DataPath, 0700)
+
 		if err != nil {
-			s.Logger.Err(err).Msgf("providing container on %v", dest)
+			s.Logger.Err(err).Msgf("providing container on %v", cfg.Storage.DataPath)
 		}
 	}
 
-	s.mountPath = dest
+	s.dataPath = cfg.Storage.DataPath
 	return &s
 }
 

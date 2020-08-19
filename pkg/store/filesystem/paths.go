@@ -10,7 +10,7 @@ const folderNameValues = "values"
 
 // buildFolderPathForBundles builds the folder path for storing settings bundles. If mkdir is true, folders in the path will be created if necessary.
 func (s Store) buildFolderPathForBundles(mkdir bool) string {
-	folderPath := filepath.Join(s.mountPath, folderNameBundles)
+	folderPath := filepath.Join(s.dataPath, folderNameBundles)
 	if mkdir {
 		s.ensureFolderExists(folderPath)
 	}
@@ -25,7 +25,7 @@ func (s Store) buildFilePathForBundle(bundleID string, mkdir bool) string {
 
 // buildFolderPathForValues builds the folder path for storing settings values. If mkdir is true, folders in the path will be created if necessary.
 func (s Store) buildFolderPathForValues(mkdir bool) string {
-	folderPath := filepath.Join(s.mountPath, folderNameValues)
+	folderPath := filepath.Join(s.dataPath, folderNameValues)
 	if mkdir {
 		s.ensureFolderExists(folderPath)
 	}
