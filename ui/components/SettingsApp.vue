@@ -18,16 +18,16 @@
         </template>
         <template v-if="settingsValuesLoaded">
           <settings-bundle
-            v-for="bundle in selectedSettingsBundles"
-            :key="'bundle-' + bundle.identifier.bundleKey"
+            v-for="bundle in selectedBundles"
+            :key="'bundle-' + bundle.id"
             :bundle="bundle"
             class="uk-margin-top"
           />
         </template>
         <div class="uk-margin-top" v-else>
-          <oc-loader :aria-label="$gettext('Loading settings values')" />
+          <oc-loader :aria-label="$gettext('Loading personal settings')" />
           <oc-alert :aria-hidden="true" varition="primary" no-close>
-            <p v-translate>Loading settings values...</p>
+            <p v-translate>Loading personal settings...</p>
           </oc-alert>
         </div>
       </template>
@@ -53,7 +53,7 @@ export default {
     ...mapGetters('Settings', [
       'extensions',
       'initialized',
-      'getSettingsBundlesByExtension'
+      'getBundlesByExtension'
     ]),
     extensionRouteParam () {
       return this.$route.params.extension
@@ -61,9 +61,9 @@ export default {
     selectedExtensionName () {
       return this.getExtensionName(this.selectedExtension)
     },
-    selectedSettingsBundles () {
+    selectedBundles () {
       if (this.selectedExtension) {
-        return this.getSettingsBundlesByExtension(this.selectedExtension)
+        return this.getBundlesByExtension(this.selectedExtension)
       }
       return []
     }

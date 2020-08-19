@@ -22,18 +22,18 @@ func (h *webBundleServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	h.r.ServeHTTP(w, r)
 }
 
-func (h *webBundleServiceHandler) SaveSettingsBundle(w http.ResponseWriter, r *http.Request) {
+func (h *webBundleServiceHandler) SaveBundle(w http.ResponseWriter, r *http.Request) {
 
-	req := &SaveSettingsBundleRequest{}
+	req := &SaveBundleRequest{}
 
-	resp := &SaveSettingsBundleResponse{}
+	resp := &SaveBundleResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.SaveSettingsBundle(
+	if err := h.h.SaveBundle(
 		r.Context(),
 		req,
 		resp,
@@ -46,18 +46,18 @@ func (h *webBundleServiceHandler) SaveSettingsBundle(w http.ResponseWriter, r *h
 	render.JSON(w, r, resp)
 }
 
-func (h *webBundleServiceHandler) GetSettingsBundle(w http.ResponseWriter, r *http.Request) {
+func (h *webBundleServiceHandler) GetBundle(w http.ResponseWriter, r *http.Request) {
 
-	req := &GetSettingsBundleRequest{}
+	req := &GetBundleRequest{}
 
-	resp := &GetSettingsBundleResponse{}
+	resp := &GetBundleResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.GetSettingsBundle(
+	if err := h.h.GetBundle(
 		r.Context(),
 		req,
 		resp,
@@ -70,18 +70,18 @@ func (h *webBundleServiceHandler) GetSettingsBundle(w http.ResponseWriter, r *ht
 	render.JSON(w, r, resp)
 }
 
-func (h *webBundleServiceHandler) ListSettingsBundles(w http.ResponseWriter, r *http.Request) {
+func (h *webBundleServiceHandler) ListBundles(w http.ResponseWriter, r *http.Request) {
 
-	req := &ListSettingsBundlesRequest{}
+	req := &ListBundlesRequest{}
 
-	resp := &ListSettingsBundlesResponse{}
+	resp := &ListBundlesResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.ListSettingsBundles(
+	if err := h.h.ListBundles(
 		r.Context(),
 		req,
 		resp,
@@ -100,9 +100,9 @@ func RegisterBundleServiceWeb(r chi.Router, i BundleServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/settings/bundle-save", handler.SaveSettingsBundle)
-	r.MethodFunc("POST", "/api/v0/settings/bundle-get", handler.GetSettingsBundle)
-	r.MethodFunc("POST", "/api/v0/settings/bundles-list", handler.ListSettingsBundles)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-save", handler.SaveBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-get", handler.GetBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundles-list", handler.ListBundles)
 }
 
 type webValueServiceHandler struct {
@@ -114,18 +114,18 @@ func (h *webValueServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	h.r.ServeHTTP(w, r)
 }
 
-func (h *webValueServiceHandler) SaveSettingsValue(w http.ResponseWriter, r *http.Request) {
+func (h *webValueServiceHandler) SaveValue(w http.ResponseWriter, r *http.Request) {
 
-	req := &SaveSettingsValueRequest{}
+	req := &SaveValueRequest{}
 
-	resp := &SaveSettingsValueResponse{}
+	resp := &SaveValueResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.SaveSettingsValue(
+	if err := h.h.SaveValue(
 		r.Context(),
 		req,
 		resp,
@@ -138,18 +138,18 @@ func (h *webValueServiceHandler) SaveSettingsValue(w http.ResponseWriter, r *htt
 	render.JSON(w, r, resp)
 }
 
-func (h *webValueServiceHandler) GetSettingsValue(w http.ResponseWriter, r *http.Request) {
+func (h *webValueServiceHandler) GetValue(w http.ResponseWriter, r *http.Request) {
 
-	req := &GetSettingsValueRequest{}
+	req := &GetValueRequest{}
 
-	resp := &GetSettingsValueResponse{}
+	resp := &GetValueResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.GetSettingsValue(
+	if err := h.h.GetValue(
 		r.Context(),
 		req,
 		resp,
@@ -162,18 +162,42 @@ func (h *webValueServiceHandler) GetSettingsValue(w http.ResponseWriter, r *http
 	render.JSON(w, r, resp)
 }
 
-func (h *webValueServiceHandler) ListSettingsValues(w http.ResponseWriter, r *http.Request) {
+func (h *webValueServiceHandler) ListValues(w http.ResponseWriter, r *http.Request) {
 
-	req := &ListSettingsValuesRequest{}
+	req := &ListValuesRequest{}
 
-	resp := &ListSettingsValuesResponse{}
+	resp := &ListValuesResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 		return
 	}
 
-	if err := h.h.ListSettingsValues(
+	if err := h.h.ListValues(
+		r.Context(),
+		req,
+		resp,
+	); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, resp)
+}
+
+func (h *webValueServiceHandler) GetValueByUniqueIdentifiers(w http.ResponseWriter, r *http.Request) {
+
+	req := &GetValueByUniqueIdentifiersRequest{}
+
+	resp := &GetValueResponse{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	if err := h.h.GetValueByUniqueIdentifiers(
 		r.Context(),
 		req,
 		resp,
@@ -192,442 +216,515 @@ func RegisterValueServiceWeb(r chi.Router, i ValueServiceHandler, middlewares ..
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/settings/value-save", handler.SaveSettingsValue)
-	r.MethodFunc("POST", "/api/v0/settings/value-get", handler.GetSettingsValue)
-	r.MethodFunc("POST", "/api/v0/settings/values-list", handler.ListSettingsValues)
+	r.MethodFunc("POST", "/api/v0/settings/value-save", handler.SaveValue)
+	r.MethodFunc("POST", "/api/v0/settings/value-get", handler.GetValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-list", handler.ListValues)
+	r.MethodFunc("POST", "/api/v0/settings/values-get-by-unique-identifiers", handler.GetValueByUniqueIdentifiers)
 }
 
-// SaveSettingsBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SaveSettingsBundleRequest. This struct is safe to replace or modify but
+// SaveBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of SaveBundleRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsBundleRequestJSONMarshaler = new(jsonpb.Marshaler)
+var SaveBundleRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SaveSettingsBundleRequest) MarshalJSON() ([]byte, error) {
+func (m *SaveBundleRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SaveSettingsBundleRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := SaveBundleRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SaveSettingsBundleRequest)(nil)
+var _ json.Marshaler = (*SaveBundleRequest)(nil)
 
-// SaveSettingsBundleRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SaveSettingsBundleRequest. This struct is safe to replace or modify but
+// SaveBundleRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of SaveBundleRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsBundleRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SaveBundleRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SaveSettingsBundleRequest) UnmarshalJSON(b []byte) error {
-	return SaveSettingsBundleRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *SaveBundleRequest) UnmarshalJSON(b []byte) error {
+	return SaveBundleRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SaveSettingsBundleRequest)(nil)
+var _ json.Unmarshaler = (*SaveBundleRequest)(nil)
 
-// SaveSettingsBundleResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SaveSettingsBundleResponse. This struct is safe to replace or modify but
+// SaveBundleResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of SaveBundleResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsBundleResponseJSONMarshaler = new(jsonpb.Marshaler)
+var SaveBundleResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SaveSettingsBundleResponse) MarshalJSON() ([]byte, error) {
+func (m *SaveBundleResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SaveSettingsBundleResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := SaveBundleResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SaveSettingsBundleResponse)(nil)
+var _ json.Marshaler = (*SaveBundleResponse)(nil)
 
-// SaveSettingsBundleResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SaveSettingsBundleResponse. This struct is safe to replace or modify but
+// SaveBundleResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of SaveBundleResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsBundleResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SaveBundleResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SaveSettingsBundleResponse) UnmarshalJSON(b []byte) error {
-	return SaveSettingsBundleResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *SaveBundleResponse) UnmarshalJSON(b []byte) error {
+	return SaveBundleResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SaveSettingsBundleResponse)(nil)
+var _ json.Unmarshaler = (*SaveBundleResponse)(nil)
 
-// GetSettingsBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of GetSettingsBundleRequest. This struct is safe to replace or modify but
+// GetBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GetBundleRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsBundleRequestJSONMarshaler = new(jsonpb.Marshaler)
+var GetBundleRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *GetSettingsBundleRequest) MarshalJSON() ([]byte, error) {
+func (m *GetBundleRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := GetSettingsBundleRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := GetBundleRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*GetSettingsBundleRequest)(nil)
+var _ json.Marshaler = (*GetBundleRequest)(nil)
 
-// GetSettingsBundleRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of GetSettingsBundleRequest. This struct is safe to replace or modify but
+// GetBundleRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GetBundleRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsBundleRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var GetBundleRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *GetSettingsBundleRequest) UnmarshalJSON(b []byte) error {
-	return GetSettingsBundleRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *GetBundleRequest) UnmarshalJSON(b []byte) error {
+	return GetBundleRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*GetSettingsBundleRequest)(nil)
+var _ json.Unmarshaler = (*GetBundleRequest)(nil)
 
-// GetSettingsBundleResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of GetSettingsBundleResponse. This struct is safe to replace or modify but
+// GetBundleResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GetBundleResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsBundleResponseJSONMarshaler = new(jsonpb.Marshaler)
+var GetBundleResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *GetSettingsBundleResponse) MarshalJSON() ([]byte, error) {
+func (m *GetBundleResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := GetSettingsBundleResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := GetBundleResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*GetSettingsBundleResponse)(nil)
+var _ json.Marshaler = (*GetBundleResponse)(nil)
 
-// GetSettingsBundleResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of GetSettingsBundleResponse. This struct is safe to replace or modify but
+// GetBundleResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GetBundleResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsBundleResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var GetBundleResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *GetSettingsBundleResponse) UnmarshalJSON(b []byte) error {
-	return GetSettingsBundleResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *GetBundleResponse) UnmarshalJSON(b []byte) error {
+	return GetBundleResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*GetSettingsBundleResponse)(nil)
+var _ json.Unmarshaler = (*GetBundleResponse)(nil)
 
-// ListSettingsBundlesRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of ListSettingsBundlesRequest. This struct is safe to replace or modify but
+// ListBundlesRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListBundlesRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsBundlesRequestJSONMarshaler = new(jsonpb.Marshaler)
+var ListBundlesRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *ListSettingsBundlesRequest) MarshalJSON() ([]byte, error) {
+func (m *ListBundlesRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := ListSettingsBundlesRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListBundlesRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*ListSettingsBundlesRequest)(nil)
+var _ json.Marshaler = (*ListBundlesRequest)(nil)
 
-// ListSettingsBundlesRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of ListSettingsBundlesRequest. This struct is safe to replace or modify but
+// ListBundlesRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListBundlesRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsBundlesRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListBundlesRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *ListSettingsBundlesRequest) UnmarshalJSON(b []byte) error {
-	return ListSettingsBundlesRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListBundlesRequest) UnmarshalJSON(b []byte) error {
+	return ListBundlesRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*ListSettingsBundlesRequest)(nil)
+var _ json.Unmarshaler = (*ListBundlesRequest)(nil)
 
-// ListSettingsBundlesResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of ListSettingsBundlesResponse. This struct is safe to replace or modify but
+// ListBundlesResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListBundlesResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsBundlesResponseJSONMarshaler = new(jsonpb.Marshaler)
+var ListBundlesResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *ListSettingsBundlesResponse) MarshalJSON() ([]byte, error) {
+func (m *ListBundlesResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := ListSettingsBundlesResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListBundlesResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*ListSettingsBundlesResponse)(nil)
+var _ json.Marshaler = (*ListBundlesResponse)(nil)
 
-// ListSettingsBundlesResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of ListSettingsBundlesResponse. This struct is safe to replace or modify but
+// ListBundlesResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListBundlesResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsBundlesResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListBundlesResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *ListSettingsBundlesResponse) UnmarshalJSON(b []byte) error {
-	return ListSettingsBundlesResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListBundlesResponse) UnmarshalJSON(b []byte) error {
+	return ListBundlesResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*ListSettingsBundlesResponse)(nil)
+var _ json.Unmarshaler = (*ListBundlesResponse)(nil)
 
-// SaveSettingsValueRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SaveSettingsValueRequest. This struct is safe to replace or modify but
+// SaveValueRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of SaveValueRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsValueRequestJSONMarshaler = new(jsonpb.Marshaler)
+var SaveValueRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SaveSettingsValueRequest) MarshalJSON() ([]byte, error) {
+func (m *SaveValueRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SaveSettingsValueRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := SaveValueRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SaveSettingsValueRequest)(nil)
+var _ json.Marshaler = (*SaveValueRequest)(nil)
 
-// SaveSettingsValueRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SaveSettingsValueRequest. This struct is safe to replace or modify but
+// SaveValueRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of SaveValueRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsValueRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SaveValueRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SaveSettingsValueRequest) UnmarshalJSON(b []byte) error {
-	return SaveSettingsValueRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *SaveValueRequest) UnmarshalJSON(b []byte) error {
+	return SaveValueRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SaveSettingsValueRequest)(nil)
+var _ json.Unmarshaler = (*SaveValueRequest)(nil)
 
-// SaveSettingsValueResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SaveSettingsValueResponse. This struct is safe to replace or modify but
+// SaveValueResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of SaveValueResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsValueResponseJSONMarshaler = new(jsonpb.Marshaler)
+var SaveValueResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SaveSettingsValueResponse) MarshalJSON() ([]byte, error) {
+func (m *SaveValueResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SaveSettingsValueResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := SaveValueResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SaveSettingsValueResponse)(nil)
+var _ json.Marshaler = (*SaveValueResponse)(nil)
 
-// SaveSettingsValueResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SaveSettingsValueResponse. This struct is safe to replace or modify but
+// SaveValueResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of SaveValueResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SaveSettingsValueResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SaveValueResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SaveSettingsValueResponse) UnmarshalJSON(b []byte) error {
-	return SaveSettingsValueResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *SaveValueResponse) UnmarshalJSON(b []byte) error {
+	return SaveValueResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SaveSettingsValueResponse)(nil)
+var _ json.Unmarshaler = (*SaveValueResponse)(nil)
 
-// GetSettingsValueRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of GetSettingsValueRequest. This struct is safe to replace or modify but
+// GetValueRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GetValueRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsValueRequestJSONMarshaler = new(jsonpb.Marshaler)
+var GetValueRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *GetSettingsValueRequest) MarshalJSON() ([]byte, error) {
+func (m *GetValueRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := GetSettingsValueRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := GetValueRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*GetSettingsValueRequest)(nil)
+var _ json.Marshaler = (*GetValueRequest)(nil)
 
-// GetSettingsValueRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of GetSettingsValueRequest. This struct is safe to replace or modify but
+// GetValueRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GetValueRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsValueRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var GetValueRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *GetSettingsValueRequest) UnmarshalJSON(b []byte) error {
-	return GetSettingsValueRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *GetValueRequest) UnmarshalJSON(b []byte) error {
+	return GetValueRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*GetSettingsValueRequest)(nil)
+var _ json.Unmarshaler = (*GetValueRequest)(nil)
 
-// GetSettingsValueResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of GetSettingsValueResponse. This struct is safe to replace or modify but
+// GetValueResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GetValueResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsValueResponseJSONMarshaler = new(jsonpb.Marshaler)
+var GetValueResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *GetSettingsValueResponse) MarshalJSON() ([]byte, error) {
+func (m *GetValueResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := GetSettingsValueResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := GetValueResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*GetSettingsValueResponse)(nil)
+var _ json.Marshaler = (*GetValueResponse)(nil)
 
-// GetSettingsValueResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of GetSettingsValueResponse. This struct is safe to replace or modify but
+// GetValueResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GetValueResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var GetSettingsValueResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var GetValueResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *GetSettingsValueResponse) UnmarshalJSON(b []byte) error {
-	return GetSettingsValueResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *GetValueResponse) UnmarshalJSON(b []byte) error {
+	return GetValueResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*GetSettingsValueResponse)(nil)
+var _ json.Unmarshaler = (*GetValueResponse)(nil)
 
-// ListSettingsValuesRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of ListSettingsValuesRequest. This struct is safe to replace or modify but
+// ListValuesRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListValuesRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsValuesRequestJSONMarshaler = new(jsonpb.Marshaler)
+var ListValuesRequestJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *ListSettingsValuesRequest) MarshalJSON() ([]byte, error) {
+func (m *ListValuesRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := ListSettingsValuesRequestJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListValuesRequestJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*ListSettingsValuesRequest)(nil)
+var _ json.Marshaler = (*ListValuesRequest)(nil)
 
-// ListSettingsValuesRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of ListSettingsValuesRequest. This struct is safe to replace or modify but
+// ListValuesRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListValuesRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsValuesRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListValuesRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *ListSettingsValuesRequest) UnmarshalJSON(b []byte) error {
-	return ListSettingsValuesRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListValuesRequest) UnmarshalJSON(b []byte) error {
+	return ListValuesRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*ListSettingsValuesRequest)(nil)
+var _ json.Unmarshaler = (*ListValuesRequest)(nil)
 
-// ListSettingsValuesResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of ListSettingsValuesResponse. This struct is safe to replace or modify but
+// ListValuesResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListValuesResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsValuesResponseJSONMarshaler = new(jsonpb.Marshaler)
+var ListValuesResponseJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *ListSettingsValuesResponse) MarshalJSON() ([]byte, error) {
+func (m *ListValuesResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := ListSettingsValuesResponseJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ListValuesResponseJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*ListSettingsValuesResponse)(nil)
+var _ json.Marshaler = (*ListValuesResponse)(nil)
 
-// ListSettingsValuesResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of ListSettingsValuesResponse. This struct is safe to replace or modify but
+// ListValuesResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListValuesResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListSettingsValuesResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListValuesResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *ListSettingsValuesResponse) UnmarshalJSON(b []byte) error {
-	return ListSettingsValuesResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *ListValuesResponse) UnmarshalJSON(b []byte) error {
+	return ListValuesResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*ListSettingsValuesResponse)(nil)
+var _ json.Unmarshaler = (*ListValuesResponse)(nil)
+
+// GetValueByUniqueIdentifiersRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of GetValueByUniqueIdentifiersRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var GetValueByUniqueIdentifiersRequestJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *GetValueByUniqueIdentifiersRequest) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := GetValueByUniqueIdentifiersRequestJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*GetValueByUniqueIdentifiersRequest)(nil)
+
+// GetValueByUniqueIdentifiersRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of GetValueByUniqueIdentifiersRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var GetValueByUniqueIdentifiersRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *GetValueByUniqueIdentifiersRequest) UnmarshalJSON(b []byte) error {
+	return GetValueByUniqueIdentifiersRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*GetValueByUniqueIdentifiersRequest)(nil)
+
+// ValueWithIdentifierJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ValueWithIdentifier. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ValueWithIdentifierJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *ValueWithIdentifier) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := ValueWithIdentifierJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*ValueWithIdentifier)(nil)
+
+// ValueWithIdentifierJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ValueWithIdentifier. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ValueWithIdentifierJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *ValueWithIdentifier) UnmarshalJSON(b []byte) error {
+	return ValueWithIdentifierJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*ValueWithIdentifier)(nil)
 
 // IdentifierJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Identifier. This struct is safe to replace or modify but
@@ -665,41 +762,77 @@ func (m *Identifier) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*Identifier)(nil)
 
-// SettingsBundleJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SettingsBundle. This struct is safe to replace or modify but
+// ResourceJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Resource. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingsBundleJSONMarshaler = new(jsonpb.Marshaler)
+var ResourceJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SettingsBundle) MarshalJSON() ([]byte, error) {
+func (m *Resource) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SettingsBundleJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ResourceJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SettingsBundle)(nil)
+var _ json.Marshaler = (*Resource)(nil)
 
-// SettingsBundleJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SettingsBundle. This struct is safe to replace or modify but
+// ResourceJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Resource. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingsBundleJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ResourceJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SettingsBundle) UnmarshalJSON(b []byte) error {
-	return SettingsBundleJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *Resource) UnmarshalJSON(b []byte) error {
+	return ResourceJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SettingsBundle)(nil)
+var _ json.Unmarshaler = (*Resource)(nil)
+
+// BundleJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Bundle. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var BundleJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *Bundle) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := BundleJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*Bundle)(nil)
+
+// BundleJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Bundle. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var BundleJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *Bundle) UnmarshalJSON(b []byte) error {
+	return BundleJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*Bundle)(nil)
 
 // SettingJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Setting. This struct is safe to replace or modify but
@@ -737,185 +870,185 @@ func (m *Setting) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*Setting)(nil)
 
-// IntSettingJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of IntSetting. This struct is safe to replace or modify but
+// IntJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Int. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntSettingJSONMarshaler = new(jsonpb.Marshaler)
+var IntJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *IntSetting) MarshalJSON() ([]byte, error) {
+func (m *Int) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := IntSettingJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := IntJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*IntSetting)(nil)
+var _ json.Marshaler = (*Int)(nil)
 
-// IntSettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of IntSetting. This struct is safe to replace or modify but
+// IntJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Int. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntSettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var IntJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *IntSetting) UnmarshalJSON(b []byte) error {
-	return IntSettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *Int) UnmarshalJSON(b []byte) error {
+	return IntJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*IntSetting)(nil)
+var _ json.Unmarshaler = (*Int)(nil)
 
-// StringSettingJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of StringSetting. This struct is safe to replace or modify but
+// StringJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of String. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringSettingJSONMarshaler = new(jsonpb.Marshaler)
+var StringJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *StringSetting) MarshalJSON() ([]byte, error) {
+func (m *String) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := StringSettingJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := StringJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*StringSetting)(nil)
+var _ json.Marshaler = (*String)(nil)
 
-// StringSettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of StringSetting. This struct is safe to replace or modify but
+// StringJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of String. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringSettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var StringJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *StringSetting) UnmarshalJSON(b []byte) error {
-	return StringSettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *String) UnmarshalJSON(b []byte) error {
+	return StringJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*StringSetting)(nil)
+var _ json.Unmarshaler = (*String)(nil)
 
-// BoolSettingJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of BoolSetting. This struct is safe to replace or modify but
+// BoolJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Bool. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BoolSettingJSONMarshaler = new(jsonpb.Marshaler)
+var BoolJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *BoolSetting) MarshalJSON() ([]byte, error) {
+func (m *Bool) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := BoolSettingJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := BoolJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*BoolSetting)(nil)
+var _ json.Marshaler = (*Bool)(nil)
 
-// BoolSettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of BoolSetting. This struct is safe to replace or modify but
+// BoolJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Bool. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BoolSettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var BoolJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *BoolSetting) UnmarshalJSON(b []byte) error {
-	return BoolSettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *Bool) UnmarshalJSON(b []byte) error {
+	return BoolJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*BoolSetting)(nil)
+var _ json.Unmarshaler = (*Bool)(nil)
 
-// SingleChoiceListSettingJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SingleChoiceListSetting. This struct is safe to replace or modify but
+// SingleChoiceListJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of SingleChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SingleChoiceListSettingJSONMarshaler = new(jsonpb.Marshaler)
+var SingleChoiceListJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SingleChoiceListSetting) MarshalJSON() ([]byte, error) {
+func (m *SingleChoiceList) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SingleChoiceListSettingJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := SingleChoiceListJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SingleChoiceListSetting)(nil)
+var _ json.Marshaler = (*SingleChoiceList)(nil)
 
-// SingleChoiceListSettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SingleChoiceListSetting. This struct is safe to replace or modify but
+// SingleChoiceListJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of SingleChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SingleChoiceListSettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SingleChoiceListJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SingleChoiceListSetting) UnmarshalJSON(b []byte) error {
-	return SingleChoiceListSettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *SingleChoiceList) UnmarshalJSON(b []byte) error {
+	return SingleChoiceListJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SingleChoiceListSetting)(nil)
+var _ json.Unmarshaler = (*SingleChoiceList)(nil)
 
-// MultiChoiceListSettingJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of MultiChoiceListSetting. This struct is safe to replace or modify but
+// MultiChoiceListJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of MultiChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceListSettingJSONMarshaler = new(jsonpb.Marshaler)
+var MultiChoiceListJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *MultiChoiceListSetting) MarshalJSON() ([]byte, error) {
+func (m *MultiChoiceList) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := MultiChoiceListSettingJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := MultiChoiceListJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*MultiChoiceListSetting)(nil)
+var _ json.Marshaler = (*MultiChoiceList)(nil)
 
-// MultiChoiceListSettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of MultiChoiceListSetting. This struct is safe to replace or modify but
+// MultiChoiceListJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of MultiChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceListSettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var MultiChoiceListJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *MultiChoiceListSetting) UnmarshalJSON(b []byte) error {
-	return MultiChoiceListSettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *MultiChoiceList) UnmarshalJSON(b []byte) error {
+	return MultiChoiceListJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*MultiChoiceListSetting)(nil)
+var _ json.Unmarshaler = (*MultiChoiceList)(nil)
 
 // ListOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of ListOption. This struct is safe to replace or modify but
@@ -953,41 +1086,41 @@ func (m *ListOption) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*ListOption)(nil)
 
-// SettingsValueJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SettingsValue. This struct is safe to replace or modify but
+// ValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of Value. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingsValueJSONMarshaler = new(jsonpb.Marshaler)
+var ValueJSONMarshaler = new(jsonpb.Marshaler)
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
 // uses the more correct jsonpb package to correctly marshal the message.
-func (m *SettingsValue) MarshalJSON() ([]byte, error) {
+func (m *Value) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
 	buf := &bytes.Buffer{}
 
-	if err := SettingsValueJSONMarshaler.Marshal(buf, m); err != nil {
+	if err := ValueJSONMarshaler.Marshal(buf, m); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-var _ json.Marshaler = (*SettingsValue)(nil)
+var _ json.Marshaler = (*Value)(nil)
 
-// SettingsValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SettingsValue. This struct is safe to replace or modify but
+// ValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of Value. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingsValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
 // uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SettingsValue) UnmarshalJSON(b []byte) error {
-	return SettingsValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+func (m *Value) UnmarshalJSON(b []byte) error {
+	return ValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
 }
 
-var _ json.Unmarshaler = (*SettingsValue)(nil)
+var _ json.Unmarshaler = (*Value)(nil)
 
 // ListValueJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of ListValue. This struct is safe to replace or modify but
@@ -1060,39 +1193,3 @@ func (m *ListOptionValue) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*ListOptionValue)(nil)
-
-// SettingsValuesJSONMarshaler describes the default jsonpb.Marshaler used by all
-// instances of SettingsValues. This struct is safe to replace or modify but
-// should not be done so concurrently.
-var SettingsValuesJSONMarshaler = new(jsonpb.Marshaler)
-
-// MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
-func (m *SettingsValues) MarshalJSON() ([]byte, error) {
-	if m == nil {
-		return json.Marshal(nil)
-	}
-
-	buf := &bytes.Buffer{}
-
-	if err := SettingsValuesJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
-}
-
-var _ json.Marshaler = (*SettingsValues)(nil)
-
-// SettingsValuesJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
-// instances of SettingsValues. This struct is safe to replace or modify but
-// should not be done so concurrently.
-var SettingsValuesJSONUnmarshaler = new(jsonpb.Unmarshaler)
-
-// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
-func (m *SettingsValues) UnmarshalJSON(b []byte) error {
-	return SettingsValuesJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
-}
-
-var _ json.Unmarshaler = (*SettingsValues)(nil)

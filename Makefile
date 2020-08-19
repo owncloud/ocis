@@ -173,19 +173,19 @@ $(PROTO_SRC)/settings.pb.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
-		--go_out=$(PROTO_SRC) settings.proto
+		--go_out=. settings.proto
 
 $(PROTO_SRC)/settings.pb.micro.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
-		--micro_out=$(PROTO_SRC) settings.proto
+		--micro_out=. settings.proto
 
 $(PROTO_SRC)/settings.pb.web.go: $(PROTO_SRC)/settings.proto
 	protoc \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
-		--microweb_out=$(PROTO_SRC) settings.proto
+		--microweb_out=. settings.proto
 
 $(PROTO_SRC)/settings.swagger.json: $(PROTO_SRC)/settings.proto
 	protoc \

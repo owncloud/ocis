@@ -44,7 +44,7 @@ type Asset struct {
 
 // Storage defines the available storage configuration.
 type Storage struct {
-	RootMountPath string
+	DataPath string
 }
 
 // TokenManager is the config for using the reva token manager

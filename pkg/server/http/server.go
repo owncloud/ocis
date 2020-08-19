@@ -25,7 +25,7 @@ func Server(opts ...Option) http.Service {
 		http.Flags(options.Flags...),
 	)
 
-	handle := svc.NewService(options.Config)
+	handle := svc.NewService(options.Config, options.Logger)
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)

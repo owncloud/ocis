@@ -40,21 +40,21 @@ var _ server.Option
 func NewBundleServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		&api.Endpoint{
-			Name:    "BundleService.SaveSettingsBundle",
+			Name:    "BundleService.SaveBundle",
 			Path:    []string{"/api/v0/settings/bundle-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
-			Name:    "BundleService.GetSettingsBundle",
+			Name:    "BundleService.GetBundle",
 			Path:    []string{"/api/v0/settings/bundle-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
-			Name:    "BundleService.ListSettingsBundles",
+			Name:    "BundleService.ListBundles",
 			Path:    []string{"/api/v0/settings/bundles-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
@@ -66,9 +66,9 @@ func NewBundleServiceEndpoints() []*api.Endpoint {
 // Client API for BundleService service
 
 type BundleService interface {
-	SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, opts ...client.CallOption) (*SaveSettingsBundleResponse, error)
-	GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, opts ...client.CallOption) (*GetSettingsBundleResponse, error)
-	ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, opts ...client.CallOption) (*ListSettingsBundlesResponse, error)
+	SaveBundle(ctx context.Context, in *SaveBundleRequest, opts ...client.CallOption) (*SaveBundleResponse, error)
+	GetBundle(ctx context.Context, in *GetBundleRequest, opts ...client.CallOption) (*GetBundleResponse, error)
+	ListBundles(ctx context.Context, in *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error)
 }
 
 type bundleService struct {
@@ -83,9 +83,9 @@ func NewBundleService(name string, c client.Client) BundleService {
 	}
 }
 
-func (c *bundleService) SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, opts ...client.CallOption) (*SaveSettingsBundleResponse, error) {
-	req := c.c.NewRequest(c.name, "BundleService.SaveSettingsBundle", in)
-	out := new(SaveSettingsBundleResponse)
+func (c *bundleService) SaveBundle(ctx context.Context, in *SaveBundleRequest, opts ...client.CallOption) (*SaveBundleResponse, error) {
+	req := c.c.NewRequest(c.name, "BundleService.SaveBundle", in)
+	out := new(SaveBundleResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -93,9 +93,9 @@ func (c *bundleService) SaveSettingsBundle(ctx context.Context, in *SaveSettings
 	return out, nil
 }
 
-func (c *bundleService) GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, opts ...client.CallOption) (*GetSettingsBundleResponse, error) {
-	req := c.c.NewRequest(c.name, "BundleService.GetSettingsBundle", in)
-	out := new(GetSettingsBundleResponse)
+func (c *bundleService) GetBundle(ctx context.Context, in *GetBundleRequest, opts ...client.CallOption) (*GetBundleResponse, error) {
+	req := c.c.NewRequest(c.name, "BundleService.GetBundle", in)
+	out := new(GetBundleResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -103,9 +103,9 @@ func (c *bundleService) GetSettingsBundle(ctx context.Context, in *GetSettingsBu
 	return out, nil
 }
 
-func (c *bundleService) ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, opts ...client.CallOption) (*ListSettingsBundlesResponse, error) {
-	req := c.c.NewRequest(c.name, "BundleService.ListSettingsBundles", in)
-	out := new(ListSettingsBundlesResponse)
+func (c *bundleService) ListBundles(ctx context.Context, in *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error) {
+	req := c.c.NewRequest(c.name, "BundleService.ListBundles", in)
+	out := new(ListBundlesResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -116,37 +116,37 @@ func (c *bundleService) ListSettingsBundles(ctx context.Context, in *ListSetting
 // Server API for BundleService service
 
 type BundleServiceHandler interface {
-	SaveSettingsBundle(context.Context, *SaveSettingsBundleRequest, *SaveSettingsBundleResponse) error
-	GetSettingsBundle(context.Context, *GetSettingsBundleRequest, *GetSettingsBundleResponse) error
-	ListSettingsBundles(context.Context, *ListSettingsBundlesRequest, *ListSettingsBundlesResponse) error
+	SaveBundle(context.Context, *SaveBundleRequest, *SaveBundleResponse) error
+	GetBundle(context.Context, *GetBundleRequest, *GetBundleResponse) error
+	ListBundles(context.Context, *ListBundlesRequest, *ListBundlesResponse) error
 }
 
 func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, opts ...server.HandlerOption) error {
 	type bundleService interface {
-		SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, out *SaveSettingsBundleResponse) error
-		GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, out *GetSettingsBundleResponse) error
-		ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, out *ListSettingsBundlesResponse) error
+		SaveBundle(ctx context.Context, in *SaveBundleRequest, out *SaveBundleResponse) error
+		GetBundle(ctx context.Context, in *GetBundleRequest, out *GetBundleResponse) error
+		ListBundles(ctx context.Context, in *ListBundlesRequest, out *ListBundlesResponse) error
 	}
 	type BundleService struct {
 		bundleService
 	}
 	h := &bundleServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "BundleService.SaveSettingsBundle",
+		Name:    "BundleService.SaveBundle",
 		Path:    []string{"/api/v0/settings/bundle-save"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "BundleService.GetSettingsBundle",
+		Name:    "BundleService.GetBundle",
 		Path:    []string{"/api/v0/settings/bundle-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "BundleService.ListSettingsBundles",
+		Name:    "BundleService.ListBundles",
 		Path:    []string{"/api/v0/settings/bundles-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
@@ -159,16 +159,16 @@ type bundleServiceHandler struct {
 	BundleServiceHandler
 }
 
-func (h *bundleServiceHandler) SaveSettingsBundle(ctx context.Context, in *SaveSettingsBundleRequest, out *SaveSettingsBundleResponse) error {
-	return h.BundleServiceHandler.SaveSettingsBundle(ctx, in, out)
+func (h *bundleServiceHandler) SaveBundle(ctx context.Context, in *SaveBundleRequest, out *SaveBundleResponse) error {
+	return h.BundleServiceHandler.SaveBundle(ctx, in, out)
 }
 
-func (h *bundleServiceHandler) GetSettingsBundle(ctx context.Context, in *GetSettingsBundleRequest, out *GetSettingsBundleResponse) error {
-	return h.BundleServiceHandler.GetSettingsBundle(ctx, in, out)
+func (h *bundleServiceHandler) GetBundle(ctx context.Context, in *GetBundleRequest, out *GetBundleResponse) error {
+	return h.BundleServiceHandler.GetBundle(ctx, in, out)
 }
 
-func (h *bundleServiceHandler) ListSettingsBundles(ctx context.Context, in *ListSettingsBundlesRequest, out *ListSettingsBundlesResponse) error {
-	return h.BundleServiceHandler.ListSettingsBundles(ctx, in, out)
+func (h *bundleServiceHandler) ListBundles(ctx context.Context, in *ListBundlesRequest, out *ListBundlesResponse) error {
+	return h.BundleServiceHandler.ListBundles(ctx, in, out)
 }
 
 // Api Endpoints for ValueService service
@@ -176,22 +176,29 @@ func (h *bundleServiceHandler) ListSettingsBundles(ctx context.Context, in *List
 func NewValueServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		&api.Endpoint{
-			Name:    "ValueService.SaveSettingsValue",
+			Name:    "ValueService.SaveValue",
 			Path:    []string{"/api/v0/settings/value-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
-			Name:    "ValueService.GetSettingsValue",
+			Name:    "ValueService.GetValue",
 			Path:    []string{"/api/v0/settings/value-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
-			Name:    "ValueService.ListSettingsValues",
+			Name:    "ValueService.ListValues",
 			Path:    []string{"/api/v0/settings/values-list"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+		&api.Endpoint{
+			Name:    "ValueService.GetValueByUniqueIdentifiers",
+			Path:    []string{"/api/v0/settings/values-get-by-unique-identifiers"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -202,9 +209,10 @@ func NewValueServiceEndpoints() []*api.Endpoint {
 // Client API for ValueService service
 
 type ValueService interface {
-	SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, opts ...client.CallOption) (*SaveSettingsValueResponse, error)
-	GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, opts ...client.CallOption) (*GetSettingsValueResponse, error)
-	ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, opts ...client.CallOption) (*ListSettingsValuesResponse, error)
+	SaveValue(ctx context.Context, in *SaveValueRequest, opts ...client.CallOption) (*SaveValueResponse, error)
+	GetValue(ctx context.Context, in *GetValueRequest, opts ...client.CallOption) (*GetValueResponse, error)
+	ListValues(ctx context.Context, in *ListValuesRequest, opts ...client.CallOption) (*ListValuesResponse, error)
+	GetValueByUniqueIdentifiers(ctx context.Context, in *GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*GetValueResponse, error)
 }
 
 type valueService struct {
@@ -219,9 +227,9 @@ func NewValueService(name string, c client.Client) ValueService {
 	}
 }
 
-func (c *valueService) SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, opts ...client.CallOption) (*SaveSettingsValueResponse, error) {
-	req := c.c.NewRequest(c.name, "ValueService.SaveSettingsValue", in)
-	out := new(SaveSettingsValueResponse)
+func (c *valueService) SaveValue(ctx context.Context, in *SaveValueRequest, opts ...client.CallOption) (*SaveValueResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.SaveValue", in)
+	out := new(SaveValueResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -229,9 +237,9 @@ func (c *valueService) SaveSettingsValue(ctx context.Context, in *SaveSettingsVa
 	return out, nil
 }
 
-func (c *valueService) GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, opts ...client.CallOption) (*GetSettingsValueResponse, error) {
-	req := c.c.NewRequest(c.name, "ValueService.GetSettingsValue", in)
-	out := new(GetSettingsValueResponse)
+func (c *valueService) GetValue(ctx context.Context, in *GetValueRequest, opts ...client.CallOption) (*GetValueResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.GetValue", in)
+	out := new(GetValueResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -239,9 +247,19 @@ func (c *valueService) GetSettingsValue(ctx context.Context, in *GetSettingsValu
 	return out, nil
 }
 
-func (c *valueService) ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, opts ...client.CallOption) (*ListSettingsValuesResponse, error) {
-	req := c.c.NewRequest(c.name, "ValueService.ListSettingsValues", in)
-	out := new(ListSettingsValuesResponse)
+func (c *valueService) ListValues(ctx context.Context, in *ListValuesRequest, opts ...client.CallOption) (*ListValuesResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.ListValues", in)
+	out := new(ListValuesResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *valueService) GetValueByUniqueIdentifiers(ctx context.Context, in *GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*GetValueResponse, error) {
+	req := c.c.NewRequest(c.name, "ValueService.GetValueByUniqueIdentifiers", in)
+	out := new(GetValueResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -252,38 +270,47 @@ func (c *valueService) ListSettingsValues(ctx context.Context, in *ListSettingsV
 // Server API for ValueService service
 
 type ValueServiceHandler interface {
-	SaveSettingsValue(context.Context, *SaveSettingsValueRequest, *SaveSettingsValueResponse) error
-	GetSettingsValue(context.Context, *GetSettingsValueRequest, *GetSettingsValueResponse) error
-	ListSettingsValues(context.Context, *ListSettingsValuesRequest, *ListSettingsValuesResponse) error
+	SaveValue(context.Context, *SaveValueRequest, *SaveValueResponse) error
+	GetValue(context.Context, *GetValueRequest, *GetValueResponse) error
+	ListValues(context.Context, *ListValuesRequest, *ListValuesResponse) error
+	GetValueByUniqueIdentifiers(context.Context, *GetValueByUniqueIdentifiersRequest, *GetValueResponse) error
 }
 
 func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts ...server.HandlerOption) error {
 	type valueService interface {
-		SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, out *SaveSettingsValueResponse) error
-		GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error
-		ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, out *ListSettingsValuesResponse) error
+		SaveValue(ctx context.Context, in *SaveValueRequest, out *SaveValueResponse) error
+		GetValue(ctx context.Context, in *GetValueRequest, out *GetValueResponse) error
+		ListValues(ctx context.Context, in *ListValuesRequest, out *ListValuesResponse) error
+		GetValueByUniqueIdentifiers(ctx context.Context, in *GetValueByUniqueIdentifiersRequest, out *GetValueResponse) error
 	}
 	type ValueService struct {
 		valueService
 	}
 	h := &valueServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "ValueService.SaveSettingsValue",
+		Name:    "ValueService.SaveValue",
 		Path:    []string{"/api/v0/settings/value-save"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "ValueService.GetSettingsValue",
+		Name:    "ValueService.GetValue",
 		Path:    []string{"/api/v0/settings/value-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "ValueService.ListSettingsValues",
+		Name:    "ValueService.ListValues",
 		Path:    []string{"/api/v0/settings/values-list"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "ValueService.GetValueByUniqueIdentifiers",
+		Path:    []string{"/api/v0/settings/values-get-by-unique-identifiers"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -295,14 +322,18 @@ type valueServiceHandler struct {
 	ValueServiceHandler
 }
 
-func (h *valueServiceHandler) SaveSettingsValue(ctx context.Context, in *SaveSettingsValueRequest, out *SaveSettingsValueResponse) error {
-	return h.ValueServiceHandler.SaveSettingsValue(ctx, in, out)
+func (h *valueServiceHandler) SaveValue(ctx context.Context, in *SaveValueRequest, out *SaveValueResponse) error {
+	return h.ValueServiceHandler.SaveValue(ctx, in, out)
 }
 
-func (h *valueServiceHandler) GetSettingsValue(ctx context.Context, in *GetSettingsValueRequest, out *GetSettingsValueResponse) error {
-	return h.ValueServiceHandler.GetSettingsValue(ctx, in, out)
+func (h *valueServiceHandler) GetValue(ctx context.Context, in *GetValueRequest, out *GetValueResponse) error {
+	return h.ValueServiceHandler.GetValue(ctx, in, out)
 }
 
-func (h *valueServiceHandler) ListSettingsValues(ctx context.Context, in *ListSettingsValuesRequest, out *ListSettingsValuesResponse) error {
-	return h.ValueServiceHandler.ListSettingsValues(ctx, in, out)
+func (h *valueServiceHandler) ListValues(ctx context.Context, in *ListValuesRequest, out *ListValuesResponse) error {
+	return h.ValueServiceHandler.ListValues(ctx, in, out)
+}
+
+func (h *valueServiceHandler) GetValueByUniqueIdentifiers(ctx context.Context, in *GetValueByUniqueIdentifiersRequest, out *GetValueResponse) error {
+	return h.ValueServiceHandler.GetValueByUniqueIdentifiers(ctx, in, out)
 }
