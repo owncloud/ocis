@@ -21,7 +21,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Flags(options.Flags...),
 	)
 
-	handle := svc.NewService(options.Config)
+	handle := svc.NewService(options.Config, options.Logger)
 	if err := proto.RegisterBundleServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register SettingsBundles service handler")
 	}

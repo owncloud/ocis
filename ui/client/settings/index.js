@@ -29,13 +29,13 @@ export const request = (method, url, body, queryParameters, form, config) => {
  ==========================================================*/
 /**
  * 
- * request: BundleService_GetSettingsBundle
- * url: BundleService_GetSettingsBundleURL
- * method: BundleService_GetSettingsBundle_TYPE
- * raw_url: BundleService_GetSettingsBundle_RAW_URL
+ * request: BundleService_GetBundle
+ * url: BundleService_GetBundleURL
+ * method: BundleService_GetBundle_TYPE
+ * raw_url: BundleService_GetBundle_RAW_URL
  * @param body - 
  */
-export const BundleService_GetSettingsBundle = function(parameters = {}) {
+export const BundleService_GetBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/bundle-get'
@@ -55,13 +55,13 @@ export const BundleService_GetSettingsBundle = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const BundleService_GetSettingsBundle_RAW_URL = function() {
+export const BundleService_GetBundle_RAW_URL = function() {
   return '/api/v0/settings/bundle-get'
 }
-export const BundleService_GetSettingsBundle_TYPE = function() {
+export const BundleService_GetBundle_TYPE = function() {
   return 'post'
 }
-export const BundleService_GetSettingsBundleURL = function(parameters = {}) {
+export const BundleService_GetBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/bundle-get'
@@ -75,13 +75,13 @@ export const BundleService_GetSettingsBundleURL = function(parameters = {}) {
 }
 /**
  * 
- * request: BundleService_SaveSettingsBundle
- * url: BundleService_SaveSettingsBundleURL
- * method: BundleService_SaveSettingsBundle_TYPE
- * raw_url: BundleService_SaveSettingsBundle_RAW_URL
+ * request: BundleService_SaveBundle
+ * url: BundleService_SaveBundleURL
+ * method: BundleService_SaveBundle_TYPE
+ * raw_url: BundleService_SaveBundle_RAW_URL
  * @param body - 
  */
-export const BundleService_SaveSettingsBundle = function(parameters = {}) {
+export const BundleService_SaveBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/bundle-save'
@@ -101,13 +101,13 @@ export const BundleService_SaveSettingsBundle = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const BundleService_SaveSettingsBundle_RAW_URL = function() {
+export const BundleService_SaveBundle_RAW_URL = function() {
   return '/api/v0/settings/bundle-save'
 }
-export const BundleService_SaveSettingsBundle_TYPE = function() {
+export const BundleService_SaveBundle_TYPE = function() {
   return 'post'
 }
-export const BundleService_SaveSettingsBundleURL = function(parameters = {}) {
+export const BundleService_SaveBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/bundle-save'
@@ -121,13 +121,13 @@ export const BundleService_SaveSettingsBundleURL = function(parameters = {}) {
 }
 /**
  * 
- * request: BundleService_ListSettingsBundles
- * url: BundleService_ListSettingsBundlesURL
- * method: BundleService_ListSettingsBundles_TYPE
- * raw_url: BundleService_ListSettingsBundles_RAW_URL
+ * request: BundleService_ListBundles
+ * url: BundleService_ListBundlesURL
+ * method: BundleService_ListBundles_TYPE
+ * raw_url: BundleService_ListBundles_RAW_URL
  * @param body - 
  */
-export const BundleService_ListSettingsBundles = function(parameters = {}) {
+export const BundleService_ListBundles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/bundles-list'
@@ -147,13 +147,13 @@ export const BundleService_ListSettingsBundles = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const BundleService_ListSettingsBundles_RAW_URL = function() {
+export const BundleService_ListBundles_RAW_URL = function() {
   return '/api/v0/settings/bundles-list'
 }
-export const BundleService_ListSettingsBundles_TYPE = function() {
+export const BundleService_ListBundles_TYPE = function() {
   return 'post'
 }
-export const BundleService_ListSettingsBundlesURL = function(parameters = {}) {
+export const BundleService_ListBundlesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/bundles-list'
@@ -167,13 +167,13 @@ export const BundleService_ListSettingsBundlesURL = function(parameters = {}) {
 }
 /**
  * 
- * request: ValueService_GetSettingsValue
- * url: ValueService_GetSettingsValueURL
- * method: ValueService_GetSettingsValue_TYPE
- * raw_url: ValueService_GetSettingsValue_RAW_URL
+ * request: ValueService_GetValue
+ * url: ValueService_GetValueURL
+ * method: ValueService_GetValue_TYPE
+ * raw_url: ValueService_GetValue_RAW_URL
  * @param body - 
  */
-export const ValueService_GetSettingsValue = function(parameters = {}) {
+export const ValueService_GetValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/value-get'
@@ -193,13 +193,13 @@ export const ValueService_GetSettingsValue = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const ValueService_GetSettingsValue_RAW_URL = function() {
+export const ValueService_GetValue_RAW_URL = function() {
   return '/api/v0/settings/value-get'
 }
-export const ValueService_GetSettingsValue_TYPE = function() {
+export const ValueService_GetValue_TYPE = function() {
   return 'post'
 }
-export const ValueService_GetSettingsValueURL = function(parameters = {}) {
+export const ValueService_GetValueURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/value-get'
@@ -213,13 +213,13 @@ export const ValueService_GetSettingsValueURL = function(parameters = {}) {
 }
 /**
  * 
- * request: ValueService_SaveSettingsValue
- * url: ValueService_SaveSettingsValueURL
- * method: ValueService_SaveSettingsValue_TYPE
- * raw_url: ValueService_SaveSettingsValue_RAW_URL
+ * request: ValueService_SaveValue
+ * url: ValueService_SaveValueURL
+ * method: ValueService_SaveValue_TYPE
+ * raw_url: ValueService_SaveValue_RAW_URL
  * @param body - 
  */
-export const ValueService_SaveSettingsValue = function(parameters = {}) {
+export const ValueService_SaveValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/value-save'
@@ -239,13 +239,13 @@ export const ValueService_SaveSettingsValue = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const ValueService_SaveSettingsValue_RAW_URL = function() {
+export const ValueService_SaveValue_RAW_URL = function() {
   return '/api/v0/settings/value-save'
 }
-export const ValueService_SaveSettingsValue_TYPE = function() {
+export const ValueService_SaveValue_TYPE = function() {
   return 'post'
 }
-export const ValueService_SaveSettingsValueURL = function(parameters = {}) {
+export const ValueService_SaveValueURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/value-save'
@@ -259,13 +259,59 @@ export const ValueService_SaveSettingsValueURL = function(parameters = {}) {
 }
 /**
  * 
- * request: ValueService_ListSettingsValues
- * url: ValueService_ListSettingsValuesURL
- * method: ValueService_ListSettingsValues_TYPE
- * raw_url: ValueService_ListSettingsValues_RAW_URL
+ * request: ValueService_GetValueByUniqueIdentifiers
+ * url: ValueService_GetValueByUniqueIdentifiersURL
+ * method: ValueService_GetValueByUniqueIdentifiers_TYPE
+ * raw_url: ValueService_GetValueByUniqueIdentifiers_RAW_URL
  * @param body - 
  */
-export const ValueService_ListSettingsValues = function(parameters = {}) {
+export const ValueService_GetValueByUniqueIdentifiers = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const ValueService_GetValueByUniqueIdentifiers_RAW_URL = function() {
+  return '/api/v0/settings/values-get-by-unique-identifiers'
+}
+export const ValueService_GetValueByUniqueIdentifiers_TYPE = function() {
+  return 'post'
+}
+export const ValueService_GetValueByUniqueIdentifiersURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * 
+ * request: ValueService_ListValues
+ * url: ValueService_ListValuesURL
+ * method: ValueService_ListValues_TYPE
+ * raw_url: ValueService_ListValues_RAW_URL
+ * @param body - 
+ */
+export const ValueService_ListValues = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/values-list'
@@ -285,13 +331,13 @@ export const ValueService_ListSettingsValues = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const ValueService_ListSettingsValues_RAW_URL = function() {
+export const ValueService_ListValues_RAW_URL = function() {
   return '/api/v0/settings/values-list'
 }
-export const ValueService_ListSettingsValues_TYPE = function() {
+export const ValueService_ListValues_TYPE = function() {
   return 'post'
 }
-export const ValueService_ListSettingsValuesURL = function(parameters = {}) {
+export const ValueService_ListValuesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/values-list'

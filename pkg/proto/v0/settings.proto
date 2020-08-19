@@ -31,126 +31,176 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 };
 
 service BundleService {
-  rpc SaveSettingsBundle(SaveSettingsBundleRequest) returns (SaveSettingsBundleResponse) {
+  rpc SaveBundle(SaveBundleRequest) returns (SaveBundleResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/bundle-save",
       body: "*"
     };
-  };
-  rpc GetSettingsBundle(GetSettingsBundleRequest) returns (GetSettingsBundleResponse) {
+  }
+  rpc GetBundle(GetBundleRequest) returns (GetBundleResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/bundle-get",
       body: "*"
     };
-  };
-  rpc ListSettingsBundles(ListSettingsBundlesRequest) returns (ListSettingsBundlesResponse) {
+  }
+  rpc ListBundles(ListBundlesRequest) returns (ListBundlesResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/bundles-list",
       body: "*"
     };
-  };
+  }
 }
 
 service ValueService {
-  rpc SaveSettingsValue(SaveSettingsValueRequest) returns (SaveSettingsValueResponse) {
+  rpc SaveValue(SaveValueRequest) returns (SaveValueResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/value-save",
       body: "*"
     };
-  };
-  rpc GetSettingsValue(GetSettingsValueRequest) returns (GetSettingsValueResponse) {
+  }
+  rpc GetValue(GetValueRequest) returns (GetValueResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/value-get",
       body: "*"
     };
-  };
-  rpc ListSettingsValues(ListSettingsValuesRequest) returns (ListSettingsValuesResponse) {
+  }
+  rpc ListValues(ListValuesRequest) returns (ListValuesResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/values-list",
       body: "*"
     };
-  };
-}
-
-// requests and responses for settings bundles
-message SaveSettingsBundleRequest {
-  SettingsBundle settings_bundle = 1;
-}
-
-message SaveSettingsBundleResponse {
-  SettingsBundle settings_bundle = 1;
-}
-
-message GetSettingsBundleRequest {
-  Identifier identifier = 1;
-}
-
-message GetSettingsBundleResponse {
-  SettingsBundle settings_bundle = 1;
-}
-
-message ListSettingsBundlesRequest {
-  Identifier identifier = 1;
-}
-
-message ListSettingsBundlesResponse {
-  repeated SettingsBundle settings_bundles = 1;
-}
-
-// requests and responses for settings values
-message SaveSettingsValueRequest {
-  SettingsValue settings_value = 1;
-}
-
-message SaveSettingsValueResponse {
-  SettingsValue settings_value = 1;
-}
-
-message GetSettingsValueRequest {
-  Identifier identifier = 1;
-}
-
-message GetSettingsValueResponse {
-  SettingsValue settings_value = 1;
-}
-
-message ListSettingsValuesRequest {
-  Identifier identifier = 1;
-}
-
-message ListSettingsValuesResponse {
-  repeated SettingsValue settings_values = 1;
-}
-
-// generic payloads
-message Identifier {
-  string extension = 1;
-  string bundle_key = 2;
-  string setting_key = 3;
-  string account_uuid = 4;
-}
-
-// payloads for settings bundles
-message SettingsBundle {
-  Identifier identifier = 1;
-  string display_name = 2;
-  repeated Setting settings = 3;
-}
-
-message Setting {
-  string setting_key = 1;
-  string display_name = 2;
-  string description = 3;
-  oneof value {
-    IntSetting int_value = 4;
-    StringSetting string_value = 5;
-    BoolSetting bool_value = 6;
-    SingleChoiceListSetting single_choice_value = 7;
-    MultiChoiceListSetting multi_choice_value = 8;
+  }
+  rpc GetValueByUniqueIdentifiers(GetValueByUniqueIdentifiersRequest) returns (GetValueResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/values-get-by-unique-identifiers",
+      body: "*"
+    };
   }
 }
 
-message IntSetting {
+// ---
+// requests and responses for settings bundles
+// ---
+message SaveBundleRequest {
+  Bundle bundle = 1;
+}
+
+message SaveBundleResponse {
+  Bundle bundle = 1;
+}
+
+message GetBundleRequest {
+  string bundle_id = 1;
+}
+
+message GetBundleResponse {
+  Bundle bundle = 1;
+}
+
+message ListBundlesRequest {
+  string account_uuid = 1;
+}
+
+message ListBundlesResponse {
+  repeated Bundle bundles = 1;
+}
+
+// requests and responses for settings values
+message SaveValueRequest {
+  Value value = 1;
+}
+
+message SaveValueResponse {
+  ValueWithIdentifier value = 1;
+}
+
+message GetValueRequest {
+  string id = 1;
+}
+
+message GetValueResponse {
+  ValueWithIdentifier value = 1;
+}
+
+message ListValuesRequest {
+  string bundle_id = 1;
+  string account_uuid = 2;
+}
+
+message ListValuesResponse {
+  repeated ValueWithIdentifier values = 1;
+}
+
+message GetValueByUniqueIdentifiersRequest{
+  string account_uuid = 1;
+  string setting_id = 2;
+}
+
+message ValueWithIdentifier {
+  Identifier identifier = 1;
+  Value value = 2;
+}
+
+message Identifier {
+  string extension = 1;
+  string bundle = 2;
+  string setting = 3;
+}
+
+// ---
+// resource payloads
+// ---
+
+message Resource {
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_SYSTEM = 1;
+    TYPE_FILE = 2;
+    TYPE_SHARE = 3;
+    TYPE_SETTING = 4;
+    TYPE_BUNDLE = 5;
+    TYPE_USER = 6;
+    TYPE_GROUP = 7;
+  }
+  Type type = 1;
+  string id = 2;
+}
+
+// ---
+// payloads for bundles
+// ---
+
+message Bundle {
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_DEFAULT = 1;
+    TYPE_ROLE = 2;
+  }
+  string id = 1;
+  string name = 2;
+  Type type = 3;
+  string extension = 4;
+  string display_name = 5;
+  repeated Setting settings = 6;
+  Resource resource = 7;
+}
+
+message Setting {
+  string id = 1;
+  string name = 2;
+  string display_name = 3;
+  string description = 4;
+  oneof value {
+    Int int_value = 5;
+    String string_value = 6;
+    Bool bool_value = 7;
+    SingleChoiceList single_choice_value = 8;
+    MultiChoiceList multi_choice_value = 9;
+  }
+  Resource resource = 11;
+}
+
+message Int {
   int64 default = 1;
   int64 min = 2;
   int64 max = 3;
@@ -158,7 +208,7 @@ message IntSetting {
   string placeholder = 5;
 }
 
-message StringSetting {
+message String {
   string default = 1;
   bool required = 2;
   int32 min_length = 3;
@@ -166,16 +216,16 @@ message StringSetting {
   string placeholder = 5;
 }
 
-message BoolSetting {
+message Bool {
   bool default = 1;
   string label = 2;
 }
 
-message SingleChoiceListSetting {
+message SingleChoiceList {
   repeated ListOption options = 1;
 }
 
-message MultiChoiceListSetting {
+message MultiChoiceList {
   repeated ListOption options = 1;
 }
 
@@ -185,14 +235,23 @@ message ListOption {
   string display_value = 3;
 }
 
-// payloads for settings values
-message SettingsValue {
-  Identifier identifier = 1;
+// ---
+// payloads for values
+// ---
+
+message Value {
+  // id is the id of the Value. It is generated on saving it.
+  string id = 1;
+  string bundle_id = 2;
+  // setting_id is the id of the setting from within its bundle.
+  string setting_id = 3;
+  string account_uuid = 4;
+  Resource resource = 5;
   oneof value {
-    bool bool_value = 2;
-    int64 int_value = 3;
-    string string_value = 4;
-    ListValue list_value = 5;
+    bool bool_value = 6;
+    int64 int_value = 7;
+    string string_value = 8;
+    ListValue list_value = 9;
   }
 }
 
@@ -205,9 +264,4 @@ message ListOptionValue {
     string string_value = 1;
     int64 int_value = 2;
   }
-}
-
-// only meant for serialization
-message SettingsValues {
-  map<string, SettingsValue> values = 1;
 }

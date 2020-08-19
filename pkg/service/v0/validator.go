@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -9,73 +10,96 @@ import (
 
 var (
 	regexForAccountUUID = regexp.MustCompile(`^[A-Za-z0-9\-_.+@]+$`)
-	accountUUIDRule     = []validation.Rule{
-		validation.Required,
+	requireAccountID    = []validation.Rule{
+		validation.Required, // use rule for validation error message consistency (".. must not be blank" on empty strings)
 		validation.Match(regexForAccountUUID),
 	}
-	regexForKeys = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
-	keyRule      = []validation.Rule{
+	regexForKeys        = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
+	requireAlphanumeric = []validation.Rule{
 		validation.Required,
 		validation.Match(regexForKeys),
 	}
 )
 
-func validateSaveSettingsBundle(req *proto.SaveSettingsBundleRequest) error {
-	if err := validateBundleIdentifier(req.SettingsBundle.Identifier); err != nil {
+func validateSaveBundle(req *proto.SaveBundleRequest) error {
+	if err := validation.ValidateStruct(
+		req.Bundle,
+		validation.Field(&req.Bundle.Id, validation.When(req.Bundle.Id != "", is.UUID)),
+		validation.Field(&req.Bundle.Name, requireAlphanumeric...),
+		validation.Field(&req.Bundle.Type, validation.NotIn(proto.Bundle_TYPE_UNKNOWN)),
+		validation.Field(&req.Bundle.Extension, requireAlphanumeric...),
+		validation.Field(&req.Bundle.DisplayName, validation.Required),
+		validation.Field(&req.Bundle.Settings, validation.Required),
+	); err != nil {
 		return err
 	}
+	if err := validateResource(req.Bundle.Resource); err != nil {
+		return err
+	}
+	for i := range req.Bundle.Settings {
+		if err := validateSetting(req.Bundle.Settings[i]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateGetBundle(req *proto.GetBundleRequest) error {
+	return validation.Validate(&req.BundleId, requireAccountID...)
+}
+
+func validateListBundles(req *proto.ListBundlesRequest) error {
+	return validation.Validate(&req.AccountUuid, requireAccountID...)
+}
+
+func validateSaveValue(req *proto.SaveValueRequest) error {
+	if err := validation.ValidateStruct(
+		req.Value,
+		validation.Field(&req.Value.Id, validation.When(req.Value.Id != "", is.UUID)),
+		validation.Field(&req.Value.BundleId, is.UUID),
+		validation.Field(&req.Value.SettingId, is.UUID),
+		validation.Field(&req.Value.AccountUuid, requireAccountID...),
+	); err != nil {
+		return err
+	}
+
+	if err := validateResource(req.Value.Resource); err != nil {
+		return err
+	}
+
+	// TODO: validate values against the respective setting. need to check if constraints of the setting are fulfilled.
+	return nil
+}
+
+func validateGetValue(req *proto.GetValueRequest) error {
+	return validation.Validate(req.Id, is.UUID)
+}
+
+func validateListValues(req *proto.ListValuesRequest) error {
 	return validation.ValidateStruct(
-		req.SettingsBundle,
-		validation.Field(&req.SettingsBundle.DisplayName, validation.Required),
-		validation.Field(&req.SettingsBundle.Settings, validation.Required),
+		req,
+		validation.Field(&req.BundleId, validation.When(req.BundleId != "", is.UUID)),
+		validation.Field(&req.AccountUuid, validation.When(req.AccountUuid != "", validation.Match(regexForAccountUUID))),
 	)
 }
 
-func validateGetSettingsBundle(req *proto.GetSettingsBundleRequest) error {
-	return validateBundleIdentifier(req.Identifier)
+// validateResource is an internal helper for validating the content of a resource.
+func validateResource(resource *proto.Resource) error {
+	if err := validation.Validate(&resource, validation.Required); err != nil {
+		return err
+	}
+	return validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN))
 }
 
-func validateListSettingsBundles(req *proto.ListSettingsBundlesRequest) error {
-	return validation.ValidateStruct(
-		req.Identifier,
-		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
-	)
-}
-
-func validateSaveSettingsValue(req *proto.SaveSettingsValueRequest) error {
-	return validateValueIdentifier(req.SettingsValue.Identifier)
-}
-
-func validateGetSettingsValue(req *proto.GetSettingsValueRequest) error {
-	return validateValueIdentifier(req.Identifier)
-}
-
-func validateListSettingsValues(req *proto.ListSettingsValuesRequest) error {
-	return validation.ValidateStruct(
-		req.Identifier,
-		validation.Field(&req.Identifier.AccountUuid, accountUUIDRule...),
-		validation.Field(&req.Identifier.Extension, validation.Match(regexForKeys)),
-		validation.Field(&req.Identifier.Extension, validation.When(req.Identifier.BundleKey != "", validation.Required)),
-		validation.Field(&req.Identifier.BundleKey, validation.Match(regexForKeys)),
-		validation.Field(&req.Identifier.BundleKey, validation.When(req.Identifier.SettingKey != "", validation.Required)),
-		validation.Field(&req.Identifier.SettingKey, validation.Match(regexForKeys)),
-	)
-}
-
-func validateBundleIdentifier(identifier *proto.Identifier) error {
-	return validation.ValidateStruct(
-		identifier,
-		validation.Field(&identifier.Extension, keyRule...),
-		validation.Field(&identifier.BundleKey, keyRule...),
-	)
-}
-
-func validateValueIdentifier(identifier *proto.Identifier) error {
-	return validation.ValidateStruct(
-		identifier,
-		validation.Field(&identifier.Extension, keyRule...),
-		validation.Field(&identifier.BundleKey, keyRule...),
-		validation.Field(&identifier.SettingKey, keyRule...),
-		validation.Field(&identifier.AccountUuid, accountUUIDRule...),
-	)
+// validateSetting is an internal helper for validating the content of a setting.
+func validateSetting(setting *proto.Setting) error {
+	// TODO: make sanity checks, like for int settings, min <= default <= max.
+	if err := validation.ValidateStruct(
+		setting,
+		validation.Field(&setting.Id, validation.When(setting.Id != "", is.UUID)),
+		validation.Field(&setting.Name, requireAlphanumeric...),
+	); err != nil {
+		return err
+	}
+	return validateResource(setting.Resource)
 }

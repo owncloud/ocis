@@ -26,12 +26,12 @@
   "paths": {
     "/api/v0/settings/bundle-get": {
       "post": {
-        "operationId": "BundleService_GetSettingsBundle",
+        "operationId": "BundleService_GetBundle",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetSettingsBundleResponse"
+              "$ref": "#/definitions/protoGetBundleResponse"
             }
           },
           "default": {
@@ -47,7 +47,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetSettingsBundleRequest"
+              "$ref": "#/definitions/protoGetBundleRequest"
             }
           }
         ],
@@ -58,12 +58,12 @@
     },
     "/api/v0/settings/bundle-save": {
       "post": {
-        "operationId": "BundleService_SaveSettingsBundle",
+        "operationId": "BundleService_SaveBundle",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoSaveSettingsBundleResponse"
+              "$ref": "#/definitions/protoSaveBundleResponse"
             }
           },
           "default": {
@@ -79,7 +79,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoSaveSettingsBundleRequest"
+              "$ref": "#/definitions/protoSaveBundleRequest"
             }
           }
         ],
@@ -90,12 +90,12 @@
     },
     "/api/v0/settings/bundles-list": {
       "post": {
-        "operationId": "BundleService_ListSettingsBundles",
+        "operationId": "BundleService_ListBundles",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListSettingsBundlesResponse"
+              "$ref": "#/definitions/protoListBundlesResponse"
             }
           },
           "default": {
@@ -111,7 +111,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListSettingsBundlesRequest"
+              "$ref": "#/definitions/protoListBundlesRequest"
             }
           }
         ],
@@ -122,12 +122,12 @@
     },
     "/api/v0/settings/value-get": {
       "post": {
-        "operationId": "ValueService_GetSettingsValue",
+        "operationId": "ValueService_GetValue",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetSettingsValueResponse"
+              "$ref": "#/definitions/protoGetValueResponse"
             }
           },
           "default": {
@@ -143,7 +143,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetSettingsValueRequest"
+              "$ref": "#/definitions/protoGetValueRequest"
             }
           }
         ],
@@ -154,12 +154,12 @@
     },
     "/api/v0/settings/value-save": {
       "post": {
-        "operationId": "ValueService_SaveSettingsValue",
+        "operationId": "ValueService_SaveValue",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoSaveSettingsValueResponse"
+              "$ref": "#/definitions/protoSaveValueResponse"
             }
           },
           "default": {
@@ -175,7 +175,39 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoSaveSettingsValueRequest"
+              "$ref": "#/definitions/protoSaveValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get-by-unique-identifiers": {
+      "post": {
+        "operationId": "ValueService_GetValueByUniqueIdentifiers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetValueByUniqueIdentifiersRequest"
             }
           }
         ],
@@ -186,12 +218,12 @@
     },
     "/api/v0/settings/values-list": {
       "post": {
-        "operationId": "ValueService_ListSettingsValues",
+        "operationId": "ValueService_ListValues",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListSettingsValuesResponse"
+              "$ref": "#/definitions/protoListValuesResponse"
             }
           },
           "default": {
@@ -207,7 +239,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListSettingsValuesRequest"
+              "$ref": "#/definitions/protoListValuesRequest"
             }
           }
         ],
@@ -218,7 +250,7 @@
     }
   },
   "definitions": {
-    "protoBoolSetting": {
+    "protoBool": {
       "type": "object",
       "properties": {
         "default": {
@@ -230,35 +262,84 @@
         }
       }
     },
-    "protoGetSettingsBundleRequest": {
+    "protoBundle": {
       "type": "object",
       "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/protoBundleType"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoSetting"
+          }
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
         }
       }
     },
-    "protoGetSettingsBundleResponse": {
+    "protoBundleType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_DEFAULT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "protoGetBundleRequest": {
       "type": "object",
       "properties": {
-        "settings_bundle": {
-          "$ref": "#/definitions/protoSettingsBundle"
+        "bundle_id": {
+          "type": "string"
         }
       }
     },
-    "protoGetSettingsValueRequest": {
+    "protoGetBundleResponse": {
       "type": "object",
       "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
         }
       }
     },
-    "protoGetSettingsValueResponse": {
+    "protoGetValueByUniqueIdentifiersRequest": {
       "type": "object",
       "properties": {
-        "settings_value": {
-          "$ref": "#/definitions/protoSettingsValue"
+        "account_uuid": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetValueRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoValueWithIdentifier"
         }
       }
     },
@@ -268,19 +349,15 @@
         "extension": {
           "type": "string"
         },
-        "bundle_key": {
+        "bundle": {
           "type": "string"
         },
-        "setting_key": {
-          "type": "string"
-        },
-        "account_uuid": {
+        "setting": {
           "type": "string"
         }
-      },
-      "title": "generic payloads"
+      }
     },
-    "protoIntSetting": {
+    "protoInt": {
       "type": "object",
       "properties": {
         "default": {
@@ -301,6 +378,25 @@
         },
         "placeholder": {
           "type": "string"
+        }
+      }
+    },
+    "protoListBundlesRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListBundlesResponse": {
+      "type": "object",
+      "properties": {
+        "bundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoBundle"
+          }
         }
       }
     },
@@ -331,44 +427,6 @@
         }
       }
     },
-    "protoListSettingsBundlesRequest": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
-        }
-      }
-    },
-    "protoListSettingsBundlesResponse": {
-      "type": "object",
-      "properties": {
-        "settings_bundles": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoSettingsBundle"
-          }
-        }
-      }
-    },
-    "protoListSettingsValuesRequest": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
-        }
-      }
-    },
-    "protoListSettingsValuesResponse": {
-      "type": "object",
-      "properties": {
-        "settings_values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoSettingsValue"
-          }
-        }
-      }
-    },
     "protoListValue": {
       "type": "object",
       "properties": {
@@ -380,7 +438,29 @@
         }
       }
     },
-    "protoMultiChoiceListSetting": {
+    "protoListValuesRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "account_uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListValuesResponse": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoValueWithIdentifier"
+          }
+        }
+      }
+    },
+    "protoMultiChoiceList": {
       "type": "object",
       "properties": {
         "options": {
@@ -391,44 +471,72 @@
         }
       }
     },
-    "protoSaveSettingsBundleRequest": {
+    "protoResource": {
       "type": "object",
       "properties": {
-        "settings_bundle": {
-          "$ref": "#/definitions/protoSettingsBundle"
-        }
-      },
-      "title": "requests and responses for settings bundles"
-    },
-    "protoSaveSettingsBundleResponse": {
-      "type": "object",
-      "properties": {
-        "settings_bundle": {
-          "$ref": "#/definitions/protoSettingsBundle"
+        "type": {
+          "$ref": "#/definitions/protoResourceType"
+        },
+        "id": {
+          "type": "string"
         }
       }
     },
-    "protoSaveSettingsValueRequest": {
+    "protoResourceType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_SYSTEM",
+        "TYPE_FILE",
+        "TYPE_SHARE",
+        "TYPE_SETTING",
+        "TYPE_BUNDLE",
+        "TYPE_USER",
+        "TYPE_GROUP"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "protoSaveBundleRequest": {
       "type": "object",
       "properties": {
-        "settings_value": {
-          "$ref": "#/definitions/protoSettingsValue"
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
+        }
+      },
+      "title": "---\nrequests and responses for settings bundles\n---"
+    },
+    "protoSaveBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
+        }
+      }
+    },
+    "protoSaveValueRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoValue"
         }
       },
       "title": "requests and responses for settings values"
     },
-    "protoSaveSettingsValueResponse": {
+    "protoSaveValueResponse": {
       "type": "object",
       "properties": {
-        "settings_value": {
-          "$ref": "#/definitions/protoSettingsValue"
+        "value": {
+          "$ref": "#/definitions/protoValueWithIdentifier"
         }
       }
     },
     "protoSetting": {
       "type": "object",
       "properties": {
-        "setting_key": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         },
         "display_name": {
@@ -438,64 +546,26 @@
           "type": "string"
         },
         "int_value": {
-          "$ref": "#/definitions/protoIntSetting"
+          "$ref": "#/definitions/protoInt"
         },
         "string_value": {
-          "$ref": "#/definitions/protoStringSetting"
+          "$ref": "#/definitions/protoString"
         },
         "bool_value": {
-          "$ref": "#/definitions/protoBoolSetting"
+          "$ref": "#/definitions/protoBool"
         },
         "single_choice_value": {
-          "$ref": "#/definitions/protoSingleChoiceListSetting"
+          "$ref": "#/definitions/protoSingleChoiceList"
         },
         "multi_choice_value": {
-          "$ref": "#/definitions/protoMultiChoiceListSetting"
+          "$ref": "#/definitions/protoMultiChoiceList"
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
         }
       }
     },
-    "protoSettingsBundle": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "settings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoSetting"
-          }
-        }
-      },
-      "title": "payloads for settings bundles"
-    },
-    "protoSettingsValue": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
-        },
-        "bool_value": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "int_value": {
-          "type": "string",
-          "format": "int64"
-        },
-        "string_value": {
-          "type": "string"
-        },
-        "list_value": {
-          "$ref": "#/definitions/protoListValue"
-        }
-      },
-      "title": "payloads for settings values"
-    },
-    "protoSingleChoiceListSetting": {
+    "protoSingleChoiceList": {
       "type": "object",
       "properties": {
         "options": {
@@ -506,7 +576,7 @@
         }
       }
     },
-    "protoStringSetting": {
+    "protoString": {
       "type": "object",
       "properties": {
         "default": {
@@ -526,6 +596,53 @@
         },
         "placeholder": {
           "type": "string"
+        }
+      }
+    },
+    "protoValue": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the id of the Value. It is generated on saving it."
+        },
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string",
+          "description": "setting_id is the id of the setting from within its bundle."
+        },
+        "account_uuid": {
+          "type": "string"
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "int_value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "list_value": {
+          "$ref": "#/definitions/protoListValue"
+        }
+      }
+    },
+    "protoValueWithIdentifier": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "$ref": "#/definitions/protoIdentifier"
+        },
+        "value": {
+          "$ref": "#/definitions/protoValue"
         }
       }
     },

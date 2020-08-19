@@ -12,7 +12,7 @@ import (
 
 var (
 	// Name is the default name for the settings store
-	Name        = "ocis-settings-store"
+	Name        = "ocis-settings"
 	managerName = "filesystem"
 )
 
@@ -24,7 +24,13 @@ type Store struct {
 
 // New creates a new store
 func New(cfg *config.Config) settings.Manager {
-	s := Store{}
+	s := Store{
+		Logger: olog.NewLogger(
+			olog.Color(cfg.Log.Color),
+			olog.Pretty(cfg.Log.Pretty),
+			olog.Level(cfg.Log.Level),
+		),
+	}
 
 	dest := path.Join(cfg.Storage.RootMountPath, Name)
 	if _, err := os.Stat(dest); err != nil {
