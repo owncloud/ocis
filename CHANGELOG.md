@@ -2,16 +2,41 @@
 
 The following sections list the changes in ocis-accounts unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.1.1...master
+[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.2.0...master
+
+## Summary
+
+* Bugfix - Atomic Requests: [#82](https://github.com/owncloud/ocis-accounts/pull/82)
+* Bugfix - Unescape value for prefix query: [#76](https://github.com/owncloud/ocis-accounts/pull/76)
+
+## Details
+
+* Bugfix - Atomic Requests: [#82](https://github.com/owncloud/ocis-accounts/pull/82)
+
+   Operations on the file system level are now atomic. This happens only on the provisioning API.
+
+   https://github.com/owncloud/ocis-accounts/pull/82
+
+
+* Bugfix - Unescape value for prefix query: [#76](https://github.com/owncloud/ocis-accounts/pull/76)
+
+   Prefix queries also need to unescape token values like `'some ''ol string'` to `some 'ol
+   string` before using it in a prefix query
+
+   https://github.com/owncloud/ocis-accounts/pull/76
+
+# Changelog for [0.2.0] (2020-08-19)
+
+The following sections list the changes in ocis-accounts 0.2.0.
+
+[0.2.0]: https://github.com/owncloud/ocis-accounts/compare/v0.1.1...v0.2.0
 
 ## Summary
 
 * Bugfix - Add write mutexes: [#71](https://github.com/owncloud/ocis-accounts/pull/71)
-* Bugfix - Atomic Requests: [#82](https://github.com/owncloud/ocis-accounts/pull/82)
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
 * Bugfix - Fix index mapping: [#73](https://github.com/owncloud/ocis-accounts/issues/73)
 * Bugfix - Use NewNumericRangeInclusiveQuery for numeric literals: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
-* Bugfix - Unescape value for prefix query: [#76](https://github.com/owncloud/ocis-accounts/pull/76)
 * Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
 * Bugfix - Update account return value not used: [#70](https://github.com/owncloud/ocis-accounts/pull/70)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#64](https://github.com/owncloud/ocis-accounts/pull/64)
@@ -37,13 +62,6 @@ The following sections list the changes in ocis-accounts unreleased.
    welcome.
 
    https://github.com/owncloud/ocis-accounts/pull/71
-
-
-* Bugfix - Atomic Requests: [#82](https://github.com/owncloud/ocis-accounts/pull/82)
-
-   Operations on the file system level are now atomic. This happens only on the provisioning API.
-
-   https://github.com/owncloud/ocis-accounts/pull/82
 
 
 * Bugfix - Fix the accountId and groupId mismatch in DeleteGroup Method: [#60](https://github.com/owncloud/ocis-accounts/pull/60)
@@ -77,14 +95,6 @@ The following sections list the changes in ocis-accounts unreleased.
    https://github.com/owncloud/ocis-glauth/issues/28
    https://github.com/owncloud/ocis-accounts/pull/68
    https://github.com/owncloud/ocis-glauth/pull/29
-
-
-* Bugfix - Unescape value for prefix query: [#76](https://github.com/owncloud/ocis-accounts/pull/76)
-
-   Prefix queries also need to unescape token values like `'some ''ol string'` to `some 'ol
-   string` before using it in a prefix query
-
-   https://github.com/owncloud/ocis-accounts/pull/76
 
 
 * Bugfix - Prevent segfault when no password is set: [#65](https://github.com/owncloud/ocis-accounts/pull/65)
