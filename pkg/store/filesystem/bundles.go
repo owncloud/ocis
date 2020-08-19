@@ -20,13 +20,13 @@ func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error
 	m.RLock()
 	defer m.RUnlock()
 
-	var records []*proto.Bundle
 	bundlesFolder := s.buildFolderPathForBundles(false)
 	bundleFiles, err := ioutil.ReadDir(bundlesFolder)
 	if err != nil {
-		return records, nil
+		return []*proto.Bundle{}, nil
 	}
 
+	records := make([]*proto.Bundle, 0, len(bundleFiles))
 	for _, bundleFile := range bundleFiles {
 		record := proto.Bundle{}
 		err = s.parseRecordFromFile(&record, filepath.Join(bundlesFolder, bundleFile.Name()))

@@ -14,13 +14,13 @@ import (
 // If the accountUUID is empty, only values with empty accountUUID are returned.
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
 func (s Store) ListValues(bundleID, accountUUID string) ([]*proto.Value, error) {
-	var records []*proto.Value
 	valuesFolder := s.buildFolderPathForValues(false)
 	valueFiles, err := ioutil.ReadDir(valuesFolder)
 	if err != nil {
-		return records, nil
+		return []*proto.Value{}, nil
 	}
 
+	records := make([]*proto.Value, 0, len(valueFiles))
 	for _, valueFile := range valueFiles {
 		record := proto.Value{}
 		err := s.parseRecordFromFile(&record, filepath.Join(valuesFolder, valueFile.Name()))
