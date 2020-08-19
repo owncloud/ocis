@@ -21,12 +21,31 @@ type Service struct {
 
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config, logger log.Logger) Service {
-	return Service{
+	service := Service{
 		config:  cfg,
 		logger:  logger,
 		manager: store.New(cfg),
 	}
+	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server).
+	for _, role := range generateBundlesDefaultRoles() {
+		bundleID := role.Extension + "." + role.Id
+		// check if the role already exists
+		bundle, _ := service.manager.ReadBundle(role.Id)
+		if bundle != nil {
+			logger.Debug().Msgf("Settings bundle %v already exists. Skipping.", bundleID)
+			continue
+		}
+		// create the role
+		_, err := service.manager.WriteBundle(role)
+		if err != nil {
+			logger.Error().Err(err).Msgf("Failed to register settings bundle %v", bundleID)
+		}
+		logger.Debug().Msgf("Successfully registered settings bundle %v", bundleID)
+	}
+	return service
 }
+
+// TODO: check permissions on every request
 
 // SaveBundle implements the BundleServiceHandler interface
 func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
