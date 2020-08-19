@@ -155,16 +155,13 @@ func TestSettingsBundleProperties(t *testing.T) {
 			},
 		},
 		{
-			"spaces are disallowed in keys",
-			"bundle-name",
+			"spaces are disallowed in bundle names",
+			"bundle name",
 			"simple display name",
 			"simple extension name",
 			"123e4567-e89b-12d3-a456-426652340000",
 			CustomError{
-				ID:     "go.micro.client",
-				Code:   500,
-				Detail: "extension: must be in a valid format.",
-				Status: "Internal Server Error",
+				Detail: "extension: must be in a valid format; name: must be in a valid format.",
 			},
 		},
 		{
@@ -235,10 +232,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 				if err != nil {
 					t.Log(err)
 				}
-				assert.Equal(t, scenario.expectedError.ID, errorData.ID)
-				assert.Equal(t, scenario.expectedError.Code, errorData.Code)
 				assert.Equal(t, scenario.expectedError.Detail, errorData.Detail)
-				assert.Equal(t, scenario.expectedError.Status, errorData.Status)
 			} else {
 				assert.Equal(t, scenario.extensionName, cresponse.Bundle.Extension)
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
@@ -266,10 +260,7 @@ func TestSettingsBundleWithoutSettings(t *testing.T) {
 	assert.Nil(t, response)
 	var errorData CustomError
 	_ = json.Unmarshal([]byte(err.Error()), &errorData)
-	assert.Equal(t, "go.micro.client", errorData.ID)
-	assert.Equal(t, 500, errorData.Code)
 	assert.Equal(t, "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", errorData.Detail)
-	assert.Equal(t, "Internal Server Error", errorData.Status)
 	os.RemoveAll(dataStore)
 }
 
