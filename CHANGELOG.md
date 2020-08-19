@@ -9,6 +9,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Bugfix - Atomic Requests: [#82](https://github.com/owncloud/ocis-accounts/pull/82)
 * Bugfix - Unescape value for prefix query: [#76](https://github.com/owncloud/ocis-accounts/pull/76)
 * Change - Adapt to new ocis-settings data model: [#87](https://github.com/owncloud/ocis-accounts/pull/87)
+* Change - Add permissions for language to default roles: [#88](https://github.com/owncloud/ocis-accounts/pull/88)
 
 ## Details
 
@@ -34,6 +35,14 @@ The following sections list the changes in ocis-accounts unreleased.
 
    https://github.com/owncloud/ocis-accounts/pull/87
    https://github.com/owncloud/ocis-settings/pull/46
+
+
+* Change - Add permissions for language to default roles: [#88](https://github.com/owncloud/ocis-accounts/pull/88)
+
+   Ocis-settings has default roles and exposes the respective bundle uuids. We now added
+   permissions for reading/writing the preferred language to the default roles.
+
+   https://github.com/owncloud/ocis-accounts/pull/88
 
 # Changelog for [0.2.0] (2020-08-19)
 
