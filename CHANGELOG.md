@@ -2,6 +2,7 @@
 
 ## Summary
 
+* Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -27,6 +28,14 @@
 * Enhancement - Update proxy to v0.2.0: [#167](https://github.com/owncloud/ocis/pull/167)
 
 ## Details
+
+* Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
+
+   Without setting `REVA_FRONTEND_URL` and `REVA_DATAGATEWAY_URL` uploads would default to
+   locahost and fail if `OCIS_DOMAIN` was used to run ocis on a remote host.
+
+   https://github.com/owncloud/ocis/pull/392
+
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 
