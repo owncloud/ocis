@@ -267,8 +267,8 @@ func RegisterValueServiceWeb(r chi.Router, i ValueServiceHandler, middlewares ..
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/settings/value-save", handler.SaveValue)
-	r.MethodFunc("POST", "/api/v0/settings/value-get", handler.GetValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-save", handler.SaveValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-get", handler.GetValue)
 	r.MethodFunc("POST", "/api/v0/settings/values-list", handler.ListValues)
 	r.MethodFunc("POST", "/api/v0/settings/values-get-by-unique-identifiers", handler.GetValueByUniqueIdentifiers)
 }

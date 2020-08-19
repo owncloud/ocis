@@ -312,7 +312,7 @@
         ]
       }
     },
-    "/api/v0/settings/value-get": {
+    "/api/v0/settings/values-get": {
       "post": {
         "operationId": "ValueService_GetValue",
         "responses": {
@@ -336,38 +336,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/protoGetValueRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ValueService"
-        ]
-      }
-    },
-    "/api/v0/settings/value-save": {
-      "post": {
-        "operationId": "ValueService_SaveValue",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/protoSaveValueResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/protoSaveValueRequest"
             }
           }
         ],
@@ -432,6 +400,38 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/protoListValuesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-save": {
+      "post": {
+        "operationId": "ValueService_SaveValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueRequest"
             }
           }
         ],

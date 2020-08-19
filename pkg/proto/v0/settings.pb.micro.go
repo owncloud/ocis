@@ -240,14 +240,14 @@ func NewValueServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		&api.Endpoint{
 			Name:    "ValueService.SaveValue",
-			Path:    []string{"/api/v0/settings/value-save"},
+			Path:    []string{"/api/v0/settings/values-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "ValueService.GetValue",
-			Path:    []string{"/api/v0/settings/value-get"},
+			Path:    []string{"/api/v0/settings/values-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -352,14 +352,14 @@ func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts
 	h := &valueServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.SaveValue",
-		Path:    []string{"/api/v0/settings/value-save"},
+		Path:    []string{"/api/v0/settings/values-save"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.GetValue",
-		Path:    []string{"/api/v0/settings/value-get"},
+		Path:    []string{"/api/v0/settings/values-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
