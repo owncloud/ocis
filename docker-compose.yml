@@ -28,11 +28,12 @@ services:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
       KONNECTD_ISS: https://${OCIS_DOMAIN:-localhost}:9200
       KONNECTD_LOG_LEVEL: debug
-      KONNECTD_TLS: '0'
+      KONNECTD_TLS: 1
       PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-localhost}:9200
       PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-localhost}:9200/.well-known/openid-configuration
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
       PROXY_HTTP_ADDR: 0.0.0.0:9200
+      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       REVA_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       OCIS_LOG_LEVEL: debug
       REVA_TRANSFER_EXPIRES: 86400
