@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/owncloud/ocis-pkg/v2/middleware"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,49 +14,39 @@ var (
 	emptyCtx         = context.Background()
 
 	scenarios = []struct {
-		name       string
-		identifier *proto.Identifier
-		ctx        context.Context
-		expect     *proto.Identifier
+		name        string
+		accountUUID string
+		ctx         context.Context
+		expect      string
 	}{
 		{
-			name: "context with UUID; identifier = 'me'",
-			ctx:  ctxWithUUID,
-			identifier: &proto.Identifier{
-				AccountUuid: "me",
-			},
-			expect: &proto.Identifier{
-				AccountUuid: ctxWithUUID.Value(middleware.UUIDKey).(string),
-			},
+			name:        "context with UUID; identifier = 'me'",
+			ctx:         ctxWithUUID,
+			accountUUID: "me",
+			expect:      ctxWithUUID.Value(middleware.UUIDKey).(string),
 		},
 		{
-			name: "context without UUID; identifier = 'me'",
-			ctx:  ctxWithEmptyUUID,
-			identifier: &proto.Identifier{
-				AccountUuid: "me",
-			},
-			expect: &proto.Identifier{
-				AccountUuid: "",
-			},
+			name:        "context without UUID; identifier = 'me'",
+			ctx:         ctxWithEmptyUUID,
+			accountUUID: "me",
+			expect:      "",
 		},
 		{
-			name:       "context with UUID; identifier not 'me'",
-			ctx:        ctxWithUUID,
-			identifier: &proto.Identifier{},
-			expect: &proto.Identifier{
-				AccountUuid: "",
-			},
+			name:        "context with UUID; identifier not 'me'",
+			ctx:         ctxWithUUID,
+			accountUUID: "",
+			expect:      "",
 		},
 	}
 )
 
-func TestGetFailsafeIdentifier(t *testing.T) {
+func TestGetValidatedAccountUUID(t *testing.T) {
 	for _, s := range scenarios {
 		scenario := s
 		t.Run(scenario.name, func(t *testing.T) {
-			got := getFailsafeIdentifier(scenario.ctx, scenario.identifier)
+			got := getValidatedAccountUUID(scenario.ctx, scenario.accountUUID)
 			assert.NotPanics(t, func() {
-				getFailsafeIdentifier(emptyCtx, scenario.identifier)
+				getValidatedAccountUUID(emptyCtx, scenario.accountUUID)
 			})
 			assert.Equal(t, scenario.expect, got)
 		})
