@@ -962,6 +962,7 @@ def ocisServer():
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+        'REVA_LDAP_IDP': 'https://ocis-server:9200',
         'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
         'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
