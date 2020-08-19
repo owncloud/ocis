@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for ocis-proxy unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.6.0...master
+
+## Summary
+
+* Enhancement - Add numeric uid and gid to the access token: [#89](https://github.com/owncloud/ocis-proxy/pull/89)
+
+## Details
+
+* Enhancement - Add numeric uid and gid to the access token: [#89](https://github.com/owncloud/ocis-proxy/pull/89)
+
+   The eos storage driver is fetching the uid and gid of a user from the access token. This PR is using
+   the response of the accounts service to mint them in the token.
+
+   https://github.com/owncloud/ocis-proxy/pull/89
+
 # Changelog for [0.6.0] (2020-08-17)
 
 The following sections list the changes for ocis-proxy 0.6.0.
