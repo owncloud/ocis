@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
@@ -67,6 +68,28 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	}
 	res.Bundles = bundles
 	return nil
+}
+
+// AddSettingToBundle implements the BundleServiceHandler interface
+func (g Service) AddSettingToBundle(c context.Context, req *proto.AddSettingToBundleRequest, res *proto.AddSettingToBundleResponse) error {
+	cleanUpResource(c, req.Setting.Resource)
+	if validationError := validateAddSettingToBundle(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.AddSettingToBundle(req.BundleId, req.Setting)
+	if err != nil {
+		return err
+	}
+	res.Setting = r
+	return nil
+}
+
+// RemoveSettingFromBundle implements the BundleServiceHandler interface
+func (g Service) RemoveSettingFromBundle(c context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
+	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
+		return validationError
+	}
+	return g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId)
 }
 
 // SaveValue implements the ValueServiceHandler interface
@@ -162,6 +185,56 @@ func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIde
 		},
 		Value: value,
 	}, nil
+}
+
+// ListRoles implements the RoleServiceHandler interface
+func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	if validationError := validateListRoles(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE)
+	if err != nil {
+		return err
+	}
+	res.Bundles = r
+	return nil
+}
+
+// ListRoleAssignments implements the RoleServiceHandler interface
+func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssignmentsRequest, res *proto.ListRoleAssignmentsResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	if validationError := validateListRoleAssignments(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.ListRoleAssignments(req.AccountUuid)
+	if err != nil {
+		return err
+	}
+	res.Assignments = r
+	return nil
+}
+
+// AssignRoleToUser implements the RoleServiceHandler interface
+func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	if validationError := validateAssignRoleToUser(req); validationError != nil {
+		return validationError
+	}
+	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
+	if err != nil {
+		return err
+	}
+	res.Assignment = r
+	return nil
+}
+
+// RemoveRoleFromUser implements the RoleServiceHandler interface
+func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
+	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
+		return validationError
+	}
+	return g.manager.RemoveRoleAssignment(req.Id)
 }
 
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.

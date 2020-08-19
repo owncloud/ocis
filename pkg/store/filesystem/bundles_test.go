@@ -70,6 +70,35 @@ var bundleScenarios = []struct {
 			},
 		},
 	},
+	{
+		name: "generic-test-role-bundle",
+		bundle: &proto.Bundle{
+			Id:          bundle3,
+			Type:        proto.Bundle_TYPE_ROLE,
+			Extension:   extension1,
+			DisplayName: "Role1",
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_SYSTEM,
+			},
+			Settings: []*proto.Setting{
+				{
+					Id:          setting3,
+					Description: "test-desc-3",
+					DisplayName: "test-displayname-3",
+					Resource: &proto.Resource{
+						Type: proto.Resource_TYPE_SETTING,
+						Id:   setting1,
+					},
+					Value: &proto.Setting_PermissionValue{
+						PermissionValue: &proto.Permission{
+							Operation:  proto.Permission_OPERATION_READ,
+							Constraint: proto.Permission_CONSTRAINT_OWN,
+						},
+					},
+				},
+			},
+		},
+	},
 }
 
 func TestBundles(t *testing.T) {

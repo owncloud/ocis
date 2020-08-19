@@ -11,7 +11,7 @@ import (
 var (
 	regexForAccountUUID = regexp.MustCompile(`^[A-Za-z0-9\-_.+@]+$`)
 	requireAccountID    = []validation.Rule{
-		validation.Required, // use rule for validation error message consistency (".. must not be blank" on empty strings)
+		validation.Required,// use rule for validation error message consistency (".. must not be blank" on empty strings)
 		validation.Match(regexForAccountUUID),
 	}
 	regexForKeys        = regexp.MustCompile(`^[A-Za-z0-9\-_]*$`)
@@ -52,6 +52,24 @@ func validateListBundles(req *proto.ListBundlesRequest) error {
 	return validation.Validate(&req.AccountUuid, requireAccountID...)
 }
 
+func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
+	if err := validation.ValidateStruct(
+		req,
+		validation.Field(&req.BundleId, is.UUID),
+	); err != nil {
+		return err
+	}
+	return validateSetting(req.Setting)
+}
+
+func validateRemoveSettingFromBundle(req *proto.RemoveSettingFromBundleRequest) error {
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.BundleId, is.UUID),
+		validation.Field(&req.SettingId, is.UUID),
+	)
+}
+
 func validateSaveValue(req *proto.SaveValueRequest) error {
 	if err := validation.ValidateStruct(
 		req.Value,
@@ -80,6 +98,29 @@ func validateListValues(req *proto.ListValuesRequest) error {
 		req,
 		validation.Field(&req.BundleId, validation.When(req.BundleId != "", is.UUID)),
 		validation.Field(&req.AccountUuid, validation.When(req.AccountUuid != "", validation.Match(regexForAccountUUID))),
+	)
+}
+
+func validateListRoles(req *proto.ListBundlesRequest) error {
+	return validation.Validate(&req.AccountUuid, requireAccountID...)
+}
+
+func validateListRoleAssignments(req *proto.ListRoleAssignmentsRequest) error {
+	return validation.Validate(req.AccountUuid, requireAccountID...)
+}
+
+func validateAssignRoleToUser(req *proto.AssignRoleToUserRequest) error {
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.AccountUuid, requireAccountID...),
+		validation.Field(&req.RoleId, is.UUID),
+	)
+}
+
+func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.Id, is.UUID),
 	)
 }
 
