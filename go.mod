@@ -8,12 +8,10 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
-	github.com/cespare/reflex v0.3.0 // indirect
 	github.com/coreos/etcd v3.3.21+incompatible // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-log/log v0.2.0 // indirect
-	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/karrick/godirwalk v1.16.1 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
@@ -33,8 +31,8 @@ require (
 	github.com/owncloud/ocis-ocs v0.2.0
 	github.com/owncloud/ocis-phoenix v0.11.0
 	github.com/owncloud/ocis-pkg/v2 v2.3.0
-	github.com/owncloud/ocis-proxy v0.6.0
-	github.com/owncloud/ocis-reva v0.12.0
+	github.com/owncloud/ocis-proxy v0.6.1-0.20200819105709-a51b3c8ed42f
+	github.com/owncloud/ocis-reva v0.12.1-0.20200819133706-f68defd1ff27
 	github.com/owncloud/ocis-settings v0.1.0
 	github.com/owncloud/ocis-store v0.1.1
 	github.com/owncloud/ocis-thumbnails v0.3.0
