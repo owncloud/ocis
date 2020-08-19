@@ -168,6 +168,9 @@ type DriverEOS struct {
 
 	// Layout of the users home dir path
 	Layout string
+
+	// gateway service to use for uid lookups
+	GatewaySVC string
 }
 
 // DriverLocal defines the available local storage driver configuration.
@@ -203,17 +206,18 @@ type OIDC struct {
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	Hostname     string
-	Port         int
-	BaseDN       string
-	LoginFilter  string
-	UserFilter   string
-	FindFilter   string
-	GroupFilter  string
-	BindDN       string
-	BindPassword string
-	IDP          string
-	Schema       LDAPSchema
+	Hostname        string
+	Port            int
+	BaseDN          string
+	LoginFilter     string
+	UserFilter      string
+	AttributeFilter string
+	FindFilter      string
+	GroupFilter     string
+	BindDN          string
+	BindPassword    string
+	IDP             string
+	Schema          LDAPSchema
 }
 
 // LDAPSchema defines the available ldap schema configuration.
@@ -222,6 +226,8 @@ type LDAPSchema struct {
 	Mail        string
 	DisplayName string
 	CN          string
+	UIDNumber   string
+	GIDNumber   string
 }
 
 // OCDav defines the available ocdav configuration.
