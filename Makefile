@@ -4,7 +4,7 @@ IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
-PHOENIX_ASSETS_VERSION = v0.14.0
+PHOENIX_ASSETS_VERSION = v0.15.0
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
