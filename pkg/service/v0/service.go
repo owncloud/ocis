@@ -43,6 +43,15 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 		}
 		logger.Debug().Msgf("Successfully registered settings bundle %v", bundleID)
 	}
+	permissionRequests := generateDefaultPermissionsRequests()
+	for i := range permissionRequests {
+		res, err := service.manager.AddSettingToBundle(permissionRequests[i].BundleId, permissionRequests[i].Setting)
+		if err != nil {
+			logger.Err(err).Str("bundle", permissionRequests[i].BundleId).Str("setting", permissionRequests[i].Setting.Id).Msg("Error adding setting to bundle")
+		} else {
+			logger.Info().Str("bundle", permissionRequests[i].BundleId).Str("setting", res.Id).Msg("Successfully added setting to bundle")
+		}
+	}
 	return service
 }
 
