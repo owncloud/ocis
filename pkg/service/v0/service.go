@@ -56,7 +56,7 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 	}
 	r, err := g.manager.WriteBundle(req.Bundle)
 	if err != nil {
-		return merrors.FromError(merrors.InternalServerError("ocis-settings", "%s", err))
+		return merrors.FromError(merrors.BadRequest("ocis-settings", "%s", err))
 	}
 	res.Bundle = r
 	return nil
