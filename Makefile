@@ -158,37 +158,41 @@ watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
 $(GOPATH)/bin/protoc-gen-go:
-	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+	GO111MODULE=off go install github.com/golang/protobuf/protoc-gen-go
 
 $(GOPATH)/bin/protoc-gen-micro:
-	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
+	GO111MODULE=on go install github.com/micro/protoc-gen-micro/v2
 
 $(GOPATH)/bin/protoc-gen-microweb:
-	GO111MODULE=off go get -v github.com/owncloud/protoc-gen-microweb
+	GO111MODULE=off go install github.com/owncloud/protoc-gen-microweb
 
 $(GOPATH)/bin/protoc-gen-swagger:
-	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	GO111MODULE=off go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
 $(PROTO_SRC)/settings.pb.go: $(PROTO_SRC)/settings.proto
 	protoc \
+		--plugin=protoc-gen-go=$GOPATH/bin/protoc-gen-go \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
 		--go_out=. settings.proto
 
 $(PROTO_SRC)/settings.pb.micro.go: $(PROTO_SRC)/settings.proto
 	protoc \
+		--plugin=protoc-gen-micro=$GOPATH/bin/protoc-gen-micro \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
 		--micro_out=. settings.proto
 
 $(PROTO_SRC)/settings.pb.web.go: $(PROTO_SRC)/settings.proto
 	protoc \
+		--plugin=protoc-gen-microweb=$GOPATH/bin/protoc-gen-microweb \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
 		--microweb_out=. settings.proto
 
 $(PROTO_SRC)/settings.swagger.json: $(PROTO_SRC)/settings.proto
 	protoc \
+		--plugin=protoc-gen-swagger=$GOPATH/bin/protoc-gen-swagger \
 		-I=third_party/ \
 		-I=$(PROTO_SRC)/ \
 		--swagger_out=$(PROTO_SRC) settings.proto
