@@ -33,14 +33,14 @@ func validateSaveBundle(req *proto.SaveBundleRequest) error {
 		validation.Field(&req.Bundle.DisplayName, validation.Required),
 		validation.Field(&req.Bundle.Settings, validation.Required),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	if err := validateResource(req.Bundle.Resource); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	for i := range req.Bundle.Settings {
 		if err := validateSetting(req.Bundle.Settings[i]); err != nil {
-			return merrors.FromError(err)
+			return err
 		}
 	}
 	return nil
@@ -48,21 +48,21 @@ func validateSaveBundle(req *proto.SaveBundleRequest) error {
 
 func validateGetBundle(req *proto.GetBundleRequest) error {
 	if err := validation.Validate(&req.BundleId, requireAccountID...); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
 
 func validateListBundles(req *proto.ListBundlesRequest) error {
 	if err := validation.Validate(&req.AccountUuid, requireAccountID...); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
 
 func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
 	if err := validation.ValidateStruct(req, validation.Field(&req.BundleId, is.UUID)); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return validateSetting(req.Setting)
 }
@@ -73,7 +73,7 @@ func validateRemoveSettingFromBundle(req *proto.RemoveSettingFromBundleRequest) 
 		validation.Field(&req.BundleId, is.UUID),
 		validation.Field(&req.SettingId, is.UUID),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -86,11 +86,11 @@ func validateSaveValue(req *proto.SaveValueRequest) error {
 		validation.Field(&req.Value.SettingId, is.UUID),
 		validation.Field(&req.Value.AccountUuid, requireAccountID...),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 
 	if err := validateResource(req.Value.Resource); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 
 	// TODO: validate values against the respective setting. need to check if constraints of the setting are fulfilled.
@@ -99,7 +99,7 @@ func validateSaveValue(req *proto.SaveValueRequest) error {
 
 func validateGetValue(req *proto.GetValueRequest) error {
 	if err := validation.Validate(req.Id, is.UUID); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -110,21 +110,21 @@ func validateListValues(req *proto.ListValuesRequest) error {
 		validation.Field(&req.BundleId, validation.When(req.BundleId != "", is.UUID)),
 		validation.Field(&req.AccountUuid, validation.When(req.AccountUuid != "", validation.Match(regexForAccountUUID))),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
 
 func validateListRoles(req *proto.ListBundlesRequest) error {
 	if err := validation.Validate(&req.AccountUuid, requireAccountID...); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
 
 func validateListRoleAssignments(req *proto.ListRoleAssignmentsRequest) error {
 	if err := validation.Validate(req.AccountUuid, requireAccountID...); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -135,7 +135,7 @@ func validateAssignRoleToUser(req *proto.AssignRoleToUserRequest) error {
 		validation.Field(&req.AccountUuid, requireAccountID...),
 		validation.Field(&req.RoleId, is.UUID),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -145,7 +145,7 @@ func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
 		req,
 		validation.Field(&req.Id, is.UUID),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -156,7 +156,7 @@ func validateResource(resource *proto.Resource) error {
 		return merrors.FromError(err)
 	}
 	if err := validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN)); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
@@ -169,10 +169,10 @@ func validateSetting(setting *proto.Setting) error {
 		validation.Field(&setting.Id, validation.When(setting.Id != "", is.UUID)),
 		validation.Field(&setting.Name, requireAlphanumeric...),
 	); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	if err := validateResource(setting.Resource); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	return nil
 }
