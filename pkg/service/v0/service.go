@@ -52,11 +52,11 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
 	cleanUpResource(c, req.Bundle.Resource)
 	if validationError := validateSaveBundle(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.FromError(merrors.BadRequest("ocis-settings", "%s", validationError))
 	}
 	r, err := g.manager.WriteBundle(req.Bundle)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.FromError(merrors.InternalServerError("ocis-settings", "%s", err))
 	}
 	res.Bundle = r
 	return nil
@@ -118,15 +118,15 @@ func (g Service) SaveValue(c context.Context, req *proto.SaveValueRequest, res *
 	cleanUpResource(c, req.Value.Resource)
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.FromError(merrors.BadRequest("ocis-settings", "%s", validationError))
 	}
 	r, err := g.manager.WriteValue(req.Value)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.FromError(merrors.BadRequest("ocis-settings", "%s", err))
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.FromError(merrors.NotFound("ocis-settings", "%s", err))
 	}
 	res.Value = valueWithIdentifier
 	return nil

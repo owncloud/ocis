@@ -103,7 +103,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
 			"सिम्प्ले",
-			merrors.New("", "extension: must be in a valid format; name: must be in a valid format.", 0),
+			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
 		},
 		{
 			"UTF validation on display name",
@@ -111,7 +111,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-display-name",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "name: must be in a valid format.", 0),
+			merrors.New("ocis-settings", "name: must be in a valid format.", 400),
 		},
 		{
 			"extension name with ../ in the name",
@@ -119,7 +119,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"../folder-a-level-higher-up",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "extension: must be in a valid format.", 0),
+			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
 		},
 		{
 			"extension name with \\ in the name",
@@ -127,7 +127,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"\\",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "extension: must be in a valid format.", 0),
+			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
 		},
 		{
 			"spaces are disallowed in bundle names",
@@ -135,7 +135,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple display name",
 			"simple extension name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "extension: must be in a valid format; name: must be in a valid format.", 0),
+			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
 		},
 		{
 			"spaces are allowed in display names",
@@ -151,7 +151,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"simple-display-name",
 			"",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "extension: cannot be blank.", 0),
+			merrors.New("ocis-settings", "extension: cannot be blank.", 400),
 		},
 		{
 			"display name missing",
@@ -159,7 +159,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"",
 			"simple-extension-name",
 			"123e4567-e89b-12d3-a456-426652340000",
-			merrors.New("", "display_name: cannot be blank.", 0),
+			merrors.New("ocis-settings", "display_name: cannot be blank.", 400),
 		},
 		{
 			"UUID missing (omitted on bundles)",
@@ -216,7 +216,7 @@ func TestSettingsBundleWithoutSettings(t *testing.T) {
 	response, err := cl.SaveBundle(context.Background(), &createRequest)
 	assert.Error(t, err)
 	assert.Nil(t, response)
-	assert.Equal(t, merrors.New("", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 0), err)
+	assert.Equal(t, merrors.New("ocis-settings", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 400), err)
 	os.RemoveAll(dataStore)
 }
 
