@@ -46,17 +46,11 @@ func validateSaveBundle(req *proto.SaveBundleRequest) error {
 }
 
 func validateGetBundle(req *proto.GetBundleRequest) error {
-	if err := validation.Validate(&req.BundleId, requireAccountID...); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(&req.BundleId, requireAccountID...)
 }
 
 func validateListBundles(req *proto.ListBundlesRequest) error {
-	if err := validation.Validate(&req.AccountUuid, requireAccountID...); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(&req.AccountUuid, requireAccountID...)
 }
 
 func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
@@ -67,14 +61,11 @@ func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
 }
 
 func validateRemoveSettingFromBundle(req *proto.RemoveSettingFromBundleRequest) error {
-	if err := validation.ValidateStruct(
+	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.BundleId, is.UUID),
 		validation.Field(&req.SettingId, is.UUID),
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 func validateSaveValue(req *proto.SaveValueRequest) error {
@@ -97,56 +88,38 @@ func validateSaveValue(req *proto.SaveValueRequest) error {
 }
 
 func validateGetValue(req *proto.GetValueRequest) error {
-	if err := validation.Validate(req.Id, is.UUID); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(req.Id, is.UUID)
 }
 
 func validateListValues(req *proto.ListValuesRequest) error {
-	if err := validation.ValidateStruct(
+	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.BundleId, validation.When(req.BundleId != "", is.UUID)),
 		validation.Field(&req.AccountUuid, validation.When(req.AccountUuid != "", validation.Match(regexForAccountUUID))),
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 func validateListRoles(req *proto.ListBundlesRequest) error {
-	if err := validation.Validate(&req.AccountUuid, requireAccountID...); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(&req.AccountUuid, requireAccountID...)
 }
 
 func validateListRoleAssignments(req *proto.ListRoleAssignmentsRequest) error {
-	if err := validation.Validate(req.AccountUuid, requireAccountID...); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(req.AccountUuid, requireAccountID...)
 }
 
 func validateAssignRoleToUser(req *proto.AssignRoleToUserRequest) error {
-	if err := validation.ValidateStruct(
+	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.AccountUuid, requireAccountID...),
 		validation.Field(&req.RoleId, is.UUID),
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
-	if err := validation.ValidateStruct(
+	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.Id, is.UUID),
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 // validateResource is an internal helper for validating the content of a resource.
@@ -154,10 +127,7 @@ func validateResource(resource *proto.Resource) error {
 	if err := validation.Validate(&resource, validation.Required); err != nil {
 		return err
 	}
-	if err := validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN)); err != nil {
-		return err
-	}
-	return nil
+	return validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN))
 }
 
 // validateSetting is an internal helper for validating the content of a setting.
@@ -170,8 +140,5 @@ func validateSetting(setting *proto.Setting) error {
 	); err != nil {
 		return err
 	}
-	if err := validateResource(setting.Resource); err != nil {
-		return err
-	}
-	return nil
+	return validateResource(setting.Resource)
 }
