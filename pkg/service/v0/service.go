@@ -109,7 +109,9 @@ func (g Service) RemoveSettingFromBundle(c context.Context, req *proto.RemoveSet
 	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
-	return g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId)
+	if err := g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId); err != nil {
+		return merrors.BadRequest("ocis-settings", "%s", err)
+	}
 }
 
 // SaveValue implements the ValueServiceHandler interface
