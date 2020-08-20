@@ -1,4 +1,51 @@
-# Changes in 0.1.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-settings unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-settings/compare/v0.1.0...master
+
+## Summary
+
+* Change - Add role service: [#110](https://github.com/owncloud/product/issues/110)
+* Change - Rename endpoints and message types: [#36](https://github.com/owncloud/ocis-settings/issues/36)
+* Change - Use UUIDs instead of alphanumeric identifiers: [#46](https://github.com/owncloud/ocis-settings/pull/46)
+
+## Details
+
+* Change - Add role service: [#110](https://github.com/owncloud/product/issues/110)
+
+   We added service endpoints for registering roles and maintaining permissions.
+
+   https://github.com/owncloud/product/issues/110
+   https://github.com/owncloud/ocis-settings/issues/10
+   https://github.com/owncloud/ocis-settings/pull/47
+
+
+* Change - Rename endpoints and message types: [#36](https://github.com/owncloud/ocis-settings/issues/36)
+
+   We decided to rename endpoints and message types to be less verbose. Specifically,
+   `SettingsBundle` became `Bundle`, `Setting` (inside a bundle) kept its name and
+   `SettingsValue` became `Value`.
+
+   https://github.com/owncloud/ocis-settings/issues/36
+   https://github.com/owncloud/ocis-settings/issues/32
+   https://github.com/owncloud/ocis-settings/pull/46
+
+
+* Change - Use UUIDs instead of alphanumeric identifiers: [#46](https://github.com/owncloud/ocis-settings/pull/46)
+
+   `Bundles`, `Settings` and `Values` were identified by a set of alphanumeric identifiers so
+   far. We switched to UUIDs in order to achieve a flat file hierarchy on disk. Referencing the
+   respective entities by their alphanumeric identifiers (as used in UI code) is still
+   supported.
+
+   https://github.com/owncloud/ocis-settings/pull/46
+
+# Changelog for [0.1.0] (2020-08-17)
+
+The following sections list the changes in ocis-settings 0.1.0.
+
+[0.1.0]: https://github.com/owncloud/ocis-settings/compare/6fdbbd7e8eb39f18ada1a8a3c45a1c925e239889...v0.1.0
 
 ## Summary
 
