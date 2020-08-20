@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Enhancement - Add numeric uid and gid to the access token: [#89](https://github.com/owncloud/ocis-proxy/pull/89)
+* Enhancement - Add configuration options for the pre-signed url middleware: [#91](https://github.com/owncloud/ocis-proxy/issues/91)
 
 ## Details
 
@@ -16,6 +17,15 @@ The following sections list the changes for ocis-proxy unreleased.
    the response of the accounts service to mint them in the token.
 
    https://github.com/owncloud/ocis-proxy/pull/89
+
+
+* Enhancement - Add configuration options for the pre-signed url middleware: [#91](https://github.com/owncloud/ocis-proxy/issues/91)
+
+   Added an option to define allowed http methods for pre-signed url requests. This is useful
+   since we only want clients to GET resources and don't upload anything with presigned requests.
+
+   https://github.com/owncloud/ocis-proxy/issues/91
+   https://github.com/owncloud/product/issues/150
 
 # Changelog for [0.6.0] (2020-08-17)
 
@@ -299,7 +309,7 @@ The following sections list the changes for ocis-proxy 0.3.1.
 
 The following sections list the changes for ocis-proxy 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.3.0
 
 ## Summary
 
@@ -333,11 +343,27 @@ The following sections list the changes for ocis-proxy 0.3.0.
 
    https://github.com/owncloud/ocis-proxy/issues/4
 
+# Changelog for [0.2.1] (2020-03-25)
+
+The following sections list the changes for ocis-proxy 0.2.1.
+
+[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.2.0...v0.2.1
+
+## Summary
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+## Details
+
+* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
+
+   https://github.com/owncloud/ocis-proxy/pull/25
+
 # Changelog for [0.2.0] (2020-03-25)
 
 The following sections list the changes for ocis-proxy 0.2.0.
 
-[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.2.1...v0.2.0
+[0.2.0]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.0
 
 ## Summary
 
@@ -367,22 +393,6 @@ The following sections list the changes for ocis-proxy 0.2.0.
    Before a generates certificates on every start was used for dev purposes.
 
    https://github.com/owncloud/ocis-proxy/pull/14
-
-# Changelog for [0.2.1] (2020-03-25)
-
-The following sections list the changes for ocis-proxy 0.2.1.
-
-[0.2.1]: https://github.com/owncloud/ocis-proxy/compare/v0.1.0...v0.2.1
-
-## Summary
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-## Details
-
-* Bugfix - Set TLS-Certificate correctly: [#25](https://github.com/owncloud/ocis-proxy/pull/25)
-
-   https://github.com/owncloud/ocis-proxy/pull/25
 
 # Changelog for [0.1.0] (2020-03-18)
 
