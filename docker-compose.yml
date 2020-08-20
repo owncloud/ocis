@@ -34,6 +34,7 @@ services:
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
       PROXY_HTTP_ADDR: 0.0.0.0:9200
       REVA_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
+      REVA_LDAP_IDP: https://${OCIS_DOMAIN:-localhost}:9200
       OCIS_LOG_LEVEL: debug
       REVA_TRANSFER_EXPIRES: 86400
       REVA_STORAGE_EOS_DRIVER: eoshome
