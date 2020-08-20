@@ -158,16 +158,16 @@ watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
 $(GOPATH)/bin/protoc-gen-go:
-	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+	GO111MODULE=off go install github.com/golang/protobuf/protoc-gen-go
 
 $(GOPATH)/bin/protoc-gen-micro:
-	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
+	GO111MODULE=on go install github.com/micro/protoc-gen-micro/v2
 
 $(GOPATH)/bin/protoc-gen-microweb:
-	GO111MODULE=off go get -v github.com/owncloud/protoc-gen-microweb
+	GO111MODULE=off go install github.com/owncloud/protoc-gen-microweb
 
 $(GOPATH)/bin/protoc-gen-swagger:
-	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	GO111MODULE=off go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
 $(PROTO_SRC)/settings.pb.go: $(PROTO_SRC)/settings.proto
 	protoc \
