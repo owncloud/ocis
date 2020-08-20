@@ -332,6 +332,7 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
          'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
          'REVA_FRONTEND_URL': 'https://ocis-server:9200',
+         'REVA_LDAP_IDP': 'https://ocis-server:9200',
          'PHOENIX_WEB_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
          'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ui/tests/config/drone/identifier-registration.yml',
