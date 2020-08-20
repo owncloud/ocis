@@ -90,6 +90,7 @@ type Config struct {
 	TokenManager   TokenManager
 	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
 	Reva           Reva
+	PreSignedURL   PreSignedURL
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
@@ -113,6 +114,11 @@ type StaticSelectorConf struct {
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
 	JWTSecret string
+}
+
+// PreSignedURL is the config for the presigned url middleware
+type PreSignedURL struct {
+	AllowedHTTPMethods []string
 }
 
 // MigrationSelectorConf is the config for the migration-selector

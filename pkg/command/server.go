@@ -50,6 +50,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
+			cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
 
 			// When running on single binary mode the before hook from the root command won't get called. We manually
 			// call this before hook from ocis command, so the configuration can be loaded.
@@ -251,6 +252,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	psMW := middleware.PresignedURL(
 		middleware.Logger(l),
 		middleware.Store(storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())),
+		middleware.PreSignedURLConfig(cfg.PreSignedURL),
 	)
 
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
