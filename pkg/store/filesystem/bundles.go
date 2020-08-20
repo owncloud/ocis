@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -45,7 +44,6 @@ func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
 func (s Store) ReadBundle(bundleID string) (*proto.Bundle, error) {
-	// FIXME: locking should happen on the file here, not globally.
 	m.RLock()
 	defer m.RUnlock()
 
@@ -61,7 +59,6 @@ func (s Store) ReadBundle(bundleID string) (*proto.Bundle, error) {
 
 // ReadSetting tries to find a setting by the given id within the dataPath.
 func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
-	// FIXME: locking should happen on the file here, not globally.
 	m.RLock()
 	defer m.RUnlock()
 
@@ -76,7 +73,7 @@ func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
 			}
 		}
 	}
-	return nil, merrors.NotFound(settingID, fmt.Sprintf("could not read setting: %v", settingID))
+	return nil, fmt.Errorf(settingID, fmt.Sprintf("could not read setting: %v", settingID))
 }
 
 // WriteBundle writes the given record into a file within the dataPath.
@@ -119,9 +116,12 @@ func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error 
 	if err != nil {
 		return nil
 	}
-	removeSetting(bundle, settingID)
-	_, err = s.WriteBundle(bundle)
-	return err
+	if ok := removeSetting(bundle, settingID); ok {
+		if _, err := s.WriteBundle(bundle); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // indexOfSetting finds the index of the given setting within the given bundle.

@@ -54,10 +54,7 @@ func validateListBundles(req *proto.ListBundlesRequest) error {
 }
 
 func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
-	if err := validation.ValidateStruct(
-		req,
-		validation.Field(&req.BundleId, is.UUID),
-	); err != nil {
+	if err := validation.ValidateStruct(req, validation.Field(&req.BundleId, is.UUID)); err != nil {
 		return err
 	}
 	return validateSetting(req.Setting)
