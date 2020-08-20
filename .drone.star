@@ -322,11 +322,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
        'pull': 'always',
        'detach': True,
        'environment' : {
-         'REVA_LDAP_HOSTNAME': 'ldap',
-         'REVA_LDAP_PORT': 636,
-         'REVA_LDAP_BIND_PASSWORD': 'admin',
-         'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
-         'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
@@ -338,10 +333,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ui/tests/config/drone/identifier-registration.yml',
          'KONNECTD_ISS': 'https://ocis-server:9200',
          'KONNECTD_TLS': 'true',
-         'LDAP_URI': 'ldap://ldap',
-         'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
-         'LDAP_BINDPW': 'admin',
-         'LDAP_BASEDN': 'dc=owncloud,dc=com',
          'OCIS_CONFIG_FILE': '/drone/src/ui/tests/config/drone/proxy-config.json'
        },
        'commands': [
@@ -368,11 +359,9 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'SERVER_HOST': 'https://ocis-server:9200',
          'BACKEND_HOST': 'https://ocis-server:9200',
          'RUN_ON_OCIS': 'true',
-         'RUN_WITH_LDAP': 'true',
          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
          'PHOENIX_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
-         'LDAP_SERVER_URL': 'ldap://ldap',
          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
          'LOCAL_UPLOAD_DIR': '/uploads',
          'PHOENIX_PATH': '/srv/app/phoenix',
@@ -403,18 +392,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
      },
    ],
    'services': [
-     {
-       'name': 'ldap',
-       'image': 'osixia/openldap:1.3.0',
-       'pull': 'always',
-       'environment': {
-         'LDAP_DOMAIN': 'owncloud.com',
-         'LDAP_ORGANISATION': 'ownCloud',
-         'LDAP_ADMIN_PASSWORD': 'admin',
-         'LDAP_TLS_VERIFY_CLIENT': 'never',
-         'HOSTNAME': 'ldap'
-       },
-     },
      {
        'name': 'redis',
        'image': 'webhippie/redis',
