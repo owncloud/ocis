@@ -20,8 +20,5 @@ func configurePhoenix(cfg *config.Config) *svcconfig.Config {
 		cfg.Phoenix.Tracing.Service = cfg.Tracing.Service
 	}
 
-	// disable ocis-hello extension
-	cfg.Phoenix.Phoenix.Config.ExternalApps = []svcconfig.ExternalApp{}
-
 	return cfg.Phoenix
 }
