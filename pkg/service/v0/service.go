@@ -235,7 +235,10 @@ func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFrom
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
-	return g.manager.RemoveRoleAssignment(req.Id)
+	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
+		return merrors.BadRequest("ocis-settings", "%s", err)
+	}
+	return nil
 }
 
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.
