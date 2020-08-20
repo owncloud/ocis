@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-phoenix unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-phoenix/compare/v0.11.0...master
+
+## Summary
+
+* Change - Enable Settings and Accounts apps by default: [#80](https://github.com/owncloud/ocis-phoenix/pull/80)
+
+## Details
+
+* Change - Enable Settings and Accounts apps by default: [#80](https://github.com/owncloud/ocis-phoenix/pull/80)
+
+   The default ocis-web config now adds the frontend of ocis-accounts and ocis-settings to the
+   builtin web config.
+
+   https://github.com/owncloud/ocis-phoenix/pull/80
+
 # Changelog for [0.11.0] (2020-08-17)
 
 The following sections list the changes in ocis-phoenix 0.11.0.
