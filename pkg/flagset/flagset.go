@@ -195,6 +195,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
+		&cli.StringSliceFlag{
+			Name:    "presignedurl-allow-method",
+			Value:   cli.NewStringSlice("GET"),
+			Usage:   "--presignedurl-allow-method GET [--presignedurl-allow-method POST]",
+			EnvVars: []string{"PRESIGNEDURL_ALLOWED_METHODS"},
+		},
 	}
 
 }
