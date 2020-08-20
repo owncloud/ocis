@@ -68,6 +68,19 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 			p.config.Phoenix.Config.Options["hideSearchBar"] = true
 		}
 
+		if p.config.Phoenix.Config.ExternalApps == nil {
+			p.config.Phoenix.Config.ExternalApps = []config.ExternalApp{
+				{
+					ID:   "accounts",
+					Path: "https://localhost:9200/accounts.js",
+				},
+				{
+					ID:   "settings",
+					Path: "https://localhost:9200/settings.js",
+				},
+			}
+		}
+
 		// make apps render as empty array if it is empty
 		// TODO remove once https://github.com/golang/go/issues/27589 is fixed
 		if len(p.config.Phoenix.Config.Apps) == 0 {
