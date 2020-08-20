@@ -33,7 +33,7 @@ and take note of its release tag name.
 3. Move all changelog items from the `changelog/unreleased/` folder to the `$major.$minor.$patchVersion_YYYY-MM-DD` folder.
 4. Update the go module `ocis-pkg` to the latest version <https://blog.golang.org/using-go-modules> .
 5. Update the phoenix asset by adjusting the value of `PHOENIX_ASSETS_VERSION` at the top of the Makefile and specify the tag name of the latest [Phoenix release](https://github.com/owncloud/phoenix/tags).
-6. Run `make generate`.
+6. Run `make clean generate`.
 7. Create a changelog item for the update in the `changelog/$major.$minor.$patchVersion_YYYY-MM-DD` folder.
 8. Commit your changes.
 9. After merging, wait for the CI to run on the merge commit.
