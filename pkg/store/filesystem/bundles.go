@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -23,7 +22,7 @@ func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error
 	bundlesFolder := s.buildFolderPathForBundles(false)
 	bundleFiles, err := ioutil.ReadDir(bundlesFolder)
 	if err != nil {
-		return []*proto.Bundle{}, merrors.FromError(err)
+		return []*proto.Bundle{}, nil
 	}
 
 	records := make([]*proto.Bundle, 0, len(bundleFiles))
@@ -74,7 +73,7 @@ func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
 			}
 		}
 	}
-	return nil, merrors.NotFound(settingID, fmt.Sprintf("could not read setting: %v", settingID))
+	return nil, fmt.Errorf(settingID, fmt.Sprintf("could not read setting: %v", settingID))
 }
 
 // WriteBundle writes the given record into a file within the dataPath.

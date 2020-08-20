@@ -5,7 +5,6 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -153,7 +152,7 @@ func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
 // validateResource is an internal helper for validating the content of a resource.
 func validateResource(resource *proto.Resource) error {
 	if err := validation.Validate(&resource, validation.Required); err != nil {
-		return merrors.FromError(err)
+		return err
 	}
 	if err := validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN)); err != nil {
 		return err
