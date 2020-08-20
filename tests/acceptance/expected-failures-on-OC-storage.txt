@@ -166,6 +166,24 @@ apiSharees/sharees.feature:516
 apiSharees/sharees.feature:537
 apiSharees/sharees.feature:538
 #
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set (shareapi_auto_accept_share)
+apiShareManagement/acceptShares.feature:333
+apiShareManagement/acceptShares.feature:415
+apiShareManagement/acceptShares.feature:416
+apiShareManagement/acceptShares.feature:417
+apiShareManagement/acceptShares.feature:418
+apiShareManagement/acceptShares.feature:419
+apiShareManagement/acceptShares.feature:421
+apiShareManagement/acceptShares.feature:436
+apiShareManagement/acceptShares.feature:458
+apiShareManagement/acceptShares.feature:477
+apiShareManagement/acceptShares.feature:511
+apiShareManagement/acceptShares.feature:542
+apiShareManagement/acceptShares.feature:561
+apiShareManagement/acceptShares.feature:582
+apiShareManagement/acceptShares.feature:652
+apiShareManagement/acceptShares.feature:696
+#
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
 apiShareManagementBasic/createShare.feature:169
 apiShareManagementBasic/createShare.feature:170
@@ -187,11 +205,6 @@ apiShareManagementBasic/deleteShare.feature:37
 apiShareOperations/accessToShare.feature:48
 apiShareOperations/accessToShare.feature:49
 #
-# https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
-# https://github.com/owncloud/ocis-reva/issues/194 Group shares support
-apiShareOperations/accessToShare.feature:63
-apiShareOperations/accessToShare.feature:64
-#
 # https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
 apiShareOperations/gettingShares.feature:21
 apiShareOperations/gettingShares.feature:22
@@ -209,9 +222,6 @@ apiShareOperations/gettingShares.feature:125
 # https://github.com/owncloud/ocis-reva/issues/374 OCS error message for attempting to access share via share id as an unauthorized user is not informative
 apiShareOperations/gettingShares.feature:168
 apiShareOperations/gettingShares.feature:169
-#
-# https://github.com/owncloud/ocis-reva/issues/194 Group shares support
-apiShareOperations/gettingShares.feature:172
 #
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
 apiShareOperations/gettingShares.feature:204
@@ -448,9 +458,6 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:196
 apiSharePublicLink2/uploadToPublicLinkShare.feature:206
 #
 apiSharePublicLink2/uploadToPublicLinkShare.feature:217
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
-apiSharePublicLink2/uploadToPublicLinkShare.feature:227
 #
 apiSharePublicLink2/uploadToPublicLinkShare.feature:238
 #
