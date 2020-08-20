@@ -188,34 +188,15 @@ func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res
 	return nil
 }
 
-func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIdentifier, error) {
-	bundle, err := g.manager.ReadBundle(value.BundleId)
-	if err != nil {
-		return nil, err
-	}
-	setting, err := g.manager.ReadSetting(value.SettingId)
-	if err != nil {
-		return nil, err
-	}
-	return &proto.ValueWithIdentifier{
-		Identifier: &proto.Identifier{
-			Extension: bundle.Extension,
-			Bundle:    bundle.Name,
-			Setting:   setting.Name,
-		},
-		Value: value,
-	}, nil
-}
-
 // ListRoles implements the RoleServiceHandler interface
 func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateListRoles(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
 	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.NotFound("ocis-settings", "%s", err)
 	}
 	res.Bundles = r
 	return nil
@@ -225,11 +206,11 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssignmentsRequest, res *proto.ListRoleAssignmentsResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateListRoleAssignments(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
 	r, err := g.manager.ListRoleAssignments(req.AccountUuid)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.NotFound("ocis-settings", "%s", err)
 	}
 	res.Assignments = r
 	return nil
@@ -239,11 +220,11 @@ func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssig
 func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
 	if err != nil {
-		return merrors.FromError(err)
+		return merrors.BadRequest("ocis-settings", "%s", err)
 	}
 	res.Assignment = r
 	return nil
@@ -252,7 +233,7 @@ func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUser
 // RemoveRoleFromUser implements the RoleServiceHandler interface
 func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
-		return merrors.FromError(validationError)
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
 	return g.manager.RemoveRoleAssignment(req.Id)
 }
@@ -273,4 +254,23 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 		}
 	}
 	return accountUUID
+}
+
+func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIdentifier, error) {
+	bundle, err := g.manager.ReadBundle(value.BundleId)
+	if err != nil {
+		return nil, err
+	}
+	setting, err := g.manager.ReadSetting(value.SettingId)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.ValueWithIdentifier{
+		Identifier: &proto.Identifier{
+			Extension: bundle.Extension,
+			Bundle:    bundle.Name,
+			Setting:   setting.Name,
+		},
+		Value: value,
+	}, nil
 }
