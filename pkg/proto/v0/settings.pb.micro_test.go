@@ -832,11 +832,11 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 	}{
 		{"space",
 			" ",
-			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"must be in a valid format\",\"status\":\"Bad Request\"}",
 		},
 		{"empty",
 			"",
-			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"cannot be blank\",\"status\":\"Internal Server Error\"}",
+			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"cannot be blank\",\"status\":\"Bad Request\"}",
 		},
 		{"numbers",
 			"123",
@@ -852,11 +852,11 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 		},
 		{"UTF",
 			"नेपाल",
-			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"must be in a valid format\",\"status\":\"Bad Request\"}",
 		},
 		{"string with spaces",
 			"abc de",
-			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"must be in a valid format\",\"status\":\"Bad Request\"}",
 		},
 	}
 	client := service.Client()
