@@ -61,15 +61,15 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     currentRole: {
-      selector: '//span[contains(@class, "accounts-roles-current-role") and text()="%s"]',
+      selector: '//span[contains(@class, "accounts-roles-current-role") and normalize-space()="%s"]',
       locateStrategy: 'xpath'
     },
     roleInRolesDropdown: {
-      selector: '//label[@class="accounts-roles-dropdown-role" and normalize-space()="%s"]',
+      selector: '//label[contains(@class, "accounts-roles-dropdown-role") and normalize-space()="%s"]',
       locateStrategy: 'xpath'
     },
     rolesDropdownTrigger: {
-      selector: '//button[@class="accounts-roles-select-trigger"]',
+      selector: '//button[contains(@class, "accounts-roles-select-trigger")]',
       locateStrategy: 'xpath'
     }
   }
