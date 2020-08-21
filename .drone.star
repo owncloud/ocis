@@ -104,7 +104,7 @@ def testing(ctx):
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
-          'make build',
+          'make protobuf build',
         ],
         'volumes': [
           {
@@ -193,7 +193,7 @@ def docker(ctx, arch):
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
-          'make build',
+          'make protobuf build',
         ],
         'volumes': [
           {
