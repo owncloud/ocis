@@ -265,6 +265,7 @@ def docker(ctx, arch):
     ],
     'depends_on': [
       'testing',
+      'UiTests',
     ],
     'trigger': {
       'ref': [
