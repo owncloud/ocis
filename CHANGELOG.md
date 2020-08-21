@@ -12,6 +12,7 @@
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
+* Change - Update ocis-settings to v0.2.0: [#467](https://github.com/owncloud/ocis/pull/467)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -109,6 +110,14 @@
    `server` command.
 
    https://github.com/owncloud/ocis/pull/287
+
+
+* Change - Update ocis-settings to v0.2.0: [#467](https://github.com/owncloud/ocis/pull/467)
+
+   This version delivers `settings` v0.2.0 and versions of accounts (v0.3.0) and phoenix
+   (v0.15.0) needed for it.
+
+   https://github.com/owncloud/ocis/pull/467
 
 
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
