@@ -17,3 +17,5 @@ Feature: Accounts
 		Then user "einstein" should be displayed in the accounts list on the WebUI
 		When the user changes the role of user "einstein" to "Admin" using the WebUI
 		Then the displayed role of user "einstein" should be "Admin" on the WebUI
+		When the user reloads the current page of the webUI
+		Then the displayed role of user "einstein" should be "Admin" on the WebUI
