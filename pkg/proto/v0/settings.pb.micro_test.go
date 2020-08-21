@@ -600,7 +600,7 @@ func TestCreateRoleAndAssign(t *testing.T) {
 						Type: proto.Resource_TYPE_SETTING,
 					},
 					Value: &proto.Setting_PermissionValue{
-						&proto.Permission{
+						PermissionValue: &proto.Permission{
 							Operation:  proto.Permission_OPERATION_UPDATE,
 							Constraint: proto.Permission_CONSTRAINT_OWN,
 						},
@@ -711,8 +711,8 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 				{displayName: "User", name: "user"},
 			},
 		},
-		{"one bundle",
-			[]*proto.Bundle{{
+		{name: "one bundle",
+			bundles: []*proto.Bundle{{
 				Type:        proto.Bundle_TYPE_ROLE,
 				DisplayName: "test role - update",
 				Name:        "TEST_ROLE",
@@ -725,7 +725,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SETTING,
 						},
 						Value: &proto.Setting_PermissionValue{
-							&proto.Permission{
+							PermissionValue: &proto.Permission{
 								Operation:  proto.Permission_OPERATION_UPDATE,
 								Constraint: proto.Permission_CONSTRAINT_OWN,
 							},
@@ -736,12 +736,12 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 					Type: proto.Resource_TYPE_SYSTEM,
 				},
 			}},
-			[]expectedBundle{
+			expectedBundles: []expectedBundle{
 				{displayName: "test role - update", name: "TEST_ROLE"},
 			},
 		},
-		{"two added bundles",
-			[]*proto.Bundle{{
+		{name: "two added bundles",
+			bundles: []*proto.Bundle{{
 				Type:        proto.Bundle_TYPE_ROLE,
 				DisplayName: "test role - update",
 				Name:        "TEST_ROLE",
@@ -754,7 +754,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SETTING,
 						},
 						Value: &proto.Setting_PermissionValue{
-							&proto.Permission{
+							PermissionValue: &proto.Permission{
 								Operation:  proto.Permission_OPERATION_UPDATE,
 								Constraint: proto.Permission_CONSTRAINT_OWN,
 							},
@@ -778,7 +778,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 								Type: proto.Resource_TYPE_SETTING,
 							},
 							Value: &proto.Setting_PermissionValue{
-								&proto.Permission{
+								PermissionValue: &proto.Permission{
 									Operation:  proto.Permission_OPERATION_UPDATE,
 									Constraint: proto.Permission_CONSTRAINT_OWN,
 								},
@@ -789,7 +789,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 						Type: proto.Resource_TYPE_SYSTEM,
 					},
 				}},
-			[]expectedBundle{
+			expectedBundles: []expectedBundle{
 				{displayName: "test role - update", name: "TEST_ROLE"},
 				{displayName: "an other role", name: "AnOtherROLE"},
 			},
@@ -827,7 +827,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 func TestListRolesVariousAccountUuid(t *testing.T) {
 	tests := []struct {
 		name        string
-		accountUuid string
+		accountUUID string
 		error       interface{}
 	}{
 		{"space",
@@ -866,7 +866,7 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 			roleService := proto.NewRoleService("com.owncloud.api.settings", client)
 
 			roles, err := roleService.ListRoles(
-				context.Background(), &proto.ListBundlesRequest{AccountUuid: tt.accountUuid},
+				context.Background(), &proto.ListBundlesRequest{AccountUuid: tt.accountUUID},
 			)
 			if tt.error != nil {
 				assert.EqualError(t, err, tt.error.(string))
@@ -877,4 +877,3 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 		})
 	}
 }
-
