@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'master', 'd6ed9f3e60f5cfc4eeb261d91a6d1607045904ee', 'master', '0ba693cea50cafdb7e6b4e3f559a70cbd4d04bbe')
+    UITests(ctx, 'master', '5b8438dacc92270bf2fabafb78d6dd54a0b04ecb', 'master', '0075dbd7b14360de203ec2a327c6b3f5c5844364')
   ]
 
   stages = [
@@ -265,6 +265,7 @@ def docker(ctx, arch):
     ],
     'depends_on': [
       'testing',
+      'UiTests',
     ],
     'trigger': {
       'ref': [
@@ -322,27 +323,20 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
        'pull': 'always',
        'detach': True,
        'environment' : {
-         'REVA_LDAP_HOSTNAME': 'ldap',
-         'REVA_LDAP_PORT': 636,
-         'REVA_LDAP_BIND_PASSWORD': 'admin',
-         'REVA_LDAP_BIND_DN': 'cn=admin,dc=owncloud,dc=com',
-         'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
          'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
          'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
          'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
          'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
          'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
          'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+         'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
+         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+         'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
+         'REVA_FRONTEND_URL': 'https://ocis-server:9200',
+         'REVA_LDAP_IDP': 'https://ocis-server:9200',
          'PHOENIX_WEB_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
-         'PHOENIX_ASSET_PATH': '/srv/app/phoenix/dist',
          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ui/tests/config/drone/identifier-registration.yml',
          'KONNECTD_ISS': 'https://ocis-server:9200',
-         'KONNECTD_TLS': 'true',
-         'LDAP_URI': 'ldap://ldap',
-         'LDAP_BINDDN': 'cn=admin,dc=owncloud,dc=com',
-         'LDAP_BINDPW': 'admin',
-         'LDAP_BASEDN': 'dc=owncloud,dc=com',
-         'OCIS_CONFIG_FILE': '/drone/src/ui/tests/config/drone/proxy-config.json'
        },
        'commands': [
          'mkdir -p /srv/app/tmp/reva',
@@ -368,11 +362,9 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'SERVER_HOST': 'https://ocis-server:9200',
          'BACKEND_HOST': 'https://ocis-server:9200',
          'RUN_ON_OCIS': 'true',
-         'RUN_WITH_LDAP': 'true',
          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
          'PHOENIX_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
-         'LDAP_SERVER_URL': 'ldap://ldap',
          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
          'LOCAL_UPLOAD_DIR': '/uploads',
          'PHOENIX_PATH': '/srv/app/phoenix',
@@ -386,8 +378,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'git checkout %s' % (phoenixCommitId),
          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
          'yarn install-all',
-         'yarn dist',
-         'cp -r /drone/src/ui/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
          'cd /drone/src',
          'yarn install --all',
          'make test-acceptance-webui'
@@ -403,18 +393,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
      },
    ],
    'services': [
-     {
-       'name': 'ldap',
-       'image': 'osixia/openldap:1.3.0',
-       'pull': 'always',
-       'environment': {
-         'LDAP_DOMAIN': 'owncloud.com',
-         'LDAP_ORGANISATION': 'ownCloud',
-         'LDAP_ADMIN_PASSWORD': 'admin',
-         'LDAP_TLS_VERIFY_CLIENT': 'never',
-         'HOSTNAME': 'ldap'
-       },
-     },
      {
        'name': 'redis',
        'image': 'webhippie/redis',
