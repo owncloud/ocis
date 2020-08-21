@@ -337,7 +337,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ui/tests/config/drone/identifier-registration.yml',
          'KONNECTD_ISS': 'https://ocis-server:9200',
          'KONNECTD_TLS': 'true',
-         'OCIS_CONFIG_FILE': '/drone/src/ui/tests/config/drone/proxy-config.json'
        },
        'commands': [
          'mkdir -p /srv/app/tmp/reva',
