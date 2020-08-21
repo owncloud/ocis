@@ -21,6 +21,25 @@ module.exports = {
           user = result
         })
       return user.value
+    },
+
+    selectRole: function (username, role) {
+      const roleSelector =
+        util.format(this.elements.rowByUsername.selector, username) +
+        util.format(this.elements.roleInRolesDropdown.selector, role)
+
+      return this
+        .click('@rolesDropdownTrigger')
+        .waitForElementVisible(roleSelector)
+        .click(roleSelector)
+    },
+
+    checkUsersRole: function (username, role) {
+      const roleSelector =
+        util.format(this.elements.rowByUsername.selector, username) +
+        util.format(this.elements.currentRole.selector, role)
+
+      return this.useXpath().expect.element(roleSelector).to.be.visible
     }
   },
 
@@ -35,6 +54,22 @@ module.exports = {
     },
     userInAccountsList: {
       selector: '//table//td[text()="%s"]',
+      locateStrategy: 'xpath'
+    },
+    rowByUsername: {
+      selector: '//table//td[text()="%s"]/ancestor::tr',
+      locateStrategy: 'xpath'
+    },
+    currentRole: {
+      selector: '//span[contains(@class, "accounts-roles-current-role") and normalize-space()="%s"]',
+      locateStrategy: 'xpath'
+    },
+    roleInRolesDropdown: {
+      selector: '//label[contains(@class, "accounts-roles-dropdown-role") and normalize-space()="%s"]',
+      locateStrategy: 'xpath'
+    },
+    rolesDropdownTrigger: {
+      selector: '//button[contains(@class, "accounts-roles-select-trigger")]',
       locateStrategy: 'xpath'
     }
   }

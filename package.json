@@ -67,6 +67,7 @@
     "swagger-vue-generator": "^1.0.6",
     "url-search-params-polyfill": "^8.1.0",
     "vue-template-compiler": "^2.6.11",
+    "vuex": "^3.5.1",
     "xml-js": "^1.6.11"
   },
   "browserslist": [
@@ -74,7 +75,6 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^1.7.0",
-    "vuex": "^3.5.1"
+    "owncloud-design-system": "^1.7.0"
   }
 }

@@ -1,13 +1,14 @@
-import {
-  // eslint-disable-next-line camelcase
-  AccountsService_ListAccounts
-} from '../client/accounts'
-import axios from 'axios'
+/* eslint-disable camelcase */
+import { AccountsService_ListAccounts } from '../client/accounts'
+import { RoleService_ListRoles } from '../client/settings'
+/* eslint-enable camelcase */
+import { injectAuthToken } from '../helpers/auth'
 
 const state = {
   config: null,
   initialized: false,
-  accounts: {}
+  accounts: {},
+  roles: null
 }
 
 const getters = {
@@ -32,6 +33,9 @@ const mutations = {
   },
   SET_ACCOUNTS (state, accounts) {
     state.accounts = accounts
+  },
+  SET_ROLES (state, roles) {
+    state.roles = roles
   }
 }
 
@@ -42,11 +46,12 @@ const actions = {
 
   async initialize ({ commit, dispatch }) {
     await dispatch('fetchAccounts')
+    await dispatch('fetchRoles')
     commit('SET_INITIALIZED', true)
   },
 
   async fetchAccounts ({ commit, dispatch, rootGetters }) {
-    injectAuthToken(rootGetters)
+    injectAuthToken(rootGetters.user.token)
     const response = await AccountsService_ListAccounts({
       $domain: rootGetters.configuration.server,
       body: {}
@@ -61,6 +66,29 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+  },
+
+  async fetchRoles ({ commit, dispatch, rootGetters }) {
+    injectAuthToken(rootGetters.user.token)
+
+    const response = await RoleService_ListRoles({
+      $domain: rootGetters.configuration.server,
+      body: {
+        accountUuid: 'me'
+      }
+    })
+
+    if (response.status === 201) {
+      const roles = response.data.bundles
+
+      commit('SET_ROLES', roles || [])
+    } else {
+      dispatch('showMessage', {
+        title: 'Failed to fetch roles.',
+        desc: response.statusText,
+        status: 'danger'
+      }, { root: true })
+    }
   }
 }
 
@@ -70,16 +98,4 @@ export default {
   getters,
   actions,
   mutations
-}
-
-function injectAuthToken (rootGetters) {
-  axios.interceptors.request.use(config => {
-    if (typeof config.headers.Authorization === 'undefined') {
-      const token = rootGetters.user.token
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    }
-    return config
-  })
 }
