@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.7.0] (2020-08-21)
 
-The following sections list the changes for ocis-proxy unreleased.
+The following sections list the changes for ocis-proxy 0.7.0.
 
-[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.6.0...master
+[0.7.0]: https://github.com/owncloud/ocis-proxy/compare/v0.6.0...v0.7.0
 
 ## Summary
 
