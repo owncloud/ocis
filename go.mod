@@ -18,6 +18,8 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	github.com/huandu/xstrings v1.3.2 // indirect
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/mennanov/fieldmask-utils v0.3.2
 	github.com/micro/cli/v2 v2.1.2
@@ -27,7 +29,7 @@ require (
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/owncloud/ocis-pkg/v2 v2.3.0
-	github.com/owncloud/ocis-settings v0.1.1-0.20200819111829-a987d53702a8
+	github.com/owncloud/ocis-settings v0.2.0
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
