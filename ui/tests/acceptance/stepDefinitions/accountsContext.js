@@ -19,7 +19,3 @@ When('the user changes the role of user {string} to {string} using the WebUI', f
 Then('the displayed role of user {string} should be {string} on the WebUI', function (username, role) {
   return client.page.accountsPage().checkUsersRole(username, role)
 })
-
-When('the user reloads the current page of the webUI', function () {
-  return client.refresh()
-})
