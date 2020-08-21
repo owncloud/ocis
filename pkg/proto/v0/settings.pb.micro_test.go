@@ -690,4 +690,191 @@ func TestCreateRoleAndAssign(t *testing.T) {
 // 	assert.Equal(t, 1, len(response.Bundles))
 // 	assert.Equal(t, response.Bundles[0].Name, "bundle1")
 // 	os.RemoveAll(dataStore)
-// }
+//
+
+func TestListRolesAfterSavingBundle(t *testing.T) {
+	type expectedBundle struct {
+		displayName string
+		name        string
+	}
+
+	tests := []struct {
+		name            string
+		bundles         []*proto.Bundle
+		expectedBundles []expectedBundle
+	}{
+		{"don't add bundle",
+			[]*proto.Bundle{},
+			[]expectedBundle{
+				{displayName: "Guest", name: "guest"},
+				{displayName: "Admin", name: "admin"},
+				{displayName: "User", name: "user"},
+			},
+		},
+		{"one bundle",
+			[]*proto.Bundle{{
+				Type:        proto.Bundle_TYPE_ROLE,
+				DisplayName: "test role - update",
+				Name:        "TEST_ROLE",
+				Extension:   "ocis-settings",
+				Settings: []*proto.Setting{
+					{
+						Name: "settingName",
+						Resource: &proto.Resource{
+							Id:   settingsStub[0].Id,
+							Type: proto.Resource_TYPE_SETTING,
+						},
+						Value: &proto.Setting_PermissionValue{
+							&proto.Permission{
+								Operation:  proto.Permission_OPERATION_UPDATE,
+								Constraint: proto.Permission_CONSTRAINT_OWN,
+							},
+						},
+					},
+				},
+				Resource: &proto.Resource{
+					Type: proto.Resource_TYPE_SYSTEM,
+				},
+			}},
+			[]expectedBundle{
+				{displayName: "test role - update", name: "TEST_ROLE"},
+			},
+		},
+		{"two added bundles",
+			[]*proto.Bundle{{
+				Type:        proto.Bundle_TYPE_ROLE,
+				DisplayName: "test role - update",
+				Name:        "TEST_ROLE",
+				Extension:   "ocis-settings",
+				Settings: []*proto.Setting{
+					{
+						Name: "settingName",
+						Resource: &proto.Resource{
+							Id:   settingsStub[0].Id,
+							Type: proto.Resource_TYPE_SETTING,
+						},
+						Value: &proto.Setting_PermissionValue{
+							&proto.Permission{
+								Operation:  proto.Permission_OPERATION_UPDATE,
+								Constraint: proto.Permission_CONSTRAINT_OWN,
+							},
+						},
+					},
+				},
+				Resource: &proto.Resource{
+					Type: proto.Resource_TYPE_SYSTEM,
+				},
+			},
+				{
+					Type:        proto.Bundle_TYPE_ROLE,
+					DisplayName: "an other role",
+					Name:        "AnOtherROLE",
+					Extension:   "ocis-settings",
+					Settings: []*proto.Setting{
+						{
+							Name: "settingName",
+							Resource: &proto.Resource{
+								Id:   settingsStub[0].Id,
+								Type: proto.Resource_TYPE_SETTING,
+							},
+							Value: &proto.Setting_PermissionValue{
+								&proto.Permission{
+									Operation:  proto.Permission_OPERATION_UPDATE,
+									Constraint: proto.Permission_CONSTRAINT_OWN,
+								},
+							},
+						},
+					},
+					Resource: &proto.Resource{
+						Type: proto.Resource_TYPE_SYSTEM,
+					},
+				}},
+			[]expectedBundle{
+				{displayName: "test role - update", name: "TEST_ROLE"},
+				{displayName: "an other role", name: "AnOtherROLE"},
+			},
+		},
+	}
+	client := service.Client()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			roleService := proto.NewRoleService("com.owncloud.api.settings", client)
+
+			bundleService := proto.NewBundleService("com.owncloud.api.settings", client)
+			for _, bundle := range tt.bundles {
+				_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+					Bundle: bundle,
+				})
+				assert.NoError(t, err)
+			}
+			rolesRes, err := roleService.ListRoles(context.Background(), &proto.ListBundlesRequest{AccountUuid: "."})
+			assert.NoError(t, err)
+
+			for _, bundle := range rolesRes.Bundles {
+				assert.Contains(t, tt.expectedBundles, expectedBundle{
+					displayName: bundle.DisplayName,
+					name:        bundle.Name,
+				})
+			}
+			assert.Equal(t, len(tt.expectedBundles), len(rolesRes.Bundles))
+
+			os.RemoveAll(dataStore)
+		})
+	}
+}
+
+func TestListRolesVariousAccountUuid(t *testing.T) {
+	tests := []struct {
+		name        string
+		accountUuid string
+		error       interface{}
+	}{
+		{"space",
+			" ",
+			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+		},
+		{"empty",
+			"",
+			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"cannot be blank\",\"status\":\"Internal Server Error\"}",
+		},
+		{"numbers",
+			"123",
+			nil,
+		},
+		{"dot",
+			".",
+			nil,
+		},
+		{"string",
+			"abc",
+			nil,
+		},
+		{"UTF",
+			"नेपाल",
+			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+		},
+		{"string with spaces",
+			"abc de",
+			"{\"id\":\"go.micro.client\",\"code\":500,\"detail\":\"must be in a valid format\",\"status\":\"Internal Server Error\"}",
+		},
+	}
+	client := service.Client()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			roleService := proto.NewRoleService("com.owncloud.api.settings", client)
+
+			roles, err := roleService.ListRoles(
+				context.Background(), &proto.ListBundlesRequest{AccountUuid: tt.accountUuid},
+			)
+			if tt.error != nil {
+				assert.EqualError(t, err, tt.error.(string))
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, 3, len(roles.Bundles))
+			}
+		})
+	}
+}
+
