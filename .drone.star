@@ -5,8 +5,8 @@ config = {
     'numberOfParts': 2
   },
   'uiTests': {
-    'phoenixBranch': 'master',
-    'phoenixCommit': '4d563782b866473bc97f529021171725b60d0ce9',
+    'phoenixBranch': 'trashbin-tests-ocis',
+    'phoenixCommit': '',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
