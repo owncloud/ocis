@@ -95,7 +95,10 @@ export default {
       })
 
       if (response.status === 201) {
-        this.getUsersCurrentRole()
+        const roleId = response.data.assignment.roleId
+        this.currentRole = this.roles.find(role => {
+          return role.id === roleId
+        })
       } else {
         this.showMessage({
           title: this.$gettext('Failed to change role.'),
