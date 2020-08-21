@@ -58,9 +58,9 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/master/var/log/eos:/var/log/eos
-    - ./e/master/var/eos/config:/var/eos/config
-    - ./e/master/var/eos/ns-queue:/var/eos/ns-queue
+    - eos-mgm-master-log:/var/log/eos
+    - eos-mgm-master-config:/var/eos/config
+    - eos-mgm-master-ns-queue:/var/eos/ns-queue
     # this volume kills mgm-master during startup
     # - ./e/master/var/eos/md:/var/eos/md
     environment:
@@ -78,9 +78,9 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/master/var/log/eos:/var/log/eos
-    - ./e/master/var/eos/config:/var/eos/config
-    - ./e/master/var/eos/ns-queue:/var/eos/ns-queue
+    - eos-mq-master-log:/var/log/eos
+    - eos-mq-master-config:/var/eos/config
+    - eos-mq-master-ns-queue:/var/eos/ns-queue
     environment:
       EOS_SET_MASTER: 1
 
@@ -96,8 +96,8 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/master/var/log/eos:/var/log/eos
-    - ./e/disks:/disks
+    - eos-fst-log:/var/log/eos
+    - eos-fst-disks:/disks
     environment:
       EOS_MGM_URL: "root://mgm-master.testnet"
 
@@ -113,7 +113,7 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/quark-1/var/lib/quarkdb:/var/lib/quarkdb
+    - eos-quarkdb1:/var/lib/quarkdb
     environment:
       EOS_QDB_DIR: "/var/lib/quarkdb/eosns"
       EOS_QDB_PORT: "7777"
@@ -133,7 +133,7 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/quark-2/var/lib/quarkdb:/var/lib/quarkdb
+    - eos-quarkdb2:/var/lib/quarkdb
     environment:
       EOS_QDB_DIR: "/var/lib/quarkdb/eosns"
       EOS_QDB_PORT: "7777"
@@ -153,10 +153,23 @@ services:
     networks:
     - testnet
     volumes:
-    - ./e/quark-3/var/lib/quarkdb:/var/lib/quarkdb
+    - eos-quarkdb3:/var/lib/quarkdb
     environment:
       EOS_QDB_DIR: "/var/lib/quarkdb/eosns"
       EOS_QDB_PORT: "7777"
       EOS_QDB_MODE: "raft"
       EOS_QDB_CLUSTER_ID: "3d659c1a-e70f-43f0-bed4-941a2ca0765b"
       EOS_QDB_NODES: "quark-1.testnet:7777,quark-2.testnet:7777,quark-3.testnet:7777"
+
+volumes:
+  eos-mgm-master-log:
+  eos-mgm-master-config:
+  eos-mgm-master-ns-queue:
+  eos-mq-master-log:
+  eos-mq-master-config:
+  eos-mq-master-ns-queue:
+  eos-fst-log:
+  eos-fst-disks:
+  eos-quarkdb1:
+  eos-quarkdb2:
+  eos-quarkdb3:
