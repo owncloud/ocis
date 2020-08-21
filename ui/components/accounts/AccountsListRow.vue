@@ -98,7 +98,7 @@ export default {
         this.getUsersCurrentRole()
       } else {
         this.showMessage({
-          title: 'Failed to change role.',
+          title: this.$gettext('Failed to change role.'),
           desc: response.statusText,
           status: 'danger'
         })
