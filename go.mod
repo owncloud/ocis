@@ -21,7 +21,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.3.0
+	github.com/owncloud/ocis-accounts v0.4.0
 	github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
@@ -43,6 +43,7 @@ require (
 	go.opencensus.io v0.22.4
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 // indirect
 	golang.org/x/text v0.3.3 // indirect
