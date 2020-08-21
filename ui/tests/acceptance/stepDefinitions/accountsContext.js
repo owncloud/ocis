@@ -12,7 +12,7 @@ Then('user {string} should be displayed in the accounts list on the WebUI', asyn
   return assert.strictEqual(userListed, username)
 })
 
-When('the users changes the role of user {string} to {string} using the WebUI', function (username, role) {
+When('the user changes the role of user {string} to {string} using the WebUI', function (username, role) {
   return client.page.accountsPage().selectRole(username, role)
 })
 
