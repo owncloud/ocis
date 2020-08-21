@@ -31,7 +31,7 @@ require (
 	github.com/owncloud/ocis-ocs v0.2.0
 	github.com/owncloud/ocis-phoenix v0.12.0
 	github.com/owncloud/ocis-pkg/v2 v2.3.0
-	github.com/owncloud/ocis-proxy v0.6.1-0.20200819105709-a51b3c8ed42f
+	github.com/owncloud/ocis-proxy v0.7.0
 	github.com/owncloud/ocis-reva v0.12.1-0.20200819133706-f68defd1ff27
 	github.com/owncloud/ocis-settings v0.2.0
 	github.com/owncloud/ocis-store v0.1.1
@@ -43,6 +43,7 @@ require (
 	go.opencensus.io v0.22.4
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 // indirect
 	golang.org/x/text v0.3.3 // indirect
