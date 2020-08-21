@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.3.0] (2020-08-20)
 
-The following sections list the changes in ocis-accounts unreleased.
+The following sections list the changes in ocis-accounts 0.3.0.
 
-[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.2.0...master
+[0.3.0]: https://github.com/owncloud/ocis-accounts/compare/v0.2.0...v0.3.0
 
 ## Summary
 
