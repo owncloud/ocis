@@ -86,7 +86,7 @@ Let us assume your local IP is `192.168.103.195`
 
 ```bash
 git clone https://github.com/owncloud-docker/compose-playground.git
-cd compose-playground/ocis
+cd compose-playground/compose/ocis
 
 sed -i -e 's/your-url/192.168.103.195/g' config/identifier-registration.yml
 
