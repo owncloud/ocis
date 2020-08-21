@@ -378,8 +378,6 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'git checkout %s' % (phoenixCommitId),
          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
          'yarn install-all',
-         'yarn dist',
-         'cp -r /drone/src/ui/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
          'cd /drone/src',
          'yarn install --all',
          'make test-acceptance-webui'
