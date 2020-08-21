@@ -11,7 +11,7 @@ geekdocFilePath: basic-remote-setup.md
 
 Out of the box the ocis single binary and the `owncloud/ocis` docker image are configured to run on localhost for quick testing and development.
 
-If you need to access ocis on a VM or a remote machine e.g when testing a mobile client you need to configure ocis to run on a different host.
+If you need to access ocis on a VM or a remote machine e.g. when testing a mobile client you need to configure ocis to run on a different host.
 
 ## Use the binary
 
@@ -19,12 +19,12 @@ If you start the ocis fullstack for the first time with `./bin/ocis server` it w
 
 {{< hint warning >}}
 **Outdated version**\
-This file `identifier-registration.yml` will only be generated if there is no such file in place. You could miss updates on this file.
+The `identifier-registration.yml` file will only be generated if there is no such file in place. You could miss updates on this file. Run `make clean` to delete the file and keep the development environment tidy otherwise as well.
 {{< /hint >}}
 
 ### Add your hostname to the idp config
 
-Let us assume `your-host` is your remote domain name or IP adress. In this example we do not change the default port (`9200`). But this could be changed to another port.
+Let us assume `your-host` is your remote domain name or IP adress. Add your host to the `identifier-registration.yml` like this:
 
 ```yaml {linenos=table,hl_lines=["15-17",21]}
 # OpenID Connect client registry.
@@ -50,9 +50,11 @@ clients:
       - https://your-server:9200
 ```
 
+In this example we do not change the default port (`9200`). But this could be changed to another port.
+
 ### Start the ocis fullstack server
 
-You need to configure `your-host` in some services to provide the needed public resources. oCIS currently needs a running Redis Server reachable locally on the machine at the default port (`localhost:6379`). You can change this using the following option `REVA_STORAGE_OWNCLOUD_REDIS_ADDR=some-host:6379`.
+You need to configure `your-host` in some services to provide the needed public resources. When using the owncloud storage driver (which is the default) oCIS currently needs a running Redis Server reachable locally on the machine at the default port (`localhost:6379`). You can change this using the following option `REVA_STORAGE_OWNCLOUD_REDIS_ADDR=some-host:6379`.
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
@@ -72,7 +74,7 @@ KONNECTD_TLS=0 \
 For more configuration options check the configuration secion in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
 
 {{< hint info >}}
-**TlS Certificate**\
+**TLS Certificate**\
 In this example, we are replacing the default self signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
 {{< /hint >}}
 
