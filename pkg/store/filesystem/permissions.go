@@ -7,7 +7,7 @@ import (
 
 // ListPermissionsByResource collects all permissions from the provided roleIDs that match the requested resource
 func (s Store) ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error) {
-	var records []*proto.Permission
+	records := make([]*proto.Permission, 0)
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
@@ -21,7 +21,7 @@ func (s Store) ListPermissionsByResource(resource *proto.Resource, roleIDs []str
 
 // extractPermissionsByResource collects all permissions from the provided role that match the requested resource
 func extractPermissionsByResource(resource *proto.Resource, role *proto.Bundle) []*proto.Permission {
-	var permissions []*proto.Permission
+	permissions := make([]*proto.Permission, 0)
 	for _, setting := range role.Settings {
 		if _, ok := setting.Value.(*proto.Setting_PermissionValue); ok {
 			value := setting.Value.(*proto.Setting_PermissionValue).PermissionValue

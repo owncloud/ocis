@@ -1,9 +1,10 @@
 package util
 
 import (
+	"testing"
+
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"gotest.tools/assert"
-	"testing"
 )
 
 func TestIsResourceMatched(t *testing.T) {
@@ -61,7 +62,7 @@ func TestIsResourceMatched(t *testing.T) {
 			"same resource types with definition = ALL and without id in example is a match",
 			&proto.Resource{
 				Type: proto.Resource_TYPE_USER,
-				Id:   ResourceIdAll,
+				Id:   ResourceIDAll,
 			},
 			&proto.Resource{
 				Type: proto.Resource_TYPE_USER,
@@ -72,7 +73,7 @@ func TestIsResourceMatched(t *testing.T) {
 			"same resource types with definition.id = ALL and with some id in example is a match",
 			&proto.Resource{
 				Type: proto.Resource_TYPE_USER,
-				Id:   ResourceIdAll,
+				Id:   ResourceIDAll,
 			},
 			&proto.Resource{
 				Type: proto.Resource_TYPE_USER,

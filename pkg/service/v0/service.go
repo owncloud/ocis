@@ -313,7 +313,7 @@ func (g Service) getRoleIDs(c context.Context, accountUUID string) []string {
 		g.logger.Err(err).Str("accountUUID", accountUUID).Msg("failed to list role assignments")
 		return []string{}
 	}
-	var roleIDs []string
+	roleIDs := make([]string, 0)
 	for _, assignment := range rolesResponse.Assignments {
 		roleIDs = append(roleIDs, assignment.RoleId)
 	}
