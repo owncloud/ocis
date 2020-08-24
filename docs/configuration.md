@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-04-29T12:08:23+0200"
+date: "2020-08-21T17:50:21+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
@@ -57,15 +57,6 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
---debug-addr | $OCIS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
 ### ocis server
 
 Start fullstack server
@@ -79,10 +70,10 @@ Usage: `ocis server [command options] [arguments...]`
 : Tracing backend type. Default: `jaeger`.
 
 --tracing-endpoint | $OCIS_TRACING_ENDPOINT  
-: Endpoint for the agent.
+: Endpoint for the agent. Default: `localhost:6831`.
 
 --tracing-collector | $OCIS_TRACING_COLLECTOR  
-: Endpoint for the collector.
+: Endpoint for the collector. Default: `http://localhost:14268/api/traces`.
 
 --tracing-service | $OCIS_TRACING_SERVICE  
 : Service name for tracing. Default: `ocis`.
@@ -108,99 +99,140 @@ Usage: `ocis server [command options] [arguments...]`
 --grpc-addr | $OCIS_GRPC_ADDR  
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+--debug-addr | $OCIS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis graph
-
-Start graph server
-
-#### ocis graph-explorer
-
-Start graph explorer
-
-#### ocis phoenix
-
-Start phoenix server
-
-#### ocis reva-storage-oc-data
-
-Start reva oc storage dataprovider
-
-#### ocis reva-auth-basic
-
-Start reva auth-basic service
 
 #### ocis glauth
 
 Start glauth server
 
-#### ocis reva-storage-eos-data
-
-Start reva eos storage dataprovider
-
-#### ocis hello
-
-Start hello server
-
 #### ocis ocs
 
 Start ocs server
 
-#### ocis reva-storage-eos
+#### ocis store
 
-Start reva eos storage
+Start a go-micro store
 
-#### ocis reva-storage-root
+#### ocis reva-auth-basic
 
-Start reva root storage
-
-#### ocis reva-auth-bearer
-
-Start reva auth-bearer service
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis reva-gateway
-
-Start reva gateway
-
-#### ocis reva-frontend
-
-Start reva frontend
-
-#### ocis reva-storage-home-data
-
-Start reva home storage dataprovider
-
-#### ocis konnectd
-
-Start konnectd server
-
-#### ocis reva-users
-
-Start reva users service
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis reva-sharing
-
-Start reva sharing service
-
-#### ocis reva-storage-home
-
-Start reva home storage
+Start reva auth-basic service
 
 #### ocis reva-storage-oc
 
 Start reva oc storage
 
+#### ocis run
+
+Runs an extension
+
+#### ocis graph-explorer
+
+Start graph explorer
+
+#### ocis hello
+
+Start hello server
+
+#### ocis phoenix
+
+Start phoenix server
+
+#### ocis reva-storage-eos-data
+
+Start reva eos storage dataprovider
+
+#### ocis reva-frontend
+
+Start reva frontend
+
+#### ocis reva-storage-home
+
+Start reva home storage
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis konnectd
+
+Start konnectd server
+
+#### ocis reva-auth-bearer
+
+Start reva auth-bearer service
+
+#### ocis reva-storage-home-data
+
+Start reva home storage dataprovider
+
+#### ocis reva-users
+
+Start reva users service
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis graph
+
+Start graph server
+
+#### ocis reva-storage-oc-data
+
+Start reva oc storage dataprovider
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis reva-storage-eos
+
+Start reva eos storage
+
+#### ocis settings
+
+Start settings server
+
+#### ocis kill
+
+Kill an extension by name
+
+#### ocis list
+
+Lists running ocis extensions
+
+#### ocis import
+
+Import a user exported by owncloud/data_exporter
+
 #### ocis thumbnails
 
 Start thumbnails server
+
+#### ocis reva-gateway
+
+Start reva gateway
+
+#### ocis reva-sharing
+
+Start reva sharing service
+
+#### ocis reva-storage-public-link
+
+Start reva public link storage
+
+#### ocis reva-storage-root
+
+Start reva root storage
 

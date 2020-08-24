@@ -23,20 +23,29 @@ Start the eos cluster and ocis via the compose stack
 docker-compose up -d
 ```
 
+{{< hint info >}}
+The first time the **ocis** container starts up, it will compile ocis from scratch which can take a while.
+To follow progress, run `docker-compose logs -f --tail=10 ocis`
+{{< /hint >}}
+
 ### 2. LDAP support
 
-Configure the os to resolve users and groups using ldap
+Configure the OS to resolve users and groups using ldap
 
 ```
 docker-compose exec -d ocis /start-ldap
 ```
 
-Check that the os in the ocis container can now resolve einstein or the other demo users
+Check that the OS in the ocis container can now resolve einstein or the other demo users
 
 ```
 $ docker-compose exec ocis id einstein
 uid=20000(einstein) gid=30000(users) groups=30000(users),30001(sailing-lovers),30002(violin-haters),30007(physics-lovers)
 ```
+
+{{< hint info >}}
+If the user is not found at first you might need to wait a few more minutes in case the ocis container is still compiling.
+{{< /hint >}}
 
 We also need to restart the reva-users service so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
 ```
@@ -83,6 +92,8 @@ Login with `einstein / relativity`, upload a file to einsteins home and verify t
 docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/4/4c510ada-c86b-4815-8820-42cdf82c3d51/
 -rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
 ```
+
+If the problem persists, please check the [troubleshooting section about uploads](#creation-and-upload-of-files-does-not-work).
 
 ## Further exploration
 
@@ -172,15 +183,45 @@ EOS Console [root://localhost] |/>
 
 But this is a different adventure. See the links at the top of this page for other sources of information on eos.
 
+## Cleaning up
+
+To clean up and start completely from scratch, run `docker-compose down -v`.
+Then delete the local "bin" folder as root which contains the ocis binaries compiled by the "ocis" docker.
 
 ## Troubleshooting
 
-Q: When running `docker-compose up -d` ocis exits right away.
-A: You can check the error code using `docker-compose ps` and investigate further by running only ocis again using `docker-compose up ocis` (without `-d` so you can see what is going on in the foreground).
+### Docker-compose exits right away
+
+When running `docker-compose up -d` ocis exits right away.
+
+You can check the error code using `docker-compose ps` and investigate further by running only ocis again using `docker-compose up ocis` (without `-d` so you can see what is going on in the foreground).
 One reason might be that the binary was already built but does not match the container env. Try running `make clean` before running `docker-compose up ocis` so it gets built inside the container.
 
-Q: How do I update a service in the ocis container?
-A: 1. `docker-compose exec ocis make clean build` to update the binary
-   2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
-   3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
-      `docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home`
+### Where are the logs ?
+
+The ocis logs can be accessed using `docker-compose logs ocis`. Add `-f` for following.
+
+### How do I update a service in the ocis container?
+
+1. `docker-compose exec ocis make clean build` to update the binary
+2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
+3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
+  `docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home`
+
+### Creation and upload of files does not work
+
+If the upload did not work, please check the status of the eos space using the command `docker-compose exec mgm-master eos fs ls`.
+In case the default space appears as offline, run `docker-compose exec mgm-master eos space set default on`.
+
+### Uploading big files appears to hang
+
+Please note that the uploads first go into the "ocis" docker and land in its "/tmp" folder, then gets copied over to the EOS docker using `xrdcopy`.
+This is why uploading first transfers all bytes and then seem to hang for a while during the final copy.
+
+### Running out of space quickly
+
+The EOS dockers are configured with replication, so every file uploaded there will be replicated 4 times,
+so make sure there is enough physical space on disk when testing.
+
+Also please note that older failed uploads might still be present in the "/tmp" directory of the "ocis" container.
+
