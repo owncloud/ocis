@@ -25,6 +25,7 @@ docker-compose up -d
 
 {{< hint info >}}
 The first time the **ocis** container starts up, it will compile ocis from scratch which can take a while.
+To follow progress, run `docker-compose logs -f --tail=10 ocis`
 {{< /hint >}}
 
 ### 2. LDAP support
@@ -92,9 +93,7 @@ docker-compose exec ocis eos ls -l /eos/dockertest/reva/users/4/4c510ada-c86b-48
 -rw-r--r--   1 einstein users              10 Jul  1 15:24 newfile.txt
 ```
 
-If the upload did not work, run `docker-compose exec mgm-master eos space set default on` then try again.
-
-If the problem persists, please check the [troubleshooting section](#troubleshooting).
+If the problem persists, please check the [troubleshooting section about uploads](#creation-and-upload-of-files-does-not-work).
 
 ## Further exploration
 
@@ -211,7 +210,10 @@ The ocis logs can be accessed using `docker-compose logs ocis`. Add `-f` for fol
 
 ### Creation and upload of files does not work
 
-Run `docker-compose exec mgm-master eos space set default on`.
+If the upload did not work, please check the status of the eos space using the command `docker-compose exec mgm-master eos fs ls`.
+In case the default space appears as offline, run `docker-compose exec mgm-master eos space set default on`.
+
+### Uploading big files appears to hang
 
 Please note that the uploads first go into the "ocis" docker and land in its "/tmp" folder, then gets copied over to the EOS docker using `xrdcopy`.
 This is why uploading first transfers all bytes and then seem to hang for a while during the final copy.
