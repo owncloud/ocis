@@ -64,14 +64,20 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 
 // GetBundle implements the BundleServiceHandler interface
 func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
-	r, err := g.manager.ReadBundle(req.BundleId)
+	bundle, err := g.manager.ReadBundle(req.BundleId)
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	res.Bundle = r
+	roleIDs := g.getRoleIDs(c, req.AccountUuid)
+	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
+	if len(filteredBundle.Settings) == 0 {
+		return merrors.NotFound("ocis-settings", "%s", err)
+	}
+	res.Bundle = filteredBundle
 	return nil
 }
 
@@ -91,45 +97,49 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
 	for _, bundle := range bundles {
-		// check if full bundle is whitelisted
-		bundleResource := &proto.Resource{
-			Type: proto.Resource_TYPE_BUNDLE,
-			Id:   bundle.Id,
-		}
-		if g.hasPermission(
-			roleIDs,
-			bundleResource,
-			[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
-			proto.Permission_CONSTRAINT_OWN,
-		) {
-			filteredBundles = append(filteredBundles, bundle)
-			continue
-		}
-
-		// filter settings based on permissions
-		var filteredSettings []*proto.Setting
-		for _, setting := range bundle.Settings {
-			settingResource := &proto.Resource{
-				Type: proto.Resource_TYPE_SETTING,
-				Id:   setting.Id,
-			}
-			if g.hasPermission(
-				roleIDs,
-				settingResource,
-				[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
-				proto.Permission_CONSTRAINT_OWN,
-			) {
-				filteredSettings = append(filteredSettings, setting)
-			}
-		}
-		bundle.Settings = filteredSettings
-		if len(filteredSettings) > 0 {
-			filteredBundles = append(filteredBundles, bundle)
+		filteredBundle := g.getFilteredBundle(roleIDs, bundle)
+		if len(filteredBundle.Settings) > 0 {
+			filteredBundles = append(filteredBundles, filteredBundle)
 		}
 	}
 
 	res.Bundles = filteredBundles
 	return nil
+}
+
+func (g Service) getFilteredBundle(roleIDs []string, bundle *proto.Bundle) *proto.Bundle {
+	// check if full bundle is whitelisted
+	bundleResource := &proto.Resource{
+		Type: proto.Resource_TYPE_BUNDLE,
+		Id:   bundle.Id,
+	}
+	if g.hasPermission(
+		roleIDs,
+		bundleResource,
+		[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
+		proto.Permission_CONSTRAINT_OWN,
+	) {
+		return bundle
+	}
+
+	// filter settings based on permissions
+	var filteredSettings []*proto.Setting
+	for _, setting := range bundle.Settings {
+		settingResource := &proto.Resource{
+			Type: proto.Resource_TYPE_SETTING,
+			Id:   setting.Id,
+		}
+		if g.hasPermission(
+			roleIDs,
+			settingResource,
+			[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
+			proto.Permission_CONSTRAINT_OWN,
+		) {
+			filteredSettings = append(filteredSettings, setting)
+		}
+	}
+	bundle.Settings = filteredSettings
+	return bundle
 }
 
 // AddSettingToBundle implements the BundleServiceHandler interface

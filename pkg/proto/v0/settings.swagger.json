@@ -578,6 +578,9 @@
       "properties": {
         "bundle_id": {
           "type": "string"
+        },
+        "account_uuid": {
+          "type": "string"
         }
       }
     },
