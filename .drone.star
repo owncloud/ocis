@@ -209,6 +209,7 @@ def getEosSetup():
       'name': 'quark-1',
       'image': 'owncloud/eos-qdb',
       'pull': 'always',
+      'hostname': 'quark-1',
       'detach': True,
       'environment': {
         'EOS_MQ_URL': 'mq-master',
@@ -234,6 +235,7 @@ def getEosSetup():
       'image': 'owncloud/eos-qdb',
       'pull': 'always',
       'detach': True,
+      'hostname': 'quark-2',
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
@@ -258,6 +260,7 @@ def getEosSetup():
       'image': 'owncloud/eos-qdb',
       'pull': 'always',
       'detach': True,
+      'hostname': 'quark-4',
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
@@ -282,6 +285,7 @@ def getEosSetup():
       'image': 'owncloud/eos-mgm',
       'pull': 'always',
       'detach': True,
+      'hostname': 'mgm-master',
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
@@ -313,6 +317,7 @@ def getEosSetup():
       'image': 'owncloud/eos-mq',
       'pull': 'always',
       'detach': True,
+      'hostname': 'mq-master',
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
@@ -344,6 +349,7 @@ def getEosSetup():
       'image': 'owncloud/eos-fst',
       'pull': 'always',
       'detach': True,
+      'hostname': 'fst',
       'environment': {
         'EOS_MQ_URL': 'mq-master',
         'EOS_MGM_ALIAS': 'mgm-master',
