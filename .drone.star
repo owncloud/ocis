@@ -59,7 +59,7 @@ def getCoreApiTestPipelineNames():
   return names
 
 def main(ctx):
-  before = testPipelines(ctx) +  [eosTests(ctx)]
+  before = testPipelines(ctx) +  [eosTests(ctx), 'uid-gid-user-create']
 
   stages = [
     docker(ctx, 'amd64'),
@@ -453,6 +453,7 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis&&~@skipOnOcis-OC-Storage',
+          'BEHAT_FEATURE': 'tests/acceptance/features/apiWebdavUpload1/uploadFile.feature:12',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
