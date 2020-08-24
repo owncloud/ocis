@@ -59,7 +59,7 @@ def getCoreApiTestPipelineNames():
   return names
 
 def main(ctx):
-  before = testPipelines(ctx) +  [eosTests(ctx, 'testFixOCISPR409', '')]
+  before = testPipelines(ctx) +  [eosTests(ctx)]
 
   stages = [
     docker(ctx, 'amd64'),
