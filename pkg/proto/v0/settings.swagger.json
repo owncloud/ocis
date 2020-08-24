@@ -806,7 +806,9 @@
         "OPERATION_CREATE",
         "OPERATION_READ",
         "OPERATION_UPDATE",
-        "OPERATION_DELETE"
+        "OPERATION_DELETE",
+        "OPERATION_WRITE",
+        "OPERATION_READWRITE"
       ],
       "default": "OPERATION_UNKNOWN"
     },

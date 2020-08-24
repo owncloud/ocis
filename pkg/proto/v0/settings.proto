@@ -356,6 +356,8 @@ message Permission {
     OPERATION_READ = 2;
     OPERATION_UPDATE = 3;
     OPERATION_DELETE = 4;
+    OPERATION_WRITE = 5;// WRITE is a combination of CREATE and UPDATE
+    OPERATION_READWRITE = 6;// READWRITE is a combination of READ and WRITE
   }
   Operation operation = 1;
   enum Constraint {

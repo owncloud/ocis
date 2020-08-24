@@ -100,7 +100,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 			if g.hasPermission(
 				roleIDs,
 				settingResource,
-				[]proto.Permission_Operation{proto.Permission_OPERATION_READ},
+				[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
 				proto.Permission_CONSTRAINT_OWN,
 			) {
 				filteredSettings = append(filteredSettings, setting)
