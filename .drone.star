@@ -206,6 +206,162 @@ def unitTests(ctx):
 def getEosSetup():
   return [
     {
+      'name': 'mgm-master',
+      'image': 'owncloud/eos-mgm',
+      'pull': 'always',
+      'detach': True,
+      'hostname': 'mgm-master',
+      'environment': {
+        'EOS_MQ_URL': 'mq-master',
+        'EOS_MGM_ALIAS': 'mgm-master',
+        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_LDAP_HOST': 'ocis-server:9125',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': '1',
+        'EOS_USE_QDB_MASTER': '1',
+        'EOS_NS_ACCOUNTING': '1',
+        'EOS_SYNCTIME_ACCOUNTING': '1',
+        'EOS_UTF8': '1',
+        'EOS_SET_MASTER': 1,
+      },
+      'volumes': [
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eos-ns-queue',
+          'path': '/var/eos/ns-queue'
+        }
+      ]
+    },
+    {
+      'name': 'ocis-server',
+      'image': 'dpakach/eos-ocis-dev',
+      'pull': 'always',
+      'detach': True,
+      'environment': {
+        'EOS_MQ_URL': 'mq-master',
+        'EOS_MGM_ALIAS': 'mgm-master',
+        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_LDAP_HOST': 'ocis-server:9125',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': '1',
+        'EOS_USE_QDB_MASTER': '1',
+        'EOS_NS_ACCOUNTING': '1',
+        'EOS_SYNCTIME_ACCOUNTING': '1',
+        'EOS_UTF8': '1',
+        'EOS_MGM_URL': "root://mgm-master:1094",
+        'OCIS_DOMAIN': "ocis-server",
+        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': "/etc/ocis/identifier-registration.yml",
+        'KONNECTD_ISS': "https://ocis-server:9200",
+        'KONNECTD_LOG_LEVEL': "debug",
+        'KONNECTD_TLS': '0',
+        'PHOENIX_OIDC_AUTHORITY': "https://ocis-server:9200",
+        'PHOENIX_OIDC_METADATA_URL': "https://ocis-server:9200/.well-known/openid-configuration",
+        'PHOENIX_WEB_CONFIG_SERVER': "https://ocis-server:9200",
+        'PROXY_HTTP_ADDR': "ocis-server:9200",
+        'REVA_OIDC_ISSUER': "https://ocis-server:9200",
+        'OCIS_LOG_LEVEL': "debug",
+        'REVA_TRANSFER_EXPIRES': 86400,
+        #for reva-storage-eos use eos as storage driver the reason is that we cannot set REVA_STORAGE_EOS_LAYOUT to empty
+        #but also we don't want to have it set to anything to remove one layer in the eos folder structure
+        #default is `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}"` for reva-storage-home
+        #and `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}"` for reva-storage-eos
+        #but that gives us an extra layer in the eos file-system: /eos/dockertest/reva/users/e/einstein/file.txt
+        #and that again is annoying when the tests try to delete user data
+        'REVA_STORAGE_EOS_DRIVER': "eoshome",
+        'REVA_STORAGE_EOS_DATA_DRIVER': "eoshome",
+        'REVA_STORAGE_HOME_DRIVER': "eoshome",
+        'REVA_STORAGE_HOME_DATA_DRIVER': "eoshome",
+        'REVA_STORAGE_EOS_MASTER_URL': "root://mgm-master:1094",
+        'REVA_STORAGE_EOS_SLAVE_URL': "root://mgm-master:1094",
+        'REVA_STORAGE_EOS_NAMESPACE': "/eos/dockertest/reva/users",
+        'REVA_STORAGE_EOS_LAYOUT': "{{.Username}}",
+        'DAV_FILES_NAMESPACE': "/eos/",
+      },
+      'commands': [
+        '/start-ldap &',
+        'sleep 10',
+        'cd /ocis',
+        'cp -r /drone/src/* .',
+        'make build',
+        'bin/ocis server'
+      ],
+      'volumes': [
+        {
+          'name': 'config',
+          'path': '/config'
+        },
+      ]
+    },
+    {
+      'name': 'mq-master',
+      'image': 'owncloud/eos-mq',
+      'pull': 'always',
+      'detach': True,
+      'hostname': 'mq-master',
+      'environment': {
+        'EOS_MQ_URL': 'mq-master',
+        'EOS_MGM_ALIAS': 'mgm-master',
+        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_LDAP_HOST': 'ocis-server:9125',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': '1',
+        'EOS_USE_QDB_MASTER': '1',
+        'EOS_NS_ACCOUNTING': '1',
+        'EOS_SYNCTIME_ACCOUNTING': '1',
+        'EOS_UTF8': '1',
+        'EOS_SET_MASTER': 1,
+      },
+      'volumes': [
+        {
+          'name': 'eosconfig',
+          'path': '/var/eos/config'
+        },
+        {
+          'name': 'eos-ns-queue',
+          'path': '/var/eos/ns-queue'
+        }
+      ]
+    },
+    {
+      'name': 'eos-fst',
+      'image': 'owncloud/eos-fst',
+      'pull': 'always',
+      'detach': True,
+      'hostname': 'fst',
+      'environment': {
+        'EOS_MQ_URL': 'mq-master',
+        'EOS_MGM_ALIAS': 'mgm-master',
+        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
+        'EOS_LDAP_HOST': 'ocis-server:9125',
+        'EOS_GEOTAG': 'test',
+        'EOS_INSTANCE_NAME': 'eostest',
+        'EOS_MAIL_CC': 'eos@localhost',
+        'EOS_USE_QDB': '1',
+        'EOS_USE_QDB_MASTER': '1',
+        'EOS_NS_ACCOUNTING': '1',
+        'EOS_SYNCTIME_ACCOUNTING': '1',
+        'EOS_UTF8': '1',
+        'EOS_SET_MASTER': 1,
+        'EOS_MGM_URL': "root://mgm-master",
+        'LUKSPASSPHRASE': "just-some-rubbish-to-make-sure-fst-entrypoint-does-not-crash",
+      },
+      'volumes': [
+        {
+          'name': 'eosdisks',
+          'path': '/disks'
+        },
+      ]
+    },
+    {
       'name': 'quark-1',
       'image': 'owncloud/eos-qdb',
       'pull': 'always',
@@ -279,162 +435,6 @@ def getEosSetup():
         'EOS_QDB_MODE': "raft",
         'EOS_QDB_CLUSTER_ID': "3d659c1a-e70f-43f0-bed4-941a2ca0765b",
       },
-    },
-    {
-      'name': 'mgm-master',
-      'image': 'owncloud/eos-mgm',
-      'pull': 'always',
-      'detach': True,
-      'hostname': 'mgm-master',
-      'environment': {
-        'EOS_MQ_URL': 'mq-master',
-        'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
-        'EOS_LDAP_HOST': 'ocis-server:9125',
-        'EOS_GEOTAG': 'test',
-        'EOS_INSTANCE_NAME': 'eostest',
-        'EOS_MAIL_CC': 'eos@localhost',
-        'EOS_USE_QDB': '1',
-        'EOS_USE_QDB_MASTER': '1',
-        'EOS_NS_ACCOUNTING': '1',
-        'EOS_SYNCTIME_ACCOUNTING': '1',
-        'EOS_UTF8': '1',
-        'EOS_SET_MASTER': 1,
-      },
-      'volumes': [
-        {
-          'name': 'eosconfig',
-          'path': '/var/eos/config'
-        },
-        {
-          'name': 'eos-ns-queue',
-          'path': '/var/eos/ns-queue'
-        }
-      ]
-    },
-    {
-      'name': 'mq-master',
-      'image': 'owncloud/eos-mq',
-      'pull': 'always',
-      'detach': True,
-      'hostname': 'mq-master',
-      'environment': {
-        'EOS_MQ_URL': 'mq-master',
-        'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
-        'EOS_LDAP_HOST': 'ocis-server:9125',
-        'EOS_GEOTAG': 'test',
-        'EOS_INSTANCE_NAME': 'eostest',
-        'EOS_MAIL_CC': 'eos@localhost',
-        'EOS_USE_QDB': '1',
-        'EOS_USE_QDB_MASTER': '1',
-        'EOS_NS_ACCOUNTING': '1',
-        'EOS_SYNCTIME_ACCOUNTING': '1',
-        'EOS_UTF8': '1',
-        'EOS_SET_MASTER': 1,
-      },
-      'volumes': [
-        {
-          'name': 'eosconfig',
-          'path': '/var/eos/config'
-        },
-        {
-          'name': 'eos-ns-queue',
-          'path': '/var/eos/ns-queue'
-        }
-      ]
-    },
-    {
-      'name': 'eos-fst',
-      'image': 'owncloud/eos-fst',
-      'pull': 'always',
-      'detach': True,
-      'hostname': 'fst',
-      'environment': {
-        'EOS_MQ_URL': 'mq-master',
-        'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
-        'EOS_LDAP_HOST': 'ocis-server:9125',
-        'EOS_GEOTAG': 'test',
-        'EOS_INSTANCE_NAME': 'eostest',
-        'EOS_MAIL_CC': 'eos@localhost',
-        'EOS_USE_QDB': '1',
-        'EOS_USE_QDB_MASTER': '1',
-        'EOS_NS_ACCOUNTING': '1',
-        'EOS_SYNCTIME_ACCOUNTING': '1',
-        'EOS_UTF8': '1',
-        'EOS_SET_MASTER': 1,
-        'EOS_MGM_URL': "root://mgm-master",
-        'LUKSPASSPHRASE': "just-some-rubbish-to-make-sure-fst-entrypoint-does-not-crash",
-      },
-      'volumes': [
-        {
-          'name': 'eosdisks',
-          'path': '/disks'
-        },
-      ]
-    },
-    {
-      'name': 'ocis-server',
-      'image': 'dpakach/eos-ocis-dev',
-      'pull': 'always',
-      'detach': True,
-      'environment': {
-        'EOS_MQ_URL': 'mq-master',
-        'EOS_MGM_ALIAS': 'mgm-master',
-        'EOS_QDB_NODES': 'quark-1:7777 quark-2:7777 quark-3:7777',
-        'EOS_LDAP_HOST': 'ocis-server:9125',
-        'EOS_GEOTAG': 'test',
-        'EOS_INSTANCE_NAME': 'eostest',
-        'EOS_MAIL_CC': 'eos@localhost',
-        'EOS_USE_QDB': '1',
-        'EOS_USE_QDB_MASTER': '1',
-        'EOS_NS_ACCOUNTING': '1',
-        'EOS_SYNCTIME_ACCOUNTING': '1',
-        'EOS_UTF8': '1',
-        'EOS_MGM_URL': "root://mgm-master:1094",
-        'OCIS_DOMAIN': "ocis-server",
-        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': "/etc/ocis/identifier-registration.yml",
-        'KONNECTD_ISS': "https://ocis-server:9200",
-        'KONNECTD_LOG_LEVEL': "debug",
-        'KONNECTD_TLS': '0',
-        'PHOENIX_OIDC_AUTHORITY': "https://ocis-server:9200",
-        'PHOENIX_OIDC_METADATA_URL': "https://ocis-server:9200/.well-known/openid-configuration",
-        'PHOENIX_WEB_CONFIG_SERVER': "https://ocis-server:9200",
-        'PROXY_HTTP_ADDR': "ocis-server:9200",
-        'REVA_OIDC_ISSUER': "https://ocis-server:9200",
-        'OCIS_LOG_LEVEL': "debug",
-        'REVA_TRANSFER_EXPIRES': 86400,
-        #for reva-storage-eos use eos as storage driver the reason is that we cannot set REVA_STORAGE_EOS_LAYOUT to empty
-        #but also we don't want to have it set to anything to remove one layer in the eos folder structure
-        #default is `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}/{{.Username}}"` for reva-storage-home
-        #and `REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Username}}"` for reva-storage-eos
-        #but that gives us an extra layer in the eos file-system: /eos/dockertest/reva/users/e/einstein/file.txt
-        #and that again is annoying when the tests try to delete user data
-        'REVA_STORAGE_EOS_DRIVER': "eoshome",
-        'REVA_STORAGE_EOS_DATA_DRIVER': "eoshome",
-        'REVA_STORAGE_HOME_DRIVER': "eoshome",
-        'REVA_STORAGE_HOME_DATA_DRIVER': "eoshome",
-        'REVA_STORAGE_EOS_MASTER_URL': "root://mgm-master:1094",
-        'REVA_STORAGE_EOS_SLAVE_URL': "root://mgm-master:1094",
-        'REVA_STORAGE_EOS_NAMESPACE': "/eos/dockertest/reva/users",
-        'REVA_STORAGE_EOS_LAYOUT': "{{.Username}}",
-        'DAV_FILES_NAMESPACE': "/eos/",
-      },
-      'commands': [
-        '/start-ldap &',
-        'sleep 10',
-        'cd /ocis',
-        'cp -r /drone/src/* .',
-        'make build',
-        'bin/ocis server'
-      ],
-      'volumes': [
-        {
-          'name': 'config',
-          'path': '/config'
-        },
-      ]
     },
   ]
 
