@@ -49,7 +49,9 @@ func isConstraintFulfilled(permissions []*proto.Permission, constraint proto.Per
 		if permission.Constraint == proto.Permission_CONSTRAINT_ALL {
 			return true
 		}
-		return permission.Constraint != proto.Permission_CONSTRAINT_UNKNOWN && permission.Constraint == constraint
+		if permission.Constraint != proto.Permission_CONSTRAINT_UNKNOWN && permission.Constraint == constraint {
+			return true
+		}
 	}
 	return false
 }
