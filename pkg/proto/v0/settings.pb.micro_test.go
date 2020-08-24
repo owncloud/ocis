@@ -74,6 +74,16 @@ func init() {
 }
 
 /**
+Make sure the default roles are created
+The tests delete the Datastore after the run, so we need to recreate it
+*/
+func rebuidDataStore() {
+	cfg := config.New()
+	cfg.Storage.DataPath = dataStore
+	svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
+}
+
+/**
 testing that saving a settings bundle and retrieving it again works correctly
 using various setting bundle properties
 */
@@ -795,6 +805,8 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 			},
 		},
 	}
+
+	rebuidDataStore()
 	client := service.Client()
 
 	for _, tt := range tests {
@@ -859,6 +871,8 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"must be in a valid format\",\"status\":\"Bad Request\"}",
 		},
 	}
+
+	rebuidDataStore()
 	client := service.Client()
 
 	for _, tt := range tests {
