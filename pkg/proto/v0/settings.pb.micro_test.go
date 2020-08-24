@@ -39,6 +39,124 @@ var (
 			Description: "dummy setting",
 		},
 	}
+
+	//optionsForListStub for choice list settings
+	optionsForListStub = []*proto.ListOption{
+		{
+			Value: &proto.ListOptionValue{
+				Option: &proto.ListOptionValue_StringValue{StringValue: "list option string value"},
+			},
+			Default:      true,
+			DisplayValue: "a string value",
+		},
+		{
+			Value: &proto.ListOptionValue{
+				Option: &proto.ListOptionValue_IntValue{IntValue: 123},
+			},
+			Default:      true,
+			DisplayValue: "a int value",
+		},
+	}
+
+	//MultiChoiceList
+	multipleChoiceSettingStub = proto.MultiChoiceList{
+		Options: optionsForListStub,
+	}
+
+	//SingleChoiceList
+	singleChoiceSettingStub = proto.SingleChoiceList{
+		Options: optionsForListStub,
+	}
+
+	complexSettingsStub = []*proto.Setting{
+		{
+			Name:        "int",
+			Id:          "4e00633d-5373-4df4-9299-1c9ed9c3ebed",
+			DisplayName: "an integer value",
+			Description: "with some description",
+			Value: &proto.Setting_IntValue{
+				IntValue: &proto.Int{
+					Default:     1,
+					Min:         1,
+					Max:         124,
+					Step:        1,
+					Placeholder: "Int value",
+				},
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+			},
+		},
+		{
+			Name:        "string",
+			Id:          "f792acb4-9f09-4fa8-92d3-4a0d0a6ca721",
+			DisplayName: "a string value",
+			Description: "with some description",
+			Value: &proto.Setting_StringValue{
+				StringValue: &proto.String{
+					Default:     "thedefaultvalue",
+					Required:    false,
+					MinLength:   2,
+					MaxLength:   255,
+					Placeholder: "a string value",
+				},
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+			},
+		},
+		{
+			Name:        "bool",
+			Id:          "6ef9268c-f0bd-48a7-a0a0-3ba3ee42b5cc",
+			DisplayName: "a bool value",
+			Description: "with some description",
+			Value: &proto.Setting_BoolValue{
+				BoolValue: &proto.Bool{
+					Default: false,
+					Label:   "bool setting",
+				},
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+			},
+		},
+		{
+			Name:        "multipleChoice",
+			Id:          "905da88c-3be0-42c2-a8b2-e6bcd9976b2d",
+			DisplayName: "a multiple choice setting",
+			Description: "with some description",
+			Value: &proto.Setting_MultiChoiceValue{
+				MultiChoiceValue: &multipleChoiceSettingStub,
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+			},
+		},
+		{
+			Name:        "singleChoice",
+			Id:          "5bf4de47-57cc-4705-a456-4fcf39673994",
+			DisplayName: "a single choice setting",
+			Description: "with some description",
+			Value: &proto.Setting_SingleChoiceValue{
+				SingleChoiceValue: &singleChoiceSettingStub,
+			},
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+			},
+		},
+	}
+
+	bundleStub = proto.Bundle{
+		Name:        "test",
+		Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
+		DisplayName: "bundleDisplayName",
+		Extension:   "testExtension",
+		Type:        proto.Bundle_TYPE_DEFAULT,
+		Settings:    complexSettingsStub,
+		Resource: &proto.Resource{
+			Type: proto.Resource_TYPE_BUNDLE,
+		},
+	}
 )
 
 const dataStore = "/var/tmp/ocis-settings"
@@ -71,6 +189,16 @@ func init() {
 	if err = service.Server().Start(); err != nil {
 		log.Fatalf("could not start server: %v", err)
 	}
+}
+
+/**
+Make sure the default roles are created
+The tests delete the Datastore after the run, so we need to recreate it
+*/
+func rebuidDataStore() {
+	cfg := config.New()
+	cfg.Storage.DataPath = dataStore
+	svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
 }
 
 /**
@@ -224,119 +352,8 @@ func TestSettingsBundleWithoutSettings(t *testing.T) {
 // testing that setting getting and listing a settings bundle works correctly with a set of setting definitions
 // */
 func TestSaveGetListSettingsBundle(t *testing.T) {
-	//options for choice list settings
-	options := []*proto.ListOption{
-		{
-			Value: &proto.ListOptionValue{
-				Option: &proto.ListOptionValue_StringValue{StringValue: "list option string value"},
-			},
-			Default:      true,
-			DisplayValue: "a string value",
-		},
-		{
-			Value: &proto.ListOptionValue{
-				Option: &proto.ListOptionValue_IntValue{IntValue: 123},
-			},
-			Default:      true,
-			DisplayValue: "a int value",
-		},
-	}
-
-	//MultiChoiceList
-	multipleChoiceSetting := proto.MultiChoiceList{
-		Options: options,
-	}
-
-	//SingleChoiceList
-	singleChoiceSetting := proto.SingleChoiceList{
-		Options: options,
-	}
-
-	settings := []*proto.Setting{
-		{
-			Name:        "int",
-			DisplayName: "an integer value",
-			Description: "with some description",
-			Value: &proto.Setting_IntValue{
-				IntValue: &proto.Int{
-					Default:     1,
-					Min:         1,
-					Max:         124,
-					Step:        1,
-					Placeholder: "Int value",
-				},
-			},
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
-			},
-		},
-		{
-			Name:        "string",
-			DisplayName: "a string value",
-			Description: "with some description",
-			Value: &proto.Setting_StringValue{
-				StringValue: &proto.String{
-					Default:     "thedefaultvalue",
-					Required:    false,
-					MinLength:   2,
-					MaxLength:   255,
-					Placeholder: "a string value",
-				},
-			},
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
-			},
-		},
-		{
-			Name:        "bool",
-			DisplayName: "a bool value",
-			Description: "with some description",
-			Value: &proto.Setting_BoolValue{
-				BoolValue: &proto.Bool{
-					Default: false,
-					Label:   "bool setting",
-				},
-			},
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
-			},
-		},
-		{
-			Name:        "multipleChoice",
-			DisplayName: "a multiple choice setting",
-			Description: "with some description",
-			Value: &proto.Setting_MultiChoiceValue{
-				MultiChoiceValue: &multipleChoiceSetting,
-			},
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
-			},
-		},
-		{
-			Name:        "singleChoice",
-			DisplayName: "a single choice setting",
-			Description: "with some description",
-			Value: &proto.Setting_SingleChoiceValue{
-				SingleChoiceValue: &singleChoiceSetting,
-			},
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
-			},
-		},
-	}
-
-	bundle := proto.Bundle{
-		Name:        "test",
-		DisplayName: "bundleDisplayName",
-		Extension:   "testExtension",
-		Type:        proto.Bundle_TYPE_DEFAULT,
-		Settings:    settings,
-		Resource: &proto.Resource{
-			Type: proto.Resource_TYPE_BUNDLE,
-		},
-	}
 	saveRequest := proto.SaveBundleRequest{
-		Bundle: &bundle,
+		Bundle: &bundleStub,
 	}
 
 	client := service.Client()
@@ -346,7 +363,7 @@ func TestSaveGetListSettingsBundle(t *testing.T) {
 	saveResponse, err := cl.SaveBundle(context.Background(), &saveRequest)
 	assert.NoError(t, err)
 	receivedBundle, _ := json.Marshal(saveResponse.Bundle.Settings)
-	expectedBundle, _ := json.Marshal(&bundle.Settings)
+	expectedBundle, _ := json.Marshal(&bundleStub.Settings)
 	assert.Equal(t, receivedBundle, expectedBundle)
 
 	//assert that GetBundle returns the same bundle as saved
@@ -355,6 +372,110 @@ func TestSaveGetListSettingsBundle(t *testing.T) {
 	assert.NoError(t, err)
 	receivedBundle, _ = json.Marshal(getResponse.Bundle.Settings)
 	assert.Equal(t, expectedBundle, receivedBundle)
+
+	os.RemoveAll(dataStore)
+}
+
+/**
+testing that saving a value works and can be retrieved again
+*/
+func TestSaveGetIntValue(t *testing.T) {
+	tests := []struct {
+		name  string
+		value proto.Value_IntValue
+	}{
+		{
+			name:  "simple int",
+			value: proto.Value_IntValue{IntValue: 43},
+		},
+		{
+			name:  "negative",
+			value: proto.Value_IntValue{IntValue: -42},
+			// https://github.com/owncloud/ocis-settings/issues/57
+		},
+		{
+			name:  "less than Min",
+			value: proto.Value_IntValue{IntValue: 0},
+			// https://github.com/owncloud/ocis-settings/issues/57
+		},
+		{
+			name:  "more than Max",
+			value: proto.Value_IntValue{IntValue: 128},
+			// https://github.com/owncloud/ocis-settings/issues/57
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := service.Client()
+			cl := proto.NewBundleService("com.owncloud.api.settings", client)
+
+			saveResponse, err := cl.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+				Bundle: &bundleStub,
+			})
+			assert.NoError(t, err)
+
+			clv := proto.NewValueService("com.owncloud.api.settings", client)
+
+			saveValueResponse, err := clv.SaveValue(context.Background(), &proto.SaveValueRequest{
+				Value: &proto.Value{
+					BundleId:    saveResponse.Bundle.Id,
+					SettingId:   "4e00633d-5373-4df4-9299-1c9ed9c3ebed", //setting id of the int setting
+					AccountUuid: "047d31b0-219a-47a4-8ee5-c5fa3802a3c2",
+					Value:       &tt.value,
+					Resource: &proto.Resource{
+						Type: 0,
+						Id:   ".",
+					},
+				},
+			})
+			assert.NoError(t, err)
+			assert.Equal(t, tt.value.IntValue, saveValueResponse.Value.Value.GetIntValue())
+
+			getValueResponse, err := clv.GetValue(
+				context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.value.IntValue, getValueResponse.Value.Value.GetIntValue())
+
+			os.RemoveAll(dataStore)
+		})
+	}
+}
+
+/**
+try to save a wrong type of the value
+https://github.com/owncloud/ocis-settings/issues/57
+*/
+func TestSaveGetIntValueIntoString(t *testing.T) {
+	client := service.Client()
+	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+
+	saveResponse, err := cl.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+		Bundle: &bundleStub,
+	})
+	assert.NoError(t, err)
+
+	clv := proto.NewValueService("com.owncloud.api.settings", client)
+	saveValueResponse, err := clv.SaveValue(context.Background(), &proto.SaveValueRequest{
+		Value: &proto.Value{
+			BundleId:    saveResponse.Bundle.Id,
+			SettingId:   "f792acb4-9f09-4fa8-92d3-4a0d0a6ca721", //setting id of the string setting
+			AccountUuid: "047d31b0-219a-47a4-8ee5-c5fa3802a3c2",
+			Value:       &proto.Value_StringValue{StringValue: "forty two"},
+			Resource: &proto.Resource{
+				Type: 0,
+				Id:   ".",
+			},
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "forty two", saveValueResponse.Value.Value.GetStringValue())
+
+	getValueResponse, err := clv.GetValue(
+		context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, "forty two", getValueResponse.Value.Value.GetStringValue())
 
 	os.RemoveAll(dataStore)
 }
@@ -795,6 +916,8 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 			},
 		},
 	}
+
+	rebuidDataStore()
 	client := service.Client()
 
 	for _, tt := range tests {
@@ -859,6 +982,8 @@ func TestListRolesVariousAccountUuid(t *testing.T) {
 			"{\"id\":\"ocis-settings\",\"code\":400,\"detail\":\"must be in a valid format\",\"status\":\"Bad Request\"}",
 		},
 	}
+
+	rebuidDataStore()
 	client := service.Client()
 
 	for _, tt := range tests {
