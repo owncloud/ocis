@@ -140,7 +140,6 @@ message SaveBundleResponse {
 
 message GetBundleRequest {
   string bundle_id = 1;
-  string account_uuid = 2;
 }
 
 message GetBundleResponse {
@@ -148,7 +147,6 @@ message GetBundleResponse {
 }
 
 message ListBundlesRequest {
-  string account_uuid = 1;
 }
 
 message ListBundlesResponse {

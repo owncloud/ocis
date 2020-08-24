@@ -578,9 +578,6 @@
       "properties": {
         "bundle_id": {
           "type": "string"
-        },
-        "account_uuid": {
-          "type": "string"
         }
       }
     },
@@ -658,12 +655,7 @@
       }
     },
     "protoListBundlesRequest": {
-      "type": "object",
-      "properties": {
-        "account_uuid": {
-          "type": "string"
-        }
-      }
+      "type": "object"
     },
     "protoListBundlesResponse": {
       "type": "object",

@@ -46,11 +46,11 @@ func validateSaveBundle(req *proto.SaveBundleRequest) error {
 }
 
 func validateGetBundle(req *proto.GetBundleRequest) error {
-	return validation.Validate(&req.BundleId, requireAccountID...)
+	return validation.Validate(&req.BundleId, is.UUID)
 }
 
 func validateListBundles(req *proto.ListBundlesRequest) error {
-	return validation.Validate(&req.AccountUuid, requireAccountID...)
+	return nil
 }
 
 func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
@@ -100,7 +100,7 @@ func validateListValues(req *proto.ListValuesRequest) error {
 }
 
 func validateListRoles(req *proto.ListBundlesRequest) error {
-	return validation.Validate(&req.AccountUuid, requireAccountID...)
+	return nil
 }
 
 func validateListRoleAssignments(req *proto.ListRoleAssignmentsRequest) error {

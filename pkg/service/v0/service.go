@@ -64,7 +64,7 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 
 // GetBundle implements the BundleServiceHandler interface
 func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
@@ -72,7 +72,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	roleIDs := g.getRoleIDs(c, req.AccountUuid)
+	roleIDs := g.getRoleIDs(c, accountUUID)
 	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
 	if len(filteredBundle.Settings) == 0 {
 		return merrors.NotFound("ocis-settings", "%s", err)
@@ -84,7 +84,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 // ListBundles implements the BundleServiceHandler interface
 func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	// fetch all bundles
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
@@ -92,7 +92,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	roleIDs := g.getRoleIDs(c, req.AccountUuid)
+	roleIDs := g.getRoleIDs(c, accountUUID)
 
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
@@ -246,7 +246,7 @@ func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res
 
 // ListRoles implements the RoleServiceHandler interface
 func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	//accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListRoles(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
@@ -254,6 +254,7 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
+	// TODO: only allow to list roles when user has account management permissions
 	res.Bundles = r
 	return nil
 }
