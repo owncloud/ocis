@@ -122,6 +122,16 @@ func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
 	)
 }
 
+func validateListPermissionsByResource(req *proto.ListPermissionsByResourceRequest) error {
+	if err := validateResource(req.Resource); err != nil {
+		return err
+	}
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.RoleIds, validation.Each(requireAlphanumeric...)),
+	)
+}
+
 // validateResource is an internal helper for validating the content of a resource.
 func validateResource(resource *proto.Resource) error {
 	if err := validation.Validate(&resource, validation.Required); err != nil {

@@ -86,13 +86,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-
-	// fetch roles of the user
-	rolesResponse := &proto.ListRoleAssignmentsResponse{}
-	err = g.ListRoleAssignments(c, &proto.ListRoleAssignmentsRequest{AccountUuid: req.AccountUuid}, rolesResponse)
-	if err != nil {
-		return err
-	}
+	roleIDs := g.getRoleIDs(c, req.AccountUuid)
 
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
@@ -104,9 +98,9 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 				Id:   setting.Id,
 			}
 			if g.hasPermission(
-				rolesResponse.Assignments,
+				roleIDs,
 				settingResource,
-				proto.Permission_OPERATION_UPDATE,
+				[]proto.Permission_Operation{proto.Permission_OPERATION_READ},
 				proto.Permission_CONSTRAINT_OWN,
 			) {
 				filteredSettings = append(filteredSettings, setting)
@@ -277,6 +271,19 @@ func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFrom
 	return nil
 }
 
+// ListPermissionsByResource implements the PermissionServiceHandler interface
+func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPermissionsByResourceRequest, res *proto.ListPermissionsByResourceResponse) error {
+	if validationError := validateListPermissionsByResource(req); validationError != nil {
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
+	}
+	permissions, err := g.manager.ListPermissionsByResource(req.Resource, req.RoleIds)
+	if err != nil {
+		return merrors.BadRequest("ocis-settings", "%s", err)
+	}
+	res.Permissions = permissions
+	return nil
+}
+
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.
 func cleanUpResource(c context.Context, resource *proto.Resource) {
 	if resource != nil && resource.Type == proto.Resource_TYPE_USER {
@@ -293,6 +300,24 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 		}
 	}
 	return accountUUID
+}
+
+// getRoleIDs loads the role assignments for the given accountUUID
+// TODO: this should work on the context in the future, as roles are supposed to be sent within the context.
+func (g Service) getRoleIDs(c context.Context, accountUUID string) []string {
+	// TODO: replace this with role ids from the context
+	// WIP PR: https://github.com/owncloud/ocis-proxy/pull/70
+	rolesResponse := &proto.ListRoleAssignmentsResponse{}
+	err := g.ListRoleAssignments(c, &proto.ListRoleAssignmentsRequest{AccountUuid: accountUUID}, rolesResponse)
+	if err != nil {
+		g.logger.Err(err).Str("accountUUID", accountUUID).Msg("failed to list role assignments")
+		return []string{}
+	}
+	var roleIDs []string
+	for _, assignment := range rolesResponse.Assignments {
+		roleIDs = append(roleIDs, assignment.RoleId)
+	}
+	return roleIDs
 }
 
 func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIdentifier, error) {

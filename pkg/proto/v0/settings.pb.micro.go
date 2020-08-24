@@ -567,3 +567,77 @@ func (h *roleServiceHandler) AssignRoleToUser(ctx context.Context, in *AssignRol
 func (h *roleServiceHandler) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *empty.Empty) error {
 	return h.RoleServiceHandler.RemoveRoleFromUser(ctx, in, out)
 }
+
+// Api Endpoints for PermissionService service
+
+func NewPermissionServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "PermissionService.ListPermissionsByResource",
+			Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+	}
+}
+
+// Client API for PermissionService service
+
+type PermissionService interface {
+	ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, opts ...client.CallOption) (*ListPermissionsByResourceResponse, error)
+}
+
+type permissionService struct {
+	c    client.Client
+	name string
+}
+
+func NewPermissionService(name string, c client.Client) PermissionService {
+	return &permissionService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *permissionService) ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, opts ...client.CallOption) (*ListPermissionsByResourceResponse, error) {
+	req := c.c.NewRequest(c.name, "PermissionService.ListPermissionsByResource", in)
+	out := new(ListPermissionsByResourceResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for PermissionService service
+
+type PermissionServiceHandler interface {
+	ListPermissionsByResource(context.Context, *ListPermissionsByResourceRequest, *ListPermissionsByResourceResponse) error
+}
+
+func RegisterPermissionServiceHandler(s server.Server, hdlr PermissionServiceHandler, opts ...server.HandlerOption) error {
+	type permissionService interface {
+		ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, out *ListPermissionsByResourceResponse) error
+	}
+	type PermissionService struct {
+		permissionService
+	}
+	h := &permissionServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "PermissionService.ListPermissionsByResource",
+		Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	return s.Handle(s.NewHandler(&PermissionService{h}, opts...))
+}
+
+type permissionServiceHandler struct {
+	PermissionServiceHandler
+}
+
+func (h *permissionServiceHandler) ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, out *ListPermissionsByResourceResponse) error {
+	return h.PermissionServiceHandler.ListPermissionsByResource(ctx, in, out)
+}

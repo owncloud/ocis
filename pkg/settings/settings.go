@@ -18,6 +18,7 @@ type Manager interface {
 	BundleManager
 	ValueManager
 	RoleAssignmentManager
+	PermissionManager
 }
 
 // BundleManager is a bundle service interface for abstraction of storage implementations
@@ -43,4 +44,9 @@ type RoleAssignmentManager interface {
 	ListRoleAssignments(accountUUID string) ([]*proto.UserRoleAssignment, error)
 	WriteRoleAssignment(accountUUID, roleID string) (*proto.UserRoleAssignment, error)
 	RemoveRoleAssignment(assignmentID string) error
+}
+
+// PermissionManager is a permissions service interface for abstraction of storage implementations
+type PermissionManager interface {
+	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
 }
