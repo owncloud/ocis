@@ -24,28 +24,29 @@ services:
       - ../ocis-reva:/ocis-reva
       - ../reva:/reva
     environment:
-      EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      # ocis log level will be used for all services
+      OCIS_LOG_LEVEL: debug
+      # domain setup
+      # TODO currently the below lines hardcode the port to 9200, use an OCIS_URL that includes protocol and port
       OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
+      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       KONNECTD_ISS: https://${OCIS_DOMAIN:-localhost}:9200
-      KONNECTD_LOG_LEVEL: debug
-      KONNECTD_TLS: '0'
       PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-localhost}:9200
       PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-localhost}:9200/.well-known/openid-configuration
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
-      PROXY_HTTP_ADDR: 0.0.0.0:9200
       REVA_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       REVA_LDAP_IDP: https://${OCIS_DOMAIN:-localhost}:9200
-      OCIS_LOG_LEVEL: debug
-      REVA_TRANSFER_EXPIRES: 86400
-      REVA_STORAGE_EOS_DRIVER: eoshome
-      REVA_STORAGE_EOS_DATA_DRIVER: eoshome
-      REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
-      REVA_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      REVA_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}"
+      # TODO make id the default in ocis-reva
+      REVA_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
       REVA_FRONTEND_URL: https://${OCIS_DOMAIN:-localhost}:9200
       REVA_DATAGATEWAY_URL: https://${OCIS_DOMAIN:-localhost}:9200/data
-
+      # common eos settings used for both drivers: eos and eoshome
+      REVA_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      REVA_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
+      # the eos end xrdcopy binaries use this env var to find the eos mgm
+      EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+  
   mgm-master:
     container_name: mgm-master
     image: owncloud/eos-mgm:4.6.5
