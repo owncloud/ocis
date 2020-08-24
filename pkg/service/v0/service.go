@@ -91,6 +91,22 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
 	for _, bundle := range bundles {
+		// check if full bundle is whitelisted
+		bundleResource := &proto.Resource{
+			Type: proto.Resource_TYPE_BUNDLE,
+			Id:   bundle.Id,
+		}
+		if g.hasPermission(
+			roleIDs,
+			bundleResource,
+			[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
+			proto.Permission_CONSTRAINT_OWN,
+		) {
+			filteredBundles = append(filteredBundles, bundle)
+			continue
+		}
+
+		// filter settings based on permissions
 		var filteredSettings []*proto.Setting
 		for _, setting := range bundle.Settings {
 			settingResource := &proto.Resource{
