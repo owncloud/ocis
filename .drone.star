@@ -501,6 +501,14 @@ def eosTests(ctx, coreBranch = 'master', coreCommit = ''):
       {
         'name': 'eosdisks',
         'temp': {},
+      },
+      {
+        'name': 'eosconfig',
+        'temp': {},
+      },
+      {
+        'name': 'eos-ns-queue',
+        'temp': {},
       }
     ],
     'trigger': {
