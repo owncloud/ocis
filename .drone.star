@@ -59,7 +59,7 @@ def getCoreApiTestPipelineNames():
   return names
 
 def main(ctx):
-  before = testPipelines(ctx) +  [eosTests(ctx), 'uid-gid-user-create']
+  before = testPipelines(ctx) +  [eosTests(ctx, 'uid-gid-user-create')]
 
   stages = [
     docker(ctx, 'amd64'),
