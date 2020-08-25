@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -21,6 +22,9 @@ func newAccountOptions(opts ...account.Option) account.Options {
 
 // AccountID serves as key for the account uuid in the context
 const AccountID string = "Account-Id"
+// UUIDKey serves as key for the account uuid in the context
+// Deprecated: UUIDKey exists for compatibility reasons. Use AccountID instead.
+var UUIDKey struct{}
 
 // ExtractAccountUUID provides a middleware to extract the account uuid from the x-access-token header value
 // and write it to the context. If there is no x-access-token the middleware is omitted.
@@ -49,7 +53,8 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 
 			// Important: user.Id.OpaqueId is the AccountUUID. Set this way in the account uuid middleware in ocis-proxy.
 			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
-			ctx := metadata.Set(r.Context(), AccountID, user.Id.OpaqueId)
+			ctx := context.WithValue(r.Context(), UUIDKey, user.Id.OpaqueId)
+			ctx = metadata.Set(ctx, AccountID, user.Id.OpaqueId)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
