@@ -325,13 +325,51 @@ func TestSettingsBundleProperties(t *testing.T) {
 			} else {
 				assert.Equal(t, scenario.extensionName, cresponse.Bundle.Extension)
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
-				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
-				c := context.WithValue(context.Background(),middleware.UUIDKey, "dfaecb31-fb9f-4f00-8856-b2e27c0bf418")
-				_, err := cl.GetBundle(c, &getRequest)
+
+				permissionRequests := []proto.AddSettingToBundleRequest{
+					{
+						BundleId: svc.BundleUUIDRoleAdmin,
+						Setting: &proto.Setting{
+							Id:          "c9999635-7bdb-42f4-9bdc-3fcb06513dd4",
+							Name:        "test-setting-update",
+							Resource: &proto.Resource{
+								Type: proto.Resource_TYPE_SETTING,
+								Id:   "123e4567-e89b-12d3-a456-426652340000",
+							},
+							Value: &proto.Setting_PermissionValue{
+								PermissionValue: &proto.Permission{
+									Operation:  proto.Permission_OPERATION_UPDATE,
+									Constraint: proto.Permission_CONSTRAINT_OWN,
+								},
+							},
+						},
+					},
+				}
+
+				for i := range permissionRequests {
+					addSettingsRes, err := cl.AddSettingToBundle(context.Background(), &permissionRequests[i])
+					assert.NoError(t, err)
+					assert.NotEmpty(t, addSettingsRes.Setting)
+				}
+
+				roleService := proto.NewRoleService("com.owncloud.api.settings", client)
+
+				_, err := roleService.AssignRoleToUser(
+					context.Background(),
+					&proto.AssignRoleToUserRequest{
+						AccountUuid: "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26", RoleId: svc.BundleUUIDRoleAdmin},
+				)
 				assert.NoError(t, err)
-//				assert.Equal(t, scenario.displayName, getResponse.Bundle.DisplayName)
+
+				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
+
+
+				ctx := context.WithValue(context.TODO(),middleware.UUIDKey, "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26")
+				getResponse, err := cl.GetBundle(ctx, &getRequest)
+				assert.NoError(t, err)
+				assert.Equal(t, scenario.displayName, getResponse.Bundle.DisplayName)
 			}
-			//os.RemoveAll(dataStore)
+			os.RemoveAll(dataStore)
 		})
 	}
 }
