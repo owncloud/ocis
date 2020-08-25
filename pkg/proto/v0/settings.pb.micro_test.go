@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 
-	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/micro/go-micro/v2/metadata"
 	ocislog "github.com/owncloud/ocis-pkg/v2/log"
@@ -21,16 +20,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var service = grpc.Service{}
-
 var (
+	service grpc.Service
+	handler svc.Service
+	bundleService proto.BundleService
+	valueService proto.ValueService
+	roleService proto.RoleService
+	permissionService proto.PermissionService
+
+	testAccountID = "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26"
+
 	settingsStub = []*proto.Setting{
 		{
 			Id:          "336c4db1-5062-4931-990f-d88e6b02cb02",
 			DisplayName: "dummy setting",
 			Name:        "dummy-setting",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Value: &proto.Setting_IntValue{
 				IntValue: &proto.Int{
@@ -85,7 +91,7 @@ var (
 				},
 			},
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 		},
 		{
@@ -103,7 +109,7 @@ var (
 				},
 			},
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 		},
 		{
@@ -118,7 +124,7 @@ var (
 				},
 			},
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 		},
 		{
@@ -130,7 +136,7 @@ var (
 				MultiChoiceValue: &multipleChoiceSettingStub,
 			},
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 		},
 		{
@@ -142,7 +148,7 @@ var (
 				SingleChoiceValue: &singleChoiceSettingStub,
 			},
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 		},
 	}
@@ -155,16 +161,14 @@ var (
 		Type:        proto.Bundle_TYPE_DEFAULT,
 		Settings:    complexSettingsStub,
 		Resource: &proto.Resource{
-			Type: proto.Resource_TYPE_BUNDLE,
+			Type: proto.Resource_TYPE_SYSTEM,
 		},
 	}
 )
 
-const dataStore = "/var/tmp/ocis-settings"
+const dataPath = "/var/tmp/grpc-tests-ocis-settings"
 
 func init() {
-	os.MkdirAll(dataStore+"/assignments", 0755)
-
 	service = grpc.NewService(
 		grpc.Namespace("com.owncloud.api"),
 		grpc.Name("settings"),
@@ -172,52 +176,57 @@ func init() {
 	)
 
 	cfg := config.New()
-	cfg.Storage.DataPath = dataStore
-	// Service initialization is not reliable. It most lilely happens
-	// asynchronous causing a data race in some tests where it needs
-	// as service but this is not available.
-	err := proto.RegisterBundleServiceHandler(service.Server(), svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true))))
+	cfg.Storage.DataPath = dataPath
+	handler = svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
+	err := proto.RegisterBundleServiceHandler(service.Server(), handler)
 	if err != nil {
 		log.Fatalf("could not register BundleServiceHandler: %v", err)
 	}
-	err = proto.RegisterValueServiceHandler(service.Server(), svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true))))
+	err = proto.RegisterValueServiceHandler(service.Server(), handler)
 	if err != nil {
 		log.Fatalf("could not register ValueServiceHandler: %v", err)
 	}
-	err = proto.RegisterRoleServiceHandler(service.Server(), svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true))))
+	err = proto.RegisterRoleServiceHandler(service.Server(), handler)
 	if err != nil {
-		log.Fatalf("could not register RegisterRoleServiceHandler: %v", err)
+		log.Fatalf("could not register RoleServiceHandler: %v", err)
+	}
+	err = proto.RegisterPermissionServiceHandler(service.Server(), handler)
+	if err != nil {
+		log.Fatalf("could not register PermissionServiceHandler: %v", err)
 	}
 
 	if err = service.Server().Start(); err != nil {
 		log.Fatalf("could not start server: %v", err)
 	}
+
+	client := service.Client()
+	bundleService = proto.NewBundleService("com.owncloud.api.settings", client)
+	valueService = proto.NewValueService("com.owncloud.api.settings", client)
+	roleService = proto.NewRoleService("com.owncloud.api.settings", client)
+	permissionService = proto.NewPermissionService("com.owncloud.api.settings", client)
 }
 
-/**
-Make sure the default roles are created
-The tests delete the Datastore after the run, so we need to recreate it
-*/
-func rebuidDataStore() {
-	cfg := config.New()
-	cfg.Storage.DataPath = dataStore
-	svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
+func setup() func() {
+	handler.RegisterDefaultRoles()
+	return func() {
+		if err := os.RemoveAll(dataPath); err != nil {
+			log.Printf("could not delete data root: %s", dataPath)
+		} else {
+			log.Println("data root deleted")
+		}
+	}
 }
 
 /**
 testing that saving a settings bundle and retrieving it again works correctly
 using various setting bundle properties
 */
-func TestSettingsBundleProperties(t *testing.T) {
-	client := service.Client()
-	cl := proto.NewBundleService("com.owncloud.api.settings", client)
-
+func TestBundleInputValidation(t *testing.T) {
 	var scenarios = []struct {
 		name          string
 		bundleName    string
 		displayName   string
 		extensionName string
-		accountUUID   string
 		expectedError error
 	}{
 		{
@@ -225,7 +234,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle-name",
 			"simple-bundle-key",
 			"simple-extension-name",
-			"123e4567-e89b-12d3-a456-426652340000",
 			nil,
 		},
 		{
@@ -233,7 +241,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-bundle-name",
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
-			"सिम्प्ले",
 			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
 		},
 		{
@@ -241,7 +248,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"सिम्प्ले-bundle-name",
 			"सिम्प्ले-display-name",
 			"simple-extension-name",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "name: must be in a valid format.", 400),
 		},
 		{
@@ -249,7 +255,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle-name",
 			"simple-display-name",
 			"../folder-a-level-higher-up",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
 		},
 		{
@@ -257,7 +262,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle-name",
 			"simple-display-name",
 			"\\",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
 		},
 		{
@@ -265,7 +269,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle name",
 			"simple display name",
 			"simple extension name",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
 		},
 		{
@@ -273,7 +276,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle-name",
 			"simple display name",
 			"simple-extension-name",
-			"123e4567-e89b-12d3-a456-426652340000",
 			nil,
 		},
 		{
@@ -281,7 +283,6 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundle-name",
 			"simple-display-name",
 			"",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "extension: cannot be blank.", 400),
 		},
 		{
@@ -289,21 +290,14 @@ func TestSettingsBundleProperties(t *testing.T) {
 			"bundleName",
 			"",
 			"simple-extension-name",
-			"123e4567-e89b-12d3-a456-426652340000",
 			merrors.New("ocis-settings", "display_name: cannot be blank.", 400),
-		},
-		{
-			"accountUUID missing (omitted on bundles)",
-			"bundle-name",
-			"simple-display-name",
-			"simple-extension-name",
-			"",
-			nil,
 		},
 	}
 	for _, scenario := range scenarios {
-		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
 			bundle := proto.Bundle{
 				Name:        scenario.bundleName,
 				Extension:   scenario.extensionName,
@@ -318,7 +312,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 				Bundle: &bundle,
 			}
 
-			cresponse, err := cl.SaveBundle(context.Background(), &createRequest)
+			cresponse, err := bundleService.SaveBundle(context.Background(), &createRequest)
 			if err != nil || scenario.expectedError != nil {
 				t.Log(err)
 				assert.Equal(t, scenario.expectedError, err)
@@ -326,99 +320,66 @@ func TestSettingsBundleProperties(t *testing.T) {
 				assert.Equal(t, scenario.extensionName, cresponse.Bundle.Extension)
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
 
-				permissionRequests := []proto.AddSettingToBundleRequest{
-					{
-						BundleId: svc.BundleUUIDRoleAdmin,
-						Setting: &proto.Setting{
-							Id:   "c9999635-7bdb-42f4-9bdc-3fcb06513dd4",
-							Name: "test-setting-readwrite",
-							Resource: &proto.Resource{
-								Type: proto.Resource_TYPE_SETTING,
-								Id:   "123e4567-e89b-12d3-a456-426652340000",
-							},
-							Value: &proto.Setting_PermissionValue{
-								PermissionValue: &proto.Permission{
-									Operation:  proto.Permission_OPERATION_READWRITE,
-									Constraint: proto.Permission_CONSTRAINT_OWN,
-								},
-							},
-						},
-					},
-				}
+				// we want to test input validation, so just allow the request permission-wise
+				setFullReadWriteOnBundle(t, testAccountID, cresponse.Bundle.Id)
 
-				for i := range permissionRequests {
-					addSettingsRes, err := cl.AddSettingToBundle(context.Background(), &permissionRequests[i])
-					assert.NoError(t, err)
-					if err == nil {
-						assert.NotEmpty(t, addSettingsRes.Setting)
-					}
-				}
-
-				roleService := proto.NewRoleService("com.owncloud.api.settings", client)
-
-				_, err := roleService.AssignRoleToUser(
-					context.Background(),
-					&proto.AssignRoleToUserRequest{
-						AccountUuid: "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26", RoleId: svc.BundleUUIDRoleAdmin},
-				)
-				assert.NoError(t, err)
-
+				ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
-
-				ctx := metadata.Set(context.Background(), middleware.AccountID, "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26")
-				getResponse, err := cl.GetBundle(ctx, &getRequest)
+				getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 				assert.NoError(t, err)
 				if err == nil {
 					assert.Equal(t, scenario.displayName, getResponse.Bundle.DisplayName)
 				}
 			}
-			os.RemoveAll(dataStore)
 		})
 	}
 }
 
-func TestSettingsBundleWithoutSettings(t *testing.T) {
-	client := service.Client()
-	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+func TestSaveBundleWithoutSettings(t *testing.T) {
+	teardown := setup()
+	defer teardown()
 
 	createRequest := proto.SaveBundleRequest{
 		Bundle: &proto.Bundle{
 			DisplayName: "Alice's Bundle",
 		},
 	}
-	response, err := cl.SaveBundle(context.Background(), &createRequest)
+	response, err := bundleService.SaveBundle(context.Background(), &createRequest)
 	assert.Error(t, err)
 	assert.Nil(t, response)
 	assert.Equal(t, merrors.New("ocis-settings", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 400), err)
-	os.RemoveAll(dataStore)
 }
 
-// /**
-// testing that setting getting and listing a settings bundle works correctly with a set of setting definitions
-// */
-func TestSaveGetListSettingsBundle(t *testing.T) {
+/**
+testing that setting getting and listing a settings bundle works correctly with a set of setting definitions
+*/
+func TestSaveAndGetBundle(t *testing.T) {
+	teardown := setup()
+	defer teardown()
+
 	saveRequest := proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	}
 
-	client := service.Client()
-	cl := proto.NewBundleService("com.owncloud.api.settings", client)
-
 	// assert that SaveBundle returns the same bundle as we have sent
-	saveResponse, err := cl.SaveBundle(context.Background(), &saveRequest)
+	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
 	assert.NoError(t, err)
 	receivedBundle, _ := json.Marshal(saveResponse.Bundle.Settings)
 	expectedBundle, _ := json.Marshal(&bundleStub.Settings)
 	assert.Equal(t, receivedBundle, expectedBundle)
 
+	// set full permissions for getting the created bundle
+	setFullReadWriteOnBundle(t, testAccountID, saveResponse.Bundle.Id)
+
 	//assert that GetBundle returns the same bundle as saved
 	getRequest := proto.GetBundleRequest{BundleId: saveResponse.Bundle.Id}
-	getResponse, err := cl.GetBundle(context.Background(), &getRequest)
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.NoError(t, err)
-	receivedBundle, _ = json.Marshal(getResponse.Bundle.Settings)
-	assert.Equal(t, expectedBundle, receivedBundle)
-
-	os.RemoveAll(dataStore)
+	if err == nil {
+		receivedBundle, _ = json.Marshal(getResponse.Bundle.Settings)
+		assert.Equal(t, expectedBundle, receivedBundle)
+	}
 }
 
 /**
@@ -451,17 +412,15 @@ func TestSaveGetIntValue(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := service.Client()
-			cl := proto.NewBundleService("com.owncloud.api.settings", client)
+			teardown := setup()
+			defer teardown()
 
-			saveResponse, err := cl.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+			saveResponse, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
 				Bundle: &bundleStub,
 			})
 			assert.NoError(t, err)
 
-			clv := proto.NewValueService("com.owncloud.api.settings", client)
-
-			saveValueResponse, err := clv.SaveValue(context.Background(), &proto.SaveValueRequest{
+			saveValueResponse, err := valueService.SaveValue(context.Background(), &proto.SaveValueRequest{
 				Value: &proto.Value{
 					BundleId:    saveResponse.Bundle.Id,
 					SettingId:   "4e00633d-5373-4df4-9299-1c9ed9c3ebed", //setting id of the int setting
@@ -476,13 +435,11 @@ func TestSaveGetIntValue(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.value.IntValue, saveValueResponse.Value.Value.GetIntValue())
 
-			getValueResponse, err := clv.GetValue(
+			getValueResponse, err := valueService.GetValue(
 				context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
 			)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.value.IntValue, getValueResponse.Value.Value.GetIntValue())
-
-			os.RemoveAll(dataStore)
 		})
 	}
 }
@@ -492,16 +449,15 @@ try to save a wrong type of the value
 https://github.com/owncloud/ocis-settings/issues/57
 */
 func TestSaveGetIntValueIntoString(t *testing.T) {
-	client := service.Client()
-	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+	teardown := setup()
+	defer teardown()
 
-	saveResponse, err := cl.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+	saveResponse, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	})
 	assert.NoError(t, err)
 
-	clv := proto.NewValueService("com.owncloud.api.settings", client)
-	saveValueResponse, err := clv.SaveValue(context.Background(), &proto.SaveValueRequest{
+	saveValueResponse, err := valueService.SaveValue(context.Background(), &proto.SaveValueRequest{
 		Value: &proto.Value{
 			BundleId:    saveResponse.Bundle.Id,
 			SettingId:   "f792acb4-9f09-4fa8-92d3-4a0d0a6ca721", //setting id of the string setting
@@ -516,22 +472,20 @@ func TestSaveGetIntValueIntoString(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "forty two", saveValueResponse.Value.Value.GetStringValue())
 
-	getValueResponse, err := clv.GetValue(
+	getValueResponse, err := valueService.GetValue(
 		context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, "forty two", getValueResponse.Value.Value.GetStringValue())
-
-	os.RemoveAll(dataStore)
 }
 
 // https://github.com/owncloud/ocis-settings/issues/18
-func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
+func TestSaveBundleWithInvalidSettings(t *testing.T) {
 	var tests = []proto.Setting{
 		{
 			Name: "intValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "intValue default is out of range",
 			Value: &proto.Setting_IntValue{
@@ -545,7 +499,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "intValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "intValue min gt max",
 			Value: &proto.Setting_IntValue{
@@ -559,7 +513,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "intValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "intValue step gt max-min",
 			Value: &proto.Setting_IntValue{
@@ -573,7 +527,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "intValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "intValue step eq 0",
 			Value: &proto.Setting_IntValue{
@@ -587,7 +541,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "intValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "intValue step lt 0",
 			Value: &proto.Setting_IntValue{
@@ -601,7 +555,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "stringValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "stringValue MinLength gt MaxLength",
 			Value: &proto.Setting_StringValue{
@@ -614,7 +568,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "stringValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "stringValue MaxLength eq 0",
 			Value: &proto.Setting_StringValue{
@@ -626,7 +580,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "stringValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "stringValue MinLength lt 0",
 			Value: &proto.Setting_StringValue{
@@ -638,7 +592,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "stringValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "stringValue MaxLength lt 0",
 			Value: &proto.Setting_StringValue{
@@ -650,7 +604,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "multiChoiceValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "multiChoice multiple options are default",
 			Value: &proto.Setting_MultiChoiceValue{
@@ -675,7 +629,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 		{
 			Name: "singleChoiceValue",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: proto.Resource_TYPE_USER,
 			},
 			Description: "singleChoice multiple options are default",
 			Value: &proto.Setting_SingleChoiceValue{
@@ -700,8 +654,9 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 	}
 
 	for index := range tests {
-		index := index
 		t.Run(tests[index].Name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
 
 			var settings []*proto.Setting
 
@@ -712,7 +667,7 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 				DisplayName: "bundledisplayname",
 				Type:        proto.Bundle_TYPE_DEFAULT,
 				Resource: &proto.Resource{
-					Type: proto.Resource_TYPE_BUNDLE,
+					Type: proto.Resource_TYPE_SYSTEM,
 				},
 				Settings: settings,
 			}
@@ -720,40 +675,35 @@ func TestSaveSettingsBundleWithInvalidSettingValues(t *testing.T) {
 				Bundle: &bundle,
 			}
 
-			client := service.Client()
-			cl := proto.NewBundleService("com.owncloud.api.settings", client)
-
 			//assert that SaveBundle returns the same bundle as we have sent there
-			saveResponse, err := cl.SaveBundle(context.Background(), &saveRequest)
+			saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
 			assert.NoError(t, err)
 			receivedBundle, _ := json.Marshal(saveResponse.Bundle.Settings)
 			expectedBundle, _ := json.Marshal(&bundle.Settings)
 			assert.Equal(t, expectedBundle, receivedBundle)
-			os.RemoveAll(dataStore)
 		})
 	}
 }
 
 // https://github.com/owncloud/ocis-settings/issues/19
-func TestGetSettingsBundleCreatesFolder(t *testing.T) {
-	client := service.Client()
-	cl := proto.NewBundleService("com.owncloud.api.settings", client)
+func TestGetBundleNoSideEffectsOnDisk(t *testing.T) {
+	teardown := setup()
+	defer teardown()
+
 	getRequest := proto.GetBundleRequest{BundleId: "non-existing-bundle"}
 
-	_, _ = cl.GetBundle(context.Background(), &getRequest)
+	_, _ = bundleService.GetBundle(context.Background(), &getRequest)
 	assert.NoDirExists(t, store.Name+"/bundles/non-existing-bundle")
 	assert.NoFileExists(t, store.Name+"/bundles/non-existing-bundle/not-existing-bundle.json")
-	os.RemoveAll(dataStore)
 }
 
 // TODO non-deterministic. Fix.
 func TestCreateRoleAndAssign(t *testing.T) {
-	c := mgrpc.NewClient()
-	bundleC := proto.NewBundleService("com.owncloud.api.settings", c)
+	teardown := setup()
+	defer teardown()
 
-	res, err := bundleC.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+	res, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
 		Bundle: &proto.Bundle{
-			// Id:          "f36db5e6-a03c-40df-8413-711c67e40b47", // bug: providing the ID ignores its value for the filename.
 			Type:        proto.Bundle_TYPE_ROLE,
 			DisplayName: "test role - update",
 			Name:        "TEST_ROLE",
@@ -779,8 +729,7 @@ func TestCreateRoleAndAssign(t *testing.T) {
 		},
 	})
 	if err == nil {
-		rolesC := proto.NewRoleService("com.owncloud.api.settings", c)
-		_, err = rolesC.AssignRoleToUser(context.Background(), &proto.AssignRoleToUserRequest{
+		_, err = roleService.AssignRoleToUser(context.Background(), &proto.AssignRoleToUserRequest{
 			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
 			RoleId:      res.Bundle.Id,
 		})
@@ -789,7 +738,6 @@ func TestCreateRoleAndAssign(t *testing.T) {
 		}
 		assert.NoError(t, err)
 	}
-	os.RemoveAll(dataStore)
 }
 
 // // TODO this tests are non-deterministic at least on my machine. Find a way to make them deterministic.
@@ -855,7 +803,6 @@ func TestCreateRoleAndAssign(t *testing.T) {
 // 	assert.NoError(t, err)
 // 	assert.Equal(t, 1, len(response.Bundles))
 // 	assert.Equal(t, response.Bundles[0].Name, "bundle1")
-// 	os.RemoveAll(dataStore)
 //
 
 func TestListRolesAfterSavingBundle(t *testing.T) {
@@ -904,6 +851,9 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 			}},
 			expectedBundles: []expectedBundle{
 				{displayName: "test role - update", name: "TEST_ROLE"},
+				{displayName: "Guest", name: "guest"},
+				{displayName: "Admin", name: "admin"},
+				{displayName: "User", name: "user"},
 			},
 		},
 		{name: "two added bundles",
@@ -958,18 +908,18 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 			expectedBundles: []expectedBundle{
 				{displayName: "test role - update", name: "TEST_ROLE"},
 				{displayName: "an other role", name: "AnOtherROLE"},
+				{displayName: "Guest", name: "guest"},
+				{displayName: "Admin", name: "admin"},
+				{displayName: "User", name: "user"},
 			},
 		},
 	}
 
-	rebuidDataStore()
-	client := service.Client()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			roleService := proto.NewRoleService("com.owncloud.api.settings", client)
+			teardown := setup()
+			defer teardown()
 
-			bundleService := proto.NewBundleService("com.owncloud.api.settings", client)
 			for _, bundle := range tt.bundles {
 				_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
 					Bundle: bundle,
@@ -985,9 +935,37 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 					name:        bundle.Name,
 				})
 			}
-			assert.Equal(t, len(tt.expectedBundles), len(rolesRes.Bundles))
-
-			os.RemoveAll(dataStore)
+			assert.Equal(t, len(tt.expectedBundles) , len(rolesRes.Bundles))
 		})
 	}
+}
+
+func setFullReadWriteOnBundle(t *testing.T, accountID, bundleID string) {
+	permissionRequest := proto.AddSettingToBundleRequest{
+		BundleId: svc.BundleUUIDRoleAdmin,
+		Setting: &proto.Setting{
+			Name: "test-bundle-permission-readwrite",
+			Resource: &proto.Resource{
+				Type: proto.Resource_TYPE_BUNDLE,
+				Id:   bundleID,
+			},
+			Value: &proto.Setting_PermissionValue{
+				PermissionValue: &proto.Permission{
+					Operation:  proto.Permission_OPERATION_READWRITE,
+					Constraint: proto.Permission_CONSTRAINT_ALL,
+				},
+			},
+		},
+	}
+	addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
+	assert.NoError(t, err)
+	if err == nil {
+		assert.NotEmpty(t, addPermissionResponse.Setting)
+	}
+
+	_, err = roleService.AssignRoleToUser(
+		context.Background(),
+		&proto.AssignRoleToUserRequest{AccountUuid: accountID, RoleId: svc.BundleUUIDRoleAdmin},
+	)
+	assert.NoError(t, err)
 }

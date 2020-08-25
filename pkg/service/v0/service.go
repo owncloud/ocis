@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"fmt"
-
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/micro/go-micro/v2/metadata"
@@ -29,23 +28,27 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 		logger:  logger,
 		manager: store.New(cfg),
 	}
-	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server).
+	service.RegisterDefaultRoles()
+	return service
+}
+
+func (g Service) RegisterDefaultRoles() {
+	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
 		bundleID := role.Extension + "." + role.Id
 		// check if the role already exists
-		bundle, _ := service.manager.ReadBundle(role.Id)
+		bundle, _ := g.manager.ReadBundle(role.Id)
 		if bundle != nil {
-			logger.Debug().Msgf("Settings bundle %v already exists. Skipping.", bundleID)
+			g.logger.Debug().Str("bundleID", bundleID).Msg("bundle already exists. skipping.")
 			continue
 		}
 		// create the role
-		_, err := service.manager.WriteBundle(role)
+		_, err := g.manager.WriteBundle(role)
 		if err != nil {
-			logger.Error().Err(err).Msgf("Failed to register settings bundle %v", bundleID)
+			g.logger.Error().Err(err).Str("bundleID", bundleID).Msg("failed to register bundle")
 		}
-		logger.Debug().Msgf("Successfully registered settings bundle %v", bundleID)
+		g.logger.Debug().Str("bundleID", bundleID).Msg("successfully registered bundle")
 	}
-	return service
 }
 
 // TODO: check permissions on every request
