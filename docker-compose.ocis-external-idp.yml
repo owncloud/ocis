@@ -1,0 +1,35 @@
+---
+version: '3.5'
+
+services:
+  ocis:
+    container_name: ocis
+    image: owncloud/eos-ocis-dev:latest
+    tty: true
+    privileged: true
+    stdin_open: true
+    ports:
+      - 9200:9200
+    env_file:
+      - ./config/eos-docker.env
+    hostname: ocis
+    networks:
+      - testidpnet
+    volumes:
+      - .:/ocis
+      - ../ocis-reva:/ocis-reva
+      - ../reva:/reva
+    environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
+      PROXY_OIDC_ISSUER: https://konnectd:9300
+      PROXY_OIDC_INSECURE: "true"
+      GRAPH_OIDC_ENDPOINT: https://konnectd:9300
+      REVA_OIDC_ISSUER: https://konnectd:9300
+      REVA_LDAP_IDP: https://konnectd:9300
+      PHOENIX_OIDC_AUTHORITY: https://konnectd:9300
+      PHOENIX_OIDC_METADATA_URL: https://konnectd:9300/.well-known/openid-configuration
+      PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
+      OCIS_LOG_LEVEL: debug
+      REVA_TRANSFER_EXPIRES: 86400
+      REVA_FRONTEND_URL: https://${OCIS_DOMAIN:-localhost}:9200
+      REVA_DATAGATEWAY_URL: https://${OCIS_DOMAIN:-localhost}:9200/data

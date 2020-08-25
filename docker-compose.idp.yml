@@ -1,0 +1,48 @@
+---
+version: '3.5'
+
+networks:
+  testidpnet:
+    name: testidpnet
+
+services:
+  proxy:
+    container_name: proxy
+    image: owncloud/ocis-proxy:latest
+    ports:
+      - 9300:9200
+    networks:
+      - testidpnet
+    volumes:
+      - ./config/proxy-idp.json:/etc/ocis/proxy.json
+    environment:
+      OCIS_LOG_LEVEL: debug
+
+  konnectd:
+    container_name: konnectd
+    image: owncloud/ocis-konnectd:latest
+    networks:
+      - testidpnet
+    environment:
+      OCIS_LOG_LEVEL: debug
+      KONNECTD_ISS: https://konnectd:9300
+      KONNECTD_LOG_LEVEL: debug
+      KONNECTD_TLS: '0'
+      LDAP_URI: ldap://glauth:9125
+
+  glauth:
+    container_name: glauth
+    image: owncloud/ocis-glauth:latest
+    networks:
+      - testidpnet
+    environment:
+      GLAUTH_LOG_LEVEL: debug
+
+  accounts:
+    container_name: accounts
+    image: owncloud/ocis-accounts:latest
+    networks:
+      - testidpnet
+    environment:
+      ACCOUNTS_LOG_LEVEL: debug
+

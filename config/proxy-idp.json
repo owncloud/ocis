@@ -1,0 +1,21 @@
+{
+    "HTTP": {
+      "Namespace": "com.owncloud"
+    },
+    "policy_selector": {
+      "static": {
+        "policy": "idp"
+      }
+    },
+    "policies": [
+      {
+        "name": "idp",
+        "routes": [
+          {
+            "endpoint": "/",
+            "backend": "http://konnectd:9130"
+          }
+        ]
+      }
+    ]
+  }
