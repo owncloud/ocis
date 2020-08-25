@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
@@ -75,6 +76,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 	roleIDs := g.getRoleIDs(c, accountUUID)
 	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
 	if len(filteredBundle.Settings) == 0 {
+		err = fmt.Errorf("could not read bundle: %v", req.BundleId)
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
 	res.Bundle = filteredBundle
