@@ -227,14 +227,6 @@ def getEosSetup():
         'EOS_SET_MASTER': 1,
       },
       'volumes': [
-        {
-          'name': 'eosconfig',
-          'path': '/var/eos/config'
-        },
-        {
-          'name': 'eos-ns-queue',
-          'path': '/var/eos/ns-queue'
-        }
       ]
     },
     {
