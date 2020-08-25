@@ -163,7 +163,7 @@ var (
 const dataStore = "/var/tmp/ocis-settings"
 
 func init() {
-	os.MkdirAll(dataStore + "/assignments", 0755)
+	os.MkdirAll(dataStore+"/assignments", 0755)
 
 	service = grpc.NewService(
 		grpc.Namespace("com.owncloud.api"),
@@ -217,7 +217,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 		bundleName    string
 		displayName   string
 		extensionName string
-		UUID          string
+		accountUUID   string
 		expectedError error
 	}{
 		{
@@ -293,7 +293,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 			merrors.New("ocis-settings", "display_name: cannot be blank.", 400),
 		},
 		{
-			"UUID missing (omitted on bundles)",
+			"accountUUID missing (omitted on bundles)",
 			"bundle-name",
 			"simple-display-name",
 			"simple-extension-name",
@@ -310,7 +310,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 				DisplayName: scenario.displayName,
 				Type:        proto.Bundle_TYPE_DEFAULT,
 				Resource: &proto.Resource{
-					Type: proto.Resource_TYPE_BUNDLE,
+					Type: proto.Resource_TYPE_SYSTEM,
 				},
 				Settings: settingsStub,
 			}
@@ -330,15 +330,15 @@ func TestSettingsBundleProperties(t *testing.T) {
 					{
 						BundleId: svc.BundleUUIDRoleAdmin,
 						Setting: &proto.Setting{
-							Id:          "c9999635-7bdb-42f4-9bdc-3fcb06513dd4",
-							Name:        "test-setting-update",
+							Id:   "c9999635-7bdb-42f4-9bdc-3fcb06513dd4",
+							Name: "test-setting-readwrite",
 							Resource: &proto.Resource{
 								Type: proto.Resource_TYPE_SETTING,
 								Id:   "123e4567-e89b-12d3-a456-426652340000",
 							},
 							Value: &proto.Setting_PermissionValue{
 								PermissionValue: &proto.Permission{
-									Operation:  proto.Permission_OPERATION_UPDATE,
+									Operation:  proto.Permission_OPERATION_READWRITE,
 									Constraint: proto.Permission_CONSTRAINT_OWN,
 								},
 							},
@@ -349,7 +349,9 @@ func TestSettingsBundleProperties(t *testing.T) {
 				for i := range permissionRequests {
 					addSettingsRes, err := cl.AddSettingToBundle(context.Background(), &permissionRequests[i])
 					assert.NoError(t, err)
-					assert.NotEmpty(t, addSettingsRes.Setting)
+					if err == nil {
+						assert.NotEmpty(t, addSettingsRes.Setting)
+					}
 				}
 
 				roleService := proto.NewRoleService("com.owncloud.api.settings", client)
@@ -363,11 +365,12 @@ func TestSettingsBundleProperties(t *testing.T) {
 
 				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
 
-
 				ctx := context.WithValue(context.TODO(),middleware.UUIDKey, "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26")
 				getResponse, err := cl.GetBundle(ctx, &getRequest)
 				assert.NoError(t, err)
-				assert.Equal(t, scenario.displayName, getResponse.Bundle.DisplayName)
+				if err == nil {
+					assert.Equal(t, scenario.displayName, getResponse.Bundle.DisplayName)
+				}
 			}
 			os.RemoveAll(dataStore)
 		})
