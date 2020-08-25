@@ -501,9 +501,6 @@ apiTrashbin/trashbinFilesFolders.feature:241
 apiTrashbin/trashbinFilesFolders.feature:242
 apiTrashbin/trashbinFilesFolders.feature:255
 apiTrashbin/trashbinFilesFolders.feature:256
-apiTrashbin/trashbinFilesFolders.feature:270
-apiTrashbin/trashbinFilesFolders.feature:271
-apiTrashbin/trashbinFilesFolders.feature:272
 apiTrashbin/trashbinFilesFolders.feature:273
 apiTrashbin/trashbinFilesFolders.feature:274
 apiTrashbin/trashbinFilesFolders.feature:275
