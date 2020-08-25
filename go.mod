@@ -22,7 +22,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.2.2-0.20200812103920-db41b5a3d14d
+	github.com/owncloud/ocis-pkg/v2 v2.4.0
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.6.1

@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -324,7 +325,7 @@ func cleanUpResource(c context.Context, resource *proto.Resource) {
 // the result of this function will always be a valid lower-case UUID or an empty string.
 func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 	if accountUUID == "me" {
-		if ownAccountUUID, ok := c.Value(middleware.UUIDKey).(string); ok {
+		if ownAccountUUID, ok := metadata.Get(c, middleware.AccountID); ok {
 			accountUUID = ownAccountUUID
 		}
 	}

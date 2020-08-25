@@ -3,16 +3,16 @@ package proto_test
 import (
 	"context"
 	"encoding/json"
-	fmt "fmt"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"fmt"
 	"log"
 	"os"
 	"testing"
 
-	merrors "github.com/micro/go-micro/v2/errors"
-
 	mgrpc "github.com/micro/go-micro/v2/client/grpc"
+	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/micro/go-micro/v2/metadata"
 	ocislog "github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
@@ -365,7 +365,7 @@ func TestSettingsBundleProperties(t *testing.T) {
 
 				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
 
-				ctx := context.WithValue(context.TODO(),middleware.UUIDKey, "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26")
+				ctx := metadata.Set(context.Background(), middleware.AccountID, "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26")
 				getResponse, err := cl.GetBundle(ctx, &getRequest)
 				assert.NoError(t, err)
 				if err == nil {
