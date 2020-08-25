@@ -32,6 +32,7 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 	return service
 }
 
+// RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
 func (g Service) RegisterDefaultRoles() {
 	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
