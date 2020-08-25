@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.3.0...master
+
+## Summary
+
+* Change - Use go-micro's metadata context for account id: [#56](https://github.com/owncloud/ocis-pkg/pull/56)
+
+## Details
+
+* Change - Use go-micro's metadata context for account id: [#56](https://github.com/owncloud/ocis-pkg/pull/56)
+
+   We switched to using go-micro's metadata context for reliably passing the AccountID in the
+   context across service boundaries.
+
+   https://github.com/owncloud/ocis-pkg/pull/56
+
 # Changelog for [2.3.0] (2020-08-17)
 
 The following sections list the changes in ocis-pkg 2.3.0.
