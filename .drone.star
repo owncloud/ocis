@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '3f127eaf24ed539fd9effbc82db9b57df38e3157',
+    'coreCommit': 'd65b8b5eefa0a59c8e9487196807d50588db698c',
     'numberOfParts': 2
   }
 }
@@ -119,7 +119,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART':  part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
