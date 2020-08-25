@@ -20,5 +20,8 @@ require (
 	github.com/spf13/viper v1.6.1
 	go.opencensus.io v0.22.4
 	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2
+	google.golang.org/grpc/examples v0.0.0-20200824180931-410880dd7d91 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
