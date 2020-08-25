@@ -56,6 +56,13 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	o.logger.Debug().Interface("account", account).Msg("got user")
 
+	// mimic the oc10 bool as string for the user enabled property
+	var enabled string
+	if account.AccountEnabled {
+		enabled = "true"
+	} else {
+		enabled = "false"
+	}
 	render.Render(w, r, response.DataRender(&data.User{
 		UserID:      account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
 		Username:    account.PreferredName,
@@ -63,8 +70,8 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		Email:       account.Mail,
 		UIDNumber:   account.UidNumber,
 		GIDNumber:   account.GidNumber,
-		Enabled:     account.AccountEnabled,
-		// FIXME only return quota for users/{userid} endpoint (not /user)
+		Enabled:     enabled,
+		// FIXME onlyfor users/{userid} endpoint (not /user)
 		// TODO query storage registry for free space? of home storage, maybe...
 		Quota: &data.Quota{
 			Free:       2840756224000,
@@ -160,6 +167,13 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	o.logger.Debug().Interface("account", account).Msg("added user")
 
+	// mimic the oc10 bool as string for the user enabled property
+	var enabled string
+	if account.AccountEnabled {
+		enabled = "true"
+	} else {
+		enabled = "false"
+	}
 	render.Render(w, r, response.DataRender(&data.User{
 		UserID:      account.Id,
 		Username:    account.PreferredName,
@@ -167,7 +181,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		Email:       account.Mail,
 		UIDNumber:   account.UidNumber,
 		GIDNumber:   account.UidNumber,
-		Enabled:     account.AccountEnabled,
+		Enabled:     enabled,
 	}))
 }
 
