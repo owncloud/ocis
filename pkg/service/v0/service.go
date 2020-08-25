@@ -328,6 +328,10 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 			accountUUID = ownAccountUUID
 		}
 	}
+	if accountUUID == "me" {
+		// no matter what happens above, an accountUUID of `me` must not be passed on. Clear it instead.
+		accountUUID = ""
+	}
 	return accountUUID
 }
 

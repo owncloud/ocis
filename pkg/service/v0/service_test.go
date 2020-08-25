@@ -26,8 +26,14 @@ var (
 			expect:      ctxWithUUID.Value(middleware.UUIDKey).(string),
 		},
 		{
-			name:        "context without UUID; identifier = 'me'",
+			name:        "context with empty UUID; identifier = 'me'",
 			ctx:         ctxWithEmptyUUID,
+			accountUUID: "me",
+			expect:      "",
+		},
+		{
+			name:        "context without UUID; identifier = 'me'",
+			ctx:         emptyCtx,
 			accountUUID: "me",
 			expect:      "",
 		},
