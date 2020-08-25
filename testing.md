@@ -19,50 +19,15 @@ All you need to do to get the acceptance tests is check out the core repo:
 git clone https://github.com/owncloud/core.git
 ```
 
-### Run a ldap server in a docker container
-
-The ownCloud 10 acceptance tests will need write permission. You can start a suitable ldap server in a docker container with:
-
-```
-docker run --hostname ldap.my-company.com \
-    -e LDAP_TLS_VERIFY_CLIENT=never \
-    -e LDAP_DOMAIN=owncloud.com \
-    -e LDAP_ORGANISATION=ownCloud \
-    -e LDAP_ADMIN_PASSWORD=admin \
-    --name docker-slapd \
-    -p 127.0.0.1:389:389 \
-    -p 636:636 -d osixia/openldap
-```
 ### Run a redis server in a docker container
 
 File versions need a redis server. Start one with docker by using:
 
 `docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
 
-### Run ocis with that ldap server
+### Run ocis
 
-`ocis` provides multiple subcommands. To configure them all via env vars you can export these environment variables.
-
-```
-export REVA_USERS_DRIVER=ldap
-export REVA_LDAP_HOSTNAME=localhost
-export REVA_LDAP_PORT=636
-export REVA_LDAP_BASE_DN='dc=owncloud,dc=com'
-export REVA_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
-export REVA_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
-export REVA_LDAP_BIND_DN='cn=admin,dc=owncloud,dc=com'
-export REVA_LDAP_BIND_PASSWORD=admin
-export REVA_LDAP_SCHEMA_UID=uid
-export REVA_LDAP_SCHEMA_MAIL=mail
-export REVA_LDAP_SCHEMA_DISPLAYNAME=displayName
-export REVA_LDAP_SCHEMA_CN=cn
-export LDAP_URI=ldap://localhost
-export LDAP_BINDDN='cn=admin,dc=owncloud,dc=com'
-export LDAP_BINDPW=admin
-export LDAP_BASEDN='dc=owncloud,dc=com'
-```
-
-Then you need to start ocis
+To start ocis:
 ```
 bin/ocis server
 ```
@@ -78,8 +43,7 @@ git clone https://github.com/owncloud/testing apps/testing
 Then run the api acceptance tests with the  following command:
 ```
 make test-acceptance-api \
-TEST_SERVER_URL=http://localhost:9140 \
-TEST_EXTERNAL_USER_BACKENDS=true \
+TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
@@ -122,8 +86,7 @@ If you want to work on a specific issue
     E.g.:
     ```
     make test-acceptance-api \
-    TEST_SERVER_URL=http://localhost:9140 \
-    TEST_EXTERNAL_USER_BACKENDS=true \
+    TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
     OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
