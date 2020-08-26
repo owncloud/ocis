@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-settings unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-settings/compare/v0.3.0...master
+
+## Summary
+
+* Bugfix - Fix fetching bundles in settings UI: [#61](https://github.com/owncloud/ocis-settings/pull/61)
+
+## Details
+
+* Bugfix - Fix fetching bundles in settings UI: [#61](https://github.com/owncloud/ocis-settings/pull/61)
+
+   We fixed the settings UI to use the changed API endpoint `BundleService.ListBundles`
+   properly.
+
+   https://github.com/owncloud/ocis-settings/pull/61
+
 # Changelog for [0.3.0] (2020-08-26)
 
 The following sections list the changes in ocis-settings 0.3.0.
