@@ -579,6 +579,13 @@ func NewPermissionServiceEndpoints() []*api.Endpoint {
 			Body:    "*",
 			Handler: "rpc",
 		},
+		&api.Endpoint{
+			Name:    "PermissionService.GetPermissionById",
+			Path:    []string{"/api/v0/settings/permissions-get-by-id"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
 	}
 }
 
@@ -586,6 +593,7 @@ func NewPermissionServiceEndpoints() []*api.Endpoint {
 
 type PermissionService interface {
 	ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, opts ...client.CallOption) (*ListPermissionsByResourceResponse, error)
+	GetPermissionById(ctx context.Context, in *GetPermissionByIdRequest, opts ...client.CallOption) (*GetPermissionByIdResponse, error)
 }
 
 type permissionService struct {
@@ -610,15 +618,27 @@ func (c *permissionService) ListPermissionsByResource(ctx context.Context, in *L
 	return out, nil
 }
 
+func (c *permissionService) GetPermissionById(ctx context.Context, in *GetPermissionByIdRequest, opts ...client.CallOption) (*GetPermissionByIdResponse, error) {
+	req := c.c.NewRequest(c.name, "PermissionService.GetPermissionById", in)
+	out := new(GetPermissionByIdResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for PermissionService service
 
 type PermissionServiceHandler interface {
 	ListPermissionsByResource(context.Context, *ListPermissionsByResourceRequest, *ListPermissionsByResourceResponse) error
+	GetPermissionById(context.Context, *GetPermissionByIdRequest, *GetPermissionByIdResponse) error
 }
 
 func RegisterPermissionServiceHandler(s server.Server, hdlr PermissionServiceHandler, opts ...server.HandlerOption) error {
 	type permissionService interface {
 		ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, out *ListPermissionsByResourceResponse) error
+		GetPermissionById(ctx context.Context, in *GetPermissionByIdRequest, out *GetPermissionByIdResponse) error
 	}
 	type PermissionService struct {
 		permissionService
@@ -627,6 +647,13 @@ func RegisterPermissionServiceHandler(s server.Server, hdlr PermissionServiceHan
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "PermissionService.ListPermissionsByResource",
 		Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "PermissionService.GetPermissionById",
+		Path:    []string{"/api/v0/settings/permissions-get-by-id"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -640,4 +667,8 @@ type permissionServiceHandler struct {
 
 func (h *permissionServiceHandler) ListPermissionsByResource(ctx context.Context, in *ListPermissionsByResourceRequest, out *ListPermissionsByResourceResponse) error {
 	return h.PermissionServiceHandler.ListPermissionsByResource(ctx, in, out)
+}
+
+func (h *permissionServiceHandler) GetPermissionById(ctx context.Context, in *GetPermissionByIdRequest, out *GetPermissionByIdResponse) error {
+	return h.PermissionServiceHandler.GetPermissionById(ctx, in, out)
 }

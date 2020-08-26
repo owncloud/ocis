@@ -280,6 +280,38 @@
         ]
       }
     },
+    "/api/v0/settings/permissions-get-by-id": {
+      "post": {
+        "operationId": "PermissionService_GetPermissionById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIdRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
     "/api/v0/settings/permissions-list-by-resource": {
       "post": {
         "operationId": "PermissionService_ListPermissionsByResource",
@@ -586,6 +618,28 @@
       "properties": {
         "bundle": {
           "$ref": "#/definitions/protoBundle"
+        }
+      }
+    },
+    "protoGetPermissionByIdRequest": {
+      "type": "object",
+      "properties": {
+        "permission_id": {
+          "type": "string"
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "protoGetPermissionByIdResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/definitions/protoPermission"
         }
       }
     },

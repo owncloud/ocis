@@ -49,4 +49,5 @@ type RoleAssignmentManager interface {
 // PermissionManager is a permissions service interface for abstraction of storage implementations
 type PermissionManager interface {
 	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
+	ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error)
 }
