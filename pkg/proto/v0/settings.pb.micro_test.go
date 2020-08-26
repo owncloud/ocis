@@ -1017,7 +1017,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READWRITE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1034,7 +1034,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READ,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 			},
@@ -1060,7 +1060,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_WRITE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1077,7 +1077,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_DELETE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1094,7 +1094,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_UPDATE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1111,7 +1111,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_CREATE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1128,7 +1128,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_UNKNOWN,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1145,7 +1145,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READ,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 			},
@@ -1170,7 +1170,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READWRITE,
-						roleUUID: svc.BundleUUIDRoleAdmin,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
 					},
 				},
 				{
@@ -1187,7 +1187,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READ,
-						roleUUID: svc.BundleUUIDRoleGuest,
+						roleUUID:   svc.BundleUUIDRoleGuest,
 					},
 				},
 				{
@@ -1204,7 +1204,7 @@ func TestListFilteredBundle(t *testing.T) {
 					},
 					permission: permission{
 						permission: proto.Permission_OPERATION_READ,
-						roleUUID: svc.BundleUUIDRoleUser,
+						roleUUID:   svc.BundleUUIDRoleUser,
 					},
 				},
 			},
@@ -1263,6 +1263,328 @@ func TestListFilteredBundle(t *testing.T) {
 				})
 			}
 			assert.Equal(t, len(tt.expectedBundles), len(listRes.Bundles))
+		})
+	}
+}
+
+func TestListGetBundleSettingMixedPermission(t *testing.T) {
+	type expectedSetting struct {
+		displayName string
+		name        string
+	}
+
+	type permission struct {
+		permission proto.Permission_Operation
+		roleUUID   string
+	}
+
+	type settingsForTest struct {
+		setting    *proto.Setting
+		permission permission
+	}
+
+	tests := []struct {
+		name             string
+		settings         []settingsForTest
+		expectedSettings []expectedSetting
+	}{
+		{
+			name: "all settings have R/RW permissions",
+			settings: []settingsForTest{
+				{
+					setting: &proto.Setting{
+						Id:          "b86fdb0a-801f-4749-ab84-5c99e90dbd6d",
+						DisplayName: "RW setting",
+						Name:        "RW-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "RW setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "cb1bbe58-27e7-461b-91b1-a9c85c488789",
+						DisplayName: "RO setting",
+						Name:        "RO-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "RO setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+			},
+			expectedSettings: []expectedSetting{
+				{displayName: "RW setting", name: "RW-setting"},
+				{displayName: "RO setting", name: "RO-setting"},
+			},
+		},
+		{
+			name: "all settings have R/RW permissions but only one the matching user",
+			settings: []settingsForTest{
+				{
+					setting: &proto.Setting{
+						Id:          "b86fdb0a-801f-4749-ab84-5c99e90dbd6d",
+						DisplayName: "matching user",
+						Name:        "matching-user",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "matching user",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "cb1bbe58-27e7-461b-91b1-a9c85c488789",
+						DisplayName: "NOT matching user",
+						Name:        "NOT-matching-user",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "NOT matching user",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID:   svc.BundleUUIDRoleGuest,
+					},
+				},
+			},
+			expectedSettings: []expectedSetting{
+				{displayName: "matching user", name: "matching-user"},
+			},
+		},
+		{
+			name: "only one settings has READ permissions",
+			settings: []settingsForTest{
+				{
+					setting: &proto.Setting{
+						Id:          "b86fdb0a-801f-4749-ab84-5c99e90dbd6d",
+						DisplayName: "WRITE setting",
+						Name:        "WRITE-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "WRITE setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_WRITE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "6163c6bf-79f2-43f7-b0ba-1493534bfc10",
+						DisplayName: "UNKNOWN setting",
+						Name:        "UNKNOWN-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "UNKNOWN setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_UNKNOWN,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "79eda727-9fa1-459f-aaff-f73ed5693419",
+						DisplayName: "CREATE setting",
+						Name:        "CREATE-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "CREATE setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_CREATE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "2be7ca51-89fb-4968-b9d2-0ac43197adff",
+						DisplayName: "UPDATE setting",
+						Name:        "UPDATE-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "UPDATE setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_UPDATE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "f1a0005e-e570-4bd8-a18c-b4afaaa8d7d9",
+						DisplayName: "DELETE setting",
+						Name:        "DELETE-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "DELETE setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_DELETE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					setting: &proto.Setting{
+						Id:          "cb1bbe58-27e7-461b-91b1-a9c85c488789",
+						DisplayName: "RO setting",
+						Name:        "RO-setting",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_USER,
+						},
+						Value: &proto.Setting_IntValue{
+							IntValue: &proto.Int{
+								Default: 42,
+							},
+						},
+						Description: "RO setting",
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID:   svc.BundleUUIDRoleAdmin,
+					},
+				},
+			},
+			expectedSettings: []expectedSetting{
+				{displayName: "RO setting", name: "RO-setting"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			// create bundle with the defined settings
+			bundle := &bundleStub
+			var settings []*proto.Setting
+
+			for _, testSetting := range tt.settings {
+				settings = append(settings, testSetting.setting)
+			}
+			bundle.Settings = settings
+
+			_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+				Bundle: bundle,
+			})
+			assert.NoError(t, err)
+
+			// set permissions for each setting
+			for _, testSetting := range tt.settings {
+				permissionRequest := proto.AddSettingToBundleRequest{
+					BundleId: testSetting.permission.roleUUID,
+					Setting: &proto.Setting{
+						Name: "permission",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SETTING,
+							Id:   testSetting.setting.Id,
+						},
+						Value: &proto.Setting_PermissionValue{
+							PermissionValue: &proto.Permission{
+								Operation:  testSetting.permission.permission,
+								Constraint: proto.Permission_CONSTRAINT_OWN,
+							},
+						},
+					},
+				}
+				addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
+				assert.NoError(t, err)
+				if err == nil {
+					assert.NotEmpty(t, addPermissionResponse.Setting)
+				}
+			}
+			_, err = roleService.AssignRoleToUser(
+				context.Background(),
+				&proto.AssignRoleToUserRequest{AccountUuid: testAccountID, RoleId: svc.BundleUUIDRoleAdmin},
+			)
+			assert.NoError(t, err)
+
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
+			assert.NoError(t, err)
+
+			for _, setting := range listRes.Bundles[0].Settings {
+				assert.Contains(t, tt.expectedSettings, expectedSetting{
+					displayName: setting.DisplayName,
+					name:        setting.Name,
+				})
+			}
+			assert.Equal(t, len(tt.expectedSettings), len(listRes.Bundles[0].Settings))
+
+			getRes, err := bundleService.GetBundle(ctx, &proto.GetBundleRequest{BundleId: bundle.Id})
+			assert.NoError(t, err)
+
+			for _, setting := range getRes.Bundle.Settings {
+				assert.Contains(t, tt.expectedSettings, expectedSetting{
+					displayName: setting.DisplayName,
+					name:        setting.Name,
+				})
+			}
+			assert.Equal(t, len(tt.expectedSettings), len(getRes.Bundle.Settings))
 		})
 	}
 }
