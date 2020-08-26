@@ -21,11 +21,11 @@ import (
 )
 
 var (
-	service grpc.Service
-	handler svc.Service
-	bundleService proto.BundleService
-	valueService proto.ValueService
-	roleService proto.RoleService
+	service           grpc.Service
+	handler           svc.Service
+	bundleService     proto.BundleService
+	valueService      proto.ValueService
+	roleService       proto.RoleService
 	permissionService proto.PermissionService
 
 	testAccountID = "e8a7f56b-10ce-4f67-b67f-eca40aa0ef26"
@@ -935,7 +935,7 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 					name:        bundle.Name,
 				})
 			}
-			assert.Equal(t, len(tt.expectedBundles) , len(rolesRes.Bundles))
+			assert.Equal(t, len(tt.expectedBundles), len(rolesRes.Bundles))
 		})
 	}
 }
