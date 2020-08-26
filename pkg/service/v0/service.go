@@ -2,9 +2,11 @@ package svc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-settings/pkg/config"
@@ -27,23 +29,28 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 		logger:  logger,
 		manager: store.New(cfg),
 	}
-	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server).
+	service.RegisterDefaultRoles()
+	return service
+}
+
+// RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
+func (g Service) RegisterDefaultRoles() {
+	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
 		bundleID := role.Extension + "." + role.Id
 		// check if the role already exists
-		bundle, _ := service.manager.ReadBundle(role.Id)
+		bundle, _ := g.manager.ReadBundle(role.Id)
 		if bundle != nil {
-			logger.Debug().Msgf("Settings bundle %v already exists. Skipping.", bundleID)
+			g.logger.Debug().Str("bundleID", bundleID).Msg("bundle already exists. skipping.")
 			continue
 		}
 		// create the role
-		_, err := service.manager.WriteBundle(role)
+		_, err := g.manager.WriteBundle(role)
 		if err != nil {
-			logger.Error().Err(err).Msgf("Failed to register settings bundle %v", bundleID)
+			g.logger.Error().Err(err).Str("bundleID", bundleID).Msg("failed to register bundle")
 		}
-		logger.Debug().Msgf("Successfully registered settings bundle %v", bundleID)
+		g.logger.Debug().Str("bundleID", bundleID).Msg("successfully registered bundle")
 	}
-	return service
 }
 
 // TODO: check permissions on every request
@@ -64,21 +71,28 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 
 // GetBundle implements the BundleServiceHandler interface
 func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
+	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
-	r, err := g.manager.ReadBundle(req.BundleId)
+	bundle, err := g.manager.ReadBundle(req.BundleId)
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	res.Bundle = r
+	roleIDs := g.getRoleIDs(c, accountUUID)
+	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
+	if len(filteredBundle.Settings) == 0 {
+		err = fmt.Errorf("could not read bundle: %s", req.BundleId)
+		return merrors.NotFound("ocis-settings", "%s", err)
+	}
+	res.Bundle = filteredBundle
 	return nil
 }
 
 // ListBundles implements the BundleServiceHandler interface
 func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	// fetch all bundles
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
@@ -86,8 +100,54 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
-	res.Bundles = bundles
+	roleIDs := g.getRoleIDs(c, accountUUID)
+
+	// filter settings in bundles that are allowed according to roles
+	var filteredBundles []*proto.Bundle
+	for _, bundle := range bundles {
+		filteredBundle := g.getFilteredBundle(roleIDs, bundle)
+		if len(filteredBundle.Settings) > 0 {
+			filteredBundles = append(filteredBundles, filteredBundle)
+		}
+	}
+
+	res.Bundles = filteredBundles
 	return nil
+}
+
+func (g Service) getFilteredBundle(roleIDs []string, bundle *proto.Bundle) *proto.Bundle {
+	// check if full bundle is whitelisted
+	bundleResource := &proto.Resource{
+		Type: proto.Resource_TYPE_BUNDLE,
+		Id:   bundle.Id,
+	}
+	if g.hasPermission(
+		roleIDs,
+		bundleResource,
+		[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
+		proto.Permission_CONSTRAINT_OWN,
+	) {
+		return bundle
+	}
+
+	// filter settings based on permissions
+	var filteredSettings []*proto.Setting
+	for _, setting := range bundle.Settings {
+		settingResource := &proto.Resource{
+			Type: proto.Resource_TYPE_SETTING,
+			Id:   setting.Id,
+		}
+		if g.hasPermission(
+			roleIDs,
+			settingResource,
+			[]proto.Permission_Operation{proto.Permission_OPERATION_READ, proto.Permission_OPERATION_READWRITE},
+			proto.Permission_CONSTRAINT_OWN,
+		) {
+			filteredSettings = append(filteredSettings, setting)
+		}
+	}
+	bundle.Settings = filteredSettings
+	return bundle
 }
 
 // AddSettingToBundle implements the BundleServiceHandler interface
@@ -194,7 +254,7 @@ func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res
 
 // ListRoles implements the RoleServiceHandler interface
 func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+	//accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListRoles(req); validationError != nil {
 		return merrors.BadRequest("ocis-settings", "%s", validationError)
 	}
@@ -202,6 +262,7 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 	if err != nil {
 		return merrors.NotFound("ocis-settings", "%s", err)
 	}
+	// TODO: only allow to list roles when user has account management permissions
 	res.Bundles = r
 	return nil
 }
@@ -245,6 +306,19 @@ func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFrom
 	return nil
 }
 
+// ListPermissionsByResource implements the PermissionServiceHandler interface
+func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPermissionsByResourceRequest, res *proto.ListPermissionsByResourceResponse) error {
+	if validationError := validateListPermissionsByResource(req); validationError != nil {
+		return merrors.BadRequest("ocis-settings", "%s", validationError)
+	}
+	permissions, err := g.manager.ListPermissionsByResource(req.Resource, req.RoleIds)
+	if err != nil {
+		return merrors.BadRequest("ocis-settings", "%s", err)
+	}
+	res.Permissions = permissions
+	return nil
+}
+
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.
 func cleanUpResource(c context.Context, resource *proto.Resource) {
 	if resource != nil && resource.Type == proto.Resource_TYPE_USER {
@@ -256,11 +330,33 @@ func cleanUpResource(c context.Context, resource *proto.Resource) {
 // the result of this function will always be a valid lower-case UUID or an empty string.
 func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 	if accountUUID == "me" {
-		if ownAccountUUID, ok := c.Value(middleware.UUIDKey).(string); ok {
+		if ownAccountUUID, ok := metadata.Get(c, middleware.AccountID); ok {
 			accountUUID = ownAccountUUID
 		}
 	}
+	if accountUUID == "me" {
+		// no matter what happens above, an accountUUID of `me` must not be passed on. Clear it instead.
+		accountUUID = ""
+	}
 	return accountUUID
+}
+
+// getRoleIDs loads the role assignments for the given accountUUID
+// TODO: this should work on the context in the future, as roles are supposed to be sent within the context.
+func (g Service) getRoleIDs(c context.Context, accountUUID string) []string {
+	// TODO: replace this with role ids from the context
+	// WIP PR: https://github.com/owncloud/ocis-proxy/pull/70
+	rolesResponse := &proto.ListRoleAssignmentsResponse{}
+	err := g.ListRoleAssignments(c, &proto.ListRoleAssignmentsRequest{AccountUuid: accountUUID}, rolesResponse)
+	if err != nil {
+		g.logger.Err(err).Str("accountUUID", accountUUID).Msg("failed to list role assignments")
+		return []string{}
+	}
+	roleIDs := make([]string, 0)
+	for _, assignment := range rolesResponse.Assignments {
+		roleIDs = append(roleIDs, assignment.RoleId)
+	}
+	return roleIDs
 }
 
 func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIdentifier, error) {

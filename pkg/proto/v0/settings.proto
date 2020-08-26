@@ -118,6 +118,15 @@ service RoleService {
   }
 }
 
+service PermissionService {
+  rpc ListPermissionsByResource(ListPermissionsByResourceRequest) returns (ListPermissionsByResourceResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/permissions-list-by-resource",
+      body: "*"
+    };
+  }
+}
+
 // ---
 // requests and responses for settings bundles
 // ---
@@ -138,7 +147,6 @@ message GetBundleResponse {
 }
 
 message ListBundlesRequest {
-  string account_uuid = 1;
 }
 
 message ListBundlesResponse {
@@ -238,6 +246,19 @@ message UserRoleAssignment {
   string role_id = 3;
 }
 
+// --
+// requests and responses for permissions
+// ---
+
+message ListPermissionsByResourceRequest {
+  Resource resource = 1;
+  repeated string role_ids = 2;
+}
+
+message ListPermissionsByResourceResponse {
+  repeated Permission permissions = 1;
+}
+
 // ---
 // resource payloads
 // ---
@@ -334,6 +355,8 @@ message Permission {
     OPERATION_READ = 2;
     OPERATION_UPDATE = 3;
     OPERATION_DELETE = 4;
+    OPERATION_WRITE = 5;// WRITE is a combination of CREATE and UPDATE
+    OPERATION_READWRITE = 6;// READWRITE is a combination of READ and WRITE
   }
   Operation operation = 1;
   enum Constraint {

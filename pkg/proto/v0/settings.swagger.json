@@ -280,6 +280,38 @@
         ]
       }
     },
+    "/api/v0/settings/permissions-list-by-resource": {
+      "post": {
+        "operationId": "PermissionService_ListPermissionsByResource",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListPermissionsByResourceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListPermissionsByResourceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
     "/api/v0/settings/roles-list": {
       "post": {
         "operationId": "RoleService_ListRoles",
@@ -623,12 +655,7 @@
       }
     },
     "protoListBundlesRequest": {
-      "type": "object",
-      "properties": {
-        "account_uuid": {
-          "type": "string"
-        }
-      }
+      "type": "object"
     },
     "protoListBundlesResponse": {
       "type": "object",
@@ -665,6 +692,31 @@
         "int_value": {
           "type": "string",
           "format": "int64"
+        }
+      }
+    },
+    "protoListPermissionsByResourceRequest": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "protoListPermissionsByResourceResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoPermission"
+          }
         }
       }
     },
@@ -749,7 +801,9 @@
         "OPERATION_CREATE",
         "OPERATION_READ",
         "OPERATION_UPDATE",
-        "OPERATION_DELETE"
+        "OPERATION_DELETE",
+        "OPERATION_WRITE",
+        "OPERATION_READWRITE"
       ],
       "default": "OPERATION_UNKNOWN"
     },

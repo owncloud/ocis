@@ -73,7 +73,7 @@ func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
 			}
 		}
 	}
-	return nil, fmt.Errorf(settingID, fmt.Sprintf("could not read setting: %v", settingID))
+	return nil, fmt.Errorf("could not read setting: %v", settingID)
 }
 
 // WriteBundle writes the given record into a file within the dataPath.

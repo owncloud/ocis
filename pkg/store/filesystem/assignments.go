@@ -16,7 +16,6 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*proto.UserRoleAssignm
 	assignmentsFolder := s.buildFolderPathForRoleAssignments(false)
 	assignmentFiles, err := ioutil.ReadDir(assignmentsFolder)
 	if err != nil {
-		s.Logger.Error().Err(err).Str("assignmentFiles", assignmentsFolder).Msg("error reading assignment file")
 		return records, nil
 	}
 
@@ -35,7 +34,7 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*proto.UserRoleAssignm
 
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s Store) WriteRoleAssignment(accountUUID, roleID string) (*proto.UserRoleAssignment, error) {
-	// as per https://jira.owncloud.com/browse/OCIS-117 "Each user can have exactly one role"
+	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
 	list, err := s.ListRoleAssignments(accountUUID)
 	if err != nil {
 		return nil, err
