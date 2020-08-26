@@ -4,6 +4,7 @@ import (
 	context "context"
 	"errors"
 	"fmt"
+	"github.com/micro/go-micro/v2/client"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
@@ -167,6 +168,8 @@ func init() {
 	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg)); err != nil {
 		log.Fatalf("Could not create new service")
 	}
+
+	hdlr.Client = mockClient{}
 
 	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
 	if err != nil {
@@ -488,7 +491,7 @@ func TestUpdateAccount(t *testing.T) {
 				GidNumber:                   1000,
 				// No email validation
 				// https://github.com/owncloud/ocis-accounts/issues/77
-				Mail:                        "1.2@3.c_@",
+				Mail: "1.2@3.c_@",
 			},
 		},
 	}
@@ -1168,4 +1171,38 @@ func TestAccountUpdateReadOnlyField(t *testing.T) {
 	}
 
 	cleanUp(t)
+}
+
+type mockClient struct{}
+
+func (c mockClient) Init(option ...client.Option) error {
+	return nil
+}
+
+func (c mockClient) Options() client.Options {
+	return client.Options{}
+}
+
+func (c mockClient) NewMessage(topic string, msg interface{}, opts ...client.MessageOption) client.Message {
+	return nil
+}
+
+func (c mockClient) NewRequest(service, endpoint string, req interface{}, reqOpts ...client.RequestOption) client.Request {
+	return nil
+}
+
+func (c mockClient) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
+	return nil
+}
+
+func (c mockClient) Stream(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
+	return nil, nil
+}
+
+func (c mockClient) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
+	return nil
+}
+
+func (c mockClient) String() string {
+	return "ClientMock"
 }

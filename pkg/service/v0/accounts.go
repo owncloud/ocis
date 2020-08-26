@@ -19,7 +19,6 @@ import (
 	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
-	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-accounts/pkg/provider"
@@ -324,7 +323,7 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 	}
 
 	// TODO: All users for now as create Account request does not have any role field
-	rs := settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
+	rs := settings.NewRoleService("com.owncloud.api.settings", s.Client)
 	_, err = rs.AssignRoleToUser(c, &settings.AssignRoleToUserRequest{
 		AccountUuid: acc.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	mclient "github.com/micro/go-micro/v2/client"
+	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -287,6 +289,7 @@ func New(opts ...Option) (s *Service, err error) {
 		id:     cfg.GRPC.Namespace + "." + cfg.Server.Name,
 		log:    logger,
 		Config: cfg,
+		Client: mgrpc.NewClient(),
 	}
 
 	indexDir := filepath.Join(cfg.Server.AccountsDataPath, "index.bleve")
@@ -315,6 +318,7 @@ type Service struct {
 	log    log.Logger
 	Config *config.Config
 	index  bleve.Index
+	Client mclient.Client
 }
 
 func cleanupID(id string) (string, error) {
