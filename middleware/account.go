@@ -22,6 +22,8 @@ func newAccountOptions(opts ...account.Option) account.Options {
 
 // AccountID serves as key for the account uuid in the context
 const AccountID string = "Account-Id"
+// RoleIDs serves as key for the roles in the context
+const RoleIDs string = "Role-Ids"
 // UUIDKey serves as key for the account uuid in the context
 // Deprecated: UUIDKey exists for compatibility reasons. Use AccountID instead.
 var UUIDKey struct{}
@@ -55,6 +57,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
 			ctx := context.WithValue(r.Context(), UUIDKey, user.Id.OpaqueId)
 			ctx = metadata.Set(ctx, AccountID, user.Id.OpaqueId)
+			ctx = metadata.Set(ctx, RoleIDs, string(user.Opaque.Map["roles"].Value))
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
