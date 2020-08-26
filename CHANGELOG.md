@@ -1,3 +1,24 @@
+# Changelog for [0.3.0] (2020-08-26)
+
+The following sections list the changes in ocis-settings 0.3.0.
+
+[0.3.0]: https://github.com/owncloud/ocis-settings/compare/v0.2.0...v0.3.0
+
+## Summary
+
+* Change - Filter settings by permissions: [#99](https://github.com/owncloud/product/issues/99)
+
+## Details
+
+* Change - Filter settings by permissions: [#99](https://github.com/owncloud/product/issues/99)
+
+   `BundleService.GetBundle` and `BundleService.ListBundles` are now filtered by READ
+   permissions in the role of the authenticated user. This prevents settings from being visible
+   to the user when their role doesn't have appropriate permissions.
+
+   https://github.com/owncloud/product/issues/99
+   https://github.com/owncloud/ocis-settings/pull/48
+
 # Changelog for [0.2.0] (2020-08-20)
 
 The following sections list the changes in ocis-settings 0.2.0.
