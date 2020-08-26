@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-accounts unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.3.0...master
+
+## Summary
+
+* Change - Create account api-call implicitly adds "default-user" role: [#173](https://github.com/owncloud/product/issues/173)
+
+## Details
+
+* Change - Create account api-call implicitly adds "default-user" role: [#173](https://github.com/owncloud/product/issues/173)
+
+   When calling CreateAccount default-user-role is implicitly added.
+
+   https://github.com/owncloud/product/issues/173
+
 # Changelog for [0.3.0] (2020-08-20)
 
 The following sections list the changes in ocis-accounts 0.3.0.
