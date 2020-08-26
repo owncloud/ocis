@@ -985,11 +985,6 @@ func TestListFilteredBundle(t *testing.T) {
 		name        string
 	}
 
-	type permission struct {
-		bundleName string
-		permission proto.Permission_Operation
-	}
-
 	type bundleForTest struct {
 		bundle     *proto.Bundle
 		permission proto.Permission_Operation
@@ -998,10 +993,9 @@ func TestListFilteredBundle(t *testing.T) {
 		name            string
 		bundles         []bundleForTest
 		expectedBundles []expectedBundle
-		permissions     []permission
 	}{
 		{
-			name: "multiple bundles, all RW permission",
+			name: "multiple bundles, all have READ(WRITE) permission",
 			bundles: []bundleForTest{
 				{
 					bundle: &proto.Bundle{
@@ -1029,8 +1023,7 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READWRITE,
-
+					permission: proto.Permission_OPERATION_READ,
 				},
 			},
 			expectedBundles: []expectedBundle{
@@ -1039,13 +1032,13 @@ func TestListFilteredBundle(t *testing.T) {
 			},
 		},
 		{
-			name: "multiple bundles, one RW permission, other RO",
+			name: "multiple bundles, only one with READ permission",
 			bundles: []bundleForTest{
 				{
 					bundle: &proto.Bundle{
-						Name:        "test-ro-1",
-						Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
-						DisplayName: "RO-Bundle1",
+						Name:        "Permission_OPERATION_WRITE",
+						Id:          "12fe2b67-4a08-4f17-9cb6-924da943da0e",
+						DisplayName: "Permission_OPERATION_WRITE",
 						Extension:   "testExtension",
 						Type:        proto.Bundle_TYPE_DEFAULT,
 						Settings:    complexSettingsStub,
@@ -1053,13 +1046,13 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READ,
+					permission: proto.Permission_OPERATION_WRITE,
 				},
 				{
 					bundle: &proto.Bundle{
-						Name:        "test-ro-2",
-						Id:          "17b6870a-e625-4b65-a316-dd5db3427dca",
-						DisplayName: "RO-Bundle2",
+						Name:        "Permission_OPERATION_DELETE",
+						Id:          "1a0b65b0-fdbf-4738-b41e-41d36a01376e",
+						DisplayName: "Permission_OPERATION_DELETE",
 						Extension:   "testExtension",
 						Type:        proto.Bundle_TYPE_DEFAULT,
 						Settings:    complexSettingsStub,
@@ -1067,13 +1060,55 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READ,
+					permission: proto.Permission_OPERATION_DELETE,
 				},
 				{
 					bundle: &proto.Bundle{
-						Name:        "test-rw",
+						Name:        "Permission_OPERATION_UPDATE",
+						Id:          "511fe78e-89c9-4237-a01e-6af5457a135e",
+						DisplayName: "Permission_OPERATION_UPDATE",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_UPDATE,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "Permission_OPERATION_CREATE",
+						Id:          "aa42fb12-57aa-40c0-b458-3a91f398deba",
+						DisplayName: "Permission_OPERATION_CREATE",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_CREATE,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "Permission_OPERATION_UNKNOWN",
+						Id:          "eabb2a18-09e2-4b06-aa62-987e8dc5e908",
+						DisplayName: "Permission_OPERATION_UNKNOWN",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_UNKNOWN,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "Permission_OPERATION_READ",
 						Id:          "3b9f230a-fc9e-4605-89ee-a21e24728c64",
-						DisplayName: "a RW bundle",
+						DisplayName: "Permission_OPERATION_READ",
 						Extension:   "testExtension",
 						Type:        proto.Bundle_TYPE_DEFAULT,
 						Settings:    complexSettingsStub,
@@ -1081,11 +1116,11 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READWRITE,
+					permission: proto.Permission_OPERATION_READ,
 				},
 			},
 			expectedBundles: []expectedBundle{
-				{displayName: "a RW bundle", name: "test-rw"},
+				{displayName: "Permission_OPERATION_READ", name: "Permission_OPERATION_READ"},
 			},
 		},
 	}
