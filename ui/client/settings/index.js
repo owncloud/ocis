@@ -397,6 +397,52 @@ export const BundleService_RemoveSettingFromBundleURL = function(parameters = {}
 }
 /**
  * 
+ * request: PermissionService_ListPermissionsByResource
+ * url: PermissionService_ListPermissionsByResourceURL
+ * method: PermissionService_ListPermissionsByResource_TYPE
+ * raw_url: PermissionService_ListPermissionsByResource_RAW_URL
+ * @param body - 
+ */
+export const PermissionService_ListPermissionsByResource = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/settings/permissions-list-by-resource'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const PermissionService_ListPermissionsByResource_RAW_URL = function() {
+  return '/api/v0/settings/permissions-list-by-resource'
+}
+export const PermissionService_ListPermissionsByResource_TYPE = function() {
+  return 'post'
+}
+export const PermissionService_ListPermissionsByResourceURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/settings/permissions-list-by-resource'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * 
  * request: RoleService_ListRoles
  * url: RoleService_ListRolesURL
  * method: RoleService_ListRoles_TYPE
