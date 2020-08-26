@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	ctxWithUUID      = context.WithValue(context.Background(), middleware.UUIDKey, "61445573-4dbe-4d56-88dc-88ab47aceba7")
-	ctxWithEmptyUUID = context.WithValue(context.Background(), middleware.UUIDKey, "")
+	ctxWithUUID      = metadata.Set(context.Background(), middleware.AccountID, "61445573-4dbe-4d56-88dc-88ab47aceba7")
+	ctxWithEmptyUUID = metadata.Set(context.Background(), middleware.AccountID, "")
 	emptyCtx         = context.Background()
 
 	scenarios = []struct {
@@ -23,7 +24,7 @@ var (
 			name:        "context with UUID; identifier = 'me'",
 			ctx:         ctxWithUUID,
 			accountUUID: "me",
-			expect:      ctxWithUUID.Value(middleware.UUIDKey).(string),
+			expect:      "61445573-4dbe-4d56-88dc-88ab47aceba7",
 		},
 		{
 			name:        "context with empty UUID; identifier = 'me'",
