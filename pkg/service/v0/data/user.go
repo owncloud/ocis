@@ -8,7 +8,7 @@ type Users struct {
 // User holds the payload for a GetUser response
 type User struct {
 	// TODO needs better naming, clarify if we need a userid, a username or both
-	Enabled     bool   `json:"enabled" xml:"enabled"`
+	Enabled     string `json:"enabled" xml:"enabled"`
 	UserID      string `json:"id" xml:"id"`
 	Username    string `json:"username" xml:"username"`
 	DisplayName string `json:"displayname" xml:"displayname"`
