@@ -19,9 +19,12 @@ import (
 	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
+	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-accounts/pkg/provider"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
 	"github.com/tredoe/osutil/user/crypt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -318,6 +321,17 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
 		s.debugLogAccount(acc).Msg("could not persist new account")
 		return
+	}
+
+	// TODO: All users for now as create Account request does not have any role field
+	rs := settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
+	_, err = rs.AssignRoleToUser(c, &settings.AssignRoleToUserRequest{
+		AccountUuid: acc.Id,
+		RoleId:      settings_svc.BundleUUIDRoleUser,
+	})
+
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not assign role to account: %v", err.Error())
 	}
 
 	if err = s.indexAccount(acc.Id); err != nil {
