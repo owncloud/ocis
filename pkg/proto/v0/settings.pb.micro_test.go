@@ -940,6 +940,170 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 	}
 }
 
+func TestListFilteredBundle(t *testing.T) {
+	type expectedBundle struct {
+		displayName string
+		name        string
+	}
+
+	type permission struct {
+		bundleName string
+		permission proto.Permission_Operation
+	}
+
+	type bundleForTest struct {
+		bundle     *proto.Bundle
+		permission proto.Permission_Operation
+	}
+	tests := []struct {
+		name            string
+		bundles         []bundleForTest
+		expectedBundles []expectedBundle
+		permissions     []permission
+	}{
+		{
+			name: "multiple bundles, all RW permission",
+			bundles: []bundleForTest{
+				{
+					bundle: &proto.Bundle{
+						Name:        "test",
+						Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
+						DisplayName: "bundleDisplayName",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_READWRITE,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "one-more",
+						Id:          "3b9f230a-fc9e-4605-89ee-a21e24728c64",
+						DisplayName: "an other bundle",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_READWRITE,
+
+				},
+			},
+			expectedBundles: []expectedBundle{
+				{displayName: "bundleDisplayName", name: "test"},
+				{displayName: "an other bundle", name: "one-more"},
+			},
+		},
+		{
+			name: "multiple bundles, one RW permission, other RO",
+			bundles: []bundleForTest{
+				{
+					bundle: &proto.Bundle{
+						Name:        "test-ro-1",
+						Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
+						DisplayName: "RO-Bundle1",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_READ,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "test-ro-2",
+						Id:          "17b6870a-e625-4b65-a316-dd5db3427dca",
+						DisplayName: "RO-Bundle2",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_READ,
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "test-rw",
+						Id:          "3b9f230a-fc9e-4605-89ee-a21e24728c64",
+						DisplayName: "a RW bundle",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: proto.Permission_OPERATION_READWRITE,
+				},
+			},
+			expectedBundles: []expectedBundle{
+				{displayName: "a RW bundle", name: "test-rw"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			for _, testBundle := range tt.bundles {
+				_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+					Bundle: testBundle.bundle,
+				})
+				assert.NoError(t, err)
+
+				permissionRequest := proto.AddSettingToBundleRequest{
+					BundleId: svc.BundleUUIDRoleAdmin,
+					Setting: &proto.Setting{
+						Name: "permission",
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_BUNDLE,
+							Id:   testBundle.bundle.Id,
+						},
+						Value: &proto.Setting_PermissionValue{
+							PermissionValue: &proto.Permission{
+								Operation:  testBundle.permission,
+								Constraint: proto.Permission_CONSTRAINT_OWN,
+							},
+						},
+					},
+				}
+				addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
+				assert.NoError(t, err)
+				if err == nil {
+					assert.NotEmpty(t, addPermissionResponse.Setting)
+				}
+			}
+			_, err := roleService.AssignRoleToUser(
+				context.Background(),
+				&proto.AssignRoleToUserRequest{AccountUuid: testAccountID, RoleId: svc.BundleUUIDRoleAdmin},
+			)
+			assert.NoError(t, err)
+
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
+			assert.NoError(t, err)
+
+			for _, bundle := range listRes.Bundles {
+				assert.Contains(t, tt.expectedBundles, expectedBundle{
+					displayName: bundle.DisplayName,
+					name:        bundle.Name,
+				})
+			}
+			assert.Equal(t, len(tt.expectedBundles), len(listRes.Bundles))
+		})
+	}
+}
+
 func setFullReadWriteOnBundle(t *testing.T, accountID, bundleID string) {
 	permissionRequest := proto.AddSettingToBundleRequest{
 		BundleId: svc.BundleUUIDRoleAdmin,
