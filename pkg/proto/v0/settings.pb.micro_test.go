@@ -985,10 +985,16 @@ func TestListFilteredBundle(t *testing.T) {
 		name        string
 	}
 
+	type permission struct {
+		permission proto.Permission_Operation
+		roleUUID   string
+	}
+
 	type bundleForTest struct {
 		bundle     *proto.Bundle
-		permission proto.Permission_Operation
+		permission permission
 	}
+
 	tests := []struct {
 		name            string
 		bundles         []bundleForTest
@@ -1009,7 +1015,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READWRITE,
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1023,7 +1032,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READ,
+					permission: permission{
+						permission: proto.Permission_OPERATION_READ,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 			},
 			expectedBundles: []expectedBundle{
@@ -1046,7 +1058,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_WRITE,
+					permission: permission{
+						permission: proto.Permission_OPERATION_WRITE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1060,7 +1075,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_DELETE,
+					permission: permission{
+						permission: proto.Permission_OPERATION_DELETE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1074,7 +1092,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_UPDATE,
+					permission: permission{
+						permission: proto.Permission_OPERATION_UPDATE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1088,7 +1109,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_CREATE,
+					permission: permission{
+						permission: proto.Permission_OPERATION_CREATE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1102,7 +1126,10 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_UNKNOWN,
+					permission: permission{
+						permission: proto.Permission_OPERATION_UNKNOWN,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 				{
 					bundle: &proto.Bundle{
@@ -1116,11 +1143,73 @@ func TestListFilteredBundle(t *testing.T) {
 							Type: proto.Resource_TYPE_SYSTEM,
 						},
 					},
-					permission: proto.Permission_OPERATION_READ,
+					permission: permission{
+						permission: proto.Permission_OPERATION_READ,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
 				},
 			},
 			expectedBundles: []expectedBundle{
 				{displayName: "Permission_OPERATION_READ", name: "Permission_OPERATION_READ"},
+			},
+		},
+		{
+			name: "multiple bundles, all have READ permission, but only one matching role",
+			bundles: []bundleForTest{
+				{
+					bundle: &proto.Bundle{
+						Name:        "matching-role",
+						Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
+						DisplayName: "bundleDisplayName",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READWRITE,
+						roleUUID: svc.BundleUUIDRoleAdmin,
+					},
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "NOT-matching-role",
+						Id:          "3b9f230a-fc9e-4605-89ee-a21e24728c64",
+						DisplayName: "an other bundle",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READ,
+						roleUUID: svc.BundleUUIDRoleGuest,
+					},
+				},
+				{
+					bundle: &proto.Bundle{
+						Name:        "NOT-matching-role2",
+						Id:          "714a5917-627c-40ac-8dc7-5fdac013e4b7",
+						DisplayName: "an other bundle",
+						Extension:   "testExtension",
+						Type:        proto.Bundle_TYPE_DEFAULT,
+						Settings:    complexSettingsStub,
+						Resource: &proto.Resource{
+							Type: proto.Resource_TYPE_SYSTEM,
+						},
+					},
+					permission: permission{
+						permission: proto.Permission_OPERATION_READ,
+						roleUUID: svc.BundleUUIDRoleUser,
+					},
+				},
+			},
+			expectedBundles: []expectedBundle{
+				{displayName: "bundleDisplayName", name: "matching-role"},
 			},
 		},
 	}
@@ -1136,7 +1225,7 @@ func TestListFilteredBundle(t *testing.T) {
 				assert.NoError(t, err)
 
 				permissionRequest := proto.AddSettingToBundleRequest{
-					BundleId: svc.BundleUUIDRoleAdmin,
+					BundleId: testBundle.permission.roleUUID,
 					Setting: &proto.Setting{
 						Name: "permission",
 						Resource: &proto.Resource{
@@ -1145,7 +1234,7 @@ func TestListFilteredBundle(t *testing.T) {
 						},
 						Value: &proto.Setting_PermissionValue{
 							PermissionValue: &proto.Permission{
-								Operation:  testBundle.permission,
+								Operation:  testBundle.permission.permission,
 								Constraint: proto.Permission_CONSTRAINT_OWN,
 							},
 						},
