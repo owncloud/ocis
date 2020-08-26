@@ -111,6 +111,20 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_OIDC_ID_CLAIM"},
 			Destination: &cfg.Reva.OIDC.IDClaim,
 		},
+		&cli.StringFlag{
+			Name: "oidc-uid-claim",
+			Value:       "",
+			Usage:       "OIDC uid claim",
+			EnvVars:     []string{"REVA_OIDC_UID_CLAIM"},
+			Destination: &cfg.Reva.OIDC.UIDClaim,
+		},
+		&cli.StringFlag{
+			Name: "oidc-gid-claim",
+			Value:       "",
+			Usage:       "OIDC gid claim",
+			EnvVars:     []string{"REVA_OIDC_GID_CLAIM"},
+			Destination: &cfg.Reva.OIDC.GIDClaim,
+		},
 
 		// Services
 

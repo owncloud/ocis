@@ -91,9 +91,11 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 								"auth_manager": "oidc",
 								"auth_managers": map[string]interface{}{
 									"oidc": map[string]interface{}{
-										"issuer":   cfg.Reva.OIDC.Issuer,
-										"insecure": cfg.Reva.OIDC.Insecure,
-										"id_claim": cfg.Reva.OIDC.IDClaim,
+										"issuer":    cfg.Reva.OIDC.Issuer,
+										"insecure":  cfg.Reva.OIDC.Insecure,
+										"id_claim":  cfg.Reva.OIDC.IDClaim,
+										"uid_claim": cfg.Reva.OIDC.UIDClaim,
+										"gid_claim": cfg.Reva.OIDC.GIDClaim,
 									},
 								},
 							},

@@ -88,10 +88,10 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"authprovider": map[string]interface{}{
-								"auth_manager": cfg.Reva.Users.Driver,
+								"auth_manager": cfg.Reva.AuthProvider.Driver,
 								"auth_managers": map[string]interface{}{
 									"json": map[string]interface{}{
-										"users": cfg.Reva.Users.JSON,
+										"users": cfg.Reva.AuthProvider.JSON,
 									},
 									"ldap": map[string]interface{}{
 										"hostname":      cfg.Reva.LDAP.Hostname,

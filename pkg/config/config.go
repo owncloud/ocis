@@ -202,6 +202,8 @@ type OIDC struct {
 	Issuer   string
 	Insecure bool
 	IDClaim  string
+	UIDClaim string
+	GIDClaim string
 }
 
 // LDAP defines the available ldap configuration.
@@ -218,6 +220,20 @@ type LDAP struct {
 	BindPassword    string
 	IDP             string
 	Schema          LDAPSchema
+}
+
+// UserRest defines the user REST driver specification.
+type UserRest struct {
+	ClientID                  string
+	ClientSecret              string
+	RedisAddress              string
+	RedisUsername             string
+	RedisPassword             string
+	IDProvider                string
+	APIBaseURL                string
+	OIDCTokenEndpoint         string
+	TargetAPI                 string
+	UserGroupsCacheExpiration int
 }
 
 // LDAPSchema defines the available ldap schema configuration.
@@ -244,6 +260,7 @@ type Reva struct {
 	TransferExpires int
 	OIDC            OIDC
 	LDAP            LDAP
+	UserRest        UserRest
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
@@ -251,6 +268,7 @@ type Reva struct {
 	DataGateway       Port
 	Gateway           Gateway
 	Users             Users
+	AuthProvider      Users
 	AuthBasic         Port
 	AuthBearer        Port
 	Sharing           Sharing

@@ -82,21 +82,21 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.JWTSecret,
 		},
 
-		// Users
+		// Auth
 
 		&cli.StringFlag{
-			Name:        "users-driver",
+			Name:        "auth-driver",
 			Value:       "ldap",
-			Usage:       "user driver: 'demo', 'json' or 'ldap'",
-			EnvVars:     []string{"REVA_USERS_DRIVER"},
-			Destination: &cfg.Reva.Users.Driver,
+			Usage:       "auth driver: 'demo', 'json' or 'ldap'",
+			EnvVars:     []string{"REVA_AUTH_DRIVER"},
+			Destination: &cfg.Reva.AuthProvider.Driver,
 		},
 		&cli.StringFlag{
-			Name:        "users-json",
+			Name:        "auth-json",
 			Value:       "",
 			Usage:       "Path to users.json file",
-			EnvVars:     []string{"REVA_USERS_JSON"},
-			Destination: &cfg.Reva.Users.JSON,
+			EnvVars:     []string{"REVA_AUTH_JSON"},
+			Destination: &cfg.Reva.AuthProvider.JSON,
 		},
 
 		// LDAP
