@@ -350,6 +350,45 @@ func TestSaveBundleWithoutSettings(t *testing.T) {
 	assert.Equal(t, merrors.New("ocis-settings", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 400), err)
 }
 
+func TestGetBundleOfABundleSavedWithoutPermissions(t *testing.T) {
+	teardown := setup()
+	defer teardown()
+
+	saveRequest := proto.SaveBundleRequest{
+		Bundle: &bundleStub,
+	}
+	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+	assert.NoError(t, err)
+	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
+
+	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
+	assert.Empty(t, getResponse)
+
+	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", 404), err)
+}
+
+func TestGetBundleOfABundleSavedWithFullPermissionsButForAnOtherUser(t *testing.T) {
+	teardown := setup()
+	defer teardown()
+
+	saveRequest := proto.SaveBundleRequest{
+		Bundle: &bundleStub,
+	}
+	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+	assert.NoError(t, err)
+	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
+
+	setFullReadWriteOnBundle(t, "33ba12b3-0340-44ec-afdf-253fb90ea47d", bundleStub.Id)
+	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
+	assert.Empty(t, getResponse)
+
+	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", 404), err)
+}
+
 /**
 testing that setting getting and listing a settings bundle works correctly with a set of setting definitions
 */
