@@ -66,6 +66,7 @@ func Server(opts ...Option) http.Service {
 		proto.RegisterBundleServiceWeb(r, handle)
 		proto.RegisterValueServiceWeb(r, handle)
 		proto.RegisterRoleServiceWeb(r, handle)
+		proto.RegisterPermissionServiceWeb(r, handle)
 	})
 
 	service.Handle(

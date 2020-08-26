@@ -23,13 +23,16 @@ func Server(opts ...Option) grpc.Service {
 
 	handle := svc.NewService(options.Config, options.Logger)
 	if err := proto.RegisterBundleServiceHandler(service.Server(), handle); err != nil {
-		options.Logger.Fatal().Err(err).Msg("could not register SettingsBundles service handler")
+		options.Logger.Fatal().Err(err).Msg("could not register Bundle service handler")
 	}
 	if err := proto.RegisterValueServiceHandler(service.Server(), handle); err != nil {
-		options.Logger.Fatal().Err(err).Msg("could not register SettingsValues service handler")
+		options.Logger.Fatal().Err(err).Msg("could not register Value service handler")
 	}
 	if err := proto.RegisterRoleServiceHandler(service.Server(), handle); err != nil {
-		options.Logger.Fatal().Err(err).Msg("could not register SettingsRoles service handler")
+		options.Logger.Fatal().Err(err).Msg("could not register Role service handler")
+	}
+	if err := proto.RegisterPermissionServiceHandler(service.Server(), handle); err != nil {
+		options.Logger.Fatal().Err(err).Msg("could not register Permission service handler")
 	}
 
 	service.Init()
