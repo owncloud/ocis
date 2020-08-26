@@ -469,6 +469,8 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 #
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinDelete.feature:31
 apiTrashbin/trashbinDelete.feature:32
 apiTrashbin/trashbinDelete.feature:33
@@ -477,6 +479,8 @@ apiTrashbin/trashbinDelete.feature:37
 apiTrashbin/trashbinDelete.feature:50
 apiTrashbin/trashbinDelete.feature:67
 #
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinFilesFolders.feature:44
 apiTrashbin/trashbinFilesFolders.feature:45
 apiTrashbin/trashbinFilesFolders.feature:60
@@ -498,6 +502,8 @@ apiTrashbin/trashbinFilesFolders.feature:242
 apiTrashbin/trashbinFilesFolders.feature:255
 apiTrashbin/trashbinFilesFolders.feature:256
 #
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinRestore.feature:31
 apiTrashbin/trashbinRestore.feature:32
 apiTrashbin/trashbinRestore.feature:62
