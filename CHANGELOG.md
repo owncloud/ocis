@@ -6,10 +6,18 @@ The following sections list the changes in ocis-ocs unreleased.
 
 ## Summary
 
+* Bugfix - Mimic oc10 user enabled as string in provisioning api: [#39](https://github.com/owncloud/ocis-ocs/pull/39)
 * Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
 * Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
 
 ## Details
+
+* Bugfix - Mimic oc10 user enabled as string in provisioning api: [#39](https://github.com/owncloud/ocis-ocs/pull/39)
+
+   The oc10 user provisioning API uses a string for the boolean `enabled` flag. 😭
+
+   https://github.com/owncloud/ocis-ocs/pull/39
+
 
 * Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
 
