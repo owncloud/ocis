@@ -56,9 +56,7 @@ const actions = {
     try {
       const response = await BundleService_ListBundles({
         $domain: rootGetters.configuration.server,
-        body: {
-          accountUuid: 'me'
-        }
+        body: {}
       })
       if (response.status === 201) {
         // the settings markup has implicit typing. inject an explicit type variable here
