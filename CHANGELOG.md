@@ -6,9 +6,20 @@ The following sections list the changes in ocis-reva unreleased.
 
 ## Summary
 
+* Enhancement - Separate user and auth providers, add config for rest user: [#412](https://github.com/owncloud/ocis-reva/pull/412)
 * Enhancement - Update reva to v1.1.1-0.20200819100654-dcbf0c8ea187: [#447](https://github.com/owncloud/ocis-reva/pull/447)
 
 ## Details
+
+* Enhancement - Separate user and auth providers, add config for rest user: [#412](https://github.com/owncloud/ocis-reva/pull/412)
+
+   Previously, the auth and user provider services used to have the same driver, which restricted
+   using separate drivers and configs for both. This PR separates the two and adds the config for
+   the rest user driver and the gatewaysvc parameter to EOS fs.
+
+   https://github.com/owncloud/ocis-reva/pull/412
+   https://github.com/cs3org/reva/pull/995
+
 
 * Enhancement - Update reva to v1.1.1-0.20200819100654-dcbf0c8ea187: [#447](https://github.com/owncloud/ocis-reva/pull/447)
 
