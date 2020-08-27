@@ -125,6 +125,12 @@ service PermissionService {
       body: "*"
     };
   }
+  rpc GetPermissionByID(GetPermissionByIDRequest) returns (GetPermissionByIDResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/permissions-get-by-id",
+      body: "*"
+    };
+  }
 }
 
 // ---
@@ -147,6 +153,7 @@ message GetBundleResponse {
 }
 
 message ListBundlesRequest {
+  repeated string bundle_ids = 1;
 }
 
 message ListBundlesResponse {
@@ -257,6 +264,15 @@ message ListPermissionsByResourceRequest {
 
 message ListPermissionsByResourceResponse {
   repeated Permission permissions = 1;
+}
+
+message GetPermissionByIDRequest {
+  string permission_id = 1;
+  repeated string role_ids = 2;
+}
+
+message GetPermissionByIDResponse {
+  Permission permission = 1;
 }
 
 // ---

@@ -124,7 +124,7 @@ func TestBundles(t *testing.T) {
 	}
 
 	// check that ListBundles only returns bundles with type DEFAULT
-	bundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT)
+	bundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT, []string{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,8 +132,18 @@ func TestBundles(t *testing.T) {
 		assert.Equal(t, proto.Bundle_TYPE_DEFAULT, bundles[i].Type)
 	}
 
+	// check that ListBundles filtered by an id only returns that bundle
+	filteredBundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT, []string{bundle2})
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, 1, len(filteredBundles))
+	if len(filteredBundles) == 1 {
+		assert.Equal(t, bundle2, filteredBundles[0].Id)
+	}
+
 	// check that ListRoles only returns bundles with type ROLE
-	roles, err := s.ListBundles(proto.Bundle_TYPE_ROLE)
+	roles, err := s.ListBundles(proto.Bundle_TYPE_ROLE, []string{})
 	if err != nil {
 		t.Error(err)
 	}

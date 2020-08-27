@@ -23,7 +23,7 @@ type Manager interface {
 
 // BundleManager is a bundle service interface for abstraction of storage implementations
 type BundleManager interface {
-	ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error)
+	ListBundles(bundleType proto.Bundle_Type, bundleIDs []string) ([]*proto.Bundle, error)
 	ReadBundle(bundleID string) (*proto.Bundle, error)
 	WriteBundle(bundle *proto.Bundle) (*proto.Bundle, error)
 	ReadSetting(settingID string) (*proto.Setting, error)
@@ -49,4 +49,5 @@ type RoleAssignmentManager interface {
 // PermissionManager is a permissions service interface for abstraction of storage implementations
 type PermissionManager interface {
 	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
+	ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error)
 }

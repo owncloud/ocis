@@ -17,6 +17,7 @@ import (
 
 // Service represents a service.
 type Service struct {
+	id      string
 	config  *config.Config
 	logger  log.Logger
 	manager settings.Manager
@@ -25,6 +26,7 @@ type Service struct {
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config, logger log.Logger) Service {
 	service := Service{
+		id:      "ocis-settings",
 		config:  cfg,
 		logger:  logger,
 		manager: store.New(cfg),
@@ -59,11 +61,11 @@ func (g Service) RegisterDefaultRoles() {
 func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
 	cleanUpResource(c, req.Bundle.Resource)
 	if validationError := validateSaveBundle(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.WriteBundle(req.Bundle)
 	if err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Bundle = r
 	return nil
@@ -73,17 +75,17 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
 	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateGetBundle(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	bundle, err := g.manager.ReadBundle(req.BundleId)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	roleIDs := g.getRoleIDs(c, accountUUID)
 	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
 	if len(filteredBundle.Settings) == 0 {
 		err = fmt.Errorf("could not read bundle: %s", req.BundleId)
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Bundle = filteredBundle
 	return nil
@@ -94,11 +96,11 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	// fetch all bundles
 	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListBundles(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	bundles, err := g.manager.ListBundles(proto.Bundle_TYPE_DEFAULT)
+	bundles, err := g.manager.ListBundles(proto.Bundle_TYPE_DEFAULT, req.BundleIds)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	roleIDs := g.getRoleIDs(c, accountUUID)
 
@@ -154,11 +156,11 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *proto.Bundle) *prot
 func (g Service) AddSettingToBundle(c context.Context, req *proto.AddSettingToBundleRequest, res *proto.AddSettingToBundleResponse) error {
 	cleanUpResource(c, req.Setting.Resource)
 	if validationError := validateAddSettingToBundle(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.AddSettingToBundle(req.BundleId, req.Setting)
 	if err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Setting = r
 	return nil
@@ -167,10 +169,10 @@ func (g Service) AddSettingToBundle(c context.Context, req *proto.AddSettingToBu
 // RemoveSettingFromBundle implements the BundleServiceHandler interface
 func (g Service) RemoveSettingFromBundle(c context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
 	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	if err := g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId); err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 
 	return nil
@@ -182,15 +184,15 @@ func (g Service) SaveValue(c context.Context, req *proto.SaveValueRequest, res *
 	cleanUpResource(c, req.Value.Resource)
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.WriteValue(req.Value)
 	if err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Value = valueWithIdentifier
 	return nil
@@ -199,15 +201,15 @@ func (g Service) SaveValue(c context.Context, req *proto.SaveValueRequest, res *
 // GetValue implements the ValueServiceHandler interface
 func (g Service) GetValue(c context.Context, req *proto.GetValueRequest, res *proto.GetValueResponse) error {
 	if validationError := validateGetValue(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.ReadValue(req.Id)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Value = valueWithIdentifier
 	return nil
@@ -217,13 +219,13 @@ func (g Service) GetValue(c context.Context, req *proto.GetValueRequest, res *pr
 func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, in *proto.GetValueByUniqueIdentifiersRequest, res *proto.GetValueResponse) error {
 	v, err := g.manager.ReadValueByUniqueIdentifiers(in.AccountUuid, in.SettingId)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 
 	if v.BundleId != "" {
 		valueWithIdentifier, err := g.getValueWithIdentifier(v)
 		if err != nil {
-			return merrors.NotFound("ocis-settings", "%s", err)
+			return merrors.NotFound(g.id, "%s", err)
 		}
 
 		res.Value = valueWithIdentifier
@@ -235,11 +237,11 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, in *proto.GetV
 func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res *proto.ListValuesResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateListValues(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.ListValues(req.BundleId, req.AccountUuid)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	var result []*proto.ValueWithIdentifier
 	for _, value := range r {
@@ -256,11 +258,11 @@ func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res
 func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	//accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListRoles(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE)
+	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE, req.BundleIds)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	// TODO: only allow to list roles when user has account management permissions
 	res.Bundles = r
@@ -271,11 +273,11 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssignmentsRequest, res *proto.ListRoleAssignmentsResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateListRoleAssignments(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.ListRoleAssignments(req.AccountUuid)
 	if err != nil {
-		return merrors.NotFound("ocis-settings", "%s", err)
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Assignments = r
 	return nil
@@ -285,11 +287,11 @@ func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssig
 func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
 	if err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Assignment = r
 	return nil
@@ -298,10 +300,10 @@ func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUser
 // RemoveRoleFromUser implements the RoleServiceHandler interface
 func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	return nil
 }
@@ -309,13 +311,29 @@ func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFrom
 // ListPermissionsByResource implements the PermissionServiceHandler interface
 func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPermissionsByResourceRequest, res *proto.ListPermissionsByResourceResponse) error {
 	if validationError := validateListPermissionsByResource(req); validationError != nil {
-		return merrors.BadRequest("ocis-settings", "%s", validationError)
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	permissions, err := g.manager.ListPermissionsByResource(req.Resource, req.RoleIds)
 	if err != nil {
-		return merrors.BadRequest("ocis-settings", "%s", err)
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Permissions = permissions
+	return nil
+}
+
+// GetPermissionByID implements the PermissionServiceHandler interface
+func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionByIDRequest, res *proto.GetPermissionByIDResponse) error {
+	if validationError := validateGetPermissionByID(req); validationError != nil {
+		return merrors.BadRequest(g.id, "%s", validationError)
+	}
+	permission, err := g.manager.ReadPermissionByID(req.PermissionId, req.RoleIds)
+	if err != nil {
+		return merrors.BadRequest(g.id, "%s", err)
+	}
+	if permission == nil {
+		return merrors.NotFound(g.id, "%s", fmt.Errorf("permission %s not found in roles", req.PermissionId))
+	}
+	res.Permission = permission
 	return nil
 }
 

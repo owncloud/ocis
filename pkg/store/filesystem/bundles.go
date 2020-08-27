@@ -14,7 +14,7 @@ import (
 var m = &sync.RWMutex{}
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
-func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error) {
+func (s Store) ListBundles(bundleType proto.Bundle_Type, bundleIDs []string) ([]*proto.Bundle, error) {
 	// FIXME: list requests should be ran against a cache, not FS
 	m.RLock()
 	defer m.RUnlock()
@@ -36,10 +36,23 @@ func (s Store) ListBundles(bundleType proto.Bundle_Type) ([]*proto.Bundle, error
 		if record.Type != bundleType {
 			continue
 		}
+		if len(bundleIDs) > 0 && !containsStr(record.Id, bundleIDs) {
+			continue
+		}
 		records = append(records, &record)
 	}
 
 	return records, nil
+}
+
+// containsStr checks if the strs slice contains str
+func containsStr(str string, strs []string) bool {
+	for _, s := range strs {
+		if s == str {
+			return true
+		}
+	}
+	return false
 }
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
@@ -62,7 +75,7 @@ func (s Store) ReadSetting(settingID string) (*proto.Setting, error) {
 	m.RLock()
 	defer m.RUnlock()
 
-	bundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT)
+	bundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT, []string{})
 	if err != nil {
 		return nil, err
 	}

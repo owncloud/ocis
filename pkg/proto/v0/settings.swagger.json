@@ -280,6 +280,38 @@
         ]
       }
     },
+    "/api/v0/settings/permissions-get-by-id": {
+      "post": {
+        "operationId": "PermissionService_GetPermissionByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIDRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
     "/api/v0/settings/permissions-list-by-resource": {
       "post": {
         "operationId": "PermissionService_ListPermissionsByResource",
@@ -589,6 +621,28 @@
         }
       }
     },
+    "protoGetPermissionByIDRequest": {
+      "type": "object",
+      "properties": {
+        "permission_id": {
+          "type": "string"
+        },
+        "role_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "protoGetPermissionByIDResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/definitions/protoPermission"
+        }
+      }
+    },
     "protoGetValueByUniqueIdentifiersRequest": {
       "type": "object",
       "properties": {
@@ -655,7 +709,15 @@
       }
     },
     "protoListBundlesRequest": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "bundle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "protoListBundlesResponse": {
       "type": "object",
