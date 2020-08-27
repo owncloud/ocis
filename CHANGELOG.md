@@ -16,6 +16,7 @@
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update ocis-accounts to v0.4.0: [#479](https://github.com/owncloud/ocis/pull/479)
 * Change - Update ocis-proxy to v0.7.0: [#476](https://github.com/owncloud/ocis/pull/476)
+* Change - Update ocis-reva to 0.13.0: [#496](https://github.com/owncloud/ocis/pull/496)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
@@ -143,6 +144,13 @@
    This version delivers ocis-proxy v0.7.0.
 
    https://github.com/owncloud/ocis/pull/476
+
+
+* Change - Update ocis-reva to 0.13.0: [#496](https://github.com/owncloud/ocis/pull/496)
+
+   This version delivers ocis-reva v0.13.0
+
+   https://github.com/owncloud/ocis/pull/496
 
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
