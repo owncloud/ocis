@@ -29,7 +29,7 @@ require (
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
 	github.com/owncloud/ocis-ocs v0.3.0
-	github.com/owncloud/ocis-phoenix v0.12.0
+	github.com/owncloud/ocis-phoenix v0.13.0
 	github.com/owncloud/ocis-pkg/v2 v2.4.0
 	github.com/owncloud/ocis-proxy v0.7.0
 	github.com/owncloud/ocis-reva v0.13.0
