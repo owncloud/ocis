@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-settings unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-settings/compare/v0.3.1...master
+
+## Summary
+
+* Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
+
+## Details
+
+* Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
+
+   We added bundle ids as filter option for ListBundles and ListRoles and a new endpoint for
+   fetching a permission by ID.
+
+   https://github.com/owncloud/ocis-settings/pull/59
+
 # Changelog for [0.3.1] (2020-08-27)
 
 The following sections list the changes in ocis-settings 0.3.1.
