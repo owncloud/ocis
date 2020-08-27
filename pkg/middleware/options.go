@@ -77,6 +77,7 @@ func AccountsClient(ac acc.AccountsService) Option {
 	}
 }
 
+// SettingsRoleService provides a function to set the role service option.
 func SettingsRoleService(rc settings.RoleService) Option {
 	return func(o *Options) {
 		o.SettingsRoleService = rc
