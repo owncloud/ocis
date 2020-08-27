@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for ocis-proxy unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-proxy/compare/v0.7.0...master
+
+## Summary
+
+* Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
+
+## Details
+
+* Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
+
+   We had the ocis-settings API and app endpoints in the builtin config already, but they were
+   missing in the example config. Added them for consistency.
+
+   https://github.com/owncloud/ocis-proxy/pull/93
+
 # Changelog for [0.7.0] (2020-08-21)
 
 The following sections list the changes for ocis-proxy 0.7.0.
