@@ -469,6 +469,8 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 #
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinDelete.feature:31
 apiTrashbin/trashbinDelete.feature:32
 apiTrashbin/trashbinDelete.feature:33
@@ -477,20 +479,18 @@ apiTrashbin/trashbinDelete.feature:37
 apiTrashbin/trashbinDelete.feature:50
 apiTrashbin/trashbinDelete.feature:67
 #
-apiTrashbin/trashbinFilesFolders.feature:21
-apiTrashbin/trashbinFilesFolders.feature:32
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinFilesFolders.feature:44
 apiTrashbin/trashbinFilesFolders.feature:45
 apiTrashbin/trashbinFilesFolders.feature:60
 apiTrashbin/trashbinFilesFolders.feature:61
-apiTrashbin/trashbinFilesFolders.feature:75
 apiTrashbin/trashbinFilesFolders.feature:89
 apiTrashbin/trashbinFilesFolders.feature:90
 apiTrashbin/trashbinFilesFolders.feature:104
 apiTrashbin/trashbinFilesFolders.feature:105
 apiTrashbin/trashbinFilesFolders.feature:136
 apiTrashbin/trashbinFilesFolders.feature:137
-apiTrashbin/trashbinFilesFolders.feature:155
 apiTrashbin/trashbinFilesFolders.feature:185
 apiTrashbin/trashbinFilesFolders.feature:186
 apiTrashbin/trashbinFilesFolders.feature:203
@@ -501,14 +501,9 @@ apiTrashbin/trashbinFilesFolders.feature:241
 apiTrashbin/trashbinFilesFolders.feature:242
 apiTrashbin/trashbinFilesFolders.feature:255
 apiTrashbin/trashbinFilesFolders.feature:256
-apiTrashbin/trashbinFilesFolders.feature:273
-apiTrashbin/trashbinFilesFolders.feature:274
-apiTrashbin/trashbinFilesFolders.feature:275
-apiTrashbin/trashbinFilesFolders.feature:276
-apiTrashbin/trashbinFilesFolders.feature:277
-apiTrashbin/trashbinFilesFolders.feature:278
-apiTrashbin/trashbinFilesFolders.feature:289
 #
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
 apiTrashbin/trashbinRestore.feature:31
 apiTrashbin/trashbinRestore.feature:32
 apiTrashbin/trashbinRestore.feature:62
@@ -535,8 +530,6 @@ apiTrashbin/trashbinRestore.feature:206
 apiTrashbin/trashbinRestore.feature:207
 apiTrashbin/trashbinRestore.feature:279
 apiTrashbin/trashbinRestore.feature:280
-apiTrashbin/trashbinRestore.feature:295
-apiTrashbin/trashbinRestore.feature:310
 apiTrashbin/trashbinRestore.feature:323
 apiTrashbin/trashbinRestore.feature:324
 apiTrashbin/trashbinRestore.feature:325
