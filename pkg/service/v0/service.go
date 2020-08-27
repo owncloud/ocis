@@ -22,6 +22,7 @@ import (
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/roles"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
 )
@@ -35,6 +36,7 @@ func New(opts ...Option) (s *Service, err error) {
 	if roleService == nil {
 		roleService = settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
 	}
+	roleCache := options.RoleCache
 	// read all user and group records
 
 	accountsDir := filepath.Join(cfg.Server.AccountsDataPath, "accounts")
@@ -175,14 +177,14 @@ func New(opts ...Option) (s *Service, err error) {
 				// set role for admin users and regular users
 				assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, roleService, logger)
 				for _, accountID := range []string{
-					"058bff95-6708-4fe5-91e4-9ea3d377588b",//moss
+					"058bff95-6708-4fe5-91e4-9ea3d377588b", //moss
 				} {
 					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, roleService, logger)
 				}
 				for _, accountID := range []string{
-					"4c510ada-c86b-4815-8820-42cdf82c3d51",//einstein
-					"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",//marie
-					"932b4540-8d16-481e-8ef4-588e4b6b151c",//richard
+					"4c510ada-c86b-4815-8820-42cdf82c3d51", //einstein
+					"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", //marie
+					"932b4540-8d16-481e-8ef4-588e4b6b151c", //richard
 				} {
 					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleUser, roleService, logger)
 				}
@@ -325,10 +327,11 @@ func New(opts ...Option) (s *Service, err error) {
 	indexMapping.TypeField = "BleveType"
 
 	s = &Service{
-		id:     cfg.GRPC.Namespace + "." + cfg.Server.Name,
-		log:    logger,
-		Config: cfg,
-		Client: mgrpc.NewClient(),
+		id:        cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		log:       logger,
+		Config:    cfg,
+		Client:    mgrpc.NewClient(),
+		RoleCache: roleCache,
 	}
 
 	indexDir := filepath.Join(cfg.Server.AccountsDataPath, "index.bleve")
@@ -365,11 +368,12 @@ func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger 
 
 // Service implements the AccountsServiceHandler interface
 type Service struct {
-	id     string
-	log    log.Logger
-	Config *config.Config
-	index  bleve.Index
-	Client mclient.Client
+	id        string
+	log       log.Logger
+	Config    *config.Config
+	index     bleve.Index
+	Client    mclient.Client
+	RoleCache *roles.Cache
 }
 
 func cleanupID(id string) (string, error) {

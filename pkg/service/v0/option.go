@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis-pkg/v2/roles"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
@@ -14,6 +15,7 @@ type Options struct {
 	Logger      log.Logger
 	Config      *config.Config
 	RoleService settings.RoleService
+	RoleCache   *roles.Cache
 }
 
 func newOptions(opts ...Option) Options {
@@ -44,5 +46,12 @@ func Config(val *config.Config) Option {
 func RoleService(val settings.RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
+	}
+}
+
+// RolesCache provides a function to set the roles cache option.
+func RoleCache(val *roles.Cache) Option {
+	return func(o *Options) {
+		o.RoleCache = val
 	}
 }

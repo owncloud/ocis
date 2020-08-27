@@ -1,13 +1,19 @@
 package http
 
 import (
+	"time"
+
 	"github.com/go-chi/chi"
+	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/assets"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
 	"github.com/owncloud/ocis-accounts/pkg/version"
+	"github.com/owncloud/ocis-pkg/v2/account"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis-pkg/v2/roles"
 	"github.com/owncloud/ocis-pkg/v2/service/http"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 // Server initializes the http service and server.
@@ -24,7 +30,9 @@ func Server(opts ...Option) http.Service {
 		http.Flags(options.Flags...),
 	)
 
-	handler, err := svc.New(svc.Logger(options.Logger), svc.Config(options.Config))
+	roleCache := roles.NewCache(roles.Size(1024), roles.TTL(time.Hour*24*7))
+
+	handler, err := svc.New(svc.Logger(options.Logger), svc.Config(options.Config), svc.RoleCache(&roleCache))
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not initialize service handler")
 	}
@@ -36,6 +44,18 @@ func Server(opts ...Option) http.Service {
 	mux.Use(middleware.Cache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)
+	mux.Use(middleware.ExtractAccountUUID(
+		account.Logger(options.Logger),
+		account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+	)
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	rs := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	mux.Use(middleware.Roles(
+		options.Logger,
+		rs,
+		&roleCache,
+	))
 
 	mux.Use(middleware.Version(
 		options.Name,

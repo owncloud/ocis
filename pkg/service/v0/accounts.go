@@ -11,20 +11,20 @@ import (
 	"sync"
 	"time"
 
-	fieldmask_utils "github.com/mennanov/fieldmask-utils"
-	"github.com/rs/zerolog"
-	"google.golang.org/genproto/protobuf/field_mask"
-
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
+	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-accounts/pkg/provider"
+	"github.com/owncloud/ocis-pkg/v2/middleware"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
+	"github.com/rs/zerolog"
 	"github.com/tredoe/osutil/user/crypt"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	// register crypt functions
@@ -157,9 +157,25 @@ func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
 	return c.Verify(hash, []byte(pwd)) == nil
 }
 
+func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
+	// get roles from context
+	roleIDs, ok := middleware.ReadRoleIDsFromContext(ctx)
+	if !ok {
+		// if there were no roleIDs on the request we have to assume that the request didn't come from the proxy
+		return true
+	}
+
+	// check if permission is present in roles of the authenticated account
+	return s.RoleCache.FindPermissionByID(roleIDs, AccountManagementPermissionID) != nil
+}
+
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
+	//if !s.hasAccountManagementPermissions(ctx) {
+	//	return merrors.Forbidden(s.id, "no permission for ListAccounts")
+	//}
+
 	accLock.Lock()
 	defer accLock.Unlock()
 	var password string
@@ -249,7 +265,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 }
 
 // GetAccount implements the AccountsServiceHandler interface
-func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
+func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
+	if !s.hasAccountManagementPermissions(ctx) {
+		return merrors.Forbidden(s.id, "no permission for GetAccount")
+	}
+
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
@@ -277,7 +297,11 @@ func (s Service) GetAccount(c context.Context, in *proto.GetAccountRequest, out 
 }
 
 // CreateAccount implements the AccountsServiceHandler interface
-func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
+func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
+	if !s.hasAccountManagementPermissions(ctx) {
+		return merrors.Forbidden(s.id, "no permission for CreateAccount")
+	}
+
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
@@ -324,7 +348,7 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 
 	// TODO: All users for now as create Account request does not have any role field
 	rs := settings.NewRoleService("com.owncloud.api.settings", s.Client)
-	_, err = rs.AssignRoleToUser(c, &settings.AssignRoleToUserRequest{
+	_, err = rs.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
 		AccountUuid: acc.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	})
@@ -358,7 +382,11 @@ func (s Service) CreateAccount(c context.Context, in *proto.CreateAccountRequest
 // UpdateAccount implements the AccountsServiceHandler interface
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
-func (s Service) UpdateAccount(c context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
+func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
+	if !s.hasAccountManagementPermissions(ctx) {
+		return merrors.Forbidden(s.id, "no permission for UpdateAccount")
+	}
+
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
@@ -467,7 +495,11 @@ var updatableAccountPaths = map[string]struct{}{
 }
 
 // DeleteAccount implements the AccountsServiceHandler interface
-func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest, out *empty.Empty) (err error) {
+func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountRequest, out *empty.Empty) (err error) {
+	if !s.hasAccountManagementPermissions(ctx) {
+		return merrors.Forbidden(s.id, "no permission for DeleteAccount")
+	}
+
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
@@ -484,7 +516,7 @@ func (s Service) DeleteAccount(c context.Context, in *proto.DeleteAccountRequest
 
 	// delete member relationship in groups
 	for i := range a.MemberOf {
-		err = s.RemoveMember(c, &proto.RemoveMemberRequest{
+		err = s.RemoveMember(ctx, &proto.RemoveMemberRequest{
 			GroupId:   a.MemberOf[i].Id,
 			AccountId: id,
 		}, a.MemberOf[i])

@@ -48,6 +48,11 @@ type Asset struct {
 	Path string
 }
 
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string
+}
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -57,12 +62,13 @@ type Log struct {
 
 // Config merges all Account config parameters.
 type Config struct {
-	LDAP   LDAP
-	HTTP   HTTP
-	GRPC   GRPC
-	Server Server
-	Asset  Asset
-	Log    Log
+	LDAP         LDAP
+	HTTP         HTTP
+	GRPC         GRPC
+	Server       Server
+	Asset        Asset
+	Log          Log
+	TokenManager TokenManager
 }
 
 // New returns a new config.
