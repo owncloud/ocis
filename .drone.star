@@ -58,39 +58,11 @@ def testing(ctx):
         ],
       },
       {
-        'name': 'vet',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make vet',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'staticcheck',
+        'name': 'golangci-lint',
         'image': 'golangci/golangci-lint:latest',
         'pull': 'always',
         'commands': [
           'golangci-lint run',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'lint',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make lint',
         ],
         'volumes': [
           {
