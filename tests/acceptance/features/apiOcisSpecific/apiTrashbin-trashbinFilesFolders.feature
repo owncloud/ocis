@@ -16,8 +16,7 @@ Feature: files and folders exist in the trashbin after being deleted
     And using new DAV path
     When user "Alice" deletes file "/textfile1.txt" using the WebDAV API
     Then as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
-    But as "Alice" the file with original path "/textfile1.txt" should not exist in the trashbin
-    And as "Alice" the file with original path "Alice/textfile1.txt" should exist in the trashbin
+    And as "Alice" the file with original path "/textfile1.txt" should exist in the trashbin
     And as "Alice" file "/textfile0.txt" should not exist
     And as "Alice" file "/textfile1.txt" should not exist
 
@@ -32,7 +31,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And using new DAV path
     When user "Alice" deletes folder "/tmp2" using the WebDAV API
     Then as "Alice" the folder with original path "/tmp1" should exist in the trashbin
-    But as "Alice" the folder with original path "/tmp2" should not exist in the trashbin
-    And as "Alice" the folder with original path "Alice/tmp2" should exist in the trashbin
+    And as "Alice" the folder with original path "/tmp2" should exist in the trashbin
     And as "Alice" folder "/tmp1" should not exist
     And as "Alice" folder "/tmp2" should not exist
