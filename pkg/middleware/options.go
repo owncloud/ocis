@@ -31,6 +31,8 @@ type Options struct {
 	RevaGatewayClient gateway.GatewayAPIClient
 	// Store for persisting data
 	Store storepb.StoreService
+	// PreSignedURLConfig to configure the middleware
+	PreSignedURLConfig config.PreSignedURL
 }
 
 // newOptions initializes the available default options.
@@ -97,5 +99,12 @@ func RevaGatewayClient(gc gateway.GatewayAPIClient) Option {
 func Store(sc storepb.StoreService) Option {
 	return func(o *Options) {
 		o.Store = sc
+	}
+}
+
+// PreSignedURLConfig provides a function to set the PreSignedURL config
+func PreSignedURLConfig(cfg config.PreSignedURL) Option {
+	return func(o *Options) {
+		o.PreSignedURLConfig = cfg
 	}
 }
