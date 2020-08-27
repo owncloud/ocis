@@ -1520,16 +1520,26 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 			defer teardown()
 
 			// create bundle with the defined settings
-			bundle := &bundleStub
 			var settings []*proto.Setting
 
 			for _, testSetting := range tt.settings {
 				settings = append(settings, testSetting.setting)
 			}
-			bundle.Settings = settings
+
+			bundle := proto.Bundle{
+				Name:        "test",
+				Id:          "b1b8c9d0-fb3c-4e12-b868-5a8508218d2e",
+				DisplayName: "bundleDisplayName",
+				Extension:   "testExtension",
+				Type:        proto.Bundle_TYPE_DEFAULT,
+				Settings:    settings,
+				Resource: &proto.Resource{
+					Type: proto.Resource_TYPE_SYSTEM,
+				},
+			}
 
 			_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
-				Bundle: bundle,
+				Bundle: &bundle,
 			})
 			assert.NoError(t, err)
 
@@ -1589,18 +1599,73 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 	}
 }
 
+func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
+	tests := []struct {
+		name                     string
+		settingPermission        proto.Permission_Operation
+		bundlePermission         proto.Permission_Operation
+		expectedAmountOfSettings int
+	}{
+		{
+			"setting has read permission bundle not",
+			proto.Permission_OPERATION_READ,
+			proto.Permission_OPERATION_UNKNOWN,
+			1,
+		},
+		{
+			"bundle has read permission setting not",
+			proto.Permission_OPERATION_UNKNOWN,
+			proto.Permission_OPERATION_READ,
+			5,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+				Bundle: &bundleStub,
+			})
+			assert.NoError(t, err)
+
+			setPermissionOnBundleOrSetting(
+				t, testAccountID, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission,
+			)
+
+			setPermissionOnBundleOrSetting(
+				t, testAccountID, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING, tt.settingPermission,
+			)
+
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
+			assert.NoError(t, err)
+			assert.Equal(t, 1, len(listRes.Bundles))
+			assert.Equal(t, tt.expectedAmountOfSettings, len(listRes.Bundles[0].Settings))
+			assert.Equal(t, bundleStub.Id, listRes.Bundles[0].Id)
+			assert.Equal(t, bundleStub.Settings[0].Id, listRes.Bundles[0].Settings[0].Id)
+		})
+	}
+}
+
 func setFullReadWriteOnBundle(t *testing.T, accountID, bundleID string) {
+	setPermissionOnBundleOrSetting(t, accountID, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE)
+}
+
+func setPermissionOnBundleOrSetting(
+	t *testing.T, accountID, bundleID string, resourceType proto.Resource_Type, permission proto.Permission_Operation,
+) {
 	permissionRequest := proto.AddSettingToBundleRequest{
 		BundleId: svc.BundleUUIDRoleAdmin,
 		Setting: &proto.Setting{
 			Name: "test-bundle-permission-readwrite",
 			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+				Type: resourceType,
 				Id:   bundleID,
 			},
 			Value: &proto.Setting_PermissionValue{
 				PermissionValue: &proto.Permission{
-					Operation:  proto.Permission_OPERATION_READWRITE,
+					Operation:  permission,
 					Constraint: proto.Permission_CONSTRAINT_ALL,
 				},
 			},
