@@ -57,34 +57,25 @@ docker-compose exec ocis ./bin/ocis run reva-users
 
 ### 3. Home storage
 
-Kill the home storage. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and a new layout:
+Kill the home storage. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home
+docker-compose exec -e REVA_STORAGE_HOME_DRIVER=eoshome -e REVA_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 ocis ./bin/ocis run reva-storage-home
 ```
 
 ### 4. Home data provider
 
-Kill the home data provider. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and a new layout:
+Kill the home data provider. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
 
 ```
 docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
-docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
+docker-compose exec -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
 ```
 
 {{< hint info >}}
 The difference between the *home storage* and the *home data provider* are that the former is responsible for metadata changes while the latter is responsible for actual data transfer. The *home storage* uses the cs3 api to manage a folder hierarchy, while the *home data provider* is responsible for moving bytes to and from the storage.
 {{< /hint >}}
-
-### 4. Frontend files namespace
-
-Restart the reva frontend with a new namespace (pointing to the eos storage provider) for the dav files endpoint
-
-```
-docker-compose exec ocis ./bin/ocis kill reva-frontend
-docker-compose exec -e DAV_FILES_NAMESPACE="/eos/" ocis ./bin/ocis run reva-frontend
-```
 
 ## Verification
 
