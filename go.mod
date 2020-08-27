@@ -28,7 +28,7 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.2.0
+	github.com/owncloud/ocis-ocs v0.3.0
 	github.com/owncloud/ocis-phoenix v0.12.0
 	github.com/owncloud/ocis-pkg/v2 v2.4.0
 	github.com/owncloud/ocis-proxy v0.7.0
@@ -44,8 +44,8 @@ require (
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
-	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
-	golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 // indirect
+	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
+	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200817023811-d00afeaade8f // indirect
 )
