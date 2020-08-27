@@ -1224,33 +1224,12 @@ func TestListFilteredBundle(t *testing.T) {
 				})
 				assert.NoError(t, err)
 
-				permissionRequest := proto.AddSettingToBundleRequest{
-					BundleId: testBundle.permission.roleUUID,
-					Setting: &proto.Setting{
-						Name: "permission",
-						Resource: &proto.Resource{
-							Type: proto.Resource_TYPE_BUNDLE,
-							Id:   testBundle.bundle.Id,
-						},
-						Value: &proto.Setting_PermissionValue{
-							PermissionValue: &proto.Permission{
-								Operation:  testBundle.permission.permission,
-								Constraint: proto.Permission_CONSTRAINT_OWN,
-							},
-						},
-					},
-				}
-				addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
-				assert.NoError(t, err)
-				if err == nil {
-					assert.NotEmpty(t, addPermissionResponse.Setting)
-				}
+				setPermissionOnBundleOrSetting(
+					t, testBundle.bundle.Id, proto.Resource_TYPE_BUNDLE,
+					testBundle.permission.permission, testBundle.permission.roleUUID,
+				)
 			}
-			_, err := roleService.AssignRoleToUser(
-				context.Background(),
-				&proto.AssignRoleToUserRequest{AccountUuid: testAccountID, RoleId: svc.BundleUUIDRoleAdmin},
-			)
-			assert.NoError(t, err)
+			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
 
 			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
@@ -1545,33 +1524,12 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 
 			// set permissions for each setting
 			for _, testSetting := range tt.settings {
-				permissionRequest := proto.AddSettingToBundleRequest{
-					BundleId: testSetting.permission.roleUUID,
-					Setting: &proto.Setting{
-						Name: "permission",
-						Resource: &proto.Resource{
-							Type: proto.Resource_TYPE_SETTING,
-							Id:   testSetting.setting.Id,
-						},
-						Value: &proto.Setting_PermissionValue{
-							PermissionValue: &proto.Permission{
-								Operation:  testSetting.permission.permission,
-								Constraint: proto.Permission_CONSTRAINT_OWN,
-							},
-						},
-					},
-				}
-				addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
-				assert.NoError(t, err)
-				if err == nil {
-					assert.NotEmpty(t, addPermissionResponse.Setting)
-				}
+				setPermissionOnBundleOrSetting(
+					t, testSetting.setting.Id, proto.Resource_TYPE_SETTING,
+					testSetting.permission.permission, testSetting.permission.roleUUID,
+				)
 			}
-			_, err = roleService.AssignRoleToUser(
-				context.Background(),
-				&proto.AssignRoleToUserRequest{AccountUuid: testAccountID, RoleId: svc.BundleUUIDRoleAdmin},
-			)
-			assert.NoError(t, err)
+			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
 
 			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
@@ -1630,12 +1588,15 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 			assert.NoError(t, err)
 
 			setPermissionOnBundleOrSetting(
-				t, testAccountID, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission,
+				t, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
 			)
 
 			setPermissionOnBundleOrSetting(
-				t, testAccountID, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING, tt.settingPermission,
+				t, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
+				tt.settingPermission, svc.BundleUUIDRoleAdmin,
 			)
+
+			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
 
 			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
@@ -1649,14 +1610,21 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 }
 
 func setFullReadWriteOnBundle(t *testing.T, accountID, bundleID string) {
-	setPermissionOnBundleOrSetting(t, accountID, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE)
+	setPermissionOnBundleOrSetting(
+		t, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE, svc.BundleUUIDRoleAdmin,
+	)
+	assignRoleToUser(t, accountID, svc.BundleUUIDRoleAdmin)
 }
 
 func setPermissionOnBundleOrSetting(
-	t *testing.T, accountID, bundleID string, resourceType proto.Resource_Type, permission proto.Permission_Operation,
+	t *testing.T,
+	bundleID string,
+	resourceType proto.Resource_Type,
+	permission proto.Permission_Operation,
+	roleUUID string,
 ) {
 	permissionRequest := proto.AddSettingToBundleRequest{
-		BundleId: svc.BundleUUIDRoleAdmin,
+		BundleId: roleUUID,
 		Setting: &proto.Setting{
 			Name: "test-bundle-permission-readwrite",
 			Resource: &proto.Resource{
@@ -1666,7 +1634,7 @@ func setPermissionOnBundleOrSetting(
 			Value: &proto.Setting_PermissionValue{
 				PermissionValue: &proto.Permission{
 					Operation:  permission,
-					Constraint: proto.Permission_CONSTRAINT_ALL,
+					Constraint: proto.Permission_CONSTRAINT_OWN,
 				},
 			},
 		},
@@ -1676,10 +1644,12 @@ func setPermissionOnBundleOrSetting(
 	if err == nil {
 		assert.NotEmpty(t, addPermissionResponse.Setting)
 	}
+}
 
-	_, err = roleService.AssignRoleToUser(
+func assignRoleToUser(t *testing.T, accountID string, roleID string) {
+	_, err := roleService.AssignRoleToUser(
 		context.Background(),
-		&proto.AssignRoleToUserRequest{AccountUuid: accountID, RoleId: svc.BundleUUIDRoleAdmin},
+		&proto.AssignRoleToUserRequest{AccountUuid: accountID, RoleId: roleID},
 	)
 	assert.NoError(t, err)
 }
