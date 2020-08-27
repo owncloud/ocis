@@ -153,6 +153,7 @@ message GetBundleResponse {
 }
 
 message ListBundlesRequest {
+  repeated string bundle_ids = 1;
 }
 
 message ListBundlesResponse {

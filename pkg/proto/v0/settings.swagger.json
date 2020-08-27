@@ -709,7 +709,15 @@
       }
     },
     "protoListBundlesRequest": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "bundle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "protoListBundlesResponse": {
       "type": "object",

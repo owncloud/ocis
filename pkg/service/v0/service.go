@@ -98,7 +98,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	bundles, err := g.manager.ListBundles(proto.Bundle_TYPE_DEFAULT)
+	bundles, err := g.manager.ListBundles(proto.Bundle_TYPE_DEFAULT, req.BundleIds)
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
@@ -260,7 +260,7 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 	if validationError := validateListRoles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE)
+	r, err := g.manager.ListBundles(proto.Bundle_TYPE_ROLE, req.BundleIds)
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
