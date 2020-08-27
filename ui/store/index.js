@@ -73,9 +73,7 @@ const actions = {
 
     const response = await RoleService_ListRoles({
       $domain: rootGetters.configuration.server,
-      body: {
-        accountUuid: 'me'
-      }
+      body: {}
     })
 
     if (response.status === 201) {

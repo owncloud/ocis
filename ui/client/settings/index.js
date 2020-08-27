@@ -489,6 +489,52 @@ export const ValueService_GetValueURL = function(parameters = {}) {
 }
 /**
  * 
+ * request: ValueService_GetValueByUniqueIdentifiers
+ * url: ValueService_GetValueByUniqueIdentifiersURL
+ * method: ValueService_GetValueByUniqueIdentifiers_TYPE
+ * raw_url: ValueService_GetValueByUniqueIdentifiers_RAW_URL
+ * @param body - 
+ */
+export const ValueService_GetValueByUniqueIdentifiers = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['body'] !== undefined) {
+    body = parameters['body']
+  }
+  if (parameters['body'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: body'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const ValueService_GetValueByUniqueIdentifiers_RAW_URL = function() {
+  return '/api/v0/settings/values-get-by-unique-identifiers'
+}
+export const ValueService_GetValueByUniqueIdentifiers_TYPE = function() {
+  return 'post'
+}
+export const ValueService_GetValueByUniqueIdentifiersURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ * 
  * request: ValueService_ListValues
  * url: ValueService_ListValuesURL
  * method: ValueService_ListValues_TYPE
