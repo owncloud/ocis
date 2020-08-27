@@ -1,14 +1,22 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.4.1] (2020-08-27)
 
-The following sections list the changes in ocis-accounts unreleased.
+The following sections list the changes in ocis-accounts 0.4.1.
 
-[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.3.0...master
+[0.4.1]: https://github.com/owncloud/ocis-accounts/compare/v0.4.0...v0.4.1
 
 ## Summary
 
+* Bugfix - Adapting to new settings API for fetching roles: [#96](https://github.com/owncloud/ocis-accounts/pull/96)
 * Change - Create account api-call implicitly adds "default-user" role: [#173](https://github.com/owncloud/product/issues/173)
 
 ## Details
+
+* Bugfix - Adapting to new settings API for fetching roles: [#96](https://github.com/owncloud/ocis-accounts/pull/96)
+
+   We fixed the usage of the ocis-settings endpoint for fetching roles.
+
+   https://github.com/owncloud/ocis-accounts/pull/96
+
 
 * Change - Create account api-call implicitly adds "default-user" role: [#173](https://github.com/owncloud/product/issues/173)
 
@@ -16,11 +24,31 @@ The following sections list the changes in ocis-accounts unreleased.
 
    https://github.com/owncloud/product/issues/173
 
+# Changelog for [0.4.0] (2020-08-20)
+
+The following sections list the changes in ocis-accounts 0.4.0.
+
+[0.4.0]: https://github.com/owncloud/ocis-accounts/compare/v0.3.0...v0.4.0
+
+## Summary
+
+* Change - Add role selection to accounts UI: [#103](https://github.com/owncloud/product/issues/103)
+
+## Details
+
+* Change - Add role selection to accounts UI: [#103](https://github.com/owncloud/product/issues/103)
+
+   We added a role selection dropdown for each account in the accounts UI. As a first iteration,
+   this doesn't require account management permissions.
+
+   https://github.com/owncloud/product/issues/103
+   https://github.com/owncloud/ocis-accounts/pull/89
+
 # Changelog for [0.3.0] (2020-08-20)
 
 The following sections list the changes in ocis-accounts 0.3.0.
 
-[0.3.0]: https://github.com/owncloud/ocis-accounts/compare/v0.4.0...v0.3.0
+[0.3.0]: https://github.com/owncloud/ocis-accounts/compare/v0.2.0...v0.3.0
 
 ## Summary
 
@@ -61,26 +89,6 @@ The following sections list the changes in ocis-accounts 0.3.0.
    permissions for reading/writing the preferred language to the default roles.
 
    https://github.com/owncloud/ocis-accounts/pull/88
-
-# Changelog for [0.4.0] (2020-08-20)
-
-The following sections list the changes in ocis-accounts 0.4.0.
-
-[0.4.0]: https://github.com/owncloud/ocis-accounts/compare/v0.2.0...v0.4.0
-
-## Summary
-
-* Change - Add role selection to accounts UI: [#103](https://github.com/owncloud/product/issues/103)
-
-## Details
-
-* Change - Add role selection to accounts UI: [#103](https://github.com/owncloud/product/issues/103)
-
-   We added a role selection dropdown for each account in the accounts UI. As a first iteration,
-   this doesn't require account management permissions.
-
-   https://github.com/owncloud/product/issues/103
-   https://github.com/owncloud/ocis-accounts/pull/89
 
 # Changelog for [0.2.0] (2020-08-19)
 
