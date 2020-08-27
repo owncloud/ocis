@@ -321,6 +321,7 @@ func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPer
 	return nil
 }
 
+// GetPermissionByID implements the PermissionServiceHandler interface
 func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionByIDRequest, res *proto.GetPermissionByIDResponse) error {
 	if validationError := validateGetPermissionByID(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
