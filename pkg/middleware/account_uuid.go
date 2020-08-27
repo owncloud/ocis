@@ -185,13 +185,13 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			}
 
 			// encode roleIDs as json string
-			roleIDsJson, jsonErr := json.Marshal(roleIDs)
+			roleIDsJSON, jsonErr := json.Marshal(roleIDs)
 			if jsonErr != nil {
 				l.Err(jsonErr).Str("accountID", account.Id).Msg("failed to marshal roleIDs into json")
 			} else {
 				user.Opaque.Map["roles"] = &types.OpaqueEntry{
 					Decoder: "json",
-					Value:   roleIDsJson,
+					Value:   roleIDsJSON,
 				}
 			}
 
