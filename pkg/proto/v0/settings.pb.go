@@ -1570,7 +1570,7 @@ func (x *ListPermissionsByResourceResponse) GetPermissions() []*Permission {
 	return nil
 }
 
-type GetPermissionByIdRequest struct {
+type GetPermissionByIDRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1579,8 +1579,8 @@ type GetPermissionByIdRequest struct {
 	RoleIds      []string `protobuf:"bytes,2,rep,name=role_ids,json=roleIds,proto3" json:"role_ids,omitempty"`
 }
 
-func (x *GetPermissionByIdRequest) Reset() {
-	*x = GetPermissionByIdRequest{}
+func (x *GetPermissionByIDRequest) Reset() {
+	*x = GetPermissionByIDRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_settings_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1588,13 +1588,13 @@ func (x *GetPermissionByIdRequest) Reset() {
 	}
 }
 
-func (x *GetPermissionByIdRequest) String() string {
+func (x *GetPermissionByIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPermissionByIdRequest) ProtoMessage() {}
+func (*GetPermissionByIDRequest) ProtoMessage() {}
 
-func (x *GetPermissionByIdRequest) ProtoReflect() protoreflect.Message {
+func (x *GetPermissionByIDRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_settings_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1606,26 +1606,26 @@ func (x *GetPermissionByIdRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPermissionByIdRequest.ProtoReflect.Descriptor instead.
-func (*GetPermissionByIdRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetPermissionByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetPermissionByIDRequest) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{26}
 }
 
-func (x *GetPermissionByIdRequest) GetPermissionId() string {
+func (x *GetPermissionByIDRequest) GetPermissionId() string {
 	if x != nil {
 		return x.PermissionId
 	}
 	return ""
 }
 
-func (x *GetPermissionByIdRequest) GetRoleIds() []string {
+func (x *GetPermissionByIDRequest) GetRoleIds() []string {
 	if x != nil {
 		return x.RoleIds
 	}
 	return nil
 }
 
-type GetPermissionByIdResponse struct {
+type GetPermissionByIDResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1633,8 +1633,8 @@ type GetPermissionByIdResponse struct {
 	Permission *Permission `protobuf:"bytes,1,opt,name=permission,proto3" json:"permission,omitempty"`
 }
 
-func (x *GetPermissionByIdResponse) Reset() {
-	*x = GetPermissionByIdResponse{}
+func (x *GetPermissionByIDResponse) Reset() {
+	*x = GetPermissionByIDResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_settings_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1642,13 +1642,13 @@ func (x *GetPermissionByIdResponse) Reset() {
 	}
 }
 
-func (x *GetPermissionByIdResponse) String() string {
+func (x *GetPermissionByIDResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPermissionByIdResponse) ProtoMessage() {}
+func (*GetPermissionByIDResponse) ProtoMessage() {}
 
-func (x *GetPermissionByIdResponse) ProtoReflect() protoreflect.Message {
+func (x *GetPermissionByIDResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_settings_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1660,12 +1660,12 @@ func (x *GetPermissionByIdResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPermissionByIdResponse.ProtoReflect.Descriptor instead.
-func (*GetPermissionByIdResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetPermissionByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetPermissionByIDResponse) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{27}
 }
 
-func (x *GetPermissionByIdResponse) GetPermission() *Permission {
+func (x *GetPermissionByIDResponse) GetPermission() *Permission {
 	if x != nil {
 		return x.Permission
 	}
@@ -2836,13 +2836,13 @@ var file_settings_proto_rawDesc = []byte{
 	0x32, 0x11, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73,
 	0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73,
 	0x22, 0x5a, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
-	0x6e, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x23, 0x0a, 0x0d,
+	0x6e, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x23, 0x0a, 0x0d,
 	0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49,
 	0x64, 0x12, 0x19, 0x0a, 0x08, 0x72, 0x6f, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x02, 0x20,
 	0x03, 0x28, 0x09, 0x52, 0x07, 0x72, 0x6f, 0x6c, 0x65, 0x49, 0x64, 0x73, 0x22, 0x4e, 0x0a, 0x19,
 	0x47, 0x65, 0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49,
-	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x0a, 0x70, 0x65, 0x72,
+	0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x0a, 0x70, 0x65, 0x72,
 	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
 	0x52, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0xd1, 0x01, 0x0a,
@@ -3119,10 +3119,10 @@ var file_settings_proto_rawDesc = []byte{
 	0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2d, 0x6c, 0x69, 0x73, 0x74, 0x2d,
 	0x62, 0x79, 0x2d, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x3a, 0x01, 0x2a, 0x12, 0x89,
 	0x01, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e,
-	0x42, 0x79, 0x49, 0x64, 0x12, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74,
-	0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65,
+	0x42, 0x79, 0x49, 0x44, 0x12, 0x1f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74,
+	0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x65,
-	0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x64, 0x52,
+	0x74, 0x50, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x52,
 	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x31, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2b, 0x22,
 	0x26, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x30, 0x2f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67,
 	0x73, 0x2f, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2d, 0x67, 0x65,
@@ -3194,8 +3194,8 @@ var file_settings_proto_goTypes = []interface{}{
 	(*UserRoleAssignment)(nil),                 // 27: proto.UserRoleAssignment
 	(*ListPermissionsByResourceRequest)(nil),   // 28: proto.ListPermissionsByResourceRequest
 	(*ListPermissionsByResourceResponse)(nil),  // 29: proto.ListPermissionsByResourceResponse
-	(*GetPermissionByIdRequest)(nil),           // 30: proto.GetPermissionByIdRequest
-	(*GetPermissionByIdResponse)(nil),          // 31: proto.GetPermissionByIdResponse
+	(*GetPermissionByIDRequest)(nil),           // 30: proto.GetPermissionByIDRequest
+	(*GetPermissionByIDResponse)(nil),          // 31: proto.GetPermissionByIDResponse
 	(*Resource)(nil),                           // 32: proto.Resource
 	(*Bundle)(nil),                             // 33: proto.Bundle
 	(*Setting)(nil),                            // 34: proto.Setting
@@ -3228,7 +3228,7 @@ var file_settings_proto_depIdxs = []int32{
 	27, // 13: proto.AssignRoleToUserResponse.assignment:type_name -> proto.UserRoleAssignment
 	32, // 14: proto.ListPermissionsByResourceRequest.resource:type_name -> proto.Resource
 	41, // 15: proto.ListPermissionsByResourceResponse.permissions:type_name -> proto.Permission
-	41, // 16: proto.GetPermissionByIdResponse.permission:type_name -> proto.Permission
+	41, // 16: proto.GetPermissionByIDResponse.permission:type_name -> proto.Permission
 	0,  // 17: proto.Resource.type:type_name -> proto.Resource.Type
 	1,  // 18: proto.Bundle.type:type_name -> proto.Bundle.Type
 	34, // 19: proto.Bundle.settings:type_name -> proto.Setting
@@ -3262,7 +3262,7 @@ var file_settings_proto_depIdxs = []int32{
 	24, // 47: proto.RoleService.AssignRoleToUser:input_type -> proto.AssignRoleToUserRequest
 	26, // 48: proto.RoleService.RemoveRoleFromUser:input_type -> proto.RemoveRoleFromUserRequest
 	28, // 49: proto.PermissionService.ListPermissionsByResource:input_type -> proto.ListPermissionsByResourceRequest
-	30, // 50: proto.PermissionService.GetPermissionById:input_type -> proto.GetPermissionByIdRequest
+	30, // 50: proto.PermissionService.GetPermissionByID:input_type -> proto.GetPermissionByIDRequest
 	5,  // 51: proto.BundleService.SaveBundle:output_type -> proto.SaveBundleResponse
 	7,  // 52: proto.BundleService.GetBundle:output_type -> proto.GetBundleResponse
 	9,  // 53: proto.BundleService.ListBundles:output_type -> proto.ListBundlesResponse
@@ -3277,7 +3277,7 @@ var file_settings_proto_depIdxs = []int32{
 	25, // 62: proto.RoleService.AssignRoleToUser:output_type -> proto.AssignRoleToUserResponse
 	45, // 63: proto.RoleService.RemoveRoleFromUser:output_type -> google.protobuf.Empty
 	29, // 64: proto.PermissionService.ListPermissionsByResource:output_type -> proto.ListPermissionsByResourceResponse
-	31, // 65: proto.PermissionService.GetPermissionById:output_type -> proto.GetPermissionByIdResponse
+	31, // 65: proto.PermissionService.GetPermissionByID:output_type -> proto.GetPermissionByIDResponse
 	51, // [51:66] is the sub-list for method output_type
 	36, // [36:51] is the sub-list for method input_type
 	36, // [36:36] is the sub-list for extension type_name
@@ -3604,7 +3604,7 @@ func file_settings_proto_init() {
 			}
 		}
 		file_settings_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPermissionByIdRequest); i {
+			switch v := v.(*GetPermissionByIDRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3616,7 +3616,7 @@ func file_settings_proto_init() {
 			}
 		}
 		file_settings_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPermissionByIdResponse); i {
+			switch v := v.(*GetPermissionByIDResponse); i {
 			case 0:
 				return &v.state
 			case 1:

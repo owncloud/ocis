@@ -125,7 +125,7 @@ service PermissionService {
       body: "*"
     };
   }
-  rpc GetPermissionById(GetPermissionByIdRequest) returns (GetPermissionByIdResponse) {
+  rpc GetPermissionByID(GetPermissionByIDRequest) returns (GetPermissionByIDResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/permissions-get-by-id",
       body: "*"
@@ -266,12 +266,12 @@ message ListPermissionsByResourceResponse {
   repeated Permission permissions = 1;
 }
 
-message GetPermissionByIdRequest {
+message GetPermissionByIDRequest {
   string permission_id = 1;
   repeated string role_ids = 2;
 }
 
-message GetPermissionByIdResponse {
+message GetPermissionByIDResponse {
   Permission permission = 1;
 }
 

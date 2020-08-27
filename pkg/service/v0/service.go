@@ -321,8 +321,8 @@ func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPer
 	return nil
 }
 
-func (g Service) GetPermissionById(c context.Context, req *proto.GetPermissionByIdRequest, res *proto.GetPermissionByIdResponse) error {
-	if validationError := validateGetPermissionById(req); validationError != nil {
+func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionByIDRequest, res *proto.GetPermissionByIDResponse) error {
+	if validationError := validateGetPermissionByID(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	permission, err := g.manager.ReadPermissionByID(req.PermissionId, req.RoleIds)

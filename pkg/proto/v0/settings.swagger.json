@@ -282,12 +282,12 @@
     },
     "/api/v0/settings/permissions-get-by-id": {
       "post": {
-        "operationId": "PermissionService_GetPermissionById",
+        "operationId": "PermissionService_GetPermissionByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetPermissionByIdResponse"
+              "$ref": "#/definitions/protoGetPermissionByIDResponse"
             }
           },
           "default": {
@@ -303,7 +303,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetPermissionByIdRequest"
+              "$ref": "#/definitions/protoGetPermissionByIDRequest"
             }
           }
         ],
@@ -621,7 +621,7 @@
         }
       }
     },
-    "protoGetPermissionByIdRequest": {
+    "protoGetPermissionByIDRequest": {
       "type": "object",
       "properties": {
         "permission_id": {
@@ -635,7 +635,7 @@
         }
       }
     },
-    "protoGetPermissionByIdResponse": {
+    "protoGetPermissionByIDResponse": {
       "type": "object",
       "properties": {
         "permission": {

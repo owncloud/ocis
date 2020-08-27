@@ -132,7 +132,7 @@ func validateListPermissionsByResource(req *proto.ListPermissionsByResourceReque
 	)
 }
 
-func validateGetPermissionById(req *proto.GetPermissionByIdRequest) error {
+func validateGetPermissionByID(req *proto.GetPermissionByIDRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.PermissionId, requireAlphanumeric...),

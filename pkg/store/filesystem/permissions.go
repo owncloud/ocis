@@ -19,7 +19,7 @@ func (s Store) ListPermissionsByResource(resource *proto.Resource, roleIDs []str
 	return records, nil
 }
 
-// ReadPermissionById finds the permission in the roles, specified by the provided roleIDs
+// ReadPermissionByID finds the permission in the roles, specified by the provided roleIDs
 func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error) {
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
