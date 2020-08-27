@@ -15,6 +15,8 @@
 * Change - Update ocis-settings to v0.2.0: [#467](https://github.com/owncloud/ocis/pull/467)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update ocis-accounts to v0.4.0: [#479](https://github.com/owncloud/ocis/pull/479)
+* Change - Update ocis-ocs to v0.3.0: [#500](https://github.com/owncloud/ocis/pull/500)
+* Change - Update ocis-phoenix to v0.13.0: [#487](https://github.com/owncloud/ocis/pull/487)
 * Change - Update ocis-proxy to v0.7.0: [#476](https://github.com/owncloud/ocis/pull/476)
 * Change - Update ocis-reva to 0.13.0: [#496](https://github.com/owncloud/ocis/pull/496)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
@@ -138,6 +140,20 @@
    Provides a web UI for role assignment.
 
    https://github.com/owncloud/ocis/pull/479
+
+
+* Change - Update ocis-ocs to v0.3.0: [#500](https://github.com/owncloud/ocis/pull/500)
+
+   This change updates ocis-ocs to version 0.3.0
+
+   https://github.com/owncloud/ocis/pull/500
+
+
+* Change - Update ocis-phoenix to v0.13.0: [#487](https://github.com/owncloud/ocis/pull/487)
+
+   This version delivers ocis-phoenix v0.13.0.
+
+   https://github.com/owncloud/ocis/pull/487
 
 
 * Change - Update ocis-proxy to v0.7.0: [#476](https://github.com/owncloud/ocis/pull/476)
