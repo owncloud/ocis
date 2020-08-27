@@ -14,3 +14,5 @@ composer.lock
 vendor-bin/**/vendor
 vendor-bin/**/composer.lock
 tests/acceptance/output
+
+.idea
