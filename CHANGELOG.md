@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [0.3.1] (2020-08-27)
 
-The following sections list the changes in ocis-settings unreleased.
+The following sections list the changes in ocis-settings 0.3.1.
 
-[unreleased]: https://github.com/owncloud/ocis-settings/compare/v0.3.0...master
+[0.3.1]: https://github.com/owncloud/ocis-settings/compare/v0.3.0...v0.3.1
 
 ## Summary
 
