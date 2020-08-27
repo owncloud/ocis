@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"net/http"
 	"strconv"
 	"strings"
@@ -146,6 +148,17 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				groups[i] = account.MemberOf[i].OnPremisesSamAccountName
 			}
 
+			// fetch active roles from ocis-settings
+			assignmentResponse, err := opt.SettingsRoleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{AccountUuid: account.Id})
+			roleIDs := make([]string, 0)
+			if err != nil {
+				l.Err(err).Str("accountID", account.Id).Msg("failed to fetch role assignments")
+			} else {
+				for _, assignment := range assignmentResponse.Assignments {
+					roleIDs = append(roleIDs, assignment.RoleId)
+				}
+			}
+
 			l.Debug().Interface("claims", claims).Interface("account", account).Msgf("Associated claims with uuid")
 			user := &revauser.User{
 				Id: &revauser.UserId{
@@ -169,6 +182,17 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			user.Opaque.Map["gid"] = &types.OpaqueEntry{
 				Decoder: "plain",
 				Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
+			}
+
+			// encode roleIDs as json string
+			roleIDsJson, jsonErr := json.Marshal(roleIDs)
+			if jsonErr != nil {
+				l.Err(jsonErr).Str("accountID", account.Id).Msg("failed to marshal roleIDs into json")
+			} else {
+				user.Opaque.Map["roles"] = &types.OpaqueEntry{
+					Decoder: "json",
+					Value:   roleIDsJson,
+				}
 			}
 
 			token, err := tokenManager.MintToken(r.Context(), user)

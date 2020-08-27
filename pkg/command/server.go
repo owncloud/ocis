@@ -10,16 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coreos/go-oidc"
-	"github.com/justinas/alice"
-	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-proxy/pkg/cs3"
-	"github.com/owncloud/ocis-proxy/pkg/middleware"
-	"golang.org/x/oauth2"
-
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"contrib.go.opencensus.io/exporter/zipkin"
+	"github.com/coreos/go-oidc"
+	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
@@ -27,15 +22,20 @@ import (
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis-proxy/pkg/cs3"
 	"github.com/owncloud/ocis-proxy/pkg/flagset"
 	"github.com/owncloud/ocis-proxy/pkg/metrics"
+	"github.com/owncloud/ocis-proxy/pkg/middleware"
 	"github.com/owncloud/ocis-proxy/pkg/proxy"
 	"github.com/owncloud/ocis-proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis-proxy/pkg/server/http"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"golang.org/x/oauth2"
 )
 
 // Server is the entrypoint for the server command.
@@ -258,11 +258,13 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis-proxy/issues/38
 	accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
+	roles := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
 
 	uuidMW := middleware.AccountUUID(
 		middleware.Logger(l),
 		middleware.TokenManagerConfig(cfg.TokenManager),
 		middleware.AccountsClient(accounts),
+		middleware.SettingsRoleService(roles),
 	)
 
 	// the connection will be established in a non blocking fashion
