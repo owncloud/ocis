@@ -17,7 +17,7 @@ require (
 	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis-accounts v0.1.2-0.20200618163128-aa8ae58dd95e
 	github.com/owncloud/ocis-pkg/v2 v2.4.0
-	github.com/owncloud/ocis-settings v0.3.2-0.20200827134219-0f9e141699e5
+	github.com/owncloud/ocis-settings v0.3.2-0.20200827192608-ad983f1e85c1
 	github.com/owncloud/ocis-store v0.0.0-20200716140351-f9670592fb7b
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
