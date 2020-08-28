@@ -10,12 +10,17 @@ import (
 )
 
 const (
+	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
 	AccountManagementPermissionID   string = "8e587774-d929-4215-910b-a317b1e80f73"
+	// AccountManagementPermissionName is the hardcoded setting name for the account management permission
 	AccountManagementPermissionName string = "account-management"
+	// GroupManagementPermissionID is the hardcoded setting UUID for the group management permission
 	GroupManagementPermissionID     string = "522adfbe-5908-45b4-b135-41979de73245"
+	// GroupManagementPermissionName is the hardcoded setting name for the group management permission
 	GroupManagementPermissionName   string = "group-management"
 )
 
+// RegisterPermissions registers permissions for account management and group management with the settings service.
 func RegisterPermissions(l *olog.Logger) {
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis-proxy/issues/38
