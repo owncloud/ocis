@@ -1265,6 +1265,8 @@ github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c/go.mo
 github.com/owncloud/ocis-hello v0.1.0-alpha1/go.mod h1:tU2bOB7DjuXZ+ju+5A+7pUHmTfPIYUk3tMflqHTBTpE=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96 h1:8zIKgKnJF0PvNI4BLXgYpUsV1H1zVaFFZwD8xDJvyW0=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200604104641-f5d5d6bafa96/go.mod h1:tf0EkzbgtgBynkQCQmZdVlTV3y7m6ltyMBbR5h+xMbs=
+github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853 h1:ei0C5Wmppw+9oiSB0XpAdwymD8+ZnmewNdVVzYE3UvQ=
+github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853/go.mod h1:vnpYlDkhVoiuUAuTnY4Ajz2d5Alz0c/49AxptOLTpYA=
 github.com/owncloud/ocis-konnectd v0.3.2 h1:lKXpiE44xd/yvRmnTC2UA9qE+xP/6VT3QLQp3lKnmbc=
 github.com/owncloud/ocis-konnectd v0.3.2/go.mod h1:pyxlwCsLY/j54w5QVOSW8owARj6JfjH01b4hFz8XtAY=
 github.com/owncloud/ocis-migration v0.2.0 h1:AmfXKIRlGDNkqhC4AetZ0RNNgcH3cHRl8iKXA83ta7A=
