@@ -1,3 +1,31 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-pkg unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-pkg/compare/v2.4.0...master
+
+## Summary
+
+* Change - Unwrap roleIDs from access-token into metadata context: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
+* Change - Provide cache for roles: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
+
+## Details
+
+* Change - Unwrap roleIDs from access-token into metadata context: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
+
+   We pass the RoleIDs from the access-token into the metadata context.
+
+   https://github.com/owncloud/ocis-pkg/pull/59
+
+
+* Change - Provide cache for roles: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
+
+   In order to work efficiently with permissions we provide a cache for roles and a middleware to
+   update the cache based on roleIDs from the metadata context. It can be used to check permissions
+   in service handlers.
+
+   https://github.com/owncloud/ocis-pkg/pull/59
+
 # Changelog for [2.4.0] (2020-08-25)
 
 The following sections list the changes in ocis-pkg 2.4.0.
