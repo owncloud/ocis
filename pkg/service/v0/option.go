@@ -49,7 +49,7 @@ func RoleService(val settings.RoleService) Option {
 	}
 }
 
-// RolesCache provides a function to set the roles cache option.
+// RoleCache provides a function to set the roles cache option.
 func RoleCache(val *roles.Cache) Option {
 	return func(o *Options) {
 		o.RoleCache = val
