@@ -1,27 +1,26 @@
 package proto_test
 
 import (
-	context "context"
+	"context"
 	"errors"
 	"fmt"
-	"github.com/micro/go-micro/v2/client"
-	"google.golang.org/genproto/protobuf/field_mask"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/micro/go-micro/v2/client"
+	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-accounts/pkg/command"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
-
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/golang/protobuf/ptypes/empty"
-	merrors "github.com/micro/go-micro/v2/errors"
+	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var service = grpc.Service{}
@@ -30,6 +29,8 @@ const dataPath = "./accounts-store"
 
 var newCreatedAccounts = []string{}
 var newCreatedGroups = []string{}
+
+var mockedRoleAssignment = map[string]string{}
 
 func getAccount(user string) *proto.Account {
 	switch user {
@@ -165,7 +166,7 @@ func init() {
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg)); err != nil {
+	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 
@@ -183,6 +184,22 @@ func init() {
 	err = service.Server().Start()
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func buildRoleServiceMock() settings.RoleService {
+	return settings.MockRoleService{
+		AssignRoleToUserFunc: func(ctx context.Context, req *settings.AssignRoleToUserRequest, opts ...client.CallOption) (res *settings.AssignRoleToUserResponse, err error) {
+			mockedRoleAssignment[req.AccountUuid] = req.RoleId
+			fmt.Println(mockedRoleAssignment)
+			fmt.Println("asdf blablabla")
+			return &settings.AssignRoleToUserResponse{
+				Assignment: &settings.UserRoleAssignment{
+					AccountUuid: req.AccountUuid,
+					RoleId:      req.RoleId,
+				},
+			}, nil
+		},
 	}
 }
 
@@ -598,7 +615,7 @@ func TestListAccounts(t *testing.T) {
 	checkError(t, err)
 
 	assert.IsType(t, &proto.ListAccountsResponse{}, resp)
-	assert.Equal(t, 7, len(resp.Accounts))
+	assert.Equal(t, 8, len(resp.Accounts))
 
 	assertResponseContainsUser(t, resp, getAccount("user1"))
 	assertResponseContainsUser(t, resp, getAccount("user2"))
@@ -612,7 +629,7 @@ func TestListWithoutUserCreation(t *testing.T) {
 	checkError(t, err)
 
 	// Only 5 default users
-	assert.Equal(t, 5, len(resp.Accounts))
+	assert.Equal(t, 6, len(resp.Accounts))
 	cleanUp(t)
 }
 
