@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"fmt"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/config"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 // TODO testing the getAccount method should inject a cache
