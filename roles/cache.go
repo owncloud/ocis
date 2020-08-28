@@ -13,7 +13,7 @@ type entry struct {
 	inserted time.Time
 }
 
-// Cache is a barebones cache implementation.
+// Cache is a cache implementation for roles, keyed by roleIDs.
 type Cache struct {
 	entries map[string]entry
 	size    int
@@ -43,7 +43,7 @@ func (c *Cache) Get(roleID string) *settings.Bundle {
 	return nil
 }
 
-// FindPermissionById searches for a setting with the permissionID, but limited to the given roleIDs
+// FindPermissionById searches for a permission-setting by the permissionID, but limited to the given roleIDs
 func (c *Cache) FindPermissionById(roleIDs []string, permissionID string) *settings.Setting {
 	for _, roleID := range roleIDs {
 		role := c.Get(roleID)
@@ -73,7 +73,7 @@ func (c *Cache) Set(roleID string, value *settings.Bundle) {
 	}
 }
 
-// Evict frees memory from the cache by removing invalid keys. It is a noop.
+// Evict frees memory from the cache by removing entries that exceeded the cache TTL.
 func (c *Cache) evict() {
 	for i := range c.entries {
 		if c.entries[i].inserted.Add(c.ttl).Before(time.Now()) {
@@ -82,11 +82,12 @@ func (c *Cache) evict() {
 	}
 }
 
-// Length returns the amount of entries per service key.
+// Length returns the amount of entries.
 func (c *Cache) Length() int {
 	return len(c.entries)
 }
 
+// fits returns whether the cache is at full capacity.
 func (c *Cache) fits() bool {
-	return c.size >= len(c.entries)
+	return c.size > len(c.entries)
 }
