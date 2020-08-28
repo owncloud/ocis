@@ -88,7 +88,12 @@ Open https://localhost:9200 and login using one of the demo accounts:
 ```console
 einstein:relativity
 marie:radioactivity
-feynman:superfluidity
+richard:superfluidity
+```
+
+There is an admin demo account:
+```console
+moss:vista
 ```
 
 ## Runtime
