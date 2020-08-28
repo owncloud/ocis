@@ -2,6 +2,7 @@
 package store
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -73,13 +74,18 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*pro
 				return &proto.Value{}, nil
 			}
 
+			// if value saved without accountUUID, then it's a global value
+			if r.AccountUuid == "" && r.SettingId == settingID {
+				return &r, nil
+			}
+			// if value saved with accountUUID, then it's a user specific value
 			if r.AccountUuid == accountUUID && r.SettingId == settingID {
 				return &r, nil
 			}
 		}
 	}
 
-	return &proto.Value{}, nil
+	return nil, fmt.Errorf("could not read value by settingID=%v and accountID=%v", settingID, accountUUID)
 }
 
 // WriteValue writes the given value into a file within the dataPath
@@ -88,6 +94,13 @@ func (s Store) WriteValue(value *proto.Value) (*proto.Value, error) {
 	if value.Id == "" {
 		value.Id = uuid.Must(uuid.NewV4()).String()
 	}
+
+	// modify value depending on associated resource
+	if value.Resource.Type == proto.Resource_TYPE_SYSTEM {
+		value.AccountUuid = ""
+	}
+
+	// write the value
 	filePath := s.buildFilePathForValue(value.Id, true)
 	if err := s.writeRecordToFile(value, filePath); err != nil {
 		return nil, err
