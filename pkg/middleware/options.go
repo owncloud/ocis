@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -23,6 +24,8 @@ type Options struct {
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
 	AccountsClient acc.AccountsService
+	// SettingsRoleService for the roles API in settings
+	SettingsRoleService settings.RoleService
 	// OIDCProviderFunc to lazily initialize a provider, must be set for the oidcProvider middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// OIDCIss is the oidc-issuer
@@ -71,6 +74,13 @@ func HTTPClient(c *http.Client) Option {
 func AccountsClient(ac acc.AccountsService) Option {
 	return func(o *Options) {
 		o.AccountsClient = ac
+	}
+}
+
+// SettingsRoleService provides a function to set the role service option.
+func SettingsRoleService(rc settings.RoleService) Option {
+	return func(o *Options) {
+		o.SettingsRoleService = rc
 	}
 }
 

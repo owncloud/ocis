@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/oidc"
 	"github.com/owncloud/ocis-proxy/pkg/config"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 // TODO testing the getAccount method should inject a cache
@@ -35,6 +36,7 @@ func TestAccountUUIDMiddleware(t *testing.T) {
 		Logger(log.NewLogger()),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
 		AccountsClient(mockAccountUUIDMiddlewareAccSvc(false, true)),
+		SettingsRoleService(mockAccountUUIDMiddlewareRolesSvc(false)),
 	)(next)
 
 	r := httptest.NewRequest(http.MethodGet, "http://www.example.com", nil)
@@ -55,6 +57,7 @@ func TestAccountUUIDMiddlewareWithDisabledAccount(t *testing.T) {
 		Logger(log.NewLogger()),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
 		AccountsClient(mockAccountUUIDMiddlewareAccSvc(false, false)),
+		SettingsRoleService(mockAccountUUIDMiddlewareRolesSvc(false)),
 	)(next)
 
 	r := httptest.NewRequest(http.MethodGet, "http://www.example.com", nil)
@@ -72,16 +75,11 @@ func TestAccountUUIDMiddlewareWithDisabledAccount(t *testing.T) {
 }
 
 func mockAccountUUIDMiddlewareAccSvc(retErr, accEnabled bool) proto.AccountsService {
-	if retErr {
-		return &proto.MockAccountsService{
-			ListFunc: func(ctx context.Context, in *proto.ListAccountsRequest, opts ...client.CallOption) (out *proto.ListAccountsResponse, err error) {
-				return nil, fmt.Errorf("error returned by mockAccountsService LIST")
-			},
-		}
-	}
-
 	return &proto.MockAccountsService{
 		ListFunc: func(ctx context.Context, in *proto.ListAccountsRequest, opts ...client.CallOption) (out *proto.ListAccountsResponse, err error) {
+			if retErr {
+				return nil, fmt.Errorf("error returned by mockAccountsService LIST")
+			}
 			return &proto.ListAccountsResponse{
 				Accounts: []*proto.Account{
 					{
@@ -92,5 +90,17 @@ func mockAccountUUIDMiddlewareAccSvc(retErr, accEnabled bool) proto.AccountsServ
 			}, nil
 		},
 	}
+}
 
+func mockAccountUUIDMiddlewareRolesSvc(returnError bool) settings.RoleService {
+	return &settings.MockRoleService{
+		ListRoleAssignmentsFunc: func(ctx context.Context, req *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) (res *settings.ListRoleAssignmentsResponse, err error) {
+			if returnError {
+				return nil, fmt.Errorf("error returned by mockRoleService.ListRoleAssignments")
+			}
+			return &settings.ListRoleAssignmentsResponse{
+				Assignments: []*settings.UserRoleAssignment{},
+			}, nil
+		},
+	}
 }
