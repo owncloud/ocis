@@ -1,11 +1,10 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	mclient "github.com/micro/go-micro/v2/client"
-	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -18,10 +17,13 @@ import (
 	"github.com/blevesearch/bleve/analysis/analyzer/standard"
 	"github.com/blevesearch/bleve/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
-
+	mclient "github.com/micro/go-micro/v2/client"
+	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
 )
 
 // New returns a new instance of Service
@@ -100,6 +102,23 @@ func New(opts ...Option) (s *Service, err error) {
 							{Id: "262982c1-2362-4afa-bfdf-8cbfef64a06e"}, // physics-lovers
 						},
 					},
+					// admin user(s)
+					{
+						Id:                       "058bff95-6708-4fe5-91e4-9ea3d377588b",
+						PreferredName:            "moss",
+						OnPremisesSamAccountName: "moss",
+						Mail:                     "moss@example.org",
+						DisplayName:              "Maurice Moss",
+						UidNumber:                20003,
+						GidNumber:                30000,
+						PasswordProfile: &proto.PasswordProfile{
+							Password: "$6$rounds=47068$lhw6odzXW0LTk/ao$GgxS.pIgP8jawLJBAiyNor2FrWzrULF95PwspRkli2W3VF.4HEwTYlQfRXbNQBMjNCEcEYlgZo3a.kRz2k2N0/",
+						},
+						AccountEnabled: true,
+						MemberOf: []*proto.Group{
+							{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+						},
+					},
 					// technical users for kopano and reva
 					{
 						Id:                       "820ba2a1-3f54-4538-80a4-2d73007e30bf",
@@ -135,6 +154,7 @@ func New(opts ...Option) (s *Service, err error) {
 					},
 				}
 				for i := range accounts {
+					// create account on disk
 					var bytes []byte
 					if bytes, err = json.Marshal(&accounts[i]); err != nil {
 						logger.Error().Err(err).Interface("account", &accounts[i]).Msg("could not marshal default account")
@@ -146,6 +166,22 @@ func New(opts ...Option) (s *Service, err error) {
 						logger.Error().Err(err).Str("path", path).Interface("account", &accounts[i]).Msg("could not persist default account")
 						return
 					}
+				}
+
+				// set role for admin users and regular users
+				rs := settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
+				assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, rs, logger)
+				for _, accountID := range []string{
+					"058bff95-6708-4fe5-91e4-9ea3d377588b",//moss
+				} {
+					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, rs, logger)
+				}
+				for _, accountID := range []string{
+					"4c510ada-c86b-4815-8820-42cdf82c3d51",//einstein
+					"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",//marie
+					"932b4540-8d16-481e-8ef4-588e4b6b151c",//richard
+				} {
+					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleUser, rs, logger)
 				}
 			}
 		} else if !fi.IsDir() {
@@ -310,6 +346,18 @@ func New(opts ...Option) (s *Service, err error) {
 	// TODO watch folders for new records
 
 	return
+}
+
+func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger log.Logger) (ok bool) {
+	_, err := rs.AssignRoleToUser(context.Background(), &settings.AssignRoleToUserRequest{
+		AccountUuid: accountID,
+		RoleId:      roleID,
+	})
+	if err != nil {
+		logger.Error().Err(err).Str("accountID", accountID).Str("roleID", roleID).Msg("could not set role for account")
+		return false
+	}
+	return true
 }
 
 // Service implements the AccountsServiceHandler interface
