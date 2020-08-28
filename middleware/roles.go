@@ -11,6 +11,8 @@ import (
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
+// Roles manages a roles.Cache by fetching and inserting roles unknown by the cache.
+// Relevant roleIDs are extracted from the metadata context, i.e. the roleIDs of the authenticated user.
 func Roles(log log.Logger, rs settings.RoleService, cache *roles.Cache) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
