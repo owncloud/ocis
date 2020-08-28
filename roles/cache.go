@@ -43,8 +43,8 @@ func (c *Cache) Get(roleID string) *settings.Bundle {
 	return nil
 }
 
-// FindPermissionById searches for a permission-setting by the permissionID, but limited to the given roleIDs
-func (c *Cache) FindPermissionById(roleIDs []string, permissionID string) *settings.Setting {
+// FindPermissionByID searches for a permission-setting by the permissionID, but limited to the given roleIDs
+func (c *Cache) FindPermissionByID(roleIDs []string, permissionID string) *settings.Setting {
 	for _, roleID := range roleIDs {
 		role := c.Get(roleID)
 		if role != nil {
