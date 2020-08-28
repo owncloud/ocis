@@ -6,9 +6,27 @@ The following sections list the changes in ocis-settings unreleased.
 
 ## Summary
 
+* Bugfix - Fix loading and saving system scoped values: [#66](https://github.com/owncloud/ocis-settings/pull/66)
+* Bugfix - Complete input validation: [#66](https://github.com/owncloud/ocis-settings/pull/66)
 * Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
 
 ## Details
+
+* Bugfix - Fix loading and saving system scoped values: [#66](https://github.com/owncloud/ocis-settings/pull/66)
+
+   We fixed loading and saving system scoped values. Those are now saved without an account uuid,
+   so that the value can be loaded by other accounts as well.
+
+   https://github.com/owncloud/ocis-settings/pull/66
+
+
+* Bugfix - Complete input validation: [#66](https://github.com/owncloud/ocis-settings/pull/66)
+
+   There was one handler function without input validation. We implemented the input validation
+   for `ValueService.ReadValueByUniqueIdentifiers`.
+
+   https://github.com/owncloud/ocis-settings/pull/66
+
 
 * Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
 

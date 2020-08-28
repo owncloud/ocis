@@ -91,6 +91,14 @@ func validateGetValue(req *proto.GetValueRequest) error {
 	return validation.Validate(req.Id, is.UUID)
 }
 
+func validateGetValueByUniqueIdentifiers(req *proto.GetValueByUniqueIdentifiersRequest) error {
+	return validation.ValidateStruct(
+		req,
+		validation.Field(&req.SettingId, is.UUID),
+		validation.Field(&req.AccountUuid, requireAccountID...),
+	)
+}
+
 func validateListValues(req *proto.ListValuesRequest) error {
 	return validation.ValidateStruct(
 		req,
