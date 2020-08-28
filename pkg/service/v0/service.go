@@ -31,6 +31,10 @@ func New(opts ...Option) (s *Service, err error) {
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
+	roleService := options.RoleService
+	if roleService == nil {
+		roleService = settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
+	}
 	// read all user and group records
 
 	accountsDir := filepath.Join(cfg.Server.AccountsDataPath, "accounts")
@@ -169,19 +173,18 @@ func New(opts ...Option) (s *Service, err error) {
 				}
 
 				// set role for admin users and regular users
-				rs := settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
-				assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, rs, logger)
+				assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, roleService, logger)
 				for _, accountID := range []string{
 					"058bff95-6708-4fe5-91e4-9ea3d377588b",//moss
 				} {
-					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, rs, logger)
+					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, roleService, logger)
 				}
 				for _, accountID := range []string{
 					"4c510ada-c86b-4815-8820-42cdf82c3d51",//einstein
 					"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",//marie
 					"932b4540-8d16-481e-8ef4-588e4b6b151c",//richard
 				} {
-					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleUser, rs, logger)
+					assignRoleToUser(accountID, settings_svc.BundleUUIDRoleUser, roleService, logger)
 				}
 			}
 		} else if !fi.IsDir() {
