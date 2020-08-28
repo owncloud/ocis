@@ -172,9 +172,9 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
-	//if !s.hasAccountManagementPermissions(ctx) {
-	//	return merrors.Forbidden(s.id, "no permission for ListAccounts")
-	//}
+	if !s.hasAccountManagementPermissions(ctx) {
+		return merrors.Forbidden(s.id, "no permission for ListAccounts")
+	}
 
 	accLock.Lock()
 	defer accLock.Unlock()
