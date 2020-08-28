@@ -216,8 +216,11 @@ func (g Service) GetValue(c context.Context, req *proto.GetValueRequest, res *pr
 }
 
 // GetValueByUniqueIdentifiers implements the ValueService interface
-func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, in *proto.GetValueByUniqueIdentifiersRequest, res *proto.GetValueResponse) error {
-	v, err := g.manager.ReadValueByUniqueIdentifiers(in.AccountUuid, in.SettingId)
+func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *proto.GetValueByUniqueIdentifiersRequest, res *proto.GetValueResponse) error {
+	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
+		return merrors.BadRequest(g.id, "%s", validationError)
+	}
+	v, err := g.manager.ReadValueByUniqueIdentifiers(req.AccountUuid, req.SettingId)
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
