@@ -29,7 +29,7 @@ require (
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/owncloud/ocis-pkg/v2 v2.4.0
-	github.com/owncloud/ocis-settings v0.3.0
+	github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
