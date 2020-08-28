@@ -1,9 +1,10 @@
 package proto
 
 import (
-	context "context"
-	empty "github.com/golang/protobuf/ptypes/empty"
-	client "github.com/micro/go-micro/v2/client"
+	"context"
+
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/micro/go-micro/v2/client"
 )
 
 // MockBundleService can be used to write tests against the bundle service.
