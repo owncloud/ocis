@@ -12,7 +12,7 @@ require (
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1
-	github.com/owncloud/ocis-settings v0.3.1
+	github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
@@ -24,5 +24,3 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
-
-replace github.com/owncloud/ocis-settings => ../ocis-settings
