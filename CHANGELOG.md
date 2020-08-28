@@ -1,3 +1,29 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-accounts unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-accounts/compare/v0.4.1...master
+
+## Summary
+
+* Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
+* Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
+
+## Details
+
+* Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
+
+   We now set the default `user` role on our builtin users.
+
+   https://github.com/owncloud/ocis-accounts/pull/102
+
+
+* Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
+
+   We added a new builtin user `moss` and assigned the admin role.
+
+   https://github.com/owncloud/ocis-accounts/pull/102
+
 # Changelog for [0.4.1] (2020-08-27)
 
 The following sections list the changes in ocis-accounts 0.4.1.
