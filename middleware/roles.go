@@ -54,11 +54,11 @@ func Roles(log log.Logger, rs settings.RoleService, cache *roles.Cache) func(nex
 
 // ReadRoleIDsFromContext extracts roleIDs from the metadata context and returns them as []string
 func ReadRoleIDsFromContext(ctx context.Context) (roleIDs []string, ok bool) {
-	roleIDsJson, ok := metadata.Get(ctx, RoleIDs)
+	roleIDsJSON, ok := metadata.Get(ctx, RoleIDs)
 	if !ok {
 		return nil, false
 	}
-	err := json.Unmarshal([]byte(roleIDsJson), &roleIDs)
+	err := json.Unmarshal([]byte(roleIDsJSON), &roleIDs)
 	if err != nil {
 		return nil, false
 	}
