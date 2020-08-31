@@ -1,6 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
+    UITests(ctx, 'master', '0c6478c9350f56ff6d7c402b5d9d60a68b0f6f75', 'master', '2e1af4c27f21439ead1e3358f9690e9ffa7eb75a')
   ]
 
   stages = [
@@ -698,4 +699,163 @@ def website(ctx):
         'refs/pull/**',
       ],
     },
+  }
+
+def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
+  return {
+   'kind': 'pipeline',
+   'type': 'docker',
+   'name': 'UiTests',
+   'platform': {
+     'os': 'linux',
+     'arch': 'amd64',
+    },
+   'steps': [
+     {
+       'name': 'build',
+       'image': 'webhippie/golang:1.13',
+       'pull': 'always',
+       'commands': [
+         'make protobuf build',
+       ],
+       'volumes': [
+         {
+           'name': 'gopath',
+           'path': '/srv/app',
+         },
+       ],
+     },
+     {
+       'name': 'build-ocis',
+       'image': 'webhippie/golang:1.13',
+       'pull': 'always',
+       'commands': [
+         'git clone -b %s --single-branch --no-tags https://github.com/owncloud/ocis /srv/app/ocis' % (ocisBranch),
+         'cd /srv/app/ocis',
+         'git checkout %s' % (ocisCommitId),
+         'make build',
+       ],
+       'volumes': [
+         {
+           'name': 'gopath',
+           'path': '/srv/app'
+         },
+       ]
+     },
+     {
+       'name': 'ocis-server',
+       'image': 'webhippie/golang:1.13',
+       'pull': 'always',
+       'detach': True,
+       'environment' : {
+         'OCIS_LOG_LEVEL': 'debug',
+         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+         'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
+         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
+         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+         'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+         'REVA_LDAP_IDP': 'https://ocis-server:9200',
+         'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+         'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
+         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+         'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
+         'REVA_FRONTEND_URL': 'https://ocis-server:9200',
+         'PHOENIX_WEB_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
+         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ui/tests/config/drone/identifier-registration.yml',
+         'KONNECTD_ISS': 'https://ocis-server:9200',
+         'KONNECTD_TLS': 'true',
+         'OCIS_CONFIG_FILE': '/drone/src/ui/tests/config/drone/proxy-config.json',
+         'SETTINGS_DATA_PATH': '/srv/app/settings-store'
+       },
+       'commands': [
+         'mkdir -p /srv/app/tmp/reva',
+         # Start ocis settings first
+         'bin/ocis-settings server &',
+         # Now run all the ocis services except the settings because it is already running
+         '/srv/app/ocis/bin/ocis server',
+       ],
+       'volumes': [
+         {
+           'name': 'gopath',
+           'path': '/srv/app'
+         },
+       ]
+     },
+     {
+       'name': 'WebUIAcceptanceTests',
+       'image': 'owncloudci/nodejs:10',
+       'pull': 'always',
+       'environment': {
+         'SERVER_HOST': 'https://ocis-server:9200',
+         'BACKEND_HOST': 'https://ocis-server:9200',
+         'RUN_ON_OCIS': 'true',
+         'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
+         'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
+         'PHOENIX_CONFIG': '/drone/src/ui/tests/config/drone/ocis-config.json',
+         'TEST_TAGS': 'not @skipOnOCIS and not @skip',
+         'LOCAL_UPLOAD_DIR': '/uploads',
+         'PHOENIX_PATH': '/srv/app/phoenix',
+         'FEATURE_PATH': 'ui/tests/acceptance/features',
+         'NODE_TLS_REJECT_UNAUTHORIZED': '0',
+         'OCIS_SETTINGS_STORE': '/srv/app/settings-store'
+       },
+       'commands': [
+         'git clone --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
+         'git clone -b %s --single-branch https://github.com/owncloud/phoenix /srv/app/phoenix' % (phoenixBranch),
+         'cd /srv/app/phoenix',
+         'git checkout %s' % (phoenixCommitId),
+         'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
+         'yarn install-all',
+         'yarn dist',
+         'cp -r /drone/src/ui/tests/config/drone/ocis-config.json /srv/app/phoenix/dist/config.json',
+         'cd /drone/src',
+         'yarn install --all',
+         'make test-acceptance-webui',
+       ],
+       'volumes': [{
+         'name': 'gopath',
+         'path': '/srv/app',
+       },
+       {
+         'name': 'uploads',
+         'path': '/uploads'
+       }]
+     },
+   ],
+   'services': [
+     {
+       'name': 'redis',
+       'image': 'webhippie/redis',
+       'pull': 'always',
+       'environment': {
+         'REDIS_DATABASES': 1
+       },
+     },
+     {
+       'name': 'selenium',
+       'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+       'pull': 'always',
+       'volumes': [{
+           'name': 'uploads',
+           'path': '/uploads'
+       }],
+     },
+   ],
+   'volumes': [
+     {
+       'name': 'gopath',
+       'temp': {},
+     },
+     {
+       'name': 'uploads',
+       'temp': {}
+     }
+   ],
+   'trigger': {
+     'ref': [
+       'refs/heads/master',
+       'refs/tags/**',
+       'refs/pull/**',
+     ],
+   },
   }
