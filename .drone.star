@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'master', 'fdf519acdedb7dfb70468b39af575559cdd5089b', 'master', 'e0746d8d3a5879d2c0cd4aaf30c07ee98ab2b945')
+    UITests(ctx, 'master', 'fdf519acdedb7dfb70468b39af575559cdd5089b', 'fix-ocis-accounts-user-ids', 'a5753cea7a771b7bd11eb6c2f06d9182dad7d06d')
   ]
 
   stages = [
