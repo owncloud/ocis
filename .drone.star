@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': '7b6a4cf6dab990d1624042589d22e348e027b74b',
+    'coreBranch': 'test-trashbinFilesFolders-ci',
+    'coreCommit': '',
     'numberOfParts': 2
   },
   'uiTests': {
