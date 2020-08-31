@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'master', 'fdf519acdedb7dfb70468b39af575559cdd5089b', 'master', '0075dbd7b14360de203ec2a327c6b3f5c5844364')
+    UITests(ctx, 'master', 'fdf519acdedb7dfb70468b39af575559cdd5089b', 'master', 'e0746d8d3a5879d2c0cd4aaf30c07ee98ab2b945')
   ]
 
   stages = [
