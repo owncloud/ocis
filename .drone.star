@@ -342,8 +342,16 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'mkdir -p /srv/app/tmp/reva',
          # First run settings service because accounts need it to register the settings bundles
          '/srv/app/ocis/bin/ocis settings &',
+
+         # Wait for the settings service to start
+         "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9190)\" != \"404\" ]]; do sleep 2; done",
+
          # Now start the accounts service
          'bin/ocis-accounts server &',
+
+         # Wait for the accounts service to start
+         "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9181)\" != \"404\" ]]; do sleep 2; done",
+
          # Now run all the ocis services except the accounts and settings because they are already running
          '/srv/app/ocis/bin/ocis server',
        ],
