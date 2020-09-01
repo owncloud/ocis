@@ -190,8 +190,9 @@ type DriverEOS struct {
 type DriverOwnCloud struct {
 	DriverCommon
 
-	Redis string
-	Scan  bool
+	UploadInfoDir string
+	Redis         string
+	Scan          bool
 }
 
 // DriverS3 defines the available S3 storage driver configuration.

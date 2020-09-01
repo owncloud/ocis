@@ -77,10 +77,12 @@ func drivers(cfg *config.Config) map[string]interface{} {
 		},
 		"owncloud": map[string]interface{}{
 			"datadirectory":   cfg.Reva.Storages.OwnCloud.Root,
-			"scan":            cfg.Reva.Storages.OwnCloud.Scan,
+			"upload_info_dir": cfg.Reva.Storages.OwnCloud.UploadInfoDir,
+			"sharedirectory":  cfg.Reva.Storages.OwnCloud.ShareFolder,
+			"user_layout":     cfg.Reva.Storages.OwnCloud.UserLayout,
 			"redis":           cfg.Reva.Storages.OwnCloud.Redis,
 			"enable_home":     cfg.Reva.Storages.OwnCloud.EnableHome,
-			"user_layout":     cfg.Reva.Storages.OwnCloud.UserLayout,
+			"scan":            cfg.Reva.Storages.OwnCloud.Scan,
 			"userprovidersvc": cfg.Reva.Users.URL,
 		},
 		"ocis": map[string]interface{}{
