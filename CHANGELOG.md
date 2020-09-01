@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-ocs unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-ocs/compare/v0.3.0...master
+
+## Summary
+
+* Enhancement - Update ocis-accounts: [#42](https://github.com/owncloud/ocis-ocs/pull/42)
+
+## Details
+
+* Enhancement - Update ocis-accounts: [#42](https://github.com/owncloud/ocis-ocs/pull/42)
+
+   Update ocis-accounts to v0.4.2-0.20200828150703-2ca83cf4ac20
+
+   https://github.com/owncloud/ocis-ocs/pull/42
+
 # Changelog for [0.3.0] (2020-08-27)
 
 The following sections list the changes in ocis-ocs 0.3.0.
