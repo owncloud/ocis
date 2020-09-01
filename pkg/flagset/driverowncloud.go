@@ -13,7 +13,7 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "/var/tmp/reva/data",
 			Usage:       "the path to the owncloud data directory",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_DATADIR"},
-			Destination: &cfg.Reva.Storages.Common.Root,
+			Destination: &cfg.Reva.Storages.OwnCloud.Root,
 		},
 		&cli.BoolFlag{
 			Name:        "storage-owncloud-scan",
@@ -34,14 +34,14 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       false,
 			Usage:       "enable the creation of home storages",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_ENABLE_HOME"},
-			Destination: &cfg.Reva.Storages.Common.EnableHome,
+			Destination: &cfg.Reva.Storages.OwnCloud.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",
 			Value:       "{{.Id.OpaqueId}}",
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.Mail}}, {{.Id.OpaqueId}}, {{.Id.Idp}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_LAYOUT"},
-			Destination: &cfg.Reva.Storages.Common.UserLayout,
+			Destination: &cfg.Reva.Storages.OwnCloud.UserLayout,
 		},
 	}
 }

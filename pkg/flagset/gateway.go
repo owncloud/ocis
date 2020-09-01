@@ -98,14 +98,6 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_GATEWAY_SHARE_FOLDER"},
 			Destination: &cfg.Reva.Gateway.ShareFolder,
 		},
-		// TODO(refs) temporary workaround needed for storing link grants.
-		&cli.StringFlag{
-			Name:        "link_grants_file",
-			Value:       "/var/tmp/reva/link_grants.json",
-			Usage:       "when using a json manager, file to use as json serialized database",
-			EnvVars:     []string{"REVA_GATEWAY_LINK_GRANTS_FILE"},
-			Destination: &cfg.Reva.Gateway.LinkGrants,
-		},
 		&cli.BoolFlag{
 			Name:        "disable-home-creation-on-login",
 			Usage:       "Disable creation of home folder on login",
@@ -118,11 +110,25 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		// storage registry
 
 		&cli.StringFlag{
+			Name:        "storage-registry-driver",
+			Value:       "static",
+			Usage:       "driver of the storage registry",
+			EnvVars:     []string{"REVA_STORAGE_REGISTRY_DRIVER"},
+			Destination: &cfg.Reva.StorageRegistry.Driver,
+		},
+		&cli.StringSliceFlag{
+			Name:    "storage-registry-rule",
+			Value:   cli.NewStringSlice(),
+			Usage:   `Replaces the generated storage registry rules with this set: --storage-registry-rule "/eos=localhost:9158" [--storage-registry-rule "1284d238-aa92-42ce-bdc4-0b0000009162=localhost:9162"]`,
+			EnvVars: []string{"REVA_STORAGE_REGISTRY_RULES"},
+		},
+
+		&cli.StringFlag{
 			Name:        "storage-home-provider",
 			Value:       "/home",
 			Usage:       "mount point of the storage provider for user homes in the global namespace",
 			EnvVars:     []string{"REVA_STORAGE_HOME_PROVIDER"},
-			Destination: &cfg.Reva.Gateway.HomeProvider,
+			Destination: &cfg.Reva.StorageRegistry.HomeProvider,
 		},
 
 		&cli.StringFlag{
@@ -166,13 +172,6 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "URL to use for the reva service",
 			EnvVars:     []string{"REVA_SHARING_URL"},
 			Destination: &cfg.Reva.Sharing.URL,
-		},
-
-		&cli.StringSliceFlag{
-			Name:    "storage-registry-rule",
-			Value:   cli.NewStringSlice(),
-			Usage:   `Replace the generated storage registry rules with this set --storage-registry-rule "/eos=localhost:9158" [--storage-registry-rule "1284d238-aa92-42ce-bdc4-0b0000009162=localhost:9162"]`,
-			EnvVars: []string{"REVA_STORAGE_REGISTRY_RULES"},
 		},
 
 		&cli.StringFlag{

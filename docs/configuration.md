@@ -885,9 +885,6 @@ Usage: `ocis-reva gateway [command options] [arguments...]`
 --share-folder | $REVA_GATEWAY_SHARE_FOLDER  
 : mount shares in this folder of the home storage provider. Default: `Shares`.
 
---link_grants_file | $REVA_GATEWAY_LINK_GRANTS_FILE  
-: when using a json manager, file to use as json serialized database. Default: `/var/tmp/reva/link_grants.json`.
-
 --disable-home-creation-on-login | $REVA_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN  
 : Disable creation of home folder on login.
 

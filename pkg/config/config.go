@@ -23,9 +23,14 @@ type Gateway struct {
 	ShareFolder                string
 	LinkGrants                 string
 	DisableHomeCreationOnLogin bool
-	// include the home folder config for the storage registry
+}
+
+// StorageRegistry defines the available storage registry configuration
+type StorageRegistry struct {
+	Driver string
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
 	HomeProvider string
+	Rules        []string
 }
 
 // Sharing defines the available sharing configuration.
@@ -100,15 +105,29 @@ type PublicStorage struct {
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
 	EOS      DriverEOS
-	Local    DriverLocal
+	Local    DriverCommon
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
 	Common   DriverCommon
 	// TODO checksums ... figure out what that is supposed to do
 }
 
+// DriverCommon defines common driver configuration options.
+type DriverCommon struct {
+	// Root is the absolute path to the location of the data
+	Root string
+	//ShareFolder defines the name of the folder jailing all shares
+	ShareFolder string
+	// UserLayout contains the template used to construct
+	// the internal path, eg: `{{substr 0 1 .Username}}/{{.Username}}`
+	UserLayout string
+	// EnableHome enables the creation of home directories.
+	EnableHome bool
+}
+
 // DriverEOS defines the available EOS driver configuration.
 type DriverEOS struct {
+	DriverCommon
 
 	// ShadowNamespace for storing shadow data
 	ShadowNamespace string
@@ -167,32 +186,18 @@ type DriverEOS struct {
 	GatewaySVC string
 }
 
-// DriverLocal defines the available local storage driver configuration.
-type DriverLocal struct {
-	Root string
-}
-
-// DriverCommon defines common driver configuration options.
-type DriverCommon struct {
-	// Root is the absolute path to the location of the data
-	Root string
-	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string
-	// UserLayout contains the template used to construct
-	// the internal path, eg: `{{substr 0 1 .Username}}/{{.Username}}`
-	UserLayout string
-	// EnableHome enables the creation of home directories.
-	EnableHome bool
-}
-
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
 type DriverOwnCloud struct {
+	DriverCommon
+
 	Redis string
 	Scan  bool
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
+	DriverCommon
+
 	Region    string
 	AccessKey string
 	SecretKey string
@@ -270,6 +275,7 @@ type Reva struct {
 	Frontend          FrontendPort
 	DataGateway       Port
 	Gateway           Gateway
+	StorageRegistry   StorageRegistry
 	Users             Users
 	AuthProvider      Users
 	AuthBasic         Port

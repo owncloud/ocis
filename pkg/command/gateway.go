@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -25,6 +26,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Flags: flagset.GatewayWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Gateway.Services = c.StringSlice("service")
+			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
 
 			return nil
 		},
@@ -104,8 +106,6 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"commit_share_to_storage_grant": cfg.Reva.Gateway.CommitShareToStorageGrant,
 								"commit_share_to_storage_ref":   cfg.Reva.Gateway.CommitShareToStorageRef,
 								"share_folder":                  cfg.Reva.Gateway.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
-								// public links
-								"link_grants_file": cfg.Reva.Gateway.LinkGrants,
 								// other
 								"disable_home_creation_on_login": cfg.Reva.Gateway.DisableHomeCreationOnLogin,
 								"datagateway":                    urlWithScheme(cfg.Reva.DataGateway.URL),
@@ -125,28 +125,11 @@ func Gateway(cfg *config.Config) *cli.Command {
 								},
 							},
 							"storageregistry": map[string]interface{}{
-								"driver": "static",
+								"driver": cfg.Reva.StorageRegistry.Driver,
 								"drivers": map[string]interface{}{
 									"static": map[string]interface{}{
-										"home_provider": cfg.Reva.Gateway.HomeProvider,
-										"rules": map[string]interface{}{
-											cfg.Reva.StorageRoot.MountPath:         cfg.Reva.StorageRoot.URL,
-											cfg.Reva.StorageRoot.MountID:           cfg.Reva.StorageRoot.URL,
-											cfg.Reva.StorageHome.MountPath:         cfg.Reva.StorageHome.URL,
-											cfg.Reva.StorageHome.MountID:           cfg.Reva.StorageHome.URL,
-											cfg.Reva.StorageEOS.MountPath:          cfg.Reva.StorageEOS.URL,
-											cfg.Reva.StorageEOS.MountID:            cfg.Reva.StorageEOS.URL,
-											cfg.Reva.StorageOC.MountPath:           cfg.Reva.StorageOC.URL,
-											cfg.Reva.StorageOC.MountID:             cfg.Reva.StorageOC.URL,
-											cfg.Reva.StorageS3.MountPath:           cfg.Reva.StorageS3.URL,
-											cfg.Reva.StorageS3.MountID:             cfg.Reva.StorageS3.URL,
-											cfg.Reva.StorageWND.MountPath:          cfg.Reva.StorageWND.URL,
-											cfg.Reva.StorageWND.MountID:            cfg.Reva.StorageWND.URL,
-											cfg.Reva.StorageCustom.MountPath:       cfg.Reva.StorageCustom.URL,
-											cfg.Reva.StorageCustom.MountID:         cfg.Reva.StorageCustom.URL,
-											"/public/":                             "localhost:10054",
-											"e1a73ede-549b-4226-abdf-40e69ca8230d": "localhost:10054",
-										},
+										"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
+										"rules":         rules(cfg),
 									},
 								},
 							},
@@ -244,6 +227,17 @@ func Gateway(cfg *config.Config) *cli.Command {
 
 func rules(cfg *config.Config) map[string]interface{} {
 
+	// if a list of rules is given it overrides the generated rules from below
+	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
+		rules := map[string]interface{}{}
+		for i := range cfg.Reva.StorageRegistry.Rules {
+			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
+			rules[parts[0]] = parts[1]
+		}
+		return rules
+	}
+
+	// generate rules based on default config
 	return map[string]interface{}{
 		cfg.Reva.StorageRoot.MountPath:       cfg.Reva.StorageRoot.URL,
 		cfg.Reva.StorageRoot.MountID:         cfg.Reva.StorageRoot.URL,
@@ -260,6 +254,6 @@ func rules(cfg *config.Config) map[string]interface{} {
 		cfg.Reva.StorageCustom.MountPath:     cfg.Reva.StorageCustom.URL,
 		cfg.Reva.StorageCustom.MountID:       cfg.Reva.StorageCustom.URL,
 		cfg.Reva.StoragePublicLink.MountPath: cfg.Reva.StoragePublicLink.URL,
-		cfg.Reva.StoragePublicLink.MountID:   cfg.Reva.StoragePublicLink.URL,
+		// public link storage returns the mount id of the actual storage
 	}
 }

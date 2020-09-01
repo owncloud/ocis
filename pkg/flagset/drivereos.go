@@ -16,7 +16,7 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "/eos/dockertest/reva",
 			Usage:       "Namespace for metadata operations",
 			EnvVars:     []string{"REVA_STORAGE_EOS_NAMESPACE"},
-			Destination: &cfg.Reva.Storages.Common.Root,
+			Destination: &cfg.Reva.Storages.EOS.Root,
 		},
 		&cli.StringFlag{
 			Name: "storage-eos-shadow-namespace",
@@ -30,7 +30,7 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "/Shares",
 			Usage:       "name of the share folder",
 			EnvVars:     []string{"REVA_STORAGE_EOS_SHARE_FOLDER"},
-			Destination: &cfg.Reva.Storages.Common.ShareFolder,
+			Destination: &cfg.Reva.Storages.EOS.ShareFolder,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-binary",
@@ -95,7 +95,7 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "storage-eos-enable-home",
 			Usage:       "enable the creation of home directories",
 			EnvVars:     []string{"REVA_STORAGE_EOS_ENABLE_HOME"},
-			Destination: &cfg.Reva.Storages.Common.EnableHome,
+			Destination: &cfg.Reva.Storages.EOS.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-sec-protocol",
@@ -120,7 +120,7 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "{{substr 0 1 .Username}}/{{.Username}}",
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"REVA_STORAGE_EOS_LAYOUT"},
-			Destination: &cfg.Reva.Storages.Common.UserLayout,
+			Destination: &cfg.Reva.Storages.EOS.UserLayout,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-gatewaysvc",
