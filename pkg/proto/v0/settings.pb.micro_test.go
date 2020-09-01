@@ -325,7 +325,7 @@ func TestBundleInputValidation(t *testing.T) {
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
 
 				// we want to test input validation, so just allow the request permission-wise
-				setFullReadWriteOnBundleForAdmin(t, ctx, cresponse.Bundle.Id)
+				setFullReadWriteOnBundleForAdmin(ctx, t, cresponse.Bundle.Id)
 
 				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
 				getResponse, err := bundleService.GetBundle(ctx, &getRequest)
@@ -391,7 +391,7 @@ func TestGetBundleHavingFullPermissionsOnAnotherRole(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
 
-	setFullReadWriteOnBundleForAdmin(t, ctx, bundleStub.Id)
+	setFullReadWriteOnBundleForAdmin(ctx, t, bundleStub.Id)
 	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
 	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.Empty(t, getResponse)
@@ -421,7 +421,7 @@ func TestSaveAndGetBundle(t *testing.T) {
 	assert.Equal(t, receivedBundle, expectedBundle)
 
 	// set full permissions for getting the created bundle
-	setFullReadWriteOnBundleForAdmin(t, ctx, saveResponse.Bundle.Id)
+	setFullReadWriteOnBundleForAdmin(ctx, t, saveResponse.Bundle.Id)
 
 	//assert that GetBundle returns the same bundle as saved
 	getRequest := proto.GetBundleRequest{BundleId: saveResponse.Bundle.Id}
@@ -1258,7 +1258,7 @@ func TestListFilteredBundle(t *testing.T) {
 				assert.NoError(t, err)
 
 				setPermissionOnBundleOrSetting(
-					t, ctx, testBundle.bundle.Id, proto.Resource_TYPE_BUNDLE,
+					ctx, t, testBundle.bundle.Id, proto.Resource_TYPE_BUNDLE,
 					testBundle.permission.permission, testBundle.permission.roleUUID,
 				)
 			}
@@ -1559,7 +1559,7 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 			// set permissions for each setting
 			for _, testSetting := range tt.settings {
 				setPermissionOnBundleOrSetting(
-					t, ctx, testSetting.setting.Id, proto.Resource_TYPE_SETTING,
+					ctx, t, testSetting.setting.Id, proto.Resource_TYPE_SETTING,
 					testSetting.permission.permission, testSetting.permission.roleUUID,
 				)
 			}
@@ -1623,11 +1623,11 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 			assert.NoError(t, err)
 
 			setPermissionOnBundleOrSetting(
-				t, ctx, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
+				ctx, t, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
 			)
 
 			setPermissionOnBundleOrSetting(
-				t, ctx, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
+				ctx, t, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
 				tt.settingPermission, svc.BundleUUIDRoleAdmin,
 			)
 
@@ -1641,15 +1641,15 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 	}
 }
 
-func setFullReadWriteOnBundleForAdmin(t *testing.T, ctx context.Context, bundleID string) {
+func setFullReadWriteOnBundleForAdmin(ctx context.Context, t *testing.T, bundleID string) {
 	setPermissionOnBundleOrSetting(
-		t, ctx, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE, svc.BundleUUIDRoleAdmin,
+		ctx, t, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE, svc.BundleUUIDRoleAdmin,
 	)
 }
 
 func setPermissionOnBundleOrSetting(
-	t *testing.T,
 	ctx context.Context,
+	t *testing.T,
 	bundleID string,
 	resourceType proto.Resource_Type,
 	permission proto.Permission_Operation,
