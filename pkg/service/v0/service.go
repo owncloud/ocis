@@ -73,7 +73,6 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 
 // GetBundle implements the BundleServiceHandler interface
 func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
-	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -81,8 +80,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	roleIDs := g.getRoleIDs(c, accountUUID)
-	filteredBundle := g.getFilteredBundle(roleIDs, bundle)
+	filteredBundle := g.getFilteredBundle(g.getRoleIDs(c), bundle)
 	if len(filteredBundle.Settings) == 0 {
 		err = fmt.Errorf("could not read bundle: %s", req.BundleId)
 		return merrors.NotFound(g.id, "%s", err)
@@ -94,7 +92,6 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 // ListBundles implements the BundleServiceHandler interface
 func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	// fetch all bundles
-	accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -102,7 +99,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	roleIDs := g.getRoleIDs(c, accountUUID)
+	roleIDs := g.getRoleIDs(c)
 
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
@@ -316,7 +313,7 @@ func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPer
 	if validationError := validateListPermissionsByResource(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permissions, err := g.manager.ListPermissionsByResource(req.Resource, req.RoleIds)
+	permissions, err := g.manager.ListPermissionsByResource(req.Resource, g.getRoleIDs(c))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -329,7 +326,7 @@ func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionBy
 	if validationError := validateGetPermissionByID(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permission, err := g.manager.ReadPermissionByID(req.PermissionId, req.RoleIds)
+	permission, err := g.manager.ReadPermissionByID(req.PermissionId, g.getRoleIDs(c))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -362,22 +359,12 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 	return accountUUID
 }
 
-// getRoleIDs loads the role assignments for the given accountUUID
-// TODO: this should work on the context in the future, as roles are supposed to be sent within the context.
-func (g Service) getRoleIDs(c context.Context, accountUUID string) []string {
-	// TODO: replace this with role ids from the context
-	// WIP PR: https://github.com/owncloud/ocis-proxy/pull/70
-	rolesResponse := &proto.ListRoleAssignmentsResponse{}
-	err := g.ListRoleAssignments(c, &proto.ListRoleAssignmentsRequest{AccountUuid: accountUUID}, rolesResponse)
-	if err != nil {
-		g.logger.Err(err).Str("accountUUID", accountUUID).Msg("failed to list role assignments")
-		return []string{}
+// getRoleIDs extracts the roleIDs of the authenticated user from the context.
+func (g Service) getRoleIDs(c context.Context) []string {
+	if ownRoleIDs, ok := middleware.ReadRoleIDsFromContext(c); ok {
+		return ownRoleIDs
 	}
-	roleIDs := make([]string, 0)
-	for _, assignment := range rolesResponse.Assignments {
-		roleIDs = append(roleIDs, assignment.RoleId)
-	}
-	return roleIDs
+	return []string{}
 }
 
 func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIdentifier, error) {

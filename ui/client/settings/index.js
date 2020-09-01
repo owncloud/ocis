@@ -397,13 +397,13 @@ export const BundleService_RemoveSettingFromBundleURL = function(parameters = {}
 }
 /**
  * 
- * request: PermissionService_GetPermissionById
- * url: PermissionService_GetPermissionByIdURL
- * method: PermissionService_GetPermissionById_TYPE
- * raw_url: PermissionService_GetPermissionById_RAW_URL
+ * request: PermissionService_GetPermissionByID
+ * url: PermissionService_GetPermissionByIDURL
+ * method: PermissionService_GetPermissionByID_TYPE
+ * raw_url: PermissionService_GetPermissionByID_RAW_URL
  * @param body - 
  */
-export const PermissionService_GetPermissionById = function(parameters = {}) {
+export const PermissionService_GetPermissionByID = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
   let path = '/api/v0/settings/permissions-get-by-id'
@@ -423,13 +423,13 @@ export const PermissionService_GetPermissionById = function(parameters = {}) {
   }
   return request('post', domain + path, body, queryParameters, form, config)
 }
-export const PermissionService_GetPermissionById_RAW_URL = function() {
+export const PermissionService_GetPermissionByID_RAW_URL = function() {
   return '/api/v0/settings/permissions-get-by-id'
 }
-export const PermissionService_GetPermissionById_TYPE = function() {
+export const PermissionService_GetPermissionByID_TYPE = function() {
   return 'post'
 }
-export const PermissionService_GetPermissionByIdURL = function(parameters = {}) {
+export const PermissionService_GetPermissionByIDURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v0/settings/permissions-get-by-id'
