@@ -28,7 +28,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
-	github.com/owncloud/ocis-pkg/v2 v2.4.0
+	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b
 	github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0

@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'master', 'fdf519acdedb7dfb70468b39af575559cdd5089b', 'master', '0075dbd7b14360de203ec2a327c6b3f5c5844364')
+    UITests(ctx, 'account-management-permission-checks', '9c24a3388e80f373f094c2b122594039c167c318', 'master', 'e0746d8d3a5879d2c0cd4aaf30c07ee98ab2b945')
   ]
 
   stages = [
@@ -342,8 +342,16 @@ def UITests(ctx, ocisBranch, ocisCommitId, phoenixBranch, phoenixCommitId):
          'mkdir -p /srv/app/tmp/reva',
          # First run settings service because accounts need it to register the settings bundles
          '/srv/app/ocis/bin/ocis settings &',
+
+         # Wait for the settings service to start
+         "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9190)\" != \"404\" ]]; do sleep 2; done",
+
          # Now start the accounts service
          'bin/ocis-accounts server &',
+
+         # Wait for the accounts service to start
+         "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9181)\" != \"404\" ]]; do sleep 2; done",
+
          # Now run all the ocis services except the accounts and settings because they are already running
          '/srv/app/ocis/bin/ocis server',
        ],

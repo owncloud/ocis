@@ -142,52 +142,16 @@ func generateProfilePermissionsRequests() []settings.AddSettingToBundleRequest {
 			BundleId: ssvc.BundleUUIDRoleAdmin,
 			Setting: &settings.Setting{
 				Id:          "7d81f103-0488-4853-bce5-98dcce36d649",
-				Name:        "language-create",
-				DisplayName: "Permission to set the language",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (anyone)",
 				Resource: &settings.Resource{
 					Type: settings.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
 				Value: &settings.Setting_PermissionValue{
 					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_CREATE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
-		{
-			BundleId: ssvc.BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
-				Id:          "04ef2fd3-e724-48f6-a411-129dd461c820",
-				Name:        "language-read",
-				DisplayName: "Permission to read the language",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
-				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READ,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
-		{
-			BundleId: ssvc.BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
-				Id:          "30ac1e63-10e2-4ef8-bf0a-941cd5b56c5c",
-				Name:        "language-update",
-				DisplayName: "Permission to update the language",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
-				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_UPDATE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
@@ -196,51 +160,15 @@ func generateProfilePermissionsRequests() []settings.AddSettingToBundleRequest {
 			BundleId: ssvc.BundleUUIDRoleUser,
 			Setting: &settings.Setting{
 				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
-				Name:        "language-create",
-				DisplayName: "Permission to set the language",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settings.Resource{
 					Type: settings.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
 				Value: &settings.Setting_PermissionValue{
 					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_CREATE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
-		{
-			BundleId: ssvc.BundleUUIDRoleUser,
-			Setting: &settings.Setting{
-				Id:          "dcaeb961-da25-46f2-9892-731603a20d3b",
-				Name:        "language-read",
-				DisplayName: "Permission to read the language",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
-				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READ,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
-		{
-			BundleId: ssvc.BundleUUIDRoleUser,
-			Setting: &settings.Setting{
-				Id:          "e43f364c-ffa5-4080-9621-0d186632a169",
-				Name:        "language-update",
-				DisplayName: "Permission to update the language",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
-				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_UPDATE,
+						Operation:  settings.Permission_OPERATION_READWRITE,
 						Constraint: settings.Permission_CONSTRAINT_OWN,
 					},
 				},
@@ -250,15 +178,15 @@ func generateProfilePermissionsRequests() []settings.AddSettingToBundleRequest {
 			BundleId: ssvc.BundleUUIDRoleGuest,
 			Setting: &settings.Setting{
 				Id:          "ca878636-8b1a-4fae-8282-8617a4c13597",
-				Name:        "language-read",
-				DisplayName: "Permission to read the language",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settings.Resource{
 					Type: settings.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
 				Value: &settings.Setting_PermissionValue{
 					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READ,
+						Operation:  settings.Permission_OPERATION_READWRITE,
 						Constraint: settings.Permission_CONSTRAINT_OWN,
 					},
 				},
