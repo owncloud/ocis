@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"testing"
 
@@ -241,35 +242,35 @@ func TestBundleInputValidation(t *testing.T) {
 			"सिम्प्ले-bundle-name",
 			"सिम्प्ले-display-name",
 			"सिम्प्ले-extension-name",
-			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
+			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", http.StatusBadRequest),
 		},
 		{
 			"UTF validation on display name",
 			"सिम्प्ले-bundle-name",
 			"सिम्प्ले-display-name",
 			"simple-extension-name",
-			merrors.New("ocis-settings", "name: must be in a valid format.", 400),
+			merrors.New("ocis-settings", "name: must be in a valid format.", http.StatusBadRequest),
 		},
 		{
 			"extension name with ../ in the name",
 			"bundle-name",
 			"simple-display-name",
 			"../folder-a-level-higher-up",
-			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
+			merrors.New("ocis-settings", "extension: must be in a valid format.", http.StatusBadRequest),
 		},
 		{
 			"extension name with \\ in the name",
 			"bundle-name",
 			"simple-display-name",
 			"\\",
-			merrors.New("ocis-settings", "extension: must be in a valid format.", 400),
+			merrors.New("ocis-settings", "extension: must be in a valid format.", http.StatusBadRequest),
 		},
 		{
 			"spaces are disallowed in bundle names",
 			"bundle name",
 			"simple display name",
 			"simple extension name",
-			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", 400),
+			merrors.New("ocis-settings", "extension: must be in a valid format; name: must be in a valid format.", http.StatusBadRequest),
 		},
 		{
 			"spaces are allowed in display names",
@@ -283,20 +284,23 @@ func TestBundleInputValidation(t *testing.T) {
 			"bundle-name",
 			"simple-display-name",
 			"",
-			merrors.New("ocis-settings", "extension: cannot be blank.", 400),
+			merrors.New("ocis-settings", "extension: cannot be blank.", http.StatusBadRequest),
 		},
 		{
 			"display name missing",
 			"bundleName",
 			"",
 			"simple-extension-name",
-			merrors.New("ocis-settings", "display_name: cannot be blank.", 400),
+			merrors.New("ocis-settings", "display_name: cannot be blank.", http.StatusBadRequest),
 		},
 	}
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
 			teardown := setup()
 			defer teardown()
+
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
 
 			bundle := proto.Bundle{
 				Name:        scenario.bundleName,
@@ -312,7 +316,7 @@ func TestBundleInputValidation(t *testing.T) {
 				Bundle: &bundle,
 			}
 
-			cresponse, err := bundleService.SaveBundle(context.Background(), &createRequest)
+			cresponse, err := bundleService.SaveBundle(ctx, &createRequest)
 			if err != nil || scenario.expectedError != nil {
 				t.Log(err)
 				assert.Equal(t, scenario.expectedError, err)
@@ -321,9 +325,8 @@ func TestBundleInputValidation(t *testing.T) {
 				assert.Equal(t, scenario.displayName, cresponse.Bundle.DisplayName)
 
 				// we want to test input validation, so just allow the request permission-wise
-				setFullReadWriteOnBundle(t, testAccountID, cresponse.Bundle.Id)
+				setFullReadWriteOnBundleForAdmin(t, ctx, cresponse.Bundle.Id)
 
-				ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 				getRequest := proto.GetBundleRequest{BundleId: cresponse.Bundle.Id}
 				getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 				assert.NoError(t, err)
@@ -339,54 +342,61 @@ func TestSaveBundleWithoutSettings(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 	createRequest := proto.SaveBundleRequest{
 		Bundle: &proto.Bundle{
 			DisplayName: "Alice's Bundle",
 		},
 	}
-	response, err := bundleService.SaveBundle(context.Background(), &createRequest)
+	response, err := bundleService.SaveBundle(ctx, &createRequest)
 	assert.Error(t, err)
 	assert.Nil(t, response)
-	assert.Equal(t, merrors.New("ocis-settings", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", 400), err)
+	assert.Equal(t, merrors.New("ocis-settings", "extension: cannot be blank; name: cannot be blank; settings: cannot be blank.", http.StatusBadRequest), err)
 }
 
 func TestGetBundleOfABundleSavedWithoutPermissions(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 	saveRequest := proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	}
-	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+	saveResponse, err := bundleService.SaveBundle(ctx, &saveRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
 
 	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
-	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.Empty(t, getResponse)
 
-	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", 404), err)
+	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", http.StatusNotFound), err)
 }
 
-func TestGetBundleOfABundleSavedWithFullPermissionsButForAnOtherUser(t *testing.T) {
+func TestGetBundleHavingFullPermissionsOnAnotherRole(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleUser))
+
 	saveRequest := proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	}
-	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+	saveResponse, err := bundleService.SaveBundle(ctx, &saveRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
 
-	setFullReadWriteOnBundle(t, "33ba12b3-0340-44ec-afdf-253fb90ea47d", bundleStub.Id)
+	setFullReadWriteOnBundleForAdmin(t, ctx, bundleStub.Id)
 	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
-	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.Empty(t, getResponse)
 
-	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", 404), err)
+	assert.Equal(t, merrors.New("ocis-settings", "could not read bundle: b1b8c9d0-fb3c-4e12-b868-5a8508218d2e", http.StatusNotFound), err)
 }
 
 /**
@@ -396,23 +406,25 @@ func TestSaveAndGetBundle(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 	saveRequest := proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	}
 
 	// assert that SaveBundle returns the same bundle as we have sent
-	saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+	saveResponse, err := bundleService.SaveBundle(ctx, &saveRequest)
 	assert.NoError(t, err)
 	receivedBundle, _ := json.Marshal(saveResponse.Bundle.Settings)
 	expectedBundle, _ := json.Marshal(&bundleStub.Settings)
 	assert.Equal(t, receivedBundle, expectedBundle)
 
 	// set full permissions for getting the created bundle
-	setFullReadWriteOnBundle(t, testAccountID, saveResponse.Bundle.Id)
+	setFullReadWriteOnBundleForAdmin(t, ctx, saveResponse.Bundle.Id)
 
 	//assert that GetBundle returns the same bundle as saved
 	getRequest := proto.GetBundleRequest{BundleId: saveResponse.Bundle.Id}
-	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.NoError(t, err)
 	if err == nil {
@@ -454,12 +466,15 @@ func TestSaveGetIntValue(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
-			saveResponse, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
+			saveResponse, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 				Bundle: &bundleStub,
 			})
 			assert.NoError(t, err)
 
-			saveValueResponse, err := valueService.SaveValue(context.Background(), &proto.SaveValueRequest{
+			saveValueResponse, err := valueService.SaveValue(ctx, &proto.SaveValueRequest{
 				Value: &proto.Value{
 					BundleId:    saveResponse.Bundle.Id,
 					SettingId:   "4e00633d-5373-4df4-9299-1c9ed9c3ebed", //setting id of the int setting
@@ -475,7 +490,7 @@ func TestSaveGetIntValue(t *testing.T) {
 			assert.Equal(t, tt.value.IntValue, saveValueResponse.Value.Value.GetIntValue())
 
 			getValueResponse, err := valueService.GetValue(
-				context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
+				ctx, &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
 			)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.value.IntValue, getValueResponse.Value.Value.GetIntValue())
@@ -491,12 +506,15 @@ func TestSaveGetIntValueIntoString(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
-	saveResponse, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
+	saveResponse, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 		Bundle: &bundleStub,
 	})
 	assert.NoError(t, err)
 
-	saveValueResponse, err := valueService.SaveValue(context.Background(), &proto.SaveValueRequest{
+	saveValueResponse, err := valueService.SaveValue(ctx, &proto.SaveValueRequest{
 		Value: &proto.Value{
 			BundleId:    saveResponse.Bundle.Id,
 			SettingId:   "f792acb4-9f09-4fa8-92d3-4a0d0a6ca721", //setting id of the string setting
@@ -512,7 +530,7 @@ func TestSaveGetIntValueIntoString(t *testing.T) {
 	assert.Equal(t, "forty two", saveValueResponse.Value.Value.GetStringValue())
 
 	getValueResponse, err := valueService.GetValue(
-		context.Background(), &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
+		ctx, &proto.GetValueRequest{Id: saveValueResponse.Value.Value.Id},
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, "forty two", getValueResponse.Value.Value.GetStringValue())
@@ -697,6 +715,9 @@ func TestSaveBundleWithInvalidSettings(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 			var settings []*proto.Setting
 
 			settings = append(settings, &tests[index])
@@ -715,7 +736,7 @@ func TestSaveBundleWithInvalidSettings(t *testing.T) {
 			}
 
 			//assert that SaveBundle returns the same bundle as we have sent there
-			saveResponse, err := bundleService.SaveBundle(context.Background(), &saveRequest)
+			saveResponse, err := bundleService.SaveBundle(ctx, &saveRequest)
 			assert.NoError(t, err)
 			receivedBundle, _ := json.Marshal(saveResponse.Bundle.Settings)
 			expectedBundle, _ := json.Marshal(&bundle.Settings)
@@ -729,9 +750,12 @@ func TestGetBundleNoSideEffectsOnDisk(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 	getRequest := proto.GetBundleRequest{BundleId: "non-existing-bundle"}
 
-	_, _ = bundleService.GetBundle(context.Background(), &getRequest)
+	_, _ = bundleService.GetBundle(ctx, &getRequest)
 	assert.NoDirExists(t, store.Name+"/bundles/non-existing-bundle")
 	assert.NoFileExists(t, store.Name+"/bundles/non-existing-bundle/not-existing-bundle.json")
 }
@@ -741,7 +765,10 @@ func TestCreateRoleAndAssign(t *testing.T) {
 	teardown := setup()
 	defer teardown()
 
-	res, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
+	res, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 		Bundle: &proto.Bundle{
 			Type:        proto.Bundle_TYPE_ROLE,
 			DisplayName: "test role - update",
@@ -768,7 +795,7 @@ func TestCreateRoleAndAssign(t *testing.T) {
 		},
 	})
 	if err == nil {
-		_, err = roleService.AssignRoleToUser(context.Background(), &proto.AssignRoleToUserRequest{
+		_, err = roleService.AssignRoleToUser(ctx, &proto.AssignRoleToUserRequest{
 			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
 			RoleId:      res.Bundle.Id,
 		})
@@ -959,13 +986,16 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 			for _, bundle := range tt.bundles {
-				_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+				_, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 					Bundle: bundle,
 				})
 				assert.NoError(t, err)
 			}
-			rolesRes, err := roleService.ListRoles(context.Background(), &proto.ListBundlesRequest{})
+			rolesRes, err := roleService.ListRoles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 
 			for _, bundle := range rolesRes.Bundles {
@@ -1218,20 +1248,21 @@ func TestListFilteredBundle(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 			for _, testBundle := range tt.bundles {
-				_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+				_, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 					Bundle: testBundle.bundle,
 				})
 				assert.NoError(t, err)
 
 				setPermissionOnBundleOrSetting(
-					t, testBundle.bundle.Id, proto.Resource_TYPE_BUNDLE,
+					t, ctx, testBundle.bundle.Id, proto.Resource_TYPE_BUNDLE,
 					testBundle.permission.permission, testBundle.permission.roleUUID,
 				)
 			}
-			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
 
-			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 
@@ -1498,6 +1529,9 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
 			// create bundle with the defined settings
 			var settings []*proto.Setting
 
@@ -1517,7 +1551,7 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 				},
 			}
 
-			_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+			_, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 				Bundle: &bundle,
 			})
 			assert.NoError(t, err)
@@ -1525,13 +1559,11 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 			// set permissions for each setting
 			for _, testSetting := range tt.settings {
 				setPermissionOnBundleOrSetting(
-					t, testSetting.setting.Id, proto.Resource_TYPE_SETTING,
+					t, ctx, testSetting.setting.Id, proto.Resource_TYPE_SETTING,
 					testSetting.permission.permission, testSetting.permission.roleUUID,
 				)
 			}
-			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
 
-			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 
@@ -1582,23 +1614,23 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
-			_, err := bundleService.SaveBundle(context.Background(), &proto.SaveBundleRequest{
+			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
+			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
+
+			_, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
 				Bundle: &bundleStub,
 			})
 			assert.NoError(t, err)
 
 			setPermissionOnBundleOrSetting(
-				t, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
+				t, ctx, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
 			)
 
 			setPermissionOnBundleOrSetting(
-				t, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
+				t, ctx, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
 				tt.settingPermission, svc.BundleUUIDRoleAdmin,
 			)
 
-			assignRoleToUser(t, testAccountID, svc.BundleUUIDRoleAdmin)
-
-			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 			assert.Equal(t, 1, len(listRes.Bundles))
@@ -1609,15 +1641,15 @@ func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
 	}
 }
 
-func setFullReadWriteOnBundle(t *testing.T, accountID, bundleID string) {
+func setFullReadWriteOnBundleForAdmin(t *testing.T, ctx context.Context, bundleID string) {
 	setPermissionOnBundleOrSetting(
-		t, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE, svc.BundleUUIDRoleAdmin,
+		t, ctx, bundleID, proto.Resource_TYPE_BUNDLE, proto.Permission_OPERATION_READWRITE, svc.BundleUUIDRoleAdmin,
 	)
-	assignRoleToUser(t, accountID, svc.BundleUUIDRoleAdmin)
 }
 
 func setPermissionOnBundleOrSetting(
 	t *testing.T,
+	ctx context.Context,
 	bundleID string,
 	resourceType proto.Resource_Type,
 	permission proto.Permission_Operation,
@@ -1639,17 +1671,14 @@ func setPermissionOnBundleOrSetting(
 			},
 		},
 	}
-	addPermissionResponse, err := bundleService.AddSettingToBundle(context.Background(), &permissionRequest)
+	addPermissionResponse, err := bundleService.AddSettingToBundle(ctx, &permissionRequest)
 	assert.NoError(t, err)
 	if err == nil {
 		assert.NotEmpty(t, addPermissionResponse.Setting)
 	}
 }
 
-func assignRoleToUser(t *testing.T, accountID string, roleID string) {
-	_, err := roleService.AssignRoleToUser(
-		context.Background(),
-		&proto.AssignRoleToUserRequest{AccountUuid: accountID, RoleId: roleID},
-	)
-	assert.NoError(t, err)
+func getRoleIDAsJSON(roleID string) string {
+	roleIDsJSON, _ := json.Marshal([]string{roleID})
+	return string(roleIDsJSON)
 }

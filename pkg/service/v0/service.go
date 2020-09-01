@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"fmt"
-
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/micro/go-micro/v2/metadata"
@@ -264,7 +263,7 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	// TODO: only allow to list roles when user has account management permissions
+	// TODO: only allow to list roles when user has account/role/... management permissions
 	res.Bundles = r
 	return nil
 }
