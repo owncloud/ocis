@@ -241,3 +241,25 @@ func Gateway(cfg *config.Config) *cli.Command {
 		},
 	}
 }
+
+func rules(cfg *config.Config) map[string]interface{} {
+
+	return map[string]interface{}{
+		cfg.Reva.StorageRoot.MountPath:       cfg.Reva.StorageRoot.URL,
+		cfg.Reva.StorageRoot.MountID:         cfg.Reva.StorageRoot.URL,
+		cfg.Reva.StorageHome.MountPath:       cfg.Reva.StorageHome.URL,
+		cfg.Reva.StorageHome.MountID:         cfg.Reva.StorageHome.URL,
+		cfg.Reva.StorageEOS.MountPath:        cfg.Reva.StorageEOS.URL,
+		cfg.Reva.StorageEOS.MountID:          cfg.Reva.StorageEOS.URL,
+		cfg.Reva.StorageOC.MountPath:         cfg.Reva.StorageOC.URL,
+		cfg.Reva.StorageOC.MountID:           cfg.Reva.StorageOC.URL,
+		cfg.Reva.StorageS3.MountPath:         cfg.Reva.StorageS3.URL,
+		cfg.Reva.StorageS3.MountID:           cfg.Reva.StorageS3.URL,
+		cfg.Reva.StorageWND.MountPath:        cfg.Reva.StorageWND.URL,
+		cfg.Reva.StorageWND.MountID:          cfg.Reva.StorageWND.URL,
+		cfg.Reva.StorageCustom.MountPath:     cfg.Reva.StorageCustom.URL,
+		cfg.Reva.StorageCustom.MountID:       cfg.Reva.StorageCustom.URL,
+		cfg.Reva.StoragePublicLink.MountPath: cfg.Reva.StoragePublicLink.URL,
+		cfg.Reva.StoragePublicLink.MountID:   cfg.Reva.StoragePublicLink.URL,
+	}
+}

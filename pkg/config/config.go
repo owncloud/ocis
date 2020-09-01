@@ -94,9 +94,7 @@ type PublicStorage struct {
 	StoragePort
 
 	PublicShareProviderAddr string
-	StorageProviderAddr     string
 	UserProviderAddr        string
-	MountID                 string
 }
 
 // StorageConfig combines all available storage driver configuration parts.
@@ -105,20 +103,18 @@ type StorageConfig struct {
 	Local    DriverLocal
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
+	Common   DriverCommon
 	// TODO checksums ... figure out what that is supposed to do
 }
 
 // DriverEOS defines the available EOS driver configuration.
 type DriverEOS struct {
-	// Namespace for metadata operations
-	Namespace string
 
 	// ShadowNamespace for storing shadow data
 	ShadowNamespace string
 
-	// ShareFolder defines the name of the folder in the
-	// shadowed namespace. Ex: /eos/user/.shadow/h/hugo/MyShares
-	ShareFolder string
+	// UploadsNamespace for storing upload data
+	UploadsNamespace string
 
 	// Location of the eos binary.
 	// Default is /usr/bin/eos.
@@ -131,6 +127,10 @@ type DriverEOS struct {
 	// URL of the Master EOS MGM.
 	// Default is root://eos-example.org
 	MasterURL string
+
+	// URI of the EOS MGM grpc server
+	// Default is empty
+	GrpcURI string
 
 	// URL of the Slave EOS MGM.
 	// Default is root://eos-example.org
@@ -154,9 +154,6 @@ type DriverEOS struct {
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
 	UseKeytab bool
 
-	// EnableHome enables the creation of home directories.
-	EnableHome bool
-
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
 	SecProtocol string
 
@@ -165,9 +162,6 @@ type DriverEOS struct {
 
 	// SingleUsername is the username to use when SingleUserMode is enabled
 	SingleUsername string
-
-	// Layout of the users home dir path
-	Layout string
 
 	// gateway service to use for uid lookups
 	GatewaySVC string
@@ -178,13 +172,23 @@ type DriverLocal struct {
 	Root string
 }
 
+// DriverCommon defines common driver configuration options.
+type DriverCommon struct {
+	// Root is the absolute path to the location of the data
+	Root string
+	//ShareFolder defines the name of the folder jailing all shares
+	ShareFolder string
+	// UserLayout contains the template used to construct
+	// the internal path, eg: `{{substr 0 1 .Username}}/{{.Username}}`
+	UserLayout string
+	// EnableHome enables the creation of home directories.
+	EnableHome bool
+}
+
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
 type DriverOwnCloud struct {
-	Datadirectory string
-	Layout        string
-	Redis         string
-	Scan          bool
-	EnableHome    bool
+	Redis string
+	Scan  bool
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
@@ -194,7 +198,6 @@ type DriverS3 struct {
 	SecretKey string
 	Endpoint  string
 	Bucket    string
-	Prefix    string
 }
 
 // OIDC defines the available OpenID Connect configuration.
@@ -273,6 +276,7 @@ type Reva struct {
 	AuthBearer        Port
 	Sharing           Sharing
 	StorageRoot       StoragePort
+	StorageRootData   StoragePort
 	StorageHome       StoragePort
 	StorageHomeData   StoragePort
 	StorageEOS        StoragePort
