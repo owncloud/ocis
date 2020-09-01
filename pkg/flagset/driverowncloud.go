@@ -23,7 +23,7 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Storages.OwnCloud.UploadInfoDir,
 		},
 		&cli.StringFlag{
-			Name:        "storage-owncloud-uploadinfo-dir",
+			Name:        "storage-owncloud-share-folder",
 			Value:       "/Shares",
 			Usage:       "name of the shares folder",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_SHARE_FOLDER"},
