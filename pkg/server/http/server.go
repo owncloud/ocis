@@ -30,9 +30,21 @@ func Server(opts ...Option) http.Service {
 		http.Flags(options.Flags...),
 	)
 
-	roleCache := roles.NewCache(roles.Size(1024), roles.TTL(time.Hour*24*7))
-
-	handler, err := svc.New(svc.Logger(options.Logger), svc.Config(options.Config), svc.RoleCache(&roleCache))
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	rs := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	roleManager := roles.NewManager(
+		roles.CacheSize(1024),
+		roles.CacheTTL(time.Hour*24*7),
+		roles.Logger(options.Logger),
+		roles.RoleService(rs),
+	)
+	handler, err := svc.New(
+		svc.Logger(options.Logger),
+		svc.Config(options.Config),
+		svc.RoleManager(&roleManager),
+		svc.RoleService(rs),
+	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not initialize service handler")
 	}
@@ -48,14 +60,6 @@ func Server(opts ...Option) http.Service {
 		account.Logger(options.Logger),
 		account.JWTSecret(options.Config.TokenManager.JWTSecret)),
 	)
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
-	rs := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
-	mux.Use(middleware.Roles(
-		options.Logger,
-		rs,
-		&roleCache,
-	))
 
 	mux.Use(middleware.Version(
 		options.Name,

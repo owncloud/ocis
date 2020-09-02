@@ -17,8 +17,6 @@ import (
 	"github.com/blevesearch/bleve/analysis/analyzer/standard"
 	"github.com/blevesearch/bleve/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
-	mclient "github.com/micro/go-micro/v2/client"
-	mgrpc "github.com/micro/go-micro/v2/client/grpc"
 	"github.com/owncloud/ocis-accounts/pkg/config"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
@@ -33,10 +31,7 @@ func New(opts ...Option) (s *Service, err error) {
 	logger := options.Logger
 	cfg := options.Config
 	roleService := options.RoleService
-	if roleService == nil {
-		roleService = settings.NewRoleService("com.owncloud.api.settings", mgrpc.NewClient())
-	}
-	roleCache := options.RoleCache
+	roleManager := options.RoleManager
 	// read all user and group records
 
 	accountsDir := filepath.Join(cfg.Server.AccountsDataPath, "accounts")
@@ -327,11 +322,11 @@ func New(opts ...Option) (s *Service, err error) {
 	indexMapping.TypeField = "BleveType"
 
 	s = &Service{
-		id:        cfg.GRPC.Namespace + "." + cfg.Server.Name,
-		log:       logger,
-		Config:    cfg,
-		Client:    mgrpc.NewClient(),
-		RoleCache: roleCache,
+		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		log:         logger,
+		Config:      cfg,
+		RoleService: roleService,
+		RoleManager: roleManager,
 	}
 
 	indexDir := filepath.Join(cfg.Server.AccountsDataPath, "index.bleve")
@@ -368,12 +363,12 @@ func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger 
 
 // Service implements the AccountsServiceHandler interface
 type Service struct {
-	id        string
-	log       log.Logger
-	Config    *config.Config
-	index     bleve.Index
-	Client    mclient.Client
-	RoleCache *roles.Cache
+	id          string
+	log         log.Logger
+	Config      *config.Config
+	index       bleve.Index
+	RoleService settings.RoleService
+	RoleManager *roles.Manager
 }
 
 func cleanupID(id string) (string, error) {

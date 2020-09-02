@@ -19,7 +19,7 @@ import (
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-accounts/pkg/provider"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis-pkg/v2/roles"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
 	"github.com/rs/zerolog"
@@ -159,14 +159,18 @@ func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
 
 func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	// get roles from context
-	roleIDs, ok := middleware.ReadRoleIDsFromContext(ctx)
+	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
-		// if there were no roleIDs on the request we have to assume that the request didn't come from the proxy
+		/**
+		 * FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
+		 * metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
+		 * for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
+		 */
 		return true
 	}
 
 	// check if permission is present in roles of the authenticated account
-	return s.RoleCache.FindPermissionByID(roleIDs, AccountManagementPermissionID) != nil
+	return s.RoleManager.FindPermissionByID(ctx, roleIDs, AccountManagementPermissionID) != nil
 }
 
 // ListAccounts implements the AccountsServiceHandler interface
@@ -346,9 +350,8 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return
 	}
 
-	// TODO: All users for now as create Account request does not have any role field
-	rs := settings.NewRoleService("com.owncloud.api.settings", s.Client)
-	_, err = rs.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
+	// TODO: assign user role to all new users for now, as create Account request does not have any role field
+	_, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
 		AccountUuid: acc.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	})
