@@ -9,6 +9,7 @@ The following sections list the changes in ocis-settings unreleased.
 * Bugfix - Fix loading and saving system scoped values: [#66](https://github.com/owncloud/ocis-settings/pull/66)
 * Bugfix - Complete input validation: [#66](https://github.com/owncloud/ocis-settings/pull/66)
 * Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
+* Change - Reuse roleIDs from the metadata context: [#69](https://github.com/owncloud/ocis-settings/pull/69)
 
 ## Details
 
@@ -34,6 +35,15 @@ The following sections list the changes in ocis-settings unreleased.
    fetching a permission by ID.
 
    https://github.com/owncloud/ocis-settings/pull/59
+
+
+* Change - Reuse roleIDs from the metadata context: [#69](https://github.com/owncloud/ocis-settings/pull/69)
+
+   The roleIDs of the authenticated user are coming in from the metadata context. Since we decided
+   to move the role assignments over to the accounts service we need to start trusting those
+   roleIDs from the metadata context instead of reloading them from disk on each request.
+
+   https://github.com/owncloud/ocis-settings/pull/69
 
 # Changelog for [0.3.1] (2020-08-27)
 
