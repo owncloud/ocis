@@ -9,6 +9,7 @@ import (
 	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis-pkg/v2/roles"
 	"github.com/owncloud/ocis-settings/pkg/config"
 	"github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/owncloud/ocis-settings/pkg/settings"
@@ -361,7 +362,7 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 
 // getRoleIDs extracts the roleIDs of the authenticated user from the context.
 func (g Service) getRoleIDs(c context.Context) []string {
-	if ownRoleIDs, ok := middleware.ReadRoleIDsFromContext(c); ok {
+	if ownRoleIDs, ok := roles.ReadRoleIDsFromContext(c); ok {
 		return ownRoleIDs
 	}
 	return []string{}
