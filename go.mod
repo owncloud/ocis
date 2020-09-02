@@ -18,7 +18,7 @@ require (
 	github.com/mitchellh/gox v1.0.1
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b
+	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.6.1
