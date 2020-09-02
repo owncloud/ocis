@@ -259,7 +259,6 @@ message UserRoleAssignment {
 
 message ListPermissionsByResourceRequest {
   Resource resource = 1;
-  repeated string role_ids = 2;
 }
 
 message ListPermissionsByResourceResponse {
@@ -268,7 +267,6 @@ message ListPermissionsByResourceResponse {
 
 message GetPermissionByIDRequest {
   string permission_id = 1;
-  repeated string role_ids = 2;
 }
 
 message GetPermissionByIDResponse {

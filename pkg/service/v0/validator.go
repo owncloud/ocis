@@ -131,20 +131,13 @@ func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
 }
 
 func validateListPermissionsByResource(req *proto.ListPermissionsByResourceRequest) error {
-	if err := validateResource(req.Resource); err != nil {
-		return err
-	}
-	return validation.ValidateStruct(
-		req,
-		validation.Field(&req.RoleIds, validation.Each(requireAlphanumeric...)),
-	)
+	return validateResource(req.Resource)
 }
 
 func validateGetPermissionByID(req *proto.GetPermissionByIDRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.PermissionId, requireAlphanumeric...),
-		validation.Field(&req.RoleIds, validation.Each(requireAlphanumeric...)),
 	)
 }
 

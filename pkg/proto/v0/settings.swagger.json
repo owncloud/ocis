@@ -626,12 +626,6 @@
       "properties": {
         "permission_id": {
           "type": "string"
-        },
-        "role_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -762,12 +756,6 @@
       "properties": {
         "resource": {
           "$ref": "#/definitions/protoResource"
-        },
-        "role_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
