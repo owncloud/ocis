@@ -1311,6 +1311,8 @@ github.com/owncloud/ocis-proxy v0.7.0 h1:ruOOz0Ed4crtkjqFRvvbgywUfDldcWDxOqbUQlw
 github.com/owncloud/ocis-proxy v0.7.0/go.mod h1:zyAWyZXjILb3Lsotxc2a+Iwkj4jKXtT4O0ajB5b3jnY=
 github.com/owncloud/ocis-proxy v0.7.1-0.20200828151439-7d24bb391fb0 h1:OSdysqyRChoTycKvIQdRkMptV3eiayE4xaCZ3zCWCow=
 github.com/owncloud/ocis-proxy v0.7.1-0.20200828151439-7d24bb391fb0/go.mod h1:zFwhh9GFzPCiHBPM4zyWzxA7d78fYMbLOPB977mGUzk=
+github.com/owncloud/ocis-proxy v0.7.1-0.20200831111919-888962f90777 h1:Ozb6XtNoqIDq8GVIihtMsGVmg5VIvmfhyHbMNQvNTBg=
+github.com/owncloud/ocis-proxy v0.7.1-0.20200831111919-888962f90777/go.mod h1:zFwhh9GFzPCiHBPM4zyWzxA7d78fYMbLOPB977mGUzk=
 github.com/owncloud/ocis-reva v0.12.1-0.20200819133706-f68defd1ff27 h1:LupXoJXY0cK33+8s6bBA3M8g4J2kv6YHBY7szyPIsHI=
 github.com/owncloud/ocis-reva v0.12.1-0.20200819133706-f68defd1ff27/go.mod h1:mZpI9axqlcOy8rk19JicZFGUIVB8VxD/0VLiIJxi6GE=
 github.com/owncloud/ocis-reva v0.13.0 h1:np4Xk/hBWSOIsahimP6tnwiEl1YKj8okJ7M5IAaNfBY=
@@ -1332,11 +1334,8 @@ github.com/owncloud/ocis-settings v0.3.0 h1:w1wdqJiMtRNJ5B7sQemvtFQQod31G6dR468G
 github.com/owncloud/ocis-settings v0.3.0/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/owncloud/ocis-settings v0.3.1 h1:DJA6ELArQbiuCSq3CCpOAhc/QcCV4bmtm8929nP6B6A=
 github.com/owncloud/ocis-settings v0.3.1/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
-<<<<<<< HEAD
-=======
 github.com/owncloud/ocis-settings v0.3.2-0.20200827193534-8caf098e6537/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
->>>>>>> 26af2eb... Update ocis-accounts@master
 github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe h1:kiU5lz12R0LNJE1/zI2vxesZPWm6BvSO7hvZC8yOoAc=
 github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/owncloud/ocis-settings v0.3.2-0.20200902094647-35dc3aeaba78 h1:mCP/1U+mI70dQugeSsTKqf1O2a/GQLInl1KMPXaU2yQ=
