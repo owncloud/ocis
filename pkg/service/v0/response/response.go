@@ -11,7 +11,7 @@ import (
 
 // Response is the top level response structure
 type Response struct {
-	OCS *Payload `json:"ocs"`
+	OCS *Payload `json:"ocs" xml:"ocs"`
 }
 
 var (
@@ -23,13 +23,12 @@ var (
 
 // Payload combines response metadata and data
 type Payload struct {
-	XMLName struct{}    `json:"-" xml:"ocs"`
-	Meta    data.Meta   `json:"meta" xml:"meta"`
-	Data    interface{} `json:"data,omitempty" xml:"data,omitempty"`
+	Meta data.Meta   `json:"meta" xml:"meta"`
+	Data interface{} `json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // MarshalXML handles ocs specific wrapping of array members in 'element' tags for the data
-func (p Payload) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
+func (rsp Response) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 	// first the easy part
 	// use ocs as the surrounding tag
 	start.Name = ocsName
@@ -38,15 +37,15 @@ func (p Payload) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) 
 	}
 
 	// encode the meta tag
-	if err = e.EncodeElement(p.Meta, metaStartElement); err != nil {
+	if err = e.EncodeElement(rsp.OCS.Meta, metaStartElement); err != nil {
 		return
 	}
 
 	// we need to use reflection to determine if p.Data is an array or a slice
-	rt := reflect.TypeOf(p.Data)
+	rt := reflect.TypeOf(rsp.OCS.Data)
 	if rt != nil && (rt.Kind() == reflect.Array || rt.Kind() == reflect.Slice) {
 		// this is how to wrap the data elements in their own <element> tag
-		v := reflect.ValueOf(p.Data)
+		v := reflect.ValueOf(rsp.OCS.Data)
 		if err = e.EncodeToken(xml.StartElement{Name: dataName}); err != nil {
 			return
 		}
@@ -58,7 +57,7 @@ func (p Payload) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) 
 		if err = e.EncodeToken(xml.EndElement{Name: dataName}); err != nil {
 			return
 		}
-	} else if err = e.EncodeElement(p.Data, xml.StartElement{Name: dataName}); err != nil {
+	} else if err = e.EncodeElement(rsp.OCS.Data, xml.StartElement{Name: dataName}); err != nil {
 		return
 	}
 
@@ -70,30 +69,34 @@ func (p Payload) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) 
 }
 
 // Render sets the status code of the http response, taking the ocs version into account
-func (p *Payload) Render(w http.ResponseWriter, r *http.Request) error {
+func (rsp *Response) Render(w http.ResponseWriter, r *http.Request) error {
 	version := APIVersion(r.Context())
 	m := statusCodeMapper(version)
-	statusCode := m(p.Meta)
+	statusCode := m(rsp.OCS.Meta)
 	render.Status(r, statusCode)
 	if version == ocsVersion2 && statusCode == http.StatusOK {
-		p.Meta.StatusCode = statusCode
+		rsp.OCS.Meta.StatusCode = statusCode
 	}
 	return nil
 }
 
 // DataRender creates an OK Payload for the given data
 func DataRender(d interface{}) render.Renderer {
-	return &Payload{
-		Meta: data.MetaOK,
-		Data: d,
+	return &Response{
+		&Payload{
+			Meta: data.MetaOK,
+			Data: d,
+		},
 	}
 }
 
 // ErrRender creates an Error Paylod with the given OCS error code and message
 // The httpcode will be determined using the API version stored in the context
 func ErrRender(c int, m string) render.Renderer {
-	return &Payload{
-		Meta: data.Meta{Status: "error", StatusCode: c, Message: m},
+	return &Response{
+		&Payload{
+			Meta: data.Meta{Status: "error", StatusCode: c, Message: m},
+		},
 	}
 }
 
