@@ -305,6 +305,14 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/settings.js",
 					Backend:  "http://localhost:9190",
 				},
+				{
+					Endpoint: "/api/v0/greet",
+					Backend:  "http://localhost:9105",
+				},
+				{
+					Endpoint: "/hello.js",
+					Backend:  "http://localhost:9105",
+				},
 			},
 		},
 		{
