@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
+* Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
 
 ## Details
 
@@ -16,6 +17,14 @@ The following sections list the changes for ocis-proxy unreleased.
    missing in the example config. Added them for consistency.
 
    https://github.com/owncloud/ocis-proxy/pull/93
+
+
+* Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
+
+   We are using the roleIDs of the authenticated user for permission checks against
+   ocis-settings. We added the roleIDs to the access token to have them available quickly.
+
+   https://github.com/owncloud/ocis-proxy/pull/95
 
 # Changelog for [0.7.0] (2020-08-21)
 
