@@ -1,7 +1,7 @@
 <template>
   <oc-table-row>
     <oc-table-cell>
-      <oc-checkbox :value="isAccountSelected" @change="TOGGLE_SELECTION_ACCOUNT(account)" />
+      <oc-checkbox :value="isAccountSelected" @change="TOGGLE_SELECTION_ACCOUNT(account)" :label="selectAccountLabel" hide-label />
     </oc-table-cell>
     <oc-table-cell>
       <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
@@ -80,6 +80,12 @@ export default {
 
     isAccountSelected () {
       return this.selectedAccounts.indexOf(this.account) > -1
+    },
+
+    selectAccountLabel () {
+      const translated = this.$gettext('Select %{ account }')
+
+      return this.$gettextInterpolate(translated, { account: this.account.displayName }, true)
     }
   },
 
