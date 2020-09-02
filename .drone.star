@@ -1,7 +1,7 @@
 def main(ctx):
   before = [
     testing(ctx),
-    UITests(ctx, 'account-management-permission-checks', '9c24a3388e80f373f094c2b122594039c167c318', 'master', 'e0746d8d3a5879d2c0cd4aaf30c07ee98ab2b945')
+    UITests(ctx, 'account-management-permission-checks', 'cbc3ac599589db685ed2f007df6e979c00bdcf29', 'master', 'e0746d8d3a5879d2c0cd4aaf30c07ee98ab2b945')
   ]
 
   stages = [
