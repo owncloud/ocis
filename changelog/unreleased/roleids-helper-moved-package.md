@@ -4,3 +4,4 @@ The helper we used from ocis-pkg for extracting roleIDs from the metadata contex
 to update as well.
 
 https://github.com/owncloud/ocis-settings/pull/72
+https://github.com/owncloud/ocis-pkg/pull/60
