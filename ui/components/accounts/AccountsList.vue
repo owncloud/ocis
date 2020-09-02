@@ -3,6 +3,14 @@
     <oc-table middle divider>
       <oc-table-group>
         <oc-table-row>
+          <oc-table-cell shrink type="head">
+            <oc-checkbox
+              :value="areAllAccountsSelected"
+              :label="$gettext('Select all users')"
+              hide-label
+              @change="toggleAllAccountsSelection"
+            />
+          </oc-table-cell>
           <oc-table-cell shrink type="head" />
           <oc-table-cell type="head" v-text="$gettext('Username')" />
           <oc-table-cell type="head" v-text="$gettext('Display name')" />
@@ -25,6 +33,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import AccountsListRow from './AccountsListRow.vue'
 
 export default {
@@ -36,6 +45,16 @@ export default {
     accounts: {
       type: Array,
       required: true
+    }
+  },
+  computed: {
+    ...mapGetters('Accounts', ['areAllAccountsSelected'])
+  },
+  methods: {
+    ...mapActions('Accounts', ['toggleSelectionAll']),
+
+    toggleAllAccountsSelection () {
+      this.toggleSelectionAll()
     }
   }
 }

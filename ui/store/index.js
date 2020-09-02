@@ -8,7 +8,8 @@ const state = {
   config: null,
   initialized: false,
   accounts: {},
-  roles: null
+  roles: null,
+  selectedAccounts: []
 }
 
 const getters = {
@@ -21,7 +22,8 @@ const getters = {
       }
       return a1.onPremisesSamAccountName.localeCompare(a2.onPremisesSamAccountName)
     })
-  }
+  },
+  areAllAccountsSelected: state => state.accounts.length === state.selectedAccounts.length
 }
 
 const mutations = {
@@ -36,6 +38,14 @@ const mutations = {
   },
   SET_ROLES (state, roles) {
     state.roles = roles
+  },
+  TOGGLE_SELECTION_ACCOUNT (state, account) {
+    const accountIndex = state.selectedAccounts.indexOf(account)
+
+    accountIndex > -1 ? state.selectedAccounts.splice(accountIndex, 1) : state.selectedAccounts.push(account)
+  },
+  SET_SELECTED_ACCOUNTS (state, accounts) {
+    state.selectedAccounts = accounts
   }
 }
 
@@ -87,6 +97,10 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+  },
+
+  toggleSelectionAll ({ commit, getters, state }) {
+    getters.areAllAccountsSelected ? commit('SET_SELECTED_ACCOUNTS', []) : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
   }
 }
 
