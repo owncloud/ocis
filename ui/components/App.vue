@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="uk-container uk-padding">
-      <h1>
-        Accounts
-      </h1>
+      <h1 v-text="$gettext('Accounts')" />
       <oc-grid v-if="selectedAccountsAmount > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
         <div>
@@ -20,6 +18,7 @@
                   role="menuitem"
                   :class="{ 'uk-margin-small-bottom': index + 1 !== actions.length }"
                   class="uk-width-1-1 uk-flex-left"
+                  @click="action.handler"
                 >
                   {{ action.label }}
                 </oc-button>
@@ -66,13 +65,15 @@ export default {
 
       if (isAnyAccountDisabled) {
         actions.push({
-          label: this.$gettext('Enable')
+          label: this.$gettext('Enable'),
+          handler: this.enableAccounts
         })
       }
 
       if (isAnyAccountEnabled) {
         actions.push({
-          label: this.$gettext('Disable')
+          label: this.$gettext('Disable'),
+          handler: this.disableAccounts
         })
       }
 
@@ -80,7 +81,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('Accounts', ['initialize'])
+    ...mapActions('Accounts', ['initialize', 'enableAccounts', 'disableAccounts'])
   },
   created () {
     this.initialize()

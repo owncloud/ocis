@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { AccountsService_ListAccounts } from '../client/accounts'
+import { AccountsService_ListAccounts, AccountsService_UpdateAccount } from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
 /* eslint-enable camelcase */
 import { injectAuthToken } from '../helpers/auth'
@@ -101,6 +101,74 @@ const actions = {
 
   toggleSelectionAll ({ commit, getters, state }) {
     getters.areAllAccountsSelected ? commit('SET_SELECTED_ACCOUNTS', []) : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
+  },
+
+  async enableAccounts ({ dispatch, rootGetters }, accounts) {
+    const failedAccounts = []
+    injectAuthToken(rootGetters.user.token)
+
+    for (const account in accounts) {
+      const response = await AccountsService_UpdateAccount({
+        $domain: rootGetters.configuration.server,
+        body: {
+          account: account
+        }
+      })
+
+      if (response.status !== 201) {
+        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+      }
+    }
+
+    if (failedAccounts.length === 1) {
+      dispatch('showMessage', {
+        title: 'Failed to enable account.',
+        desc: failedAccounts[0].statusText,
+        status: 'danger'
+      }, { root: true })
+    }
+
+    if (failedAccounts.length > 1) {
+      dispatch('showMessage', {
+        title: 'Failed to enable accounts.',
+        desc: 'Could not enable multiple accounts',
+        status: 'danger'
+      }, { root: true })
+    }
+  },
+
+  async disableAccounts ({ dispatch, state, rootGetters }) {
+    const failedAccounts = []
+    injectAuthToken(rootGetters.user.token)
+
+    for (const account of state.selectedAccounts) {
+      const response = await AccountsService_UpdateAccount({
+        $domain: rootGetters.configuration.server,
+        body: {
+          account: account
+        }
+      })
+
+      if (response.status !== 201) {
+        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+      }
+    }
+
+    if (failedAccounts.length === 1) {
+      dispatch('showMessage', {
+        title: 'Failed to disable account.',
+        desc: failedAccounts[0].statusText,
+        status: 'danger'
+      }, { root: true })
+    }
+
+    if (failedAccounts.length > 1) {
+      dispatch('showMessage', {
+        title: 'Failed to disable accounts.',
+        desc: 'Could not disable multiple accounts',
+        status: 'danger'
+      }, { root: true })
+    }
   }
 }
 
