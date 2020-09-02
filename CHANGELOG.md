@@ -26,6 +26,7 @@
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
+* Enhancement - Update extensions 2020-09-02: [#516](https://github.com/owncloud/ocis/pull/516)
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
 * Enhancement - Update extensions: [#151](https://github.com/owncloud/ocis/pull/151)
 * Enhancement - Update extensions 2020-07-10: [#376](https://github.com/owncloud/ocis/pull/376)
@@ -230,6 +231,14 @@
    - ocis-reva 0.9.0
 
    https://github.com/owncloud/ocis/pull/357
+
+
+* Enhancement - Update extensions 2020-09-02: [#516](https://github.com/owncloud/ocis/pull/516)
+
+   - ocis-accounts 0.4.2-0.20200828150703-2ca83cf4ac20 - ocis-ocs 0.3.1 - ocis-settings
+   0.3.2-0.20200828130413-0cc0f5bf26fe
+
+   https://github.com/owncloud/ocis/pull/516
 
 
 * Enhancement - Update extensions: [#209](https://github.com/owncloud/ocis/pull/209)
