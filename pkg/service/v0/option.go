@@ -15,7 +15,7 @@ type Options struct {
 	Logger      log.Logger
 	Config      *config.Config
 	RoleService settings.RoleService
-	RoleCache   *roles.Cache
+	RoleManager *roles.Manager
 }
 
 func newOptions(opts ...Option) Options {
@@ -49,9 +49,9 @@ func RoleService(val settings.RoleService) Option {
 	}
 }
 
-// RoleCache provides a function to set the roles cache option.
-func RoleCache(val *roles.Cache) Option {
+// RoleManager provides a function to set the roles manager option.
+func RoleManager(val *roles.Manager) Option {
 	return func(o *Options) {
-		o.RoleCache = val
+		o.RoleManager = val
 	}
 }

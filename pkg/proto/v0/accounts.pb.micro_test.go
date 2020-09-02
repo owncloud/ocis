@@ -170,8 +170,6 @@ func init() {
 		log.Fatalf("Could not create new service")
 	}
 
-	hdlr.Client = mockClient{}
-
 	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
 	if err != nil {
 		log.Fatal("could not register the Accounts handler")
@@ -1188,38 +1186,4 @@ func TestAccountUpdateReadOnlyField(t *testing.T) {
 	}
 
 	cleanUp(t)
-}
-
-type mockClient struct{}
-
-func (c mockClient) Init(option ...client.Option) error {
-	return nil
-}
-
-func (c mockClient) Options() client.Options {
-	return client.Options{}
-}
-
-func (c mockClient) NewMessage(topic string, msg interface{}, opts ...client.MessageOption) client.Message {
-	return nil
-}
-
-func (c mockClient) NewRequest(service, endpoint string, req interface{}, reqOpts ...client.RequestOption) client.Request {
-	return nil
-}
-
-func (c mockClient) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-	return nil
-}
-
-func (c mockClient) Stream(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
-	return nil, nil
-}
-
-func (c mockClient) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
-	return nil
-}
-
-func (c mockClient) String() string {
-	return "ClientMock"
 }
