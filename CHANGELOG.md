@@ -8,7 +8,6 @@ The following sections list the changes in ocis-pkg unreleased.
 
 * Change - Unwrap roleIDs from access-token into metadata context: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
 * Change - Provide cache for roles: [#59](https://github.com/owncloud/ocis-pkg/pull/59)
-* Change - Roles manager: [#60](https://github.com/owncloud/ocis-pkg/pull/60)
 
 ## Details
 
@@ -26,15 +25,6 @@ The following sections list the changes in ocis-pkg unreleased.
    in service handlers.
 
    https://github.com/owncloud/ocis-pkg/pull/59
-
-
-* Change - Roles manager: [#60](https://github.com/owncloud/ocis-pkg/pull/60)
-
-   We combined the roles middleware and cache into a roles manager. The manager doesn't expose the
-   cache anymore and manages the state of the cache by fetching roles from the role service which
-   don't exist in the cache, yet.
-
-   https://github.com/owncloud/ocis-pkg/pull/60
 
 # Changelog for [2.4.0] (2020-08-25)
 
