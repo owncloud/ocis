@@ -7,6 +7,7 @@ The following sections list the changes for ocis-proxy unreleased.
 ## Summary
 
 * Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
+* Enhancement - Add hello API and app endpoints to example config and builtin config: [#96](https://github.com/owncloud/ocis-proxy/pull/96)
 * Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
 
 ## Details
@@ -17,6 +18,13 @@ The following sections list the changes for ocis-proxy unreleased.
    missing in the example config. Added them for consistency.
 
    https://github.com/owncloud/ocis-proxy/pull/93
+
+
+* Enhancement - Add hello API and app endpoints to example config and builtin config: [#96](https://github.com/owncloud/ocis-proxy/pull/96)
+
+   We added the ocis-hello API and app endpoints to both the example config and the builtin config.
+
+   https://github.com/owncloud/ocis-proxy/pull/96
 
 
 * Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
