@@ -7,12 +7,14 @@ import (
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
+// Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.
 type Manager struct {
 	logger      log.Logger
 	cache       cache
 	roleService settings.RoleService
 }
 
+// NewManager returns a new instance of Manager.
 func NewManager(o ...Option) Manager {
 	opts := newOptions(o...)
 
