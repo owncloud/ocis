@@ -71,6 +71,10 @@ module.exports = {
     rolesDropdownTrigger: {
       selector: '//button[contains(@class, "accounts-roles-select-trigger")]',
       locateStrategy: 'xpath'
+    },
+    loadingAccountsList: {
+      selector: '//div[contains(@class, "oc-loader")]',
+      locateStrategy: 'xpath'
     }
   }
 }
