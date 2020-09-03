@@ -9,6 +9,7 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - We make use of the roles cache to enforce permission checks: [#100](https://github.com/owncloud/ocis-accounts/pull/100)
+* Change - We make use of the roles manager to enforce permission checks: [#108](https://github.com/owncloud/ocis-accounts/pull/108)
 
 ## Details
 
@@ -32,6 +33,16 @@ The following sections list the changes in ocis-accounts unreleased.
    The permission checks take place in the accounts handler.
 
    https://github.com/owncloud/ocis-accounts/pull/100
+
+
+* Change - We make use of the roles manager to enforce permission checks: [#108](https://github.com/owncloud/ocis-accounts/pull/108)
+
+   The roles cache and its cache update middleware have been replaced with a roles manager in
+   ocis-pkg/v2. We've switched over to the new roles manager implementation, to prepare for
+   permission checks on grpc requests as well.
+
+   https://github.com/owncloud/ocis-accounts/pull/108
+   https://github.com/owncloud/ocis-pkg/pull/60
 
 # Changelog for [0.4.1] (2020-08-27)
 
