@@ -10,6 +10,7 @@ The following sections list the changes in ocis-settings unreleased.
 * Bugfix - Complete input validation: [#66](https://github.com/owncloud/ocis-settings/pull/66)
 * Change - Add filter option for bundle ids in ListBundles and ListRoles: [#59](https://github.com/owncloud/ocis-settings/pull/59)
 * Change - Reuse roleIDs from the metadata context: [#69](https://github.com/owncloud/ocis-settings/pull/69)
+* Change - Update ocis-pkg/v2: [#72](https://github.com/owncloud/ocis-settings/pull/72)
 
 ## Details
 
@@ -44,6 +45,15 @@ The following sections list the changes in ocis-settings unreleased.
    roleIDs from the metadata context instead of reloading them from disk on each request.
 
    https://github.com/owncloud/ocis-settings/pull/69
+
+
+* Change - Update ocis-pkg/v2: [#72](https://github.com/owncloud/ocis-settings/pull/72)
+
+   The helper we used from ocis-pkg for extracting roleIDs from the metadata context has moved to
+   another package, so we needed to update as well.
+
+   https://github.com/owncloud/ocis-settings/pull/72
+   https://github.com/owncloud/ocis-pkg/pull/60
 
 # Changelog for [0.3.1] (2020-08-27)
 
