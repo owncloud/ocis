@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': '1f5506549cbebdc910b6d24681278e9a210f6d82',
+    'coreBranch': 'refactor-tests-to-use-Shares-folder',
+    'coreCommit': '',
     'numberOfParts': 2
   },
   'uiTests': {
