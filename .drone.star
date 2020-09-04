@@ -345,17 +345,26 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'DRONE_COMMIT_ID': ctx.build.commit
         },
         'commands': [
+          # Install Go
           'wget -q https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz',
           'mkdir -p /usr/local/bin',
           'tar xf go1.14.2.linux-amd64.tar.gz -C /usr/local',
           'ln -s /usr/local/go/bin/* /usr/local/bin',
 
+          # Install Hcloud Cli
           'go get -u github.com/hetznercloud/cli/cmd/hcloud',
+          'ln -s /root/go/bin/* /usr/local/bin',
 
+          # Create an eos machine
           'cd /drone/src',
-          '/drone/src/tests/spwan_eos.sh',
+          '/drone/src/tests/spawn_eos.sh',
           'cd /srv/app/testrunner',
+
+          # Run tests
           'make test-acceptance-api',
+
+          # Delete the eos machine
+          'hcloud server delete droneci-eos-test-%s-%s' % (ctx.build.commit, part_number)
         ],
         'volumes': [{
           'name': 'gopath',
