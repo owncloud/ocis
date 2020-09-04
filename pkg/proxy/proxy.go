@@ -35,6 +35,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		logger:    options.Logger,
 		config:    options.Config,
 	}
+	rp.Director = rp.directorSelectionDirector
 
 	if options.Config.Policies == nil {
 		rp.logger.Info().Str("source", "runtime").Msg("Policies")
@@ -87,6 +88,61 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	return rp
 }
 
+func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
+	pol, err := p.PolicySelector(r.Context(), r)
+	if err != nil {
+		p.logger.Error().Msgf("Error while selecting pol %v", err)
+		return
+	}
+
+	if _, ok := p.Directors[pol]; !ok {
+		p.logger.
+			Error().
+			Msgf("policy %v is not configured", pol)
+		return
+	}
+
+	// find matching director
+	for _, rt := range config.RouteTypes {
+		var handler func(string, url.URL) bool
+		switch rt {
+		case config.QueryRoute:
+			handler = p.queryRouteMatcher
+		case config.RegexRoute:
+			handler = p.regexRouteMatcher
+		case config.PrefixRoute:
+			fallthrough
+		default:
+			handler = p.prefixRouteMatcher
+		}
+		for endpoint := range p.Directors[pol][rt] {
+			if handler(endpoint, *r.URL) {
+				p.logger.
+					Debug().
+					Str("policy", pol).
+					Str("prefix", endpoint).
+					Str("path", r.URL.Path).
+					Str("routeType", string(rt)).
+					Msg("director found")
+				p.Directors[pol][rt][endpoint](r)
+				return
+			}
+		}
+	}
+
+	// override default director with root. If any
+	if p.Directors[pol][config.PrefixRoute]["/"] != nil {
+		p.Directors[pol][config.PrefixRoute]["/"](r)
+		return
+	}
+
+	p.logger.
+		Warn().
+		Str("policy", pol).
+		Str("path", r.URL.Path).
+		Msg("no director found")
+}
+
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")
@@ -135,18 +191,6 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var hit bool
-	pol, err := p.PolicySelector(r.Context(), r)
-	if err != nil {
-		p.logger.Error().Msgf("Error while selecting pol %v", err)
-	}
-
-	if _, ok := p.Directors[pol]; !ok {
-		p.logger.
-			Error().
-			Msgf("policy %v is not configured", pol)
-	}
-
 	ctx := context.Background()
 	var span *trace.Span
 
@@ -155,40 +199,6 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		ctx, span = trace.StartSpan(context.Background(), r.URL.String())
 		defer span.End()
 		p.propagator.SpanContextToRequest(span.SpanContext(), r)
-	}
-
-Loop:
-	for _, rt := range config.RouteTypes {
-		var handler func(string, url.URL) bool
-		switch rt {
-		case config.QueryRoute:
-			handler = p.queryRouteMatcher
-		case config.RegexRoute:
-			handler = p.regexRouteMatcher
-		case config.PrefixRoute:
-			fallthrough
-		default:
-			handler = p.prefixRouteMatcher
-		}
-		for endpoint := range p.Directors[pol][rt] {
-			if handler(endpoint, *r.URL) {
-				p.Director = p.Directors[pol][rt][endpoint]
-				hit = true
-				p.logger.
-					Debug().
-					Str("policy", pol).
-					Str("prefix", endpoint).
-					Str("path", r.URL.Path).
-					Str("routeType", string(rt)).
-					Msg("director found")
-				break Loop
-			}
-		}
-	}
-
-	// override default director with root. If any
-	if !hit && p.Directors[pol][config.PrefixRoute]["/"] != nil {
-		p.Director = p.Directors[pol][config.PrefixRoute]["/"]
 	}
 
 	// Call upstream ServeHTTP
