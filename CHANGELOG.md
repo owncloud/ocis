@@ -6,11 +6,19 @@ The following sections list the changes for ocis-proxy unreleased.
 
 ## Summary
 
+* Bugfix - Fix director selection: [#99](https://github.com/owncloud/ocis-proxy/pull/99)
 * Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
 * Enhancement - Add hello API and app endpoints to example config and builtin config: [#96](https://github.com/owncloud/ocis-proxy/pull/96)
 * Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
 
 ## Details
+
+* Bugfix - Fix director selection: [#99](https://github.com/owncloud/ocis-proxy/pull/99)
+
+   We fixed a bug where simultaneous requests could be executed on the wrong backend.
+
+   https://github.com/owncloud/ocis-proxy/pull/99
+
 
 * Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
 
