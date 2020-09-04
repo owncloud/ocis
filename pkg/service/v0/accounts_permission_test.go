@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/golang/protobuf/ptypes/empty"
 	"log"
 	"net/http"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/micro/go-micro/v2/client"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/micro/go-micro/v2/metadata"
