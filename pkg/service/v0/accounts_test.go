@@ -159,6 +159,54 @@ func TestPermissionsGetAccount(t *testing.T) {
 	}
 }
 
+// TestPermissionsCreateAccount checks permission handling on CreateAccount
+func TestPermissionsCreateAccount(t *testing.T) {
+	var scenarios = []struct {
+		name            string
+		roleIDs         []string
+		permissionError error
+	}{
+		// TODO: remove this test when https://github.com/owncloud/ocis-accounts/pull/111 is merged
+		// replace with two tests:
+		// 1: "CreateAccount fails with 403 when roleIDs don't exist in context"
+		// 2: "CreateAccount fails with 403 when no admin role in context"
+		{
+			"CreateAccount succeeds when no role IDs in context",
+			nil,
+			nil,
+		},
+		{
+			"CreateAccount fails when no admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleUser, ssvc.BundleUUIDRoleGuest},
+			merrors.Forbidden(s.id, "no permission for CreateAccount"),
+		},
+		{
+			"CreateAccount succeeds when admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleAdmin},
+			nil,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			ctx := buildTestCtx(t, scenario.roleIDs)
+			request := &proto.CreateAccountRequest{}
+			response := &proto.Account{}
+			err := s.CreateAccount(ctx, request, response)
+			if scenario.permissionError != nil {
+				assert.Equal(t, scenario.permissionError, err)
+			} else if err != nil {
+				// we are only checking permissions here, so just check that the error code is not 403
+				merr := merrors.FromError(err)
+				assert.NotEqual(t, http.StatusForbidden, merr.GetCode())
+			}
+		})
+	}
+}
+
 // TestPermissionsUpdateAccount checks permission handling on UpdateAccount
 func TestPermissionsUpdateAccount(t *testing.T) {
 	var scenarios = []struct {
