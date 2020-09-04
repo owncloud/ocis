@@ -1,15 +1,15 @@
 #!/bin/bash
 ME=$DRONE_HCLOUD_USER
-SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}
+SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${PART_NUMBER}
 
 # Create a new machine on hcloud for eos
 hcloud server create --type cx21 --image ubuntu-20.04 --ssh-key $ME --name $SERVER_NAME --label owner=$ME --label for=test --label from=eos-compose
+# time for the server to start up
+sleep 15
 
 IPADDR=$(hcloud server ip $SERVER_NAME)
-OCIS_DOMAIN=$(hcloud server ip $SERVER_NAME)
-
-# timeout 180 while [[ \"$(curl -k -v -s -o /dev/null -w ''%{http_code}'' https://:9200)\" != \"200\" ]]; do sleep 2; done
-# sleep 15
+export IPADDR=$IPADDR
+export TEST_SERVER_URL=https://${IPADDR}:9200
 
 # Setup system and clone ocis
 ssh -t root@$IPADDR apt-get update -y
