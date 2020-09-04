@@ -189,8 +189,6 @@ func buildRoleServiceMock() settings.RoleService {
 	return settings.MockRoleService{
 		AssignRoleToUserFunc: func(ctx context.Context, req *settings.AssignRoleToUserRequest, opts ...client.CallOption) (res *settings.AssignRoleToUserResponse, err error) {
 			mockedRoleAssignment[req.AccountUuid] = req.RoleId
-			fmt.Println(mockedRoleAssignment)
-			fmt.Println("asdf blablabla")
 			return &settings.AssignRoleToUserResponse{
 				Assignment: &settings.UserRoleAssignment{
 					AccountUuid: req.AccountUuid,
