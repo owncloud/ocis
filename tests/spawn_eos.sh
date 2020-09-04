@@ -1,6 +1,6 @@
 #!/bin/bash
 ME=$DRONE_HCLOUD_USER
-SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${PART_NUMBER}
+SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${RUN_PART}
 
 # Create a new machine on hcloud for eos
 hcloud server create --type cx21 --image ubuntu-20.04 --ssh-key $ME --name $SERVER_NAME --label owner=$ME --label for=test --label from=eos-compose
