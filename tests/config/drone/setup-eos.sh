@@ -8,7 +8,11 @@ do
 done
 
 docker-compose -f ./docker-compose-eos-ci.yml exec -d ocis /start-ldap
+
+# time for ldap service to starup within ocis container
 sleep 5
+
+# Configure ocis
 docker-compose -f ./docker-compose-eos-ci.yml exec ocis id einstein
 docker-compose -f ./docker-compose-eos-ci.yml exec ocis /ocis/bin/ocis kill reva-users
 docker-compose -f ./docker-compose-eos-ci.yml exec ocis /ocis/bin/ocis run reva-users

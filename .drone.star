@@ -92,6 +92,9 @@ def testPipelines(ctx):
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
 
+  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
 
@@ -282,7 +285,8 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt',
+          'PART_NUMBER': part_number
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -296,6 +300,65 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     ],
     'services':
       redis(),
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'coreApiTests-Eos-Storage-%s' % (part_number),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      cloneCoreRepos(coreBranch, coreCommit) + [
+      {
+        'name': 'oC10ApiTests-%s' % (part_number),
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'TEST_OCIS':'true',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@local_storage',
+          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          'RUN_PART': part_number,
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
+          'DELETE_USER_DATA_CMD': 'ssh -t root@${IPADDR} docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s',
+          'DRONE_COMMIT_ID': ctx.build.commit
+        },
+        'commands': [
+          'wget -q https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz',
+          'mkdir -p /usr/local/bin',
+          'tar xf go1.14.2.linux-amd64.tar.gz -C /usr/local',
+          'ln -s /usr/local/go/bin/* /usr/local/bin',
+
+          'go get -u github.com/hetznercloud/cli/cmd/hcloud',
+
+          'cd /drone/src',
+          '/drone/src/tests/spwan_eos.sh',
+          'cd /srv/app/testrunner',
+          'make test-acceptance-api',
+        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+    ],
     'volumes': [
       {
         'name': 'gopath',
