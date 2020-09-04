@@ -335,6 +335,14 @@ func buildRoleServiceMock() settings.RoleService {
 			},
 			Settings: []*settings.Setting{},
 		},
+		ssvc.BundleUUIDRoleGuest: {
+			Id:   ssvc.BundleUUIDRoleGuest,
+			Type: settings.Bundle_TYPE_ROLE,
+			Resource: &settings.Resource{
+				Type: settings.Resource_TYPE_SYSTEM,
+			},
+			Settings: []*settings.Setting{},
+		},
 	}
 	return settings.MockRoleService{
 		ListRolesFunc: func(ctx context.Context, req *settings.ListBundlesRequest, opts ...client.CallOption) (res *settings.ListBundlesResponse, err error) {
