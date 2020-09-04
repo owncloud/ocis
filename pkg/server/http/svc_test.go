@@ -74,6 +74,7 @@ type User struct {
 	ID          string `json:"id" xml:"id"`
 	Username    string `json:"username" xml:"username"`
 	Email       string `json:"email" xml:"email"`
+	Password    string `json:"-" xml:"-"`
 	Quota       Quota  `json:"quota" xml:"quota"`
 	UIDNumber   int    `json:"uidnumber" xml:"uidnumber"`
 	GIDNumber   int    `json:"gidnumber" xml:"gidnumber"`
@@ -82,6 +83,10 @@ type User struct {
 
 func (u *User) getUserRequestString() string {
 	res := url.Values{}
+
+	if u.Password != "" {
+		res.Add("password", u.Password)
+	}
 
 	if u.ID != "" {
 		res.Add("userid", u.ID)
@@ -358,6 +363,7 @@ func TestCreateUser(t *testing.T) {
 				ID:          "rutherford",
 				Email:       "rutherford@example.com",
 				Displayname: "ErnestRutherFord",
+				Password:    "newPassword",
 			},
 			nil,
 		},
@@ -372,6 +378,7 @@ func TestCreateUser(t *testing.T) {
 				Displayname: "J. J. Thomson",
 				UIDNumber:   20027,
 				GIDNumber:   30000,
+				Password:    "newPassword",
 			},
 			nil,
 		},
@@ -384,11 +391,26 @@ func TestCreateUser(t *testing.T) {
 				ID:          "bohr",
 				Email:       "bohr@example.com",
 				Displayname: "Niels Bohr",
+				Password:    "newPassword",
+			},
+			nil,
+		},
+
+		// User withoutl password
+		// https://github.com/owncloud/ocis-ocs/issues/50
+		{
+			User{
+				Enabled:     "true",
+				Username:    "john",
+				ID:          "john",
+				Email:       "john@example.com",
+				Displayname: "John Dalton",
 			},
 			nil,
 		},
 
 		// User with special character in username
+		// https://github.com/owncloud/ocis-ocs/issues/49
 		{
 			User{
 				Enabled:     "true",
@@ -396,6 +418,7 @@ func TestCreateUser(t *testing.T) {
 				ID:          "schrödinger",
 				Email:       "schrödinger@example.com",
 				Displayname: "Erwin Schrödinger",
+				Password:    "newPassword",
 			},
 			&Meta{
 				Status:     "error",
@@ -412,6 +435,7 @@ func TestCreateUser(t *testing.T) {
 				ID:          "planck",
 				Email:       "max@example.com",
 				Displayname: "Max Planck",
+				Password:    "newPassword",
 			},
 			nil,
 		},
@@ -424,6 +448,7 @@ func TestCreateUser(t *testing.T) {
 				ID:          "hberg",
 				Email:       "werner@example.com",
 				Displayname: "Werner Hisenberg",
+				Password:    "newPassword",
 			},
 			nil,
 		},
@@ -435,6 +460,7 @@ func TestCreateUser(t *testing.T) {
 				Username: "oppenheimer",
 				ID:       "oppenheimer",
 				Email:    "robert@example.com",
+				Password: "newPassword",
 			},
 			nil,
 		},
@@ -446,6 +472,7 @@ func TestCreateUser(t *testing.T) {
 				Username: "chadwick",
 				ID:       "chadwick",
 				Email:    "not_a_email",
+				Password: "newPassword",
 			},
 			&Meta{
 				Status:     "error",
@@ -460,6 +487,7 @@ func TestCreateUser(t *testing.T) {
 				Enabled:  "true",
 				Username: "chadwick",
 				ID:       "chadwick",
+				Password: "newPassword",
 			},
 			&Meta{
 				Status:     "error",
@@ -471,9 +499,10 @@ func TestCreateUser(t *testing.T) {
 		// User without username
 		{
 			User{
-				Enabled: "true",
-				ID:      "chadwick",
-				Email:   "james@example.com",
+				Enabled:  "true",
+				ID:       "chadwick",
+				Email:    "james@example.com",
+				Password: "newPassword",
 			},
 			&Meta{
 				Status:     "error",
@@ -488,6 +517,7 @@ func TestCreateUser(t *testing.T) {
 				Enabled:  "true",
 				Username: "chadwick",
 				Email:    "james@example.com",
+				Password: "newPassword",
 			},
 			nil,
 		},
@@ -945,6 +975,7 @@ func TestUpdateUser(t *testing.T) {
 			nil,
 		},
 		// Empty values doesn't gives error
+		// https://github.com/owncloud/ocis-ocs/issues/51
 		{
 			"email",
 			"",
