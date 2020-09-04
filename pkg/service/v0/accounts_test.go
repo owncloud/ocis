@@ -96,13 +96,7 @@ func TestPermissionsListAccounts(t *testing.T) {
 			teardown := setup()
 			defer teardown()
 
-			ctx := context.Background()
-			if scenario.roleIDs != nil {
-				roleIDs, err := json.Marshal(scenario.roleIDs)
-				assert.NoError(t, err)
-				ctx = metadata.Set(ctx, middleware.RoleIDs, string(roleIDs))
-			}
-
+			ctx := buildTestCtx(t, scenario.roleIDs)
 			request := &proto.ListAccountsRequest{
 				Query: scenario.query,
 			}
@@ -117,6 +111,61 @@ func TestPermissionsListAccounts(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestPermissionsGetAccount checks permission handling on GetAccount
+// TODO: remove this test function entirely, when https://github.com/owncloud/ocis-accounts/pull/111 is merged. GetAccount will not have permission checks for the time being.
+func TestPermissionsGetAccount(t *testing.T) {
+	var scenarios = []struct {
+		name            string
+		roleIDs         []string
+		permissionError error
+	}{
+		{
+			"GetAccount succeeds when no role IDs in context",
+			nil,
+			nil,
+		},
+		{
+			"GetAccount fails when no admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleUser, ssvc.BundleUUIDRoleGuest},
+			merrors.Forbidden(s.id, "no permission for GetAccount"),
+		},
+		{
+			"GetAccount succeeds when admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleAdmin},
+			nil,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			ctx := buildTestCtx(t, scenario.roleIDs)
+			request := &proto.GetAccountRequest{}
+			response := &proto.Account{}
+			err := s.GetAccount(ctx, request, response)
+			if scenario.permissionError != nil {
+				assert.Equal(t, scenario.permissionError, err)
+			} else if err != nil {
+				// we are only checking permissions here, so just check that the error code is not 403
+				merr := merrors.FromError(err)
+				assert.NotEqual(t, http.StatusForbidden, merr.GetCode())
+			}
+		})
+	}
+}
+
+func buildTestCtx(t *testing.T, roleIDs []string) context.Context {
+	ctx := context.Background()
+	if roleIDs != nil {
+		roleIDs, err := json.Marshal(roleIDs)
+		assert.NoError(t, err)
+		ctx = metadata.Set(ctx, middleware.RoleIDs, string(roleIDs))
+	}
+	return ctx
 }
 
 func buildRoleServiceMock() settings.RoleService {
