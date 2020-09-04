@@ -21,7 +21,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20200418040025-38ba6e5628f1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
-	github.com/owncloud/ocis-accounts v0.4.2-0.20200901074457-6a27781a2741
+	github.com/owncloud/ocis-accounts v0.4.2-0.20200904103043-8e665bb1263c
 	github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
@@ -30,10 +30,10 @@ require (
 	github.com/owncloud/ocis-migration v0.2.0
 	github.com/owncloud/ocis-ocs v0.3.1
 	github.com/owncloud/ocis-phoenix v0.13.0
-	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b
+	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902152028-72d605ba3857
 	github.com/owncloud/ocis-proxy v0.7.1-0.20200904132806-fcceec602fcb
 	github.com/owncloud/ocis-reva v0.13.0
-	github.com/owncloud/ocis-settings v0.3.2-0.20200902094647-35dc3aeaba78
+	github.com/owncloud/ocis-settings v0.3.2-0.20200903035407-ad5de8264f91
 	github.com/owncloud/ocis-store v0.1.1
 	github.com/owncloud/ocis-thumbnails v0.3.0
 	github.com/owncloud/ocis-webdav v0.1.1

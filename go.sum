@@ -1257,6 +1257,8 @@ github.com/owncloud/ocis-accounts v0.4.1/go.mod h1:vTIgPpoRz2zrLU4kGY6nGKUap/NvL
 github.com/owncloud/ocis-accounts v0.4.2-0.20200828150703-2ca83cf4ac20/go.mod h1:R2mNcvDvma7D7n1yxpLHIJR9dHUx4As7QfiJlD8e9DE=
 github.com/owncloud/ocis-accounts v0.4.2-0.20200901074457-6a27781a2741 h1:7Vf+BXwXUerJuGPOIThjPbt69rxvJo3PIW1qb0mCn2M=
 github.com/owncloud/ocis-accounts v0.4.2-0.20200901074457-6a27781a2741/go.mod h1:ermjPwC2b3Tsh8YF3oUl6cOHMvFPN6MY8ZlkmO6w0xw=
+github.com/owncloud/ocis-accounts v0.4.2-0.20200904103043-8e665bb1263c h1:dP5NIUW0Ht8nYXetm/GJ7Ce01iRBNnUQDGN4xRx+JbU=
+github.com/owncloud/ocis-accounts v0.4.2-0.20200904103043-8e665bb1263c/go.mod h1:+o4FgF3WtPpb75f9saszqSR1qvsybyyjppshDBLqvUM=
 github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1 h1:YA7tS4VFSUmjeZBt4Wa+fSoreH1VJYCFlHvoRey3ngM=
 github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1/go.mod h1:lZkoEjBuEi0QZUlBG+XgVvWC4GzbWCTnmZQcIhC2kMg=
 github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7 h1:gT0GyIOoR7XtpZ7sIxVJSckcz/nueGB1Cm1xNaflXQ0=
@@ -1306,6 +1308,9 @@ github.com/owncloud/ocis-pkg/v2 v2.4.0 h1:/3ZOd4txtwjiNKJA9iLT9BjrJw5YgHSX13fQR4
 github.com/owncloud/ocis-pkg/v2 v2.4.0/go.mod h1:FSzIvhx9HcZcq4jgNaDowNvM7PTX/XCyoMvyfzidUpE=
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b h1:PRw0b4abdrDKloh417qPsS5lkB/bjJ3Rc4txzHx/hBg=
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
+github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
+github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902152028-72d605ba3857 h1:CP2FZWAe3qwzWNrK5Z8Jk7xXIh5hCEXnwFRymvC3HTk=
+github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902152028-72d605ba3857/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
 github.com/owncloud/ocis-proxy v0.6.1-0.20200819105709-a51b3c8ed42f h1:qY8fwArWIBuIFT4QBYQgpupUSGtvuVGT8QSIOF1R0qg=
 github.com/owncloud/ocis-proxy v0.6.1-0.20200819105709-a51b3c8ed42f/go.mod h1:zyAWyZXjILb3Lsotxc2a+Iwkj4jKXtT4O0ajB5b3jnY=
 github.com/owncloud/ocis-proxy v0.7.0 h1:ruOOz0Ed4crtkjqFRvvbgywUfDldcWDxOqbUQlwthTU=
@@ -1343,6 +1348,8 @@ github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe h1:kiU5lz
 github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/owncloud/ocis-settings v0.3.2-0.20200902094647-35dc3aeaba78 h1:mCP/1U+mI70dQugeSsTKqf1O2a/GQLInl1KMPXaU2yQ=
 github.com/owncloud/ocis-settings v0.3.2-0.20200902094647-35dc3aeaba78/go.mod h1:J2m9TM5FqYDTvrr2zH78JsC1Xv8hXmd+0dntHCWYYoc=
+github.com/owncloud/ocis-settings v0.3.2-0.20200903035407-ad5de8264f91 h1:fiCEaM9Ysc9Tw7dhZk9mTjdHB8grrx2TEiEfRd4yYNo=
+github.com/owncloud/ocis-settings v0.3.2-0.20200903035407-ad5de8264f91/go.mod h1:KGNSgqec5Kv4tgD4rLbo7Z5vrEYTnxd5g2NHmpUJ3O8=
 github.com/owncloud/ocis-store v0.0.0-20200716140351-f9670592fb7b/go.mod h1:7WRMnx4ffwtckNl4qD2Gj/d5fvl84jyydOV2FbUUu3A=
 github.com/owncloud/ocis-store v0.1.1 h1:lPvWjjPqbVqDW0sfgQdfY3dOOvXK0wC87eTL2fWxRBg=
 github.com/owncloud/ocis-store v0.1.1/go.mod h1:Rav5iw0fZXYFqJl81IbyTVa/FidaBhgVPtp0XqkgviM=
