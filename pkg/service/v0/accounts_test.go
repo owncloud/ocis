@@ -69,8 +69,8 @@ func TestPermissionsListAccounts(t *testing.T) {
 	}{
 		// TODO: remove this test when https://github.com/owncloud/ocis-accounts/pull/111 is merged
 		// replace with two tests:
-		// 1: "ListAccounts fails with 403 when no roleIDs in context"
-		// 2: "ListAccounts fails with 403 when no admin role in context and query empty"
+		// 1: "ListAccounts fails with 403 when roleIDs don't exist in context"
+		// 2: "ListAccounts fails with 403 when ('no admin role in context' AND 'empty query')"
 		{
 			"ListAccounts succeeds when no roleIDs in context",
 			nil,
@@ -147,6 +147,54 @@ func TestPermissionsGetAccount(t *testing.T) {
 			request := &proto.GetAccountRequest{}
 			response := &proto.Account{}
 			err := s.GetAccount(ctx, request, response)
+			if scenario.permissionError != nil {
+				assert.Equal(t, scenario.permissionError, err)
+			} else if err != nil {
+				// we are only checking permissions here, so just check that the error code is not 403
+				merr := merrors.FromError(err)
+				assert.NotEqual(t, http.StatusForbidden, merr.GetCode())
+			}
+		})
+	}
+}
+
+// TestPermissionsUpdateAccount checks permission handling on UpdateAccount
+func TestPermissionsUpdateAccount(t *testing.T) {
+	var scenarios = []struct {
+		name            string
+		roleIDs         []string
+		permissionError error
+	}{
+		// TODO: remove this test when https://github.com/owncloud/ocis-accounts/pull/111 is merged
+		// replace with two tests:
+		// 1: "UpdateAccount fails with 403 when roleIDs don't exist in context"
+		// 2: "UpdateAccount fails with 403 when no admin role in context"
+		{
+			"UpdateAccount succeeds when no role IDs in context",
+			nil,
+			nil,
+		},
+		{
+			"UpdateAccount fails when no admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleUser, ssvc.BundleUUIDRoleGuest},
+			merrors.Forbidden(s.id, "no permission for UpdateAccount"),
+		},
+		{
+			"UpdateAccount succeeds when admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleAdmin},
+			nil,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			ctx := buildTestCtx(t, scenario.roleIDs)
+			request := &proto.UpdateAccountRequest{}
+			response := &proto.Account{}
+			err := s.UpdateAccount(ctx, request, response)
 			if scenario.permissionError != nil {
 				assert.Equal(t, scenario.permissionError, err)
 			} else if err != nil {
