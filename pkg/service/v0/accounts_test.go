@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"github.com/golang/protobuf/ptypes/empty"
 	"log"
 	"net/http"
 	"os"
@@ -195,6 +196,54 @@ func TestPermissionsUpdateAccount(t *testing.T) {
 			request := &proto.UpdateAccountRequest{}
 			response := &proto.Account{}
 			err := s.UpdateAccount(ctx, request, response)
+			if scenario.permissionError != nil {
+				assert.Equal(t, scenario.permissionError, err)
+			} else if err != nil {
+				// we are only checking permissions here, so just check that the error code is not 403
+				merr := merrors.FromError(err)
+				assert.NotEqual(t, http.StatusForbidden, merr.GetCode())
+			}
+		})
+	}
+}
+
+// TestPermissionsDeleteAccount checks permission handling on DeleteAccount
+func TestPermissionsDeleteAccount(t *testing.T) {
+	var scenarios = []struct {
+		name            string
+		roleIDs         []string
+		permissionError error
+	}{
+		// TODO: remove this test when https://github.com/owncloud/ocis-accounts/pull/111 is merged
+		// replace with two tests:
+		// 1: "DeleteAccount fails with 403 when roleIDs don't exist in context"
+		// 2: "DeleteAccount fails with 403 when no admin role in context"
+		{
+			"DeleteAccount succeeds when no role IDs in context",
+			nil,
+			nil,
+		},
+		{
+			"DeleteAccount fails when no admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleUser, ssvc.BundleUUIDRoleGuest},
+			merrors.Forbidden(s.id, "no permission for DeleteAccount"),
+		},
+		{
+			"DeleteAccount succeeds when admin roleID in context",
+			[]string{ssvc.BundleUUIDRoleAdmin},
+			nil,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			teardown := setup()
+			defer teardown()
+
+			ctx := buildTestCtx(t, scenario.roleIDs)
+			request := &proto.DeleteAccountRequest{}
+			response := &empty.Empty{}
+			err := s.DeleteAccount(ctx, request, response)
 			if scenario.permissionError != nil {
 				assert.Equal(t, scenario.permissionError, err)
 			} else if err != nil {
