@@ -138,21 +138,27 @@ func (m *Meta) Success(ocsVersion string) bool {
 }
 
 type SingleUserResponse struct {
-	Meta Meta `json:"meta" xml:"meta"`
-	Data User `json:"data" xml:"data"`
+	Ocs struct {
+		Meta Meta `json:"meta" xml:"meta"`
+		Data User `json:"data" xml:"data"`
+	} `json:"ocs" xml:"ocs"`
 }
 
 type GetUsersResponse struct {
-	Meta Meta `json:"meta" xml:"meta"`
-	Data struct {
-		Users []string `json:"users" xml:"users>element"`
-	} `json:"data" xml:"data"`
+	Ocs struct {
+		Meta Meta `json:"meta" xml:"meta"`
+		Data struct {
+			Users []string `json:"users" xml:"users>element"`
+		} `json:"data" xml:"data"`
+	} `json:"ocs" xml:"ocs"`
 }
 
 type DeleteUserRespone struct {
-	Meta Meta `json:"meta" xml:"meta"`
-	Data struct {
-	} `json:"data" xml:"data"`
+	Ocs struct {
+		Meta Meta `json:"meta" xml:"meta"`
+		Data struct {
+		} `json:"data" xml:"data"`
+	} `json:"ocs" xml:"ocs"`
 }
 
 func assertStatusCode(t *testing.T, statusCode int, res *httptest.ResponseRecorder, ocsVersion string) {
@@ -545,25 +551,25 @@ func TestCreateUser(t *testing.T) {
 						t.Fatal(err)
 					}
 				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 						t.Fatal(err)
 					}
 				}
 
 				if data.err == nil {
-					assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+					assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
 					assertStatusCode(t, 200, res, ocsVersion)
-					assertUserSame(t, data.user, response.Data, false)
+					assertUserSame(t, data.user, response.Ocs.Data, false)
 				} else {
 					assertStatusCode(t, 400, res, ocsVersion)
-					assertResponseMeta(t, *data.err, response.Meta)
+					assertResponseMeta(t, *data.err, response.Ocs.Meta)
 				}
 
 				var id string
 				if data.user.ID != "" {
 					id = data.user.ID
 				} else {
-					id = response.Data.ID
+					id = response.Ocs.Data.ID
 				}
 
 				res, err = sendRequest(
@@ -582,12 +588,12 @@ func TestCreateUser(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				assert.True(t, usersResponse.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+				assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
 
 				if data.err == nil {
-					assert.Contains(t, usersResponse.Data.Users, id)
+					assert.Contains(t, usersResponse.Ocs.Data.Users, id)
 				} else {
-					assert.NotContains(t, usersResponse.Data.Users, data.user.ID)
+					assert.NotContains(t, usersResponse.Ocs.Data.Users, data.user.ID)
 				}
 			}
 			cleanUp(t)
@@ -641,15 +647,15 @@ func TestGetUsers(t *testing.T) {
 					t.Fatal(err)
 				}
 			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 					t.Fatal(err)
 				}
 			}
 
 			assertStatusCode(t, 200, res, ocsVersion)
-			assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
 			for _, user := range users {
-				assert.Contains(t, response.Data.Users, user.Username)
+				assert.Contains(t, response.Ocs.Data.Users, user.Username)
 			}
 			cleanUp(t)
 		}
@@ -678,15 +684,15 @@ func TestGetUsersDefaultUsers(t *testing.T) {
 					t.Fatal(err)
 				}
 			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 					t.Fatal(err)
 				}
 			}
 
 			assertStatusCode(t, 200, res, ocsVersion)
-			assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
 			for _, user := range DefaultUsers {
-				assert.Contains(t, response.Data.Users, user)
+				assert.Contains(t, response.Ocs.Data.Users, user)
 			}
 			cleanUp(t)
 		}
@@ -739,14 +745,14 @@ func TestGetUser(t *testing.T) {
 						t.Fatal(err)
 					}
 				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 						t.Fatal(err)
 					}
 				}
 
 				assertStatusCode(t, 200, res, ocsVersion)
-				assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
-				assertUserSame(t, user, response.Data, true)
+				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
+				assertUserSame(t, user, response.Ocs.Data, true)
 			}
 			cleanUp(t)
 		}
@@ -782,18 +788,18 @@ func TestGetUserInvalidId(t *testing.T) {
 						t.Fatal(err)
 					}
 				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 						t.Fatal(err)
 					}
 				}
 
 				assertStatusCode(t, 404, res, ocsVersion)
-				assert.False(t, response.Meta.Success(ocsVersion), "the response was expected to fail but passed")
+				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "the response was expected to fail but passed")
 				assertResponseMeta(t, Meta{
 					Status:     "error",
 					StatusCode: 998,
 					Message:    "not found",
-				}, response.Meta)
+				}, response.Ocs.Meta)
 				cleanUp(t)
 			}
 		}
@@ -844,14 +850,14 @@ func TestDeleteUser(t *testing.T) {
 					t.Fatal(err)
 				}
 			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 					t.Fatal(err)
 				}
 			}
 
 			assertStatusCode(t, 200, res, ocsVersion)
-			assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
-			assert.Empty(t, response.Data)
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+			assert.Empty(t, response.Ocs.Data)
 
 			// Check deleted user doesn't exist and the other user does
 			res, err = sendRequest(
@@ -870,9 +876,9 @@ func TestDeleteUser(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.True(t, usersResponse.Meta.Success("v1.php"), "The response was expected to be successful but was not")
-			assert.Contains(t, usersResponse.Data.Users, "thomson")
-			assert.NotContains(t, usersResponse.Data.Users, "rutherford")
+			assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+			assert.Contains(t, usersResponse.Ocs.Data.Users, "thomson")
+			assert.NotContains(t, usersResponse.Ocs.Data.Users, "rutherford")
 
 			cleanUp(t)
 		}
@@ -909,20 +915,20 @@ func TestDeleteUserInvalidId(t *testing.T) {
 						t.Fatal(err)
 					}
 				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 						t.Fatal(err)
 					}
 				}
 
 				assertStatusCode(t, 404, res, ocsVersion)
-				assert.False(t, response.Meta.Success(ocsVersion), "The response was not expected to be successful but was")
-				assert.Empty(t, response.Data)
+				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was not expected to be successful but was")
+				assert.Empty(t, response.Ocs.Data)
 
 				assertResponseMeta(t, Meta{
 					Status:     "error",
 					StatusCode: 998,
 					Message:    "The requested user could not be found",
-				}, response.Meta)
+				}, response.Ocs.Meta)
 			}
 		}
 	}
@@ -1069,7 +1075,9 @@ func TestUpdateUser(t *testing.T) {
 				}
 
 				var response struct {
-					Meta Meta `json:"meta" xml:"meta"`
+					Ocs struct {
+						Meta Meta `json:"meta" xml:"meta"`
+					} `json:"ocs" xml:"ocs"`
 				}
 
 				if format == "json" {
@@ -1077,16 +1085,16 @@ func TestUpdateUser(t *testing.T) {
 						t.Fatal(err)
 					}
 				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
 						t.Fatal(err)
 					}
 				}
 
 				if data.Error != nil {
-					assertResponseMeta(t, *data.Error, response.Meta)
+					assertResponseMeta(t, *data.Error, response.Ocs.Meta)
 					assertStatusCode(t, 400, res, ocsVersion)
 				} else {
-					assert.True(t, response.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+					assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
 					assertStatusCode(t, 200, res, ocsVersion)
 				}
 
@@ -1107,11 +1115,11 @@ func TestUpdateUser(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				assert.True(t, usersResponse.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+				assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
 				if data.Error == nil {
-					assertUserSame(t, updatedUser, usersResponse.Data, true)
+					assertUserSame(t, updatedUser, usersResponse.Ocs.Data, true)
 				} else {
-					assertUserSame(t, user, usersResponse.Data, true)
+					assertUserSame(t, user, usersResponse.Ocs.Data, true)
 				}
 				cleanUp(t)
 			}
