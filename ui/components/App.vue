@@ -5,7 +5,7 @@
       <oc-grid v-if="selectedAccountsAmount > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
         <div>
-          <oc-action-drop>
+          <oc-action-drop class="accounts-actions-dropdown">
             <template v-slot:button>
               <span class="uk-margin-xsmall-right" v-text="$gettext('Actions')" />
               <oc-icon name="expand_more" />
@@ -14,6 +14,7 @@
                 <oc-button
                   v-for="(action, index) in actions"
                   :key="action.label"
+                  :id="action.id"
                   variation="raw"
                   role="menuitem"
                   :class="{ 'uk-margin-small-bottom': index + 1 !== actions.length }"
@@ -65,6 +66,7 @@ export default {
 
       if (isAnyAccountDisabled) {
         actions.push({
+          id: 'accounts-actions-dropdown-action-enable',
           label: this.$gettext('Enable'),
           handler: this.enableAccounts
         })
@@ -72,6 +74,7 @@ export default {
 
       if (isAnyAccountEnabled) {
         actions.push({
+          id: 'accounts-actions-dropdown-action-disable',
           label: this.$gettext('Disable'),
           handler: this.disableAccounts
         })
