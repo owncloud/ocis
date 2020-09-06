@@ -338,7 +338,11 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
           'DELETE_USER_DATA_CMD': 'ssh -t root@${IPADDR} docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s',
-          'DRONE_COMMIT_ID': ctx.build.commit
+          'DRONE_COMMIT_ID': ctx.build.commit,
+          'HCLOUD_TOKEN': {
+            'from_secret': 'hcloud_token',
+          },
+          'DRONE_HCLOUD_USER': 'dipak',
         },
         'commands': [
           # Install Go
