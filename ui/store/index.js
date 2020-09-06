@@ -46,6 +46,16 @@ const mutations = {
   },
   SET_SELECTED_ACCOUNTS (state, accounts) {
     state.selectedAccounts = accounts
+  },
+
+  UPDATE_ACCOUNT (state, updatedAccount) {
+    const accountIndex = state.accounts.findIndex(account => account.id === updatedAccount.id)
+
+    state.accounts.splice(accountIndex, 1, updatedAccount)
+  },
+
+  RESET_ACCOUNTS_SELECTION (state) {
+    state.selectedAccounts = []
   }
 }
 
@@ -103,19 +113,32 @@ const actions = {
     getters.areAllAccountsSelected ? commit('SET_SELECTED_ACCOUNTS', []) : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
   },
 
-  async enableAccounts ({ dispatch, rootGetters }, accounts) {
+  async enableAccounts ({ commit, dispatch, state, rootGetters }) {
     const failedAccounts = []
     injectAuthToken(rootGetters.user.token)
 
-    for (const account in accounts) {
+    for (const account of state.selectedAccounts) {
+      if (account.accountEnabled) {
+        continue
+      }
+
       const response = await AccountsService_UpdateAccount({
         $domain: rootGetters.configuration.server,
         body: {
-          account: account
+          account: {
+            id: account.id,
+            accountEnabled: true
+          },
+          update_mask: {
+            paths: ['AccountEnabled']
+          }
         }
       })
 
-      if (response.status !== 201) {
+      if (response.status === 201) {
+        console.log('Going to update')
+        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: true })
+      } else {
         failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
       }
     }
@@ -135,21 +158,35 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+
+    commit('RESET_ACCOUNTS_SELECTION')
   },
 
-  async disableAccounts ({ dispatch, state, rootGetters }) {
+  async disableAccounts ({ commit, dispatch, state, rootGetters }) {
     const failedAccounts = []
     injectAuthToken(rootGetters.user.token)
 
     for (const account of state.selectedAccounts) {
+      if (!account.accountEnabled) {
+        continue
+      }
+
       const response = await AccountsService_UpdateAccount({
         $domain: rootGetters.configuration.server,
         body: {
-          account: account
+          account: {
+            id: account.id,
+            accountEnabled: false
+          },
+          update_mask: {
+            paths: ['AccountEnabled']
+          }
         }
       })
 
-      if (response.status !== 201) {
+      if (response.status === 201) {
+        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: false })
+      } else {
         failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
       }
     }
@@ -169,6 +206,8 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+
+    commit('RESET_ACCOUNTS_SELECTION')
   }
 }
 

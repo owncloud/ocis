@@ -42,8 +42,8 @@
     <oc-table-cell v-text="account.uidNumber || '-'" />
     <oc-table-cell v-text="account.gidNumber || '-'" />
     <oc-table-cell class="uk-text-center">
-      <oc-icon v-if="account.accountEnabled" name="ready" variation="success" :aria-label="$gettext('Account is enabled')" />
-      <oc-icon v-else name="deprecated" variation="danger" :aria-label="$gettext('Account is disabled')" />
+      <oc-icon v-if="account.accountEnabled" key="account-icon-enabled" name="ready" variation="success" :aria-label="$gettext('Account is enabled')" />
+      <oc-icon v-else name="deprecated" key="account-icon-disabled" variation="danger" :aria-label="$gettext('Account is disabled')" />
     </oc-table-cell>
   </oc-table-row>
 </template>
