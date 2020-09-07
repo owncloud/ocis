@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,55 +13,35 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	oidc "github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
+	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 )
 
 func getAccount(l log.Logger, ac acc.AccountsService, query string) (account *acc.Account, status int) {
-	entry, err := svcCache.Get(AccountsKey, query)
+	resp, err := ac.ListAccounts(context.Background(), &acc.ListAccountsRequest{
+		Query:    query,
+		PageSize: 2,
+	})
+
 	if err != nil {
-		l.Debug().Msgf("No cache entry for %s", query)
-		resp, err := ac.ListAccounts(context.Background(), &acc.ListAccountsRequest{
-			Query:    query,
-			PageSize: 2,
-		})
-
-		if err != nil {
-			l.Error().Err(err).Str("query", query).Msgf("Error fetching from accounts-service")
-			status = http.StatusInternalServerError
-			return
-		}
-
-		if len(resp.Accounts) <= 0 {
-			l.Error().Str("query", query).Msgf("Account not found")
-			status = http.StatusNotFound
-			return
-		}
-
-		// TODO provision account
-
-		if len(resp.Accounts) > 1 {
-			l.Error().Str("query", query).Msgf("More than one account found. Not logging user in.")
-			status = http.StatusForbidden
-			return
-		}
-
-		err = svcCache.Set(AccountsKey, query, *resp.Accounts[0])
-		if err != nil {
-			l.Err(err).Str("query", query).Msgf("Could not cache user")
-			status = http.StatusInternalServerError
-			return
-		}
-
-		account = resp.Accounts[0]
-	} else {
-		l.Debug().Msgf("using cache entry for %s", query)
-		a, ok := entry.V.(acc.Account) // TODO how can we directly point to the cached account?
-		if !ok {
-			status = http.StatusInternalServerError
-			return
-		}
-		account = &a
+		l.Error().Err(err).Str("query", query).Msgf("Error fetching from accounts-service")
+		status = http.StatusInternalServerError
+		return
 	}
+
+	if len(resp.Accounts) <= 0 {
+		l.Error().Str("query", query).Msgf("Account not found")
+		status = http.StatusNotFound
+		return
+	}
+
+	if len(resp.Accounts) > 1 {
+		l.Error().Str("query", query).Msgf("More than one account found. Not logging user in.")
+		status = http.StatusForbidden
+		return
+	}
+
+	account = resp.Accounts[0]
 	return
 }
 
