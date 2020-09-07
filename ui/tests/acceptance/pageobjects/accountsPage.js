@@ -40,6 +40,42 @@ module.exports = {
         util.format(this.elements.currentRole.selector, role)
 
       return this.useXpath().expect.element(roleSelector).to.be.visible
+    },
+
+    toggleUserStatus: function (usernames, status) {
+      usernames = usernames.split(',')
+      const actionSelector = status === 'enabled' ? this.elements.enableAction : this.elements.disableAction
+
+      // Select users
+      for (const username of usernames) {
+        const checkboxSelector =
+          util.format(this.elements.rowByUsername.selector, username) +
+          this.elements.rowCheckbox.selector
+
+        this.useXpath().click(checkboxSelector)
+      }
+
+      return this
+        .waitForElementVisible('@actionsDropdownTrigger')
+        .click('@actionsDropdownTrigger')
+        .useCss()
+        .waitForElementVisible(actionSelector)
+        .click(actionSelector)
+        .useXpath()
+    },
+
+    checkUsersStatus: function (usernames, status) {
+      usernames = usernames.split(',')
+
+      for (const username of usernames) {
+        const indicatorSelector =
+          util.format(this.elements.rowByUsername.selector, username) +
+          util.format(this.elements.statusIndicator.selector, status)
+
+        this.useXpath().waitForElementVisible(indicatorSelector)
+      }
+
+      return this
     }
   },
 
@@ -74,6 +110,24 @@ module.exports = {
     },
     loadingAccountsList: {
       selector: '//div[contains(@class, "oc-loader")]',
+      locateStrategy: 'xpath'
+    },
+    rowCheckbox: {
+      selector: '//input[@class="oc-checkbox"]',
+      locateStrategy: 'xpath'
+    },
+    actionsDropdownTrigger: {
+      selector: '//div[contains(@class, "accounts-actions-dropdown")]//button[normalize-space()="Actions"]',
+      locateStrategy: 'xpath'
+    },
+    disableAction: {
+      selector: '#accounts-actions-dropdown-action-disable'
+    },
+    enableAction: {
+      selector: '#accounts-actions-dropdown-action-enable'
+    },
+    statusIndicator: {
+      selector: '//span[contains(@class, "accounts-status-indicator-%s")]',
       locateStrategy: 'xpath'
     }
   }

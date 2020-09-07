@@ -32,3 +32,30 @@ Feature: Accounts
 		And user "Einstein" logs in using the webUI
 		And the user browses to the accounts page
 		Then the user should not be able to see the accounts list on the WebUI
+
+	# We want to separate this into own scenarios but because we do not have clean env for each scenario yet
+	# we are resetting it manually by combining them into one
+	Scenario: disable/enable account
+		Given user "Moss" has logged in using the webUI
+		When the user browses to the accounts page
+		Then user "einstein" should be displayed in the accounts list on the WebUI
+		When the user disables user "einstein" using the WebUI
+		Then the status indicator of user "einstein" should be "disabled" on the WebUI
+		# And user "einstein" should not be able to log in
+		When the user enables user "einstein" using the WebUI
+		Then the status indicator of user "einstein" should be "enabled" on the WebUI
+		# And user "einstein" should be able to log in
+
+	Scenario: disable/enable multiple accounts
+		Given user "Moss" has logged in using the webUI
+		When the user browses to the accounts page
+		Then user "einstein" should be displayed in the accounts list on the WebUI
+		And user "marie" should be displayed in the accounts list on the WebUI
+		When the user disables users "einstein,marie" using the WebUI
+		Then the status indicator of users "einstein,marie" should be "disabled" on the WebUI
+		# And user "einstein" should not be able to log in
+		# And user "marie" should not be able to log in
+		When the user enables users "einstein,marie" using the WebUI
+		Then the status indicator of user "einstein,marie" should be "enabled" on the WebUI
+		# And user "einstein" should be able to log in
+		# And user "marie" should be able to log in

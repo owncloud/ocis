@@ -1,6 +1,9 @@
 <template>
   <oc-table-row>
     <oc-table-cell>
+      <oc-checkbox :value="isAccountSelected" @change="TOGGLE_SELECTION_ACCOUNT(account)" :label="selectAccountLabel" hide-label />
+    </oc-table-cell>
+    <oc-table-cell>
       <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
     </oc-table-cell>
     <oc-table-cell v-text="account.onPremisesSamAccountName" />
@@ -39,14 +42,28 @@
     <oc-table-cell v-text="account.uidNumber || '-'" />
     <oc-table-cell v-text="account.gidNumber || '-'" />
     <oc-table-cell class="uk-text-center">
-      <oc-icon v-if="account.accountEnabled" name="ready" variation="success" :aria-label="$gettext('Account is enabled')" />
-      <oc-icon v-else name="deprecated" variation="danger" :aria-label="$gettext('Account is disabled')" />
+      <oc-icon
+        v-if="account.accountEnabled"
+        key="account-icon-enabled"
+        name="ready"
+        variation="success"
+        :aria-label="$gettext('Account is enabled')"
+        class="accounts-status-indicator-enabled"
+      />
+      <oc-icon
+        v-else
+        name="deprecated"
+        key="account-icon-disabled"
+        variation="danger"
+        :aria-label="$gettext('Account is disabled')"
+        class="accounts-status-indicator-disabled"
+      />
     </oc-table-cell>
   </oc-table-row>
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import { isObjectEmpty } from '../../helpers/utils'
 import { injectAuthToken } from '../../helpers/auth'
 // eslint-disable-next-line camelcase
@@ -73,7 +90,17 @@ export default {
 
   computed: {
     ...mapGetters(['user', 'configuration']),
-    ...mapState('Accounts', ['roles'])
+    ...mapState('Accounts', ['roles', 'selectedAccounts']),
+
+    isAccountSelected () {
+      return this.selectedAccounts.indexOf(this.account) > -1
+    },
+
+    selectAccountLabel () {
+      const translated = this.$gettext('Select %{ account }')
+
+      return this.$gettextInterpolate(translated, { account: this.account.displayName }, true)
+    }
   },
 
   created () {
@@ -82,6 +109,7 @@ export default {
 
   methods: {
     ...mapActions(['showMessage']),
+    ...mapMutations('Accounts', ['TOGGLE_SELECTION_ACCOUNT']),
 
     async changeRole (roleId) {
       injectAuthToken(this.user.token)

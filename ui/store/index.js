@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { AccountsService_ListAccounts } from '../client/accounts'
+import { AccountsService_ListAccounts, AccountsService_UpdateAccount } from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
 /* eslint-enable camelcase */
 import { injectAuthToken } from '../helpers/auth'
@@ -8,7 +8,8 @@ const state = {
   config: null,
   initialized: false,
   accounts: {},
-  roles: null
+  roles: null,
+  selectedAccounts: []
 }
 
 const getters = {
@@ -21,7 +22,8 @@ const getters = {
       }
       return a1.onPremisesSamAccountName.localeCompare(a2.onPremisesSamAccountName)
     })
-  }
+  },
+  areAllAccountsSelected: state => state.accounts.length === state.selectedAccounts.length
 }
 
 const mutations = {
@@ -36,6 +38,24 @@ const mutations = {
   },
   SET_ROLES (state, roles) {
     state.roles = roles
+  },
+  TOGGLE_SELECTION_ACCOUNT (state, account) {
+    const accountIndex = state.selectedAccounts.indexOf(account)
+
+    accountIndex > -1 ? state.selectedAccounts.splice(accountIndex, 1) : state.selectedAccounts.push(account)
+  },
+  SET_SELECTED_ACCOUNTS (state, accounts) {
+    state.selectedAccounts = accounts
+  },
+
+  UPDATE_ACCOUNT (state, updatedAccount) {
+    const accountIndex = state.accounts.findIndex(account => account.id === updatedAccount.id)
+
+    state.accounts.splice(accountIndex, 1, updatedAccount)
+  },
+
+  RESET_ACCOUNTS_SELECTION (state) {
+    state.selectedAccounts = []
   }
 }
 
@@ -87,6 +107,63 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+  },
+
+  toggleSelectionAll ({ commit, getters, state }) {
+    getters.areAllAccountsSelected ? commit('RESET_ACCOUNTS_SELECTION') : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
+  },
+
+  async toggleAccountStatus ({ commit, dispatch, state, rootGetters }, status) {
+    const failedAccounts = []
+    injectAuthToken(rootGetters.user.token)
+
+    for (const account of state.selectedAccounts) {
+      if (account.accountEnabled === status) {
+        continue
+      }
+
+      const response = await AccountsService_UpdateAccount({
+        $domain: rootGetters.configuration.server,
+        body: {
+          account: {
+            id: account.id,
+            accountEnabled: status
+          },
+          update_mask: {
+            paths: ['AccountEnabled']
+          }
+        }
+      })
+
+      if (response.status === 201) {
+        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: status })
+      } else {
+        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+      }
+    }
+
+    if (failedAccounts.length === 1) {
+      const failedMessageTitle = status ? 'Failed to enable account.' : 'Failed to disable account.'
+
+      dispatch('showMessage', {
+        title: failedMessageTitle,
+        desc: failedAccounts[0].statusText,
+        status: 'danger'
+      }, { root: true })
+    }
+
+    if (failedAccounts.length > 1) {
+      const failedMessageTitle = status ? 'Failed to enable accounts.' : 'Failed to disable accounts.'
+      const failedMessageDesc = status ? 'Could not enable multiple accounts.' : 'Could not disable multiple accounts.'
+
+      dispatch('showMessage', {
+        title: failedMessageTitle,
+        desc: failedMessageDesc,
+        status: 'danger'
+      }, { root: true })
+    }
+
+    commit('RESET_ACCOUNTS_SELECTION')
   }
 }
 
