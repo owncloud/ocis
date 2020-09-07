@@ -355,6 +355,20 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'go get -u github.com/hetznercloud/cli/cmd/hcloud',
           'ln -s /root/go/bin/* /usr/local/bin',
 
+          'ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""',
+          'hcloud ssh-key create --name drone-$DRONE_COMMIT_ID-$RUN_PART --public-key-from-file /root/.ssh/id_rsa.pub',
+
+          # Create a new machine on hcloud for eos
+          'hcloud server create --type cx21 --image ubuntu-20.04 --ssh-key $SERVER_NAME --name $SERVER_NAME --label owner=$ME --label for=test --label from=eos-compose',
+          # time for the server to start up
+          'sleep 15',
+
+          'export IPADDR=$(hcloud server ip ${SERVER_NAME})',
+          'export IPADDR=${IPADDR}',
+          'export TEST_SERVER_URL=https://${IPADDR}:9200',
+
+          'ssh -o StrictHostKeyChecking=no root@$IPADDR',
+
           # Create an eos machine
           'cd /drone/src',
           '/drone/src/tests/spawn_eos.sh',
