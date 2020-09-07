@@ -1,6 +1,6 @@
 #!/bin/bash
-ME=$DRONE_HCLOUD_USER
-SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${RUN_PART}
+# ME=$DRONE_HCLOUD_USER
+# SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${RUN_PART}
 
 # # setup ssh keys for hcloud
 # ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
@@ -19,17 +19,17 @@ SERVER_NAME=droneci-eos-test-${DRONE_COMMIT_ID}-${RUN_PART}
 
 
 # Setup system and clone ocis
-ssh -t root@$IPADDR apt-get update -y
-ssh -t root@$IPADDR apt-get install -y git screen docker.io docker-compose ldap-utils
-ssh -t root@$IPADDR git clone https://github.com/owncloud/ocis.git /ocis
-ssh -t root@$IPADDR "cd /ocis && git checkout $DRONE_COMMIT_ID"
+ssh -tt root@$IPADDR apt-get update -y
+ssh -tt root@$IPADDR apt-get install -y git screen docker.io docker-compose ldap-utils
+ssh -tt root@$IPADDR git clone https://github.com/owncloud/ocis.git /ocis
+ssh -tt root@$IPADDR "cd /ocis && git checkout $DRONE_COMMIT_ID"
 
 # Create necessary files
-ssh -t root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-config.json.sh"
-ssh -t root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-identifier-registration.sh"
+ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-config.json.sh"
+ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-identifier-registration.sh"
 
 # run ocis with eos
-ssh -t root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} docker-compose -f ./docker-compose-eos-ci.yml up -d"
+ssh -tt root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} docker-compose -f ./docker-compose-eos-ci.yml up -d"
 
 # Some necessary configuration for eos
-ssh -t root@$IPADDR "cd /ocis && bash /ocis/tests/config/drone/setup-eos.sh"
+ssh -tt root@$IPADDR "cd /ocis && bash /ocis/tests/config/drone/setup-eos.sh"

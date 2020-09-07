@@ -337,7 +337,7 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
-          'DELETE_USER_DATA_CMD': 'ssh -t root@${IPADDR} docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s',
+          'DELETE_USER_DATA_CMD': 'ssh -t root@$IPADDR docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s',
           'DRONE_COMMIT_ID': ctx.build.commit,
           'HCLOUD_TOKEN': {
             'from_secret': 'hcloud_token',
@@ -356,16 +356,18 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'ln -s /root/go/bin/* /usr/local/bin',
 
           'ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""',
-          'hcloud ssh-key create --name drone-$DRONE_COMMIT_ID-$RUN_PART --public-key-from-file /root/.ssh/id_rsa.pub',
+          'hcloud ssh-key create --name droneci-eos-test-$DRONE_COMMIT_ID-$RUN_PART --public-key-from-file /root/.ssh/id_rsa.pub',
+
+          'export SERVER_NAME=droneci-eos-test-$DRONE_COMMIT_ID-$RUN_PART',
 
           # Create a new machine on hcloud for eos
-          'hcloud server create --type cx21 --image ubuntu-20.04 --ssh-key $SERVER_NAME --name $SERVER_NAME --label owner=$ME --label for=test --label from=eos-compose',
+          'hcloud server create --type cx21 --image ubuntu-20.04 --ssh-key $SERVER_NAME --name $SERVER_NAME --label owner=$DRONE_HCLOUD_USER --label for=test --label from=eos-compose',
+
           # time for the server to start up
           'sleep 15',
 
-          'export IPADDR=$(hcloud server ip ${SERVER_NAME})',
-          'export IPADDR=${IPADDR}',
-          'export TEST_SERVER_URL=https://${IPADDR}:9200',
+          'export IPADDR=$(hcloud server ip $SERVER_NAME)',
+          'export TEST_SERVER_URL=https://$IPADDR:9200',
 
           'ssh -o StrictHostKeyChecking=no root@$IPADDR',
 
@@ -378,7 +380,8 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
           'make test-acceptance-api',
 
           # Delete the eos machine
-          'hcloud server delete droneci-eos-test-%s-%s' % (ctx.build.commit, part_number)
+          'hcloud server delete droneci-eos-test-%s-%s' % (ctx.build.commit, part_number),
+          'hcloud ssh-key delete droneci-eos-test-%s-%s' % (ctx.build.commit, part_number),
         ],
         'volumes': [{
           'name': 'gopath',

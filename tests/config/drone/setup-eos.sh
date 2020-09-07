@@ -3,8 +3,8 @@
 # wait for ocis to start
 until $(curl -k --output /dev/null --silent --head --fail https://localhost:9200);
 do
-    printf '.'
-    sleep 2
+    echo '.'
+    sleep 5
 done
 
 docker-compose -f ./docker-compose-eos-ci.yml exec -d ocis /start-ldap
