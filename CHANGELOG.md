@@ -8,6 +8,7 @@ The following sections list the changes for ocis-proxy unreleased.
 
 * Bugfix - Fix director selection: [#99](https://github.com/owncloud/ocis-proxy/pull/99)
 * Bugfix - Add settings API and app endpoints to example config: [#93](https://github.com/owncloud/ocis-proxy/pull/93)
+* Change - Remove accounts caching: [#100](https://github.com/owncloud/ocis-proxy/pull/100)
 * Enhancement - Add hello API and app endpoints to example config and builtin config: [#96](https://github.com/owncloud/ocis-proxy/pull/96)
 * Enhancement - Add roleIDs to the access token: [#95](https://github.com/owncloud/ocis-proxy/pull/95)
 
@@ -26,6 +27,14 @@ The following sections list the changes for ocis-proxy unreleased.
    missing in the example config. Added them for consistency.
 
    https://github.com/owncloud/ocis-proxy/pull/93
+
+
+* Change - Remove accounts caching: [#100](https://github.com/owncloud/ocis-proxy/pull/100)
+
+   We removed the accounts cache in order to avoid problems with accounts that have been updated in
+   the accounts service.
+
+   https://github.com/owncloud/ocis-proxy/pull/100
 
 
 * Enhancement - Add hello API and app endpoints to example config and builtin config: [#96](https://github.com/owncloud/ocis-proxy/pull/96)
