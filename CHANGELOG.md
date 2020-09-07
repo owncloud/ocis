@@ -4,6 +4,7 @@
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
+* Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -54,6 +55,15 @@
    removed, as it was blocking a new set of default external apps in ocis-phoenix.
 
    https://github.com/owncloud/ocis/pull/473
+
+
+* Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+
+   We fixed a bug in ocis-proxy where simultaneous requests could be executed on the wrong
+   backend.
+
+   https://github.com/owncloud/ocis/pull/521
+   https://github.com/owncloud/ocis-proxy/pull/99
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
