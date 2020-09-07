@@ -8,7 +8,7 @@
               :value="areAllAccountsSelected"
               :label="$gettext('Select all users')"
               hide-label
-              @change="toggleAllAccountsSelection"
+              @change="toggleSelectionAll"
             />
           </oc-table-cell>
           <oc-table-cell shrink type="head" />
@@ -51,11 +51,7 @@ export default {
     ...mapGetters('Accounts', ['areAllAccountsSelected'])
   },
   methods: {
-    ...mapActions('Accounts', ['toggleSelectionAll']),
-
-    toggleAllAccountsSelection () {
-      this.toggleSelectionAll()
-    }
+    ...mapActions('Accounts', ['toggleSelectionAll'])
   }
 }
 </script>

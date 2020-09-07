@@ -2,8 +2,12 @@
   <div>
     <div class="uk-container uk-padding">
       <h1 v-text="$gettext('Accounts')" />
-      <oc-grid v-if="selectedAccountsAmount > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
+      <oc-grid v-if="numberOfSelectedAccounts > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
+        <span>|</span>
+        <div>
+          <oc-button v-text="$gettext('Clear selection')" variation="raw" @click="RESET_ACCOUNTS_SELECTION" />
+        </div>
         <div>
           <oc-action-drop class="accounts-actions-dropdown">
             <template v-slot:button>
@@ -36,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import AccountsList from './accounts/AccountsList.vue'
 export default {
   name: 'App',
@@ -49,26 +53,27 @@ export default {
       return this.getAccountsSorted
     },
 
-    selectedAccountsAmount () {
+    numberOfSelectedAccounts () {
       return this.selectedAccounts.length
     },
 
     selectionInfoText () {
-      const translated = this.$ngettext('%{ amount } selected user', '%{ amount } selected users', this.selectedAccountsAmount)
+      const translated = this.$ngettext('%{ amount } selected user', '%{ amount } selected users', this.numberOfSelectedAccounts)
 
-      return this.$gettextInterpolate(translated, { amount: this.selectedAccountsAmount })
+      return this.$gettextInterpolate(translated, { amount: this.numberOfSelectedAccounts })
     },
 
     actions () {
       const actions = []
-      const isAnyAccountDisabled = this.selectedAccounts.some(account => !account.accountEnabled)
-      const isAnyAccountEnabled = this.selectedAccounts.some(account => account.accountEnabled)
+      const numberOfDisabledAccounts = this.selectedAccounts.filter(account => !account.accountEnabled).length
+      const isAnyAccountDisabled = numberOfDisabledAccounts > 0
+      const isAnyAccountEnabled = numberOfDisabledAccounts < this.numberOfSelectedAccounts
 
       if (isAnyAccountDisabled) {
         actions.push({
           id: 'accounts-actions-dropdown-action-enable',
           label: this.$gettext('Enable'),
-          handler: this.enableAccounts
+          handler: () => this.toggleAccountStatus(true)
         })
       }
 
@@ -76,7 +81,7 @@ export default {
         actions.push({
           id: 'accounts-actions-dropdown-action-disable',
           label: this.$gettext('Disable'),
-          handler: this.disableAccounts
+          handler: () => this.toggleAccountStatus(false)
         })
       }
 
@@ -84,10 +89,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions('Accounts', ['initialize', 'enableAccounts', 'disableAccounts'])
+    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus']),
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
   },
   created () {
     this.initialize()
+  },
+  beforeDestroy () {
+    this.RESET_ACCOUNTS_SELECTION()
   }
 }
 </script>

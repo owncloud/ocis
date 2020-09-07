@@ -110,15 +110,15 @@ const actions = {
   },
 
   toggleSelectionAll ({ commit, getters, state }) {
-    getters.areAllAccountsSelected ? commit('SET_SELECTED_ACCOUNTS', []) : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
+    getters.areAllAccountsSelected ? commit('RESET_ACCOUNTS_SELECTION') : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
   },
 
-  async enableAccounts ({ commit, dispatch, state, rootGetters }) {
+  async toggleAccountStatus ({ commit, dispatch, state, rootGetters }, status) {
     const failedAccounts = []
     injectAuthToken(rootGetters.user.token)
 
     for (const account of state.selectedAccounts) {
-      if (account.accountEnabled) {
+      if (account.accountEnabled === status) {
         continue
       }
 
@@ -127,7 +127,7 @@ const actions = {
         body: {
           account: {
             id: account.id,
-            accountEnabled: true
+            accountEnabled: status
           },
           update_mask: {
             paths: ['AccountEnabled']
@@ -136,73 +136,29 @@ const actions = {
       })
 
       if (response.status === 201) {
-        console.log('Going to update')
-        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: true })
+        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: status })
       } else {
         failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
       }
     }
 
     if (failedAccounts.length === 1) {
+      const failedMessageTitle = status ? 'Failed to enable account.' : 'Failed to disable account.'
+
       dispatch('showMessage', {
-        title: 'Failed to enable account.',
+        title: failedMessageTitle,
         desc: failedAccounts[0].statusText,
         status: 'danger'
       }, { root: true })
     }
 
     if (failedAccounts.length > 1) {
+      const failedMessageTitle = status ? 'Failed to enable accounts.' : 'Failed to disable accounts.'
+      const failedMessageDesc = status ? 'Could not enable multiple accounts.' : 'Could not disable multiple accounts.'
+
       dispatch('showMessage', {
-        title: 'Failed to enable accounts.',
-        desc: 'Could not enable multiple accounts',
-        status: 'danger'
-      }, { root: true })
-    }
-
-    commit('RESET_ACCOUNTS_SELECTION')
-  },
-
-  async disableAccounts ({ commit, dispatch, state, rootGetters }) {
-    const failedAccounts = []
-    injectAuthToken(rootGetters.user.token)
-
-    for (const account of state.selectedAccounts) {
-      if (!account.accountEnabled) {
-        continue
-      }
-
-      const response = await AccountsService_UpdateAccount({
-        $domain: rootGetters.configuration.server,
-        body: {
-          account: {
-            id: account.id,
-            accountEnabled: false
-          },
-          update_mask: {
-            paths: ['AccountEnabled']
-          }
-        }
-      })
-
-      if (response.status === 201) {
-        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: false })
-      } else {
-        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
-      }
-    }
-
-    if (failedAccounts.length === 1) {
-      dispatch('showMessage', {
-        title: 'Failed to disable account.',
-        desc: failedAccounts[0].statusText,
-        status: 'danger'
-      }, { root: true })
-    }
-
-    if (failedAccounts.length > 1) {
-      dispatch('showMessage', {
-        title: 'Failed to disable accounts.',
-        desc: 'Could not disable multiple accounts',
+        title: failedMessageTitle,
+        desc: failedMessageDesc,
         status: 'danger'
       }, { root: true })
     }
