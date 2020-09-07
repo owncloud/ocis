@@ -12,4 +12,4 @@ clients:
       - https://${OCIS_DOMAIN}:9200/
     origins:
       -  https://${OCIS_DOMAIN}:9200
-authorities:" > $PWD/identifier-registration.yml
+authorities:" > $PWD/identifier-registration.yaml
