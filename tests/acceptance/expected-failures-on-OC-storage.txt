@@ -121,6 +121,10 @@ apiProvisioning-v1/addUser.feature:122
 apiProvisioning-v1/addUser.feature:123
 apiProvisioning-v1/deleteUser.feature:29
 apiProvisioning-v1/deleteUser.feature:30
+apiProvisioning-v1/disableUser.feature:29
+apiProvisioning-v1/disableUser.feature:30
+apiProvisioning-v1/enableUser.feature:31
+apiProvisioning-v1/enableUser.feature:32
 apiProvisioning-v1/editUser.feature:29
 apiProvisioning-v1/editUser.feature:30
 apiProvisioning-v1/getUser.feature:34
@@ -129,6 +133,10 @@ apiProvisioning-v2/addUser.feature:29
 apiProvisioning-v2/addUser.feature:30
 apiProvisioning-v2/deleteUser.feature:29
 apiProvisioning-v2/deleteUser.feature:30
+apiProvisioning-v2/disableUser.feature:29
+apiProvisioning-v2/disableUser.feature:30
+apiProvisioning-v2/enableUser.feature:31
+apiProvisioning-v2/enableUser.feature:32
 apiProvisioning-v2/editUser.feature:29
 apiProvisioning-v2/editUser.feature:30
 apiProvisioning-v2/getUser.feature:34
@@ -192,6 +200,29 @@ apiProvisioning-v2/editUser.feature:122
 apiProvisioning-v1/resetUserPassword.feature:21
 apiProvisioning-v2/getUser.feature:47
 apiProvisioning-v2/resetUserPassword.feature:21
+#
+#enable/disable user
+apiProvisioning-v1/disableUser.feature:11
+apiProvisioning-v1/disableUser.feature:79
+apiProvisioning-v1/disableUser.feature:99
+apiProvisioning-v1/disableUser.feature:107
+apiProvisioning-v1/disableUser.feature:129
+apiProvisioning-v1/enableUser.feature:11
+apiProvisioning-v1/enableUser.feature:34
+apiProvisioning-v1/enableUser.feature:56
+apiProvisioning-v1/enableUser.feature:63
+apiProvisioning-v1/enableUser.feature:86
+apiProvisioning-v2/disableUser.feature:11
+apiProvisioning-v2/disableUser.feature:81
+apiProvisioning-v2/disableUser.feature:101
+apiProvisioning-v2/disableUser.feature:110
+apiProvisioning-v2/disableUser.feature:133
+apiProvisioning-v2/enableUser.feature:11
+apiProvisioning-v2/enableUser.feature:34
+apiProvisioning-v2/enableUser.feature:56
+apiProvisioning-v2/enableUser.feature:64
+apiProvisioning-v2/enableUser.feature:88
+
 #
 # https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
 apiSharees/sharees.feature:32
