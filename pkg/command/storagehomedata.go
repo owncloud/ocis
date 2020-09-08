@@ -70,6 +70,14 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 				uuid := uuid.Must(uuid.NewV4())
 				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
+				// override driver enable home option with home config
+				if cfg.Reva.Storages.Home.EnableHome {
+					cfg.Reva.Storages.Common.EnableHome = true
+					cfg.Reva.Storages.EOS.EnableHome = true
+					cfg.Reva.Storages.Local.EnableHome = true
+					cfg.Reva.Storages.OwnCloud.EnableHome = true
+					cfg.Reva.Storages.S3.EnableHome = true
+				}
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
 						"max_cpus":             cfg.Reva.Users.MaxCPUs,
