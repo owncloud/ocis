@@ -143,6 +143,15 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 				ResultCode: code,
 			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
 		}
+
+		// check if the searchBaseDN already has a username and add it to the query
+		parts := strings.Split(strings.TrimSuffix(searchBaseDN, baseDN), ",")
+		if len(parts) > 0 && strings.HasPrefix(parts[0], "cn=") {
+			if len(query) > 0 {
+				query += " AND "
+			}
+			query += fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(strings.TrimPrefix(parts[0], "cn=")))
+		}
 	}
 
 	entries := []*ldap.Entry{}
@@ -292,7 +301,7 @@ func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
 	return entries
 }
 
-// LDAP filters might ask for grouips and users at the same time, eg.
+// LDAP filters might ask for groups and users at the same time, eg.
 // (|
 //   (&(objectClass=posixaccount)(cn=einstein))
 //   (&(objectClass=posixgroup)(cn=users))
