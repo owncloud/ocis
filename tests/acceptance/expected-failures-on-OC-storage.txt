@@ -184,6 +184,12 @@ apiShareManagement/acceptShares.feature:582
 apiShareManagement/acceptShares.feature:652
 apiShareManagement/acceptShares.feature:696
 #
+# Accepting a share returns empty response
+apiShareManagement/acceptSharesToSharesFolder.feature:15
+apiShareManagement/acceptSharesToSharesFolder.feature:22
+apiShareManagement/acceptSharesToSharesFolder.feature:30
+apiShareManagement/acceptSharesToSharesFolder.feature:52
+#
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
 apiShareManagementBasic/createShare.feature:169
 apiShareManagementBasic/createShare.feature:170
