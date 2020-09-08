@@ -92,8 +92,10 @@ def testPipelines(ctx):
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
 
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+  # for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+  #   pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+
+  pipelines.append(coreApiTestsEos(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 1, config['apiTests']['numberOfParts']))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
@@ -315,6 +317,67 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     },
   }
 
+def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'coreApiTests-Eos-Storage',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      cloneCoreRepos(coreBranch, coreCommit) + [
+      {
+        'name': 'oC10ApiTests',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'TEST_OCIS':'true',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@local_storage',
+          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          'RUN_PART': part_number,
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
+          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -tt root@95.217.215.207 docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s',
+          'SSH_PASSWORD_HCLOUD': {
+            'from_secret': 'ssh_password'
+          },
+          'TEST_SERVER_URL': 'https://95.217.215.207:9200'
+
+        },
+        'commands': [
+          # Install Go
+          'apt update -y',
+          'apt install sshpass -y',
+
+          # Create an eos machine
+          'cd /srv/app/testrunner',
+
+          # Run tests
+          'make test-acceptance-api',
+
+        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
 def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
   return {
     'kind': 'pipeline',
