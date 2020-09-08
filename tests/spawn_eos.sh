@@ -25,13 +25,11 @@ ssh -tt root@$IPADDR git clone https://github.com/owncloud/ocis.git /ocis
 ssh -tt root@$IPADDR "cd /ocis && git checkout $DRONE_COMMIT_ID"
 
 # Create necessary files
-# ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-config.json.sh"
-# ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-config.json.sh"
-
-ssh -tt root@$IPADDR "cd /ocis/config && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-identifier-registration.sh"
+ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-config.json.sh"
+ssh -tt root@$IPADDR "cd /ocis/tests/config/drone && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/create-identifier-registration.sh"
 
 # run ocis with eos
-ssh -tt root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} docker-compose up -d"
+ssh -tt root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} docker-compose -f ./docker-compose-eos-ci.yml up -d"
 
 # Some necessary configuration for eos
 ssh -tt root@$IPADDR "cd /ocis && bash /ocis/tests/config/drone/setup-eos.sh"
