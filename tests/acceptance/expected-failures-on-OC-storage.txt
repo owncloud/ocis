@@ -179,11 +179,11 @@ apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
 #https://github.com/owncloud/product/issues/198 no authentication required to use provisioning api
 apiProvisioning-v1/deleteUser.feature:53
 apiProvisioning-v1/getUser.feature:81
-apiProvisioning-v1/getUsers.feature:44
+apiProvisioning-v1/getUsers.feature:43
 apiProvisioning-v1/resetUserPassword.feature:55
 apiProvisioning-v2/deleteUser.feature:54
 apiProvisioning-v2/getUser.feature:82
-apiProvisioning-v2/getUsers.feature:45
+apiProvisioning-v2/getUsers.feature:44
 apiProvisioning-v2/resetUserPassword.feature:55
 #
 #https://github.com/owncloud/product/issues/206 clearing displayname doesnot default it to username
