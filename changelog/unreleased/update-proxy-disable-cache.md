@@ -4,3 +4,4 @@ We removed the accounts cache in ocis-proxy in order to avoid problems with acco
 
 https://github.com/owncloud/ocis/pull/525
 https://github.com/owncloud/ocis-proxy/pull/100
+https://github.com/owncloud/ocis-accounts/pull/114
