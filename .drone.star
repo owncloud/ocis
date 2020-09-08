@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
     'coreCommit': 'c38647e8af903e75c1e96ec95ca1dc777d5ec9a4',
-    'numberOfParts': 2
+    'numberOfParts': 1
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -336,15 +336,15 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@local_storage',
-          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
-          'RUN_PART': part_number,
+          # 'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          # 'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
-          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -tt root@95.217.215.207 "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
+          'DELETE_USER_DATA_CMD': 'bash /drone/src/tests/config/drone/clear-eos-data.sh %s',
           'SSH_PASSWORD_HCLOUD': {
             'from_secret': 'ssh_password'
           },
-          'TEST_SERVER_URL': 'https://95.217.215.207:9200'
-
+          'TEST_SERVER_URL': 'https://95.217.215.207:9200',
+          'BEHAT_SUITE': 'apiWebdavUpload1',
         },
         'commands': [
           # Install Go
