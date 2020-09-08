@@ -93,8 +93,7 @@ func StorageOC(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageOC.MountID,
 								"expose_data_server": cfg.Reva.StorageOC.ExposeDataServer,
 								// TODO use cfg.Reva.SStorageOCData.URL, ?
-								"data_server_url":      cfg.Reva.StorageOC.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageOC.EnableHomeCreation,
+								"data_server_url": cfg.Reva.StorageOC.DataServerURL,
 							},
 						},
 					},

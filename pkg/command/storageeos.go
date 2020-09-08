@@ -93,8 +93,7 @@ func StorageEOS(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageEOS.MountID,
 								"expose_data_server": cfg.Reva.StorageEOS.ExposeDataServer,
 								// TODO use cfg.Reva.SStorageEOSData.URL, ?
-								"data_server_url":      cfg.Reva.StorageEOS.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageEOS.EnableHomeCreation,
+								"data_server_url": cfg.Reva.StorageEOS.DataServerURL,
 							},
 						},
 					},

@@ -92,13 +92,6 @@ func StorageOCWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_OC_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageOC.DataServerURL,
 		},
-		&cli.BoolFlag{
-			Name:        "enable-home-creation",
-			Value:       false,
-			Usage:       "if enabled home dirs will be automatically created",
-			EnvVars:     []string{"REVA_STORAGE_OC_ENABLE_HOME_CREATION"},
-			Destination: &cfg.Reva.StorageOC.EnableHomeCreation,
-		},
 
 		// User provider
 

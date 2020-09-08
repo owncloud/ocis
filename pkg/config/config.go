@@ -82,12 +82,11 @@ type FrontendPort struct {
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
-	Driver             string
-	MountPath          string
-	MountID            string
-	ExposeDataServer   bool
-	DataServerURL      string
-	EnableHomeCreation bool
+	Driver           string
+	MountPath        string
+	MountID          string
+	ExposeDataServer bool
+	DataServerURL    string
 
 	// for HTTP ports with only one http service
 	Prefix     string

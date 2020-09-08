@@ -87,13 +87,12 @@ func StorageRoot(cfg *config.Config) *cli.Command {
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
-								"driver":               cfg.Reva.StorageRoot.Driver,
-								"drivers":              drivers(cfg),
-								"mount_path":           cfg.Reva.StorageRoot.MountPath,
-								"mount_id":             cfg.Reva.StorageRoot.MountID,
-								"expose_data_server":   cfg.Reva.StorageRoot.ExposeDataServer,
-								"data_server_url":      cfg.Reva.StorageRoot.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageRoot.EnableHomeCreation,
+								"driver":             cfg.Reva.StorageRoot.Driver,
+								"drivers":            drivers(cfg),
+								"mount_path":         cfg.Reva.StorageRoot.MountPath,
+								"mount_id":           cfg.Reva.StorageRoot.MountID,
+								"expose_data_server": cfg.Reva.StorageRoot.ExposeDataServer,
+								"data_server_url":    cfg.Reva.StorageRoot.DataServerURL,
 							},
 						},
 					},

@@ -90,13 +90,6 @@ func StorageEOSWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_EOS_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageEOS.DataServerURL,
 		},
-		&cli.BoolFlag{
-			Name:        "enable-home-creation",
-			Value:       false,
-			Usage:       "if enabled home dirs will be automatically created",
-			EnvVars:     []string{"REVA_STORAGE_EOS_ENABLE_HOME_CREATION"},
-			Destination: &cfg.Reva.StorageEOS.EnableHomeCreation,
-		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)

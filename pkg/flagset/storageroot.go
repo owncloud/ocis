@@ -91,12 +91,6 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_ROOT_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageRoot.DataServerURL,
 		},
-		&cli.BoolFlag{
-			Name:        "enable-home-creation",
-			Usage:       "if enabled home dirs will be automatically created",
-			EnvVars:     []string{"REVA_STORAGE_HOME_ENABLE_HOME_CREATION"},
-			Destination: &cfg.Reva.StorageHome.EnableHomeCreation,
-		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)

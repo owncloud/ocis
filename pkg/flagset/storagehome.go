@@ -73,11 +73,11 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name: "mount-id",
-			// This is tho mount id of the /oc storage
-			// set it to 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
-			// Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", /os
-
-			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154", // /home
+			// This is the mount id of the storage provider using the same storage driver
+			// as /home but withoud home enabled. Set it to
+			// 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
+			// 1284d238-aa92-42ce-bdc4-0b0000009162 for /oc
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", // /oc
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageHome.MountID,
@@ -95,13 +95,6 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "data server url",
 			EnvVars:     []string{"REVA_STORAGE_HOME_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageHome.DataServerURL,
-		},
-		&cli.BoolFlag{
-			Name:        "enable-home-creation",
-			Value:       true,
-			Usage:       "if enabled home dirs will be automatically created",
-			EnvVars:     []string{"REVA_STORAGE_HOME_ENABLE_HOME_CREATION"},
-			Destination: &cfg.Reva.StorageHome.EnableHomeCreation,
 		},
 
 		// User provider
