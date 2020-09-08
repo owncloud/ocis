@@ -351,6 +351,9 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	}
 
 	// TODO: assign user role to all new users for now, as create Account request does not have any role field
+	if s.RoleService == nil {
+		return merrors.InternalServerError(s.id, "could not assign role to account: roleService not configured")
+	}
 	_, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
 		AccountUuid: acc.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
