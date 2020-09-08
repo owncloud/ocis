@@ -281,9 +281,11 @@ apiShareManagement/acceptShares.feature:582
 apiShareManagement/acceptShares.feature:652
 apiShareManagement/acceptShares.feature:696
 #
-# Accepting a share returns empty response
+# https://github.com/owncloud/product/issues/208 After accepting a share data in the received file cannot be downloaded
 apiShareManagement/acceptSharesToSharesFolder.feature:15
 apiShareManagement/acceptSharesToSharesFolder.feature:22
+#
+# https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 apiShareManagement/acceptSharesToSharesFolder.feature:30
 apiShareManagement/acceptSharesToSharesFolder.feature:52
 #
