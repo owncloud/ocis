@@ -264,7 +264,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "public-link-url",
-			Value:       "localhost:10054",
+			Value:       "localhost:9178",
 			Usage:       "URL to use for the public links service",
 			EnvVars:     []string{"REVA_STORAGE_PUBLIC_LINK_URL"},
 			Destination: &cfg.Reva.StoragePublicLink.URL,

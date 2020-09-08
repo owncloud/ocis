@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-06-24T22:26:40+0200"
+date: "2020-09-08T14:35:15+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-reva
 geekdocEditPath: edit/master/docs
@@ -57,410 +57,14 @@ Usage: `ocis-reva [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis-reva users
-
-Start reva users service
-
-Usage: `ocis-reva users [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_SHARING_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9145`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---ldap-hostname | $REVA_LDAP_HOSTNAME  
-: LDAP hostname. Default: `localhost`.
-
---ldap-base-dn | $REVA_LDAP_BASE_DN  
-: LDAP basedn. Default: `dc=example,dc=org`.
-
---ldap-userfilter | $REVA_LDAP_USERFILTER  
-: LDAP userfilter. Default: `(&(objectclass=posixAccount)(cn=%s*))`.
-
---ldap-groupfilter | $REVA_LDAP_GROUPFILTER  
-: LDAP groupfilter. Default: `(&(objectclass=posixGroup)(cn=%s*))`.
-
---ldap-bind-dn | $REVA_LDAP_BIND_DN  
-: LDAP bind dn. Default: `cn=reva,ou=sysusers,dc=example,dc=org`.
-
---ldap-bind-password | $REVA_LDAP_BIND_PASSWORD  
-: LDAP bind password. Default: `reva`.
-
---ldap-idp | $REVA_LDAP_IDP  
-: Identity provider to use for users. Default: `https://localhost:9200`.
-
---ldap-schema-uid | $REVA_LDAP_SCHEMA_UID  
-: LDAP schema uid. Default: `uid`.
-
---ldap-schema-mail | $REVA_LDAP_SCHEMA_MAIL  
-: LDAP schema mail. Default: `mail`.
-
---ldap-schema-displayName | $REVA_LDAP_SCHEMA_DISPLAYNAME  
-: LDAP schema displayName. Default: `sn`.
-
---ldap-schema-cn | $REVA_LDAP_SCHEMA_CN  
-: LDAP schema cn. Default: `cn`.
-
---network | $REVA_USERS_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_USERS_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_USERS_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9144`.
-
---url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
---driver | $REVA_USERS_DRIVER  
-: user driver: 'demo', 'json' or 'ldap'. Default: `ldap`.
-
---json-config | $REVA_USERS_JSON  
-: Path to users.json file.
-
-### ocis-reva auth-basic
-
-Start reva authprovider for basic auth
-
-Usage: `ocis-reva auth-basic [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_AUTH_BASIC_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9147`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---users-driver | $REVA_USERS_DRIVER  
-: user driver: 'demo', 'json' or 'ldap'. Default: `ldap`.
-
---users-json | $REVA_USERS_JSON  
-: Path to users.json file.
-
---ldap-hostname | $REVA_LDAP_HOSTNAME  
-: LDAP hostname. Default: `localhost`.
-
---ldap-base-dn | $REVA_LDAP_BASE_DN  
-: LDAP basedn. Default: `dc=example,dc=org`.
-
---ldap-userfilter | $REVA_LDAP_USERFILTER  
-: LDAP userfilter. Default: `(&(objectclass=posixAccount)(cn=%s))`.
-
---ldap-groupfilter | $REVA_LDAP_GROUPFILTER  
-: LDAP groupfilter. Default: `(&(objectclass=posixGroup)(cn=%s))`.
-
---ldap-bind-dn | $REVA_LDAP_BIND_DN  
-: LDAP bind dn. Default: `cn=reva,ou=sysusers,dc=example,dc=org`.
-
---ldap-bind-password | $REVA_LDAP_BIND_PASSWORD  
-: LDAP bind password. Default: `reva`.
-
---ldap-idp | $REVA_LDAP_IDP  
-: Identity provider to use for users. Default: `https://localhost:9200`.
-
---ldap-schema-uid | $REVA_LDAP_SCHEMA_UID  
-: LDAP schema uid. Default: `uid`.
-
---ldap-schema-mail | $REVA_LDAP_SCHEMA_MAIL  
-: LDAP schema mail. Default: `mail`.
-
---ldap-schema-displayName | $REVA_LDAP_SCHEMA_DISPLAYNAME  
-: LDAP schema displayName. Default: `sn`.
-
---ldap-schema-cn | $REVA_LDAP_SCHEMA_CN  
-: LDAP schema cn. Default: `cn`.
-
---network | $REVA_AUTH_BASIC_NETWORK  
-: Network to use for the reva auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_AUTH_BASIC_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_AUTH_BASIC_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9146`.
-
---url | $REVA_AUTH_BASIC_URL  
-: URL to use for the reva service. Default: `localhost:9146`.
-
-### ocis-reva storage-oc-data
-
-Start reva storage-oc-data service
-
-Usage: `ocis-reva storage-oc-data [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9165`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---network | $REVA_STORAGE_OC_DATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_OC_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_STORAGE_OC_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9164`.
-
---url | $REVA_STORAGE_OC_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9164`.
-
---driver | $REVA_STORAGE_OC_DATA_DRIVER  
-: storage driver, eg. local, eos, owncloud or s3. Default: `owncloud`.
-
---prefix | $REVA_STORAGE_OC_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_OC_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations.
-
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
-
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder.
-
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
-
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
-
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-example.org`.
-
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-example.org`.
-
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
-
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
-
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
-
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
-
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
-
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories.
-
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
-
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
-
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
-
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
-
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
-
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
-
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
-
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
-
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `false`.
-
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
-### ocis-reva frontend
-
-Start reva frontend service
-
-Usage: `ocis-reva frontend [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_FRONTEND_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9141`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---transfer-secret | $REVA_TRANSFER_SECRET  
-: Transfer secret for datagateway. Default: `replace-me-with-a-transfer-secret`.
-
---webdav-namespace | $WEBDAV_NAMESPACE  
-: Namespace prefix for the /webdav endpoint. Default: `/home/`.
-
---dav-files-namespace | $DAV_FILES_NAMESPACE  
-: Namespace prefix for the webdav /dav/files endpoint. Default: `/oc/`.
-
---network | $REVA_FRONTEND_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_FRONTEND_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_FRONTEND_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9140`.
-
---url | $REVA_FRONTEND_URL  
-: URL to use for the reva service. Default: `https://localhost:9200`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
---upload-disable-tus | $REVA_FRONTEND_UPLOAD_DISABLE_TUS  
-: Disables TUS upload mechanism. Default: `false`.
-
---upload-http-method-override | $REVA_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE  
-: Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
-
 ### ocis-reva storage-root
 
 Start reva storage-root service
 
 Usage: `ocis-reva storage-root [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_STORAGE_ROOT_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9153`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --network | $REVA_STORAGE_ROOT_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
@@ -489,191 +93,14 @@ Usage: `ocis-reva storage-root [command options] [arguments...]`
 --data-server-url | $REVA_STORAGE_ROOT_DATA_SERVER_URL  
 : data server url.
 
---enable-home-creation | $REVA_STORAGE_HOME_ENABLE_HOME_CREATION  
-: if enabled home dirs will be automatically created.
-
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations.
-
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
-
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
-
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-example.org`.
-
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-example.org`.
-
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
-
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
-
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
-
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
-
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
-
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories.
-
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
-
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
-
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
-
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
-
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
-
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
-
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
-
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
-
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `false`.
-
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
-
-### ocis-reva reva-storage-public-link
-
-Start reva storage-public-link service
-
-Usage: `ocis-reva reva-storage-public-link [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_STORAGE_PUBLIC_LINK_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:10053`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---network | $REVA_STORAGE_PUBLIC_LINK_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_PUBLIC_LINK_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_STORAGE_PUBLIC_LINK_ADDR  
-: Address to bind reva service. Default: `localhost:10054`.
-
---public_share_provider_addr | $REVA_STORAGE_PUBLICLINK_PUBLIC_SHARE_PROVIDER_ADDR  
-: public share provider service address. Default: `localhost:9150`.
-
---user_provider_addr | $REVA_STORAGE_PUBLICLINK_USER_PROVIDER_ADDR  
-: user provider service address. Default: `localhost:9144`.
-
---storage_provider_addr | $REVA_STORAGE_PUBLICLINK_STORAGE_PROVIDER_ADDR  
-: storage provider service address. Default: `localhost:9154`.
-
---driver | $REVA_STORAGE_PUBLIC_LINK_DRIVER  
-: storage driver, eg. local, eos, owncloud or s3. Default: `owncloud`.
-
---mount-id | $REVA_STORAGE_PUBLIC_LINK_MOUNT_ID  
-: mount id. Default: `e1a73ede-549b-4226-abdf-40e69ca8230d`.
-
---expose-data-server | $REVA_STORAGE_PUBLIC_LINK_EXPOSE_DATA_SERVER  
-: exposes a dedicated data server. Default: `true`.
-
---data-server-url | $REVA_STORAGE_PUBLIC_LINK_DATA_SERVER_URL  
-: data server url. Default: `http://localhost:9156/data`.
-
---enable-home-creation | $REVA_STORAGE_PUBLIC_LINK_ENABLE_HOME_CREATION  
-: if enabled home dirs will be automatically created. Default: `true`.
-
---mount-path | $REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH  
-: mount path. Default: `/public/`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
-### ocis-reva health
-
-Check health status
-
-Usage: `ocis-reva health [command options] [arguments...]`
-
---debug-addr | $REVA_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
-
 ### ocis-reva auth-bearer
 
 Start reva authprovider for bearer auth
 
 Usage: `ocis-reva auth-bearer [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_AUTH_BEARER_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9149`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --oidc-issuer | $REVA_OIDC_ISSUER  
 : OIDC issuer. Default: `https://localhost:9200`.
@@ -683,6 +110,12 @@ Usage: `ocis-reva auth-bearer [command options] [arguments...]`
 
 --oidc-id-claim | $REVA_OIDC_ID_CLAIM  
 : OIDC id claim. Default: `preferred_username`.
+
+--oidc-uid-claim | $REVA_OIDC_UID_CLAIM  
+: OIDC uid claim.
+
+--oidc-gid-claim | $REVA_OIDC_GID_CLAIM  
+: OIDC gid claim.
 
 --network | $REVA_AUTH_BEARER_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
@@ -696,170 +129,14 @@ Usage: `ocis-reva auth-bearer [command options] [arguments...]`
 --url | $REVA_AUTH_BEARER_URL  
 : URL to use for the reva service. Default: `localhost:9148`.
 
-### ocis-reva storage-home-data
-
-Start reva storage-home-data service
-
-Usage: `ocis-reva storage-home-data [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_STORAGE_HOME_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9157`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---network | $REVA_STORAGE_HOME_DATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_HOME_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_STORAGE_HOME_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9156`.
-
---url | $REVA_STORAGE_HOME_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9156`.
-
---driver | $REVA_STORAGE_HOME_DATA_DRIVER  
-: storage driver, eg. local, eos, owncloud or s3. Default: `owncloud`.
-
---prefix | $REVA_STORAGE_HOME_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_HOME_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations. Default: `/eos/dockertest/reva/users`.
-
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
-
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder. Default: `/Shares`.
-
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
-
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
-
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
-
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
-
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
-
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
-
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
-
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories. Default: `true`.
-
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
-
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
-
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
-
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "E/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
-
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
-
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
-
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
-
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
-
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `true`.
-
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
 ### ocis-reva gateway
 
 Start reva gateway
 
 Usage: `ocis-reva gateway [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_GATEWAY_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9143`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --transfer-secret | $REVA_TRANSFER_SECRET  
 : Transfer secret for datagateway. Default: `replace-me-with-a-transfer-secret`.
@@ -887,6 +164,9 @@ Usage: `ocis-reva gateway [command options] [arguments...]`
 
 --disable-home-creation-on-login | $REVA_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN  
 : Disable creation of home folder on login.
+
+--storage-registry-driver | $REVA_STORAGE_REGISTRY_DRIVER  
+: driver of the storage registry. Default: `static`.
 
 --storage-home-provider | $REVA_STORAGE_HOME_PROVIDER  
 : mount point of the storage provider for user homes in the global namespace. Default: `/home`.
@@ -924,6 +204,9 @@ Usage: `ocis-reva gateway [command options] [arguments...]`
 --storage-home-mount-path | $REVA_STORAGE_HOME_MOUNT_PATH  
 : mount path. Default: `/home`.
 
+--storage-home-mount-id | $REVA_STORAGE_HOME_MOUNT_ID  
+: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009154`.
+
 --storage-eos-url | $REVA_STORAGE_EOS_URL  
 : URL to use for the reva service. Default: `localhost:9158`.
 
@@ -942,8 +225,47 @@ Usage: `ocis-reva gateway [command options] [arguments...]`
 --storage-oc-mount-id | $REVA_STORAGE_OC_MOUNT_ID  
 : mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009162`.
 
---public-links-url | $REVA_STORAGE_PUBLIC_LINK_URL  
-: URL to use for the public links service. Default: `localhost:10054`.
+--public-link-url | $REVA_STORAGE_PUBLIC_LINK_URL  
+: URL to use for the public links service. Default: `localhost:9178`.
+
+--storage-public-link-mount-path | $REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH  
+: mount path. Default: `/public/`.
+
+### ocis-reva storage-eos-data
+
+Start reva storage-eos-data service
+
+Usage: `ocis-reva storage-eos-data [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9161`.
+
+--network | $REVA_STORAGE_EOS_DATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_EOS_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
+
+--addr | $REVA_STORAGE_EOS_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9160`.
+
+--url | $REVA_STORAGE_EOS_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9160`.
+
+--driver | $REVA_STORAGE_EOS_DATA_DRIVER  
+: storage driver, eg. local, eos, owncloud or s3. Default: `eos`.
+
+--prefix | $REVA_STORAGE_EOS_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
+
+--temp-folder | $REVA_STORAGE_EOS_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
 ### ocis-reva storage-home
 
@@ -951,35 +273,8 @@ Start reva storage-home service
 
 Usage: `ocis-reva storage-home [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_STORAGE_HOME_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9155`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --network | $REVA_STORAGE_HOME_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
@@ -1008,263 +303,113 @@ Usage: `ocis-reva storage-home [command options] [arguments...]`
 --data-server-url | $REVA_STORAGE_HOME_DATA_SERVER_URL  
 : data server url. Default: `http://localhost:9156/data`.
 
---enable-home-creation | $REVA_STORAGE_HOME_ENABLE_HOME_CREATION  
-: if enabled home dirs will be automatically created. Default: `true`.
-
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations. Default: `/eos/dockertest/reva/users`.
-
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
-
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder. Default: `/Shares`.
-
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
-
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
-
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
-
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
-
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
-
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
-
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
-
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
+--enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
 : enable the creation of home directories. Default: `true`.
 
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
+### ocis-reva reva-storage-public-link
 
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
+Start reva storage-public-link service
 
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "E/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
+Usage: `ocis-reva reva-storage-public-link [command options] [arguments...]`
 
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
+--debug-addr | $REVA_STORAGE_PUBLIC_LINK_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9179`.
 
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
-
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
-
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
-
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `true`.
-
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
-
-### ocis-reva storage-eos-data
-
-Start reva storage-eos-data service
-
-Usage: `ocis-reva storage-eos-data [command options] [arguments...]`
-
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9161`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---network | $REVA_STORAGE_EOS_DATA_NETWORK  
+--network | $REVA_STORAGE_PUBLIC_LINK_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---protocol | $REVA_STORAGE_EOS_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
+--protocol | $REVA_STORAGE_PUBLIC_LINK_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
 
---addr | $REVA_STORAGE_EOS_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9160`.
+--addr | $REVA_STORAGE_PUBLIC_LINK_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9178`.
 
---url | $REVA_STORAGE_EOS_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9160`.
+--url | $REVA_STORAGE_PUBLIC_LINK_URL  
+: Address to bind reva service. Default: `localhost:9178`.
 
---driver | $REVA_STORAGE_EOS_DATA_DRIVER  
-: storage driver, eg. local, eos, owncloud or s3. Default: `eos`.
-
---prefix | $REVA_STORAGE_EOS_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_EOS_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations. Default: `/eos/dockertest/reva`.
-
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
-
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder. Default: `/Shares`.
-
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
-
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
-
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
-
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
-
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
-
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
-
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
-
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
-
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories.
-
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
-
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
-
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
-
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
-
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
-
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
-
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
-
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
-
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `false`.
-
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
+--mount-path | $REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH  
+: mount path. Default: `/public/`.
 
 --gateway-url | $REVA_GATEWAY_URL  
 : URL to use for the reva gateway service. Default: `localhost:9142`.
 
-### ocis-reva sharing
+### ocis-reva auth-basic
 
-Start reva sharing service
+Start reva authprovider for basic auth
 
-Usage: `ocis-reva sharing [command options] [arguments...]`
+Usage: `ocis-reva auth-basic [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
+--debug-addr | $REVA_AUTH_BASIC_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9147`.
 
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
+--auth-driver | $REVA_AUTH_DRIVER  
+: auth driver: 'demo', 'json' or 'ldap'. Default: `ldap`.
 
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
+--auth-json | $REVA_AUTH_JSON  
+: Path to users.json file.
 
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
+--network | $REVA_AUTH_BASIC_NETWORK  
+: Network to use for the reva auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
---debug-addr | $REVA_SHARING_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9151`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
-
---network | $REVA_SHARING_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_SHARING_PROTOCOL  
+--protocol | $REVA_AUTH_BASIC_PROTOCOL  
 : protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
 
---addr | $REVA_SHARING_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9150`.
+--addr | $REVA_AUTH_BASIC_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9146`.
 
---url | $REVA_SHARING_URL  
-: URL to use for the reva service. Default: `localhost:9150`.
+--url | $REVA_AUTH_BASIC_URL  
+: URL to use for the reva service. Default: `localhost:9146`.
 
---user-driver | $REVA_SHARING_USER_DRIVER  
-: driver to use for the UserShareProvider. Default: `json`.
+### ocis-reva frontend
 
---user-json-file | $REVA_SHARING_USER_JSON_FILE  
-: file used to persist shares for the UserShareProvider. Default: `/var/tmp/reva/shares.json`.
+Start reva frontend service
 
---public-driver | $REVA_SHARING_PUBLIC_DRIVER  
-: driver to use for the PublicShareProvider. Default: `json`.
+Usage: `ocis-reva frontend [command options] [arguments...]`
+
+--debug-addr | $REVA_FRONTEND_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9141`.
+
+--transfer-secret | $REVA_TRANSFER_SECRET  
+: Transfer secret for datagateway. Default: `replace-me-with-a-transfer-secret`.
+
+--webdav-namespace | $WEBDAV_NAMESPACE  
+: Namespace prefix for the /webdav endpoint. Default: `/home/`.
+
+--dav-files-namespace | $DAV_FILES_NAMESPACE  
+: Namespace prefix for the webdav /dav/files endpoint. Default: `/oc/`.
+
+--network | $REVA_FRONTEND_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_FRONTEND_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
+
+--addr | $REVA_FRONTEND_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9140`.
+
+--url | $REVA_FRONTEND_URL  
+: URL to use for the reva service. Default: `https://localhost:9200`.
+
+--datagateway-prefix | $REVA_FRONTEND_DATAGATEWAY_PREFIX  
+: datagateway prefix. Default: `data`.
+
+--ocdav-prefix | $REVA_FRONTEND_OCDAV_PREFIX  
+: owncloud webdav endpoint prefix.
+
+--ocs-prefix | $REVA_FRONTEND_OCS_PREFIX  
+: open collaboration services endpoint prefix. Default: `ocs`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
+--upload-disable-tus | $REVA_FRONTEND_UPLOAD_DISABLE_TUS  
+: Disables TUS upload mechanism. Default: `false`.
+
+--upload-http-method-override | $REVA_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE  
+: Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
 
 ### ocis-reva storage-eos
 
@@ -1272,35 +417,8 @@ Start reva storage-eos service
 
 Usage: `ocis-reva storage-eos [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_STORAGE_EOS_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9159`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --network | $REVA_STORAGE_EOS_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
@@ -1329,77 +447,89 @@ Usage: `ocis-reva storage-eos [command options] [arguments...]`
 --data-server-url | $REVA_STORAGE_EOS_DATA_SERVER_URL  
 : data server url. Default: `http://localhost:9160/data`.
 
---enable-home-creation | $REVA_STORAGE_EOS_ENABLE_HOME_CREATION  
-: if enabled home dirs will be automatically created. Default: `false`.
+### ocis-reva storage-oc-data
 
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations. Default: `/eos/dockertest/reva`.
+Start reva storage-oc-data service
 
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
+Usage: `ocis-reva storage-oc-data [command options] [arguments...]`
 
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder. Default: `/Shares`.
+--debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9165`.
 
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
+--network | $REVA_STORAGE_OC_DATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
+--protocol | $REVA_STORAGE_OC_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
 
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
+--addr | $REVA_STORAGE_OC_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9164`.
 
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-mgm1.eoscluster.cern.ch:1094`.
+--url | $REVA_STORAGE_OC_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9164`.
 
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
+--driver | $REVA_STORAGE_OC_DATA_DRIVER  
+: storage driver, eg. local, eos, owncloud or s3. Default: `owncloud`.
 
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
+--prefix | $REVA_STORAGE_OC_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
 
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
+--temp-folder | $REVA_STORAGE_OC_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
 
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
 
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories.
+### ocis-reva health
 
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
+Check health status
 
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
+Usage: `ocis-reva health [command options] [arguments...]`
 
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
+--debug-addr | $REVA_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
+### ocis-reva storage-home-data
 
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
+Start reva storage-home-data service
 
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
+Usage: `ocis-reva storage-home-data [command options] [arguments...]`
 
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
+--debug-addr | $REVA_STORAGE_HOME_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9157`.
 
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
+--network | $REVA_STORAGE_HOME_DATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `false`.
+--protocol | $REVA_STORAGE_HOME_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
 
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
+--addr | $REVA_STORAGE_HOME_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9156`.
+
+--url | $REVA_STORAGE_HOME_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9156`.
+
+--driver | $REVA_STORAGE_HOME_DATA_DRIVER  
+: storage driver, eg. local, eos, owncloud or s3. Default: `owncloud`.
+
+--prefix | $REVA_STORAGE_HOME_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
+
+--temp-folder | $REVA_STORAGE_HOME_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
+
+--enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
+: enable the creation of home directories. Default: `true`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
 ### ocis-reva storage-oc
 
@@ -1407,35 +537,8 @@ Start reva storage-oc service
 
 Usage: `ocis-reva storage-oc [command options] [arguments...]`
 
---tracing-enabled | $REVA_TRACING_ENABLED  
-: Enable sending traces.
-
---tracing-type | $REVA_TRACING_TYPE  
-: Tracing backend type. Default: `jaeger`.
-
---tracing-endpoint | $REVA_TRACING_ENDPOINT  
-: Endpoint for the agent.
-
---tracing-collector | $REVA_TRACING_COLLECTOR  
-: Endpoint for the collector.
-
---tracing-service | $REVA_TRACING_SERVICE  
-: Service name for tracing. Default: `reva`.
-
 --debug-addr | $REVA_STORAGE_OC_DEBUG_ADDR  
 : Address to bind debug server. Default: `0.0.0.0:9163`.
-
---debug-token | $REVA_DEBUG_TOKEN  
-: Token to grant metrics access.
-
---debug-pprof | $REVA_DEBUG_PPROF  
-: Enable pprof debugging.
-
---debug-zpages | $REVA_DEBUG_ZPAGES  
-: Enable zpages debugging.
-
---jwt-secret | $REVA_JWT_SECRET  
-: Shared jwt secret for reva service communication. Default: `Pive-Fumkiu4`.
 
 --network | $REVA_STORAGE_OC_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
@@ -1464,75 +567,90 @@ Usage: `ocis-reva storage-oc [command options] [arguments...]`
 --data-server-url | $REVA_STORAGE_OC_DATA_SERVER_URL  
 : data server url. Default: `http://localhost:9164/data`.
 
---enable-home-creation | $REVA_STORAGE_OC_ENABLE_HOME_CREATION  
-: if enabled home dirs will be automatically created. Default: `false`.
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
---storage-eos-namespace | $REVA_STORAGE_EOS_NAMESPACE  
-: Namespace for metadata operations.
+### ocis-reva users
 
---storage-eos-shadow-namespace | $REVA_STORAGE_EOS_SHADOW_NAMESPACE  
-: Shadow namespace where share references are stored.
+Start reva users service
 
---storage-eos-share-folder | $REVA_STORAGE_EOS_SHARE_FOLDER  
-: name of the share folder.
+Usage: `ocis-reva users [command options] [arguments...]`
 
---storage-eos-binary | $REVA_STORAGE_EOS_BINARY  
-: Location of the eos binary. Default: `/usr/bin/eos`.
+--debug-addr | $REVA_SHARING_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9145`.
 
---storage-eos-xrdcopy-binary | $REVA_STORAGE_EOS_XRDCOPY_BINARY  
-: Location of the xrdcopy binary. Default: `/usr/bin/xrdcopy`.
+--network | $REVA_USERS_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---storage-eos-master-url | $REVA_STORAGE_EOS_MASTER_URL  
-: URL of the Master EOS MGM. Default: `root://eos-example.org`.
+--protocol | $REVA_USERS_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
 
---storage-eos-slave-url | $REVA_STORAGE_EOS_SLAVE_URL  
-: URL of the Slave EOS MGM. Default: `root://eos-example.org`.
+--addr | $REVA_USERS_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9144`.
 
---storage-eos-cache-directory | $REVA_STORAGE_EOS_CACHE_DIRECTORY  
-: Location on the local fs where to store reads. Default: `os.TempDir()`.
+--url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
---storage-eos-enable-logging | $REVA_STORAGE_EOS_ENABLE_LOGGING  
-: Enables logging of the commands executed.
+--driver | $REVA_USERS_DRIVER  
+: user driver: 'demo', 'json', 'ldap', or 'rest'. Default: `ldap`.
 
---storage-eos-show-hidden-sysfiles | $REVA_STORAGE_EOS_SHOW_HIDDEN_SYSFILES  
-: show internal EOS files like .sys.v# and .sys.a# files..
+--json-config | $REVA_USERS_JSON  
+: Path to users.json file.
 
---storage-eos-force-singleuser-mode | $REVA_STORAGE_EOS_FORCE_SINGLEUSER_MODE  
-: force connections to EOS to use SingleUsername.
+--rest-client-id | $REVA_REST_CLIENT_ID  
+: User rest driver Client ID.
 
---storage-eos-use-keytab | $REVA_STORAGE_EOS_USE_KEYTAB  
-: authenticate requests by using an EOS keytab.
+--rest-client-secret | $REVA_REST_CLIENT_SECRET  
+: User rest driver Client Secret.
 
---storage-eos-enable-home | $REVA_STORAGE_EOS_ENABLE_HOME  
-: enable the creation of home directories.
+--rest-redis-address | $REVA_REST_REDIS_ADDRESS  
+: Address for redis server. Default: `localhost:6379`.
 
---storage-eos-sec-protocol | $REVA_STORAGE_EOS_SEC_PROTOCOL  
-: the xrootd security protocol to use between the server and EOS.
+--rest-redis-username | $REVA_REST_REDIS_USERNAME  
+: Username for redis server.
 
---storage-eos-keytab | $REVA_STORAGE_EOS_KEYTAB  
-: the location of the keytab to use to authenticate to EOS.
+--rest-redis-password | $REVA_REST_REDIS_PASSWORD  
+: Password for redis server.
 
---storage-eos-single-username | $REVA_STORAGE_EOS_SINGLE_USERNAME  
-: the username to use when SingleUserMode is enabled.
+--rest-id-provider | $REVA_REST_ID_PROVIDER  
+: The OIDC Provider.
 
---storage-eos-layout | $REVA_STORAGE_EOS_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{substr 0 1 .Username}}/{{.Username}}`.
+--rest-api-base-url | $REVA_REST_API_BASE_URL  
+: Base API Endpoint.
 
---storage-local-root | $REVA_STORAGE_LOCAL_ROOT  
-: the path to the local storage root. Default: `/var/tmp/reva/root`.
+--rest-oidc-token-endpoint | $REVA_REST_OIDC_TOKEN_ENDPOINT  
+: Endpoint to generate token to access the API.
 
---storage-owncloud-datadir | $REVA_STORAGE_OWNCLOUD_DATADIR  
-: the path to the owncloud data directory. Default: `/var/tmp/reva/data`.
+--rest-target-api | $REVA_REST_TARGET_API  
+: The target application.
 
---storage-owncloud-scan | $REVA_STORAGE_OWNCLOUD_SCAN  
-: scan files on startup to add fileids. Default: `true`.
+### ocis-reva sharing
 
---storage-owncloud-redis | $REVA_STORAGE_OWNCLOUD_REDIS_ADDR  
-: the address of the redis server. Default: `:6379`.
+Start reva sharing service
 
---storage-owncloud-enable-home | $REVA_STORAGE_OWNCLOUD_ENABLE_HOME  
-: enable the creation of home storages. Default: `false`.
+Usage: `ocis-reva sharing [command options] [arguments...]`
 
---storage-owncloud-layout | $REVA_STORAGE_OWNCLOUD_LAYOUT  
-: `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `. Default: `{{.Username}}`.
+--debug-addr | $REVA_SHARING_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9151`.
+
+--network | $REVA_SHARING_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_SHARING_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_SHARING_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9150`.
+
+--url | $REVA_SHARING_URL  
+: URL to use for the reva service. Default: `localhost:9150`.
+
+--user-driver | $REVA_SHARING_USER_DRIVER  
+: driver to use for the UserShareProvider. Default: `json`.
+
+--user-json-file | $REVA_SHARING_USER_JSON_FILE  
+: file used to persist shares for the UserShareProvider. Default: `/var/tmp/reva/shares.json`.
+
+--public-driver | $REVA_SHARING_PUBLIC_DRIVER  
+: driver to use for the PublicShareProvider. Default: `json`.
 
