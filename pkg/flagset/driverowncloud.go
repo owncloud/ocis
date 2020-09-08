@@ -45,7 +45,7 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "storage-owncloud-enable-home",
-			Value:       true,
+			Value:       false,
 			Usage:       "enable the creation of home storages",
 			EnvVars:     []string{"REVA_STORAGE_OWNCLOUD_ENABLE_HOME"},
 			Destination: &cfg.Reva.Storages.OwnCloud.EnableHome,

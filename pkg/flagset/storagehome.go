@@ -96,6 +96,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_HOME_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageHome.DataServerURL,
 		},
+		&cli.BoolFlag{
+			Name:        "enable-home",
+			Value:       true,
+			Usage:       "enable the creation of home directories",
+			EnvVars:     []string{"REVA_STORAGE_HOME_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.Home.EnableHome,
+		},
 
 		// User provider
 

@@ -103,6 +103,7 @@ type PublicStorage struct {
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
+	Home     DriverCommon
 	EOS      DriverEOS
 	Local    DriverCommon
 	OwnCloud DriverOwnCloud
