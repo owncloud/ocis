@@ -6,6 +6,7 @@ The following sections list the changes in ocis-accounts unreleased.
 
 ## Summary
 
+* Bugfix - Initialize roleService client in GRPC server: [#114](https://github.com/owncloud/ocis-accounts/pull/114)
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - We make use of the roles cache to enforce permission checks: [#100](https://github.com/owncloud/ocis-accounts/pull/100)
@@ -13,6 +14,14 @@ The following sections list the changes in ocis-accounts unreleased.
 * Enhancement - Add enable/disable capabilities to the WebUI: [#118](https://github.com/owncloud/product/issues/118)
 
 ## Details
+
+* Bugfix - Initialize roleService client in GRPC server: [#114](https://github.com/owncloud/ocis-accounts/pull/114)
+
+   We fixed the initialization of the GRPC server by also providing a roleService client and a
+   roleManager instance.
+
+   https://github.com/owncloud/ocis-accounts/pull/114
+
 
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 
