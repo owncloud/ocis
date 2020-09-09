@@ -51,5 +51,5 @@ When(
 )
 
 When('the user deletes user/users {string} using the WebUI', function (usernames) {
-  return client.page.accounts().deleteUsers(usernames)
+  return client.page.accountsPage().deleteUsers(usernames)
 })
