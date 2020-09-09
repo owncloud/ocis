@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
     'coreCommit': 'eb39d0d5c9597e12877e319a5657911525065dff',
-    'numberOfParts': 3
+    'numberOfParts': 5
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -323,6 +323,8 @@ def getEosServers(part_number):
     return "168.119.98.74"
   elif(part_number == 4):
     return "135.181.40.111"
+  elif(part_number == 5):
+    return "135.181.40.144"
   else:
     return ""
 
@@ -345,7 +347,7 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
         'environment' : {
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@local_storage',
+          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-EOS-Storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
