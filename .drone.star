@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
-    'coreCommit': 'c38647e8af903e75c1e96ec95ca1dc777d5ec9a4',
+    'coreCommit': '9d6c874fe72e3c4580f0ec6f4cf258119413d0d4',
     'numberOfParts': 1
   },
   'uiTests': {
@@ -339,7 +339,7 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           # 'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           # 'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
-          'DELETE_USER_DATA_CMD': 'bash /drone/src/tests/config/drone/clear-eos-data.sh %s',
+          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -tt root@95.217.215.207 "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
           'SSH_PASSWORD_HCLOUD': {
             'from_secret': 'ssh_password'
           },
@@ -347,7 +347,7 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           'BEHAT_SUITE': 'apiWebdavUpload1',
         },
         'commands': [
-          # Install Go
+          # Install sshpass
           'apt update -y',
           'apt install sshpass -y',
 
