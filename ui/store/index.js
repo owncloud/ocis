@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { AccountsService_ListAccounts, AccountsService_UpdateAccount } from '../client/accounts'
+import { AccountsService_ListAccounts, AccountsService_UpdateAccount, AccountsService_CreateAccount } from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
 /* eslint-enable camelcase */
 import { injectAuthToken } from '../helpers/auth'
@@ -56,6 +56,10 @@ const mutations = {
 
   RESET_ACCOUNTS_SELECTION (state) {
     state.selectedAccounts = []
+  },
+
+  PUSH_NEW_ACCOUNT (state, account) {
+    state.accounts.push(account)
   }
 }
 
@@ -164,6 +168,35 @@ const actions = {
     }
 
     commit('RESET_ACCOUNTS_SELECTION')
+  },
+  async createNewAccount ({ rootGetters, commit, dispatch }, account) {
+    injectAuthToken(rootGetters.user.token)
+
+    const response = await AccountsService_CreateAccount({
+      $domain: rootGetters.configuration.server,
+      body: {
+        account: {
+          on_premises_sam_account_name: account.username,
+          mail: account.email,
+          password_profile: {
+            password: account.password
+          },
+          account_enabled: true,
+          display_name: account.username
+        }
+      }
+    })
+
+    if (response.status === 201) {
+      commit('PUSH_NEW_ACCOUNT', account)
+      console.log(response)
+    } else {
+      dispatch('showMessage', {
+        title: 'Failed to create account',
+        desc: response.statusText,
+        status: 'danger'
+      }, { root: true })
+    }
   }
 }
 

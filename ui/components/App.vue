@@ -2,7 +2,16 @@
   <div>
     <div class="uk-container uk-padding">
       <h1 v-text="$gettext('Accounts')" />
-      <oc-grid v-if="numberOfSelectedAccounts > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
+      <oc-button
+        v-if="numberOfSelectedAccounts < 1"
+        key="create-accounts-button"
+        v-text="$gettext('Create new user')"
+        variation="primary"
+        :disabled="isAccountCreationInProgress || !isInitialized"
+        :uk-tooltip="disabledCreateAccountBtnTooltip"
+        @click="setAccountCreationProgress(true)"
+      />
+      <oc-grid v-else key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
         <span>|</span>
         <div>
@@ -32,7 +41,11 @@
         </div>
       </oc-grid>
       <template v-if="isInitialized">
-        <accounts-list :accounts="accounts" />
+        <accounts-list
+          :accounts="accounts"
+          :is-create-new-row-displayed="isAccountCreationInProgress"
+          @cancelAccountCreation="setAccountCreationProgress(false)"
+        />
       </template>
       <oc-loader v-else />
     </div>
@@ -45,6 +58,9 @@ import AccountsList from './accounts/AccountsList.vue'
 export default {
   name: 'App',
   components: { AccountsList },
+  data: () => ({
+    isAccountCreationInProgress: false
+  }),
   computed: {
     ...mapGetters('Accounts', ['isInitialized', 'getAccountsSorted']),
     ...mapState('Accounts', ['selectedAccounts']),
@@ -86,17 +102,34 @@ export default {
       }
 
       return actions
+    },
+
+    disabledCreateAccountBtnTooltip () {
+      if (!this.isInitialized) {
+        return this.$gettext('Loading users')
+      }
+
+      if (this.isAccountCreationInProgress) {
+        return this.$gettext('User creation is already in progress')
+      }
+
+      return null
     }
   },
   methods: {
     ...mapActions('Accounts', ['initialize', 'toggleAccountStatus']),
-    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION']),
+
+    setAccountCreationProgress (isInProgress) {
+      this.isAccountCreationInProgress = isInProgress
+    }
   },
   created () {
     this.initialize()
   },
   beforeDestroy () {
     this.RESET_ACCOUNTS_SELECTION()
+    this.setAccountCreationProgress(false)
   }
 }
 </script>

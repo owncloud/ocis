@@ -22,6 +22,7 @@
         </oc-table-row>
       </oc-table-group>
       <oc-table-group>
+        <accounts-list-new-account-row v-if="isCreateNewRowDisplayed" @cancel="emitCreationCancel" />
         <accounts-list-row
           v-for="account in accounts"
           :key="`account-list-row-${account.id}`"
@@ -35,23 +36,34 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import AccountsListRow from './AccountsListRow.vue'
+import AccountsListNewAccountRow from './AccountsListNewAccountRow.vue'
 
 export default {
   name: 'AccountsList',
   components: {
-    AccountsListRow
+    AccountsListRow,
+    AccountsListNewAccountRow
   },
   props: {
     accounts: {
       type: Array,
       required: true
+    },
+    isCreateNewRowDisplayed: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
     ...mapGetters('Accounts', ['areAllAccountsSelected'])
   },
   methods: {
-    ...mapActions('Accounts', ['toggleSelectionAll'])
+    ...mapActions('Accounts', ['toggleSelectionAll']),
+
+    emitCreationCancel () {
+      this.$emit('cancelAccountCreation')
+    }
   }
 }
 </script>
