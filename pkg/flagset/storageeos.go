@@ -58,7 +58,7 @@ func StorageEOSWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "eos",
-			Usage:       "storage driver, eg. local, eos, owncloud or s3",
+			Usage:       "storage driver for eos mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"REVA_STORAGE_EOS_DRIVER"},
 			Destination: &cfg.Reva.StorageEOS.Driver,
 		},

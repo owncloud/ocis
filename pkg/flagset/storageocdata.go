@@ -59,7 +59,7 @@ func StorageOCDataWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "owncloud",
-			Usage:       "storage driver, eg. local, eos, owncloud or s3",
+			Usage:       "storage driver for oc data mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"REVA_STORAGE_OC_DATA_DRIVER"},
 			Destination: &cfg.Reva.StorageOCData.Driver,
 		},

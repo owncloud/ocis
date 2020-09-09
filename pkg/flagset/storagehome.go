@@ -60,7 +60,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "owncloud",
-			Usage:       "storage driver, eg. local, eos, owncloud or s3",
+			Usage:       "storage driver for home mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"REVA_STORAGE_HOME_DRIVER"},
 			Destination: &cfg.Reva.StorageHome.Driver,
 		},

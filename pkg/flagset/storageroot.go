@@ -60,7 +60,7 @@ func StorageRootWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "local",
-			Usage:       "storage driver, eg. local, eos, owncloud or s3",
+			Usage:       "storage driver for root mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"REVA_STORAGE_ROOT_DRIVER"},
 			Destination: &cfg.Reva.StorageRoot.Driver,
 		},
