@@ -79,6 +79,7 @@ export default {
       }
 
       this.createNewAccount({ username: this.username, email: this.email, password: this.password })
+      this.emitCancel()
     },
 
     checkUsername () {

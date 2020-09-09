@@ -189,8 +189,7 @@ const actions = {
     })
 
     if (response.status === 201) {
-      commit('PUSH_NEW_ACCOUNT', account)
-      console.log(response)
+      commit('PUSH_NEW_ACCOUNT', response.data)
     } else {
       dispatch('showMessage', {
         title: 'Failed to create account',
