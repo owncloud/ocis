@@ -20,18 +20,20 @@
             @input="checkEmail"
           />
         </label>
-        <label class="uk-flex uk-flex-middle">
-          <oc-text-input
-            :type="passwordInputType"
-            v-model="password"
-            :error-message="passwordError"
-            :placeholder="$gettext('Password')"
-            class="uk-margin-xsmall-right"
-            @input="checkPassword"
-          />
-          <oc-button variation="raw" :aria-label="$gettext('Display password')" @click="togglePasswordVisibility">
-            <oc-icon name="remove_red_eye" aria-hidden="true" size="small" />
-          </oc-button>
+        <label>
+          <div class="uk-flex uk-flex-middle">
+            <oc-text-input
+              :type="passwordInputType"
+              v-model="password"
+              :error-message="passwordError"
+              :placeholder="$gettext('Password')"
+              class="uk-margin-xsmall-right"
+              @input="checkPassword"
+            />
+            <oc-button variation="raw" :aria-label="$gettext('Display password')" @click="togglePasswordVisibility">
+              <oc-icon name="remove_red_eye" aria-hidden="true" size="small" />
+            </oc-button>
+          </div>
         </label>
         <div>
           <oc-button v-text="$gettext('Cancel')" @click="emitCancel" class="uk-margin-xsmall-right" />
