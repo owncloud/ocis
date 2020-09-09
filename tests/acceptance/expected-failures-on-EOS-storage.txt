@@ -114,6 +114,101 @@ apiCapabilities/capabilitiesWithNormalUser.feature:11
 apiFavorites/favorites.feature:228
 apiFavorites/favorites.feature:229
 #
+# OCS Provisioning API scenarios that fail - to be investigated and issues raised or comments added here
+apiProvisioning-v1/addUser.feature:29
+apiProvisioning-v1/addUser.feature:30
+apiProvisioning-v1/addUser.feature:32
+apiProvisioning-v1/addUser.feature:39
+apiProvisioning-v1/addUser.feature:69
+apiProvisioning-v1/addUser.feature:96
+apiProvisioning-v1/addUser.feature:97
+apiProvisioning-v1/addUser.feature:98
+apiProvisioning-v1/addUser.feature:99
+apiProvisioning-v1/addUser.feature:100
+apiProvisioning-v1/addUser.feature:102
+apiProvisioning-v1/addUser.feature:118
+apiProvisioning-v1/addUser.feature:121
+apiProvisioning-v1/addUser.feature:122
+apiProvisioning-v1/addUser.feature:123
+apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39
+apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:67
+apiProvisioning-v1/deleteUser.feature:29
+apiProvisioning-v1/deleteUser.feature:30
+apiProvisioning-v1/deleteUser.feature:32
+apiProvisioning-v1/deleteUser.feature:53
+apiProvisioning-v1/disableUser.feature:11
+apiProvisioning-v1/disableUser.feature:29
+apiProvisioning-v1/disableUser.feature:30
+apiProvisioning-v1/disableUser.feature:79
+apiProvisioning-v1/disableUser.feature:99
+apiProvisioning-v1/disableUser.feature:107
+apiProvisioning-v1/disableUser.feature:129
+apiProvisioning-v1/editUser.feature:29
+apiProvisioning-v1/editUser.feature:30
+apiProvisioning-v1/editUser.feature:47
+apiProvisioning-v1/editUser.feature:56
+apiProvisioning-v1/editUser.feature:122
+apiProvisioning-v1/enableUser.feature:11
+apiProvisioning-v1/enableUser.feature:31
+apiProvisioning-v1/enableUser.feature:32
+apiProvisioning-v1/enableUser.feature:34
+apiProvisioning-v1/enableUser.feature:56
+apiProvisioning-v1/enableUser.feature:63
+apiProvisioning-v1/enableUser.feature:86
+apiProvisioning-v1/getUser.feature:34
+apiProvisioning-v1/getUser.feature:35
+apiProvisioning-v1/getUser.feature:37
+apiProvisioning-v1/getUser.feature:81
+apiProvisioning-v1/getUsers.feature:11
+apiProvisioning-v1/getUsers.feature:35
+apiProvisioning-v1/resetUserPassword.feature:21
+apiProvisioning-v1/resetUserPassword.feature:55
+apiProvisioning-v2/addUser.feature:29
+apiProvisioning-v2/addUser.feature:30
+apiProvisioning-v2/addUser.feature:32
+apiProvisioning-v2/addUser.feature:39
+apiProvisioning-v2/addUser.feature:69
+apiProvisioning-v2/addUser.feature:96
+apiProvisioning-v2/addUser.feature:97
+apiProvisioning-v2/addUser.feature:98
+apiProvisioning-v2/addUser.feature:99
+apiProvisioning-v2/addUser.feature:100
+apiProvisioning-v2/addUser.feature:102
+apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:39
+apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
+apiProvisioning-v2/deleteUser.feature:29
+apiProvisioning-v2/deleteUser.feature:30
+apiProvisioning-v2/deleteUser.feature:32
+apiProvisioning-v2/deleteUser.feature:54
+apiProvisioning-v2/disableUser.feature:11
+apiProvisioning-v2/disableUser.feature:29
+apiProvisioning-v2/disableUser.feature:30
+apiProvisioning-v2/disableUser.feature:81
+apiProvisioning-v2/disableUser.feature:101
+apiProvisioning-v2/disableUser.feature:110
+apiProvisioning-v2/disableUser.feature:133
+apiProvisioning-v2/editUser.feature:29
+apiProvisioning-v2/editUser.feature:30
+apiProvisioning-v2/editUser.feature:47
+apiProvisioning-v2/editUser.feature:56
+apiProvisioning-v2/editUser.feature:122
+apiProvisioning-v2/enableUser.feature:11
+apiProvisioning-v2/enableUser.feature:31
+apiProvisioning-v2/enableUser.feature:32
+apiProvisioning-v2/enableUser.feature:34
+apiProvisioning-v2/enableUser.feature:56
+apiProvisioning-v2/enableUser.feature:64
+apiProvisioning-v2/enableUser.feature:88
+apiProvisioning-v2/getUser.feature:34
+apiProvisioning-v2/getUser.feature:35
+apiProvisioning-v2/getUser.feature:37
+apiProvisioning-v2/getUser.feature:47
+apiProvisioning-v2/getUser.feature:82
+apiProvisioning-v2/getUsers.feature:11
+apiProvisioning-v2/getUsers.feature:36
+apiProvisioning-v2/resetUserPassword.feature:21
+apiProvisioning-v2/resetUserPassword.feature:55
+#
 # https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
 apiSharees/sharees.feature:32
 apiSharees/sharees.feature:33
@@ -168,6 +263,32 @@ apiSharees/sharees.feature:516
 apiSharees/sharees.feature:537
 apiSharees/sharees.feature:538
 #
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set (shareapi_auto_accept_share)
+apiShareManagement/acceptShares.feature:155
+apiShareManagement/acceptShares.feature:313
+apiShareManagement/acceptShares.feature:333
+apiShareManagement/acceptShares.feature:415
+apiShareManagement/acceptShares.feature:416
+apiShareManagement/acceptShares.feature:417
+apiShareManagement/acceptShares.feature:418
+apiShareManagement/acceptShares.feature:419
+apiShareManagement/acceptShares.feature:421
+apiShareManagement/acceptShares.feature:436
+apiShareManagement/acceptShares.feature:458
+apiShareManagement/acceptShares.feature:477
+apiShareManagement/acceptShares.feature:511
+apiShareManagement/acceptShares.feature:542
+apiShareManagement/acceptShares.feature:561
+apiShareManagement/acceptShares.feature:582
+apiShareManagement/acceptShares.feature:652
+apiShareManagement/acceptShares.feature:696
+#
+# Accepting a share returns empty response
+apiShareManagement/acceptSharesToSharesFolder.feature:15
+apiShareManagement/acceptSharesToSharesFolder.feature:22
+apiShareManagement/acceptSharesToSharesFolder.feature:30
+apiShareManagement/acceptSharesToSharesFolder.feature:52
+#
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
 apiShareManagementBasic/createShare.feature:169
 apiShareManagementBasic/createShare.feature:170
@@ -189,11 +310,6 @@ apiShareManagementBasic/deleteShare.feature:37
 apiShareOperations/accessToShare.feature:48
 apiShareOperations/accessToShare.feature:49
 #
-# https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
-# https://github.com/owncloud/ocis-reva/issues/194 Group shares support
-apiShareOperations/accessToShare.feature:63
-apiShareOperations/accessToShare.feature:64
-#
 # https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
 apiShareOperations/gettingShares.feature:21
 apiShareOperations/gettingShares.feature:22
@@ -211,9 +327,6 @@ apiShareOperations/gettingShares.feature:125
 # https://github.com/owncloud/ocis-reva/issues/374 OCS error message for attempting to access share via share id as an unauthorized user is not informative
 apiShareOperations/gettingShares.feature:168
 apiShareOperations/gettingShares.feature:169
-#
-# https://github.com/owncloud/ocis-reva/issues/194 Group shares support
-apiShareOperations/gettingShares.feature:172
 #
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
 apiShareOperations/gettingShares.feature:204
@@ -451,15 +564,88 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:206
 #
 apiSharePublicLink2/uploadToPublicLinkShare.feature:217
 #
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
-apiSharePublicLink2/uploadToPublicLinkShare.feature:227
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:238
 #
 apiSharePublicLink2/uploadToPublicLinkShare.feature:255
 #
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:273
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinDelete.feature:31
+apiTrashbin/trashbinDelete.feature:32
+apiTrashbin/trashbinDelete.feature:33
+apiTrashbin/trashbinDelete.feature:34
+apiTrashbin/trashbinDelete.feature:37
+apiTrashbin/trashbinDelete.feature:50
+apiTrashbin/trashbinDelete.feature:67
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinFilesFolders.feature:44
+apiTrashbin/trashbinFilesFolders.feature:45
+apiTrashbin/trashbinFilesFolders.feature:60
+apiTrashbin/trashbinFilesFolders.feature:61
+apiTrashbin/trashbinFilesFolders.feature:89
+apiTrashbin/trashbinFilesFolders.feature:90
+apiTrashbin/trashbinFilesFolders.feature:104
+apiTrashbin/trashbinFilesFolders.feature:105
+apiTrashbin/trashbinFilesFolders.feature:136
+apiTrashbin/trashbinFilesFolders.feature:137
+apiTrashbin/trashbinFilesFolders.feature:217
+apiTrashbin/trashbinFilesFolders.feature:218
+apiTrashbin/trashbinFilesFolders.feature:235
+apiTrashbin/trashbinFilesFolders.feature:236
+apiTrashbin/trashbinFilesFolders.feature:259
+apiTrashbin/trashbinFilesFolders.feature:260
+apiTrashbin/trashbinFilesFolders.feature:273
+apiTrashbin/trashbinFilesFolders.feature:274
+apiTrashbin/trashbinFilesFolders.feature:287
+apiTrashbin/trashbinFilesFolders.feature:288
+apiTrashbin/trashbinFilesFolders.feature:302
+apiTrashbin/trashbinFilesFolders.feature:303
+apiTrashbin/trashbinFilesFolders.feature:304
+apiTrashbin/trashbinFilesFolders.feature:308
+apiTrashbin/trashbinFilesFolders.feature:309
+apiTrashbin/trashbinFilesFolders.feature:310
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinRestore.feature:31
+apiTrashbin/trashbinRestore.feature:32
+apiTrashbin/trashbinRestore.feature:62
+apiTrashbin/trashbinRestore.feature:63
+apiTrashbin/trashbinRestore.feature:76
+apiTrashbin/trashbinRestore.feature:77
+apiTrashbin/trashbinRestore.feature:92
+apiTrashbin/trashbinRestore.feature:93
+apiTrashbin/trashbinRestore.feature:112
+apiTrashbin/trashbinRestore.feature:113
+apiTrashbin/trashbinRestore.feature:114
+apiTrashbin/trashbinRestore.feature:115
+apiTrashbin/trashbinRestore.feature:116
+apiTrashbin/trashbinRestore.feature:117
+apiTrashbin/trashbinRestore.feature:141
+apiTrashbin/trashbinRestore.feature:142
+apiTrashbin/trashbinRestore.feature:143
+apiTrashbin/trashbinRestore.feature:144
+apiTrashbin/trashbinRestore.feature:165
+apiTrashbin/trashbinRestore.feature:166
+apiTrashbin/trashbinRestore.feature:188
+apiTrashbin/trashbinRestore.feature:189
+apiTrashbin/trashbinRestore.feature:206
+apiTrashbin/trashbinRestore.feature:207
+apiTrashbin/trashbinRestore.feature:279
+apiTrashbin/trashbinRestore.feature:280
+apiTrashbin/trashbinRestore.feature:323
+apiTrashbin/trashbinRestore.feature:324
+apiTrashbin/trashbinRestore.feature:325
+apiTrashbin/trashbinRestore.feature:326
+apiTrashbin/trashbinRestore.feature:327
+apiTrashbin/trashbinRestore.feature:328
+apiTrashbin/trashbinRestore.feature:343
+apiTrashbin/trashbinRestore.feature:344
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 # https://github.com/owncloud/ocis-reva/issues/56  remote.php/dav/uploads endpoint does not exist

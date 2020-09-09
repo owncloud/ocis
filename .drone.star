@@ -1,7 +1,7 @@
 config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
-    'coreCommit': 'eb39d0d5c9597e12877e319a5657911525065dff',
+    'coreCommit': '6e58d9797b88275c0925a86844b0274fa9742b5b',
     'numberOfParts': 5
   },
   'uiTests': {
