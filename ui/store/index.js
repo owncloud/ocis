@@ -223,7 +223,7 @@ const actions = {
         }
       })
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 204) {
         commit('DELETE_ACCOUNT', account.id)
       } else {
         failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
