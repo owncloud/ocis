@@ -8,6 +8,7 @@ The following sections list the changes in ocis-glauth unreleased.
 
 * Bugfix - Return invalid credentials when user was not found: [#30](https://github.com/owncloud/ocis-glauth/pull/30)
 * Bugfix - Query numeric attribute values without quotes: [#28](https://github.com/owncloud/ocis-glauth/issues/28)
+* Bugfix - Use searchBaseDN if already a user/group name: [#214](https://github.com/owncloud/product/issues/214)
 * Bugfix - Fix LDAP substring startswith filters: [#31](https://github.com/owncloud/ocis-glauth/pull/31)
 
 ## Details
@@ -33,6 +34,16 @@ The following sections list the changes in ocis-glauth unreleased.
    https://github.com/owncloud/ocis-glauth/issues/28
    https://github.com/owncloud/ocis-glauth/pull/29
    https://github.com/owncloud/ocis-accounts/pull/68
+
+
+* Bugfix - Use searchBaseDN if already a user/group name: [#214](https://github.com/owncloud/product/issues/214)
+
+   In case of the searchBaseDN already referencing a user or group, the search query was ignoring
+   the user/group name entirely, because the searchBaseDN is not part of the LDAP filters. We
+   fixed this by including an additional query part if the searchBaseDN contains a CN.
+
+   https://github.com/owncloud/product/issues/214
+   https://github.com/owncloud/ocis-glauth/pull/32
 
 
 * Bugfix - Fix LDAP substring startswith filters: [#31](https://github.com/owncloud/ocis-glauth/pull/31)
