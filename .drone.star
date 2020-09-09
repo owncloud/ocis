@@ -1,8 +1,8 @@
 config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
-    'coreCommit': '9d6c874fe72e3c4580f0ec6f4cf258119413d0d4',
-    'numberOfParts': 1
+    'coreCommit': 'eb39d0d5c9597e12877e319a5657911525065dff',
+    'numberOfParts': 2
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -91,11 +91,12 @@ def testPipelines(ctx):
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
-
+ 
   # for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
   #   pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
 
-  pipelines.append(coreApiTestsEos(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 1, config['apiTests']['numberOfParts']))
+  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    pipelines.append(coreApiTestsEos(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
@@ -317,11 +318,20 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     },
   }
 
+def getEosServers(part_number):
+  if(part_number == 1):
+    return "95.217.215.207"
+  elif(part_number == 2):
+    return "135.181.28.182"
+  else:
+    return ""
+
 def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+  server = getEosServers(part_number)
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'coreApiTests-Eos-Storage',
+    'name': 'coreApiTests-Eos-Storage-%s' % (part_number),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -336,29 +346,27 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@local_storage',
-          # 'DIVIDE_INTO_NUM_PARTS': number_of_parts,
-          # 'RUN_PART': part_number,
+          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
+          'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
-          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@95.217.215.207 "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
+          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@' + server + ' "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
           'SSH_PASSWORD_HCLOUD': {
             'from_secret': 'ssh_password'
           },
-          'TEST_SERVER_URL': 'https://95.217.215.207:9200',
-          'BEHAT_SUITE': 'apiWebdavUpload1',
+          'TEST_SERVER_URL': 'https://%s:9200' % (server),
         },
         'commands': [
           # Install sshpass
           'apt update -y',
           'apt install sshpass -y',
 
-          'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@95.217.215.207 "ls -la"',
+          'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@%s "ls -la"' % (server),
 
           # Create an eos machine
           'cd /srv/app/testrunner',
 
           # Run tests
           'make test-acceptance-api',
-
         ],
         'volumes': [{
           'name': 'gopath',
