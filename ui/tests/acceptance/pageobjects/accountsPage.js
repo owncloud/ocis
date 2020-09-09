@@ -76,7 +76,7 @@ module.exports = {
       return this
         .waitForElementVisible('@actionsDropdownTrigger')
         .click('@actionsDropdownTrigger')
-        .click('@newAccountButtonConfirm')
+        .click('@deleteAction')
     },
 
     selectUsers: function (usernames) {
@@ -168,6 +168,9 @@ module.exports = {
     },
     accountsNewAccountTrigger: {
       selector: '#accounts-new-account-trigger'
+    },
+    deleteAction: {
+      selector: '#accounts-actions-dropdown-action-delete'
     }
   }
 }

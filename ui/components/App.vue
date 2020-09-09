@@ -3,7 +3,7 @@
     <div class="uk-container uk-padding">
       <h1 v-text="$gettext('Accounts')" />
       <oc-button
-        v-if="numberOfSelectedAccounts < 1"
+        v-if="numberOfSelectedAccounts < 1 && !isAccountCreationInProgress"
         id="accounts-new-account-trigger"
         key="create-accounts-button"
         v-text="$gettext('Create new user')"
@@ -12,7 +12,8 @@
         :uk-tooltip="disabledCreateAccountBtnTooltip"
         @click="setAccountCreationProgress(true)"
       />
-      <oc-grid v-else key="selected-accounts-info" gutter="small" class="uk-flex-middle">
+      <accounts-list-new-account-row v-if="isAccountCreationInProgress" @close="setAccountCreationProgress(false)" />
+      <oc-grid v-if="numberOfSelectedAccounts > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
         <span>|</span>
         <div>
@@ -42,11 +43,7 @@
         </div>
       </oc-grid>
       <template v-if="isInitialized">
-        <accounts-list
-          :accounts="accounts"
-          :is-create-new-row-displayed="isAccountCreationInProgress"
-          @cancelAccountCreation="setAccountCreationProgress(false)"
-        />
+        <accounts-list :accounts="accounts" />
       </template>
       <oc-loader v-else />
     </div>
@@ -56,9 +53,11 @@
 <script>
 import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import AccountsList from './accounts/AccountsList.vue'
+import AccountsListNewAccountRow from './accounts/AccountsListNewAccountRow.vue'
+
 export default {
   name: 'App',
-  components: { AccountsList },
+  components: { AccountsList, AccountsListNewAccountRow },
   data: () => ({
     isAccountCreationInProgress: false
   }),
@@ -81,14 +80,7 @@ export default {
     },
 
     actions () {
-      let actions = []
-      const permanentActions = [
-        {
-          id: 'accounts-actions-dropdown-action-delete',
-          label: this.$gettext('Delete'),
-          handler: this.deleteAccounts
-        }
-      ]
+      const actions = []
       const numberOfDisabledAccounts = this.selectedAccounts.filter(account => !account.accountEnabled).length
       const isAnyAccountDisabled = numberOfDisabledAccounts > 0
       const isAnyAccountEnabled = numberOfDisabledAccounts < this.numberOfSelectedAccounts
@@ -109,7 +101,11 @@ export default {
         })
       }
 
-      actions = actions.concat(permanentActions)
+      actions.push({
+        id: 'accounts-actions-dropdown-action-delete',
+        label: this.$gettext('Delete'),
+        handler: this.deleteAccounts
+      })
 
       return actions
     },

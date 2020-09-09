@@ -1,53 +1,64 @@
 <template>
-  <oc-table-row>
-    <oc-table-cell colspan="9">
-      <oc-grid gutter="small">
-        <label>
-          <oc-text-input
-            id="accounts-new-account-input-username"
-            type="text"
-            v-model="username"
-            :error-message="usernameError"
-            :placeholder="$gettext('Username')"
-            @input="checkUsername"
-            @keydown.enter="createAccount"
+  <div class="uk-flex uk-flex-top">
+    <oc-grid gutter="small">
+      <label>
+        <oc-text-input
+          id="accounts-new-account-input-username"
+          type="text"
+          v-model="username"
+          :error-message="usernameError"
+          :placeholder="$gettext('Username')"
+          :disabled="isInProgress"
+          @keydown.enter="createAccount"
+        />
+      </label>
+      <label>
+        <oc-text-input
+          id="accounts-new-account-input-email"
+          type="email"
+          v-model="email"
+          :error-message="emailError"
+          :placeholder="$gettext('Email')"
+          :disabled="isInProgress"
+          @keydown.enter="createAccount"
+        />
+      </label>
+      <label class="uk-margin-xsmall-right">
+        <oc-text-input
+          id="accounts-new-account-input-password"
+          type="password"
+          v-model="password"
+          :error-message="passwordError"
+          :placeholder="$gettext('Password')"
+          :disabled="isInProgress"
+          @keydown.enter="createAccount"
+        />
+      </label>
+      <div>
+        <oc-button
+          v-text="$gettext('Cancel')"
+          @click="emitClose"
+          class="uk-margin-xsmall-right"
+          :disabled="isInProgress"
+        />
+        <oc-button
+          id="accounts-new-account-button-confirm"
+          variation="primary"
+          :disabled="isInProgress"
+          @click="createAccount"
+        >
+          <oc-spinner
+            v-if="isInProgress"
+            key="account-creation-in-progress"
+            size="xsmall"
+            class="uk-margin-xsmall-right"
+            aria-hidden="true"
           />
-        </label>
-        <label>
-          <oc-text-input
-            id="accounts-new-account-input-email"
-            type="email"
-            v-model="email"
-            :error-message="emailError"
-            :placeholder="$gettext('Email')"
-            @input="checkEmail"
-            @keydown.enter="createAccount"
-          />
-        </label>
-        <label>
-          <div class="uk-flex uk-flex-middle">
-            <oc-text-input
-              id="accounts-new-account-input-password"
-              :type="passwordInputType"
-              v-model="password"
-              :error-message="passwordError"
-              :placeholder="$gettext('Password')"
-              class="uk-margin-xsmall-right"
-              @input="checkPassword"
-              @keydown.enter="createAccount"
-            />
-            <oc-button variation="raw" :aria-label="$gettext('Display password')" @click="togglePasswordVisibility">
-              <oc-icon name="remove_red_eye" aria-hidden="true" size="small" />
-            </oc-button>
-          </div>
-        </label>
-        <div>
-          <oc-button v-text="$gettext('Cancel')" @click="emitCancel" class="uk-margin-xsmall-right" />
-          <oc-button id="accounts-new-account-button-confirm" v-text="$gettext('Create')" variation="primary" @click="createAccount" />
-        </div>
-      </oc-grid>
-    </oc-table-cell>
-  </oc-table-row>
+          <span v-text="isInProgress ? $gettext('Creating') : $gettext('Create')" />
+        </oc-button>
+      </div>
+    </oc-grid>
+  </div>
 </template>
 
 <script>
@@ -66,70 +77,69 @@ export default {
     emailError: '',
     password: '',
     passwordError: '',
-    passwordInputType: 'password'
+    isInProgress: false
   }),
 
   methods: {
     ...mapActions('Accounts', ['createNewAccount']),
 
-    emitCancel () {
-      this.$emit('cancel')
+    emitClose () {
+      this.$emit('close')
     },
     createAccount () {
-      this.checkUsername()
-      this.checkEmail()
-      this.checkPassword()
-
-      if (this.usernameError !== '' || this.emailError !== '' || this.passwordError !== '') {
+      if (!(this.checkUsername() & this.checkEmail() & this.checkPassword())) {
         return
       }
 
-      this.createNewAccount({ username: this.username, email: this.email, password: this.password })
-      this.emitCancel()
+      this.isInProgress = true
+      this.createNewAccount({ username: this.username, email: this.email, password: this.password }).finally(() => {
+        this.isInProgress = false
+      })
+      this.emitClose()
     },
 
     checkUsername () {
       if (isEmpty(this.username)) {
         debounce(this.usernameError = this.$gettext('Username cannot be empty'), 500)
-
-        return
+        return false
       }
 
       this.usernameError = ''
+      return true
     },
 
     checkEmail () {
       if (isEmpty(this.email)) {
         debounce(this.emailError = this.$gettext('Email cannot be empty'), 500)
-
-        return
+        return false
       }
 
       if (!isEmail(this.email)) {
         debounce(this.emailError = this.$gettext('Invalid email address'), 500)
-
-        return
+        return false
       }
 
       this.emailError = ''
+      return true
     },
 
     checkPassword () {
       // Later on some restrictions might be applied here
       if (isEmpty(this.password)) {
         debounce(this.passwordError = this.$gettext('Password cannot be empty'), 500)
-
-        return
+        return false
       }
 
       this.passwordError = ''
-    },
-
-    togglePasswordVisibility () {
-      this.passwordInputType === 'password'
-        ? this.passwordInputType = 'text'
-        : this.passwordInputType = 'password'
+      return true
     }
   }
 }
 </script>
+
+<style>
+#accounts-new-account-button-confirm > span {
+  display: flex;
+  align-items: center;
+}
+</style>
