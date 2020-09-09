@@ -14,13 +14,14 @@ module.exports = {
       return this.waitForElementVisible('@accountsListTable')
     },
     isUserListed: async function (username) {
-      let user
       const usernameInTable = util.format(this.elements.userInAccountsList.selector, username)
       await this.useXpath().waitForElementVisible(usernameInTable)
-        .getText(usernameInTable, (result) => {
-          user = result
-        })
-      return user.value
+      return true
+    },
+    isUserDeleted: async function (username) {
+      const usernameInTable = util.format(this.elements.userInAccountsList.selector, username)
+      await this.useXpath().waitForElementNotPresent(usernameInTable)
+      return true
     },
 
     selectRole: function (username, role) {

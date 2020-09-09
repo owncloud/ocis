@@ -7,9 +7,15 @@ When('the user browses to the accounts page', function () {
 })
 
 Then('user {string} should be displayed in the accounts list on the WebUI', async function (username) {
-  await client.page.accountsPage().accountsList(username)
+  await client.page.accountsPage().accountsList()
   const userListed = await client.page.accountsPage().isUserListed(username)
-  return assert.strictEqual(userListed, username)
+  return assert.strictEqual(userListed, true)
+})
+
+Then('user {string} should not be displayed in the accounts list on the WebUI', async function (username) {
+  await client.page.accountsPage().accountsList()
+  const userDeleted = await client.page.accountsPage().isUserDeleted(username)
+  return assert.strictEqual(userDeleted, true)
 })
 
 Given('the user has changed the role of user {string} to {string}', function (username, role) {
