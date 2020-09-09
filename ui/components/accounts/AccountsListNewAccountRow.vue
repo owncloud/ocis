@@ -4,6 +4,7 @@
       <oc-grid gutter="small">
         <label>
           <oc-text-input
+            id="accounts-new-account-input-username"
             type="text"
             v-model="username"
             :error-message="usernameError"
@@ -14,6 +15,7 @@
         </label>
         <label>
           <oc-text-input
+            id="accounts-new-account-input-email"
             type="email"
             v-model="email"
             :error-message="emailError"
@@ -25,6 +27,7 @@
         <label>
           <div class="uk-flex uk-flex-middle">
             <oc-text-input
+              id="accounts-new-account-input-password"
               :type="passwordInputType"
               v-model="password"
               :error-message="passwordError"
@@ -40,7 +43,7 @@
         </label>
         <div>
           <oc-button v-text="$gettext('Cancel')" @click="emitCancel" class="uk-margin-xsmall-right" />
-          <oc-button v-text="$gettext('Create')" variation="primary" @click="createAccount" />
+          <oc-button id="accounts-new-account-button-confirm" v-text="$gettext('Create')" variation="primary" @click="createAccount" />
         </div>
       </oc-grid>
     </oc-table-cell>

@@ -43,17 +43,9 @@ module.exports = {
     },
 
     toggleUserStatus: function (usernames, status) {
-      usernames = usernames.split(',')
       const actionSelector = status === 'enabled' ? this.elements.enableAction : this.elements.disableAction
 
-      // Select users
-      for (const username of usernames) {
-        const checkboxSelector =
-          util.format(this.elements.rowByUsername.selector, username) +
-          this.elements.rowCheckbox.selector
-
-        this.useXpath().click(checkboxSelector)
-      }
+      this.selectUsers(usernames)
 
       return this
         .waitForElementVisible('@actionsDropdownTrigger')
@@ -76,6 +68,37 @@ module.exports = {
       }
 
       return this
+    },
+
+    deleteUsers: function (usernames) {
+      this.selectUsers(usernames)
+
+      return this
+        .waitForElementVisible('@actionsDropdownTrigger')
+        .click('@actionsDropdownTrigger')
+        .click('@newAccountButtonConfirm')
+    },
+
+    selectUsers: function (usernames) {
+      usernames = usernames.split(',')
+
+      for (const username of usernames) {
+        const checkboxSelector =
+          util.format(this.elements.rowByUsername.selector, username) +
+          this.elements.rowCheckbox.selector
+
+        this.useXpath().click(checkboxSelector)
+      }
+
+      return this
+    },
+
+    createUser: function (username, email, password) {
+      return this
+        .setValue('@newAccountInputUsername', username)
+        .setValue('@newAccountInputEmail', email)
+        .setValue('@newAccountInputPassword', password)
+        .click('@newAccountButtonConfirm')
     }
   },
 
@@ -129,6 +152,18 @@ module.exports = {
     statusIndicator: {
       selector: '//span[contains(@class, "accounts-status-indicator-%s")]',
       locateStrategy: 'xpath'
+    },
+    newAccountInputUsername: {
+      selector: '#accounts-new-account-input-username'
+    },
+    newAccountInputEmail: {
+      selector: '#accounts-new-account-input-email'
+    },
+    newAccountInputPassword: {
+      selector: '#accounts-new-account-input-password'
+    },
+    newAccountButtonConfirm: {
+      selector: '#accounts-new-account-button-confirm'
     }
   }
 }

@@ -42,3 +42,14 @@ When('the user enables user/users {string} using the WebUI', function (usernames
 Then('the status indicator of user/users {string} should be {string} on the WebUI', function (usernames, status) {
   return client.page.accountsPage().checkUsersStatus(usernames, status)
 })
+
+When(
+  'the user creates a new user with username {string}, email {email} and password {password} using the WebUI',
+  function (username, email, password) {
+    return client.page.accountsPage().createUser(username, email, password)
+  }
+)
+
+When('the user deletes user/users {string} using the WebUI', function (usernames) {
+  return client.page.accounts().deleteUsers(usernames)
+})
