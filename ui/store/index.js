@@ -177,6 +177,7 @@ const actions = {
       body: {
         account: {
           on_premises_sam_account_name: account.username,
+          preferred_name: account.username,
           mail: account.email,
           password_profile: {
             password: account.password
