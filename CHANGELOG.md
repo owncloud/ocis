@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+* Bugfix - Update ocis-glauth for fixed single user search: [#214](https://github.com/owncloud/product/issues/214)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -64,6 +65,17 @@
 
    https://github.com/owncloud/ocis/pull/521
    https://github.com/owncloud/ocis-proxy/pull/99
+
+
+* Bugfix - Update ocis-glauth for fixed single user search: [#214](https://github.com/owncloud/product/issues/214)
+
+   We updated ocis-glauth to a version that comes with a fix for searching a single user or group.
+   ocis-glauth was dropping search context before by ignoring the searchBaseDN for filtering.
+   This has been fixed.
+
+   https://github.com/owncloud/product/issues/214
+   https://github.com/owncloud/ocis/pull/535
+   https://github.com/owncloud/ocis-glauth/pull/32
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
