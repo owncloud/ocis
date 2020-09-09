@@ -9,6 +9,7 @@
             :error-message="usernameError"
             :placeholder="$gettext('Username')"
             @input="checkUsername"
+            @keydown.enter="createAccount"
           />
         </label>
         <label>
@@ -18,6 +19,7 @@
             :error-message="emailError"
             :placeholder="$gettext('Email')"
             @input="checkEmail"
+            @keydown.enter="createAccount"
           />
         </label>
         <label>
@@ -29,6 +31,7 @@
               :placeholder="$gettext('Password')"
               class="uk-margin-xsmall-right"
               @input="checkPassword"
+              @keydown.enter="createAccount"
             />
             <oc-button variation="raw" :aria-label="$gettext('Display password')" @click="togglePasswordVisibility">
               <oc-icon name="remove_red_eye" aria-hidden="true" size="small" />
