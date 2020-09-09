@@ -339,7 +339,7 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           # 'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           # 'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-EOS-storage.txt',
-          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -tt root@95.217.215.207 "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
+          'DELETE_USER_DATA_CMD': 'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@95.217.215.207 "docker exec -it mgm-master eos -r 0 0 rm -r /eos/dockertest/reva/users/%s"',
           'SSH_PASSWORD_HCLOUD': {
             'from_secret': 'ssh_password'
           },
@@ -350,6 +350,8 @@ def coreApiTestsEos(ctx, coreBranch = 'master', coreCommit = '', part_number = 1
           # Install sshpass
           'apt update -y',
           'apt install sshpass -y',
+
+          'sshpass -p "$SSH_PASSWORD_HCLOUD" ssh -o StrictHostKeyChecking=no -tt root@95.217.215.207 "ls -la"',
 
           # Create an eos machine
           'cd /srv/app/testrunner',
