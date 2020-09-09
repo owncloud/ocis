@@ -44,7 +44,7 @@ Then('the status indicator of user/users {string} should be {string} on the WebU
 })
 
 When(
-  'the user creates a new user with username {string}, email {email} and password {password} using the WebUI',
+  'the user creates a new user with username {string}, email {string} and password {string} using the WebUI',
   function (username, email, password) {
     return client.page.accountsPage().createUser(username, email, password)
   }
