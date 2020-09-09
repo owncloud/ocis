@@ -5,13 +5,14 @@ package proto
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/golang/protobuf/jsonpb"
+
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 type webAccountsServiceHandler struct {
@@ -24,7 +25,9 @@ func (h *webAccountsServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 }
 
 func (h *webAccountsServiceHandler) ListAccounts(w http.ResponseWriter, r *http.Request) {
+
 	req := &ListAccountsRequest{}
+
 	resp := &ListAccountsResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -33,7 +36,7 @@ func (h *webAccountsServiceHandler) ListAccounts(w http.ResponseWriter, r *http.
 	}
 
 	if err := h.h.ListAccounts(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -46,7 +49,9 @@ func (h *webAccountsServiceHandler) ListAccounts(w http.ResponseWriter, r *http.
 }
 
 func (h *webAccountsServiceHandler) GetAccount(w http.ResponseWriter, r *http.Request) {
+
 	req := &GetAccountRequest{}
+
 	resp := &Account{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -55,7 +60,7 @@ func (h *webAccountsServiceHandler) GetAccount(w http.ResponseWriter, r *http.Re
 	}
 
 	if err := h.h.GetAccount(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -68,7 +73,9 @@ func (h *webAccountsServiceHandler) GetAccount(w http.ResponseWriter, r *http.Re
 }
 
 func (h *webAccountsServiceHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
+
 	req := &CreateAccountRequest{}
+
 	resp := &Account{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -77,7 +84,7 @@ func (h *webAccountsServiceHandler) CreateAccount(w http.ResponseWriter, r *http
 	}
 
 	if err := h.h.CreateAccount(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -90,7 +97,9 @@ func (h *webAccountsServiceHandler) CreateAccount(w http.ResponseWriter, r *http
 }
 
 func (h *webAccountsServiceHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
+
 	req := &UpdateAccountRequest{}
+
 	resp := &Account{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -99,7 +108,7 @@ func (h *webAccountsServiceHandler) UpdateAccount(w http.ResponseWriter, r *http
 	}
 
 	if err := h.h.UpdateAccount(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -112,7 +121,9 @@ func (h *webAccountsServiceHandler) UpdateAccount(w http.ResponseWriter, r *http
 }
 
 func (h *webAccountsServiceHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
+
 	req := &DeleteAccountRequest{}
+	resp := &empty.Empty{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
@@ -120,8 +131,9 @@ func (h *webAccountsServiceHandler) DeleteAccount(w http.ResponseWriter, r *http
 	}
 
 	if err := h.h.DeleteAccount(
-		context.Background(),
+		r.Context(),
 		req,
+		resp,
 	); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -154,7 +166,9 @@ func (h *webGroupsServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *webGroupsServiceHandler) ListGroups(w http.ResponseWriter, r *http.Request) {
+
 	req := &ListGroupsRequest{}
+
 	resp := &ListGroupsResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -163,7 +177,7 @@ func (h *webGroupsServiceHandler) ListGroups(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := h.h.ListGroups(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -176,7 +190,9 @@ func (h *webGroupsServiceHandler) ListGroups(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *webGroupsServiceHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
+
 	req := &GetGroupRequest{}
+
 	resp := &Group{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -185,7 +201,7 @@ func (h *webGroupsServiceHandler) GetGroup(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := h.h.GetGroup(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -198,7 +214,9 @@ func (h *webGroupsServiceHandler) GetGroup(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *webGroupsServiceHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
+
 	req := &CreateGroupRequest{}
+
 	resp := &Group{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -207,7 +225,7 @@ func (h *webGroupsServiceHandler) CreateGroup(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := h.h.CreateGroup(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -220,7 +238,9 @@ func (h *webGroupsServiceHandler) CreateGroup(w http.ResponseWriter, r *http.Req
 }
 
 func (h *webGroupsServiceHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
+
 	req := &UpdateGroupRequest{}
+
 	resp := &Group{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -229,7 +249,7 @@ func (h *webGroupsServiceHandler) UpdateGroup(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := h.h.UpdateGroup(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -242,7 +262,9 @@ func (h *webGroupsServiceHandler) UpdateGroup(w http.ResponseWriter, r *http.Req
 }
 
 func (h *webGroupsServiceHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+
 	req := &DeleteGroupRequest{}
+	resp := &empty.Empty{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
@@ -250,8 +272,9 @@ func (h *webGroupsServiceHandler) DeleteGroup(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := h.h.DeleteGroup(
-		context.Background(),
+		r.Context(),
 		req,
+		resp,
 	); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -262,7 +285,9 @@ func (h *webGroupsServiceHandler) DeleteGroup(w http.ResponseWriter, r *http.Req
 }
 
 func (h *webGroupsServiceHandler) AddMember(w http.ResponseWriter, r *http.Request) {
+
 	req := &AddMemberRequest{}
+
 	resp := &Group{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -271,7 +296,7 @@ func (h *webGroupsServiceHandler) AddMember(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := h.h.AddMember(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -284,7 +309,9 @@ func (h *webGroupsServiceHandler) AddMember(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *webGroupsServiceHandler) RemoveMember(w http.ResponseWriter, r *http.Request) {
+
 	req := &RemoveMemberRequest{}
+
 	resp := &Group{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -293,7 +320,7 @@ func (h *webGroupsServiceHandler) RemoveMember(w http.ResponseWriter, r *http.Re
 	}
 
 	if err := h.h.RemoveMember(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -301,12 +328,14 @@ func (h *webGroupsServiceHandler) RemoveMember(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
 func (h *webGroupsServiceHandler) ListMembers(w http.ResponseWriter, r *http.Request) {
+
 	req := &ListMembersRequest{}
+
 	resp := &ListMembersResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -315,7 +344,7 @@ func (h *webGroupsServiceHandler) ListMembers(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := h.h.ListMembers(
-		context.Background(),
+		r.Context(),
 		req,
 		resp,
 	); err != nil {
@@ -323,7 +352,7 @@ func (h *webGroupsServiceHandler) ListMembers(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, resp)
 }
 
@@ -339,8 +368,8 @@ func RegisterGroupsServiceWeb(r chi.Router, i GroupsServiceHandler, middlewares 
 	r.MethodFunc("POST", "/api/v0/accounts/groups-update", handler.UpdateGroup)
 	r.MethodFunc("POST", "/api/v0/accounts/groups-delete", handler.DeleteGroup)
 	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/$ref", handler.AddMember)
-	r.MethodFunc("DELETE", "/api/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
-	r.MethodFunc("GET", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
+	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
+	r.MethodFunc("POST", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
 }
 
 // ListAccountsRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
