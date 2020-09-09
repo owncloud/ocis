@@ -4,6 +4,7 @@
       <h1 v-text="$gettext('Accounts')" />
       <oc-button
         v-if="numberOfSelectedAccounts < 1"
+        id="accounts-new-account-trigger"
         key="create-accounts-button"
         v-text="$gettext('Create new user')"
         variation="primary"

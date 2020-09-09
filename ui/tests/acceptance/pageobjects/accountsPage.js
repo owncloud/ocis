@@ -95,6 +95,7 @@ module.exports = {
 
     createUser: function (username, email, password) {
       return this
+        .click('@accountsNewAccountTrigger')
         .setValue('@newAccountInputUsername', username)
         .setValue('@newAccountInputEmail', email)
         .setValue('@newAccountInputPassword', password)
@@ -164,6 +165,9 @@ module.exports = {
     },
     newAccountButtonConfirm: {
       selector: '#accounts-new-account-button-confirm'
+    },
+    accountsNewAccountTrigger: {
+      selector: '#accounts-new-account-trigger'
     }
   }
 }
