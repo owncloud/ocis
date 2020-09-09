@@ -11,6 +11,8 @@ The following sections list the changes in ocis-accounts unreleased.
 * Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - We make use of the roles cache to enforce permission checks: [#100](https://github.com/owncloud/ocis-accounts/pull/100)
 * Change - We make use of the roles manager to enforce permission checks: [#108](https://github.com/owncloud/ocis-accounts/pull/108)
+* Enhancement - Add create account form: [#148](https://github.com/owncloud/product/issues/148)
+* Enhancement - Add delete accounts action: [#148](https://github.com/owncloud/product/issues/148)
 * Enhancement - Add enable/disable capabilities to the WebUI: [#118](https://github.com/owncloud/product/issues/118)
 
 ## Details
@@ -53,6 +55,22 @@ The following sections list the changes in ocis-accounts unreleased.
 
    https://github.com/owncloud/ocis-accounts/pull/108
    https://github.com/owncloud/ocis-pkg/pull/60
+
+
+* Enhancement - Add create account form: [#148](https://github.com/owncloud/product/issues/148)
+
+   We've added a form to create new users above the accounts list.
+
+   https://github.com/owncloud/product/issues/148
+   https://github.com/owncloud/ocis-accounts/pull/115
+
+
+* Enhancement - Add delete accounts action: [#148](https://github.com/owncloud/product/issues/148)
+
+   We've added an action into the actions dropdown to enable admins to delete users.
+
+   https://github.com/owncloud/product/issues/148
+   https://github.com/owncloud/ocis-accounts/pull/115
 
 
 * Enhancement - Add enable/disable capabilities to the WebUI: [#118](https://github.com/owncloud/product/issues/118)
