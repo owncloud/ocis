@@ -146,7 +146,7 @@
         ]
       }
     },
-    "/api/v0/groups/groups-create": {
+    "/api/v0/accounts/groups-create": {
       "post": {
         "summary": "Creates an account",
         "operationId": "CreateGroup",
@@ -173,7 +173,7 @@
         ]
       }
     },
-    "/api/v0/groups/groups-delete": {
+    "/api/v0/accounts/groups-delete": {
       "post": {
         "summary": "Deletes an account",
         "operationId": "DeleteGroup",
@@ -200,7 +200,7 @@
         ]
       }
     },
-    "/api/v0/groups/groups-get": {
+    "/api/v0/accounts/groups-get": {
       "post": {
         "summary": "Gets an account",
         "operationId": "GetGroup",
@@ -227,7 +227,7 @@
         ]
       }
     },
-    "/api/v0/groups/groups-list": {
+    "/api/v0/accounts/groups-list": {
       "post": {
         "summary": "Lists accounts",
         "operationId": "ListGroups",
@@ -254,7 +254,7 @@
         ]
       }
     },
-    "/api/v0/groups/groups-update": {
+    "/api/v0/accounts/groups-update": {
       "post": {
         "summary": "Updates an account",
         "operationId": "UpdateGroup",
@@ -281,7 +281,7 @@
         ]
       }
     },
-    "/v0/groups/{group_id}/members/$ref": {
+    "/api/v0/groups/{group_id}/members/$ref": {
       "post": {
         "summary": "group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0\u0026tabs=http",
         "operationId": "AddMember",
@@ -315,8 +315,8 @@
         ]
       }
     },
-    "/v0/groups/{group_id}/members/{account_id}/$ref": {
-      "delete": {
+    "/api/v0/groups/{group_id}/members/{account_id}/$ref": {
+      "post": {
         "summary": "group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0",
         "operationId": "RemoveMember",
         "responses": {
@@ -341,6 +341,14 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsRemoveMemberRequest"
+            }
           }
         ],
         "tags": [
@@ -348,8 +356,8 @@
         ]
       }
     },
-    "/v0/groups/{id}/members/$ref": {
-      "get": {
+    "/api/v0/groups/{id}/members/$ref": {
+      "post": {
         "summary": "group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0",
         "operationId": "ListMembers",
         "responses": {
@@ -369,36 +377,12 @@
             "type": "string"
           },
           {
-            "name": "page_size",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "page_token",
-            "description": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "field_mask.paths",
-            "description": "The set of field mask paths.",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "query",
-            "description": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned. TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/settingsListMembersRequest"
+            }
           }
         ],
         "tags": [
@@ -819,6 +803,32 @@
         }
       }
     },
+    "settingsListMembersRequest": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_token": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "field_mask": {
+          "$ref": "#/definitions/protobufFieldMask",
+          "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+        },
+        "query": {
+          "type": "string",
+          "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
+          "title": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned"
+        },
+        "id": {
+          "type": "string",
+          "title": "The id of the group to list members from"
+        }
+      }
+    },
     "settingsListMembersResponse": {
       "type": "object",
       "properties": {
@@ -885,6 +895,19 @@
           "type": "boolean",
           "format": "boolean",
           "description": "If *true*, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false."
+        }
+      }
+    },
+    "settingsRemoveMemberRequest": {
+      "type": "object",
+      "properties": {
+        "group_id": {
+          "type": "string",
+          "title": "The id of the group to remove a member from"
+        },
+        "account_id": {
+          "type": "string",
+          "title": "The account id to remove"
         }
       }
     },

@@ -119,7 +119,8 @@ service GroupsService {
     rpc RemoveMember(RemoveMemberRequest) returns (Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            delete: "/api/v0/groups/{group_id=*}/members/{account_id}/$ref"
+            // URLs are broken
+            post: "/api/v0/groups/{group_id=*}/members/{account_id}/$ref"
             body: "*"
         };
     }
@@ -127,7 +128,8 @@ service GroupsService {
     rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            get: "/api/v0/groups/{id=*}/members/$ref"
+            // URLs are broken
+            post: "/api/v0/groups/{id=*}/members/$ref"
             body: "*"
         };
     }

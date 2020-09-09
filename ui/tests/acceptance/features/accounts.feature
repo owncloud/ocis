@@ -59,3 +59,15 @@ Feature: Accounts
 		Then the status indicator of user "einstein,marie" should be "enabled" on the WebUI
 		# And user "einstein" should be able to log in
 		# And user "marie" should be able to log in
+
+	Scenario: create a user
+		Given user "Moss" has logged in using the webUI
+		And the user browses to the accounts page
+		When the user creates a new user with username "bob", email "bob@example.org" and password "bob" using the WebUI
+		Then user "bob" should be displayed in the accounts list on the WebUI
+
+	Scenario: delete a user
+		Given user "Moss" has logged in using the webUI
+		And the user browses to the accounts page
+		When the user deletes user "bob" using the WebUI
+		Then user "bob" should not be displayed in the accounts list on the WebUI

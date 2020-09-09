@@ -294,14 +294,15 @@ func NewGroupsServiceEndpoints() []*api.Endpoint {
 		&api.Endpoint{
 			Name:    "GroupsService.RemoveMember",
 			Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
-			Method:  []string{"DELETE"},
+			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		&api.Endpoint{
 			Name:    "GroupsService.ListMembers",
 			Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
-			Method:  []string{"GET"},
+			Method:  []string{"POST"},
+			Body:    "*",
 			Handler: "rpc",
 		},
 	}
@@ -501,14 +502,15 @@ func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, op
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.RemoveMember",
 		Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
-		Method:  []string{"DELETE"},
+		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.ListMembers",
 		Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
-		Method:  []string{"GET"},
+		Method:  []string{"POST"},
+		Body:    "*",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&GroupsService{h}, opts...))

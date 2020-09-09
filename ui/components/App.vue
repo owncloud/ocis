@@ -2,6 +2,17 @@
   <div>
     <div class="uk-container uk-padding">
       <h1 v-text="$gettext('Accounts')" />
+      <oc-button
+        v-if="numberOfSelectedAccounts < 1 && !isAccountCreationInProgress"
+        id="accounts-new-account-trigger"
+        key="create-accounts-button"
+        v-text="$gettext('Create new user')"
+        variation="primary"
+        :disabled="isAccountCreationInProgress || !isInitialized"
+        :uk-tooltip="disabledCreateAccountBtnTooltip"
+        @click="setAccountCreationProgress(true)"
+      />
+      <accounts-list-new-account-row v-if="isAccountCreationInProgress" @close="setAccountCreationProgress(false)" />
       <oc-grid v-if="numberOfSelectedAccounts > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
         <span v-text="selectionInfoText" />
         <span>|</span>
@@ -42,9 +53,14 @@
 <script>
 import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import AccountsList from './accounts/AccountsList.vue'
+import AccountsListNewAccountRow from './accounts/AccountsListNewAccountRow.vue'
+
 export default {
   name: 'App',
-  components: { AccountsList },
+  components: { AccountsList, AccountsListNewAccountRow },
+  data: () => ({
+    isAccountCreationInProgress: false
+  }),
   computed: {
     ...mapGetters('Accounts', ['isInitialized', 'getAccountsSorted']),
     ...mapState('Accounts', ['selectedAccounts']),
@@ -85,18 +101,41 @@ export default {
         })
       }
 
+      actions.push({
+        id: 'accounts-actions-dropdown-action-delete',
+        label: this.$gettext('Delete'),
+        handler: this.deleteAccounts
+      })
+
       return actions
+    },
+
+    disabledCreateAccountBtnTooltip () {
+      if (!this.isInitialized) {
+        return this.$gettext('Loading users')
+      }
+
+      if (this.isAccountCreationInProgress) {
+        return this.$gettext('User creation is already in progress')
+      }
+
+      return null
     }
   },
   methods: {
-    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus']),
-    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
+    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus', 'deleteAccounts']),
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION']),
+
+    setAccountCreationProgress (isInProgress) {
+      this.isAccountCreationInProgress = isInProgress
+    }
   },
   created () {
     this.initialize()
   },
   beforeDestroy () {
     this.RESET_ACCOUNTS_SELECTION()
+    this.setAccountCreationProgress(false)
   }
 }
 </script>
