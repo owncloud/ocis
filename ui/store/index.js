@@ -1,5 +1,10 @@
 /* eslint-disable camelcase */
-import { AccountsService_ListAccounts, AccountsService_UpdateAccount, AccountsService_CreateAccount } from '../client/accounts'
+import {
+  AccountsService_ListAccounts,
+  AccountsService_UpdateAccount,
+  AccountsService_CreateAccount,
+  AccountsService_DeleteAccount
+} from '../client/accounts'
 import { RoleService_ListRoles } from '../client/settings'
 /* eslint-enable camelcase */
 import { injectAuthToken } from '../helpers/auth'
@@ -60,6 +65,12 @@ const mutations = {
 
   PUSH_NEW_ACCOUNT (state, account) {
     state.accounts.push(account)
+  },
+
+  DELETE_ACCOUNT (state, accountId) {
+    const accountIndex = state.accounts.findIndex(account => account.id === accountId)
+
+    state.accounts.splice(accountIndex, 1)
   }
 }
 
@@ -197,6 +208,45 @@ const actions = {
         status: 'danger'
       }, { root: true })
     }
+  },
+
+  async deleteAccounts ({ rootGetters, state, commit, dispatch }) {
+    const failedAccounts = []
+
+    injectAuthToken(rootGetters.user.token)
+
+    for (const account of state.selectedAccounts) {
+      const response = await AccountsService_DeleteAccount({
+        $domain: rootGetters.configuration.server,
+        body: {
+          id: account.id
+        }
+      })
+
+      if (response.status === 201) {
+        commit('DELETE_ACCOUNT', account.id)
+      } else {
+        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+      }
+    }
+
+    if (failedAccounts.length === 1) {
+      dispatch('showMessage', {
+        title: 'Failed to delete account',
+        desc: failedAccounts[0].statusText,
+        status: 'danger'
+      }, { root: true })
+    }
+
+    if (failedAccounts.length > 1) {
+      dispatch('showMessage', {
+        title: 'Failed to delete accounts',
+        desc: 'Could not delete multiple accounts',
+        status: 'danger'
+      }, { root: true })
+    }
+
+    commit('RESET_ACCOUNTS_SELECTION')
   }
 }
 

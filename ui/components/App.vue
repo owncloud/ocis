@@ -80,7 +80,14 @@ export default {
     },
 
     actions () {
-      const actions = []
+      let actions = []
+      const permanentActions = [
+        {
+          id: 'accounts-actions-dropdown-action-delete',
+          label: this.$gettext('Delete'),
+          handler: this.deleteAccounts
+        }
+      ]
       const numberOfDisabledAccounts = this.selectedAccounts.filter(account => !account.accountEnabled).length
       const isAnyAccountDisabled = numberOfDisabledAccounts > 0
       const isAnyAccountEnabled = numberOfDisabledAccounts < this.numberOfSelectedAccounts
@@ -101,6 +108,8 @@ export default {
         })
       }
 
+      actions = actions.concat(permanentActions)
+
       return actions
     },
 
@@ -117,7 +126,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus']),
+    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus', 'deleteAccounts']),
     ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION']),
 
     setAccountCreationProgress (isInProgress) {
