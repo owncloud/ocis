@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
     'coreCommit': 'eb39d0d5c9597e12877e319a5657911525065dff',
-    'numberOfParts': 2
+    'numberOfParts': 3
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -285,8 +285,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt',
-          'PART_NUMBER': part_number
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -320,6 +319,10 @@ def getEosServers(part_number):
     return "95.217.215.207"
   elif(part_number == 2):
     return "135.181.28.182"
+  elif(part_number == 3):
+    return "168.119.98.74"
+  elif(part_number == 4):
+    return "135.181.40.111"
   else:
     return ""
 
