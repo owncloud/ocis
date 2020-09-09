@@ -15,7 +15,7 @@ import (
 func RevaStorageEOSCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "reva-storage-eos",
-		Usage:    "Start reva eos storage",
+		Usage:    "Start reva storage service for eos mount",
 		Category: "Extensions",
 		Flags:    flagset.StorageEOSWithConfig(cfg.Reva),
 		Action: func(c *cli.Context) error {
