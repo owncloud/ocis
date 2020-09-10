@@ -70,6 +70,14 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				uuid := uuid.Must(uuid.NewV4())
 				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
+				// override driver enable home option with home config
+				if cfg.Reva.Storages.Home.EnableHome {
+					cfg.Reva.Storages.Common.EnableHome = true
+					cfg.Reva.Storages.EOS.EnableHome = true
+					cfg.Reva.Storages.Local.EnableHome = true
+					cfg.Reva.Storages.OwnCloud.EnableHome = true
+					cfg.Reva.Storages.S3.EnableHome = true
+				}
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
 						"max_cpus":             cfg.Reva.Users.MaxCPUs,
@@ -87,71 +95,13 @@ func StorageHome(cfg *config.Config) *cli.Command {
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
-								"driver": cfg.Reva.StorageHome.Driver,
-								"drivers": map[string]interface{}{
-									"eos": map[string]interface{}{
-										"namespace":              cfg.Reva.Storages.EOS.Namespace,
-										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
-										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
-										"eos_binary":             cfg.Reva.Storages.EOS.EosBinary,
-										"xrdcopy_binary":         cfg.Reva.Storages.EOS.XrdcopyBinary,
-										"master_url":             cfg.Reva.Storages.EOS.MasterURL,
-										"slave_url":              cfg.Reva.Storages.EOS.SlaveURL,
-										"cache_directory":        cfg.Reva.Storages.EOS.CacheDirectory,
-										"enable_logging":         cfg.Reva.Storages.EOS.EnableLogging,
-										"show_hidden_sys_files":  cfg.Reva.Storages.EOS.ShowHiddenSysFiles,
-										"force_single_user_mode": cfg.Reva.Storages.EOS.ForceSingleUserMode,
-										"use_keytab":             cfg.Reva.Storages.EOS.UseKeytab,
-										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
-										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
-										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"gatewaysvc":             cfg.Reva.Storages.EOS.GatewaySVC,
-									},
-									"eoshome": map[string]interface{}{
-										"namespace":              cfg.Reva.Storages.EOS.Namespace,
-										"shadow_namespace":       cfg.Reva.Storages.EOS.ShadowNamespace,
-										"share_folder":           cfg.Reva.Storages.EOS.ShareFolder,
-										"eos_binary":             cfg.Reva.Storages.EOS.EosBinary,
-										"xrdcopy_binary":         cfg.Reva.Storages.EOS.XrdcopyBinary,
-										"master_url":             cfg.Reva.Storages.EOS.MasterURL,
-										"slave_url":              cfg.Reva.Storages.EOS.SlaveURL,
-										"cache_directory":        cfg.Reva.Storages.EOS.CacheDirectory,
-										"enable_logging":         cfg.Reva.Storages.EOS.EnableLogging,
-										"show_hidden_sys_files":  cfg.Reva.Storages.EOS.ShowHiddenSysFiles,
-										"force_single_user_mode": cfg.Reva.Storages.EOS.ForceSingleUserMode,
-										"use_keytab":             cfg.Reva.Storages.EOS.UseKeytab,
-										"sec_protocol":           cfg.Reva.Storages.EOS.SecProtocol,
-										"keytab":                 cfg.Reva.Storages.EOS.Keytab,
-										"single_username":        cfg.Reva.Storages.EOS.SingleUsername,
-										"user_layout":            cfg.Reva.Storages.EOS.Layout,
-										"gatewaysvc":             cfg.Reva.Storages.EOS.GatewaySVC,
-									},
-									"local": map[string]interface{}{
-										"root": cfg.Reva.Storages.Local.Root,
-									},
-									"owncloud": map[string]interface{}{
-										"datadirectory":   cfg.Reva.Storages.OwnCloud.Datadirectory,
-										"scan":            cfg.Reva.Storages.OwnCloud.Scan,
-										"redis":           cfg.Reva.Storages.OwnCloud.Redis,
-										"enable_home":     true,
-										"user_layout":     cfg.Reva.Storages.OwnCloud.Layout,
-										"userprovidersvc": cfg.Reva.Users.URL,
-									},
-									"s3": map[string]interface{}{
-										"region":     cfg.Reva.Storages.S3.Region,
-										"access_key": cfg.Reva.Storages.S3.AccessKey,
-										"secret_key": cfg.Reva.Storages.S3.SecretKey,
-										"endpoint":   cfg.Reva.Storages.S3.Endpoint,
-										"bucket":     cfg.Reva.Storages.S3.Bucket,
-										"prefix":     cfg.Reva.Storages.S3.Prefix,
-									},
-								},
+								"driver":             cfg.Reva.StorageHome.Driver,
+								"drivers":            drivers(cfg),
 								"mount_path":         cfg.Reva.StorageHome.MountPath,
 								"mount_id":           cfg.Reva.StorageHome.MountID,
 								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
 								// TODO use cfg.Reva.StorageHomeData.URL, ?
-								"data_server_url":      cfg.Reva.StorageHome.DataServerURL,
-								"enable_home_creation": cfg.Reva.StorageHome.EnableHomeCreation,
+								"data_server_url": cfg.Reva.StorageHome.DataServerURL,
 							},
 						},
 					},

@@ -68,8 +68,11 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":        cfg.Reva.StoragePublicLink.MaxCPUs,
-						"tracing_enabled": true,
+						"max_cpus":             cfg.Reva.StoragePublicLink.MaxCPUs,
+						"tracing_enabled":      cfg.Tracing.Enabled,
+						"tracing_endpoint":     cfg.Tracing.Endpoint,
+						"tracing_collector":    cfg.Tracing.Collector,
+						"tracing_service_name": "storage-public-link",
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
@@ -83,8 +86,6 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 						"services": map[string]interface{}{
 							"publicstorageprovider": map[string]interface{}{
 								"mount_path":   cfg.Reva.StoragePublicLink.MountPath,
-								"mount_id":     cfg.Reva.StoragePublicLink.MountID,
-								"driver_addr":  cfg.Reva.StoragePublicLink.PublicShareProviderAddr,
 								"gateway_addr": cfg.Reva.Gateway.URL,
 							},
 							"authprovider": map[string]interface{}{

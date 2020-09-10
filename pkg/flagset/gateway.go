@@ -7,42 +7,7 @@ import (
 
 // GatewayWithConfig applies cfg to the root flagset
 func GatewayWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
-
-		&cli.BoolFlag{
-			Name:        "tracing-enabled",
-			Usage:       "Enable sending traces",
-			EnvVars:     []string{"REVA_TRACING_ENABLED"},
-			Destination: &cfg.Tracing.Enabled,
-		},
-		&cli.StringFlag{
-			Name:        "tracing-type",
-			Value:       "jaeger",
-			Usage:       "Tracing backend type",
-			EnvVars:     []string{"REVA_TRACING_TYPE"},
-			Destination: &cfg.Tracing.Type,
-		},
-		&cli.StringFlag{
-			Name:        "tracing-endpoint",
-			Value:       "",
-			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"REVA_TRACING_ENDPOINT"},
-			Destination: &cfg.Tracing.Endpoint,
-		},
-		&cli.StringFlag{
-			Name:        "tracing-collector",
-			Value:       "",
-			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"REVA_TRACING_COLLECTOR"},
-			Destination: &cfg.Tracing.Collector,
-		},
-		&cli.StringFlag{
-			Name:        "tracing-service",
-			Value:       "reva",
-			Usage:       "Service name for tracing",
-			EnvVars:     []string{"REVA_TRACING_SERVICE"},
-			Destination: &cfg.Tracing.Service,
-		},
+	flags := []cli.Flag{
 
 		// debug ports are the odd ports
 		&cli.StringFlag{
@@ -52,35 +17,9 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_GATEWAY_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Gateway.DebugAddr,
 		},
-		&cli.StringFlag{
-			Name:        "debug-token",
-			Value:       "",
-			Usage:       "Token to grant metrics access",
-			EnvVars:     []string{"REVA_DEBUG_TOKEN"},
-			Destination: &cfg.Debug.Token,
-		},
-		&cli.BoolFlag{
-			Name:        "debug-pprof",
-			Usage:       "Enable pprof debugging",
-			EnvVars:     []string{"REVA_DEBUG_PPROF"},
-			Destination: &cfg.Debug.Pprof,
-		},
-		&cli.BoolFlag{
-			Name:        "debug-zpages",
-			Usage:       "Enable zpages debugging",
-			EnvVars:     []string{"REVA_DEBUG_ZPAGES"},
-			Destination: &cfg.Debug.Zpages,
-		},
 
 		// REVA
 
-		&cli.StringFlag{
-			Name:        "jwt-secret",
-			Value:       "Pive-Fumkiu4",
-			Usage:       "Shared jwt secret for reva service communication",
-			EnvVars:     []string{"REVA_JWT_SECRET"},
-			Destination: &cfg.Reva.JWTSecret,
-		},
 		&cli.StringFlag{
 			Name:        "transfer-secret",
 			Value:       "replace-me-with-a-transfer-secret",
@@ -159,14 +98,6 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_GATEWAY_SHARE_FOLDER"},
 			Destination: &cfg.Reva.Gateway.ShareFolder,
 		},
-		// TODO(refs) temporary workaround needed for storing link grants.
-		&cli.StringFlag{
-			Name:        "link_grants_file",
-			Value:       "/var/tmp/reva/link_grants.json",
-			Usage:       "when using a json manager, file to use as json serialized database",
-			EnvVars:     []string{"REVA_GATEWAY_LINK_GRANTS_FILE"},
-			Destination: &cfg.Reva.Gateway.LinkGrants,
-		},
 		&cli.BoolFlag{
 			Name:        "disable-home-creation-on-login",
 			Usage:       "Disable creation of home folder on login",
@@ -179,11 +110,25 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		// storage registry
 
 		&cli.StringFlag{
+			Name:        "storage-registry-driver",
+			Value:       "static",
+			Usage:       "driver of the storage registry",
+			EnvVars:     []string{"REVA_STORAGE_REGISTRY_DRIVER"},
+			Destination: &cfg.Reva.StorageRegistry.Driver,
+		},
+		&cli.StringSliceFlag{
+			Name:    "storage-registry-rule",
+			Value:   cli.NewStringSlice(),
+			Usage:   `Replaces the generated storage registry rules with this set: --storage-registry-rule "/eos=localhost:9158" [--storage-registry-rule "1284d238-aa92-42ce-bdc4-0b0000009162=localhost:9162"]`,
+			EnvVars: []string{"REVA_STORAGE_REGISTRY_RULES"},
+		},
+
+		&cli.StringFlag{
 			Name:        "storage-home-provider",
 			Value:       "/home",
 			Usage:       "mount point of the storage provider for user homes in the global namespace",
 			EnvVars:     []string{"REVA_STORAGE_HOME_PROVIDER"},
-			Destination: &cfg.Reva.Gateway.HomeProvider,
+			Destination: &cfg.Reva.StorageRegistry.HomeProvider,
 		},
 
 		&cli.StringFlag{
@@ -266,11 +211,8 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageHome.MountPath,
 		},
 		&cli.StringFlag{
-			Name: "storage-home-mount-id",
-			// This is tho mount id of the /oc storage
-			// set it to 1284d238-aa92-42ce-bdc4-0b0000009158 for /eos
-			// Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", /os
-			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154", // /home
+			Name:        "storage-home-mount-id",
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154",
 			Usage:       "mount id",
 			EnvVars:     []string{"REVA_STORAGE_HOME_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageHome.MountID,
@@ -319,12 +261,27 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_OC_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageOC.MountID,
 		},
+
 		&cli.StringFlag{
-			Name:        "public-links-url",
-			Value:       "localhost:10054",
+			Name:        "public-link-url",
+			Value:       "localhost:9178",
 			Usage:       "URL to use for the public links service",
 			EnvVars:     []string{"REVA_STORAGE_PUBLIC_LINK_URL"},
 			Destination: &cfg.Reva.StoragePublicLink.URL,
 		},
+		&cli.StringFlag{
+			Name:        "storage-public-link-mount-path",
+			Value:       "/public/",
+			Usage:       "mount path",
+			EnvVars:     []string{"REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH"},
+			Destination: &cfg.Reva.StoragePublicLink.MountPath,
+		},
+		// public-link has no mount id
 	}
+
+	flags = append(flags, TracingWithConfig(cfg)...)
+	flags = append(flags, DebugWithConfig(cfg)...)
+	flags = append(flags, SecretWithConfig(cfg)...)
+
+	return flags
 }
