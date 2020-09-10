@@ -6,6 +6,7 @@
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Update ocis-glauth for fixed single user search: [#214](https://github.com/owncloud/product/issues/214)
+* Bugfix - Fix builtin config for external apps: [#218](https://github.com/owncloud/product/issues/218)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -30,6 +31,7 @@
 * Change - Update ocis-settings to v0.3.0: [#490](https://github.com/owncloud/ocis/pull/490)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Accounts UI improvements: [#222](https://github.com/owncloud/product/issues/222)
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
 * Enhancement - Update extensions: [#180](https://github.com/owncloud/ocis/pull/180)
 * Enhancement - Update extensions 2020-07-01: [#357](https://github.com/owncloud/ocis/pull/357)
@@ -81,6 +83,16 @@
    https://github.com/owncloud/product/issues/214
    https://github.com/owncloud/ocis/pull/535
    https://github.com/owncloud/ocis-glauth/pull/32
+
+
+* Bugfix - Fix builtin config for external apps: [#218](https://github.com/owncloud/product/issues/218)
+
+   We fixed a bug in the builtin config of ocis-phoenix, having hardcoded urls instead of just the
+   path of external apps.
+
+   https://github.com/owncloud/product/issues/218
+   https://github.com/owncloud/ocis-phoenix/pull/83
+   https://github.com/owncloud/ocis/pull/544
 
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
@@ -299,6 +311,18 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+
+* Enhancement - Accounts UI improvements: [#222](https://github.com/owncloud/product/issues/222)
+
+   We aligned the visual appearance of the accounts UI with default ocis-web apps (full width,
+   style of batch actions), added icons to buttons, extracted the buttons from the batch actions
+   dropdown into individual buttons, improved the wording added a confirmation widget for the
+   user deletion and removed the uid and gid columns.
+
+   https://github.com/owncloud/product/issues/222
+   https://github.com/owncloud/ocis-accounts/pull/116
+   https://github.com/owncloud/ocis/pull/549
 
 
 * Enhancement - Add new REVA config variables to docs: [#345](https://github.com/owncloud/ocis/pull/345)
