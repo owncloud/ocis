@@ -287,6 +287,7 @@ def testing(ctx):
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
+          'mkdir -p /srv/app/tmp/ocis/root/',
           'bin/ocis-reva --log-level debug --log-pretty gateway &',
           'bin/ocis-reva --log-level debug --log-pretty users &',
           'bin/ocis-reva --log-level debug --log-pretty auth-basic &',
