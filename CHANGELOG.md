@@ -18,10 +18,14 @@
 * Change - Update ocis-settings to v0.2.0: [#467](https://github.com/owncloud/ocis/pull/467)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update ocis-accounts to v0.4.0: [#479](https://github.com/owncloud/ocis/pull/479)
+* Change - Create accounts in accounts UI: [#148](https://github.com/owncloud/product/issues/148)
+* Change - Delete accounts in accounts UI: [#148](https://github.com/owncloud/product/issues/148)
+* Change - Enable/disable accounts in accounts UI: [#118](https://github.com/owncloud/product/issues/118)
 * Change - Update ocis-ocs to v0.3.0: [#500](https://github.com/owncloud/ocis/pull/500)
 * Change - Update ocis-phoenix to v0.13.0: [#487](https://github.com/owncloud/ocis/pull/487)
 * Change - Update ocis-proxy to v0.7.0: [#476](https://github.com/owncloud/ocis/pull/476)
 * Change - Update ocis-reva to 0.13.0: [#496](https://github.com/owncloud/ocis/pull/496)
+* Change - Update proxy with disabled accounts cache: [#525](https://github.com/owncloud/ocis/pull/525)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Update ocis-settings to v0.3.0: [#490](https://github.com/owncloud/ocis/pull/490)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -191,6 +195,36 @@
    https://github.com/owncloud/ocis/pull/479
 
 
+* Change - Create accounts in accounts UI: [#148](https://github.com/owncloud/product/issues/148)
+
+   We've added a form to create new users above the accounts list in the accounts UI.
+
+   https://github.com/owncloud/product/issues/148
+   https://github.com/owncloud/ocis-accounts/pull/115
+   https://github.com/owncloud/ocis/pull/525
+
+
+* Change - Delete accounts in accounts UI: [#148](https://github.com/owncloud/product/issues/148)
+
+   We've added an action into the actions dropdown of the accounts UI to enable admins to delete
+   users.
+
+   https://github.com/owncloud/product/issues/148
+   https://github.com/owncloud/ocis-accounts/pull/115
+   https://github.com/owncloud/ocis/pull/525
+
+
+* Change - Enable/disable accounts in accounts UI: [#118](https://github.com/owncloud/product/issues/118)
+
+   We added a new feature in the ocis-accounts web extension to enable or disable accounts. This
+   also introduces batch actions, where accounts can be selected and a batch action applied to
+   them. The UI for this is the same as in the files extension of ocis-web.
+
+   https://github.com/owncloud/product/issues/118
+   https://github.com/owncloud/ocis-accounts/pull/109
+   https://github.com/owncloud/ocis/pull/525
+
+
 * Change - Update ocis-ocs to v0.3.0: [#500](https://github.com/owncloud/ocis/pull/500)
 
    This change updates ocis-ocs to version 0.3.0
@@ -217,6 +251,16 @@
    This version delivers ocis-reva v0.13.0
 
    https://github.com/owncloud/ocis/pull/496
+
+
+* Change - Update proxy with disabled accounts cache: [#525](https://github.com/owncloud/ocis/pull/525)
+
+   We removed the accounts cache in ocis-proxy in order to avoid problems with accounts that have
+   been updated in ocis-accounts.
+
+   https://github.com/owncloud/ocis/pull/525
+   https://github.com/owncloud/ocis-proxy/pull/100
+   https://github.com/owncloud/ocis-accounts/pull/114
 
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
