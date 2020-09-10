@@ -23,6 +23,7 @@ services:
       - .:/ocis
       - ../ocis-reva:/ocis-reva
       - ../reva:/reva
+      - ./config:/ocis-config
     environment:
       # ocis log level will be used for all services
       OCIS_LOG_LEVEL: debug
@@ -46,6 +47,9 @@ services:
       REVA_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
       # the eos end xrdcopy binaries use this env var to find the eos mgm
       EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      # uses identifier registration from config directory
+      KONNECTD_IDENTIFIER_REGISTRATION_CONF: /ocis-config/identifier-registration.yaml
+
   
   mgm-master:
     container_name: mgm-master
