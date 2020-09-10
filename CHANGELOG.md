@@ -6,9 +6,30 @@ The following sections list the changes in ocis-reva unreleased.
 
 ## Summary
 
+* Bugfix - Fix default configuration for accessing shares: [#205](https://github.com/owncloud/product/issues/205)
+* Enhancement - Allow configuring arbitrary storage registry rules: [#193](https://github.com/owncloud/product/issues/193)
 * Enhancement - Update reva to v1.2.1-0.20200826162318-c0f54e1f37ea: [#454](https://github.com/owncloud/ocis-reva/pull/454)
 
 ## Details
+
+* Bugfix - Fix default configuration for accessing shares: [#205](https://github.com/owncloud/product/issues/205)
+
+   The storage provider mounted at `/home` should always have EnableHome set to `true`. The other
+   storage providers should have it set to `false`.
+
+   https://github.com/owncloud/product/issues/205
+   https://github.com/owncloud/ocis-reva/pull/461
+
+
+* Enhancement - Allow configuring arbitrary storage registry rules: [#193](https://github.com/owncloud/product/issues/193)
+
+   We added a new config flag `storage-registry-rule` that can be given multiple times for the
+   gateway to specify arbitrary storage registry rules. You can also use a comma separated list of
+   rules in the `REVA_STORAGE_REGISTRY_RULES` environment variable.
+
+   https://github.com/owncloud/product/issues/193
+   https://github.com/owncloud/ocis-reva/pull/461
+
 
 * Enhancement - Update reva to v1.2.1-0.20200826162318-c0f54e1f37ea: [#454](https://github.com/owncloud/ocis-reva/pull/454)
 
