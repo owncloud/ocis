@@ -35,7 +35,8 @@ def testPipelines(ctx):
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'oc'))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   return pipelines
 
@@ -95,21 +96,21 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'oc'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'Core-API-Tests-%s' % (part_number),
+    'name': 'Core-API-Tests-%s-%s' % (storage, part_number),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
     'steps':
       build() +
-      revaServer() +
+      revaServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'oC10ApiTests-%s' % (part_number),
+        'name': 'oC10ApiTests-%s-%s' % (storage, part_number),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
@@ -122,7 +123,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@provisioning_api-app-required&&~@preview-extension-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART':  part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.capitalize())
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -945,7 +946,7 @@ def build():
     }
   ]
 
-def revaServer():
+def revaServer(storage):
   return [
     {
       'name': 'reva-server',
@@ -959,6 +960,10 @@ def revaServer():
         'REVA_LDAP_BIND_PASSWORD': 'admin',
         'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
         'REVA_LDAP_SCHEMA_UID': 'uid',
+        'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
