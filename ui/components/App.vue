@@ -1,49 +1,20 @@
 <template>
   <div>
-    <div class="uk-container uk-padding">
-      <h1 v-text="$gettext('Accounts')" />
-      <oc-button
-        v-if="numberOfSelectedAccounts < 1 && !isAccountCreationInProgress"
-        id="accounts-new-account-trigger"
-        key="create-accounts-button"
-        v-text="$gettext('Create new user')"
-        variation="primary"
-        :disabled="isAccountCreationInProgress || !isInitialized"
-        :uk-tooltip="disabledCreateAccountBtnTooltip"
-        @click="setAccountCreationProgress(true)"
-      />
-      <accounts-list-new-account-row v-if="isAccountCreationInProgress" @close="setAccountCreationProgress(false)" />
-      <oc-grid v-if="numberOfSelectedAccounts > 0" key="selected-accounts-info" gutter="small" class="uk-flex-middle">
-        <span v-text="selectionInfoText" />
-        <span>|</span>
-        <div>
-          <oc-button v-text="$gettext('Clear selection')" variation="raw" @click="RESET_ACCOUNTS_SELECTION" />
-        </div>
-        <div>
-          <oc-action-drop class="accounts-actions-dropdown">
-            <template v-slot:button>
-              <span class="uk-margin-xsmall-right" v-text="$gettext('Actions')" />
-              <oc-icon name="expand_more" />
-            </template>
-            <template v-slot:actions>
-                <oc-button
-                  v-for="(action, index) in actions"
-                  :key="action.label"
-                  :id="action.id"
-                  variation="raw"
-                  role="menuitem"
-                  :class="{ 'uk-margin-small-bottom': index + 1 !== actions.length }"
-                  class="uk-width-1-1 uk-flex-left"
-                  @click="action.handler"
-                >
-                  {{ action.label }}
-                </oc-button>
-            </template>
-          </oc-action-drop>
-        </div>
-      </oc-grid>
+    <div class="uk-flex uk-flex-column">
       <template v-if="isInitialized">
-        <accounts-list :accounts="accounts" />
+        <div class="oc-app-bar">
+          <accounts-batch-actions
+            v-if="isAnyAccountSelected"
+            :number-of-selected-accounts="numberOfSelectedAccounts"
+            :selected-accounts="selectedAccounts"
+          />
+          <accounts-create v-else />
+        </div>
+        <oc-grid class="uk-height-1-1 uk-flex-1 uk-overflow-auto">
+          <div class="uk-width-expand">
+            <accounts-list :accounts="accounts" />
+          </div>
+        </oc-grid>
       </template>
       <oc-loader v-else />
     </div>
@@ -51,91 +22,30 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import AccountsList from './accounts/AccountsList.vue'
-import AccountsListNewAccountRow from './accounts/AccountsListNewAccountRow.vue'
+import AccountsCreate from './accounts/AccountsCreate.vue'
+import AccountsBatchActions from './accounts/AccountsBatchActions.vue'
 
 export default {
   name: 'App',
-  components: { AccountsList, AccountsListNewAccountRow },
-  data: () => ({
-    isAccountCreationInProgress: false
-  }),
+  components: { AccountsBatchActions, AccountsList, AccountsCreate },
   computed: {
-    ...mapGetters('Accounts', ['isInitialized', 'getAccountsSorted']),
+    ...mapGetters('Accounts', ['isInitialized', 'getAccountsSorted', 'isAnyAccountSelected']),
     ...mapState('Accounts', ['selectedAccounts']),
 
     accounts () {
       return this.getAccountsSorted
     },
-
     numberOfSelectedAccounts () {
       return this.selectedAccounts.length
-    },
-
-    selectionInfoText () {
-      const translated = this.$ngettext('%{ amount } selected user', '%{ amount } selected users', this.numberOfSelectedAccounts)
-
-      return this.$gettextInterpolate(translated, { amount: this.numberOfSelectedAccounts })
-    },
-
-    actions () {
-      const actions = []
-      const numberOfDisabledAccounts = this.selectedAccounts.filter(account => !account.accountEnabled).length
-      const isAnyAccountDisabled = numberOfDisabledAccounts > 0
-      const isAnyAccountEnabled = numberOfDisabledAccounts < this.numberOfSelectedAccounts
-
-      if (isAnyAccountDisabled) {
-        actions.push({
-          id: 'accounts-actions-dropdown-action-enable',
-          label: this.$gettext('Enable'),
-          handler: () => this.toggleAccountStatus(true)
-        })
-      }
-
-      if (isAnyAccountEnabled) {
-        actions.push({
-          id: 'accounts-actions-dropdown-action-disable',
-          label: this.$gettext('Disable'),
-          handler: () => this.toggleAccountStatus(false)
-        })
-      }
-
-      actions.push({
-        id: 'accounts-actions-dropdown-action-delete',
-        label: this.$gettext('Delete'),
-        handler: this.deleteAccounts
-      })
-
-      return actions
-    },
-
-    disabledCreateAccountBtnTooltip () {
-      if (!this.isInitialized) {
-        return this.$gettext('Loading users')
-      }
-
-      if (this.isAccountCreationInProgress) {
-        return this.$gettext('User creation is already in progress')
-      }
-
-      return null
     }
   },
   methods: {
-    ...mapActions('Accounts', ['initialize', 'toggleAccountStatus', 'deleteAccounts']),
-    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION']),
-
-    setAccountCreationProgress (isInProgress) {
-      this.isAccountCreationInProgress = isInProgress
-    }
+    ...mapActions('Accounts', ['initialize'])
   },
   created () {
     this.initialize()
-  },
-  beforeDestroy () {
-    this.RESET_ACCOUNTS_SELECTION()
-    this.setAccountCreationProgress(false)
   }
 }
 </script>

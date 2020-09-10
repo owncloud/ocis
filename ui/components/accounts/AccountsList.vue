@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters, mapMutations } from 'vuex'
 import AccountsListRow from './AccountsListRow.vue'
 
 export default {
@@ -51,7 +51,11 @@ export default {
     ...mapGetters('Accounts', ['areAllAccountsSelected'])
   },
   methods: {
-    ...mapActions('Accounts', ['toggleSelectionAll'])
+    ...mapActions('Accounts', ['toggleSelectionAll']),
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
+  },
+  beforeDestroy () {
+    this.RESET_ACCOUNTS_SELECTION()
   }
 }
 </script>

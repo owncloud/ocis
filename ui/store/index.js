@@ -28,7 +28,8 @@ const getters = {
       return a1.onPremisesSamAccountName.localeCompare(a2.onPremisesSamAccountName)
     })
   },
-  areAllAccountsSelected: state => state.accounts.length === state.selectedAccounts.length
+  areAllAccountsSelected: state => state.accounts.length === state.selectedAccounts.length,
+  isAnyAccountSelected: state => state.selectedAccounts.length > 0
 }
 
 const mutations = {
