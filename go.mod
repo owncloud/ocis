@@ -20,4 +20,4 @@ require (
 )
 
 // ocis-sharing branch
-replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20200910112438-dd43734ae8af
+replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20200910140954-a6079f23695f
