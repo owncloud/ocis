@@ -121,19 +121,31 @@ export default {
     },
 
     createAccount () {
+      // note: use bitwise AND because we want all checks to be performed
       if (!(this.checkUsername() & this.checkEmail() & this.checkPassword())) {
         return
       }
 
       this.isRequestInProgress = true
-      this.createNewAccount(this.formData).finally(() => {
-        this.cancelForm()
-      })
+      this.createNewAccount(this.formData)
+        .then((success) => {
+          if (success) {
+            this.cancelForm()
+          }
+        })
+        .finally(() => {
+          this.isRequestInProgress = false
+        })
     },
 
     checkUsername () {
       if (isEmpty(this.formData.username)) {
         debounce(this.formValidation.usernameError = this.$gettext('Username cannot be empty'), 500)
+        return false
+      }
+      // hacky check: we want to allow emails and the username part of emails as username
+      if (!isEmail(this.formData.username) && !isEmail(this.formData.username + '@validate.it')) {
+        debounce(this.formValidation.usernameError = this.$gettext('Invalid username'), 500)
         return false
       }
 

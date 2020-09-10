@@ -138,77 +138,77 @@ const actions = {
         continue
       }
 
-      const response = await AccountsService_UpdateAccount({
-        $domain: rootGetters.configuration.server,
-        body: {
-          account: {
-            id: account.id,
-            accountEnabled: activated
-          },
-          update_mask: {
-            paths: ['AccountEnabled']
+      try {
+        const response = await AccountsService_UpdateAccount({
+          $domain: rootGetters.configuration.server,
+          body: {
+            account: {
+              id: account.id,
+              accountEnabled: activated
+            },
+            update_mask: {
+              paths: ['AccountEnabled']
+            }
           }
+        })
+        if (response.status === 201) {
+          commit('UPDATE_ACCOUNT', { ...account, accountEnabled: activated })
+        } else {
+          failedAccounts.push({ account: account.username })
         }
-      })
-
-      if (response.status === 201) {
-        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: activated })
-      } else {
-        failedAccounts.push({ account: account.displayName, statusText: response.statusText })
+      } catch (error) {
+        failedAccounts.push({ account: account.username })
       }
     }
 
-    if (failedAccounts.length === 1) {
-      const failedMessageTitle = activated ? 'Failed to activate account.' : 'Failed to block account.'
-
+    if (failedAccounts.length > 0) {
+      let errorTitle = ''
+      if (failedAccounts.length === 1) {
+        errorTitle = activated ? 'Failed to activate account.' : 'Failed to block account.'
+      } else {
+        errorTitle = activated ? 'Failed to activate accounts.' : 'Failed to block accounts.'
+      }
       dispatch('showMessage', {
-        title: failedMessageTitle,
-        desc: failedAccounts[0].statusText,
+        title: errorTitle,
         status: 'danger'
       }, { root: true })
-    }
-
-    if (failedAccounts.length > 1) {
-      const failedMessageTitle = activated ? 'Failed to activate accounts.' : 'Failed to block accounts.'
-      const failedMessageDesc = activated ? 'Could not activate multiple accounts.' : 'Could not block multiple accounts.'
-
-      dispatch('showMessage', {
-        title: failedMessageTitle,
-        desc: failedMessageDesc,
-        status: 'danger'
-      }, { root: true })
+      return Promise.resolve(false)
     }
 
     commit('RESET_ACCOUNTS_SELECTION')
+    return Promise.resolve(true)
   },
   async createNewAccount ({ rootGetters, commit, dispatch }, account) {
     injectAuthToken(rootGetters.user.token)
 
-    const response = await AccountsService_CreateAccount({
-      $domain: rootGetters.configuration.server,
-      body: {
-        account: {
-          on_premises_sam_account_name: account.username,
-          preferred_name: account.username,
-          mail: account.email,
-          password_profile: {
-            password: account.password
-          },
-          account_enabled: true,
-          display_name: account.username
+    try {
+      const response = await AccountsService_CreateAccount({
+        $domain: rootGetters.configuration.server,
+        body: {
+          account: {
+            on_premises_sam_account_name: account.username,
+            preferred_name: account.username,
+            mail: account.email,
+            password_profile: {
+              password: account.password
+            },
+            account_enabled: true,
+            display_name: account.username
+          }
         }
+      })
+      if (response.status === 201) {
+        commit('PUSH_NEW_ACCOUNT', response.data)
+        return Promise.resolve(true)
       }
-    })
-
-    if (response.status === 201) {
-      commit('PUSH_NEW_ACCOUNT', response.data)
-    } else {
+    } catch (error) {
       dispatch('showMessage', {
-        title: 'Failed to create account',
-        desc: response.statusText,
+        title: 'Failed to create account.',
         status: 'danger'
       }, { root: true })
+      return Promise.reject(error)
     }
+    return Promise.resolve(false)
   },
 
   async deleteAccounts ({ rootGetters, state, commit, dispatch }) {
@@ -217,37 +217,34 @@ const actions = {
     injectAuthToken(rootGetters.user.token)
 
     for (const account of state.selectedAccounts) {
-      const response = await AccountsService_DeleteAccount({
-        $domain: rootGetters.configuration.server,
-        body: {
-          id: account.id
+      try {
+        const response = await AccountsService_DeleteAccount({
+          $domain: rootGetters.configuration.server,
+          body: {
+            id: account.id
+          }
+        })
+        if (response.status === 201 || response.status === 204) {
+          commit('DELETE_ACCOUNT', account.id)
+        } else {
+          failedAccounts.push({ account: account.username })
         }
-      })
-
-      if (response.status === 201 || response.status === 204) {
-        commit('DELETE_ACCOUNT', account.id)
-      } else {
-        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+      } catch (error) {
+        failedAccounts.push({ account: account.username })
       }
     }
 
-    if (failedAccounts.length === 1) {
+    if (failedAccounts.length > 0) {
+      const errorTitle = failedAccounts.length === 1 ? 'Failed to delete account.' : 'Failed to delete accounts.'
       dispatch('showMessage', {
-        title: 'Failed to delete account',
-        desc: failedAccounts[0].statusText,
+        title: errorTitle,
         status: 'danger'
       }, { root: true })
-    }
-
-    if (failedAccounts.length > 1) {
-      dispatch('showMessage', {
-        title: 'Failed to delete accounts',
-        desc: 'Could not delete multiple accounts',
-        status: 'danger'
-      }, { root: true })
+      return Promise.resolve(false)
     }
 
     commit('RESET_ACCOUNTS_SELECTION')
+    return Promise.resolve(true)
   }
 }
 
