@@ -7,7 +7,16 @@
     </div>
     <oc-grid gutter="small" id="accounts-batch-actions">
       <div v-for="action in actions" :key="action.label">
-        <oc-button :id="action.id" @click="action.handler" :variation="action.variation || 'default'" :icon="action.icon">
+        <oc-alert v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'default'" noClose class="tmp-alert-fixes">
+          <span>{{ action.confirmation.message }}</span>
+          <oc-button size="small" :id="action.confirmation.cancel.id" @click="action.confirmation.cancel.handler" :variation="action.confirmation.cancel.variation || 'default'">
+            {{ action.confirmation.cancel.label }}
+          </oc-button>
+          <oc-button size="small" :id="action.confirmation.confirm.id" @click="action.confirmation.confirm.handler" :variation="action.confirmation.confirm.variation || 'default'">
+            {{ action.confirmation.confirm.label }}
+          </oc-button>
+        </oc-alert>
+        <oc-button v-else :id="action.id" @click="action.handler" :variation="action.variation || 'default'" :icon="action.icon">
           {{ action.label }}
         </oc-button>
       </div>
@@ -28,6 +37,11 @@ export default {
     selectedAccounts: {
       type: Array,
       required: true
+    }
+  },
+  data: () => {
+    return {
+      isConfirmationInProgress: {}
     }
   },
   computed: {
@@ -63,7 +77,27 @@ export default {
         id: 'accounts-actions-dropdown-action-delete',
         label: this.$gettext('Delete'),
         icon: 'delete',
-        handler: this.deleteAccounts
+        handler: () => this.showConfirmationRequest('accounts-actions-dropdown-action-delete'),
+        confirmation: {
+          variation: 'danger',
+          message: this.$ngettext(
+            'Delete the selected account?',
+            'Delete the selected accounts?',
+            this.numberOfSelectedAccounts
+          ),
+          cancel: {
+            id: 'accounts-actions-dropdown-action-delete-cancel',
+            label: this.$gettext('Cancel'),
+            variation: 'secondary',
+            handler: () => this.hideConfirmationRequest('accounts-actions-dropdown-action-delete')
+          },
+          confirm: {
+            id: 'accounts-actions-dropdown-action-delete-confirm',
+            label: this.$gettext('Confirm'),
+            variation: 'danger',
+            handler: this.deleteAccounts
+          }
+        }
       })
 
       return actions
@@ -71,7 +105,27 @@ export default {
   },
   methods: {
     ...mapActions('Accounts', ['setAccountActivated', 'deleteAccounts']),
-    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION']),
+    showConfirmationRequest (actionId) {
+      this.isConfirmationInProgress = { ...this.isConfirmationInProgress, [actionId]: true }
+    },
+    hideConfirmationRequest (actionId) {
+      this.isConfirmationInProgress = { ...this.isConfirmationInProgress, [actionId]: false }
+    }
   }
 }
 </script>
+
+<style scoped>
+.tmp-alert-fixes {
+  padding: 5px 10px 4px !important;
+  border-radius: 3px !important;
+  background-color: #fff !important;
+  border: 1px solid rgb(224, 0, 0) !important;
+  color: rgb(224, 0, 0) !important;
+
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+</style>
