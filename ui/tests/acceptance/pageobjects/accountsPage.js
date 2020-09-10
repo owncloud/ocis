@@ -6,9 +6,9 @@ module.exports = {
   },
 
   commands: {
-    navigateAndWaitTillLoaded: async function () {
+    navigateAndWaitUntilMounted: async function () {
       const url = this.url()
-      return this.navigate(url).waitForElementVisible('@accountsLabel')
+      return this.navigate(url).waitForElementVisible('@accountsApp')
     },
     accountsList: function () {
       return this.waitForElementVisible('@accountsListTable')
@@ -43,18 +43,9 @@ module.exports = {
       return this.useXpath().expect.element(roleSelector).to.be.visible
     },
 
-    toggleUserStatus: function (usernames, status) {
-      const actionSelector = status === 'enabled' ? this.elements.enableAction : this.elements.disableAction
-
+    setUserActivated: function (usernames, activated) {
       this.selectUsers(usernames)
-
-      return this
-        .waitForElementVisible('@actionsDropdownTrigger')
-        .click('@actionsDropdownTrigger')
-        .useCss()
-        .waitForElementVisible(actionSelector)
-        .click(actionSelector)
-        .useXpath()
+      return this.click(activated === true ? this.elements.batchActionEnable : this.elements.batchActionDisable)
     },
 
     checkUsersStatus: function (usernames, status) {
@@ -73,11 +64,9 @@ module.exports = {
 
     deleteUsers: function (usernames) {
       this.selectUsers(usernames)
-
-      return this
-        .waitForElementVisible('@actionsDropdownTrigger')
-        .click('@actionsDropdownTrigger')
-        .click('@deleteAction')
+      return this.click(this.elements.batchActionDelete)
+        .waitForElementVisible(this.elements.batchActionDeleteConfirm)
+        .click(this.elements.batchActionDeleteConfirm)
     },
 
     selectUsers: function (usernames) {
@@ -105,9 +94,8 @@ module.exports = {
   },
 
   elements: {
-    accountsLabel: {
-      selector: "//h1[normalize-space(.)='Accounts']",
-      locateStrategy: 'xpath'
+    accountsApp: {
+      selector: '#accounts-app'
     },
     accountsListTable: {
       selector: "//table[@class='uk-table uk-table-middle uk-table-divider']",
@@ -141,15 +129,20 @@ module.exports = {
       selector: '//input[@class="oc-checkbox"]',
       locateStrategy: 'xpath'
     },
-    actionsDropdownTrigger: {
-      selector: '//div[contains(@class, "accounts-actions-dropdown")]//button[normalize-space()="Actions"]',
-      locateStrategy: 'xpath'
+    batchActionDisable: {
+      selector: '#accounts-batch-action-disable'
     },
-    disableAction: {
-      selector: '#accounts-actions-dropdown-action-disable'
+    batchActionEnable: {
+      selector: '#accounts-batch-action-enable'
     },
-    enableAction: {
-      selector: '#accounts-actions-dropdown-action-enable'
+    batchActionDelete: {
+      selector: '#accounts-batch-action-delete'
+    },
+    batchActionDeleteCancel: {
+      selector: '#accounts-batch-action-delete-cancel'
+    },
+    batchActionDeleteConfirm: {
+      selector: '#accounts-batch-action-delete-confirm'
     },
     statusIndicator: {
       selector: '//span[contains(@class, "accounts-status-indicator-%s")]',
@@ -169,9 +162,6 @@ module.exports = {
     },
     accountsNewAccountTrigger: {
       selector: '#accounts-new-account-trigger'
-    },
-    deleteAction: {
-      selector: '#accounts-actions-dropdown-action-delete'
     }
   }
 }

@@ -16,9 +16,7 @@
           <oc-table-cell type="head" v-text="$gettext('Display name')" />
           <oc-table-cell type="head" v-text="$gettext('Email')" />
           <oc-table-cell type="head" v-text="$gettext('Role')" />
-          <oc-table-cell shrink type="head" class="uk-text-nowrap" v-text="$gettext('Uid number')" />
-          <oc-table-cell shrink type="head" class="uk-text-nowrap" v-text="$gettext('Gid number')" />
-          <oc-table-cell shrink type="head" v-text="$gettext('Enabled')" />
+          <oc-table-cell shrink type="head" v-text="$gettext('Activated')" />
         </oc-table-row>
       </oc-table-group>
       <oc-table-group>
@@ -33,7 +31,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 import AccountsListRow from './AccountsListRow.vue'
 
 export default {
@@ -51,7 +49,11 @@ export default {
     ...mapGetters('Accounts', ['areAllAccountsSelected'])
   },
   methods: {
-    ...mapActions('Accounts', ['toggleSelectionAll'])
+    ...mapActions('Accounts', ['toggleSelectionAll']),
+    ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
+  },
+  beforeDestroy () {
+    this.RESET_ACCOUNTS_SELECTION()
   }
 }
 </script>
