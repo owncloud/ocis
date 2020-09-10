@@ -18,3 +18,6 @@ require (
 	github.com/spf13/viper v1.6.1
 	gopkg.in/ini.v1 v1.51.1 // indirect
 )
+
+// ocis-driver branch
+replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20200908144404-c3dd7a3924c0
