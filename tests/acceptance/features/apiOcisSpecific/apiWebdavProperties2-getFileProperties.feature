@@ -38,7 +38,7 @@ Feature: get file properties
       | old         | /file ?2.txt | webdav\/file%20%3F2\.txt                 |
       | new         | /file ?2.txt | dav\/files\/%username%\/file%20%3F2\.txt |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-265
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-265
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: upload a file to content
     Given using <dav_version> DAV path
@@ -91,7 +91,7 @@ Feature: get file properties
       | old         | /folder ?2.txt  | webdav\/folder%20%3F2\.txt                                                |
       | new         | /folder ?2.txt  | dav\/files\/%username%\/folder%20%3F2\.txt                                     |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-265
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-265
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various folder names
     Given using <dav_version> DAV path

@@ -9,7 +9,7 @@ Feature: download file
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "Welcome this is just an example file for developers." to "/welcome.txt"
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-98
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-98
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Get the content-length response header of a pdf file
     Given using <dav_version> DAV path

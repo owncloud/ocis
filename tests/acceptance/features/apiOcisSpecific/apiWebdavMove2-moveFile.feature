@@ -32,7 +32,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-211
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-211
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: renaming to a file with special characters
     When user "Alice" moves file "/textfile0.txt" to "/<renamed_file>" using the WebDAV API

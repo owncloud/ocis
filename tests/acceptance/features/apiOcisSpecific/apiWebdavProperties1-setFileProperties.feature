@@ -8,7 +8,7 @@ Feature: set file properties
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-276
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-276
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Setting custom DAV property
     Given using <dav_version> DAV path
