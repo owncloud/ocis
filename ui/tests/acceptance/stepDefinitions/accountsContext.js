@@ -38,11 +38,11 @@ Then('the user should not be able to see the accounts list on the WebUI', async 
 })
 
 When('the user disables user/users {string} using the WebUI', function (usernames) {
-  return client.page.accountsPage().toggleUserStatus(usernames, 'disabled')
+  return client.page.accountsPage().setUserActivated(usernames, false)
 })
 
 When('the user enables user/users {string} using the WebUI', function (usernames) {
-  return client.page.accountsPage().toggleUserStatus(usernames, 'enabled')
+  return client.page.accountsPage().setUserActivated(usernames, true)
 })
 
 Then('the status indicator of user/users {string} should be {string} on the WebUI', function (usernames, status) {

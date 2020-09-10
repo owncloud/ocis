@@ -5,28 +5,13 @@
     <div>
       <oc-button v-text="$gettext('Clear selection')" variation="raw" @click="RESET_ACCOUNTS_SELECTION" />
     </div>
-    <div>
-      <oc-action-drop class="accounts-actions-dropdown">
-        <template v-slot:button>
-          <span class="uk-margin-xsmall-right" v-text="$gettext('Actions')" />
-          <oc-icon name="expand_more" />
-        </template>
-        <template v-slot:actions>
-          <oc-button
-            v-for="(action, index) in actions"
-            :key="action.label"
-            :id="action.id"
-            variation="raw"
-            role="menuitem"
-            :class="{ 'uk-margin-small-bottom': index + 1 !== actions.length }"
-            class="uk-width-1-1 uk-flex-left"
-            @click="action.handler"
-          >
-            {{ action.label }}
-          </oc-button>
-        </template>
-      </oc-action-drop>
-    </div>
+    <oc-grid gutter="small" id="accounts-batch-actions">
+      <div v-for="action in actions" :key="action.label">
+        <oc-button :id="action.id" @click="action.handler" :variation="action.variation || 'default'" :icon="action.icon">
+          {{ action.label }}
+        </oc-button>
+      </div>
+    </oc-grid>
   </oc-grid>
 </template>
 
@@ -60,6 +45,7 @@ export default {
         actions.push({
           id: 'accounts-actions-dropdown-action-enable',
           label: this.$gettext('Activate'),
+          icon: 'ready',
           handler: () => this.setAccountActivated(true)
         })
       }
@@ -68,6 +54,7 @@ export default {
         actions.push({
           id: 'accounts-actions-dropdown-action-disable',
           label: this.$gettext('Block'),
+          icon: 'deprecated',
           handler: () => this.setAccountActivated(false)
         })
       }
@@ -75,6 +62,7 @@ export default {
       actions.push({
         id: 'accounts-actions-dropdown-action-delete',
         label: this.$gettext('Delete'),
+        icon: 'delete',
         handler: this.deleteAccounts
       })
 

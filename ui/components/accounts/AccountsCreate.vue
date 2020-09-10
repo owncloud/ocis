@@ -63,10 +63,12 @@
         <oc-button
           id="accounts-new-account-trigger"
           key="create-accounts-button"
-          v-text="$gettext('Create new account')"
+          icon="add"
           variation="primary"
           @click="setFormInProgress(true)"
-        />
+        >
+          <translate>Create new account</translate>
+        </oc-button>
       </div>
     </oc-grid>
   </div>
