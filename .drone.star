@@ -968,7 +968,7 @@ def revaServer(storage):
         'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
         'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-        'REVA_OCIS_STORAGE_ROOT': '/srv/app/tmp/ocis/root',
+        'REVA_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/root',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
