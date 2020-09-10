@@ -129,12 +129,12 @@ const actions = {
     getters.areAllAccountsSelected ? commit('RESET_ACCOUNTS_SELECTION') : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
   },
 
-  async toggleAccountStatus ({ commit, dispatch, state, rootGetters }, status) {
+  async setAccountActivated ({ commit, dispatch, state, rootGetters }, activated) {
     const failedAccounts = []
     injectAuthToken(rootGetters.user.token)
 
     for (const account of state.selectedAccounts) {
-      if (account.accountEnabled === status) {
+      if (account.accountEnabled === activated) {
         continue
       }
 
@@ -143,7 +143,7 @@ const actions = {
         body: {
           account: {
             id: account.id,
-            accountEnabled: status
+            accountEnabled: activated
           },
           update_mask: {
             paths: ['AccountEnabled']
@@ -152,14 +152,14 @@ const actions = {
       })
 
       if (response.status === 201) {
-        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: status })
+        commit('UPDATE_ACCOUNT', { ...account, accountEnabled: activated })
       } else {
-        failedAccounts.push({ account: account.diisplayName, statusText: response.statusText })
+        failedAccounts.push({ account: account.displayName, statusText: response.statusText })
       }
     }
 
     if (failedAccounts.length === 1) {
-      const failedMessageTitle = status ? 'Failed to enable account.' : 'Failed to disable account.'
+      const failedMessageTitle = activated ? 'Failed to activate account.' : 'Failed to block account.'
 
       dispatch('showMessage', {
         title: failedMessageTitle,
@@ -169,8 +169,8 @@ const actions = {
     }
 
     if (failedAccounts.length > 1) {
-      const failedMessageTitle = status ? 'Failed to enable accounts.' : 'Failed to disable accounts.'
-      const failedMessageDesc = status ? 'Could not enable multiple accounts.' : 'Could not disable multiple accounts.'
+      const failedMessageTitle = activated ? 'Failed to activate accounts.' : 'Failed to block accounts.'
+      const failedMessageDesc = activated ? 'Could not activate multiple accounts.' : 'Could not block multiple accounts.'
 
       dispatch('showMessage', {
         title: failedMessageTitle,

@@ -16,7 +16,7 @@
           <oc-table-cell type="head" v-text="$gettext('Display name')" />
           <oc-table-cell type="head" v-text="$gettext('Email')" />
           <oc-table-cell type="head" v-text="$gettext('Role')" />
-          <oc-table-cell shrink type="head" v-text="$gettext('Enabled')" />
+          <oc-table-cell shrink type="head" v-text="$gettext('Activated')" />
         </oc-table-row>
       </oc-table-group>
       <oc-table-group>

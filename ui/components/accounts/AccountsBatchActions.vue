@@ -59,16 +59,16 @@ export default {
       if (isAnyAccountDisabled) {
         actions.push({
           id: 'accounts-actions-dropdown-action-enable',
-          label: this.$gettext('Enable'),
-          handler: () => this.toggleAccountStatus(true)
+          label: this.$gettext('Activate'),
+          handler: () => this.setAccountActivated(true)
         })
       }
 
       if (isAnyAccountEnabled) {
         actions.push({
           id: 'accounts-actions-dropdown-action-disable',
-          label: this.$gettext('Disable'),
-          handler: () => this.toggleAccountStatus(false)
+          label: this.$gettext('Block'),
+          handler: () => this.setAccountActivated(false)
         })
       }
 
@@ -82,7 +82,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('Accounts', ['toggleAccountStatus', 'deleteAccounts']),
+    ...mapActions('Accounts', ['setAccountActivated', 'deleteAccounts']),
     ...mapMutations('Accounts', ['RESET_ACCOUNTS_SELECTION'])
   }
 }

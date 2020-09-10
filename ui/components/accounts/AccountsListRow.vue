@@ -45,7 +45,7 @@
         key="account-icon-enabled"
         name="ready"
         variation="success"
-        :aria-label="$gettext('Account is enabled')"
+        :aria-label="$gettext('Account is activated')"
         class="accounts-status-indicator-enabled"
       />
       <oc-icon
@@ -53,7 +53,7 @@
         name="deprecated"
         key="account-icon-disabled"
         variation="danger"
-        :aria-label="$gettext('Account is disabled')"
+        :aria-label="$gettext('Account is blocked')"
         class="accounts-status-indicator-disabled"
       />
     </oc-table-cell>
