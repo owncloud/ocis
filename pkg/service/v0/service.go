@@ -72,11 +72,11 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 			p.config.Phoenix.Config.ExternalApps = []config.ExternalApp{
 				{
 					ID:   "accounts",
-					Path: singleJoiningSlash(p.config.Phoenix.Config.Server, "accounts.js"),
+					Path: "/accounts.js",
 				},
 				{
 					ID:   "settings",
-					Path: singleJoiningSlash(p.config.Phoenix.Config.Server, "settings.js"),
+					Path: "/settings.js",
 				},
 			}
 		}
@@ -107,18 +107,6 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 			Msg("failed to read custom config")
 	}
 	return
-}
-
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
 }
 
 // Config implements the Service interface.
