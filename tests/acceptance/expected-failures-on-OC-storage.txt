@@ -367,6 +367,12 @@ apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:135
 apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 #
+# These currently pass in owncloud/ocis-reva and should start passing here in ocis soon
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:115
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:116
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:153
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:154
+#
 # https://github.com/owncloud/ocis-reva/issues/260 Sharee retrieves the information about a share -but gets response containing all the shares
 apiShareOperations/accessToShare.feature:48
 apiShareOperations/accessToShare.feature:49
