@@ -39,8 +39,6 @@
         </ul>
       </oc-drop>
     </oc-table-cell>
-    <oc-table-cell v-text="account.uidNumber || '-'" />
-    <oc-table-cell v-text="account.gidNumber || '-'" />
     <oc-table-cell class="uk-text-center">
       <oc-icon
         v-if="account.accountEnabled"
