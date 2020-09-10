@@ -42,6 +42,7 @@ def testPipelines(ctx):
   return pipelines
 
 def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
+  dataRootConfig = "'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/'" if storage == 'owncloud' else "'DELETE_USER_DATA_CMD': 'rm -rf /srv/app/tmp/ocis/root/*'"
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -60,7 +61,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'http://reva-server:9140',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          dataRootConfig,
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
@@ -966,6 +967,7 @@ def revaServer(storage):
         'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
         'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'REVA_OCIS_STORAGE_ROOT': '/srv/app/tmp/ocis/root',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
