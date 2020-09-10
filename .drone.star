@@ -31,17 +31,17 @@ def main(ctx):
 def testPipelines(ctx):
   pipelines = [
     testing(ctx),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'oc'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'oc'))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   return pipelines
 
-def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'oc'):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -97,7 +97,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'oc'):
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'oc'):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
