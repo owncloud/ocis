@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="uk-flex uk-flex-column">
+    <div class="uk-flex uk-flex-column" id="accounts-app">
       <template v-if="isInitialized">
         <div class="oc-app-bar">
           <accounts-batch-actions

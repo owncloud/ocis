@@ -57,7 +57,7 @@ export default {
 
       if (isAnyAccountDisabled) {
         actions.push({
-          id: 'accounts-actions-dropdown-action-enable',
+          id: 'accounts-batch-action-enable',
           label: this.$gettext('Activate'),
           icon: 'ready',
           handler: () => this.setAccountActivated(true)
@@ -66,18 +66,19 @@ export default {
 
       if (isAnyAccountEnabled) {
         actions.push({
-          id: 'accounts-actions-dropdown-action-disable',
+          id: 'accounts-batch-action-disable',
           label: this.$gettext('Block'),
           icon: 'deprecated',
           handler: () => this.setAccountActivated(false)
         })
       }
 
+      const idDeleteAction = 'accounts-batch-action-delete'
       actions.push({
-        id: 'accounts-actions-dropdown-action-delete',
+        id: idDeleteAction,
         label: this.$gettext('Delete'),
         icon: 'delete',
-        handler: () => this.showConfirmationRequest('accounts-actions-dropdown-action-delete'),
+        handler: () => this.showConfirmationRequest(idDeleteAction),
         confirmation: {
           variation: 'danger',
           message: this.$ngettext(
@@ -86,13 +87,13 @@ export default {
             this.numberOfSelectedAccounts
           ),
           cancel: {
-            id: 'accounts-actions-dropdown-action-delete-cancel',
+            id: 'accounts-batch-action-delete-cancel',
             label: this.$gettext('Cancel'),
             variation: 'secondary',
-            handler: () => this.hideConfirmationRequest('accounts-actions-dropdown-action-delete')
+            handler: () => this.hideConfirmationRequest(idDeleteAction)
           },
           confirm: {
-            id: 'accounts-actions-dropdown-action-delete-confirm',
+            id: 'accounts-batch-action-delete-confirm',
             label: this.$gettext('Confirm'),
             variation: 'danger',
             handler: this.deleteAccounts

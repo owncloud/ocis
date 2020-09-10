@@ -6,9 +6,9 @@ module.exports = {
   },
 
   commands: {
-    navigateAndWaitTillLoaded: async function () {
+    navigateAndWaitUntilMounted: async function () {
       const url = this.url()
-      return this.navigate(url).waitForElementVisible('@accountsLabel')
+      return this.navigate(url).waitForElementVisible('@accountsApp')
     },
     accountsList: function () {
       return this.waitForElementVisible('@accountsListTable')
@@ -65,6 +65,8 @@ module.exports = {
     deleteUsers: function (usernames) {
       this.selectUsers(usernames)
       return this.click(this.elements.batchActionDelete)
+        .waitForElementVisible(this.elements.batchActionDeleteConfirm)
+        .click(this.elements.batchActionDeleteConfirm)
     },
 
     selectUsers: function (usernames) {
@@ -92,9 +94,8 @@ module.exports = {
   },
 
   elements: {
-    accountsLabel: {
-      selector: "//h1[normalize-space(.)='Accounts']",
-      locateStrategy: 'xpath'
+    accountsApp: {
+      selector: '#accounts-app'
     },
     accountsListTable: {
       selector: "//table[@class='uk-table uk-table-middle uk-table-divider']",
@@ -136,6 +137,12 @@ module.exports = {
     },
     batchActionDelete: {
       selector: '#accounts-batch-action-delete'
+    },
+    batchActionDeleteCancel: {
+      selector: '#accounts-batch-action-delete-cancel'
+    },
+    batchActionDeleteConfirm: {
+      selector: '#accounts-batch-action-delete-confirm'
     },
     statusIndicator: {
       selector: '//span[contains(@class, "accounts-status-indicator-%s")]',

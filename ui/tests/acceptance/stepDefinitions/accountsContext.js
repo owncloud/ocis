@@ -3,7 +3,7 @@ const { client } = require('nightwatch-api')
 const { Given, When, Then } = require('cucumber')
 
 When('the user browses to the accounts page', function () {
-  return client.page.accountsPage().navigateAndWaitTillLoaded()
+  return client.page.accountsPage().navigateAndWaitUntilMounted()
 })
 
 Then('user {string} should be displayed in the accounts list on the WebUI', async function (username) {
