@@ -1073,10 +1073,6 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
 # Failures that need to be investigated
-apiFavorites/favorites.feature:28
-apiFavorites/favorites.feature:44
-apiFavorites/favorites.feature:59
-apiFavorites/favorites.feature:75
 apiShareManagementBasic/createShare.feature:85
 apiShareManagementBasic/createShare.feature:86
 apiShareManagementBasic/createShare.feature:88
@@ -1128,8 +1124,6 @@ apiSharePublicLink2/copyFromPublicLink.feature:152
 apiSharePublicLink2/copyFromPublicLink.feature:153
 apiSharePublicLink2/multilinkSharing.feature:108
 apiSharePublicLink2/uploadToPublicLinkShare.feature:92
-apiVersions/fileVersions.feature:61
-apiVersions/fileVersions.feature:69
 apiWebdavMove2/moveFile.feature:21
 apiWebdavMove2/moveFile.feature:22
 apiWebdavMove2/moveFile.feature:34
