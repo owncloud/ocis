@@ -107,8 +107,8 @@ github.com/blang/semver v3.1.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnweb
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40 h1:y4B3+GPxKlrigF1ha5FFErxK+sr6sWxQovRMzwMhejo=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
-github.com/butonic/reva v0.0.0-20200910140954-a6079f23695f h1:mh7Gvg9bBF9bCvmyq3qB3UjZeeoDGHlFIq3AQWCDv1E=
-github.com/butonic/reva v0.0.0-20200910140954-a6079f23695f/go.mod h1:2nFeb46NQSd8MliTlPTc+ycYnPwmRFNqB7DXn++TYiY=
+github.com/butonic/reva v0.0.0-20200910205656-164632b889fd h1:0r3nx/JU5/JspWWpLCGGacTHa4n/uTXiSIlc6wvaJqo=
+github.com/butonic/reva v0.0.0-20200910205656-164632b889fd/go.mod h1:2nFeb46NQSd8MliTlPTc+ycYnPwmRFNqB7DXn++TYiY=
 github.com/bwmarrin/discordgo v0.19.0/go.mod h1:O9S4p+ofTFwB02em7jkpkV8M3R0/PUVOwN61zSZ0r4Q=
 github.com/bwmarrin/discordgo v0.20.1/go.mod h1:O9S4p+ofTFwB02em7jkpkV8M3R0/PUVOwN61zSZ0r4Q=
 github.com/bwmarrin/discordgo v0.20.2/go.mod h1:O9S4p+ofTFwB02em7jkpkV8M3R0/PUVOwN61zSZ0r4Q=
