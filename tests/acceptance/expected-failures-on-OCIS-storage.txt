@@ -192,18 +192,8 @@ apiShareManagement/acceptSharesToSharesFolder.feature:30
 apiShareManagement/acceptSharesToSharesFolder.feature:52
 #
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
-apiShareManagementBasic/createShare.feature:169
-apiShareManagementBasic/createShare.feature:170
-apiShareManagementBasic/createShare.feature:194
-apiShareManagementBasic/createShare.feature:195
-apiShareManagementBasic/createShare.feature:417
-apiShareManagementBasic/createShare.feature:418
-#
 # https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
-apiShareManagementBasic/createShare.feature:269
-apiShareManagementBasic/createShare.feature:270
-#
 # https://github.com/owncloud/ocis-reva/issues/356 Fields missing in delete share OCS response
 # https://github.com/owncloud/product/issues/203 file_target in share response
 apiShareToSharesManagementBasic/createShareToSharesFolder.feature:36
