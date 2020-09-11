@@ -496,8 +496,6 @@ apiTrashbin/trashbinFilesFolders.feature:89
 apiTrashbin/trashbinFilesFolders.feature:90
 apiTrashbin/trashbinFilesFolders.feature:104
 apiTrashbin/trashbinFilesFolders.feature:105
-apiTrashbin/trashbinFilesFolders.feature:136
-apiTrashbin/trashbinFilesFolders.feature:137
 apiTrashbin/trashbinFilesFolders.feature:217
 apiTrashbin/trashbinFilesFolders.feature:218
 apiTrashbin/trashbinFilesFolders.feature:235
@@ -1120,6 +1118,10 @@ apiWebdavProperties2/getFileProperties.feature:25
 apiWebdavProperties2/getFileProperties.feature:26
 apiWebdavProperties2/getFileProperties.feature:38
 apiWebdavProperties2/getFileProperties.feature:42
+apiWebdavProperties2/getFileProperties.feature:58
+apiWebdavProperties2/getFileProperties.feature:62
+apiWebdavProperties2/getFileProperties.feature:65
+apiWebdavProperties2/getFileProperties.feature:69
 apiWebdavProperties2/getFileProperties.feature:81
 apiWebdavProperties2/getFileProperties.feature:82
 apiWebdavProperties2/getFileProperties.feature:83
