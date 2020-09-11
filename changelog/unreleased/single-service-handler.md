@@ -1,4 +1,4 @@
-Bugfix: Separate indices in memory
+Bugfix: Cleanup separated indices in memory
 
 The accounts service was creating a bleve index instance in the service handler, thus creating separate in memory indices for the http and grpc servers. We moved the service handler creation out of the server creation so that the service handler, thus also the bleve index, is a shared instance of the servers.
 
