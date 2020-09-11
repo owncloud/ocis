@@ -7,6 +7,7 @@ The following sections list the changes in ocis-accounts unreleased.
 ## Summary
 
 * Bugfix - Initialize roleService client in GRPC server: [#114](https://github.com/owncloud/ocis-accounts/pull/114)
+* Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - We make use of the roles cache to enforce permission checks: [#100](https://github.com/owncloud/ocis-accounts/pull/100)
@@ -24,6 +25,20 @@ The following sections list the changes in ocis-accounts unreleased.
    roleManager instance.
 
    https://github.com/owncloud/ocis-accounts/pull/114
+
+
+* Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
+
+   The accounts service was creating a bleve index instance in the service handler, thus creating
+   separate in memory indices for the http and grpc servers. We moved the service handler creation
+   out of the server creation so that the service handler, thus also the bleve index, is a shared
+   instance of the servers.
+
+   This fixes a bug that accounts created through the web ui were not able to sign in until a service
+   restart.
+
+   https://github.com/owncloud/product/issues/224
+   https://github.com/owncloud/ocis-accounts/pull/117
 
 
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
