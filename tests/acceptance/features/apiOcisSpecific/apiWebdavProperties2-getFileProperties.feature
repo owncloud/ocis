@@ -49,7 +49,7 @@ Feature: get file properties
       | old         | /file ?2.txt  |
       | new         | /file ?2.txt  |
 
-  @issue-ocis-reva-214
+  @issue-ocis-reva-214 @skipOnOcis-OCIS-Storage @issue-ocis-reva-471
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various folder names
     Given using <dav_version> DAV path
@@ -75,7 +75,7 @@ Feature: get file properties
       | new         | /folder #2.txt  | dav\/files\/%username%\/folder%20%232\.txt                                     |
       | new         | /folder &2.txt  | dav\/files\/%username%\/folder%20&2\.txt                                       |
 
-  @issue-ocis-reva-214 @skipOnOcis-EOS-Storage @issue-ocis-reva-265
+  @issue-ocis-reva-214 @skipOnOcis-EOS-Storage @issue-ocis-reva-265 @skipOnOcis-OCIS-Storage @issue-ocis-reva-471
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various folder names
     Given using <dav_version> DAV path
