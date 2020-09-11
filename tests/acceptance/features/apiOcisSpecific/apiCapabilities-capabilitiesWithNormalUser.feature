@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @skipOnOcis-OCIS-Storage
+@api @files_sharing-app-required
 Feature: default capabilities for normal user
 
   Background:

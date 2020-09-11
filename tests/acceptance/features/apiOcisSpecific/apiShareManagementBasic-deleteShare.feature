@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @issue-ocis-reva-243 @skipOnOcis-OCIS-Storage
+@api @files_sharing-app-required @issue-ocis-reva-243
 Feature: sharing
 
   @issue-ocis-reva-356

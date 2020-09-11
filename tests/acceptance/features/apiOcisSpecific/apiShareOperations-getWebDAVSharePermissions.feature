@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @issue-ocis-reva-47 @skipOnOcis-OCIS-Storage
+@api @files_sharing-app-required @issue-ocis-reva-47
 Feature: sharing
 
   Background:

@@ -1,4 +1,4 @@
-@api @skipOnOcis-OCIS-Storage
+@api
 Feature: auth
 
   Background:
