@@ -62,9 +62,6 @@ func New(opts ...Option) (s *Service, err error) {
 	if s.index, err = s.buildIndex(); err != nil {
 		return nil, err
 	}
-	fmt.Print("\n\n\n")
-	fmt.Print(s.index)
-	fmt.Print("\n\n\n")
 
 	// create default accounts
 	accountsDir := filepath.Join(cfg.Server.AccountsDataPath, "accounts")
