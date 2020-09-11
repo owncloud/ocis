@@ -102,7 +102,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'Core-API-Tests-%s-%s' % (storage, part_number),
+    'name': 'Core-API-Tests-%s-storage-%s' % (storage, part_number),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -112,7 +112,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       revaServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'oC10ApiTests-%s-%s' % (storage, part_number),
+        'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
