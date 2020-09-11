@@ -1002,13 +1002,9 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
 # Failures that need to be investigated
 apiFavorites/favorites.feature:28
-apiFavorites/favorites.feature:29
 apiFavorites/favorites.feature:44
-apiFavorites/favorites.feature:45
 apiFavorites/favorites.feature:59
-apiFavorites/favorites.feature:60
 apiFavorites/favorites.feature:75
-apiFavorites/favorites.feature:76
 apiShareManagementBasic/createShare.feature:85
 apiShareManagementBasic/createShare.feature:86
 apiShareManagementBasic/createShare.feature:88
@@ -1101,13 +1097,6 @@ apiWebdavProperties1/createFolder.feature:29
 apiWebdavProperties1/createFolder.feature:30
 apiWebdavProperties1/createFolder.feature:31
 apiWebdavProperties1/createFolder.feature:32
-apiWebdavProperties1/setFileProperties.feature:20
-apiWebdavProperties1/setFileProperties.feature:21
-apiWebdavProperties1/setFileProperties.feature:45
-apiWebdavProperties1/setFileProperties.feature:46
-apiWebdavProperties1/setFileProperties.feature:76
-apiWebdavProperties1/setFileProperties.feature:77
-apiWebdavProperties1/setFileProperties.feature:80
 apiWebdavProperties2/getFileProperties.feature:19
 apiWebdavProperties2/getFileProperties.feature:20
 apiWebdavProperties2/getFileProperties.feature:21
@@ -1118,10 +1107,6 @@ apiWebdavProperties2/getFileProperties.feature:25
 apiWebdavProperties2/getFileProperties.feature:26
 apiWebdavProperties2/getFileProperties.feature:38
 apiWebdavProperties2/getFileProperties.feature:42
-apiWebdavProperties2/getFileProperties.feature:58
-apiWebdavProperties2/getFileProperties.feature:62
-apiWebdavProperties2/getFileProperties.feature:65
-apiWebdavProperties2/getFileProperties.feature:69
 apiWebdavProperties2/getFileProperties.feature:81
 apiWebdavProperties2/getFileProperties.feature:82
 apiWebdavProperties2/getFileProperties.feature:83
@@ -1163,7 +1148,6 @@ apiWebdavUpload1/uploadFile.feature:171
 apiWebdavUpload1/uploadFile.feature:172
 apiWebdavUpload1/uploadFile.feature:184
 apiWebdavUpload1/uploadFile.feature:185
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:74
 apiShareToSharesManagementBasic/createShareToSharesFolder.feature:36
 apiShareToSharesManagementBasic/createShareToSharesFolder.feature:37
 apiShareToSharesManagementBasic/createShareToSharesFolder.feature:66
