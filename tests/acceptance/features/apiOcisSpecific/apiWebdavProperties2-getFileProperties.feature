@@ -8,7 +8,7 @@ Feature: get file properties
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-ocis-reva-214
+  @issue-ocis-reva-214 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various file names
     Given using <dav_version> DAV path
@@ -25,7 +25,7 @@ Feature: get file properties
       | new         | /file #2.txt  | dav\/files\/%username%\/file%20%232\.txt  |
       | new         | /file &2.txt  | dav\/files\/%username%\/file%20&2\.txt    |
 
-  @issue-ocis-reva-214 @issue-ocis-reva-265 @skipOnOcis-EOS-Storage
+  @issue-ocis-reva-214 @issue-ocis-reva-265 @skipOnOcis-EOS-Storage @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various file names
     Given using <dav_version> DAV path

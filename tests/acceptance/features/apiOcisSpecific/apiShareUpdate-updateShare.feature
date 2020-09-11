@@ -5,7 +5,7 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and skeleton files
 
-  @skipOnOcis-EOS-Storage @toFixOnOCIS @issue-ocis-reva-243
+  @skipOnOcis-EOS-Storage @toFixOnOCIS @issue-ocis-reva-243 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Share ownership change after moving a shared file to another share
     Given these users have been created with default attributes and without skeleton files:
