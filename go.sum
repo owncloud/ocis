@@ -676,6 +676,7 @@ github.com/gofrs/uuid v3.3.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRx
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/gogo/protobuf v1.2.0/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/gogo/protobuf v1.2.1/go.mod h1:hp+jE20tsWTFYpLwKvXlhS1hjn+gTNwPg2I6zVXpSg4=
+github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d h1:3PaI8p3seN09VjbTYC/QWlUZdZ1qS1zGjy7LH2Wt07I=
 github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d/go.mod h1:SlYgWuQ5SjCEi6WLHjHCa1yvBfUnHcTbrrZtXPKa29o=
 github.com/gogo/protobuf v1.3.1 h1:DqDEcV5aeaTmdFBePNpYsp3FlcVH/2ISVVM9Qf8PSls=
 github.com/gogo/protobuf v1.3.1/go.mod h1:SlYgWuQ5SjCEi6WLHjHCa1yvBfUnHcTbrrZtXPKa29o=
@@ -1266,6 +1267,8 @@ github.com/owncloud/ocis-accounts v0.4.2-0.20200910185129-565d3babb2ac h1:tmb3gE
 github.com/owncloud/ocis-accounts v0.4.2-0.20200910185129-565d3babb2ac/go.mod h1:wNACZ+jUb1upH9Uy74+rmGW5ZF4Y3/PBRHDuEfxQrYc=
 github.com/owncloud/ocis-accounts v0.4.2-0.20200911145524-bf3fb9eb4be6 h1:4e4u6uT4AVWuyCECFKJ89nVGu7mZWQ3YTGzi4gGfM3k=
 github.com/owncloud/ocis-accounts v0.4.2-0.20200911145524-bf3fb9eb4be6/go.mod h1:wNACZ+jUb1upH9Uy74+rmGW5ZF4Y3/PBRHDuEfxQrYc=
+github.com/owncloud/ocis-accounts v0.4.2-0.20200911161616-e55b8ae2f440 h1:NOt2IoHWGG+gRkNGmEfU/Y8GxWH256hF5KzS21srEto=
+github.com/owncloud/ocis-accounts v0.4.2-0.20200911161616-e55b8ae2f440/go.mod h1:wNACZ+jUb1upH9Uy74+rmGW5ZF4Y3/PBRHDuEfxQrYc=
 github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1 h1:YA7tS4VFSUmjeZBt4Wa+fSoreH1VJYCFlHvoRey3ngM=
 github.com/owncloud/ocis-glauth v0.5.1-0.20200731165959-1081de7c60f1/go.mod h1:lZkoEjBuEi0QZUlBG+XgVvWC4GzbWCTnmZQcIhC2kMg=
 github.com/owncloud/ocis-glauth v0.5.1-0.20200909064150-0735ec933777 h1:WqILokqgQ1M8Iau8o27zr4BV5IWgTzgLlNYGmIkOgJ4=
