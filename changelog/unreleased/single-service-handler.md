@@ -6,4 +6,5 @@ This fixes a bug that accounts created through the web ui were not able to sign 
 
 https://github.com/owncloud/product/issues/224
 https://github.com/owncloud/ocis-accounts/pull/117
+https://github.com/owncloud/ocis-accounts/pull/118
 

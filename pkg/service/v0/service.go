@@ -68,10 +68,16 @@ func New(opts ...Option) (s *Service, err error) {
 	if err = s.createDefaultAccounts(accountsDir); err != nil {
 		return nil, err
 	}
+	if err = s.indexAccounts(accountsDir); err != nil {
+		return nil, err
+	}
 
 	// create default groups
 	groupsDir := filepath.Join(cfg.Server.AccountsDataPath, "groups")
 	if err = s.createDefaultGroups(groupsDir); err != nil {
+		return nil, err
+	}
+	if err = s.indexGroups(groupsDir); err != nil {
 		return nil, err
 	}
 
@@ -293,11 +299,6 @@ func (s Service) createDefaultAccounts(accountsDir string) (err error) {
 					s.log.Error().Err(err).Str("path", path).Interface("account", &accounts[i]).Msg("could not persist default account")
 					return
 				}
-				if err = s.indexAccount(accounts[i].Id); err != nil {
-					accounts[i].PasswordProfile.Password = "***REMOVED***"
-					s.log.Error().Err(err).Str("path", path).Interface("account", &accounts[i]).Msg("could not index default account")
-					return
-				}
 			}
 
 			// set role for admin users and regular users
@@ -374,10 +375,6 @@ func (s Service) createDefaultGroups(groupsDir string) (err error) {
 				path := filepath.Join(groupsDir, groups[i].Id)
 				if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 					s.log.Error().Err(err).Str("path", path).Interface("group", &groups[i]).Msg("could not persist default group")
-					return
-				}
-				if err = s.indexGroup(groups[i].Id); err != nil {
-					s.log.Error().Err(err).Str("path", path).Interface("group", &groups[i]).Msg("could not index default group")
 					return
 				}
 			}
