@@ -8,7 +8,7 @@ Feature: create folder
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-ocis-reva-168 @skipOnOcis-EOS-Storage
+  @issue-ocis-reva-168 @skipOnOcis-EOS-Storage @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: try to create a folder that already exists
     Given using <dav_version> DAV path

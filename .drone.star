@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'master',
     'coreCommit': '65ee49ae5dad3af84aa781b98e805fe463baf9fe',
-    'numberOfParts': 2
+    'numberOfParts': 4
   }
 }
 
@@ -31,39 +31,42 @@ def main(ctx):
 def testPipelines(ctx):
   pipelines = [
     testing(ctx),
-    localApiTestsOcStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'])
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   return pipelines
 
-def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'localApiTestsOcStorage',
+    'name': 'localApiTests-%s-storage' % (storage),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
     'steps':
       build() +
-      revaServer() +
+      revaServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'localApiTestsOcStorage',
+        'name': 'localApiTests-%s-storage' % (storage),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'http://reva-server:9140',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
@@ -95,26 +98,27 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'Core-API-Tests-%s' % (part_number),
+    'name': 'Core-API-Tests-%s-storage-%s' % (storage, part_number),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
     'steps':
       build() +
-      revaServer() +
+      revaServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'oC10ApiTests-%s' % (part_number),
+        'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'http://reva-server:9140',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_EXTERNAL_USER_BACKENDS':'true',
           'REVA_LDAP_HOSTNAME':'ldap',
@@ -122,7 +126,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@provisioning_api-app-required&&~@preview-extension-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART':  part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -945,7 +949,7 @@ def build():
     }
   ]
 
-def revaServer():
+def revaServer(storage):
   return [
     {
       'name': 'reva-server',
@@ -959,7 +963,12 @@ def revaServer():
         'REVA_LDAP_BIND_PASSWORD': 'admin',
         'REVA_LDAP_BASE_DN': 'dc=owncloud,dc=com',
         'REVA_LDAP_SCHEMA_UID': 'uid',
+        'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'REVA_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/root',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://reva-server:9164/data',
@@ -972,6 +981,7 @@ def revaServer():
       'commands': [
         'apk add mailcap',
         'mkdir -p /srv/app/tmp/reva',
+        'mkdir -p /srv/app/tmp/ocis/root/nodes',
         'bin/ocis-reva --log-level debug --log-pretty gateway &',
         'bin/ocis-reva --log-level debug --log-pretty users &',
         'bin/ocis-reva --log-level debug --log-pretty auth-basic &',

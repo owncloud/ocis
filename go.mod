@@ -3,7 +3,7 @@ module github.com/owncloud/ocis-reva
 go 1.13
 
 require (
-	github.com/cs3org/reva v1.2.1-0.20200826162318-c0f54e1f37ea
+	github.com/cs3org/reva v1.2.1-0.20200911111727-51649e37df2d
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/micro/cli/v2 v2.1.1

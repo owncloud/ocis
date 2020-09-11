@@ -5,7 +5,7 @@ Feature: sharing
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and skeleton files
 
-  @skipOnOcis-EOS-Storage @toFixOnOCIS @issue-ocis-reva-243
+  @skipOnOcis-EOS-Storage @toFixOnOCIS @issue-ocis-reva-243 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Share ownership change after moving a shared file to another share
     Given these users have been created with default attributes and without skeleton files:
@@ -43,7 +43,7 @@ Feature: sharing
     And as "Alice" folder "/Alice-folder/folder2" should exist
     And as "Carol" folder "/Carol-folder/folder2" should not exist
 
-  @skipOnOcis-OC-Storage @toFixOnOCIS @issue-ocis-reva-243
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @toFixOnOCIS @issue-ocis-reva-243
   # same as oC10 core Scenario but without displayname_owner because EOS does not report it
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Share ownership change after moving a shared file to another share

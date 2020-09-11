@@ -5,7 +5,7 @@ Feature: create a public link share
   Background:
     Given user "Alice" has been created with default attributes and skeleton files
 
-  @issue-37605
+  @issue-37605 @skipOnOcis-OCIS-Storage
   # after fixing all issues make the oC10 scenario like this one, and delete this scenario
   Scenario: Get the mtime of a file inside a folder shared by public link using new webDAV version (run on OCIS)
     Given user "Alice" has created folder "testFolder"
@@ -17,7 +17,7 @@ Feature: create a public link share
     And as "Alice" the mtime of the file "testFolder/file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
     And the mtime of file "file.txt" in the last shared public link using the WebDAV API should be "Thu, 08 Aug 2019 04:18:13 GMT"
 
-  @issue-37605
+  @issue-37605 @skipOnOcis-OCIS-Storage
   # after fixing all issues make the oC10 scenario like this one, and delete this scenario
   Scenario: overwriting a file changes its mtime (new public webDAV API) (run on OCIS)
     Given user "Alice" has created folder "testFolder"
