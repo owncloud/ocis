@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	mclient "github.com/micro/go-micro/v2/client"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/analysis/analyzer/custom"
@@ -30,10 +32,18 @@ func New(opts ...Option) (s *Service, err error) {
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
-	roleService := options.RoleService
-	roleManager := options.RoleManager
-	// read all user and group records
 
+	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+	// https://github.com/owncloud/ocis-proxy/issues/38
+	roleService := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	roleManager := roles.NewManager(
+		roles.CacheSize(1024),
+		roles.CacheTTL(time.Hour*24*7),
+		roles.Logger(options.Logger),
+		roles.RoleService(roleService),
+	)
+
+	// read all user and group records
 	accountsDir := filepath.Join(cfg.Server.AccountsDataPath, "accounts")
 	{
 		// check if accounts exist
@@ -326,7 +336,7 @@ func New(opts ...Option) (s *Service, err error) {
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
-		RoleManager: roleManager,
+		RoleManager: &roleManager,
 	}
 
 	indexDir := filepath.Join(cfg.Server.AccountsDataPath, "index.bleve")
