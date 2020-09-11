@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: get file properties
   As a user
   I want to be able to get meta-information about files

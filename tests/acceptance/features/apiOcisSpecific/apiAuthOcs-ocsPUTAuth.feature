@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: auth
 
   @issue-ocis-reva-30

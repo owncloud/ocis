@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: LOCK file/folder
 
   Background:

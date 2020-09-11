@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @public_link_share-feature-required @issue-ocis-reva-310
+@api @files_sharing-app-required @public_link_share-feature-required @issue-ocis-reva-310 @skipOnOcis-OCIS-Storage
 Feature: copying from public link share
 
   Background:

@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: MOVE file/folder
 
   Background:

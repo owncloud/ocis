@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: get file info using PROPFIND
 
   Background:

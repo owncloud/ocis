@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required
+@api @files_trashbin-app-required @skipOnOcis-OCIS-Storage
 Feature: files and folders can be deleted from the trashbin
   As a user
   I want to delete files and folders from the trashbin

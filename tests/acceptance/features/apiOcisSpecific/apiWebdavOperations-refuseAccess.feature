@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: refuse access
   As an administrator
   I want to refuse access to unauthenticated and disabled users

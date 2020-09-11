@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcis-OCIS-Storage
 Feature: Other tests related to api
 
   @issue-ocis-reva-100
