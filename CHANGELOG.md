@@ -9,6 +9,7 @@ The following sections list the changes in ocis-reva unreleased.
 * Bugfix - Fix default configuration for accessing shares: [#205](https://github.com/owncloud/product/issues/205)
 * Enhancement - Allow configuring arbitrary storage registry rules: [#193](https://github.com/owncloud/product/issues/193)
 * Enhancement - Update reva to v1.2.1-0.20200826162318-c0f54e1f37ea: [#454](https://github.com/owncloud/ocis-reva/pull/454)
+* Enhancement - Update reva to v1.2.1-0.20200911111727-51649e37df2d: [#466](https://github.com/owncloud/ocis-reva/pull/466)
 
 ## Details
 
@@ -62,6 +63,18 @@ The following sections list the changes in ocis-reva unreleased.
    [(reva/#1094)](https://github.com/cs3org/reva/pull/1094)
 
    https://github.com/owncloud/ocis-reva/pull/454
+
+
+* Enhancement - Update reva to v1.2.1-0.20200911111727-51649e37df2d: [#466](https://github.com/owncloud/ocis-reva/pull/466)
+
+   - Update reva to v1.2.1-0.20200911111727-51649e37df2d - Added new OCIS storage driver ocis
+   [(reva/#1155)](https://github.com/cs3org/reva/pull/1155) - App provider: fallback to
+   env. variable if 'iopsecret' unset
+   [(reva/#1146)](https://github.com/cs3org/reva/pull/1146) - Add switch to database
+   [(reva/#1135)](https://github.com/cs3org/reva/pull/1135) - Add the ocdav HTTP svc to the
+   standalone config [(reva/#1128)](https://github.com/cs3org/reva/pull/1128)
+
+   https://github.com/owncloud/ocis-reva/pull/466
 
 # Changelog for [0.13.0] (2020-08-27)
 
