@@ -43,6 +43,11 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
+			if err != nil {
+				logger.Fatal().Err(err).Msg("could not initialize service handler")
+			}
+
 			{
 				server := http.Server(
 					http.Logger(logger),
@@ -52,6 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Metrics(mtrcs),
 					http.Flags(flagset.RootWithConfig(cfg)),
 					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Handler(handler),
 				)
 
 				gr.Add(server.Run, func(_ error) {
@@ -70,6 +76,7 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Context(ctx),
 					grpc.Config(cfg),
 					grpc.Metrics(mtrcs),
+					grpc.Handler(handler),
 				)
 
 				gr.Add(func() error {

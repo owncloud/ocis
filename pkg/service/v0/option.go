@@ -28,28 +28,28 @@ func newOptions(opts ...Option) Options {
 	return opt
 }
 
-// Logger provides a function to set the logger option.
+// Logger provides a function to set the Logger option.
 func Logger(val log.Logger) Option {
 	return func(o *Options) {
 		o.Logger = val
 	}
 }
 
-// Config provides a function to set the config option.
+// Config provides a function to set the Config option.
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
 	}
 }
 
-// RoleService provides a function to set the role service option.
+// RoleService provides a function to set the RoleService option.
 func RoleService(val settings.RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
 	}
 }
 
-// RoleManager provides a function to set the roles manager option.
+// RoleManager provides a function to set the RoleManager option.
 func RoleManager(val *roles.Manager) Option {
 	return func(o *Options) {
 		o.RoleManager = val
