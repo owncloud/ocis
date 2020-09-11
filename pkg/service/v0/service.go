@@ -33,22 +33,29 @@ func New(opts ...Option) (s *Service, err error) {
 	logger := options.Logger
 	cfg := options.Config
 
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
-	roleService := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
-	roleManager := roles.NewManager(
-		roles.CacheSize(1024),
-		roles.CacheTTL(time.Hour*24*7),
-		roles.Logger(options.Logger),
-		roles.RoleService(roleService),
-	)
+	roleService := options.RoleService
+	if roleService == nil {
+		// https://github.com/owncloud/ocis-proxy/issues/38
+		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		roleService = settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	}
+	roleManager := options.RoleManager
+	if roleManager == nil {
+		m := roles.NewManager(
+			roles.CacheSize(1024),
+			roles.CacheTTL(time.Hour*24*7),
+			roles.Logger(options.Logger),
+			roles.RoleService(roleService),
+		)
+		roleManager = &m
+	}
 
 	s = &Service{
 		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
-		RoleManager: &roleManager,
+		RoleManager: roleManager,
 	}
 
 	// build an index
