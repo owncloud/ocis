@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+* Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
 * Bugfix - Update ocis-glauth for fixed single user search: [#214](https://github.com/owncloud/product/issues/214)
 * Bugfix - Fix builtin config for external apps: [#218](https://github.com/owncloud/product/issues/218)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
@@ -72,6 +73,22 @@
 
    https://github.com/owncloud/ocis/pull/521
    https://github.com/owncloud/ocis-proxy/pull/99
+
+
+* Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
+
+   The accounts service was creating a bleve index instance in the service handler, thus creating
+   separate in memory indices for the http and grpc servers. We moved the service handler creation
+   out of the server creation so that the service handler, thus also the bleve index, is a shared
+   instance of the servers.
+
+   This fixes a bug that accounts created through the web ui were not able to sign in until a service
+   restart.
+
+   https://github.com/owncloud/product/issues/224
+   https://github.com/owncloud/ocis-accounts/pull/117
+   https://github.com/owncloud/ocis-accounts/pull/118
+   https://github.com/owncloud/ocis/pull/555
 
 
 * Bugfix - Update ocis-glauth for fixed single user search: [#214](https://github.com/owncloud/product/issues/214)
