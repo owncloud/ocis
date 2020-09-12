@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'master',
     'coreCommit': 'e9850b40657ff78f32cb5585ec00342fe07a5ff2',
-    'numberOfParts': 2
+    'numberOfParts': 4
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -55,7 +55,8 @@ def getUITestSuites():
 def getCoreApiTestPipelineNames():
   names = []
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    names.append('coreApiTests-%s' % runPart)
+    names.append('Core-API-Tests-owncloud-storage-%s' % runPart)
+    names.append('Core-API-Tests-ocis-storage-%s' % runPart)
   return names
 
 def main(ctx):
@@ -86,11 +87,13 @@ def testPipelines(ctx):
   pipelines = [
     linting(ctx),
     unitTests(ctx),
-    localApiTestsOcStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'])
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
+    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
@@ -204,11 +207,11 @@ def unitTests(ctx):
     },
   }
 
-def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'localApiTestsOcStorage',
+    'name': 'localApiTests-%s-storage' % (storage),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -216,18 +219,19 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
     'steps':
       generate() +
       build() +
-      ocisServer() +
+      ocisServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'localApiTestsOcStorage',
+        'name': 'localApiTests-%s-storage' % (storage),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@skipOnOcis-OC-Storage',
+          'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
@@ -256,11 +260,11 @@ def localApiTestsOcStorage(ctx, coreBranch = 'master', coreCommit = ''):
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'coreApiTests-%s' % (part_number),
+    'name': 'Core-API-Tests-%s-storage-%s' % (storage, part_number),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -268,21 +272,22 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     'steps':
       generate() +
       build() +
-      ocisServer() +
+      ocisServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'oC10ApiTests-%s' % (part_number),
+        'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
         'image': 'owncloudci/php:7.2',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva/',
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-OC-storage.txt'
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -315,7 +320,7 @@ def uiTests(ctx, phoenixBranch, phoenixCommit):
   suiteNames = getUITestSuiteNames()
   return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
 
-def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
+def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud'):
   suites = getUITestSuites()
   paths = ""
   for path in suites[suiteName]:
@@ -332,7 +337,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = ''):
     'steps':
       generate() +
       build() +
-      ocisServer() + [
+      ocisServer(storage) + [
       {
         'name': 'webUITests',
         'image': 'owncloudci/nodejs:11',
@@ -456,7 +461,8 @@ def docker(ctx, arch):
     'depends_on': [
       'linting',
       'unitTests',
-      'localApiTestsOcStorage',
+      'localApiTests-owncloud-storage',
+      'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
     'trigger': {
       'ref': [
@@ -602,7 +608,8 @@ def binary(ctx, name):
     'depends_on': [
       'linting',
       'unitTests',
-      'localApiTestsOcStorage',
+      'localApiTests-owncloud-storage',
+      'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
     'trigger': {
       'ref': [
@@ -988,7 +995,7 @@ def build():
     },
   ]
 
-def ocisServer():
+def ocisServer(storage):
   return [
     {
       'name': 'ocis-server',
@@ -997,8 +1004,12 @@ def ocisServer():
       'detach': True,
       'environment' : {
         'OCIS_LOG_LEVEL': 'debug',
-
+        'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
+        'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'REVA_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/root',
         'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
         'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
         'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
@@ -1017,6 +1028,7 @@ def ocisServer():
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/reva',
+        'mkdir -p /srv/app/tmp/ocis/root/nodes',
         'bin/ocis server'
       ],
       'volumes': [
