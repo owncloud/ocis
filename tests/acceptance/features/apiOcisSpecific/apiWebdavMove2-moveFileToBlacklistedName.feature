@@ -6,7 +6,8 @@ Feature: users cannot move (rename) a file to a blacklisted name
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and skeleton files
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "some welcome data" to "/welcome.txt"
 
   @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core

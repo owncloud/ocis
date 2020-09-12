@@ -3,7 +3,7 @@ Feature: sharing
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and skeleton files
+    And user "Alice" has been created with default attributes and without skeleton files
 
   @skipOnOcis-EOS-Storage @toFixOnOCIS @issue-ocis-reva-243 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core

@@ -2,7 +2,7 @@
 Feature: auth
 
   Background:
-    Given user "Alice" has been created with default attributes and skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-ocis-reva-29
   @issue-ocis-reva-30
@@ -179,7 +179,7 @@ Feature: auth
   @smokeTest
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS as normal user (username does not have a capital letter) with wrong password
-    Given user "brian" has been created with default attributes and skeleton files
+    Given user "brian" has been created with default attributes and without skeleton files
     When user "brian" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
       | /ocs/v1.php/cloud/users |

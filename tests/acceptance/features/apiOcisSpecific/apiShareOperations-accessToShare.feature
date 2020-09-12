@@ -2,10 +2,14 @@
 Feature: sharing
 
   Background:
-    Given these users have been created with default attributes and skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |
+    And user "Alice" has uploaded file with content "ownCloud test text file 0 Alice" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "ownCloud test text file 1 Alice" to "/textfile1.txt"
+    And user "Brian" has uploaded file with content "ownCloud test text file 0 Brian" to "/textfile0.txt"
+    And user "Brian" has uploaded file with content "ownCloud test text file 1 Brian" to "/textfile1.txt"
 
   @issue-ocis-reva-260
   # after fixing all issues delete this Scenario and use the one from oC10 core

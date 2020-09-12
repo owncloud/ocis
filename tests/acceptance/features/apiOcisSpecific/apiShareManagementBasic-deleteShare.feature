@@ -4,7 +4,8 @@ Feature: sharing
   @issue-ocis-reva-356
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: delete a share
-    Given user "Alice" has been created with default attributes and skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Brian" has been created with default attributes and without skeleton files
     And using OCS API version "<ocs_api_version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
