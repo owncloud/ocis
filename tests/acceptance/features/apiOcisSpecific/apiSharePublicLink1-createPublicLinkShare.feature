@@ -3,7 +3,7 @@
 Feature: create a public link share
 
   Background:
-    Given user "Alice" has been created with default attributes and skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-37605 @skipOnOcis-OCIS-Storage
   # after fixing all issues make the oC10 scenario like this one, and delete this scenario

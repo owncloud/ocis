@@ -3,7 +3,8 @@
 Feature: upload to a public link share
 
   Background:
-    Given user "Alice" has been created with default attributes and skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/FOLDER"
 
   @issue-ocis-reva-290
   # after fixing all issues delete this Scenario and use the one from oC10 core
