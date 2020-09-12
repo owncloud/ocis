@@ -40,6 +40,7 @@ Feature: files and folders can be deleted from the trashbin
   @smokeTest
   @issue-ocis-reva-118
   @issue-product-179
+  @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: delete a single file from the trashbin
     Given user "Alice" has deleted file "/textfile0.txt"
