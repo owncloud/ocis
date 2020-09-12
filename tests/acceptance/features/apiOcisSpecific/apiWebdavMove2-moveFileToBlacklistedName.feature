@@ -8,7 +8,7 @@ Feature: users cannot move (rename) a file to a blacklisted name
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and skeleton files
 
-  @issue-ocis-reva-211
+  @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: rename a file to a filename that is banned by default
     Given using <dav_version> DAV path

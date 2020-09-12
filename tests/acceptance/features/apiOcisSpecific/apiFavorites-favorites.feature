@@ -13,7 +13,7 @@ Feature: favorite
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-276
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-276
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Favorite a folder
     Given using <dav_version> DAV path

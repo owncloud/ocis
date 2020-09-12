@@ -6,7 +6,7 @@ Feature: copying from public link share
     And user "Alice" has created folder "/PARENT"
     And the administrator has enabled DAV tech_preview
 
-  @issue-ocis-reva-373 @issue-core-37683
+  @issue-ocis-reva-373 @issue-core-37683 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Copy folder within a public link folder to the same folder name as an already existing file
     Given user "Alice" has created folder "/PARENT/testFolder"
@@ -22,7 +22,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
     And the content of file "/PARENT/copy1.txt" for user "Alice" should be "some data 1"
 
-  @issue-ocis-reva-373 @issue-core-37683
+  @issue-ocis-reva-373 @issue-core-37683 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Copy file within a public link folder to a file with name same as an existing folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
@@ -37,7 +37,7 @@ Feature: copying from public link share
     And as "Alice" file "/PARENT/new-folder" should exist
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
 
-  @issue-ocis-reva-368
+  @issue-ocis-reva-368 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Copy file within a public link folder to a file with unusual destination names
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
@@ -53,7 +53,7 @@ Feature: copying from public link share
       | testfile.txt          |
       |                       |
 
-  @issue-ocis-reva-368
+  @issue-ocis-reva-368 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: Copy folder within a public link folder to a folder with unusual destination names
     Given user "Alice" has created folder "/PARENT/testFolder"
