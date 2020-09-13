@@ -28,6 +28,7 @@
 * Change - Update ocis-proxy to v0.7.0: [#476](https://github.com/owncloud/ocis/pull/476)
 * Change - Update ocis-reva to 0.13.0: [#496](https://github.com/owncloud/ocis/pull/496)
 * Change - Update proxy with disabled accounts cache: [#525](https://github.com/owncloud/ocis/pull/525)
+* Change - Update ocis-reva to v0.14.0: [#556](https://github.com/owncloud/ocis/pull/556)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Update ocis-settings to v0.3.0: [#490](https://github.com/owncloud/ocis/pull/490)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -291,6 +292,18 @@
    https://github.com/owncloud/ocis/pull/525
    https://github.com/owncloud/ocis-proxy/pull/100
    https://github.com/owncloud/ocis-accounts/pull/114
+
+
+* Change - Update ocis-reva to v0.14.0: [#556](https://github.com/owncloud/ocis/pull/556)
+
+   - Update ocis-reva to v0.14.0 - Fix default configuration for accessing shares
+   (ocis-reva/#461) - Allow configuring arbitrary storage registry rules (ocis-reva/#461) -
+   Update reva to v1.2.1-0.20200911111727-51649e37df2d (reva/#454, reva/#466)
+
+   https://github.com/owncloud/ocis/pull/556
+   https://github.com/owncloud/ocis-reva/pull/461
+   https://github.com/owncloud/ocis-reva/pull/454
+   https://github.com/owncloud/ocis-reva/pull/466
 
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
