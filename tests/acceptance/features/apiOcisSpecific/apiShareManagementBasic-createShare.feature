@@ -5,7 +5,7 @@ Feature: sharing
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-301 @issue-ocis-reva-302
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-301 @issue-ocis-reva-302
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Creating a share of a file with a user and asking for various permission combinations
     Given using OCS API version "<ocs_api_version>"
@@ -56,7 +56,7 @@ Feature: sharing
       | 1               | 200                | 500                |
       | 2               | 200                | 500                |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-301 @issue-ocis-reva-302
+  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-301 @issue-ocis-reva-302
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Creating a share of a folder with a user, the default permissions are all permissions(31)
     Given using OCS API version "<ocs_api_version>"
@@ -83,7 +83,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-ocis-reva-372 @issue-ocis-reva-243
+  @issue-ocis-reva-372 @issue-ocis-reva-243 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: sharing subfolder of already shared folder, GET result is correct
     Given using OCS API version "<ocs_api_version>"

@@ -2,7 +2,7 @@
 Feature: auth
 
   Background:
-    Given user "Alice" has been created with default attributes and skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-ocis-ocs-26 @issue-ocis-reva-30
   # after fixing all issues delete this Scenario and use the one from oC10 core

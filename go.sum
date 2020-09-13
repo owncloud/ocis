@@ -166,6 +166,7 @@ github.com/aws/aws-sdk-go v1.33.19 h1:SMna0QLInNqm+nNL9tb7OVWTqSfNYSxrCa2adnyVth
 github.com/aws/aws-sdk-go v1.33.19/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.34.2 h1:9vCknCdTAmmV4ht7lPuda7aJXzllXwEQyCMZKJHjBrM=
 github.com/aws/aws-sdk-go v1.34.2/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.34.12/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-xray-sdk-go v0.9.4/go.mod h1:XtMKdBQfpVut+tJEwI7+dJFRxxRdxHDyVNp2tHXRq04=
 github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f/go.mod h1:AuiFmCCPBSrqvVMvuqFuk0qogytodnVFVSN5CeJB8Gc=
 github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
@@ -323,6 +324,7 @@ github.com/cs3org/reva v1.1.1-0.20200819100654-dcbf0c8ea187 h1:ZyDXH+zy5KPOH5AM5
 github.com/cs3org/reva v1.1.1-0.20200819100654-dcbf0c8ea187/go.mod h1:gkGtoun9QABW8k7jzAWWxB9jO64DJ1lreSzTucci/ok=
 github.com/cs3org/reva v1.2.1-0.20200826162318-c0f54e1f37ea h1:xVyJvR+GoaBrRJV6GnDflgm9bzkmjchCBBg0nMiHu6M=
 github.com/cs3org/reva v1.2.1-0.20200826162318-c0f54e1f37ea/go.mod h1:FvYB+UPpuPCw0hH42qHVR1R2atZyy69METZI/zEaST8=
+github.com/cs3org/reva v1.2.1-0.20200911111727-51649e37df2d/go.mod h1:Q1/JB40ZKtlhZUxz+ZqB/O/VlrnQX//NYdPPRPsP0UE=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 h1:iwZdTE0PVqJCos1vaoKsclOGD3ADKpshg3SRtYBbwso=
@@ -1342,6 +1344,8 @@ github.com/owncloud/ocis-reva v0.13.0 h1:np4Xk/hBWSOIsahimP6tnwiEl1YKj8okJ7M5IAa
 github.com/owncloud/ocis-reva v0.13.0/go.mod h1:cTcLFOO/tg4/GyYygi/VVXFjZAQWE3YxlyfhZ/vcAj4=
 github.com/owncloud/ocis-reva v0.13.1-0.20200910085648-26465bbdcf46 h1:V+LuunhiVuQZX40jlkBVoqlHxU/aUgbS8jJXxWy9ges=
 github.com/owncloud/ocis-reva v0.13.1-0.20200910085648-26465bbdcf46/go.mod h1:cTcLFOO/tg4/GyYygi/VVXFjZAQWE3YxlyfhZ/vcAj4=
+github.com/owncloud/ocis-reva v0.14.0 h1:JSLd6RWYzDAVyhNFzNbgL2/6G3iAh6N6e2rd/7xF4YE=
+github.com/owncloud/ocis-reva v0.14.0/go.mod h1:ZYs0NaqS/KlQgb92JJsqy3AJXbFqe4ejZO9k0hb7rDY=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363 h1:wk/7aAUITTrM192TFoIDq4fqzJQtFOQ0dDdSRkJ25SU=
 github.com/owncloud/ocis-settings v0.0.0-20200522101320-46ea31026363/go.mod h1:/h0ceztOoFc3KAnm8nqZI4zwsaaZK9q4MTgtintwsXc=
 github.com/owncloud/ocis-settings v0.0.0-20200629120229-69693c5f8f43 h1:IekDKhkoaOhUnpIHSG5d02hGMOW5u4tZEEfxVC1KGgk=

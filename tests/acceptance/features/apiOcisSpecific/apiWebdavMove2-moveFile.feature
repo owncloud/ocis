@@ -6,9 +6,10 @@ Feature: move (rename) file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and skeleton files
+    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "some welcome data" to "/welcome.txt"
 
-  @issue-ocis-reva-211
+  @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: rename a file into an invalid filename
     Given using <dav_version> DAV path
@@ -20,7 +21,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-  @issue-ocis-reva-211
+  @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Renaming a file to a path with extension .part is possible
     Given using <dav_version> DAV path
@@ -32,7 +33,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-211
+  @skipOnOcis-OC-Storage @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: renaming to a file with special characters
     When user "Alice" moves file "/textfile0.txt" to "/<renamed_file>" using the WebDAV API
