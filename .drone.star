@@ -2,7 +2,8 @@ config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
     'coreCommit': 'c731fc3ba0858811aef6d3b56002f67b6f9f42f8',
-    'numberOfParts': 10
+    'numberOfParts': 4,
+    'numberOfPartsEos': 10,
   },
   'uiTests': {
     'phoenixBranch': 'master',
@@ -95,8 +96,10 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts']))
+  for runPart in range(1, config['apiTests']['numberOfPartsEos'] + 1):
+    pipelines.append(coreApiTestsEosStorage(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfPartsEos']))
+
+  pipelines.append(eosCleanup(ctx, config['apiTests']['numberOfPartsEos']))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
@@ -399,6 +402,66 @@ def coreApiTestsEosStorage(ctx, coreBranch = 'master', coreCommit = '', part_num
         'temp': {},
       },
     ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def eosCleanup(ctx, parts):
+  depends_on = []
+  steps = []
+  for parts_number in range(1, parts + 1):
+    depends_on.append('coreApiTests-Eos-Storage-%s' % (parts_number))
+    steps.append('hcloud server delete droneci-eos-test-%s-%s' % (ctx.build.commit, parts_number))
+    steps.append('hcloud ssh-key delete droneci-eos-test-%s-%s' % (ctx.build.commit, parts_number))
+
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'eos-cleanup',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'eos-cleanup',
+        'image': 'owncloudci/php:7.2',
+        'pull': 'always',
+        'environment' : {
+          'HCLOUD_TOKEN': {
+            'from_secret': 'hcloud_token',
+          },
+          'DRONE_HCLOUD_USER': 'dipak',
+        },
+        'commands': [
+          # Install Go
+          'wget -q https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz',
+          'mkdir -p /usr/local/bin',
+          'tar xf go1.14.2.linux-amd64.tar.gz -C /usr/local',
+          'ln -s /usr/local/go/bin/* /usr/local/bin',
+
+          # Install Hcloud Cli
+          'go get -u github.com/hetznercloud/cli/cmd/hcloud',
+          'ln -s /root/go/bin/* /usr/local/bin',
+        ] + steps,
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        }]
+      },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'depends_on': depends_on,
     'trigger': {
       'ref': [
         'refs/heads/master',
