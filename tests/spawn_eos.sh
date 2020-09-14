@@ -33,4 +33,4 @@ ssh -tt root@$IPADDR "cd /ocis/config && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/
 ssh -tt root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} docker-compose up -d"
 
 # Some necessary configuration for eos
-ssh -tt root@$IPADDR "cd /ocis && bash /ocis/tests/config/drone/setup-eos.sh"
+ssh -tt root@$IPADDR "cd /ocis && OCIS_DOMAIN=${IPADDR} bash /ocis/tests/config/drone/setup-eos.sh"

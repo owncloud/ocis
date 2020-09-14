@@ -1,8 +1,8 @@
 config = {
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': 'e9850b40657ff78f32cb5585ec00342fe07a5ff2',
-    'numberOfParts': 4
+    'coreBranch': 'uid-gid-user-create',
+    'coreCommit': 'c731fc3ba0858811aef6d3b56002f67b6f9f42f8',
+    'numberOfParts': 1
   },
   'uiTests': {
     'phoenixBranch': 'master',
