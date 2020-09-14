@@ -2,7 +2,7 @@ config = {
   'apiTests': {
     'coreBranch': 'uid-gid-user-create',
     'coreCommit': 'c731fc3ba0858811aef6d3b56002f67b6f9f42f8',
-    'numberOfParts': 1
+    'numberOfParts': 10
   },
   'uiTests': {
     'phoenixBranch': 'master',
