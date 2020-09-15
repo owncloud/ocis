@@ -153,10 +153,19 @@ type GetUsersResponse struct {
 	} `json:"ocs" xml:"ocs"`
 }
 
-type DeleteUserRespone struct {
+type EmptyResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta" xml:"meta"`
 		Data struct {
+		} `json:"data" xml:"data"`
+	} `json:"ocs" xml:"ocs"`
+}
+
+type GetUsersGroupsResponse struct {
+	Ocs struct {
+		Meta Meta `json:"meta" xml:"meta"`
+		Data struct {
+			Groups []string `json:"groups" xml:"groups>element"`
 		} `json:"data" xml:"data"`
 	} `json:"ocs" xml:"ocs"`
 }
@@ -844,7 +853,7 @@ func TestDeleteUser(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var response DeleteUserRespone
+			var response EmptyResponse
 			if format == "json" {
 				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
 					t.Fatal(err)
@@ -909,7 +918,7 @@ func TestDeleteUserInvalidId(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				var response DeleteUserRespone
+				var response EmptyResponse
 				if format == "json" {
 					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
 						t.Fatal(err)
@@ -1129,7 +1138,6 @@ func TestUpdateUser(t *testing.T) {
 
 // This is a bug demonstration test for endpoint '/cloud/user'
 // Link to the issue: https://github.com/owncloud/ocis-ocs/issues/52
-
 func TestGetSingleUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1159,7 +1167,7 @@ func TestGetSingleUser(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var response GetUsersResponse
+			var response EmptyResponse
 
 			if format == "json" {
 				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
@@ -1179,10 +1187,12 @@ func TestGetSingleUser(t *testing.T) {
 				StatusCode: 400,
 				Message:    "missing user in context",
 			}, response.Ocs.Meta)
+			assert.Empty(t, response.Ocs.Data)
 			cleanUp(t)
 		}
 	}
 }
+
 // This is a bug demonstration test for endpoint '/cloud/user'
 // Link to the issue: https://github.com/owncloud/ocis-ocs/issues/53
 
@@ -1215,7 +1225,7 @@ func TestGetUserSigningKey(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var response GetUsersResponse
+			var response EmptyResponse
 
 			if format == "json" {
 				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
@@ -1235,6 +1245,427 @@ func TestGetUserSigningKey(t *testing.T) {
 				StatusCode: 400,
 				Message:    "missing user in context",
 			}, response.Ocs.Meta)
+			assert.Empty(t, response.Ocs.Data)
+			cleanUp(t)
+		}
+	}
+}
+
+func AddUserToGroup(userid, groupid string) error {
+	res, err := sendRequest(
+		"POST",
+		fmt.Sprintf("/v2.php/cloud/users/%s/groups", userid),
+		fmt.Sprintf("groupid=%v", groupid),
+		"admin:admin",
+	)
+	if err != nil {
+		return err
+	}
+	if res.Code != 200 {
+		return fmt.Errorf("Failed while adding the user to group")
+	}
+	return nil
+}
+
+func TestListUsersGroupNewUsers(t *testing.T) {
+	users := []User{
+		{
+			Enabled:     "true",
+			Username:    "rutherford",
+			ID:          "rutherford",
+			Email:       "rutherford@example.com",
+			Displayname: "Ernest RutherFord",
+		},
+		{
+			Enabled:     "true",
+			Username:    "thomson",
+			ID:          "thomson",
+			Email:       "thomson@example.com",
+			Displayname: "J. J. Thomson",
+		},
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			for _, user := range users {
+				err := createUser(user)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				res, err := sendRequest(
+					"GET",
+					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
+					"",
+					"admin:admin",
+				)
+
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var response GetUsersGroupsResponse
+				if format == "json" {
+					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				assertStatusCode(t, 200, res, ocsVersion)
+				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+				assert.Empty(t, response.Ocs.Data.Groups)
+
+				cleanUp(t)
+			}
+		}
+	}
+}
+
+func TestListUsersGroupDefaultUsers(t *testing.T) {
+	DefaultGroups := map[string][]string{
+		"4c510ada-c86b-4815-8820-42cdf82c3d51": {
+			"509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+			"6040aa17-9c64-4fef-9bd0-77234d71bad0",
+			"dd58e5ec-842e-498b-8800-61f2ec6f911f",
+			"262982c1-2362-4afa-bfdf-8cbfef64a06e",
+		},
+		"820ba2a1-3f54-4538-80a4-2d73007e30bf": {
+			"34f38767-c937-4eb6-b847-1c175829a2a0",
+		},
+		"932b4540-8d16-481e-8ef4-588e4b6b151c": {
+			"509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+			"a1726108-01f8-4c30-88df-2b1a9d1cba1a",
+			"167cbee2-0518-455a-bfb2-031fe0621e5d",
+			"262982c1-2362-4afa-bfdf-8cbfef64a06e",
+		},
+		"bc596f3c-c955-4328-80a0-60d018b4ad57": {
+			"34f38767-c937-4eb6-b847-1c175829a2a0",
+		},
+		"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c": {
+			"509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+			"7b87fd49-286e-4a5f-bafd-c535d5dd997a",
+			"cedc21aa-4072-4614-8676-fa9165f598ff",
+			"262982c1-2362-4afa-bfdf-8cbfef64a06e",
+		},
+		"058bff95-6708-4fe5-91e4-9ea3d377588b": {
+			"509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+		},
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			for _, user := range DefaultUsers {
+				res, err := sendRequest(
+					"GET",
+					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
+					"",
+					"admin:admin",
+				)
+
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var response GetUsersGroupsResponse
+				if format == "json" {
+					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				assertStatusCode(t, 200, res, ocsVersion)
+				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+
+				assert.Equal(t, DefaultGroups[user], response.Ocs.Data.Groups)
+			}
+		}
+	}
+	cleanUp(t)
+}
+
+func TestGetGroupForUserInvalidUserId(t *testing.T) {
+
+	invalidUsers := []string{
+		"1",
+		"invalid",
+		"3434234233",
+		"1am41validUs3r",
+		"_-@@--$$__",
+	}
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			for _, user := range invalidUsers {
+				res, err := sendRequest(
+					"GET",
+					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
+					"",
+					"admin:admin",
+				)
+
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var response EmptyResponse
+				if format == "json" {
+					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				assertStatusCode(t, 404, res, ocsVersion)
+				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+				assertResponseMeta(t, Meta{
+					Status:     "error",
+					StatusCode: 998,
+					Message:    "The requested user could not be found",
+				}, response.Ocs.Meta)
+
+				assert.Empty(t, response.Ocs.Data)
+			}
+		}
+	}
+}
+
+func TestAddUsersToGroupsNewUsers(t *testing.T) {
+	users := []User{
+		{
+			Enabled:     "true",
+			Username:    "rutherford",
+			ID:          "rutherford",
+			Email:       "rutherford@example.com",
+			Displayname: "Ernest RutherFord",
+		},
+		{
+			Enabled:     "true",
+			Username:    "thomson",
+			ID:          "thomson",
+			Email:       "thomson@example.com",
+			Displayname: "J. J. Thomson",
+		},
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			for _, user := range users {
+				err := createUser(user)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				// group id for Physics lover
+				groupid := "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+
+				res, err := sendRequest(
+					"POST",
+					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
+					"groupid="+groupid,
+					"admin:admin",
+				)
+
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var response EmptyResponse
+				if format == "json" {
+					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				assertStatusCode(t, 200, res, ocsVersion)
+				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+				assert.Empty(t, response.Ocs.Data)
+
+				// Check the user is in the group
+				res, err = sendRequest(
+					"GET",
+					fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
+					"",
+					"admin:admin",
+				)
+				if err != nil {
+					t.Fatal(err)
+				}
+				var grpResponse GetUsersGroupsResponse
+				if err := json.Unmarshal(res.Body.Bytes(), &grpResponse); err != nil {
+					t.Fatal(err)
+				}
+				assert.Contains(t, grpResponse.Ocs.Data.Groups, groupid)
+
+				cleanUp(t)
+			}
+		}
+	}
+}
+
+// Issue: https://github.com/owncloud/ocis-ocs/issues/55 Incorrect message when adding user to non existing group
+func TestAddUsersToGroupInvalidGroup(t *testing.T) {
+	user := User{
+		Enabled:     "true",
+		Username:    "rutherford",
+		ID:          "rutherford",
+		Email:       "rutherford@example.com",
+		Displayname: "Ernest RutherFord",
+	}
+	err := createUser(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	invalidGroups := []string{
+		"1",
+		"invalid",
+		"3434234233",
+		"1am41validUs3r",
+		"_-@@--$$__",
+		"c7fbe8c4-139b-4376-b307-cf0a8c2d0d9c",
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			for _, groupid := range invalidGroups {
+				res, err := sendRequest(
+					"POST",
+					fmt.Sprintf("/%s/cloud/users/rutherford/groups%s", ocsVersion, formatpart),
+					"groupid="+groupid,
+					"admin:admin",
+				)
+
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var response EmptyResponse
+				if format == "json" {
+					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+						t.Fatal(err)
+					}
+				}
+
+				assertStatusCode(t, 404, res, ocsVersion)
+				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be fail but was successful")
+				assertResponseMeta(t, Meta{
+					"error",
+					998,
+					"The requested user could not be found",
+				}, response.Ocs.Meta)
+				assert.Empty(t, response.Ocs.Data)
+			}
+		}
+	}
+	cleanUp(t)
+}
+
+// Issue: https://github.com/owncloud/ocis-ocs/issues/57 - cannot remove user from group
+func TestRemoveUserFromGroup(t *testing.T) {
+	user := User{
+		Enabled:     "true",
+		Username:    "rutherford",
+		ID:          "rutherford",
+		Email:       "rutherford@example.com",
+		Displayname: "Ernest RutherFord",
+	}
+
+	groups := []string{
+		"7b87fd49-286e-4a5f-bafd-c535d5dd997a", // radium-lovers
+		"cedc21aa-4072-4614-8676-fa9165f598ff", // polonium-lovers
+		"262982c1-2362-4afa-bfdf-8cbfef64a06e", // physics-lovers
+	}
+
+	var err error
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+
+			err = createUser(user)
+			if err != nil {
+				t.Fatalf("Failed while creating new user: %v", err)
+			}
+			for _, group := range groups {
+				err := AddUserToGroup(user.ID, group)
+				if err != nil {
+					t.Fatalf("Failed while creating new user: %v", err)
+				}
+			}
+
+			// Remove user from one group
+			res, err := sendRequest(
+				"DELETE",
+				fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
+				"groupid="+groups[0],
+				"admin:admin",
+			)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var response EmptyResponse
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			assertStatusCode(t, 500, res, ocsVersion)
+			assertResponseMeta(t, Meta{
+				"error",
+				996,
+				"{\"id\":\".\",\"code\":500,\"detail\":\"could not clean up group id: invalid id .\",\"status\":\"Internal Server Error\"}",
+			}, response.Ocs.Meta)
+			assert.Empty(t, response.Ocs.Data)
+
+			// Check the users are correctly added to group
+			res, err = sendRequest(
+				"GET",
+				fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
+				"",
+				"admin:admin",
+			)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var grpResponse GetUsersGroupsResponse
+			if err := json.Unmarshal(res.Body.Bytes(), &grpResponse); err != nil {
+				t.Fatal(err)
+			}
+
+			// Change this line once the issue is fixed
+			// assert.NotContains(t, grpResponse.Ocs.Data.Groups, groups[0])
+			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[0])
+			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[1])
+			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[2])
 			cleanUp(t)
 		}
 	}
