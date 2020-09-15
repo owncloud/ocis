@@ -1127,6 +1127,119 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
+// This is a bug demonstration test for endpoint '/cloud/user'
+// Link to the issue: https://github.com/owncloud/ocis-ocs/issues/52
+
+func TestGetSingleUser(t *testing.T) {
+	user := User{
+		Enabled:     "true",
+		Username:    "rutherford",
+		ID:          "rutherford",
+		Email:       "rutherford@example.com",
+		Displayname: "Ernest RutherFord",
+		Password:    "password",
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			err := createUser(user)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			formatpart := getFormatString(format)
+			res, err := sendRequest(
+				"GET",
+				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
+				"",
+				fmt.Sprintf("%v:%v", user.Username, user.Password),
+			)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var response GetUsersResponse
+
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					log.Println(err)
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			assertStatusCode(t, 400, res, ocsVersion)
+			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
+			assertResponseMeta(t, Meta{
+				Status:     "error",
+				StatusCode: 400,
+				Message:    "missing user in context",
+			}, response.Ocs.Meta)
+			cleanUp(t)
+		}
+	}
+}
+// This is a bug demonstration test for endpoint '/cloud/user'
+// Link to the issue: https://github.com/owncloud/ocis-ocs/issues/53
+
+func TestGetUserSigningKey(t *testing.T) {
+	user := User{
+		Enabled:     "true",
+		Username:    "rutherford",
+		ID:          "rutherford",
+		Email:       "rutherford@example.com",
+		Displayname: "Ernest RutherFord",
+		Password:    "password",
+	}
+
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			err := createUser(user)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			formatpart := getFormatString(format)
+			res, err := sendRequest(
+				"GET",
+				fmt.Sprintf("/%v/cloud/user/signing-key%v", ocsVersion, formatpart),
+				"",
+				fmt.Sprintf("%v:%v", user.Username, user.Password),
+			)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var response GetUsersResponse
+
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					log.Println(err)
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			assertStatusCode(t, 400, res, ocsVersion)
+			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
+			assertResponseMeta(t, Meta{
+				Status:     "error",
+				StatusCode: 400,
+				Message:    "missing user in context",
+			}, response.Ocs.Meta)
+			cleanUp(t)
+		}
+	}
+}
+
 type mockClient struct{}
 
 func (c mockClient) Init(option ...client.Option) error {
