@@ -7,6 +7,7 @@ The following sections list the changes in ocis-phoenix unreleased.
 ## Summary
 
 * Bugfix - Fix external app URLs: [#218](https://github.com/owncloud/product/issues/218)
+* Change - Remove pdf-viewer from default apps: [#85](https://github.com/owncloud/ocis-phoenix/pull/85)
 
 ## Details
 
@@ -17,6 +18,13 @@ The following sections list the changes in ocis-phoenix unreleased.
 
    https://github.com/owncloud/product/issues/218
    https://github.com/owncloud/ocis-phoenix/pull/83
+
+* Change - Remove pdf-viewer from default apps: [#85](https://github.com/owncloud/ocis-phoenix/pull/85)
+
+   OCIS-web doesn't have a dedicated pdf-viewer app anymore but instead uses the default browser
+   behaviour for PDFs. We removed pdf-viewer from the set of default apps.
+
+   https://github.com/owncloud/ocis-phoenix/pull/85
 
 # Changelog for [0.13.0] (2020-08-25)
 
