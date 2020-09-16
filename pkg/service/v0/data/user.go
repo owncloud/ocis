@@ -8,14 +8,15 @@ type Users struct {
 // User holds the payload for a GetUser response
 type User struct {
 	// TODO needs better naming, clarify if we need a userid, a username or both
-	Enabled     string `json:"enabled" xml:"enabled"`
-	UserID      string `json:"id" xml:"id"`
-	Username    string `json:"username" xml:"username"`
-	DisplayName string `json:"displayname" xml:"displayname"`
-	Email       string `json:"email" xml:"email"`
-	Quota       *Quota `json:"quota" xml:"quota"`
-	UIDNumber   int64  `json:"uidnumber" xml:"uidnumber"`
-	GIDNumber   int64  `json:"gidnumber" xml:"gidnumber"`
+	Enabled           string `json:"enabled" xml:"enabled"`
+	UserID            string `json:"id" xml:"id"`
+	Username          string `json:"username" xml:"username"`
+	DisplayName       string `json:"display-name" xml:"display-name"`
+	LegacyDisplayName string `json:"displayname" xml:"displayname"`
+	Email             string `json:"email" xml:"email"`
+	Quota             *Quota `json:"quota" xml:"quota"`
+	UIDNumber         int64  `json:"uidnumber" xml:"uidnumber"`
+	GIDNumber         int64  `json:"gidnumber" xml:"gidnumber"`
 }
 
 // Quota holds quota information

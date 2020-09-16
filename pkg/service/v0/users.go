@@ -63,14 +63,16 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	} else {
 		enabled = "false"
 	}
+
 	render.Render(w, r, response.DataRender(&data.User{
-		UserID:      account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
-		Username:    account.PreferredName,
-		DisplayName: account.DisplayName,
-		Email:       account.Mail,
-		UIDNumber:   account.UidNumber,
-		GIDNumber:   account.GidNumber,
-		Enabled:     enabled,
+		UserID:            account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
+		Username:          account.PreferredName,
+		DisplayName:       account.DisplayName,
+		LegacyDisplayName: account.DisplayName,
+		Email:             account.Mail,
+		UIDNumber:         account.UidNumber,
+		GIDNumber:         account.GidNumber,
+		Enabled:           enabled,
 		// FIXME onlyfor users/{userid} endpoint (not /user)
 		// TODO query storage registry for free space? of home storage, maybe...
 		Quota: &data.Quota{
@@ -175,13 +177,14 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		enabled = "false"
 	}
 	render.Render(w, r, response.DataRender(&data.User{
-		UserID:      account.Id,
-		Username:    account.PreferredName,
-		DisplayName: account.DisplayName,
-		Email:       account.Mail,
-		UIDNumber:   account.UidNumber,
-		GIDNumber:   account.UidNumber,
-		Enabled:     enabled,
+		UserID:            account.Id,
+		Username:          account.PreferredName,
+		DisplayName:       account.DisplayName,
+		LegacyDisplayName: account.DisplayName,
+		Email:             account.Mail,
+		UIDNumber:         account.UidNumber,
+		GIDNumber:         account.UidNumber,
+		Enabled:           enabled,
 	}))
 }
 
