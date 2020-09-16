@@ -208,7 +208,7 @@ func cleanUp(t *testing.T) {
 			continue
 		}
 		_, err := deleteAccount(t, id)
-		checkError(t, err)
+		checkNoError(t, err)
 	}
 
 	datastore = filepath.Join(dataPath, "groups")
@@ -219,7 +219,7 @@ func cleanUp(t *testing.T) {
 			continue
 		}
 		_, err := deleteGroup(t, id)
-		checkError(t, err)
+		checkNoError(t, err)
 	}
 
 	newCreatedAccounts = []string{}
@@ -308,7 +308,7 @@ func assertGroupHasMember(t *testing.T, grp *proto.Group, memberId string) {
 	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberId, grp.DisplayName)
 }
 
-func checkError(t *testing.T, err error) {
+func checkNoError(t *testing.T, err error) {
 	if err != nil {
 		t.Fatalf("Expected Error to be nil but got %s", err)
 	}
@@ -367,7 +367,7 @@ func listGroups(t *testing.T) *proto.ListGroupsResponse {
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	response, err := cl.ListGroups(context.Background(), request)
-	checkError(t, err)
+	checkNoError(t, err)
 	return response
 }
 
@@ -393,14 +393,14 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 func TestCreateAccount(t *testing.T) {
 
 	resp, err := createAccount(t, "user1")
-	checkError(t, err)
+	checkNoError(t, err)
 	assertUserExists(t, getAccount("user1"))
 	assert.IsType(t, &proto.Account{}, resp)
 	// Account is not returned in response
 	// assertAccountsSame(t, getAccount("user1"), resp)
 
 	resp, err = createAccount(t, "user2")
-	checkError(t, err)
+	checkNoError(t, err)
 	assertUserExists(t, getAccount("user2"))
 	assert.IsType(t, &proto.Account{}, resp)
 	// Account is not returned in response
@@ -409,14 +409,13 @@ func TestCreateAccount(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateExistingUser(t *testing.T) {
 	createAccount(t, "user1")
-	_, err := createAccount(t, "user1")
+	res, err := createAccount(t, "user1")
 
-	// Should give error but it does not
-	checkError(t, err)
-	assertUserExists(t, getAccount("user1"))
+	assert.Empty(t, res)
+	assert.Error(t, err)
+	assert.Equal(t, merrors.BadRequest(".", "account already exists"), err)
 
 	cleanUp(t)
 }
@@ -426,7 +425,7 @@ func TestCreateExistingUser(t *testing.T) {
 func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	resp, err := listAccounts(t)
-	checkError(t, err)
+	checkNoError(t, err)
 	numAccounts := len(resp.GetAccounts())
 
 	testData := []string{
@@ -447,7 +446,7 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	// resp should have the same number of accounts
 	resp, err = listAccounts(t)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.Equal(t, numAccounts, len(resp.GetAccounts()))
 
@@ -528,7 +527,7 @@ func TestUpdateAccount(t *testing.T) {
 			tt.userAccount.IsResourceAccount = false
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
 
-			checkError(t, err)
+			checkNoError(t, err)
 
 			assert.IsType(t, &proto.Account{}, resp)
 			assertAccountsSame(t, tt.userAccount, resp)
@@ -608,7 +607,7 @@ func TestListAccounts(t *testing.T) {
 	createAccount(t, "user2")
 
 	resp, err := listAccounts(t)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.IsType(t, &proto.ListAccountsResponse{}, resp)
 	assert.Equal(t, 8, len(resp.Accounts))
@@ -622,7 +621,7 @@ func TestListAccounts(t *testing.T) {
 func TestListWithoutUserCreation(t *testing.T) {
 	resp, err := listAccounts(t)
 
-	checkError(t, err)
+	checkNoError(t, err)
 
 	// Only 5 default users
 	assert.Equal(t, 6, len(resp.Accounts))
@@ -639,7 +638,7 @@ func TestGetAccount(t *testing.T) {
 
 	resp, err := cl.GetAccount(context.Background(), req)
 
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.IsType(t, &proto.Account{}, resp)
 	assertAccountsSame(t, getAccount("user1"), resp)
 
@@ -656,7 +655,7 @@ func TestDeleteAccount(t *testing.T) {
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.DeleteAccount(context.Background(), req)
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.IsType(t, resp, &empty.Empty{})
 
 	// Check the account doesn't exists anymore
@@ -674,7 +673,7 @@ func TestListGroups(t *testing.T) {
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.ListGroups(context.Background(), req)
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.IsType(t, &proto.ListGroupsResponse{}, resp)
 	assert.Equal(t, len(resp.Groups), 9)
 
@@ -717,7 +716,7 @@ func TestGetGroups(t *testing.T) {
 		req := &proto.GetGroupRequest{Id: group.Id}
 		resp, err := cl.GetGroup(context.Background(), req)
 
-		checkError(t, err)
+		checkNoError(t, err)
 		assert.IsType(t, &proto.Group{}, resp)
 		assertGroupsSame(t, group, resp)
 	}
@@ -732,7 +731,7 @@ func TestCreateGroup(t *testing.T) {
 	}}
 
 	res, err := createGroup(t, group)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 
@@ -754,7 +753,7 @@ func TestGetGroupInvalidID(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, resp)
 	assert.Empty(t, resp)
 	assert.Error(t, err)
-	assert.Equal(t, "{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/42: no such file or directory\",\"status\":\"Not Found\"}", err.Error())
+	assert.Equal(t, merrors.NotFound(".", "could not read group: open accounts-store/groups/42: no such file or directory"), err)
 	cleanUp(t)
 }
 
@@ -772,12 +771,12 @@ func TestDeleteGroup(t *testing.T) {
 	req := &proto.DeleteGroupRequest{Id: grp1.Id}
 	res, err := cl.DeleteGroup(context.Background(), req)
 	assert.IsType(t, res, &empty.Empty{})
-	checkError(t, err)
+	checkNoError(t, err)
 
 	req = &proto.DeleteGroupRequest{Id: grp2.Id}
 	res, err = cl.DeleteGroup(context.Background(), req)
 	assert.IsType(t, res, &empty.Empty{})
-	checkError(t, err)
+	checkNoError(t, err)
 
 	groupsResponse := listGroups(t)
 	assertResponseNotContainsGroup(t, groupsResponse, grp1)
@@ -804,11 +803,7 @@ func TestDeleteGroupNotExisting(t *testing.T) {
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read group: open accounts-store/groups/%v: no such file or directory", id), err)
 	}
 	cleanUp(t)
 }
@@ -832,11 +827,7 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":500,\"detail\":\"could not clean up group id: invalid id %v\",\"status\":\"Internal Server Error\"}", val),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.InternalServerError(".", "could not clean up group id: invalid id %v", val), err)
 	}
 	cleanUp(t)
 }
@@ -859,11 +850,7 @@ func TestUpdateGroup(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, res)
 	assert.Empty(t, res)
 	assert.Error(t, err)
-	assert.Equal(
-		t,
-		"{\"id\":\".\",\"code\":500,\"detail\":\"not implemented\",\"status\":\"Internal Server Error\"}",
-		err.Error(),
-	)
+	assert.Equal(t, merrors.InternalServerError(".", "not implemented"), err)
 	cleanUp(t)
 }
 
@@ -884,7 +871,7 @@ func TestAddMember(t *testing.T) {
 	req := &proto.AddMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
 
 	res, err := cl.AddMember(context.Background(), req)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 
@@ -918,7 +905,7 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 	res, err := cl.AddMember(context.Background(), req)
 
 	// Should Give Error
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 	//assert.Equal(t, proto.Group{}, *res)
 	//assertGroupsSame(t, updatedGroup, res)
@@ -953,11 +940,7 @@ func TestAddMemberNonExisting(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read account: open accounts-store/accounts/%v: no such file or directory", id), err)
 	}
 
 	// Check group is not changed
@@ -994,7 +977,7 @@ func TestRemoveMember(t *testing.T) {
 	req := &proto.RemoveMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
 
 	res, err := cl.RemoveMember(context.Background(), req)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 	//assert.Equal(t, proto.Group{}, *res)
@@ -1029,11 +1012,7 @@ func TestRemoveMemberNonExistingUser(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read account: open accounts-store/accounts/%v: no such file or directory", id), err)
 	}
 
 	// Check group is not changed
@@ -1058,15 +1037,11 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 	res, err := cl.RemoveMember(context.Background(), req)
 
 	// Should give an error
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 
 	//assert.Error(t, err)
-	//assert.Equal(
-	//	t,
-	//	fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"User not found in the group\",\"status\":\"Not Found\"}", account.Id),
-	//	err.Error(),
-	//)
+	//assert.Equal(t, merrors.NotFound(".", "User not found in the group"), err)
 
 	// Check group is not changed
 	resp := listGroups(t)
@@ -1095,7 +1070,7 @@ func TestListMembers(t *testing.T) {
 		req := &proto.ListMembersRequest{Id: expectedGroup.Id}
 
 		res, err := cl.ListMembers(context.Background(), req)
-		checkError(t, err)
+		checkNoError(t, err)
 
 		assert.Equal(t, len(res.Members), len(expectedGroup.Members))
 
@@ -1128,7 +1103,7 @@ func TestListMembersEmptyGroup(t *testing.T) {
 
 	res, err := cl.ListMembers(context.Background(), req)
 
-	checkError(t, err)
+	checkNoError(t, err)
 	assert.Empty(t, res.Members)
 
 	cleanUp(t)
@@ -1149,7 +1124,7 @@ func TestAccountUpdateMask(t *testing.T) {
 
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 	res, err := cl.UpdateAccount(context.Background(), req)
-	checkError(t, err)
+	checkNoError(t, err)
 
 	assert.Equal(t, "ShouldBeUpdated", res.DisplayName)
 	assert.Equal(t, user1.PreferredName, res.PreferredName)
