@@ -8,6 +8,7 @@ The following sections list the changes in ocis-accounts unreleased.
 
 * Bugfix - Initialize roleService client in GRPC server: [#114](https://github.com/owncloud/ocis-accounts/pull/114)
 * Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
+* Bugfix - Don't create account if id/mail/username already taken: [#123](https://github.com/owncloud/ocis-accounts/pull/123)
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - Add new builtin admin user: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
 * Change - We make use of the roles cache to enforce permission checks: [#100](https://github.com/owncloud/ocis-accounts/pull/100)
@@ -40,6 +41,14 @@ The following sections list the changes in ocis-accounts unreleased.
    https://github.com/owncloud/product/issues/224
    https://github.com/owncloud/ocis-accounts/pull/117
    https://github.com/owncloud/ocis-accounts/pull/118
+
+
+* Bugfix - Don't create account if id/mail/username already taken: [#123](https://github.com/owncloud/ocis-accounts/pull/123)
+
+   We don't allow anymore to create a new account if the provided id/mail/username is already
+   taken.
+
+   https://github.com/owncloud/ocis-accounts/pull/123
 
 
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
