@@ -1294,6 +1294,8 @@ github.com/owncloud/ocis-ocs v0.3.0 h1:bHwySRrYhgSXrIgTFvDpdScriIzu+z5rk7HrhsuOB
 github.com/owncloud/ocis-ocs v0.3.0/go.mod h1:xk7iq7qczDfLgVG6DWFnCq8We9bWinsLnFDJ3y67HVM=
 github.com/owncloud/ocis-ocs v0.3.1 h1:ieY/5BTC5LxNz+/S2UN55vn5iOVJviFxpDAxW1ny31A=
 github.com/owncloud/ocis-ocs v0.3.1/go.mod h1:TpBlVYnJcZp0Bl+bZRtoQx/NrcNGXv2TUMXq7IWMULQ=
+github.com/owncloud/ocis-ocs v0.3.2-0.20200916110615-7ca52baa61c4 h1:HjMWrRTs+mhQKPhTjFiUsiCkEQDBD6DpXqdbawZOeY8=
+github.com/owncloud/ocis-ocs v0.3.2-0.20200916110615-7ca52baa61c4/go.mod h1:MTKTeGDsydQeyf85AvSZFChObW1wdsbRP9ANwZ8l5K4=
 github.com/owncloud/ocis-phoenix v0.11.0 h1:0aoFJWpayxlyQZMx5cYHu0e3UpSifwJkdkcI4OFKAaQ=
 github.com/owncloud/ocis-phoenix v0.11.0/go.mod h1:1pwRccQdRJGOdZeC3yO+/ujPMGPBAJcIVYFYZHajbt8=
 github.com/owncloud/ocis-phoenix v0.11.1-0.20200819165316-a06c8ee00160 h1:WunkcKFmAkxaAERlk6q127xFwswOF2aph2+OMxNMb3g=
@@ -1875,6 +1877,8 @@ golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc h1:zK/HqS5bZxDptfPJNq8v7vJfX
 golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
 golang.org/x/net v0.0.0-20200822124328-c89045814202 h1:VvcQYSHwXgi7W+TpUR6A9g6Up98WAHf3f/ulnJ62IyA=
 golang.org/x/net v0.0.0-20200822124328-c89045814202/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
+golang.org/x/net v0.0.0-20200904194848-62affa334b73 h1:MXfv8rhZWmFeqX3GNZRsd6vOLoaCHjYEX3qkRo3YBUA=
+golang.org/x/net v0.0.0-20200904194848-62affa334b73/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
@@ -1981,6 +1985,8 @@ golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 h1:MEU99+Z67sctTw1UjDlQ6wjRF
 golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 h1:DvY3Zkh7KabQE/kfzMvYvKirSiguP9Q/veMtkYyf0o8=
 golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a h1:chkwkn8HYWVtTE5DCQNKYlkyptadXYY0+PuyaVdyMo4=
+golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.0.0-20160726164857-2910a502d2bf/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=

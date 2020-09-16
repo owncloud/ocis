@@ -18,7 +18,7 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853
 	github.com/owncloud/ocis-konnectd v0.3.2
 	github.com/owncloud/ocis-migration v0.2.0
-	github.com/owncloud/ocis-ocs v0.3.1
+	github.com/owncloud/ocis-ocs v0.3.2-0.20200916110615-7ca52baa61c4
 	github.com/owncloud/ocis-phoenix v0.13.1-0.20200910090722-8e3ed0e966a5
 	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada
 	github.com/owncloud/ocis-proxy v0.7.1-0.20200907105449-201b9a652685
@@ -30,6 +30,8 @@ require (
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
 	github.com/restic/calens v0.2.0
 	go.opencensus.io v0.22.4
+	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+	golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
