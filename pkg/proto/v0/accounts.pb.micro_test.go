@@ -409,14 +409,13 @@ func TestCreateAccount(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateExistingUser(t *testing.T) {
 	createAccount(t, "user1")
-	_, err := createAccount(t, "user1")
+	res, err := createAccount(t, "user1")
 
-	// Should give error but it does not
-	checkNoError(t, err)
-	assertUserExists(t, getAccount("user1"))
+	assert.Empty(t, res)
+	assert.Error(t, err)
+	assert.Equal(t, merrors.BadRequest(".", "account already exists"), err)
 
 	cleanUp(t)
 }
