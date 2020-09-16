@@ -15,7 +15,7 @@ import (
 func RevaStorageOCCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "reva-storage-oc",
-		Usage:    "Start reva oc storage",
+		Usage:    "Start reva storage service for oc mount",
 		Category: "Extensions",
 		Flags:    flagset.StorageOCWithConfig(cfg.Reva),
 		Action: func(c *cli.Context) error {

@@ -15,7 +15,7 @@ import (
 func RevaStorageHomeCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "reva-storage-home",
-		Usage:    "Start reva home storage",
+		Usage:    "Start reva storage service for home mount",
 		Category: "Extensions",
 		Flags:    flagset.StorageHomeWithConfig(cfg.Reva),
 		Action: func(c *cli.Context) error {
