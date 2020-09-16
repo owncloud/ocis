@@ -1,3 +1,24 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes in ocis-ocs unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis-ocs/compare/v0.3.1...master
+
+## Summary
+
+* Bugfix - Match the user response to the OC10 format: [#181](https://github.com/owncloud/product/issues/181)
+
+## Details
+
+* Bugfix - Match the user response to the OC10 format: [#181](https://github.com/owncloud/product/issues/181)
+
+   The user response contained the field `displayname` but for certain responses the field
+   `display-name` is expected. The field `display-name` was added and now both fields are
+   returned to the client.
+
+   https://github.com/owncloud/product/issues/181
+   https://github.com/owncloud/ocis-ocs/pull/61
+
 # Changelog for [0.3.1] (2020-09-02)
 
 The following sections list the changes in ocis-ocs 0.3.1.
