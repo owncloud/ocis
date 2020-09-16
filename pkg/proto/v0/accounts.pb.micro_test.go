@@ -753,7 +753,7 @@ func TestGetGroupInvalidID(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, resp)
 	assert.Empty(t, resp)
 	assert.Error(t, err)
-	assert.Equal(t, "{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/42: no such file or directory\",\"status\":\"Not Found\"}", err.Error())
+	assert.Equal(t, merrors.NotFound(".", "could not read group: open accounts-store/groups/42: no such file or directory"), err)
 	cleanUp(t)
 }
 
@@ -803,11 +803,7 @@ func TestDeleteGroupNotExisting(t *testing.T) {
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read group: open accounts-store/groups/%v: no such file or directory", id), err)
 	}
 	cleanUp(t)
 }
@@ -831,11 +827,7 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":500,\"detail\":\"could not clean up group id: invalid id %v\",\"status\":\"Internal Server Error\"}", val),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.InternalServerError(".", "could not clean up group id: invalid id %v", val), err)
 	}
 	cleanUp(t)
 }
@@ -858,11 +850,7 @@ func TestUpdateGroup(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, res)
 	assert.Empty(t, res)
 	assert.Error(t, err)
-	assert.Equal(
-		t,
-		"{\"id\":\".\",\"code\":500,\"detail\":\"not implemented\",\"status\":\"Internal Server Error\"}",
-		err.Error(),
-	)
+	assert.Equal(t, merrors.InternalServerError(".", "not implemented"), err)
 	cleanUp(t)
 }
 
@@ -952,11 +940,7 @@ func TestAddMemberNonExisting(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read account: open accounts-store/accounts/%v: no such file or directory", id), err)
 	}
 
 	// Check group is not changed
@@ -1028,11 +1012,7 @@ func TestRemoveMemberNonExistingUser(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
+		assert.Equal(t, merrors.NotFound(".", "could not read account: open accounts-store/accounts/%v: no such file or directory", id), err)
 	}
 
 	// Check group is not changed
@@ -1061,11 +1041,7 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, res)
 
 	//assert.Error(t, err)
-	//assert.Equal(
-	//	t,
-	//	fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"User not found in the group\",\"status\":\"Not Found\"}", account.Id),
-	//	err.Error(),
-	//)
+	//assert.Equal(t, merrors.NotFound(".", "User not found in the group"), err)
 
 	// Check group is not changed
 	resp := listGroups(t)
