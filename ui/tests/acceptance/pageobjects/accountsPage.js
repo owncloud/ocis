@@ -30,9 +30,12 @@ module.exports = {
         util.format(this.elements.roleInRolesDropdown.selector, role)
 
       return this
+        .initAjaxCounters()
+        .waitForElementVisible('@rolesDropdownTrigger')
         .click('@rolesDropdownTrigger')
         .waitForElementVisible(roleSelector)
         .click(roleSelector)
+        .waitForOutstandingAjaxCalls()
     },
 
     checkUsersRole: function (username, role) {
