@@ -7,4 +7,4 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: license.md
 ---
 
-This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis-reva/blob/master/LICENSE) license. For the license of the used libraries you have to check the respective sources.
+This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis/ocis-revablob/master/LICENSE) license. For the license of the used libraries you have to check the respective sources.

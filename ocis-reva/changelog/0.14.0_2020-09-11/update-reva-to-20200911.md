@@ -6,5 +6,5 @@ Enhancement: update reva to v1.2.1-0.20200911111727-51649e37df2d
 - Add switch to database [(reva/#1135)](https://github.com/cs3org/reva/pull/1135)
 - Add the ocdav HTTP svc to the standalone config [(reva/#1128)](https://github.com/cs3org/reva/pull/1128)
 
-https://github.com/owncloud/ocis-reva/pull/466
+https://github.com/owncloud/ocis/ocis-revapull/466
 

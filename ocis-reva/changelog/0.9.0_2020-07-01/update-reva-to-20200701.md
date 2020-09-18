@@ -12,7 +12,7 @@ Enhancement: update reva to v0.1.1-0.20200701152626-2f6cc60e2f66
 - OCS Share Remove array from OCS Share update response (#252, reva/#919)
 - OCS Share Implement GET request for single shares  (#249, reva/#921)
 
-https://github.com/owncloud/ocis-reva/pull/328
+https://github.com/owncloud/ocis/ocis-revapull/328
 https://github.com/cs3org/reva/pull/909
 https://github.com/cs3org/reva/pull/915
 https://github.com/cs3org/reva/pull/916
@@ -21,10 +21,10 @@ https://github.com/cs3org/reva/pull/912
 https://github.com/cs3org/reva/pull/913
 https://github.com/cs3org/reva/pull/926
 https://github.com/cs3org/reva/pull/911
-https://github.com/owncloud/ocis-reva/issues/288
+https://github.com/owncloud/ocis/ocis-revaissues/288
 https://github.com/cs3org/reva/pull/918
-https://github.com/owncloud/ocis-reva/issues/252
+https://github.com/owncloud/ocis/ocis-revaissues/252
 https://github.com/cs3org/reva/pull/919
-https://github.com/owncloud/ocis-reva/issues/249
+https://github.com/owncloud/ocis/ocis-revaissues/249
 https://github.com/cs3org/reva/pull/921
 

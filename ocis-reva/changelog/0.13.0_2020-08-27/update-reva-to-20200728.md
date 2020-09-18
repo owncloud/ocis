@@ -14,4 +14,4 @@ Enhancement: update reva to v1.1.1-0.20200819100654-dcbf0c8ea187
 - Local storage provider: Fixed resolution of fileid [(reva/#1046)](https://github.com/cs3org/reva/pull/1046)
 - List public shares only created by the current user [(reva/#1042)](https://github.com/cs3org/reva/pull/1042)
 
-https://github.com/owncloud/ocis-reva/pull/447
+https://github.com/owncloud/ocis/ocis-revapull/447

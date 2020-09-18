@@ -13,17 +13,17 @@ Enhancement: update reva to v0.1.1-0.20200709064551-91eed007038f
 - Change percentagused to percentageused (reva/#903)
 - Fix file-descriptor leak (reva/#954)
 
-https://github.com/owncloud/ocis-reva/pull/362
+https://github.com/owncloud/ocis/ocis-revapull/362
 https://github.com/cs3org/reva/pull/936
 https://github.com/cs3org/reva/pull/937
 https://github.com/cs3org/reva/pull/938
 https://github.com/cs3org/reva/pull/940
 https://github.com/cs3org/reva/pull/951
-https://github.com/owncloud/ocis-reva/issues/344
+https://github.com/owncloud/ocis/ocis-revaissues/344
 https://github.com/cs3org/reva/pull/945
-https://github.com/owncloud/ocis-reva/issues/336
+https://github.com/owncloud/ocis/ocis-revaissues/336
 https://github.com/cs3org/reva/pull/929
-https://github.com/owncloud/ocis-reva/issues/11
+https://github.com/owncloud/ocis/ocis-revaissues/11
 https://github.com/cs3org/reva/pull/946
 https://github.com/cs3org/reva/pull/944
 https://github.com/cs3org/reva/pull/903

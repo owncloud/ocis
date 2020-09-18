@@ -20,5 +20,5 @@ Enhancement: update reva to v1.2.1-0.20200826162318-c0f54e1f37ea
 - System information included in Prometheus metrics [(reva/#1071)](https://github.com/cs3org/reva/pull/1071)
 - Add logic for resolving storage references over webdav [(reva/#1094)](https://github.com/cs3org/reva/pull/1094)
 
-https://github.com/owncloud/ocis-reva/pull/454
+https://github.com/owncloud/ocis/ocis-revapull/454
 

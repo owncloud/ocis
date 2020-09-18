@@ -13,4 +13,4 @@ The `WEBDAV_NAMESPACE_JAIL` environment variable is split into
 - `WEBDAV_NAMESPACE` and
 - `DAV_FILES_NAMESPACE` accordingly.
 
-Related: https://github.com/owncloud/ocis-reva/pull/68
+Related: https://github.com/owncloud/ocis/ocis-revapull/68

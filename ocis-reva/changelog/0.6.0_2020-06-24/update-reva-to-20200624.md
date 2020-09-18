@@ -26,22 +26,22 @@ Enhancement: update reva to v0.1.1-0.20200624063447-db5e6635d5f0
 - Pass etag in quotes from the fs layer (#269, reva/#866, reva/#867)
 - OCM: use refactored cs3apis provider definition (reva/#864)
 
-https://github.com/owncloud/ocis-reva/pull/279
+https://github.com/owncloud/ocis/ocis-revapull/279
 https://github.com/owncloud/cs3org/reva/pull/799
 https://github.com/owncloud/cs3org/reva/pull/803
 https://github.com/owncloud/cs3org/reva/pull/817
-https://github.com/owncloud/ocis-reva/issues/116
+https://github.com/owncloud/ocis/ocis-revaissues/116
 https://github.com/owncloud/cs3org/reva/pull/805
 https://github.com/owncloud/cs3org/reva/pull/814
 https://github.com/owncloud/cs3org/reva/pull/816
 https://github.com/owncloud/cs3org/reva/pull/818
-https://github.com/owncloud/ocis-reva/issues/112
-https://github.com/owncloud/ocis-reva/issues/253
-https://github.com/owncloud/ocis-reva/issues/254
+https://github.com/owncloud/ocis/ocis-revaissues/112
+https://github.com/owncloud/ocis/ocis-revaissues/253
+https://github.com/owncloud/ocis/ocis-revaissues/254
 https://github.com/owncloud/cs3org/reva/pull/819
 https://github.com/owncloud/cs3org/reva/pull/820
 https://github.com/owncloud/ocis/issues/216
-https://github.com/owncloud/ocis-reva/issues/174
+https://github.com/owncloud/ocis/ocis-revaissues/174
 https://github.com/owncloud/cs3org/reva/pull/823
 https://github.com/owncloud/cs3org/reva/pull/841
 https://github.com/owncloud/cs3org/reva/pull/813
@@ -54,7 +54,7 @@ https://github.com/owncloud/cs3org/reva/pull/842
 https://github.com/owncloud/cs3org/reva/pull/829
 https://github.com/owncloud/cs3org/reva/pull/831
 https://github.com/owncloud/cs3org/reva/pull/830
-https://github.com/owncloud/ocis-reva/issues/47
+https://github.com/owncloud/ocis/ocis-revaissues/47
 https://github.com/owncloud/cs3org/reva/pull/836
 https://github.com/owncloud/cs3org/reva/pull/852
 https://github.com/owncloud/cs3org/reva/pull/850
@@ -62,7 +62,7 @@ https://github.com/owncloud/cs3org/reva/pull/664
 https://github.com/owncloud/cs3org/reva/pull/853
 https://github.com/owncloud/cs3org/reva/pull/849
 https://github.com/owncloud/cs3org/reva/pull/863
-https://github.com/owncloud/ocis-reva/issues/269
+https://github.com/owncloud/ocis/ocis-revaissues/269
 https://github.com/owncloud/cs3org/reva/pull/866
 https://github.com/owncloud/cs3org/reva/pull/867
 https://github.com/owncloud/cs3org/reva/pull/864

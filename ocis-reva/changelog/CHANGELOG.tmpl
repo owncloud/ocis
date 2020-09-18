@@ -10,17 +10,17 @@ The following sections list the changes in ocis-reva {{ .Version }}.
 {{ if ne (len $allVersions) $next -}}
 {{ $previousVersion := (index $allVersions $next).Version -}}
 {{ if eq .Version "unreleased" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-reva/compare/v{{ $previousVersion }}...master
+[{{ .Version }}]: https://github.com/owncloud/ocis/ocis-revacompare/v{{ $previousVersion }}...master
 
 {{ else -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-reva/compare/v{{ $previousVersion }}...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/ocis-revacompare/v{{ $previousVersion }}...v{{ .Version }}
 
 {{ end -}}
 {{ end -}}
 
 {{- /* last version managed by calens, end of the loop */ -}}
 {{ if eq .Version "0.1.0" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-reva/compare/6702be7f9045a382d40691a9bcd04f572203e9ed...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/ocis-revacompare/6702be7f9045a382d40691a9bcd04f572203e9ed...v{{ .Version }}
 
 {{ end -}}
 {{ else -}}

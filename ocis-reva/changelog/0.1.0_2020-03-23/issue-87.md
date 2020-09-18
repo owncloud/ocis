@@ -17,4 +17,4 @@ Three new flags are now available:
   env var: `REVA_STORAGE_OWNCLOUD_REDIS_ADDR`
   cli option: `--storage-owncloud-redis`
 
-https://github.com/owncloud/ocis-reva/issues/87
+https://github.com/owncloud/ocis/ocis-revaissues/87

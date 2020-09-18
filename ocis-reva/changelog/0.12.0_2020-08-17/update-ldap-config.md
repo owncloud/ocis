@@ -8,5 +8,5 @@ userfilter = "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.O
 findfilter = "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))"
 ```
 
-https://github.com/owncloud/ocis-reva/pull/399
+https://github.com/owncloud/ocis/ocis-revapull/399
 https://github.com/cs3org/reva/pull/996
