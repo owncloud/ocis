@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 )
 
