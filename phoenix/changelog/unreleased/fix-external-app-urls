@@ -1,0 +1,6 @@
+Bugfix: Fix external app URLs
+
+The URLs for the default set of external apps was hardcoded to localhost:9200. We fixed that by using relative paths instead.
+
+https://github.com/owncloud/product/issues/218
+https://github.com/owncloud/ocis-phoenix/pull/83
