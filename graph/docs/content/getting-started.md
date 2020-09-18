@@ -142,7 +142,7 @@ If you prefer to configure the service with commandline flags you can see the av
 
 #### Configuration file
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-graph/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/graph.yml`, `${HOME}/.ocis/graph.yml` or `$(pwd)/config/graph.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/graph/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/graph.yml`, `${HOME}/.ocis/graph.yml` or `$(pwd)/config/graph.yml`.
 
 ### Usage
 

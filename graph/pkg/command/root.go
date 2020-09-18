@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis-graph/pkg/config"
-	"github.com/owncloud/ocis-graph/pkg/flagset"
-	"github.com/owncloud/ocis-graph/pkg/version"
+	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/flagset"
+	"github.com/owncloud/ocis/graph/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/spf13/viper"
 )
