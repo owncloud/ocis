@@ -9,7 +9,7 @@ import (
 	"github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/oidc"
-	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
 func TestStaticSelector(t *testing.T) {

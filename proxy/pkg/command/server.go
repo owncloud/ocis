@@ -23,14 +23,14 @@ import (
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-proxy/pkg/config"
-	"github.com/owncloud/ocis-proxy/pkg/cs3"
-	"github.com/owncloud/ocis-proxy/pkg/flagset"
-	"github.com/owncloud/ocis-proxy/pkg/metrics"
-	"github.com/owncloud/ocis-proxy/pkg/middleware"
-	"github.com/owncloud/ocis-proxy/pkg/proxy"
-	"github.com/owncloud/ocis-proxy/pkg/server/debug"
-	proxyHTTP "github.com/owncloud/ocis-proxy/pkg/server/http"
+	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/cs3"
+	"github.com/owncloud/ocis/proxy/pkg/flagset"
+	"github.com/owncloud/ocis/proxy/pkg/metrics"
+	"github.com/owncloud/ocis/proxy/pkg/middleware"
+	"github.com/owncloud/ocis/proxy/pkg/proxy"
+	"github.com/owncloud/ocis/proxy/pkg/server/debug"
+	proxyHTTP "github.com/owncloud/ocis/proxy/pkg/server/http"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 	"go.opencensus.io/stats/view"
@@ -256,7 +256,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	)
 
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
+	// https://github.com/owncloud/ocis/proxy/issues/38
 	accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
 	roles := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
 

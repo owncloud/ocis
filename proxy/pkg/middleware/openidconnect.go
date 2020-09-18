@@ -8,7 +8,7 @@ import (
 
 	"github.com/coreos/go-oidc"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
-	"github.com/owncloud/ocis-proxy/pkg/cache"
+	"github.com/owncloud/ocis/proxy/pkg/cache"
 	"golang.org/x/oauth2"
 )
 

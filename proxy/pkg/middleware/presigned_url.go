@@ -10,7 +10,7 @@ import (
 
 	"github.com/owncloud/ocis-pkg/v2/log"
 	ocisoidc "github.com/owncloud/ocis-pkg/v2/oidc"
-	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
 )

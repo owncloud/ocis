@@ -7,7 +7,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 	storepb "github.com/owncloud/ocis-store/pkg/proto/v0"
 )
 

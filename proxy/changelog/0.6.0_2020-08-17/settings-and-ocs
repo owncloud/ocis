@@ -2,4 +2,4 @@ Change: add settings and ocs group routes
 
 Route settings requests and ocs group related requests to new services
 
-https://github.com/owncloud/ocis-proxy/pull/81
+https://github.com/owncloud/ocis/proxy/pull/81

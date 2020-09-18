@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis-proxy/pkg/command"
+	"github.com/owncloud/ocis/proxy/pkg/command"
 )
 
 func main() {

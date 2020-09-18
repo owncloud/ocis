@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
 func TestPrefixRouteMatcher(t *testing.T) {

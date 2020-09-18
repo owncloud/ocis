@@ -6,4 +6,4 @@ The accounts service has a ui that requires routing
 
 to http://localhost:9181
 
-https://github.com/owncloud/ocis-proxy/pull/65
+https://github.com/owncloud/ocis/proxy/pull/65

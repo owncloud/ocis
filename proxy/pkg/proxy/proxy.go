@@ -8,12 +8,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/owncloud/ocis-proxy/pkg/proxy/policy"
+	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
 	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
 	"go.opencensus.io/trace"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
 // MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies

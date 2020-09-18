@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-proxy
+module github.com/owncloud/ocis/proxy
 
 go 1.13
 

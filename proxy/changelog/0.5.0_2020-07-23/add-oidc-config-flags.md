@@ -8,4 +8,4 @@ This changes ocis-proxy to now load the oidc-middleware by default, requiring a 
 
 Setting `PROXY_OIDC_ISSUER=""` will disable the OIDC middleware.
 
-https://github.com/owncloud/ocis-proxy/pull/66
+https://github.com/owncloud/ocis/proxy/pull/66
