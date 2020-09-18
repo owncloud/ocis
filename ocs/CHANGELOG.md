@@ -92,18 +92,18 @@ The following sections list the changes in ocis-ocs 0.2.0.
 
 ## Summary
 
-* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis/accounts/issues/79)
 * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis/ocs/pull/25)
 * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis/ocs/pull/23)
 
 ## Details
 
-* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
+* Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis/accounts/issues/79)
 
    Only use a single instance of go-micro's GRPC client as it already does connection pooling.
    This prevents connection and file descriptor leaks.
 
-   https://github.com/owncloud/ocis-accounts/issues/79
+   https://github.com/owncloud/ocis/accounts/issues/79
    https://github.com/owncloud/ocis/ocs/pull/29
 
 

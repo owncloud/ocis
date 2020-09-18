@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/render"
 	merrors "github.com/micro/go-micro/v2/errors"
 
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 )

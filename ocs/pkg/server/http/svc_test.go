@@ -18,18 +18,18 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
-	ocisLog "github.com/owncloud/ocis-pkg/v2/log"
+	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/owncloud/ocis-pkg/v2/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
-	accountsCmd "github.com/owncloud/ocis-accounts/pkg/command"
-	accountsCfg "github.com/owncloud/ocis-accounts/pkg/config"
-	accountsProto "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	accountsSvc "github.com/owncloud/ocis-accounts/pkg/service/v0"
+	accountsCmd "github.com/owncloud/ocis/accounts/pkg/command"
+	accountsCfg "github.com/owncloud/ocis/accounts/pkg/config"
+	accountsProto "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	accountsSvc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 
 	"github.com/micro/go-micro/v2/client"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 var service = grpc.Service{}

@@ -8,12 +8,12 @@ import (
 	"github.com/go-chi/render"
 	"github.com/micro/go-micro/v2/client/grpc"
 
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 var defaultClient = grpc.NewClient()
