@@ -13,8 +13,8 @@ import (
 	"github.com/glauth/glauth/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 type queryType string

@@ -33,7 +33,7 @@ The following sections list the changes in ocis-glauth unreleased.
 
    https://github.com/owncloud/ocis/glauth/issues/28
    https://github.com/owncloud/ocis/glauth/pull/29
-   https://github.com/owncloud/ocis-accounts/pull/68
+   https://github.com/owncloud/ocis/accounts/pull/68
 
 
 * Bugfix - Use searchBaseDN if already a user/group name: [#214](https://github.com/owncloud/product/issues/214)

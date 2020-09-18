@@ -8,7 +8,7 @@ import (
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/glauth/pkg/version"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/spf13/viper"
 )
 

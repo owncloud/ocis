@@ -4,4 +4,4 @@ Some LDAP properties like `uidnumber` and `gidnumber` are numeric. When an OS tr
 
 https://github.com/owncloud/ocis/glauth/issues/28
 https://github.com/owncloud/ocis/glauth/pull/29
-https://github.com/owncloud/ocis-accounts/pull/68
+https://github.com/owncloud/ocis/accounts/pull/68

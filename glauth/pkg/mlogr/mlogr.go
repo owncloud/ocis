@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/go-logr/logr"
-	plog "github.com/owncloud/ocis-pkg/v2/log"
+	plog "github.com/owncloud/ocis/ocis-pkg/log"
 
 	"github.com/rs/zerolog"
 )

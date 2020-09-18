@@ -20,7 +20,7 @@ import (
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
