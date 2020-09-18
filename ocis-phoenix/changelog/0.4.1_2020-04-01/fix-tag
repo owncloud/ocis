@@ -1,0 +1,5 @@
+Bugfix: Create a new tag to fix v0.4.0
+
+Release v0.4.0 is using the wrong assets. We fixed that by creating a new release.
+
+https://github.com/owncloud/ocis/ocis-phoenix/pull/62
