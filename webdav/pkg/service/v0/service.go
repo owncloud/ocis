@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/micro/go-micro/v2/client"
-	thumbnails "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	thumbnail "github.com/owncloud/ocis/webdav/pkg/dav/thumbnails"
 )
