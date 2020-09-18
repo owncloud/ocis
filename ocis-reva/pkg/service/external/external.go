@@ -6,7 +6,7 @@ import (
 
 	"github.com/micro/go-micro/broker"
 	"github.com/micro/go-micro/v2/registry"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/micro/go-micro/v2/registry"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 func TestRegisterGRPCEndpoint(t *testing.T) {
