@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 var m = &sync.RWMutex{}

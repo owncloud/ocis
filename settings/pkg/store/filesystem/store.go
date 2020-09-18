@@ -5,8 +5,8 @@ import (
 	"os"
 
 	olog "github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-settings/pkg/config"
-	"github.com/owncloud/ocis-settings/pkg/settings"
+	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/settings"
 )
 
 var (

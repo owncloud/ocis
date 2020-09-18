@@ -769,6 +769,7 @@ github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b h1:PRw0b4ab
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200828095914-d3b859484b2b/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada h1:iVknnuT/z8QCAeBpHEcbI/AiQ9FOBvF5aOAFT3TIM+I=
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
+github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872 h1:VGWM/eLIxXY6BJLDuzpdjSVa73Dj5S8pfUtT9Sb5Ono=
 github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=

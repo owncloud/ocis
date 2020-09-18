@@ -1,6 +1,6 @@
 package svc
 
-import settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+import settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
 const (
 	// BundleUUIDRoleAdmin represents the admin role

@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"github.com/owncloud/ocis-settings/pkg/metrics"
+	"github.com/owncloud/ocis/settings/pkg/metrics"
 )
 
 // NewInstrument returns a service that instruments metrics.

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.

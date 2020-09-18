@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"github.com/owncloud/ocis-settings/pkg/config"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 var (

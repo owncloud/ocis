@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.

@@ -6,4 +6,4 @@ to the settings ui as well.
 
 https://github.com/owncloud/owncloud-design-system/issues/745
 https://github.com/owncloud/owncloud-design-system/pull/768
-https://github.com/owncloud/ocis-settings/pulls/31
+https://github.com/owncloud/ocis/settings/pulls/31

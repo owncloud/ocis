@@ -86,7 +86,7 @@ export default {
          * TODO:
          * a) set up a map with possible extensions and icons?
          * or b) let extensions register app info like displayName + icon?
-         * https://github.com/owncloud/ocis-settings/issues/27
+         * https://github.com/owncloud/ocis/settings/issues/27
          */
         const navItem = {
           name: this.getExtensionName(extension),

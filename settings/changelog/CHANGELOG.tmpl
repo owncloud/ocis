@@ -10,17 +10,17 @@ The following sections list the changes in ocis-settings {{ .Version }}.
 {{ if ne (len $allVersions) $next -}}
 {{ $previousVersion := (index $allVersions $next).Version -}}
 {{ if eq .Version "unreleased" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-settings/compare/v{{ $previousVersion }}...master
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/v{{ $previousVersion }}...master
 
 {{ else -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-settings/compare/v{{ $previousVersion }}...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/v{{ $previousVersion }}...v{{ .Version }}
 
 {{ end -}}
 {{ end -}}
 
 {{- /* last version managed by calens, end of the loop */ -}}
 {{ if eq .Version "0.1.0" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-settings/compare/6fdbbd7e8eb39f18ada1a8a3c45a1c925e239889...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/6fdbbd7e8eb39f18ada1a8a3c45a1c925e239889...v{{ .Version }}
 
 {{ end -}}
 {{ else -}}

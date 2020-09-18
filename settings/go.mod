@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-settings
+module github.com/owncloud/ocis/settings
 
 go 1.13
 

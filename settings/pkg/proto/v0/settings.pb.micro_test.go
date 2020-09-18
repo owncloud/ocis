@@ -14,10 +14,10 @@ import (
 	ocislog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
-	"github.com/owncloud/ocis-settings/pkg/config"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	svc "github.com/owncloud/ocis-settings/pkg/service/v0"
-	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
+	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -448,17 +448,17 @@ func TestSaveGetIntValue(t *testing.T) {
 		{
 			name:  "negative",
 			value: proto.Value_IntValue{IntValue: -42},
-			// https://github.com/owncloud/ocis-settings/issues/57
+			// https://github.com/owncloud/ocis/settings/issues/57
 		},
 		{
 			name:  "less than Min",
 			value: proto.Value_IntValue{IntValue: 0},
-			// https://github.com/owncloud/ocis-settings/issues/57
+			// https://github.com/owncloud/ocis/settings/issues/57
 		},
 		{
 			name:  "more than Max",
 			value: proto.Value_IntValue{IntValue: 128},
-			// https://github.com/owncloud/ocis-settings/issues/57
+			// https://github.com/owncloud/ocis/settings/issues/57
 		},
 	}
 	for _, tt := range tests {
@@ -500,7 +500,7 @@ func TestSaveGetIntValue(t *testing.T) {
 
 /**
 try to save a wrong type of the value
-https://github.com/owncloud/ocis-settings/issues/57
+https://github.com/owncloud/ocis/settings/issues/57
 */
 func TestSaveGetIntValueIntoString(t *testing.T) {
 	teardown := setup()
@@ -536,7 +536,7 @@ func TestSaveGetIntValueIntoString(t *testing.T) {
 	assert.Equal(t, "forty two", getValueResponse.Value.Value.GetStringValue())
 }
 
-// https://github.com/owncloud/ocis-settings/issues/18
+// https://github.com/owncloud/ocis/settings/issues/18
 func TestSaveBundleWithInvalidSettings(t *testing.T) {
 	var tests = []proto.Setting{
 		{
@@ -745,7 +745,7 @@ func TestSaveBundleWithInvalidSettings(t *testing.T) {
 	}
 }
 
-// https://github.com/owncloud/ocis-settings/issues/19
+// https://github.com/owncloud/ocis/settings/issues/19
 func TestGetBundleNoSideEffectsOnDisk(t *testing.T) {
 	teardown := setup()
 	defer teardown()

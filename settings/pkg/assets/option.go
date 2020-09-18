@@ -2,7 +2,7 @@ package assets
 
 import (
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/config"
 )
 
 // Option defines a single option function.

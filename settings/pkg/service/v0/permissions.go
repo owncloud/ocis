@@ -1,6 +1,6 @@
 package svc
 
-import "github.com/owncloud/ocis-settings/pkg/proto/v0"
+import "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
 func (g Service) hasPermission(
 	roleIDs []string,

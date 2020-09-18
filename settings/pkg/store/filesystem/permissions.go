@@ -1,8 +1,8 @@
 package store
 
 import (
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"github.com/owncloud/ocis-settings/pkg/util"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/util"
 )
 
 // ListPermissionsByResource collects all permissions from the provided roleIDs that match the requested resource

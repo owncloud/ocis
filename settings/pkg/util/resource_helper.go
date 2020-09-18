@@ -1,6 +1,6 @@
 package util
 
-import "github.com/owncloud/ocis-settings/pkg/proto/v0"
+import "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
 const (
 	// ResourceIDAll declares on a resource that it matches any id

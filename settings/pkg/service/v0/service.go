@@ -10,10 +10,10 @@ import (
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/roles"
-	"github.com/owncloud/ocis-settings/pkg/config"
-	"github.com/owncloud/ocis-settings/pkg/proto/v0"
-	"github.com/owncloud/ocis-settings/pkg/settings"
-	store "github.com/owncloud/ocis-settings/pkg/store/filesystem"
+	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/settings"
+	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
 )
 
 // Service represents a service.
