@@ -1,0 +1,7 @@
+Enhancement: Disable keep-alive on server-side OIDC requests
+
+This should reduce file-descriptor counts
+
+https://github.com/owncloud/ocis/issues/268
+https://github.com/owncloud/ocis-proxy/pull/42
+https://github.com/cs3org/reva/pull/787

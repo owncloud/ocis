@@ -1,0 +1,5 @@
+Enhancement: Retrieve Account UUID From User Claims
+
+OIDC Middleware can make use of uuidFromClaims to trade claims.Email for an account's UUID. For this, a general purpose cache was added that caches on a per-request basis, meaning whenever the request parameters match a set of keys, the cached value is returned, saving a round trip to the accounts service that otherwise would happen in every single request.
+
+https://github.com/owncloud/ocis-proxy/pull/36

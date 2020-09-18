@@ -1,0 +1,113 @@
+package policy
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/micro/go-micro/v2/client/grpc"
+	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis-proxy/pkg/config"
+)
+
+var (
+	// ErrMultipleSelectors in case there is more then one selector configured.
+	ErrMultipleSelectors = fmt.Errorf("only one type of policy-selector (static or migration) can be configured")
+	// ErrSelectorConfigIncomplete if policy_selector conf is missing
+	ErrSelectorConfigIncomplete = fmt.Errorf("missing either \"static\" or \"migration\" configuration in policy_selector config ")
+	// ErrUnexpectedConfigError unexpected config error
+	ErrUnexpectedConfigError = fmt.Errorf("could not initialize policy-selector for given config")
+)
+
+// Selector is a function which selects a proxy-policy based on the request.
+//
+// A policy is a random name which identifies a set of proxy-routes:
+//{
+//  "policies": [
+//    {
+//      "name": "us-east-1",
+//      "routes": [
+//        {
+//          "endpoint": "/",
+//          "backend": "https://backend.us.example.com:8080/app"
+//        }
+//      ]
+//    },
+//    {
+//      "name": "eu-ams-1",
+//      "routes": [
+//        {
+//          "endpoint": "/",
+//          "backend": "https://backend.eu.example.com:8080/app"
+//        }
+//      ]
+//    }
+//  ]
+//}
+type Selector func(ctx context.Context, r *http.Request) (string, error)
+
+// LoadSelector constructs a specific policy-selector from a given configuration
+func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
+	if cfg.Migration != nil && cfg.Static != nil {
+		return nil, ErrMultipleSelectors
+	}
+
+	if cfg.Migration == nil && cfg.Static == nil {
+		return nil, ErrSelectorConfigIncomplete
+	}
+
+	if cfg.Static != nil {
+		return NewStaticSelector(cfg.Static), nil
+	}
+
+	if cfg.Migration != nil {
+		return NewMigrationSelector(
+			cfg.Migration,
+			accounts.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
+	}
+
+	return nil, ErrUnexpectedConfigError
+}
+
+// NewStaticSelector returns a selector which uses a pre-configured policy.
+//
+// Configuration:
+//
+// "policy_selector": {
+//    "static": {"policy" : "reva"}
+//  },
+func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
+	return func(ctx context.Context, r *http.Request) (s string, err error) {
+		return cfg.Policy, nil
+	}
+}
+
+// NewMigrationSelector selects the policy based on the existence of the oidc "preferred_username" claim in the accounts-service.
+// The policy for each case is configurable:
+// "policy_selector": {
+//    "migration": {
+//      "acc_found_policy" : "reva",
+//      "acc_not_found_policy": "oc10",
+//      "unauthenticated_policy": "oc10"
+//    }
+//  },
+//
+// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
+// thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
+func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
+	var acc = ss
+	return func(ctx context.Context, r *http.Request) (s string, err error) {
+		var userID string
+		if claims := oidc.FromContext(r.Context()); claims != nil {
+			userID = claims.PreferredUsername
+			if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
+				return cfg.AccNotFoundPolicy, nil
+			}
+
+			return cfg.AccFoundPolicy, nil
+		}
+
+		return cfg.UnauthenticatedPolicy, nil
+	}
+}
