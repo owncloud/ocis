@@ -1,0 +1,1113 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Settings",
+    "version": "1.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis-settings",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis-settings/blob/master/LICENSE"
+    }
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v0/settings/assignments-add": {
+      "post": {
+        "operationId": "RoleService_AssignRoleToUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoAssignRoleToUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoAssignRoleToUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-list": {
+      "post": {
+        "operationId": "RoleService_ListRoleAssignments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListRoleAssignmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListRoleAssignmentsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-remove": {
+      "post": {
+        "operationId": "RoleService_RemoveRoleFromUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoRemoveRoleFromUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundle-get": {
+      "post": {
+        "operationId": "BundleService_GetBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundle-save": {
+      "post": {
+        "operationId": "BundleService_SaveBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSaveBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSaveBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-add-setting": {
+      "post": {
+        "operationId": "BundleService_AddSettingToBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoAddSettingToBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoAddSettingToBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-list": {
+      "post": {
+        "operationId": "BundleService_ListBundles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-remove-setting": {
+      "post": {
+        "operationId": "BundleService_RemoveSettingFromBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoRemoveSettingFromBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/permissions-get-by-id": {
+      "post": {
+        "operationId": "PermissionService_GetPermissionByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetPermissionByIDRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
+    "/api/v0/settings/permissions-list-by-resource": {
+      "post": {
+        "operationId": "PermissionService_ListPermissionsByResource",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListPermissionsByResourceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListPermissionsByResourceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
+    "/api/v0/settings/roles-list": {
+      "post": {
+        "operationId": "RoleService_ListRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListBundlesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get": {
+      "post": {
+        "operationId": "ValueService_GetValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get-by-unique-identifiers": {
+      "post": {
+        "operationId": "ValueService_GetValueByUniqueIdentifiers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoGetValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetValueByUniqueIdentifiersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-list": {
+      "post": {
+        "operationId": "ValueService_ListValues",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoListValuesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoListValuesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-save": {
+      "post": {
+        "operationId": "ValueService_SaveValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoSaveValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PermissionConstraint": {
+      "type": "string",
+      "enum": [
+        "CONSTRAINT_UNKNOWN",
+        "CONSTRAINT_OWN",
+        "CONSTRAINT_SHARED",
+        "CONSTRAINT_ALL"
+      ],
+      "default": "CONSTRAINT_UNKNOWN"
+    },
+    "protoAddSettingToBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/protoSetting"
+        }
+      }
+    },
+    "protoAddSettingToBundleResponse": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/protoSetting"
+        }
+      }
+    },
+    "protoAssignRoleToUserRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        },
+        "role_id": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "protoAssignRoleToUserResponse": {
+      "type": "object",
+      "properties": {
+        "assignment": {
+          "$ref": "#/definitions/protoUserRoleAssignment"
+        }
+      }
+    },
+    "protoBool": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "protoBundle": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/protoBundleType"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoSetting"
+          }
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        }
+      }
+    },
+    "protoBundleType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_DEFAULT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "protoGetBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
+        }
+      }
+    },
+    "protoGetPermissionByIDRequest": {
+      "type": "object",
+      "properties": {
+        "permission_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetPermissionByIDResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/definitions/protoPermission"
+        }
+      }
+    },
+    "protoGetValueByUniqueIdentifiersRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetValueRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoGetValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoValueWithIdentifier"
+        }
+      }
+    },
+    "protoIdentifier": {
+      "type": "object",
+      "properties": {
+        "extension": {
+          "type": "string"
+        },
+        "bundle": {
+          "type": "string"
+        },
+        "setting": {
+          "type": "string"
+        }
+      }
+    },
+    "protoInt": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "format": "int64"
+        },
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "max": {
+          "type": "string",
+          "format": "int64"
+        },
+        "step": {
+          "type": "string",
+          "format": "int64"
+        },
+        "placeholder": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListBundlesRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "protoListBundlesResponse": {
+      "type": "object",
+      "properties": {
+        "bundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoBundle"
+          }
+        }
+      }
+    },
+    "protoListOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoListOptionValue"
+        },
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "display_value": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListOptionValue": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int_value": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "protoListPermissionsByResourceRequest": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        }
+      }
+    },
+    "protoListPermissionsByResourceResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoPermission"
+          }
+        }
+      }
+    },
+    "protoListRoleAssignmentsRequest": {
+      "type": "object",
+      "properties": {
+        "account_uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListRoleAssignmentsResponse": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoUserRoleAssignment"
+          }
+        }
+      }
+    },
+    "protoListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoListOptionValue"
+          }
+        }
+      }
+    },
+    "protoListValuesRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "account_uuid": {
+          "type": "string"
+        }
+      }
+    },
+    "protoListValuesResponse": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoValueWithIdentifier"
+          }
+        }
+      }
+    },
+    "protoMultiChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoListOption"
+          }
+        }
+      }
+    },
+    "protoPermission": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "$ref": "#/definitions/protoPermissionOperation"
+        },
+        "constraint": {
+          "$ref": "#/definitions/PermissionConstraint"
+        }
+      }
+    },
+    "protoPermissionOperation": {
+      "type": "string",
+      "enum": [
+        "OPERATION_UNKNOWN",
+        "OPERATION_CREATE",
+        "OPERATION_READ",
+        "OPERATION_UPDATE",
+        "OPERATION_DELETE",
+        "OPERATION_WRITE",
+        "OPERATION_READWRITE"
+      ],
+      "default": "OPERATION_UNKNOWN"
+    },
+    "protoRemoveRoleFromUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoRemoveSettingFromBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/protoResourceType"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protoResourceType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_SYSTEM",
+        "TYPE_FILE",
+        "TYPE_SHARE",
+        "TYPE_SETTING",
+        "TYPE_BUNDLE",
+        "TYPE_USER",
+        "TYPE_GROUP"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "protoSaveBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
+        }
+      },
+      "title": "---\nrequests and responses for settings bundles\n---"
+    },
+    "protoSaveBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/protoBundle"
+        }
+      }
+    },
+    "protoSaveValueRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoValue"
+        }
+      }
+    },
+    "protoSaveValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/protoValueWithIdentifier"
+        }
+      }
+    },
+    "protoSetting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "int_value": {
+          "$ref": "#/definitions/protoInt"
+        },
+        "string_value": {
+          "$ref": "#/definitions/protoString"
+        },
+        "bool_value": {
+          "$ref": "#/definitions/protoBool"
+        },
+        "single_choice_value": {
+          "$ref": "#/definitions/protoSingleChoiceList"
+        },
+        "multi_choice_value": {
+          "$ref": "#/definitions/protoMultiChoiceList"
+        },
+        "permission_value": {
+          "$ref": "#/definitions/protoPermission"
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        }
+      }
+    },
+    "protoSingleChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoListOption"
+          }
+        }
+      }
+    },
+    "protoString": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "min_length": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "max_length": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "placeholder": {
+          "type": "string"
+        }
+      }
+    },
+    "protoUserRoleAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is generated upon saving the assignment"
+        },
+        "account_uuid": {
+          "type": "string"
+        },
+        "role_id": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "protoValue": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the id of the Value. It is generated on saving it."
+        },
+        "bundle_id": {
+          "type": "string"
+        },
+        "setting_id": {
+          "type": "string",
+          "description": "setting_id is the id of the setting from within its bundle."
+        },
+        "account_uuid": {
+          "type": "string"
+        },
+        "resource": {
+          "$ref": "#/definitions/protoResource"
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "int_value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "list_value": {
+          "$ref": "#/definitions/protoListValue"
+        }
+      }
+    },
+    "protoValueWithIdentifier": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "$ref": "#/definitions/protoIdentifier"
+        },
+        "value": {
+          "$ref": "#/definitions/protoValue"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "http://owncloud.github.io/extensions/ocis_settings/"
+  }
+}
