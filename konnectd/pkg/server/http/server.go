@@ -7,8 +7,8 @@ import (
 	"github.com/owncloud/ocis/konnectd/pkg/crypto"
 	svc "github.com/owncloud/ocis/konnectd/pkg/service/v0"
 	"github.com/owncloud/ocis/konnectd/pkg/version"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
-	"github.com/owncloud/ocis-pkg/v2/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/service/http"
 )
 
 // Server initializes the http service and server.

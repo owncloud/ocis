@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis/konnectd/pkg/config"
 	logw "github.com/owncloud/ocis/konnectd/pkg/log"
 	"github.com/owncloud/ocis/konnectd/pkg/middleware"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"stash.kopano.io/kc/konnect/bootstrap"
 	kcconfig "stash.kopano.io/kc/konnect/config"
 	"stash.kopano.io/kc/konnect/server"
