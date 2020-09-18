@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis-glauth/pkg/crypto"
+	"github.com/owncloud/ocis/glauth/pkg/crypto"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -21,10 +21,10 @@ import (
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-glauth/pkg/config"
-	"github.com/owncloud/ocis-glauth/pkg/flagset"
-	"github.com/owncloud/ocis-glauth/pkg/server/debug"
-	"github.com/owncloud/ocis-glauth/pkg/server/glauth"
+	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/flagset"
+	"github.com/owncloud/ocis/glauth/pkg/server/debug"
+	"github.com/owncloud/ocis/glauth/pkg/server/glauth"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )

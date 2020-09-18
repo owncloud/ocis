@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-glauth
+module github.com/owncloud/ocis/glauth
 
 go 1.13
 

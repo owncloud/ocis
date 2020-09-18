@@ -3,7 +3,7 @@ package debug
 import (
 	"context"
 
-	"github.com/owncloud/ocis-glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 

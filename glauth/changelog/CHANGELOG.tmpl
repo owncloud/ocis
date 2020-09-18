@@ -10,17 +10,17 @@ The following sections list the changes in ocis-glauth {{ .Version }}.
 {{ if ne (len $allVersions) $next -}}
 {{ $previousVersion := (index $allVersions $next).Version -}}
 {{ if eq .Version "unreleased" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-glauth/compare/v{{ $previousVersion }}...master
+[{{ .Version }}]: https://github.com/owncloud/ocis/glauth/compare/v{{ $previousVersion }}...master
 
 {{ else -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-glauth/compare/v{{ $previousVersion }}...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/glauth/compare/v{{ $previousVersion }}...v{{ .Version }}
 
 {{ end -}}
 {{ end -}}
 
 {{- /* last version managed by calens, end of the loop */ -}}
 {{ if eq .Version "0.1.0" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-glauth/compare/178b6ccde34b64a88e8c14a9acb5857a4c6a3164...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/glauth/compare/178b6ccde34b64a88e8c14a9acb5857a4c6a3164...v{{ .Version }}
 
 {{ end -}}
 {{ else -}}

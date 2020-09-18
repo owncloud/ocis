@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis-glauth/pkg/config"
-	"github.com/owncloud/ocis-glauth/pkg/flagset"
+	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/flagset"
 )
 
 // Health is the entrypoint for the health command.

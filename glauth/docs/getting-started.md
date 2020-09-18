@@ -149,7 +149,7 @@ If you prefer to configure the service with commandline flags you can see the av
 
 ### Configuration file
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis-glauth/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/glauth.yml`, `${HOME}/.ocis/glauth.yml` or `$(pwd)/config/glauth.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/glauth/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/glauth.yml`, `${HOME}/.ocis/glauth.yml` or `$(pwd)/config/glauth.yml`.
 
 ## Usage
 
