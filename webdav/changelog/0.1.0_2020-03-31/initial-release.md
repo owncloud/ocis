@@ -4,4 +4,4 @@ Just prepared an initial basic version to serve webdav for the ownCloud
 Infinite Scale project. It just provides a minimal viable product to
 demonstrate the microservice pattern.
 
-https://github.com/owncloud/ocis-webdav/issues/1
+https://github.com/owncloud/ocis/webdav/issues/1

@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-webdav
+module github.com/owncloud/ocis/webdav
 
 go 1.13
 
@@ -16,3 +16,5 @@ require (
 	github.com/spf13/viper v1.5.0
 	go.opencensus.io v0.22.2
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
