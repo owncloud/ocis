@@ -12,11 +12,14 @@ require (
 	github.com/micro/go-micro v1.18.0 // indirect
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.3.0
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/restic/calens v0.2.0
-	github.com/spf13/viper v1.6.1
+	github.com/spf13/viper v1.6.3
 	go.opencensus.io v0.22.4
-	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+replace (
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)

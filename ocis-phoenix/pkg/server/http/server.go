@@ -4,8 +4,8 @@ import (
 	phoenixmid "github.com/owncloud/ocis/ocis-phoenix/pkg/middleware"
 	svc "github.com/owncloud/ocis/ocis-phoenix/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-phoenix/pkg/version"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
-	"github.com/owncloud/ocis-pkg/v2/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/service/http"
 )
 
 // Server initializes the http service and server.
