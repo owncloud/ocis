@@ -1,0 +1,11 @@
+coverage.out
+
+.idea
+/bin
+/dist
+/hugo
+
+/pkg/proto/v0/accounts-store/
+
+/node_modules
+/assets
