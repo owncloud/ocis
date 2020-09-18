@@ -2,7 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis-revapkg/config"
+	"github.com/owncloud/ocis/ocis-reva/pkg/config"
 )
 
 // StorageEOSDataWithConfig applies cfg to the root flagset

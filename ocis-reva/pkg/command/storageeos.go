@@ -11,9 +11,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-revapkg/config"
-	"github.com/owncloud/ocis/ocis-revapkg/flagset"
-	"github.com/owncloud/ocis/ocis-revapkg/server/debug"
+	"github.com/owncloud/ocis/ocis-reva/pkg/config"
+	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
+	"github.com/owncloud/ocis/ocis-reva/pkg/server/debug"
 )
 
 // StorageEOS is the entrypoint for the storage-eos command.

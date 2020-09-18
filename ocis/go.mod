@@ -26,6 +26,7 @@ require (
 	github.com/owncloud/ocis/ocis-reva v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/proxy v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/ocis-phoenix v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/settings v0.0.0-20200914113019-7c3cfd3f8756
 	github.com/owncloud/ocis/store v0.0.0-20200914113019-7c3cfd3f8756
 	github.com/owncloud/ocis/thumbnails v0.1.6
@@ -38,10 +39,11 @@ require (
 replace (
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts
-	github.com/owncloud/ocis/ocis-reva => ../ocis-reva
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/konnectd => ../konnectd
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	github.com/owncloud/ocis/ocis-reva => ../ocis-reva
+	github.com/owncloud/ocis/ocis-phoenix => ../ocis-phoenix
 	github.com/owncloud/ocis/ocs => ../ocs
 	github.com/owncloud/ocis/proxy => ../proxy
 	github.com/owncloud/ocis/settings => ../settings

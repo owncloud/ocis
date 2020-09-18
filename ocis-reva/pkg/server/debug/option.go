@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis/ocis-revapkg/config"
+	"github.com/owncloud/ocis/ocis-reva/pkg/config"
 )
 
 // Option defines a single option function.

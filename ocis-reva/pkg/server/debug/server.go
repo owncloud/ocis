@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis-pkg/v2/service/debug"
-	"github.com/owncloud/ocis/ocis-revapkg/config"
-	"github.com/owncloud/ocis/ocis-revapkg/version"
+	"github.com/owncloud/ocis/ocis-reva/pkg/config"
+	"github.com/owncloud/ocis/ocis-reva/pkg/version"
 )
 
 // Server initializes the debug service and server.

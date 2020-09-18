@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis-revapkg/config"
+	"github.com/owncloud/ocis/ocis-reva/pkg/config"
 )
 
 // DriverEOSWithConfig applies cfg to the root flagset
