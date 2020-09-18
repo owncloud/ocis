@@ -6,9 +6,9 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-store/pkg/config"
-	"github.com/owncloud/ocis-store/pkg/flagset"
-	"github.com/owncloud/ocis-store/pkg/version"
+	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/owncloud/ocis/store/pkg/flagset"
+	"github.com/owncloud/ocis/store/pkg/version"
 	"github.com/spf13/viper"
 )
 

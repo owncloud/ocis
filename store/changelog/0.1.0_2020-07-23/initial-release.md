@@ -4,5 +4,5 @@ We have built a new service which implements go micro's [store interface](https:
 so that we can provide a key-value-store through GRPC for our services. The underlying implementation stores data as json
 files on disk and maintains an index using [bleve](https://github.com/blevesearch/bleve).
 
-https://github.com/owncloud/ocis-store/pull/1
-https://github.com/owncloud/ocis-store/pull/2
+https://github.com/owncloud/ocis/store/pull/1
+https://github.com/owncloud/ocis/store/pull/2

@@ -5,8 +5,8 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-store/pkg/config"
-	"github.com/owncloud/ocis-store/pkg/metrics"
+	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/owncloud/ocis/store/pkg/metrics"
 )
 
 // Option defines a single option function.

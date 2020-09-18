@@ -11,8 +11,8 @@ import (
 	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-store/pkg/config"
-	"github.com/owncloud/ocis-store/pkg/proto/v0"
+	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/owncloud/ocis/store/pkg/proto/v0"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
