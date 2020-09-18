@@ -9,7 +9,7 @@ import (
 	tokenpkg "github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/micro/go-micro/v2/errors"
-	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"google.golang.org/grpc/metadata"
 )
 

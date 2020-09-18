@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"os"
 
-	svc "github.com/owncloud/ocis-pkg/v2/service/http"
+	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/proxy/pkg/crypto"
 	"github.com/owncloud/ocis/proxy/pkg/version"
 )

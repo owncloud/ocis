@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/micro/go-micro/v2/client/grpc"
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 

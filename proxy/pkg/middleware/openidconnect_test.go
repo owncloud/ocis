@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/coreos/go-oidc"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"golang.org/x/oauth2"
 )
 

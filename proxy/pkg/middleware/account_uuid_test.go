@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/micro/go-micro/v2/client"
-	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // TODO testing the getAccount method should inject a cache

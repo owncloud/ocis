@@ -6,7 +6,7 @@ import (
 
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
 )

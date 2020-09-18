@@ -11,10 +11,10 @@ import (
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	acc "github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 func getAccount(l log.Logger, ac acc.AccountsService, query string) (account *acc.Account, status int) {
