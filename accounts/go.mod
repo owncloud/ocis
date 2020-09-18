@@ -15,8 +15,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/owncloud/ocis v1.0.0-rc1 // indirect
-	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada
-	github.com/owncloud/ocis-settings v0.3.2-0.20200903035407-ad5de8264f91
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
+	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
@@ -27,4 +27,8 @@ require (
 	google.golang.org/protobuf v1.25.0
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+replace (
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	github.com/owncloud/ocis/settings => ../settings
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)

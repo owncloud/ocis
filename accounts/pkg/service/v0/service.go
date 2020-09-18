@@ -21,10 +21,10 @@ import (
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-pkg/v2/roles"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
-	settings_svc "github.com/owncloud/ocis-settings/pkg/service/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/roles"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // New returns a new instance of Service

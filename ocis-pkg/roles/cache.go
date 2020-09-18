@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // entry extends a bundle and adds a TTL

@@ -18,7 +18,7 @@ require (
 	github.com/mitchellh/gox v1.0.1
 	github.com/oklog/run v1.0.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee // indirect
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.6.1
@@ -30,4 +30,7 @@ require (
 	gotest.tools v2.2.0+incompatible
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+replace (
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+)

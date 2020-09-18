@@ -180,7 +180,7 @@ The following sections list the changes in ocis-accounts 0.3.0.
    adjusts ocis-accounts accordingly.
 
    https://github.com/owncloud/ocis/accounts/pull/87
-   https://github.com/owncloud/ocis-settings/pull/46
+   https://github.com/owncloud/ocis/settings/pull/46
 
 
 * Change - Add permissions for language to default roles: [#88](https://github.com/owncloud/ocis/accounts/pull/88)

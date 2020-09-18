@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/middleware"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // Logger is a middleware to log http requests.

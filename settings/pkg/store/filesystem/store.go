@@ -4,7 +4,7 @@ package store
 import (
 	"os"
 
-	olog "github.com/owncloud/ocis-pkg/v2/log"
+	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/settings"
 )

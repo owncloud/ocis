@@ -5,7 +5,7 @@ import (
 	"net/http/pprof"
 
 	"github.com/justinas/alice"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/zpages"
 )

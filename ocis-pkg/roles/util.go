@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/micro/go-micro/v2/metadata"
-	"github.com/owncloud/ocis-pkg/v2/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
 )
 
 // ReadRoleIDsFromContext extracts roleIDs from the metadata context and returns them as []string

@@ -3,8 +3,8 @@ package roles
 import (
 	"context"
 
-	"github.com/owncloud/ocis-pkg/v2/log"
-	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.

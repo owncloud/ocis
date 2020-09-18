@@ -6,7 +6,7 @@ import (
 
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/micro/go-micro/v2/metadata"
-	"github.com/owncloud/ocis-pkg/v2/account"
+	"github.com/owncloud/ocis/ocis-pkg/account"
 )
 
 // newAccountOptions initializes the available default options.
