@@ -1,0 +1,16 @@
+---
+
+# OpenID Connect client registry.
+clients:
+  - id: phoenix
+    name: OCIS
+    application_type: web
+    insecure: yes
+    trusted: yes
+    redirect_uris:
+      - http://phoenix:9100/oidc-callback.html
+      - http://phoenix:9100/
+    origins:
+      - http://phoenix:9100
+
+authorities:
