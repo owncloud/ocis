@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/owncloud/ocis-ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 )
 
 type key int

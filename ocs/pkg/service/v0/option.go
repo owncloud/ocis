@@ -3,7 +3,7 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis-ocs/pkg/config"
+	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 

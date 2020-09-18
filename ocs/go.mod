@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-ocs
+module github.com/owncloud/ocis/ocs
 
 go 1.13
 
@@ -12,12 +12,12 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.1.2 // indirect
+	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis-accounts v0.4.2-0.20200828150703-2ca83cf4ac20
-	github.com/owncloud/ocis-hello v0.1.0-alpha1 // indirect
 	github.com/owncloud/ocis-pkg/v2 v2.4.0
 	github.com/owncloud/ocis-settings v0.3.2-0.20200828130413-0cc0f5bf26fe
 	github.com/owncloud/ocis-store v0.0.0-20200716140351-f9670592fb7b

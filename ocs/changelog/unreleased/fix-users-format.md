@@ -5,4 +5,4 @@ the field `display-name` is expected. The field `display-name` was added and
 now both fields are returned to the client.
 
 https://github.com/owncloud/product/issues/181
-https://github.com/owncloud/ocis-ocs/pull/61
+https://github.com/owncloud/ocis/ocs/pull/61

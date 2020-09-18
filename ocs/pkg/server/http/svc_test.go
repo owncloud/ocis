@@ -16,8 +16,8 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis-ocs/pkg/config"
-	svc "github.com/owncloud/ocis-ocs/pkg/service/v0"
+	"github.com/owncloud/ocis/ocs/pkg/config"
+	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
 	ocisLog "github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/stretchr/testify/assert"
 
@@ -209,7 +209,7 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	}
 
 	// FIXME: gidnumber and Uidnumber are always 0
-	// https://github.com/owncloud/ocis-ocs/issues/45
+	// https://github.com/owncloud/ocis/ocs/issues/45
 	assert.Equal(t, 0, actual.UIDNumber, "UidNumber doesn't match for user %v", expected.Username)
 	assert.Equal(t, 0, actual.GIDNumber, "GIDNumber doesn't match for user %v", expected.Username)
 
@@ -412,7 +412,7 @@ func TestCreateUser(t *testing.T) {
 		},
 
 		// User withoutl password
-		// https://github.com/owncloud/ocis-ocs/issues/50
+		// https://github.com/owncloud/ocis/ocs/issues/50
 		{
 			User{
 				Enabled:     "true",
@@ -425,7 +425,7 @@ func TestCreateUser(t *testing.T) {
 		},
 
 		// User with special character in username
-		// https://github.com/owncloud/ocis-ocs/issues/49
+		// https://github.com/owncloud/ocis/ocs/issues/49
 		{
 			User{
 				Enabled:     "true",
@@ -973,7 +973,7 @@ func TestUpdateUser(t *testing.T) {
 			nil,
 		},
 		// Invalid email doesn't gives error
-		// https://github.com/owncloud/ocis-ocs/issues/46
+		// https://github.com/owncloud/ocis/ocs/issues/46
 		{
 			"email",
 			"not_a_valid_email",
@@ -990,7 +990,7 @@ func TestUpdateUser(t *testing.T) {
 			nil,
 		},
 		// Empty values doesn't gives error
-		// https://github.com/owncloud/ocis-ocs/issues/51
+		// https://github.com/owncloud/ocis/ocs/issues/51
 		{
 			"email",
 			"",
@@ -1137,7 +1137,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 // This is a bug demonstration test for endpoint '/cloud/user'
-// Link to the issue: https://github.com/owncloud/ocis-ocs/issues/52
+// Link to the issue: https://github.com/owncloud/ocis/ocs/issues/52
 func TestGetSingleUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1194,7 +1194,7 @@ func TestGetSingleUser(t *testing.T) {
 }
 
 // This is a bug demonstration test for endpoint '/cloud/user'
-// Link to the issue: https://github.com/owncloud/ocis-ocs/issues/53
+// Link to the issue: https://github.com/owncloud/ocis/ocs/issues/53
 
 func TestGetUserSigningKey(t *testing.T) {
 	user := User{
@@ -1520,7 +1520,7 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 	}
 }
 
-// Issue: https://github.com/owncloud/ocis-ocs/issues/55 Incorrect message when adding user to non existing group
+// Issue: https://github.com/owncloud/ocis/ocs/issues/55 Incorrect message when adding user to non existing group
 func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1583,7 +1583,7 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 	cleanUp(t)
 }
 
-// Issue: https://github.com/owncloud/ocis-ocs/issues/57 - cannot remove user from group
+// Issue: https://github.com/owncloud/ocis/ocs/issues/57 - cannot remove user from group
 func TestRemoveUserFromGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",

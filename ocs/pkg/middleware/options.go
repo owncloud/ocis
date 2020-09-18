@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/owncloud/ocis-ocs/pkg/config"
+	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
