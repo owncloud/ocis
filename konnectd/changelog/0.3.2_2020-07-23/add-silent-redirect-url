@@ -2,5 +2,5 @@ Bugfix: add silent redirect url
 
 Adds the oidc-silent-redirect.html phoenix uses to silently refresh access tokens to the default identifier-registration.yml
 
-https://github.com/owncloud/ocis-konnectd/issues/69
-https://github.com/owncloud/ocis-konnectd/pull/70
+https://github.com/owncloud/ocis/konnectd/issues/69
+https://github.com/owncloud/ocis/konnectd/pull/70

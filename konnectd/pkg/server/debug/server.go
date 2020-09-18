@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis-konnectd/pkg/config"
-	"github.com/owncloud/ocis-konnectd/pkg/version"
+	"github.com/owncloud/ocis/konnectd/pkg/config"
+	"github.com/owncloud/ocis/konnectd/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/service/debug"
 )
 

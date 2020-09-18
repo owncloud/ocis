@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"os"
 
-	"github.com/owncloud/ocis-konnectd/pkg/crypto"
-	svc "github.com/owncloud/ocis-konnectd/pkg/service/v0"
-	"github.com/owncloud/ocis-konnectd/pkg/version"
+	"github.com/owncloud/ocis/konnectd/pkg/crypto"
+	svc "github.com/owncloud/ocis/konnectd/pkg/service/v0"
+	"github.com/owncloud/ocis/konnectd/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/service/http"
 )

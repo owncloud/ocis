@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-konnectd
+module github.com/owncloud/ocis/konnectd
 
 go 1.13
 
@@ -28,3 +28,5 @@ require (
 	stash.kopano.io/kc/konnect v0.30.0
 	stash.kopano.io/kgol/rndm v1.1.0
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
