@@ -8,12 +8,12 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis-accounts/pkg/config"
-	"github.com/owncloud/ocis-accounts/pkg/flagset"
-	"github.com/owncloud/ocis-accounts/pkg/metrics"
-	"github.com/owncloud/ocis-accounts/pkg/server/grpc"
-	"github.com/owncloud/ocis-accounts/pkg/server/http"
-	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+	"github.com/owncloud/ocis/accounts/pkg/metrics"
+	"github.com/owncloud/ocis/accounts/pkg/server/grpc"
+	"github.com/owncloud/ocis/accounts/pkg/server/http"
+	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 )
 
 // Server is the entry point for the server command.

@@ -34,8 +34,7 @@ require (
 	golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a // indirect
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
-
-replace github.com/lucas-clemente/quic-go v0.15.7 => github.com/lucas-clemente/quic-go v0.14.1
-
-replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
+replace (
+	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)

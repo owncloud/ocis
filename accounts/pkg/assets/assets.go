@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis-accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 
 	// Fake the import to make the dep tree happy.

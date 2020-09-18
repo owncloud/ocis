@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2/client/grpc"
-	"github.com/owncloud/ocis-accounts/pkg/config"
-	"github.com/owncloud/ocis-accounts/pkg/flagset"
-	accounts "github.com/owncloud/ocis-accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"os"
 )
 

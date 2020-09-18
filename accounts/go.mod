@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-accounts
+module github.com/owncloud/ocis/accounts
 
 go 1.13
 
@@ -21,7 +21,7 @@ require (
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
-	github.com/tredoe/osutil v1.0.5
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
 	google.golang.org/protobuf v1.25.0

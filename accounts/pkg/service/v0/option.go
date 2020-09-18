@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/owncloud/ocis-accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis-pkg/v2/roles"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"

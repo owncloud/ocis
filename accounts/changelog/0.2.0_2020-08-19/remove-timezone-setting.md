@@ -4,4 +4,4 @@ We had a timezone setting in our profile settings bundle. As we're not dealing w
 it would be confusing for the user to have a timezone setting available. We removed it, until we
 have a timezone implementation available in ocis-web.
 
-https://github.com/owncloud/ocis-accounts/pull/33
+https://github.com/owncloud/ocis/accounts/pull/33

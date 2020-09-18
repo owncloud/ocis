@@ -12,10 +12,10 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/micro/go-micro/v2/client"
 	merrors "github.com/micro/go-micro/v2/errors"
-	"github.com/owncloud/ocis-accounts/pkg/command"
-	"github.com/owncloud/ocis-accounts/pkg/config"
-	"github.com/owncloud/ocis-accounts/pkg/proto/v0"
-	svc "github.com/owncloud/ocis-accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/accounts/pkg/command"
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis-pkg/v2/service/grpc"
 	settings "github.com/owncloud/ocis-settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
@@ -389,7 +389,7 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 	return res, err
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/61
+// https://github.com/owncloud/ocis/accounts/issues/61
 func TestCreateAccount(t *testing.T) {
 
 	resp, err := createAccount(t, "user1")
@@ -421,7 +421,7 @@ func TestCreateExistingUser(t *testing.T) {
 }
 
 // All tests fail after running this
-// https://github.com/owncloud/ocis-accounts/issues/62
+// https://github.com/owncloud/ocis/accounts/issues/62
 func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	resp, err := listAccounts(t)
@@ -502,7 +502,7 @@ func TestUpdateAccount(t *testing.T) {
 				UidNumber:                   1000,
 				GidNumber:                   1000,
 				// No email validation
-				// https://github.com/owncloud/ocis-accounts/issues/77
+				// https://github.com/owncloud/ocis/accounts/issues/77
 				Mail: "1.2@3.c_@",
 			},
 		},
@@ -723,7 +723,7 @@ func TestGetGroups(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/61
+// https://github.com/owncloud/ocis/accounts/issues/61
 func TestCreateGroup(t *testing.T) {
 	group := &proto.Group{Id: "2d58e5ec-842e-498b-8800-61f2ec6f911f", GidNumber: 30042, OnPremisesSamAccountName: "quantum-group", DisplayName: "Quantum Group", Members: []*proto.Account{
 		{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
@@ -854,7 +854,7 @@ func TestUpdateGroup(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/61
+// https://github.com/owncloud/ocis/accounts/issues/61
 func TestAddMember(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
@@ -884,7 +884,7 @@ func TestAddMember(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/62
+// https://github.com/owncloud/ocis/accounts/issues/62
 func TestAddMemberAlreadyInGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
@@ -961,7 +961,7 @@ func addMemberToGroup(t *testing.T, groupId, memberId string) (*proto.Group, err
 	return res, err
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/61
+// https://github.com/owncloud/ocis/accounts/issues/61
 func TestRemoveMember(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
@@ -1021,7 +1021,7 @@ func TestRemoveMemberNonExistingUser(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis-accounts/issues/62
+// https://github.com/owncloud/ocis/accounts/issues/62
 func TestRemoveMemberNotInGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
