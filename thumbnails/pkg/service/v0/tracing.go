@@ -3,7 +3,7 @@ package svc
 import (
 	"context"
 
-	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"go.opencensus.io/trace"
 )
 

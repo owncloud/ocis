@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
 )
 
 // NewFileSystemSource return a new FileSystem instance

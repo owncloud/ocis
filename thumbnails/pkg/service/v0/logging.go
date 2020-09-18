@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
-	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 )
 
 // NewLogging returns a service that logs messages.

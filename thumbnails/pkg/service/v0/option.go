@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/storage"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 )
 
 // Option defines a single option function.

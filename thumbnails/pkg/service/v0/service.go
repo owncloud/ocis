@@ -7,10 +7,10 @@ import (
 
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis-pkg/v2/log"
-	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/imgsource"
-	"github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/resolution"
 	"github.com/pkg/errors"
 )
 

@@ -3,7 +3,7 @@ package proto_test
 import (
 	"testing"
 
-	"github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	"github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 )
 

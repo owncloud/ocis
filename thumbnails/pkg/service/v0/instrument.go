@@ -3,8 +3,8 @@ package svc
 import (
 	"context"
 
-	"github.com/owncloud/ocis-thumbnails/pkg/metrics"
-	v0proto "github.com/owncloud/ocis-thumbnails/pkg/proto/v0"
+	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
+	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

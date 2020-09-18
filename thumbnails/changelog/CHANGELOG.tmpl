@@ -10,17 +10,17 @@ The following sections list the changes in ocis-thumbnails {{ .Version }}.
 {{ if ne (len $allVersions) $next -}}
 {{ $previousVersion := (index $allVersions $next).Version -}}
 {{ if eq .Version "unreleased" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-thumbnails/compare/v{{ $previousVersion }}...master
+[{{ .Version }}]: https://github.com/owncloud/ocis/thumbnails/compare/v{{ $previousVersion }}...master
 
 {{ else -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-thumbnails/compare/v{{ $previousVersion }}...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/thumbnails/compare/v{{ $previousVersion }}...v{{ .Version }}
 
 {{ end -}}
 {{ end -}}
 
 {{- /* last version managed by calens, end of the loop */ -}}
 {{ if eq .Version "0.1.0" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis-thumbnails/compare/c43f3a33cb0b57d7e25ebc88c138d22e95f88cfe...v{{ .Version }}
+[{{ .Version }}]: https://github.com/owncloud/ocis/thumbnails/compare/c43f3a33cb0b57d7e25ebc88c138d22e95f88cfe...v{{ .Version }}
 
 {{ end -}}
 {{ else -}}

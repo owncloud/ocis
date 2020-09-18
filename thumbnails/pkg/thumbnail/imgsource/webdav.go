@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
 )
 
 // NewWebDavSource creates a new webdav instance.

@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/owncloud/ocis-pkg/v2/log"
-	"github.com/owncloud/ocis-thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 )
 

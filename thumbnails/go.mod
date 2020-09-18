@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-thumbnails
+module github.com/owncloud/ocis/thumbnails
 
 go 1.13
 
@@ -12,7 +12,6 @@ require (
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
 	github.com/golang/protobuf v1.3.2
-	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/mattn/go-colorable v0.1.2 // indirect
@@ -37,3 +36,5 @@ require (
 	gopkg.in/square/go-jose.v2 v2.3.1
 	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/owncloud/ocis-thumbnails/pkg/thumbnail/resolution"
+import "github.com/owncloud/ocis/thumbnails/pkg/thumbnail/resolution"
 
 // Request combines different attributes needed for storage operations.
 type Request struct {
