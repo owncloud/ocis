@@ -2,7 +2,7 @@ SHELL := bash
 NAME := ocis
 IMPORT := github.com/owncloud/$(NAME)
 HUGO := hugo
-EXTENSIONS := accounts glauth graph konnectd ocis ocis-phoenix ocis-reva ocs proxy settings store thumbnails webdav
+EXTENSIONS := accounts glauth graph konnectd ocis-phoenix ocis-reva ocs proxy settings store thumbnails webdav
 
 .PHONY: all
 all: build
@@ -19,15 +19,21 @@ clean:
 generate-docs: $(EXTENSIONS)
 $(EXTENSIONS):
 	$(MAKE) -C $@ docs; \
-	mkdir -p docs/$@; \
-	cp -R $@/docs/ docs/$@
+	mkdir -p docs/extensions/$@; \
+	cp -R $@/docs/ docs/extensions/$@
 
 .PHONY: clean-docs
 clean-docs:
 	rm -rf docs
 
+.PHONY: ocis-docs
+ocis-docs:
+	mkdir -p docs/ocis; \
+	$(MAKE) -C ocis docs; \
+	cp -R ocis/docs/ docs/ocis
+
 .PHONY: docs
-docs: clean-docs generate-docs
+docs: clean-docs generate-docs ocis-docs
 
 BEHAT_BIN=vendor-bin/behat/vendor/bin/behat
 
