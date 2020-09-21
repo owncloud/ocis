@@ -72,9 +72,9 @@ fmt:
 vet:
 	go vet $(PACKAGES)
 
-# .PHONY: staticcheck
-# staticcheck:
-# 	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
+.PHONY: staticcheck
+staticcheck:
+	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
 
 .PHONY: lint
 lint:
