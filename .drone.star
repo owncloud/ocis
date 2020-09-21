@@ -654,6 +654,124 @@ def binary(ctx, name):
     },
   }
 
+def manifest(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'manifest',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'execute',
+        'image': 'plugins/manifest:1',
+        'pull': 'always',
+        'settings': {
+          'username': {
+            'from_secret': 'docker_username',
+          },
+          'password': {
+            'from_secret': 'docker_password',
+          },
+          'spec': 'ocis/docker/manifest.tmpl',
+          'auto_tag': True,
+          'ignore_missing': True,
+        },
+      },
+    ],
+    'depends_on': [
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
+      'binaries-linux',
+      'binaries-darwin',
+      'binaries-windows',
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+      ],
+    },
+  }
+
+def readme(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'readme',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'execute',
+        'image': 'sheogorath/readme-to-dockerhub:latest',
+        'pull': 'always',
+        'environment': {
+          'DOCKERHUB_USERNAME': {
+            'from_secret': 'docker_username',
+          },
+          'DOCKERHUB_PASSWORD': {
+            'from_secret': 'docker_password',
+          },
+          'DOCKERHUB_REPO_PREFIX': ctx.repo.namespace,
+          'DOCKERHUB_REPO_NAME': ctx.repo.name,
+          'SHORT_DESCRIPTION': 'Docker images for %s' % (ctx.repo.name),
+          'README_PATH': 'README.md',
+        },
+      },
+    ],
+    'depends_on': [
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+      ],
+    },
+  }
+
+def badges(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'badges',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'execute',
+        'image': 'plugins/webhook:1',
+        'pull': 'always',
+        'settings': {
+          'urls': {
+            'from_secret': 'microbadger_url',
+          },
+        },
+      },
+    ],
+    'depends_on': [
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+      ],
+    },
+  }
+
 def generate(module):
   return [
     {
