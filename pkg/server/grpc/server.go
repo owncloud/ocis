@@ -17,6 +17,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
+		grpc.Version(options.Config.Server.Version),
 	)
 
 	if err := proto.RegisterAccountsServiceHandler(service.Server(), handler); err != nil {
