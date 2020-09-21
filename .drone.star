@@ -6,7 +6,7 @@ config = {
     'ocis-reva':'',
     'ocis-pkg':'',
     'ocis-phoenix':'',
-    'ocis-store':'',
+    'store':'',
     'ocs':'',
     'webdav':'',
     'thumbnails':'',
