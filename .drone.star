@@ -6,8 +6,8 @@ def main(ctx):
 
   stages = [
     docker(ctx, 'amd64'),
-    docker(ctx, 'arm64'),
-    docker(ctx, 'arm'),
+    #docker(ctx, 'arm64'),
+    #docker(ctx, 'arm'),
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
@@ -633,8 +633,8 @@ def manifest(ctx):
     ],
     'depends_on': [
       'amd64',
-      'arm64',
-      'arm',
+      #'arm64',
+      #'arm',
       'linux',
       'darwin',
       'windows',
