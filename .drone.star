@@ -92,6 +92,12 @@ def main(ctx):
   ]
 
   after = [
+    manifest(ctx),
+    #changelog(ctx),
+    readme(ctx),
+    badges(ctx),
+    website(ctx),
+    #updateDeployment(ctx)
   ]
 
   return before + stages + after
@@ -854,6 +860,46 @@ def generate(module):
       ],
     }
   ]
+
+def updateDeployment(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'updateDeployment',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'webhook',
+        'image': 'plugins/webhook',
+        'settings': {
+          'username': {
+            'from_secret': 'webhook_username',
+          },
+          'password': {
+            'from_secret': 'webhook_password',
+          },
+          'method': 'GET',
+          'urls': 'https://ocis.owncloud.works/hooks/update-ocis',
+        }
+      }
+    ],
+    'depends_on': [
+      'amd64',
+      'arm64',
+      'arm',
+      'linux',
+      'darwin',
+      'windows',
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+      ],
+    }
+  }
 
 def frontend(module):
   return [
