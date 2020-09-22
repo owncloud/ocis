@@ -879,7 +879,7 @@ def ocisServer(storage):
       'pull': 'always',
       'detach': True,
       'environment' : {
-        'OCIS_LOG_LEVEL': 'debug',
+        #'OCIS_LOG_LEVEL': 'debug',
         'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
