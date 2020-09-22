@@ -13,5 +13,5 @@ See --help for details.
 Note that not all account-attributes have an effect yet. This is due to ocis
 being in an early development stage.
 
-https://github.com/owncloud/ocis-accounts/pull/69
+https://github.com/owncloud/ocis/accounts/pull/69
 https://github.com/owncloud/product/issues/115

@@ -4,4 +4,4 @@ We added a role selection dropdown for each account in the accounts UI. As a fir
 require account management permissions.
 
 https://github.com/owncloud/product/issues/103
-https://github.com/owncloud/ocis-accounts/pull/89
+https://github.com/owncloud/ocis/accounts/pull/89

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis-accounts/pkg/config"
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 
 	// Fake the import to make the dep tree happy.
 	_ "golang.org/x/net/context"
