@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
