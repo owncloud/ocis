@@ -14,7 +14,6 @@ require (
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/owncloud/ocis v1.0.0-rc1 // indirect
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/restic/calens v0.2.0
