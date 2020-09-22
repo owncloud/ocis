@@ -1,0 +1,5 @@
+Bugfix: Adapting to new settings API for fetching roles
+
+We fixed the usage of the ocis-settings endpoint for fetching roles.
+
+https://github.com/owncloud/ocis-accounts/pull/96
