@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis/status.svg)](https://cloud.drone.io/owncloud/ocis)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/app/owncloud/ocis?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/app/owncloud/ocis?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis&amp;utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis?status.svg)](http://godoc.org/github.com/owncloud/ocis)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis)](http://goreportcard.com/report/github.com/owncloud/ocis)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis.svg)](http://microbadger.com/images/owncloud/ocis "Get your own image badge on microbadger.com")
@@ -51,7 +51,7 @@ mkdir -p /var/tmp/reva/root/{home,oc}
     ./bin/ocis server
     ```
 
--   Open <https://localhost:9200>
+-   Open [https://localhost:9200](https://localhost:9200)
 
 -   Accept the self-signed certificate (it is regenerated every time the server starts)
 
@@ -68,7 +68,6 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 The list of available extensions can be found in the "Extensions" section when running `./bin/ocis`.
 
 For example to run the "phoenix" extension:
-
 ```console
 ./bin/ocis --log-level debug phoenix
 ```
@@ -77,7 +76,7 @@ For example to run the "phoenix" extension:
 
 ## Security
 
-If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
+If you find a security issue please contact security@owncloud.com first.
 
 ## Contributing
 

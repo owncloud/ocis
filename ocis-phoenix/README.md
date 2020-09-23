@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-phoenix/status.svg)](https://cloud.drone.io/owncloud/ocis-phoenix)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/afe89eb0894848c5b67dc0343afd1df9)](https://www.codacy.com/app/owncloud/ocis-phoenix?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-phoenix&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/afe89eb0894848c5b67dc0343afd1df9)](https://www.codacy.com/app/owncloud/ocis-phoenix?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-phoenix&amp;utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-phoenix?status.svg)](http://godoc.org/github.com/owncloud/ocis-phoenix)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-phoenix)](http://goreportcard.com/report/github.com/owncloud/ocis-phoenix)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-phoenix.svg)](http://microbadger.com/images/owncloud/ocis-phoenix "Get your own image badge on microbadger.com")
@@ -28,7 +28,7 @@ make generate build
 
 ## Security
 
-If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
+If you find a security issue please contact security@owncloud.com first.
 
 ## Contributing
 
