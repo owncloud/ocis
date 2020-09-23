@@ -89,6 +89,7 @@ def main(ctx):
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
+    releaseSubmodule(ctx),
   ]
 
   after = [
@@ -209,7 +210,8 @@ def testing(ctx, module):
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
+        'refs/tags/%s/v*' % (module),
         'refs/pull/**',
       ],
     },
@@ -263,7 +265,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
         'refs/pull/**',
       ],
     },
@@ -319,7 +321,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
         'refs/pull/**',
       ],
     },
@@ -400,7 +402,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
         'refs/pull/**',
       ],
     },
@@ -458,7 +460,6 @@ def docker(ctx, arch):
           'ref': {
             'exclude': [
               'refs/pull/**',
-              'refs/tags/*/v*',
             ],
           },
         },
@@ -478,7 +479,7 @@ def docker(ctx, arch):
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
         'refs/pull/**',
       ],
     },
@@ -618,6 +619,37 @@ def binary(ctx, name):
           ],
         },
       },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'depends_on':
+      getTestSuiteNames() + [
+      'localApiTests-owncloud-storage',
+      'localApiTests-ocis-storage',
+    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/**',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def releaseSubmodule(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'release-%s' % (ctx.build.ref.replace("refs/tags/", "")),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps' : [
       {
         'name': 'release-submodule',
         'image': 'plugins/github-release:1',
@@ -628,7 +660,7 @@ def binary(ctx, name):
           },
           'files': [
           ],
-          'title': ctx.build.ref.replace("refs/tags/", ""),
+          'title': ctx.build.ref.replace("refs/tags/", "").replace("/v", " "),
           'note': 'Release %s submodule' % (ctx.build.ref.replace("refs/tags/", "").replace("/v", " ")),
           'overwrite': True,
           'prerelease': len(ctx.build.ref.split("-")) > 1,
@@ -646,19 +678,16 @@ def binary(ctx, name):
         'temp': {},
       },
     ],
-    'depends_on': 
-      getTestSuiteNames() + [
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
+    'depends_on': [
+      'linting&unitTests-%s' % (ctx.build.ref.replace("refs/tags/", "").split("/")[0]),
+    ],
     'trigger': {
       'ref': [
-        'refs/heads/master',
-        'refs/tags/**',
-        'refs/pull/**',
+        'refs/tags/*/v',
       ],
     },
   }
+
 
 def manifest(ctx):
   return {
