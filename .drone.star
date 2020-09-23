@@ -641,10 +641,9 @@ def binary(ctx, name):
   }
 
 def releaseSubmodule(ctx):
+  depends = []
   if len(ctx.build.ref.replace("refs/tags/", "").split("/")) == 2:
     depends = ['linting&unitTests-%s' % (ctx.build.ref.replace("refs/tags/", "").split("/")[0])]
-  else:
-    depends = []
 
   return {
     'kind': 'pipeline',
