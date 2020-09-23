@@ -641,6 +641,11 @@ def binary(ctx, name):
   }
 
 def releaseSubmodule(ctx):
+  if len(ctx.build.ref.replace("refs/tags/", "").split("/")) == 2:
+    depends = ['linting&unitTests-%s' % (ctx.build.ref.replace("refs/tags/", "").split("/")[0])]
+  else:
+    depends = []
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -678,9 +683,7 @@ def releaseSubmodule(ctx):
         'temp': {},
       },
     ],
-    'depends_on': [
-      'linting&unitTests-%s' % (ctx.build.ref.replace("refs/tags/", "").split("/")[0]),
-    ],
+    'depends_on': depends,
     'trigger': {
       'ref': [
         'refs/tags/*/v',
