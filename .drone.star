@@ -634,7 +634,7 @@ def binary(ctx, name):
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
         'refs/pull/**',
       ],
     },
@@ -685,7 +685,7 @@ def releaseSubmodule(ctx):
     'depends_on': depends,
     'trigger': {
       'ref': [
-        'refs/tags/*/v',
+        'refs/tags/*/v*',
       ],
     },
   }
