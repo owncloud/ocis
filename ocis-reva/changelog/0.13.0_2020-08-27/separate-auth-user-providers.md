@@ -5,5 +5,5 @@ which restricted using separate drivers and configs for both. This PR separates
 the two and adds the config for the rest user driver and the gatewaysvc
 parameter to EOS fs.
 
-https://github.com/owncloud/ocis/ocis-revapull/412
-https://github.com/cs3org/reva/pull/995
+<https://github.com/owncloud/ocis/ocis-revapull/412>
+<https://github.com/cs3org/reva/pull/995>

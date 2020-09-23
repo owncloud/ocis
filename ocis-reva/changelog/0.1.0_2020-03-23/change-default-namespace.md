@@ -8,4 +8,4 @@ This will allow us to focus on getting a single storage driver like eos or owncl
 
 To get back the global namespace, which ultimately is the goal, just set the above environment variable to `/`.
 
-https://github.com/owncloud/ocis/ocis-revapull/68
+<https://github.com/owncloud/ocis/ocis-revapull/68>

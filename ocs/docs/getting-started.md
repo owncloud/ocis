@@ -1,13 +1,14 @@
----
+* * *
+
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
 weight: 10
-geekdocRepo: https://github.com/owncloud/ocis-ocs
+geekdocRepo: <https://github.com/owncloud/ocis-ocs>
 geekdocEditPath: edit/master/docs
-geekdocFilePath: getting-started.md
----
 
-{{< toc >}}
+## geekdocFilePath: getting-started.md
+
+{{&lt; toc >}}
 
 ## Installation
 
@@ -15,7 +16,7 @@ So far we are offering two different variants for the installation. You can choo
 
 ### Docker
 
-Docker images for ocis-ocs are hosted on https://hub.docker.com/r/owncloud/ocis-ocs.
+Docker images for ocis-ocs are hosted on <https://hub.docker.com/r/owncloud/ocis-ocs>.
 
 The `latest` tag always reflects the current master branch.
 
@@ -25,7 +26,7 @@ docker pull owncloud/ocis-ocs
 
 ### Binaries
 
-The pre-built binaries for different platforms are downloadable at https://download.owncloud.com/ocis/ocs/ . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in https://download.owncloud.com/ocis/ocs/testing/
+The pre-built binaries for different platforms are downloadable at <https://download.owncloud.com/ocis/ocs/> . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in <https://download.owncloud.com/ocis/ocs/testing/>
 
 ```console
 curl https://download.owncloud.com/ocis/ocis-ocs/1.0.0-beta1/ocis-ocs-1.0.0-beta1-darwin-amd64 --output ocis-ocs
@@ -41,17 +42,17 @@ The program provides a few sub-commands on execution. The available configuratio
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 ocis-ocs server --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 ocis-ocs health --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ## Metrics
 

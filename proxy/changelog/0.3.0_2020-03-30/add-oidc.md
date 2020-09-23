@@ -4,5 +4,4 @@ The proxy will try to authenticate every request with the configured OIDC provid
 
 See configs/proxy-example.oidc.json for an example-configuration.
 
-https://github.com/owncloud/ocis/proxy/pull/27
-
+<https://github.com/owncloud/ocis/proxy/pull/27>

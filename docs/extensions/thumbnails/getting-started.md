@@ -1,13 +1,14 @@
----
+* * *
+
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-thumbnails
+geekdocRepo: <https://github.com/owncloud/ocis-thumbnails>
 geekdocEditPath: edit/master/docs
-geekdocFilePath: getting-started.md
----
 
-{{< toc >}}
+## geekdocFilePath: getting-started.md
+
+{{&lt; toc >}}
 
 ## Installation
 
@@ -88,7 +89,7 @@ THUMBNAILS_WEBDAVSOURCE_BASEURL
 : Base url for a webdav api, defaults to `https://localhost:9200/remote.php/webdav/`
 
 THUMBNAILS_RESOLUTIONS
-: List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
+: List of resolutions supported by the service, defaults to \`["16x16", "32x32", "64x64", "128x128"]
 
 #### Health
 
@@ -101,68 +102,68 @@ If you prefer to configure the service with commandline flags you can see the av
 
 #### Global
 
---config-file
+\--config-file
 : Path to config file, empty default value
 
---log-level
+\--log-level
 : Set logging level, defaults to `info`
 
---log-color
+\--log-color
 : Enable colored logging, defaults to `true`
 
---log-pretty
+\--log-pretty
 : Enable pretty logging, defaults to `true`
 
 #### Server
 
---tracing-enabled
+\--tracing-enabled
 : Enable sending traces, defaults to `false`
 
---tracing-type
+\--tracing-type
 : Tracing backend type, defaults to `jaeger`
 
---tracing-endpoint
+\--tracing-endpoint
 : Endpoint for the agent, empty default value
 
---tracing-collector
+\--tracing-collector
 : Endpoint for the collector, empty default value
 
---tracing-service
+\--tracing-service
 : Service name for tracing, defaults to `thumbnails`
 
---debug-addr
+\--debug-addr
 : Address to bind debug server, defaults to `0.0.0.0:9189`
 
---debug-token
+\--debug-token
 : Token to grant metrics access, empty default value
 
---debug-pprof
+\--debug-pprof
 : Enable pprof debugging, defaults to `false`
 
---debug-zpages
+\--debug-zpages
 : Enable zpages debugging, defaults to `false`
 
---grpc-name
+\--grpc-name
 : Name of the service, defaults to `thumbnails`
 
---grpc-addr
+\--grpc-addr
 : Address to bind grpc server, defaults to `0.0.0.0:9185`
 
---grpc-namespace
+\--grpc-namespace
 : Set the base namespace for the grpc namespace", defaults to `com.owncloud.api`
 
---filesystemstorage-root
+\--filesystemstorage-root
 : Root path of the filesystem storage directory, defaults to `<os tempdir>/ocis-thumbnails/`
 
---webdavsource-baseurl
+\--webdavsource-baseurl
 : Base url for a webdav api, defaults to `https://localhost:9200/remote.php/webdav/`
 
---thumbnail-resolution
-: List of resolutions supported by the service, defaults to `["16x16", "32x32", "64x64", "128x128"]
+\--thumbnail-resolution
+: List of resolutions supported by the service, defaults to \`["16x16", "32x32", "64x64", "128x128"]
 
 #### Health
 
---debug-addr
+\--debug-addr
 : Address to debug endpoint, defaults to `0.0.0.0:9189`
 
 ### Configuration file
@@ -177,17 +178,17 @@ The program provides a few sub-commands on execution. The available configuratio
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 {{ Name }} server --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 {{ Name }} health --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ## Metrics
 

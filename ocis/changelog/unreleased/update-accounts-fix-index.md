@@ -4,7 +4,7 @@ The accounts service was creating a bleve index instance in the service handler,
 
 This fixes a bug that accounts created through the web ui were not able to sign in until a service restart.
 
-https://github.com/owncloud/product/issues/224
-https://github.com/owncloud/ocis-accounts/pull/117
-https://github.com/owncloud/ocis-accounts/pull/118
-https://github.com/owncloud/ocis/pull/555
+<https://github.com/owncloud/product/issues/224>
+<https://github.com/owncloud/ocis-accounts/pull/117>
+<https://github.com/owncloud/ocis-accounts/pull/118>
+<https://github.com/owncloud/ocis/pull/555>

@@ -1,13 +1,14 @@
----
+* * *
+
 title: "Getting Started"
 date: 2020-02-27T20:35:00+01:00
 weight: 15
-geekdocRepo: https://github.com/owncloud/ocis
+geekdocRepo: <https://github.com/owncloud/ocis>
 geekdocEditPath: edit/master/docs
-geekdocFilePath: getting-started.md
----
 
-{{< toc >}}
+## geekdocFilePath: getting-started.md
+
+{{&lt; toc >}}
 
 ## Installation
 
@@ -15,7 +16,7 @@ So far we are offering two different variants for the installation. You can choo
 
 ### Docker
 
-Docker images for ocis are hosted on https://hub.docker.com/r/owncloud/ocis.
+Docker images for ocis are hosted on <https://hub.docker.com/r/owncloud/ocis>.
 
 The `latest` tag always reflects the current master branch.
 
@@ -25,8 +26,8 @@ docker pull owncloud/ocis
 
 #### Dependencies
 
-- Running ocis currently needs a working Redis caching server
-- The default storage location in the container is `/var/tmp/reva/data`. You may want to create a volume to persist the files in the primary storage
+-   Running ocis currently needs a working Redis caching server
+-   The default storage location in the container is `/var/tmp/reva/data`. You may want to create a volume to persist the files in the primary storage
 
 #### Docker compose
 
@@ -40,7 +41,7 @@ docker-compose -f ocis.yml -f ../cache/redis-ocis.yml up
 
 ### Binaries
 
-The pre-built binaries for different platforms are downloadable at https://download.owncloud.com/ocis/ocis/ . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in https://download.owncloud.com/ocis/ocis/testing/
+The pre-built binaries for different platforms are downloadable at <https://download.owncloud.com/ocis/ocis/> . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in <https://download.owncloud.com/ocis/ocis/testing/>
 
 ```console
 curl https://download.owncloud.com/ocis/ocis/1.0.0-beta1/ocis-1.0.0-beta1-darwin-amd64 --output ocis
@@ -50,8 +51,8 @@ chmod +x ocis
 
 #### Dependencies
 
-- Running ocis currently needs a working Redis caching server
-- The default promary storage location is `/var/tmp/reva/data`. You can change that value by configuration.
+-   Running ocis currently needs a working Redis caching server
+-   The default promary storage location is `/var/tmp/reva/data`. You can change that value by configuration.
 
 ## Usage
 
@@ -61,21 +62,21 @@ The program provides a few sub-commands on execution. The available configuratio
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 ocis server --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
-{{< highlight txt >}}
+{{&lt; highlight txt >}}
 ocis health --help
-{{< / highlight >}}
+{{&lt; / highlight >}}
 
 ## Quickstart for Developers
 
-Following https://github.com/owncloud/ocis#development
+Following <https://github.com/owncloud/ocis#development>
 
 ```console
 git clone https://github.com/owncloud/ocis.git
@@ -83,7 +84,7 @@ cd ocis
 make generate build
 ```
 
-Open https://localhost:9200 and login using one of the demo accounts:
+Open https&#x3A;//localhost:9200 and login using one of the demo accounts:
 
 ```console
 einstein:relativity

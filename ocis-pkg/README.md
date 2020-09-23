@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-pkg/status.svg)](https://cloud.drone.io/owncloud/ocis-pkg)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/27b2cb74a61547329f9b3c56d90bd05c)](https://www.codacy.com/manual/owncloud/ocis-pkg?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-pkg&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/27b2cb74a61547329f9b3c56d90bd05c)](https://www.codacy.com/manual/owncloud/ocis-pkg?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-pkg&utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-pkg?status.svg)](http://godoc.org/github.com/owncloud/ocis-pkg)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-pkg)](http://goreportcard.com/report/github.com/owncloud/ocis-pkg)
 
@@ -28,7 +28,7 @@ make test
 
 ## Security
 
-If you find a security issue please contact security@owncloud.com first.
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
 

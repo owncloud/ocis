@@ -10,7 +10,8 @@ This PR allows setting up different namespaces for `/webav` and `/dav/files`:
 This mimics oc10
 
 The `WEBDAV_NAMESPACE_JAIL` environment variable is split into
-- `WEBDAV_NAMESPACE` and
-- `DAV_FILES_NAMESPACE` accordingly.
 
-Related: https://github.com/owncloud/ocis/ocis-revapull/68
+-   `WEBDAV_NAMESPACE` and
+-   `DAV_FILES_NAMESPACE` accordingly.
+
+Related: <https://github.com/owncloud/ocis/ocis-revapull/68>

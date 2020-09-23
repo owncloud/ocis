@@ -5,4 +5,4 @@ The flags that let reva storage providers announce that they expose a data serve
 `REVA_STORAGE_HOME_EXPOSE_DATA_SERVER=1`
 `REVA_STORAGE_OC_EXPOSE_DATA_SERVER=1`
 
-https://github.com/owncloud/ocis/ocis-revaissues/89
+<https://github.com/owncloud/ocis/ocis-revaissues/89>

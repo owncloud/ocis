@@ -18,8 +18,8 @@ clean:
 .PHONY: generate-docs $(EXTENSIONS)
 generate-docs: $(EXTENSIONS)
 $(EXTENSIONS):
-	$(MAKE) -C $@ docs; \
-	mkdir -p docs/extensions/$@; \
+	$(MAKE) -C $@ docs; \\
+	mkdir -p docs/extensions/$@; \\
 	cp -R $@/docs/ docs/extensions/$@
 
 .PHONY: clean-docs
@@ -28,8 +28,8 @@ clean-docs:
 
 .PHONY: ocis-docs
 ocis-docs:
-	mkdir -p docs/ocis; \
-	$(MAKE) -C ocis docs; \
+	mkdir -p docs/ocis; \\
+	$(MAKE) -C ocis docs; \\
 	cp -R ocis/docs/ docs/ocis
 
 .PHONY: docs

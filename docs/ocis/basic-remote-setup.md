@@ -1,13 +1,14 @@
----
+* * *
+
 title: "Basic Remote Setup"
 date: 2020-02-27T20:35:00+01:00
 weight: 16
-geekdocRepo: https://github.com/owncloud/ocis
+geekdocRepo: <https://github.com/owncloud/ocis>
 geekdocEditPath: edit/master/docs
-geekdocFilePath: basic-remote-setup.md
----
 
-{{< toc >}}
+## geekdocFilePath: basic-remote-setup.md
+
+{{&lt; toc >}}
 
 Out of the box the ocis single binary and the `owncloud/ocis` docker image are configured to run on localhost for quick testing and development.
 
@@ -17,16 +18,16 @@ If you need to access ocis on a VM or a remote machine e.g. when testing a mobil
 
 If you start the ocis fullstack for the first time with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder relative to its location. This file is used to configure the clients for the built-in Identity Provider.
 
-{{< hint warning >}}
-**Outdated version**\
+{{&lt; hint warning >}}
+**Outdated version**\\
 The `identifier-registration.yml` file will only be generated if there is no such file in place. You could miss updates on this file. Run `make clean` to delete the file and keep the development environment tidy otherwise as well.
-{{< /hint >}}
+{{&lt; /hint >}}
 
 ### Add your hostname to the idp config
 
 Let us assume `your-host` is your remote domain name or IP adress. Add your host to the `identifier-registration.yml` like this:
 
-```yaml {linenos=table,hl_lines=["15-17",21]}
+```yaml {linenos=table,hl_lines=\["15-17",21]}
 # OpenID Connect client registry.
 clients:
   - id: phoenix
@@ -73,10 +74,10 @@ KONNECTD_TLS=0 \
 
 For more configuration options check the configuration secion in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
 
-{{< hint info >}}
-**TLS Certificate**\
+{{&lt; hint info >}}
+**TLS Certificate**\\
 In this example, we are replacing the default self signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
-{{< /hint >}}
+{{&lt; /hint >}}
 
 ## Use Docker Compose
 

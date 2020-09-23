@@ -1,23 +1,23 @@
----
+* * *
+
 title: "Login Flow"
 date: 2020-05-04T20:47:00+01:00
 weight: 43
-geekdocRepo: https://github.com/owncloud/ocis
+geekdocRepo: <https://github.com/owncloud/ocis>
 geekdocEditPath: edit/master/docs
-geekdocFilePath: login-flow.md
----
 
+## geekdocFilePath: login-flow.md
 
 ## Login Flow
 
 The following sequence diagram describes the [openid connect auth code flow](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth). The eight numbered steps and notes correspond to the [openid connect auth code flow steps](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowSteps). Example requests are based on the spec as well.:
 
-{{< mermaid class="text-center">}}
+{{&lt; mermaid class="text-center">}}
 sequenceDiagram
-    %% we have comments!! \o/
+    %% we have comments!! \\o/
     %% this documents the login workflow
-    %% examples taken from the oidc spec https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth
-    %% TODO add PKCE, see https://developer.okta.com/blog/2019/08/22/okta-authjs-pkce#use-pkce-to-make-your-apps-more-secure
+    %% examples taken from the oidc spec <https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth>
+    %% TODO add PKCE, see <https://developer.okta.com/blog/2019/08/22/okta-authjs-pkce#use-pkce-to-make-your-apps-more-secure>
     participant user as User
     participant client as Client
     participant proxy as ocis-proxy
@@ -82,4 +82,5 @@ sequenceDiagram
         client->>+proxy: PROPFIND <br> With access token
         proxy-->>-client: 207 Multi-Status
     client-->>-user: List of Files X, Y, Z ...
-{{< /mermaid >}}
+
+{{&lt; /mermaid >}}

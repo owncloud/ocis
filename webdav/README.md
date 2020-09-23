@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-webdav/status.svg)](https://cloud.drone.io/owncloud/ocis-webdav)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0913fcc866a344b587bb867fcec5b848)](https://www.codacy.com/app/owncloud/ocis-webdav?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-webdav&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0913fcc866a344b587bb867fcec5b848)](https://www.codacy.com/app/owncloud/ocis-webdav?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-webdav&utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-webdav?status.svg)](http://godoc.org/github.com/owncloud/ocis-webdav)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-webdav)](http://goreportcard.com/report/github.com/owncloud/ocis-webdav)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-webdav.svg)](http://microbadger.com/images/owncloud/ocis-webdav "Get your own image badge on microbadger.com")
@@ -28,7 +28,7 @@ make generate build
 
 ## Security
 
-If you find a security issue please contact security@owncloud.com first.
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
 
