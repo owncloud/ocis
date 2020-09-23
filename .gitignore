@@ -1,0 +1,9 @@
+*/coverage.out
+
+/ocis/bin
+/ocis/dist
+/hugo
+*.key
+*crt
+
+.idea
