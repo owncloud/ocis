@@ -4,4 +4,4 @@ We added an `ocis.id` claim to the OIDC standard claims. It allows the idp to se
 
 In addition we added `uidnumber` and `gidnumber` claims, which can be used by the IdP as well. They will be used by storage providers that integrate with an existing LDAP server.
 
-<https://github.com/owncloud/ocis-pkg/pull/50>
+https://github.com/owncloud/ocis-pkg/pull/50

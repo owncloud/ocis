@@ -4,4 +4,4 @@ We changed the default configuration to use the config file backend instead of t
 
 The config backend currently only has two hard coded users: demo and admin. To switch back to the ownCloud backend use `GLAUTH_BACKEND_DATASTORE=owncloud`
 
-<https://github.com/owncloud/ocis/glauth/pull/6>
+https://github.com/owncloud/ocis/glauth/pull/6

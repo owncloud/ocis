@@ -4,4 +4,4 @@ With the default setup of running oCIS with ocis-proxy we need to set `REVA_DATA
 `REVA_FRONTEND_URL` environment variables. We added those to the configuration instructions in
 the dev docs.
 
-<https://github.com/owncloud/ocis/pull/345>
+https://github.com/owncloud/ocis/pull/345

@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-glauth/status.svg)](https://cloud.drone.io/owncloud/ocis-glauth)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6f1eaaa399294d959ef7b3b10deed41d)](https://www.codacy.com/manual/owncloud/ocis-glauth?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-glauth&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6f1eaaa399294d959ef7b3b10deed41d)](https://www.codacy.com/manual/owncloud/ocis-glauth?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-glauth&amp;utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-glauth?status.svg)](http://godoc.org/github.com/owncloud/ocis-glauth)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-glauth)](http://goreportcard.com/report/github.com/owncloud/ocis-glauth)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-glauth.svg)](http://microbadger.com/images/owncloud/ocis-glauth "Get your own image badge on microbadger.com")
@@ -28,7 +28,7 @@ make generate build
 
 ## Security
 
-If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
+If you find a security issue please contact security@owncloud.com first.
 
 ## Contributing
 

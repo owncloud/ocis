@@ -1,20 +1,20 @@
-* * *
-
+---
 title: "Request Flow"
 date: 2020-04-27T16:07:00+01:00
 weight: 45
-geekdocRepo: <https://github.com/owncloud/ocis>
+geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
+geekdocFilePath: request-flow.md
+---
 
-## geekdocFilePath: request-flow.md
 
 ## Request Flow
 
 The following sequence diagram describes the general request flow. It shows where account provisioning and token minting are happening:
 
-{{&lt; mermaid class="text-center">}}
+{{< mermaid class="text-center">}}
 sequenceDiagram
-    %% we have comments!! \\o/
+    %% we have comments!! \o/
     participant user as User
     participant client as Client
     participant proxy as ocis-proxy
@@ -93,5 +93,4 @@ sequenceDiagram
         proxy-->>-client: Multistatus response
 
     client-->>-user: List of Files X, Y, Z ...
-
-{{&lt; /mermaid >}}
+{{< /mermaid >}}

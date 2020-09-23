@@ -9,13 +9,13 @@ Known issue: for users without the `AccountManagement` permission, the accounts 
 in the ocis-web app switcher, but the requests for loading the users will fail (as expected). We are working
 on a way to hide the accounts UI extension if the user doesn't have the `AccountManagement` permission.
 
-<https://github.com/owncloud/product/issues/124>
-<https://github.com/owncloud/ocis/settings/pull/59>
-<https://github.com/owncloud/ocis/settings/pull/66>
-<https://github.com/owncloud/ocis/settings/pull/67>
-<https://github.com/owncloud/ocis/settings/pull/69>
-<https://github.com/owncloud/ocis-proxy/pull/95>
-<https://github.com/owncloud/ocis-pkg/pull/59>
-<https://github.com/owncloud/ocis-accounts/pull/95>
-<https://github.com/owncloud/ocis-accounts/pull/100>
-<https://github.com/owncloud/ocis-accounts/pull/102>
+https://github.com/owncloud/product/issues/124
+https://github.com/owncloud/ocis/settings/pull/59
+https://github.com/owncloud/ocis/settings/pull/66
+https://github.com/owncloud/ocis/settings/pull/67
+https://github.com/owncloud/ocis/settings/pull/69
+https://github.com/owncloud/ocis-proxy/pull/95
+https://github.com/owncloud/ocis-pkg/pull/59
+https://github.com/owncloud/ocis-accounts/pull/95
+https://github.com/owncloud/ocis-accounts/pull/100
+https://github.com/owncloud/ocis-accounts/pull/102

@@ -1,19 +1,18 @@
-* * *
-
+---
 title: "Reva"
 date: 2018-05-02T00:00:00+00:00
 weight: 10
-geekdocRepo: <https://github.com/owncloud/ocis-reva>
+geekdocRepo: https://github.com/owncloud/ocis-reva
 geekdocEditPath: edit/master/docs
-
-## geekdocFilePath: \_index.md
+geekdocFilePath: _index.md
+---
 
 This service provides an ocis extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
 
 It uses the port range 9140-9179 to preconfigure several services.
 
 | port | service |
-\+------+---------+
++------+---------+
 | 9109 | health? |
 | 9140 | frontend        |
 | 9141 | frontend debug        |

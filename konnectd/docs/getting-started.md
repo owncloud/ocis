@@ -1,14 +1,13 @@
-* * *
-
+---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
 weight: 10
-geekdocRepo: <https://github.com/owncloud/ocis-konnectd>
+geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
+geekdocFilePath: getting-started.md
+---
 
-## geekdocFilePath: getting-started.md
-
-{{&lt; toc >}}
+{{< toc >}}
 
 ## Installation
 
@@ -16,7 +15,7 @@ So far we are offering two different variants for the installation. You can choo
 
 ### Docker
 
-Docker images for ocis-reva are hosted on <https://hub.docker.com/r/owncloud/ocis-konnectd>.
+Docker images for ocis-reva are hosted on https://hub.docker.com/r/owncloud/ocis-konnectd.
 
 The `latest` tag always reflects the current master branch.
 
@@ -26,7 +25,7 @@ docker pull owncloud/ocis-konnectd
 
 ### Binaries
 
-The pre-built binaries for different platforms are downloadable at <https://download.owncloud.com/ocis/ocis-konnectd/> . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in <https://download.owncloud.com/ocis/ocis-konnectd/testing/>
+The pre-built binaries for different platforms are downloadable at https://download.owncloud.com/ocis/ocis-konnectd/ . Specific releases are organized in separate folders. They are in sync which every release tag on GitHub. The binaries from the current master branch can be found in https://download.owncloud.com/ocis/ocis-konnectd/testing/
 
 ```console
 curl https://download.owncloud.com/ocis/ocis-konnectd/1.0.0-beta1/ocis-konnectd-1.0.0-beta1-darwin-amd64 --output ocis-konnectd
@@ -42,17 +41,17 @@ The program provides a few sub-commands on execution. The available configuratio
 
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
-{{&lt; highlight txt >}}
+{{< highlight txt >}}
 ocis-konnectd server --help
-{{&lt; / highlight >}}
+{{< / highlight >}}
 
 ### Health
 
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
-{{&lt; highlight txt >}}
+{{< highlight txt >}}
 ocis-konnectd health --help
-{{&lt; / highlight >}}
+{{< / highlight >}}
 
 ## Metrics
 

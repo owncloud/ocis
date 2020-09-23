@@ -1,4 +1,4 @@
-# Changelog for [0.3.2] \(2020-07-23)
+# Changelog for [0.3.2] (2020-07-23)
 
 The following sections list the changes in ocis-konnectd 0.3.2.
 
@@ -6,27 +6,27 @@ The following sections list the changes in ocis-konnectd 0.3.2.
 
 ## Summary
 
--   Bugfix - Add silent redirect url: [#69](https://github.com/owncloud/ocis/konnectd/issues/69)
--   Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis/konnectd/pull/71)
+* Bugfix - Add silent redirect url: [#69](https://github.com/owncloud/ocis/konnectd/issues/69)
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis/konnectd/pull/71)
 
 ## Details
 
--   Bugfix - Add silent redirect url: [#69](https://github.com/owncloud/ocis/konnectd/issues/69)
+* Bugfix - Add silent redirect url: [#69](https://github.com/owncloud/ocis/konnectd/issues/69)
 
-     Adds the oidc-silent-redirect.html phoenix uses to silently refresh access tokens to the
-     default identifier-registration.yml
+   Adds the oidc-silent-redirect.html phoenix uses to silently refresh access tokens to the
+   default identifier-registration.yml
 
-     <https://github.com/owncloud/ocis/konnectd/issues/69>
-     <https://github.com/owncloud/ocis/konnectd/pull/70>
+   https://github.com/owncloud/ocis/konnectd/issues/69
+   https://github.com/owncloud/ocis/konnectd/pull/70
 
 
--   Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis/konnectd/pull/71)
+* Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#71](https://github.com/owncloud/ocis/konnectd/pull/71)
 
-     ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
+   ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
 
-     <https://github.com/owncloud/ocis/konnectd/pull/71>
+   https://github.com/owncloud/ocis/konnectd/pull/71
 
-# Changelog for [0.3.1] \(2020-04-14)
+# Changelog for [0.3.1] (2020-04-14)
 
 The following sections list the changes in ocis-konnectd 0.3.1.
 
@@ -34,17 +34,17 @@ The following sections list the changes in ocis-konnectd 0.3.1.
 
 ## Summary
 
--   Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis/konnectd/pull/64)
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis/konnectd/pull/64)
 
 ## Details
 
--   Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis/konnectd/pull/64)
+* Bugfix - Include the assets for #62: [#64](https://github.com/owncloud/ocis/konnectd/pull/64)
 
-     PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
+   PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
 
-     <https://github.com/owncloud/ocis/konnectd/pull/64>
+   https://github.com/owncloud/ocis/konnectd/pull/64
 
-# Changelog for [0.3.0] \(2020-04-14)
+# Changelog for [0.3.0] (2020-04-14)
 
 The following sections list the changes in ocis-konnectd 0.3.0.
 
@@ -52,41 +52,41 @@ The following sections list the changes in ocis-konnectd 0.3.0.
 
 ## Summary
 
--   Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
--   Change - Add a trailing slash to trusted redirect uris: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
--   Change - Improve client identifiers for end users: [#62](https://github.com/owncloud/ocis/konnectd/pull/62)
--   Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
+* Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
+* Change - Add a trailing slash to trusted redirect uris: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
+* Change - Improve client identifiers for end users: [#62](https://github.com/owncloud/ocis/konnectd/pull/62)
+* Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
 
 ## Details
 
--   Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
+* Bugfix - Redirect to the provided uri: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
 
-     The phoenix client was not set as trusted therefore when logging out the user was redirected to a
-     default page instead of the provided url.
+   The phoenix client was not set as trusted therefore when logging out the user was redirected to a
+   default page instead of the provided url.
 
-     <https://github.com/owncloud/ocis/konnectd/issues/26>
-
-
--   Change - Add a trailing slash to trusted redirect uris: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
-
-     Phoenix changed the redirect uri to `<baseUrl>#/login` that means it will contain a trailing
-     slash after the base url.
-
-     <https://github.com/owncloud/ocis/konnectd/issues/26>
+   https://github.com/owncloud/ocis/konnectd/issues/26
 
 
--   Change - Improve client identifiers for end users: [#62](https://github.com/owncloud/ocis/konnectd/pull/62)
+* Change - Add a trailing slash to trusted redirect uris: [#26](https://github.com/owncloud/ocis/konnectd/issues/26)
 
-     Improved end user facing client names in default identifier-registration.yaml
+   Phoenix changed the redirect uri to `<baseUrl>#/login` that means it will contain a trailing
+   slash after the base url.
 
-     <https://github.com/owncloud/ocis/konnectd/pull/62>
+   https://github.com/owncloud/ocis/konnectd/issues/26
 
 
--   Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
+* Change - Improve client identifiers for end users: [#62](https://github.com/owncloud/ocis/konnectd/pull/62)
 
-     <https://github.com/owncloud/product/issues/14>
+   Improved end user facing client names in default identifier-registration.yaml
 
-# Changelog for [0.2.0] \(2020-03-18)
+   https://github.com/owncloud/ocis/konnectd/pull/62
+
+
+* Enhancement - Use upstream version of konnect library: [#14](https://github.com/owncloud/product/issues/14)
+
+   https://github.com/owncloud/product/issues/14
+
+# Changelog for [0.2.0] (2020-03-18)
 
 The following sections list the changes in ocis-konnectd 0.2.0.
 
@@ -94,15 +94,15 @@ The following sections list the changes in ocis-konnectd 0.2.0.
 
 ## Summary
 
--   Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis/konnectd/pull/55)
+* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis/konnectd/pull/55)
 
 ## Details
 
--   Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis/konnectd/pull/55)
+* Enhancement - Change default config for single-binary: [#55](https://github.com/owncloud/ocis/konnectd/pull/55)
 
-     <https://github.com/owncloud/ocis/konnectd/pull/55>
+   https://github.com/owncloud/ocis/konnectd/pull/55
 
-# Changelog for [0.1.0] \(2020-03-18)
+# Changelog for [0.1.0] (2020-03-18)
 
 The following sections list the changes in ocis-konnectd 0.1.0.
 
@@ -110,41 +110,42 @@ The following sections list the changes in ocis-konnectd 0.1.0.
 
 ## Summary
 
--   Bugfix - Generate a random CSP-Nonce in the webapp: [#17](https://github.com/owncloud/ocis/konnectd/issues/17)
--   Change - Dummy index.html is not required anymore by upstream: [#25](https://github.com/owncloud/ocis/konnectd/issues/25)
--   Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis/konnectd/issues/1)
--   Change - Use glauth as ldap backend, default to running behind ocis-proxy: [#52](https://github.com/owncloud/ocis/konnectd/pull/52)
+* Bugfix - Generate a random CSP-Nonce in the webapp: [#17](https://github.com/owncloud/ocis/konnectd/issues/17)
+* Change - Dummy index.html is not required anymore by upstream: [#25](https://github.com/owncloud/ocis/konnectd/issues/25)
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis/konnectd/issues/1)
+* Change - Use glauth as ldap backend, default to running behind ocis-proxy: [#52](https://github.com/owncloud/ocis/konnectd/pull/52)
 
 ## Details
 
--   Bugfix - Generate a random CSP-Nonce in the webapp: [#17](https://github.com/owncloud/ocis/konnectd/issues/17)
+* Bugfix - Generate a random CSP-Nonce in the webapp: [#17](https://github.com/owncloud/ocis/konnectd/issues/17)
 
-     <https://github.com/owncloud/ocis/konnectd/issues/17>
-     <https://github.com/owncloud/ocis/konnectd/pull/29>
-
-
--   Change - Dummy index.html is not required anymore by upstream: [#25](https://github.com/owncloud/ocis/konnectd/issues/25)
-
-     The workaround was required as identifier webapp was mandatory, but we serve it from memory.
-     This also introduces --disable-identifier-webapp flag.
-
-     <https://github.com/owncloud/ocis/konnectd/issues/25>
+   https://github.com/owncloud/ocis/konnectd/issues/17
+   https://github.com/owncloud/ocis/konnectd/pull/29
 
 
--   Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis/konnectd/issues/1)
+* Change - Dummy index.html is not required anymore by upstream: [#25](https://github.com/owncloud/ocis/konnectd/issues/25)
 
-     Just prepare an initial basic version to serve konnectd embedded into our microservice
-     infrastructure in the scope of the ownCloud Infinite Scale project.
+   The workaround was required as identifier webapp was mandatory, but we serve it from memory.
+   This also introduces --disable-identifier-webapp flag.
 
-     <https://github.com/owncloud/ocis/konnectd/issues/1>
+   https://github.com/owncloud/ocis/konnectd/issues/25
 
 
--   Change - Use glauth as ldap backend, default to running behind ocis-proxy: [#52](https://github.com/owncloud/ocis/konnectd/pull/52)
+* Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis/konnectd/issues/1)
 
-     We changed the default configuration to integrate better with ocis.
+   Just prepare an initial basic version to serve konnectd embedded into our microservice
+   infrastructure in the scope of the ownCloud Infinite Scale project.
 
-     The default ldap port changes to 9125, which is used by ocis-glauth and we use ocis-proxy to do
-     the tls offloading. Clients are supposed to use the ocis-proxy endpoint
-     `https://localhost:9200`
+   https://github.com/owncloud/ocis/konnectd/issues/1
 
-     <https://github.com/owncloud/ocis/konnectd/pull/52>
+
+* Change - Use glauth as ldap backend, default to running behind ocis-proxy: [#52](https://github.com/owncloud/ocis/konnectd/pull/52)
+
+   We changed the default configuration to integrate better with ocis.
+
+   The default ldap port changes to 9125, which is used by ocis-glauth and we use ocis-proxy to do
+   the tls offloading. Clients are supposed to use the ocis-proxy endpoint
+   `https://localhost:9200`
+
+   https://github.com/owncloud/ocis/konnectd/pull/52
+

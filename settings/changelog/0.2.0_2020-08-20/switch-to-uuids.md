@@ -4,4 +4,4 @@ Change: Use UUIDs instead of alphanumeric identifiers
 in order to achieve a flat file hierarchy on disk. Referencing the respective entities by their alphanumeric
 identifiers (as used in UI code) is still supported.
 
-<https://github.com/owncloud/ocis/settings/pull/46>
+https://github.com/owncloud/ocis/settings/pull/46

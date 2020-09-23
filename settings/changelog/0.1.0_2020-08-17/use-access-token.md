@@ -5,4 +5,4 @@ authenticated user from the `x-access-token` of the http request header and inje
 it into the Identifier protobuf messages wherever possible. This allows us to use
 `me` instead of an actual account uuid, when the request comes through the proxy.
 
-<https://github.com/owncloud/ocis/settings/pull/14>
+https://github.com/owncloud/ocis/settings/pull/14

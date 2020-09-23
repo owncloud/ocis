@@ -1,12 +1,11 @@
-* * *
-
+---
 title: "Debugging"
 date: 2020-03-19T08:21:00+01:00
 weight: 50
-geekdocRepo: <https://github.com/owncloud/ocis>
+geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
-
-## geekdocFilePath: debugging.md
+geekdocFilePath: debugging.md
+---
 
 ## Debugging
 
@@ -14,7 +13,7 @@ As a single binary for easy deployment running `ocis server` just forks itself t
 
 Ultimately, we want to be able to stop a single service using eg. `ocis kill phoenix` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
 
-### Start ocis
+### Start ocis 
 
 For debugging there are two workflows that work well, depending on your preferences.
 
@@ -68,8 +67,7 @@ Then you can set a breakpoint in the service you need and attach to the process 
 
 #### Start all services independently to replace one of them with a debug process
 
-1.  You can use this `./ocis.sh` script to start all services independently, so they don't get restrarted by the runtime when you kill them:
-
+1. You can use this `./ocis.sh` script to start all services independently, so they don't get restrarted by the runtime when you kill them:
 ```bash
 #/bin/sh
 LOG_LEVEL="debug"
@@ -99,7 +97,7 @@ bin/ocis --log-level=$LOG_LEVEL reva-users &
 bin/ocis --log-level=$LOG_LEVEL proxy &
 ```
 
-2.  Get the list of running processes:
+2. Get the list of running processes:
 
 ```console
 # ps ax | grep ocis
@@ -128,13 +126,14 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 13015 pts/1    Sl     0:00 bin/ocis-debug reva-auth-basic
 ```
 
-3.  Kill the service you want to start in debug mode:
+3. Kill the service you want to start in debug mode:
+
 
 ```console
 # kill 17628
 ```
 
-4.  Start the service you are interested in in debug mode. When using make to build the binary there is already a `bin/ocis-debug` binary for you. When running an IDE tell it which service to start by providing the corresponding sub command, eg. `bin\ocis-debug reva-frontend`.
+4. Start the service you are interested in in debug mode. When using make to build the binary there is already a `bin/ocis-debug` binary for you. When running an IDE tell it which service to start by providing the corresponding sub command, eg. `bin\ocis-debug reva-frontend`.
 
 ### Gather error messages
 
@@ -158,22 +157,24 @@ This popped up when I tried to add `marie` as a collaborator in phoenix. That tr
 </ocs>
 ```
 
-{{&lt; hint info >}}
+{{< hint info >}}
 The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
-{{&lt; /hint >}}
-{{&lt; hint danger >}}
+{{< /hint >}}
+{{< hint danger >}}
 TODO add ocis cli tool to obtain a bearer token.
-{{&lt; /hint >}}
+{{< /hint >}}
 
 We also have a few interesting log entries:
 
-    0:43PM INF home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/grpc/interceptors/log/log.go:69 > unary code=OK end="18/Mar/2020:22:43:40 +0100" from=tcp://[::1]:44078 pid=17836 pkg=rgrpc start="18/Mar/2020:22:43:40 +0100" time_ns=95841 traceid=b4eb9a9f45921f7d3632523ca32a42b0 uri=/cs3.storage.registry.v1beta1.RegistryAPI/GetStorageProvider user-agent=grpc-go/1.26.0
-    10:43PM ERR home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/grpc/interceptors/log/log.go:69 > unary code=Unknown end="18/Mar/2020:22:43:40 +0100" from=tcp://[::1]:43910 pid=17836 pkg=rgrpc start="18/Mar/2020:22:43:40 +0100" time_ns=586115 traceid=b4eb9a9f45921f7d3632523ca32a42b0 uri=/cs3.gateway.v1beta1.GatewayAPI/Stat user-agent=grpc-go/1.26.0
-    10:43PM ERR home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/http/services/owncloud/ocs/reqres.go:94 > error sending a grpc stat request error="rpc error: code = Unknown desc = gateway: error calling Stat: rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp [::1]:9152: connect: connection refused\"" pid=17832 pkg=rhttp traceid=b4eb9a9f45921f7d3632523ca32a42b0
+```
+0:43PM INF home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/grpc/interceptors/log/log.go:69 > unary code=OK end="18/Mar/2020:22:43:40 +0100" from=tcp://[::1]:44078 pid=17836 pkg=rgrpc start="18/Mar/2020:22:43:40 +0100" time_ns=95841 traceid=b4eb9a9f45921f7d3632523ca32a42b0 uri=/cs3.storage.registry.v1beta1.RegistryAPI/GetStorageProvider user-agent=grpc-go/1.26.0
+10:43PM ERR home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/grpc/interceptors/log/log.go:69 > unary code=Unknown end="18/Mar/2020:22:43:40 +0100" from=tcp://[::1]:43910 pid=17836 pkg=rgrpc start="18/Mar/2020:22:43:40 +0100" time_ns=586115 traceid=b4eb9a9f45921f7d3632523ca32a42b0 uri=/cs3.gateway.v1beta1.GatewayAPI/Stat user-agent=grpc-go/1.26.0
+10:43PM ERR home/jfd/go/pkg/mod/github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/http/services/owncloud/ocs/reqres.go:94 > error sending a grpc stat request error="rpc error: code = Unknown desc = gateway: error calling Stat: rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing dial tcp [::1]:9152: connect: connection refused\"" pid=17832 pkg=rhttp traceid=b4eb9a9f45921f7d3632523ca32a42b0
+```
 
-{{&lt; hint danger >}}
-TODO return the trace id in the response so we can correlate easier. For reva tracked in <https://github.com/cs3org/reva/issues/587>
-{{&lt; /hint >}}
+{{< hint danger >}}
+TODO return the trace id in the response so we can correlate easier. For reva tracked in https://github.com/cs3org/reva/issues/587
+{{< /hint >}}
 
 The last line gives us a hint where the log message originated: `.../github.com/cs3org/reva@v0.0.2-0.20200318111623-a2f97d4aa741/internal/http/services/owncloud/ocs/reqres.go:94`. Which looks like this:
 
@@ -202,14 +203,15 @@ Debug wherever the call trace leads you to ... good luck!
 You can either run and manage the services independently, or you can update the `go.mod` file and replace dependencies with your local version.
 
 To debug the reva frontend we need to add two replacements:
-
-    // use the local ocis-reva repo
-    replace github.com/owncloud/ocis-reva => ../ocis-reva
-    // also use the local reva repo
-    replace github.com/cs3org/reva => ../reva
-
-{{&lt; hint info >}}
+```
+// use the local ocis-reva repo
+replace github.com/owncloud/ocis-reva => ../ocis-reva
+// also use the local reva repo
+replace github.com/cs3org/reva => ../reva
+```
+{{< hint info >}}
 The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
-{{&lt; /hint >}}
+{{< /hint >}}
 
 Rebuild ocis to make sure the dependency is used. It should be sufficient to just restart the service you want to debug.
+

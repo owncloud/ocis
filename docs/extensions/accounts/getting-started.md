@@ -1,14 +1,13 @@
-* * *
-
+---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
 weight: 20
-geekdocRepo: <https://github.com/owncloud/ocis-accounts>
+geekdocRepo: https://github.com/owncloud/ocis-accounts
 geekdocEditPath: edit/master/docs
+geekdocFilePath: getting-started.md
+---
 
-## geekdocFilePath: getting-started.md
-
-{{&lt; toc >}}
+{{< toc >}}
 
 ## Installation
 
@@ -57,6 +56,6 @@ The program provides a few sub-commands on execution. The available configuratio
 
 The server command is used to start the grpc server. For further help please execute:
 
-{{&lt; highlight txt >}}
+{{< highlight txt >}}
 ocis-accounts server --help
-{{&lt; / highlight >}}
+{{< / highlight >}}
