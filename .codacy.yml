@@ -1,9 +1,14 @@
 ---
 exclude_paths:
-  - CHANGELOG.md
-  - changelog/**
-  - docs/**
-  - pkg/proto/**
-  - tests/acceptance/features/bootstrap/*
+  - 'CHANGELOG.md'
+  - '**/CHANGELOG.md'
+  - 'changelog/**'
+  - '**/changelog/**'
+  - 'docs/**'
+  - '**/docs/**'
+  - '**/pkg/proto/**'
+  - 'konnectd/assets/identifier/**'
+  - 'settings/rollup.config.js'
+  - 'accounts/rollup.config.js'
 
 ...

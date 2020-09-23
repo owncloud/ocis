@@ -1,0 +1,7 @@
+coverage.out
+
+/bin
+/dist
+/hugo
+ldap.key
+ldap.crt

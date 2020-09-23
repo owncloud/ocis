@@ -1,0 +1,53 @@
+{{ $allVersions := . }}
+{{- range $index, $changes := . }}{{ with $changes -}}
+{{ if gt (len $allVersions) 1 -}}
+# Changelog for [{{ .Version }}] ({{ .Date }})
+
+The following sections list the changes in ocis-settings {{ .Version }}.
+
+{{/* creating version compare links */ -}}
+{{ $next := add1 $index -}}
+{{ if ne (len $allVersions) $next -}}
+{{ $previousVersion := (index $allVersions $next).Version -}}
+{{ if eq .Version "unreleased" -}}
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/v{{ $previousVersion }}...master
+
+{{ else -}}
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/v{{ $previousVersion }}...v{{ .Version }}
+
+{{ end -}}
+{{ end -}}
+
+{{- /* last version managed by calens, end of the loop */ -}}
+{{ if eq .Version "0.1.0" -}}
+[{{ .Version }}]: https://github.com/owncloud/ocis/settings/compare/6fdbbd7e8eb39f18ada1a8a3c45a1c925e239889...v{{ .Version }}
+
+{{ end -}}
+{{ else -}}
+# Changes in {{ .Version }}
+
+{{ end -}}
+
+## Summary
+{{ range $entry := .Entries }}{{ with $entry }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
+{{- end }}{{ end }}
+
+## Details
+{{ range $entry := .Entries }}{{ with $entry }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
+{{ range $par := .Paragraphs }}
+   {{ wrapIndent $par 80 3 }}
+{{ end -}}
+{{ range $url := .IssueURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .PRURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .OtherURLs }}
+   {{ $url -}}
+{{ end }}
+
+{{ end }}{{ end -}}
+{{ end }}{{ end -}}

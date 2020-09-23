@@ -1,0 +1,9 @@
+---
+exclude_paths:
+  - CHANGELOG.md
+  - changelog/**
+  - docs/**
+  - pkg/proto/**
+  - tests/acceptance/features/bootstrap/*
+
+...

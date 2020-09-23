@@ -1,0 +1,5 @@
+Change: Point /data endpoint to reva frontend
+
+Adjusted example config files to point /data to the reva frontend.
+
+https://github.com/owncloud/ocis/proxy/pull/45

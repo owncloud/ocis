@@ -1,7 +1,21 @@
 config = {
+  'modules': {
+    'accounts': 'frontend',
+    'glauth':'',
+    'konnectd':'',
+    'ocis-phoenix':'',
+    'ocis-pkg':'',
+    'ocis-reva':'',
+    'ocs':'',
+    'proxy':'',
+    'settings':'frontend',
+    'store':'',
+    'thumbnails':'',
+    'webdav':'',
+  },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': 'cb90a3b8bfcddb81f8cf6d84750feaa779105b94',
+    'coreCommit': '2c5bb68fc689d7e9dd912125680c0fad99528fa9',
     'numberOfParts': 4
   },
   'uiTests': {
@@ -45,6 +59,12 @@ config = {
     }
   }
 }
+def getTestSuiteNames():
+  keys = config['modules'].keys()
+  names = []
+  for key in keys:
+    names.append('linting&unitTests-%s' % (key))
+  return names
 
 def getUITestSuiteNames():
   return config['uiTests']['suites'].keys()
@@ -64,8 +84,8 @@ def main(ctx):
 
   stages = [
     docker(ctx, 'amd64'),
-    docker(ctx, 'arm64'),
-    docker(ctx, 'arm'),
+    #docker(ctx, 'arm64'),
+    #docker(ctx, 'arm'),
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
@@ -73,20 +93,22 @@ def main(ctx):
 
   after = [
     manifest(ctx),
-    changelog(ctx),
+    #changelog(ctx),
     readme(ctx),
     badges(ctx),
     website(ctx),
-    updateDeployment(ctx)
+    #updateDeployment(ctx)
   ]
 
   return before + stages + after
 
 def testPipelines(ctx):
+  pipelines = []
 
-  pipelines = [
-    linting(ctx),
-    unitTests(ctx),
+  for module in config['modules']:
+    pipelines.append(testing(ctx, module))
+
+  pipelines += [
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
   ]
@@ -98,86 +120,59 @@ def testPipelines(ctx):
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
   return pipelines
 
-def linting(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'linting',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps':
-      generate() + [
-      {
-        'name': 'vet',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make vet',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'staticcheck',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make staticcheck',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-      {
-        'name': 'lint',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make lint',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
-      },
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/**',
-        'refs/pull/**',
+def testing(ctx, module):
+  steps = generate(module) + [
+    {
+      'name': 'vet',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'cd %s' % (module),
+        'make vet',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
       ],
     },
-  }
-
-def unitTests(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'unitTests',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
+    {
+      'name': 'staticcheck',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'cd %s' % (module),
+        'make staticcheck',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
     },
-    'steps':
-      generate() +
-      build() + [
-      {
+    {
+      'name': 'lint',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'cd %s' % (module),
+        'make lint',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+    },
+    {
         'name': 'test',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
+          'cd %s' % (module),
           'make test',
         ],
         'volumes': [
@@ -197,7 +192,20 @@ def unitTests(ctx):
           },
         },
       },
-    ],
+  ]
+
+  if config['modules'][module] == 'frontend':
+    steps = frontend(module) + steps
+
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'linting&unitTests-%s' % (module),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': steps,
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -217,7 +225,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
       'arch': 'amd64',
     },
     'steps':
-      generate() +
+      generate('ocis') +
       build() +
       ocisServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
@@ -235,6 +243,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'PATH_TO_CORE': '/srv/app/testrunner'
         },
         'commands': [
+          'cd ocis',
           'make test-acceptance-api',
         ],
         'volumes': [{
@@ -270,7 +279,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       'arch': 'amd64',
     },
     'steps':
-      generate() +
+      generate('ocis') +
       build() +
       ocisServer(storage) +
       cloneCoreRepos(coreBranch, coreCommit) + [
@@ -287,7 +296,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage',
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
+          'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -335,7 +344,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
       'arch': 'amd64',
     },
     'steps':
-      generate() +
+      generate('ocis') +
       build() +
       ocisServer(storage) + [
       {
@@ -348,7 +357,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
-          'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
@@ -401,13 +410,13 @@ def docker(ctx, arch):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': arch,
+    'name': 'docker-%s' % (arch),
     'platform': {
       'os': 'linux',
       'arch': arch,
     },
     'steps':
-      generate() +
+      generate('ocis') +
       build() + [
       {
         'name': 'dryrun',
@@ -415,8 +424,9 @@ def docker(ctx, arch):
         'pull': 'always',
         'settings': {
           'dry_run': True,
+          'context': 'ocis',
           'tags': 'linux-%s' % (arch),
-          'dockerfile': 'docker/Dockerfile.linux.%s' % (arch),
+          'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
           'repo': ctx.repo.slug,
         },
         'when': {
@@ -433,20 +443,22 @@ def docker(ctx, arch):
         'pull': 'always',
         'settings': {
           'username': {
-            'from_secret': 'docker_username',
+            'from_secret': '*docker_username*',
           },
           'password': {
             'from_secret': 'docker_password',
           },
           'auto_tag': True,
+          'context': 'ocis',
           'auto_tag_suffix': 'linux-%s' % (arch),
-          'dockerfile': 'docker/Dockerfile.linux.%s' % (arch),
+          'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
           'repo': ctx.repo.slug,
         },
         'when': {
           'ref': {
             'exclude': [
               'refs/pull/**',
+              'refs/tags/*/v*',
             ],
           },
         },
@@ -458,9 +470,8 @@ def docker(ctx, arch):
         'temp': {},
       },
     ],
-    'depends_on': [
-      'linting',
-      'unitTests',
+    'depends_on': 
+      getTestSuiteNames() + [
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
@@ -483,14 +494,14 @@ def binary(ctx, name):
         'from_secret': 'aws_access_key_id',
       },
       'secret_key': {
-        'from_secret': 'aws_secret_access_key',
+        'from_secret': '*aws_secret_access_key*',
       },
       'bucket': {
         'from_secret': 's3_bucket',
       },
       'path_style': True,
-      'strip_prefix': 'dist/release/',
-      'source': 'dist/release/*',
+      'strip_prefix': 'ocis/dist/release/',
+      'source': 'ocis/dist/release/*',
       'target': '/ocis/%s/%s' % (ctx.repo.name.replace("ocis-", ""), ctx.build.ref.replace("refs/tags/v", "")),
     }
   else:
@@ -502,32 +513,33 @@ def binary(ctx, name):
         'from_secret': 'aws_access_key_id',
       },
       'secret_key': {
-        'from_secret': 'aws_secret_access_key',
+        'from_secret': '*aws_secret_access_key*',
       },
       'bucket': {
         'from_secret': 's3_bucket',
       },
       'path_style': True,
       'strip_prefix': 'dist/release/',
-      'source': 'dist/release/*',
+      'source': 'ocis/dist/release/*',
       'target': '/ocis/%s/testing' % (ctx.repo.name.replace("ocis-", "")),
     }
 
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': name,
+    'name': 'binaries-%s' % (name),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
     'steps':
-      generate() + [
+      generate('ocis') + [
       {
         'name': 'build',
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
+          'cd ocis',
           'make release-%s' % (name),
         ],
         'volumes': [
@@ -542,6 +554,7 @@ def binary(ctx, name):
         'image': 'webhippie/golang:1.13',
         'pull': 'always',
         'commands': [
+          'cd ocis',
           'make release-finish',
         ],
         'volumes': [
@@ -550,6 +563,12 @@ def binary(ctx, name):
             'path': '/srv/app',
           },
         ],
+        'when': {
+          'ref': [
+            'refs/heads/master',
+            'refs/tags/v*',
+          ],
+        },
       },
       {
         'name': 'upload',
@@ -559,7 +578,7 @@ def binary(ctx, name):
         'when': {
           'ref': [
             'refs/heads/master',
-            'refs/tags/**',
+            'refs/tags/v*',
           ],
         },
       },
@@ -568,11 +587,12 @@ def binary(ctx, name):
         'image': 'toolhippie/calens:latest',
         'pull': 'always',
         'commands': [
+          'cd ocis',
           'calens --version %s -o dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
           'ref': [
-            'refs/tags/**',
+            'refs/tags/v*',
           ],
         },
       },
@@ -585,16 +605,37 @@ def binary(ctx, name):
             'from_secret': 'github_token',
           },
           'files': [
-            'dist/release/*',
+            'ocis/dist/release/*',
           ],
           'title': ctx.build.ref.replace("refs/tags/v", ""),
-          'note': 'dist/CHANGELOG.md',
+          'note': 'ocis/dist/CHANGELOG.md',
           'overwrite': True,
           'prerelease': len(ctx.build.ref.split("-")) > 1,
         },
         'when': {
           'ref': [
-            'refs/tags/**',
+            'refs/tags/v*',
+          ],
+        },
+      },
+      {
+        'name': 'release-submodule',
+        'image': 'plugins/github-release:1',
+        'pull': 'always',
+        'settings': {
+          'api_key': {
+            'from_secret': 'github_token',
+          },
+          'files': [
+          ],
+          'title': ctx.build.ref.replace("refs/tags/", ""),
+          'note': 'Release %s submodule' % (ctx.build.ref.replace("refs/tags/", "").replace("/v", " ")),
+          'overwrite': True,
+          'prerelease': len(ctx.build.ref.split("-")) > 1,
+        },
+        'when': {
+          'ref': [
+            'refs/tags/*/v*',
           ],
         },
       },
@@ -605,9 +646,8 @@ def binary(ctx, name):
         'temp': {},
       },
     ],
-    'depends_on': [
-      'linting',
-      'unitTests',
+    'depends_on': 
+      getTestSuiteNames() + [
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
@@ -618,46 +658,6 @@ def binary(ctx, name):
         'refs/pull/**',
       ],
     },
-  }
-
-def updateDeployment(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'updateDeployment',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps': [
-      {
-        'name': 'webhook',
-        'image': 'plugins/webhook',
-        'settings': {
-          'username': {
-            'from_secret': 'webhook_username',
-          },
-          'password': {
-            'from_secret': 'webhook_password',
-          },
-          'method': 'GET',
-          'urls': 'https://ocis.owncloud.works/hooks/update-ocis',
-        }
-      }
-    ],
-    'depends_on': [
-      'amd64',
-      'arm64',
-      'arm',
-      'linux',
-      'darwin',
-      'windows',
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-      ],
-    }
   }
 
 def manifest(ctx):
@@ -681,123 +681,24 @@ def manifest(ctx):
           'password': {
             'from_secret': 'docker_password',
           },
-          'spec': 'docker/manifest.tmpl',
+          'spec': 'ocis/docker/manifest.tmpl',
           'auto_tag': True,
           'ignore_missing': True,
         },
       },
     ],
     'depends_on': [
-      'amd64',
-      'arm64',
-      'arm',
-      'linux',
-      'darwin',
-      'windows',
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
+      'binaries-linux',
+      'binaries-darwin',
+      'binaries-windows',
     ],
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
-      ],
-    },
-  }
-
-def changelog(ctx):
-  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'changelog',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'clone': {
-      'disable': True,
-    },
-    'steps': [
-      {
-        'name': 'clone',
-        'image': 'plugins/git-action:1',
-        'pull': 'always',
-        'settings': {
-          'actions': [
-            'clone',
-          ],
-          'remote': 'https://github.com/%s' % (repo_slug),
-          'branch': ctx.build.source if ctx.build.event == 'pull_request' else 'master',
-          'path': '/drone/src',
-          'netrc_machine': 'github.com',
-          'netrc_username': {
-            'from_secret': 'github_username',
-          },
-          'netrc_password': {
-            'from_secret': 'github_token',
-          },
-        },
-      },
-      {
-        'name': 'generate',
-        'image': 'webhippie/golang:1.13',
-        'pull': 'always',
-        'commands': [
-          'make changelog',
-        ],
-      },
-      {
-        'name': 'diff',
-        'image': 'owncloud/alpine:latest',
-        'pull': 'always',
-        'commands': [
-          'git diff',
-        ],
-      },
-      {
-        'name': 'output',
-        'image': 'owncloud/alpine:latest',
-        'pull': 'always',
-        'commands': [
-          'cat CHANGELOG.md',
-        ],
-      },
-      {
-        'name': 'publish',
-        'image': 'plugins/git-action:1',
-        'pull': 'always',
-        'settings': {
-          'actions': [
-            'commit',
-            'push',
-          ],
-          'message': 'Automated changelog update [skip ci]',
-          'branch': 'master',
-          'author_email': 'devops@owncloud.com',
-          'author_name': 'ownClouders',
-          'netrc_machine': 'github.com',
-          'netrc_username': {
-            'from_secret': 'github_username',
-          },
-          'netrc_password': {
-            'from_secret': 'github_token',
-          },
-        },
-        'when': {
-          'ref': {
-            'exclude': [
-              'refs/pull/**',
-            ],
-          },
-        },
-      },
-    ],
-    'depends_on': [
-      'manifest',
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/pull/**',
+        'refs/tags/v*',
       ],
     },
   }
@@ -831,12 +732,14 @@ def readme(ctx):
       },
     ],
     'depends_on': [
-      'changelog',
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
     ],
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
       ],
     },
   }
@@ -863,12 +766,14 @@ def badges(ctx):
       },
     ],
     'depends_on': [
-      'readme',
+      'docker-amd64',
+      #'docker-arm64',
+      #'docker-arm',
     ],
     'trigger': {
       'ref': [
         'refs/heads/master',
-        'refs/tags/**',
+        'refs/tags/v*',
       ],
     },
   }
@@ -883,28 +788,6 @@ def website(ctx):
       'arch': 'amd64',
     },
     'steps': [
-      {
-        'name': 'prepare',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'make docs-copy'
-        ],
-      },
-      {
-        'name': 'test',
-        'image': 'webhippie/hugo:latest',
-        'commands': [
-          'cd hugo',
-          'hugo',
-        ],
-      },
-      {
-        'name': 'list',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'tree hugo/public',
-        ],
-      },
       {
         'name': 'publish',
         'image': 'plugins/gh-pages:1',
@@ -959,13 +842,14 @@ def website(ctx):
     },
   }
 
-def generate():
+def generate(module):
   return [
     {
       'name': 'generate',
       'image': 'webhippie/golang:1.13',
       'pull': 'always',
       'commands': [
+        'cd %s' % (module),
         'make generate',
       ],
       'volumes': [
@@ -977,22 +861,60 @@ def generate():
     }
   ]
 
-def build():
+def updateDeployment(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'updateDeployment',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'webhook',
+        'image': 'plugins/webhook',
+        'settings': {
+          'username': {
+            'from_secret': 'webhook_username',
+          },
+          'password': {
+            'from_secret': 'webhook_password',
+          },
+          'method': 'GET',
+          'urls': 'https://ocis.owncloud.works/hooks/update-ocis',
+        }
+      }
+    ],
+    'depends_on': [
+      'amd64',
+      'arm64',
+      'arm',
+      'linux',
+      'darwin',
+      'windows',
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+      ],
+    }
+  }
+
+def frontend(module):
   return [
     {
-      'name': 'build',
-      'image': 'webhippie/golang:1.13',
+      'name': 'frontend',
+      'image': 'webhippie/nodejs:latest',
       'pull': 'always',
       'commands': [
-        'make build',
+        'cd %s' % (module),
+        'yarn install --frozen-lockfile',
+        'yarn lint',
+        'yarn test',
+        'yarn build',
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
-    },
+    }
   ]
 
 def ocisServer(storage):
@@ -1003,7 +925,7 @@ def ocisServer(storage):
       'pull': 'always',
       'detach': True,
       'environment' : {
-        'OCIS_LOG_LEVEL': 'debug',
+        #'OCIS_LOG_LEVEL': 'debug',
         'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
         'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
         'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
@@ -1020,16 +942,17 @@ def ocisServer(storage):
         'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
         'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
         'REVA_FRONTEND_URL': 'https://ocis-server:9200',
-        'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
-        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
+        'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
+        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
+        'ACCOUNTS_DATA_PATH': '/srv/app/tmp/ocis-accounts/',
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/reva',
         'mkdir -p /srv/app/tmp/ocis/root/nodes',
-        'bin/ocis server'
+        'ocis/bin/ocis server'
       ],
       'volumes': [
         {
@@ -1083,4 +1006,23 @@ def selenium():
           'path': '/uploads'
       }],
     }
+  ]
+
+def build():
+  return [
+    {
+      'name': 'build',
+      'image': 'webhippie/golang:1.13',
+      'pull': 'always',
+      'commands': [
+        'cd ocis',
+        'make build',
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+    },
   ]

@@ -1,0 +1,5 @@
+Enhancement: add new config options for the http client
+
+The internal certificates are checked for validity after https://github.com/cs3org/reva/pull/914, which causes the acceptance tests to fail. This change sets new hardcoded defaults.
+
+https://github.com/owncloud/ocis/ocis-revapull/330

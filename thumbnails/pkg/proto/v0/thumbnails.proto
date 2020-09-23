@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package com.owncloud.ocis.thumbnails.v0;
+option go_package = "proto";
+
+// A Service for handling thumbnail generation
+service ThumbnailService {
+    // Generates the thumbnail and returns it.
+    rpc GetThumbnail(GetRequest) returns (GetResponse);
+}
+
+// A request to retrieve a thumbnail
+message GetRequest {
+    // The path to the source image
+    string filepath = 1;
+    // The file types to which the thumbnail cna get encoded to.
+    enum FileType {
+        PNG = 0; // Represents PNG type
+        JPG = 1; // Represents JPG type
+    }
+    // The type to which the thumbnail should get encoded to.
+    FileType filetype = 2;
+    // The etag of the source image
+    string etag = 3;
+    // The width of the thumbnail
+    int32 width = 4;
+    // The height of the thumbnail
+    int32 height = 5;
+    // The authorization token
+    string authorization = 6;
+}
+
+// The service response
+message GetResponse {
+    // The thumbnail as a binary
+    bytes thumbnail = 1;
+    // The mimetype of the thumbnail
+    string mimetype = 2;
+}

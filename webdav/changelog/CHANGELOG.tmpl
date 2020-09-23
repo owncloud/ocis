@@ -1,0 +1,28 @@
+{{- range $changes := . }}{{ with $changes -}}
+# Changelog for {{ .Version }}
+
+The following sections list the changes for {{ .Version }}.
+
+## Summary
+{{ range $entry := .Entries }}{{ with $entry }}
+ * {{ .TypeShort }} #{{ .PrimaryID }}: {{ .Title }}
+{{- end }}{{ end }}
+
+## Details
+{{ range $entry := .Entries }}{{ with $entry }}
+ * {{ .Type }} #{{ .PrimaryID }}: {{ .Title }}
+{{ range $par := .Paragraphs }}
+   {{ wrapIndent $par 80 3 }}
+{{ end -}}
+{{ range $url := .IssueURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .PRURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .OtherURLs }}
+   {{ $url -}}
+{{ end }}
+{{ end }}{{ end }}
+
+{{ end }}{{ end -}}
