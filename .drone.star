@@ -443,7 +443,7 @@ def docker(ctx, arch):
         'pull': 'always',
         'settings': {
           'username': {
-            'from_secret': '*docker_username*',
+            'from_secret': 'docker_username',
           },
           'password': {
             'from_secret': 'docker_password',
@@ -494,7 +494,7 @@ def binary(ctx, name):
         'from_secret': 'aws_access_key_id',
       },
       'secret_key': {
-        'from_secret': '*aws_secret_access_key*',
+        'from_secret': 'aws_secret_access_key',
       },
       'bucket': {
         'from_secret': 's3_bucket',
@@ -513,7 +513,7 @@ def binary(ctx, name):
         'from_secret': 'aws_access_key_id',
       },
       'secret_key': {
-        'from_secret': '*aws_secret_access_key*',
+        'from_secret': 'aws_secret_access_key',
       },
       'bucket': {
         'from_secret': 's3_bucket',
