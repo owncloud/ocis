@@ -1,0 +1,12 @@
+---
+exclude_paths:
+  - 'CHANGELOG.md'
+  - '**/CHANGELOG.md'
+  - 'changelog/**'
+  - '**/changelog/**'
+  - 'docs/**'
+  - '**/docs/**'
+  - '**/pkg/proto/**'
+  - 'konnectd/assets/identifier/**'
+
+...
