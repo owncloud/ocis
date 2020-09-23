@@ -2,7 +2,7 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis-konnectd/status.svg)](https://cloud.drone.io/owncloud/ocis-konnectd)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6f9033737404c9da3ba4738b6501bdb)](https://www.codacy.com/manual/owncloud/ocis-konnectd?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis-konnectd&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6f9033737404c9da3ba4738b6501bdb)](https://www.codacy.com/manual/owncloud/ocis-konnectd?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis-konnectd&utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis-konnectd?status.svg)](http://godoc.org/github.com/owncloud/ocis-konnectd)
 [![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis-konnectd)](http://goreportcard.com/report/github.com/owncloud/ocis-konnectd)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis-konnectd.svg)](http://microbadger.com/images/owncloud/ocis-konnectd "Get your own image badge on microbadger.com")
@@ -28,7 +28,7 @@ make generate build
 
 ## Security
 
-If you find a security issue please contact security@owncloud.com first.
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
 

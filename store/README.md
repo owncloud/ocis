@@ -23,7 +23,7 @@ make generate build
 
 ## Security
 
-If you find a security issue please contact security@owncloud.com first.
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
 
@@ -37,22 +37,4 @@ Apache-2.0
 
 ```console
 Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
-```
-
-## Design
-
-```
-/var/tmp
-    /ocis-store
-        /index.bleve
-        /databases
-            /ocs
-                /users
-            /settings
-                /bundles
-                /values
-                /assignments
-            /accounts
-                /accounts
-                /groups
 ```

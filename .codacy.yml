@@ -8,5 +8,7 @@ exclude_paths:
   - '**/docs/**'
   - '**/pkg/proto/**'
   - 'konnectd/assets/identifier/**'
+  - 'settings/rollup.config.js'
+  - 'accounts/rollup.config.js'
 
 ...
