@@ -12,7 +12,7 @@ import (
 // RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of
 // non-micro GRPC-services like reva. No health-checks are done, thus the caller is responsible for canceling.
 //
-func RegisterGRPCEndpoint(ctx context.Context, serviceID string, uuid string, addr string, logger log.Logger) error {
+func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, logger log.Logger) error {
 	node := &registry.Node{
 		Id:       serviceID + "-" + uuid,
 		Address:  addr,
@@ -45,13 +45,13 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID string, uuid string, ad
 		for {
 			select {
 			case <-t.C:
-				logger.Debug().Interface("service", service).Msg("Refreshing external service-registration")
+				logger.Debug().Interface("service", service).Msg("refreshing external service-registration")
 				err := registry.Register(service, rOpts...)
 				if err != nil {
-					logger.Error().Err(err).Msgf("Registration error for external service %v", serviceID)
+					logger.Error().Err(err).Msgf("registration error for external service %v", serviceID)
 				}
 			case <-ctx.Done():
-				logger.Debug().Interface("service", service).Msg("Unregistering")
+				logger.Debug().Interface("service", service).Msg("unregistering")
 				t.Stop()
 				err := registry.Deregister(service)
 				if err != nil {
