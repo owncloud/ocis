@@ -3,7 +3,6 @@
 #
 # test scenarios that specifically fail with OCIS storage
 #
-apiSharePublicLink2/multilinkSharing.feature:181
 apiWebdavProperties1/setFileProperties.feature:32
 apiWebdavProperties1/setFileProperties.feature:33
 #
