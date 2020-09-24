@@ -448,7 +448,7 @@ func (h ocisHandler) Close(boundDN string, conn net.Conn) error {
 	return nil
 }
 
-// NewOCISHandler implements a glauth backend with ocis-accounts as tdhe datasource
+// NewOCISHandler implements a glauth backend with ocis-accounts as the datasource
 func NewOCISHandler(opts ...Option) handler.Handler {
 	options := newOptions(opts...)
 

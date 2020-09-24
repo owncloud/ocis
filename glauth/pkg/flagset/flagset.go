@@ -159,7 +159,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
 			Destination: &cfg.Ldaps.Key,
 		},
-
+		&cli.StringFlag{
+			Name:  "backend-datastore",
+			Value: "accounts",
+			// TODO bring back config / flat file support
+			Usage:       "datastore to use as the backend. one of accounts, ldap or owncloud",
+			EnvVars:     []string{"GLAUTH_BACKEND_DATASTORE"},
+			Destination: &cfg.Backend.Datastore,
+		},
 		&cli.StringFlag{
 			Name:        "backend-basedn",
 			Value:       "dc=example,dc=org",
@@ -188,12 +195,25 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_BACKEND_GROUP_FORMAT"},
 			Destination: &cfg.Backend.GroupFormat,
 		},
+		&cli.StringSliceFlag{
+			Name:    "backend-server",
+			Value:   cli.NewStringSlice("https://demo.owncloud.com"),
+			Usage:   `--backend-server http://internal1.example.com [--backend-server http://internal2.example.com]`,
+			EnvVars: []string{"GLAUTH_BACKEND_SERVERS"},
+		},
 		&cli.StringFlag{
 			Name:        "backend-ssh-key-attr",
 			Value:       "sshPublicKey",
 			Usage:       "ssh key attribute for entries to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_SSH_KEY_ATTR"},
 			Destination: &cfg.Backend.SSHKeyAttr,
+		},
+		&cli.BoolFlag{
+			Name:        "backend-use-graphapi",
+			Value:       true,
+			Usage:       "use Graph API, only for owncloud datastore",
+			EnvVars:     []string{"GLAUTH_BACKEND_USE_GRAPHAPI"},
+			Destination: &cfg.Backend.UseGraphAPI,
 		},
 	}
 }

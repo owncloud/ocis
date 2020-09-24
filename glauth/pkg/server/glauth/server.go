@@ -2,9 +2,11 @@ package glauth
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/GeertJohan/yubigo"
 	"github.com/glauth/glauth/pkg/config"
+	"github.com/glauth/glauth/pkg/handler"
 	"github.com/go-logr/logr"
 	"github.com/nmcclain/ldap"
 	"github.com/owncloud/ocis/glauth/pkg/mlogr"
@@ -18,7 +20,8 @@ type LdapSvc struct {
 	l        *ldap.Server
 }
 
-// Server initializes the debug service and server.
+// Server initializes the ldap server.
+// It is a fork github.com/glauth/pkg/server because it would introduce a go-micro dependency upstream.
 func Server(opts ...Option) (*LdapSvc, error) {
 	options := newOptions(opts...)
 
@@ -40,15 +43,41 @@ func Server(opts ...Option) (*LdapSvc, error) {
 	// configure the backend
 	s.l = ldap.NewServer()
 	s.l.EnforceLDAP = true
-	h := NewOCISHandler(
-		AccountsService(options.AccountsService),
-		GroupsService(options.GroupsService),
-		Logger(options.Logger),
-		Config(s.c),
-	)
-	s.l.BindFunc("", h)
-	s.l.SearchFunc("", h)
-	s.l.CloseFunc("", h)
+	var h handler.Handler
+	switch s.c.Backend.Datastore {
+	/* TODO bring back file config
+	case "config":
+		h = handler.NewConfigHandler(
+			handler.Logger(s.log),
+			handler.Config(s.c),
+			handler.YubiAuth(s.yubiAuth),
+		)
+	*/
+	case "ldap":
+		h = handler.NewLdapHandler(
+			handler.Logger(s.log),
+			handler.Config(s.c),
+		)
+	case "owncloud":
+		h = handler.NewOwnCloudHandler(
+			handler.Logger(s.log),
+			handler.Config(s.c),
+		)
+	case "accounts":
+		h = NewOCISHandler(
+			AccountsService(options.AccountsService),
+			GroupsService(options.GroupsService),
+			Logger(options.Logger),
+			Config(s.c),
+		)
+	default:
+		return nil, fmt.Errorf("unsupported backend %s - must be 'ldap', 'owncloud' or 'accounts'", s.c.Backend.Datastore)
+		//return nil, fmt.Errorf("unsupported backend %s - must be 'config', 'homed', 'ldap', 'owncloud' or 'accounts'", s.c.Backend.Datastore)
+	}
+	s.log.V(3).Info("Using backend", "datastore", s.c.Backend.Datastore)
+	s.l.BindFunc(s.c.Backend.BaseDN, h)
+	s.l.SearchFunc(s.c.Backend.BaseDN, h)
+	s.l.CloseFunc(s.c.Backend.BaseDN, h)
 
 	return &s, nil
 }
