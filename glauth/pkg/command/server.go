@@ -40,6 +40,8 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
+			cfg.Backend.Servers = c.StringSlice("backend-server")
+
 			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -150,11 +152,14 @@ func Server(cfg *config.Config) *cli.Command {
 						Key:     cfg.Ldaps.Key,
 					},
 					Backend: glauthcfg.Backend{
+						Datastore:   cfg.Backend.Datastore,
 						BaseDN:      cfg.Backend.BaseDN,
 						Insecure:    cfg.Backend.Insecure,
 						NameFormat:  cfg.Backend.NameFormat,
 						GroupFormat: cfg.Backend.GroupFormat,
+						Servers:     cfg.Backend.Servers,
 						SSHKeyAttr:  cfg.Backend.SSHKeyAttr,
+						UseGraphAPI: cfg.Backend.UseGraphAPI,
 					},
 				}
 

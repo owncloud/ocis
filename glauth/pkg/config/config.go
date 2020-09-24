@@ -46,11 +46,14 @@ type Ldaps struct {
 
 // Backend defined the available backend configuration.
 type Backend struct {
+	Datastore   string
 	BaseDN      string
 	Insecure    bool
 	NameFormat  string
 	GroupFormat string
+	Servers     []string
 	SSHKeyAttr  string
+	UseGraphAPI bool
 }
 
 // Config combines all available configuration parts.
