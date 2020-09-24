@@ -1,6 +1,6 @@
 # ownCloud Infinite Scale
 
-[![Build Status](https://cloud.drone.io/api/badges/owncloud/ocis/status.svg)](https://cloud.drone.io/owncloud/ocis)
+[![Build Status](https://drone.owncloud.com/api/badges/owncloud/ocis/status.svg)](https://drone.owncloud.com/owncloud/ocis)
 [![Gitter chat](https://badges.gitter.im/cs3org/reva.svg)](https://gitter.im/cs3org/reva)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/app/owncloud/ocis?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis&utm_campaign=Badge_Grade)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis?status.svg)](http://godoc.org/github.com/owncloud/ocis)
@@ -19,12 +19,16 @@ Make sure you have a working Go environment, for further reference or a guide ta
 
 ```console
 git clone https://github.com/owncloud/ocis.git
-cd ocis
+cd ocis/ocis
 
 make generate build
 
 ./bin/ocis -h
 ```
+
+### Folder Structure
+
+This is a monorepo for multiple microservices. The individual services are located in subfolders like `accounts`. The code in the `ocis` subfolder aggregates all the go modules and implements commands to start the individual services or the full-stack server with a default config. It also builds a single binary and docker images.
 
 ## Prerequisites
 
@@ -43,25 +47,25 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 
 ## Quickstart
 
--   Make sure that the binary was built with the above steps.
+- Make sure that the binary was built with the above steps.
 
--   Now start all services with the following command
+- Now start all services with the following command
 
-    ```console
-    ./bin/ocis server
-    ```
+```console
+./bin/ocis server
+```
 
--   Open <https://localhost:9200>
+- Open <https://localhost:9200>
 
--   Accept the self-signed certificate (it is regenerated every time the server starts)
+- Accept the self-signed certificate (it is regenerated every time the server starts)
 
--   Login using one of the demo accounts:
+- Login using one of the demo accounts:
 
-    ```console
-    einstein:relativity
-    marie:radioactivity
-    richard:superfluidity
-    ```
+```console
+einstein:relativity
+marie:radioactivity
+richard:superfluidity
+```
 
 ## Running single extensions
 
