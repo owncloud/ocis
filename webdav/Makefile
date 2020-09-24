@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-webdav
-IMPORT := github.com/owncloud/$(NAME)
+NAME := webdav
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 

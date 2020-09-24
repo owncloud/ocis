@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-proxy
-IMPORT := github.com/owncloud/$(NAME)
+NAME := proxy
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo

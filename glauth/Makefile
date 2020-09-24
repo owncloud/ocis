@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-glauth
-IMPORT := github.com/owncloud/$(NAME)
+NAME := glauth
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo

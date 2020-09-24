@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-settings
-IMPORT := github.com/owncloud/$(NAME)
+NAME := settings
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
