@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-thumbnails
-IMPORT := github.com/owncloud/$(NAME)
+NAME := thumbnails
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo

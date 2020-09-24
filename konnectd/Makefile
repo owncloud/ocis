@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-konnectd
-IMPORT := github.com/owncloud/$(NAME)
+NAME := konnectd
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo

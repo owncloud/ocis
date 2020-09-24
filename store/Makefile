@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-store
-IMPORT := github.com/owncloud/$(NAME)
+NAME := store
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 HUGO := hugo
