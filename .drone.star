@@ -84,8 +84,8 @@ def main(ctx):
 
   stages = [
     docker(ctx, 'amd64'),
-    #docker(ctx, 'arm64'),
-    #docker(ctx, 'arm'),
+    docker(ctx, 'arm64'),
+    docker(ctx, 'arm'),
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
@@ -720,8 +720,8 @@ def manifest(ctx):
     ],
     'depends_on': [
       'docker-amd64',
-      #'docker-arm64',
-      #'docker-arm',
+      'docker-arm64',
+      'docker-arm',
       'binaries-linux',
       'binaries-darwin',
       'binaries-windows',
@@ -764,8 +764,8 @@ def readme(ctx):
     ],
     'depends_on': [
       'docker-amd64',
-      #'docker-arm64',
-      #'docker-arm',
+      'docker-arm64',
+      'docker-arm',
     ],
     'trigger': {
       'ref': [
@@ -798,8 +798,8 @@ def badges(ctx):
     ],
     'depends_on': [
       'docker-amd64',
-      #'docker-arm64',
-      #'docker-arm',
+      'docker-arm64',
+      'docker-arm',
     ],
     'trigger': {
       'ref': [
