@@ -98,7 +98,7 @@ def main(ctx):
     readme(ctx),
     badges(ctx),
     website(ctx),
-    #updateDeployment(ctx)
+    updateDeployment(ctx)
   ]
 
   return before + stages + after
@@ -918,12 +918,12 @@ def updateDeployment(ctx):
       }
     ],
     'depends_on': [
-      'amd64',
-      'arm64',
-      'arm',
-      'linux',
-      'darwin',
-      'windows',
+      'docker-amd64',
+      'docker-arm64',
+      'docker-arm',
+      'binaries-linux',
+      'binaries-darwin',
+      'binaries-windows',
     ],
     'trigger': {
       'ref': [
