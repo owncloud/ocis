@@ -3,8 +3,6 @@
 #
 # test scenarios that specifically fail with OCIS storage
 #
-apiShareOperations/gettingShares.feature:155
-apiShareOperations/gettingShares.feature:156
 apiSharePublicLink2/multilinkSharing.feature:181
 apiWebdavProperties1/setFileProperties.feature:32
 apiWebdavProperties1/setFileProperties.feature:33
@@ -364,19 +362,9 @@ apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareOperations/accessToShare.feature:48
 apiShareOperations/accessToShare.feature:49
 #
-# https://github.com/owncloud/ocis/ocis-reva/issues/262 Shares are not deleted when user is deleted
-apiShareOperations/gettingShares.feature:21
-apiShareOperations/gettingShares.feature:22
-#
 # https://github.com/owncloud/ocis/ocis-reva/issues/65 There is no such thing like a "super-user"
 apiShareOperations/gettingShares.feature:34
 apiShareOperations/gettingShares.feature:35
-#
-# https://github.com/owncloud/ocis/ocis-reva/issues/357 Delete shares from user when user is deleted
-# https://github.com/owncloud/ocis/ocis-reva/issues/301 no displayname_owner shown when creating a share
-# https://github.com/owncloud/ocis/ocis-reva/issues/302 when sharing a file mime-type field is set to application/octet-stream
-apiShareOperations/gettingShares.feature:124
-apiShareOperations/gettingShares.feature:125
 #
 # https://github.com/owncloud/ocis/ocis-reva/issues/374 OCS error message for attempting to access share via share id as an unauthorized user is not informative
 apiShareOperations/gettingShares.feature:168
