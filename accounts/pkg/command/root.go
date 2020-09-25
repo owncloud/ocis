@@ -37,6 +37,7 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
+			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
 
@@ -47,6 +48,7 @@ func Execute() error {
 			ListAccounts(cfg),
 			InspectAccount(cfg),
 			RemoveAccount(cfg),
+			PrintVersion(cfg),
 		},
 	}
 

@@ -39,6 +39,7 @@ type GRPC struct {
 
 // Server configures a server.
 type Server struct {
+	Version          string
 	Name             string
 	AccountsDataPath string
 }

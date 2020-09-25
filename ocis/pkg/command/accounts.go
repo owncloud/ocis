@@ -9,6 +9,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 )
 
 // AccountsCommand is the entrypoint for the accounts command.
@@ -24,6 +25,7 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 			command.UpdateAccount(cfg.Accounts),
 			command.RemoveAccount(cfg.Accounts),
 			command.InspectAccount(cfg.Accounts),
+			command.PrintVersion(cfg.Accounts),
 		},
 		Action: func(c *cli.Context) error {
 			accountsCommand := command.Server(configureAccounts(cfg))
@@ -40,6 +42,7 @@ func configureAccounts(cfg *config.Config) *svcconfig.Config {
 	cfg.Accounts.Log.Level = cfg.Log.Level
 	cfg.Accounts.Log.Pretty = cfg.Log.Pretty
 	cfg.Accounts.Log.Color = cfg.Log.Color
+	cfg.Accounts.Server.Version = version.String
 
 	return cfg.Accounts
 }
