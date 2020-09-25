@@ -134,7 +134,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "com.owncloud.web",
 			Usage:       "Set the base namespace for service discovery",
 			EnvVars:     []string{"KONNECTD_HTTP_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "konnectd",
+			Usage:       "Service name",
+			EnvVars:     []string{"KONNECTD_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "identity-manager",
@@ -304,6 +311,25 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"KONNECTD_DISABLE_IDENTIFIER_WEBAPP"},
 			Value:       true,
 			Destination: &cfg.Konnectd.IdentifierClientDisabled,
+		},
+	}
+}
+
+// ListKonnectdWithConfig applies the config to the list commands flags
+func ListKonnectdWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{&cli.StringFlag{
+		Name:        "http-namespace",
+		Value:       "com.owncloud.web",
+		Usage:       "Set the base namespace for service discovery",
+		EnvVars:     []string{"KONNECTD_HTTP_NAMESPACE"},
+		Destination: &cfg.Service.Namespace,
+	},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "konnectd",
+			Usage:       "Service name",
+			EnvVars:     []string{"KONNECTD_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 	}
 }

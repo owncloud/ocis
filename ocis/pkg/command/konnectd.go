@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/konnectd/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 )
 
 // KonnectdCommand is the entrypoint for the konnectd command.
@@ -16,6 +17,9 @@ func KonnectdCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start konnectd server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Konnectd),
+		Subcommands: []*cli.Command{
+			command.PrintVersion(cfg.Konnectd),
+		},
 		Action: func(c *cli.Context) error {
 			konnectdCommand := command.Server(configureKonnectd(cfg))
 
@@ -33,6 +37,7 @@ func configureKonnectd(cfg *config.Config) *svcconfig.Config {
 	cfg.Konnectd.Log.Pretty = cfg.Log.Pretty
 	cfg.Konnectd.Log.Color = cfg.Log.Color
 	cfg.Konnectd.HTTP.TLS = false
+	cfg.Konnectd.Service.Version = version.String
 
 	if cfg.Tracing.Enabled {
 		cfg.Konnectd.Tracing.Enabled = cfg.Tracing.Enabled
