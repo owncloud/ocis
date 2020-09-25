@@ -20,6 +20,7 @@ type Server struct {
 	Name      string
 	Namespace string
 	Address   string
+	Version   string
 }
 
 // Tracing defines the available tracing configuration.
