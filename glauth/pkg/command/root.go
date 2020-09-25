@@ -32,6 +32,7 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
+			cfg.Version = version.String
 			return ParseConfig(c, cfg)
 		},
 

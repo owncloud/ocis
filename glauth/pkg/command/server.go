@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"os"
 	"os/signal"
 	"strings"
@@ -134,10 +135,12 @@ func Server(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
+				metrics     = metrics.New()
 			)
 
 			defer cancel()
+
+			metrics.BuildInfo.WithLabelValues(cfg.Version).Set(1)
 
 			{
 				cfg := glauthcfg.Config{
