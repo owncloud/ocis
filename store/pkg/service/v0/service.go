@@ -49,7 +49,7 @@ func New(opts ...Option) (s *Service, err error) {
 	indexMapping.DefaultAnalyzer = keyword.Name
 
 	s = &Service{
-		id:     cfg.GRPC.Namespace + "." + "store",
+		id:     cfg.Service.Namespace + "." + cfg.Service.Name,
 		log:    logger,
 		Config: cfg,
 	}

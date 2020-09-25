@@ -120,7 +120,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "com.owncloud.api",
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
-			Destination: &cfg.GRPC.Namespace,
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "store",
+			Usage:       "Service name",
+			EnvVars:     []string{"STORE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
@@ -128,6 +135,25 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "location of the store data path",
 			EnvVars:     []string{"STORE_DATA_PATH"},
 			Destination: &cfg.Datapath,
+		},
+	}
+}
+
+// ListStoreWithConfig applies the config to the list commands flags.
+func ListStoreWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{&cli.StringFlag{
+		Name:        "grpc-namespace",
+		Value:       "com.owncloud.api",
+		Usage:       "Set the base namespace for the grpc namespace",
+		EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
+		Destination: &cfg.Service.Namespace,
+	},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "store",
+			Usage:       "Service name",
+			EnvVars:     []string{"STORE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 	}
 }
