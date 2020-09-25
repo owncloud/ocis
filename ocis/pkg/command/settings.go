@@ -4,6 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/command"
 	svcconfig "github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/flagset"
@@ -18,6 +19,9 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start settings server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Settings),
+		Subcommands: []*cli.Command{
+			command.PrintVersion(cfg.Settings),
+		},
 		Action: func(ctx *cli.Context) error {
 			settingsCommand := command.Server(configureSettings(cfg))
 
@@ -34,6 +38,7 @@ func configureSettings(cfg *config.Config) *svcconfig.Config {
 	cfg.Settings.Log.Level = cfg.Log.Level
 	cfg.Settings.Log.Pretty = cfg.Log.Pretty
 	cfg.Settings.Log.Color = cfg.Log.Color
+	cfg.Settings.Service.Version = version.String
 
 	if cfg.Tracing.Enabled {
 		cfg.Settings.Tracing.Enabled = cfg.Tracing.Enabled

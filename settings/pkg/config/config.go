@@ -28,6 +28,13 @@ type GRPC struct {
 	Namespace string
 }
 
+// Service provides configuration options for the service
+type Service struct {
+	Name     string
+	Version  string
+	DataPath string
+}
+
 // Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool
@@ -42,11 +49,6 @@ type Asset struct {
 	Path string
 }
 
-// Storage defines the available storage configuration.
-type Storage struct {
-	DataPath string
-}
-
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
 	JWTSecret string
@@ -55,7 +57,7 @@ type TokenManager struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File         string
-	Storage      Storage
+	Service      Service
 	Log          Log
 	Debug        Debug
 	HTTP         HTTP
