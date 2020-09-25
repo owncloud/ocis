@@ -12,7 +12,7 @@ This service provides an ocis extension that wraps [reva](https://github.com/cs3
 It uses the port range 9140-9179 to preconfigure several services.
 
 | port | service |
-+------+---------+
+|------|---------|
 | 9109 | health? |
 | 9140 | frontend        |
 | 9141 | frontend debug        |
