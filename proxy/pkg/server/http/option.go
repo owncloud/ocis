@@ -22,7 +22,6 @@ type Options struct {
 	Handler     http.Handler
 	Metrics     *metrics.Metrics
 	Flags       []cli.Flag
-	Namespace   string
 	Middlewares alice.Chain
 }
 
@@ -69,13 +68,6 @@ func Metrics(val *metrics.Metrics) Option {
 func Flags(val []cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, val...)
-	}
-}
-
-// Namespace provides a function to set the namespace option.
-func Namespace(val string) Option {
-	return func(o *Options) {
-		o.Namespace = val
 	}
 }
 

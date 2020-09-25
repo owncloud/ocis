@@ -6,7 +6,6 @@ import (
 
 	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/proxy/pkg/crypto"
-	"github.com/owncloud/ocis/proxy/pkg/version"
 )
 
 // Server initializes the http service and server.
@@ -48,11 +47,11 @@ func Server(opts ...Option) (svc.Service, error) {
 	chain := options.Middlewares.Then(options.Handler)
 
 	service := svc.NewService(
-		svc.Name("web.proxy"),
+		svc.Name(options.Config.Service.Name),
 		svc.TLSConfig(tlsConfig),
 		svc.Logger(options.Logger),
-		svc.Namespace(options.Namespace),
-		svc.Version(version.String),
+		svc.Namespace(options.Config.Service.Namespace),
+		svc.Version(options.Config.Service.Version),
 		svc.Address(options.Config.HTTP.Addr),
 		svc.Context(options.Context),
 		svc.Flags(options.Flags...),

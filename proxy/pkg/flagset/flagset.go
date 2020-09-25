@@ -137,11 +137,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
-			Name:        "http-namespace",
-			Value:       "com.owncloud",
-			Usage:       "Set the base namespace for the http namespace",
-			EnvVars:     []string{"PROXY_HTTP_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
+			Name:        "service-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for the service namespace",
+			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "service-name",
+			Value:       "proxy",
+			Usage:       "Service name",
+			EnvVars:     []string{"PROXY_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
@@ -203,4 +210,24 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 	}
 
+}
+
+// ListProxyWithConfig applies the config to the list commands flags.
+func ListProxyWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "service-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for the service namespace",
+			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "service-name",
+			Value:       "proxy",
+			Usage:       "Service name",
+			EnvVars:     []string{"PROXY_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
+		},
+	}
 }

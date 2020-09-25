@@ -17,12 +17,18 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string
+	Addr    string
+	Root    string
+	TLSCert string
+	TLSKey  string
+	TLS     bool
+}
+
+// Service defines the available service configuration.
+type Service struct {
+	Name      string
 	Namespace string
-	Root      string
-	TLSCert   string
-	TLSKey    string
-	TLS       bool
+	Version   string
 }
 
 // Tracing defines the available tracing configuration.
@@ -83,6 +89,7 @@ type Config struct {
 	Log            Log
 	Debug          Debug
 	HTTP           HTTP
+	Service        Service
 	Tracing        Tracing
 	Asset          Asset
 	Policies       []Policy
