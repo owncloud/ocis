@@ -86,9 +86,11 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"userprovidersvc": cfg.Reva.Users.URL,
 		},
 		"ocis": map[string]interface{}{
-			"root":        cfg.Reva.Storages.Common.Root,
-			"enable_home": cfg.Reva.Storages.Common.EnableHome,
-			"user_layout": cfg.Reva.Storages.Common.UserLayout,
+			"root":                cfg.Reva.Storages.Common.Root,
+			"enable_home":         cfg.Reva.Storages.Common.EnableHome,
+			"user_layout":         cfg.Reva.Storages.Common.UserLayout,
+			"treetime_accounting": true,
+			"treesize_accounting": true,
 		},
 		"s3": map[string]interface{}{
 			"region":     cfg.Reva.Storages.S3.Region,
