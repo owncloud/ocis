@@ -15,7 +15,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '2c5bb68fc689d7e9dd912125680c0fad99528fa9',
+    'coreCommit': 'c76cec3e567a439e41192b536d7e563de63a0fed',
     'numberOfParts': 4
   },
   'uiTests': {
@@ -471,7 +471,7 @@ def docker(ctx, arch):
         'temp': {},
       },
     ],
-    'depends_on': 
+    'depends_on':
       getTestSuiteNames() + [
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
