@@ -32,12 +32,14 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
+			cfg.Service.Version = version.String
 			return ParseConfig(c, cfg)
 		},
 
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
+			PrintVersion(cfg),
 		},
 	}
 

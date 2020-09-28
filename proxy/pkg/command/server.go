@@ -58,7 +58,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
@@ -152,6 +151,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
 				proxy.Config(cfg),
@@ -161,7 +162,6 @@ func Server(cfg *config.Config) *cli.Command {
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(rp),
 					proxyHTTP.Logger(logger),
-					proxyHTTP.Namespace(httpNamespace),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics),

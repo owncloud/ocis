@@ -14,9 +14,10 @@ var (
 
 // Metrics defines the available metrics of this service.
 type Metrics struct {
-	Counter  *prometheus.CounterVec
-	Latency  *prometheus.SummaryVec
-	Duration *prometheus.HistogramVec
+	Counter   *prometheus.CounterVec
+	Latency   *prometheus.SummaryVec
+	Duration  *prometheus.HistogramVec
+	BuildInfo *prometheus.GaugeVec
 }
 
 // New initializes the available metrics.
@@ -40,6 +41,12 @@ func New() *Metrics {
 			Name:      "proxy_duration_seconds",
 			Help:      "proxy method request time in seconds",
 		}, []string{}),
+		BuildInfo: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: Namespace,
+			Subsystem: Subsystem,
+			Name:      "build_info",
+			Help:      "Build Information",
+		}, []string{"versions"}),
 	}
 
 	prometheus.Register(
@@ -52,6 +59,10 @@ func New() *Metrics {
 
 	prometheus.Register(
 		m.Duration,
+	)
+
+	prometheus.Register(
+		m.BuildInfo,
 	)
 
 	return m
