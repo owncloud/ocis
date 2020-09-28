@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -405,6 +406,7 @@ type Service struct {
 	index       bleve.Index
 	RoleService settings.RoleService
 	RoleManager *roles.Manager
+	repo        storage.DiskRepo
 }
 
 func cleanupID(id string) (string, error) {
