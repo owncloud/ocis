@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -25,6 +26,8 @@ import (
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	// TODO this endpoint needs authentication using the roles and permissions
 	userid := chi.URLParam(r, "userid")
+	var account *accounts.Account
+	var err error
 
 	if userid == "" {
 		u, ok := user.ContextGetUser(r.Context())
@@ -32,13 +35,12 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
 			return
 		}
-
-		userid = u.Id.OpaqueId
+		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+			Id: u.Id.OpaqueId,
+		})
+	} else {
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	}
-
-	account, err := o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-		Id: userid,
-	})
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -65,8 +67,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, response.DataRender(&data.User{
-		UserID:            account.Id, // TODO userid vs username! implications for clients if we return the userid here? -> implement graph ASAP?
-		Username:          account.PreferredName,
+		UserID:            account.PreferredName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
@@ -90,7 +91,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	// TODO this endpoint needs authentication using the roles and permissions
 	userid := r.PostFormValue("userid")
 	password := r.PostFormValue("password")
-	username := r.PostFormValue("username")
 	displayname := r.PostFormValue("displayname")
 	email := r.PostFormValue("email")
 	uid := r.PostFormValue("uidnumber")
@@ -129,13 +129,13 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	newAccount := &accounts.Account{
+		Id:                       userid,
 		DisplayName:              displayname,
-		PreferredName:            username,
-		OnPremisesSamAccountName: username,
+		PreferredName:            userid,
+		OnPremisesSamAccountName: userid,
 		PasswordProfile: &accounts.PasswordProfile{
 			Password: password,
 		},
-		Id:             userid,
 		Mail:           email,
 		AccountEnabled: true,
 	}
@@ -178,7 +178,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Render(w, r, response.DataRender(&data.User{
 		UserID:            account.Id,
-		Username:          account.PreferredName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
@@ -191,9 +190,22 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	// TODO this endpoint needs authentication
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not edit user")
+		return
+	}
+
 	req := accounts.UpdateAccountRequest{
 		Account: &accounts.Account{
-			Id: chi.URLParam(r, "userid"),
+			Id: account.Id,
 		},
 	}
 	key := r.PostFormValue("key")
@@ -221,12 +233,10 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := o.getAccountService().UpdateAccount(r.Context(), &req)
+	account, err = o.getAccountService().UpdateAccount(r.Context(), &req)
 	if err != nil {
 		merr := merrors.FromError(err)
 		switch merr.Code {
-		case http.StatusNotFound:
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
 		case http.StatusBadRequest:
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
 		default:
@@ -247,11 +257,24 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	req := accounts.DeleteAccountRequest{
-		Id: chi.URLParam(r, "userid"),
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not delete user")
+		return
 	}
 
-	_, err := o.getAccountService().DeleteAccount(r.Context(), &req)
+	req := accounts.DeleteAccountRequest{
+		Id: account.Id,
+	}
+
+	_, err = o.getAccountService().DeleteAccount(r.Context(), &req)
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -344,7 +367,7 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("search")
 	query := ""
 	if search != "" {
-		query = fmt.Sprintf("id eq '%s' or on_premises_sam_account_name eq '%s'", escapeValue(search), escapeValue(search))
+		query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(search))
 	}
 
 	res, err := o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
@@ -367,4 +390,18 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 // escapeValue escapes all special characters in the value
 func escapeValue(value string) string {
 	return strings.ReplaceAll(value, "'", "''")
+}
+
+func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts.Account, error) {
+	var res *accounts.ListAccountsResponse
+	res, err := o.getAccountService().ListAccounts(ctx, &accounts.ListAccountsRequest{
+		Query: fmt.Sprintf("on_premises_sam_account_name eq '%v'", escapeValue(name)),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if res != nil && len(res.Accounts) == 1 {
+		return res.Accounts[0], nil
+	}
+	return nil, fmt.Errorf("cannot find account by username '%v'", name)
 }
