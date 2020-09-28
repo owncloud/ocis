@@ -251,32 +251,37 @@ apiSharees/sharees.feature:516
 apiSharees/sharees.feature:537
 apiSharees/sharees.feature:538
 #
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set (shareapi_auto_accept_share)
-apiShareManagement/acceptShares.feature:155
-apiShareManagement/acceptShares.feature:313
-apiShareManagement/acceptShares.feature:333
-apiShareManagement/acceptShares.feature:415
-apiShareManagement/acceptShares.feature:416
-apiShareManagement/acceptShares.feature:417
-apiShareManagement/acceptShares.feature:418
-apiShareManagement/acceptShares.feature:419
-apiShareManagement/acceptShares.feature:421
-apiShareManagement/acceptShares.feature:436
-apiShareManagement/acceptShares.feature:458
-apiShareManagement/acceptShares.feature:477
-apiShareManagement/acceptShares.feature:511
-apiShareManagement/acceptShares.feature:542
-apiShareManagement/acceptShares.feature:561
-apiShareManagement/acceptShares.feature:582
-apiShareManagement/acceptShares.feature:652
-apiShareManagement/acceptShares.feature:696
+# Various failures accepting shares
+apiShareManagementToShares/acceptShares.feature:22
+apiShareManagementToShares/acceptShares.feature:52
+apiShareManagementToShares/acceptShares.feature:71
+apiShareManagementToShares/acceptShares.feature:152
+apiShareManagementToShares/acceptShares.feature:153
+apiShareManagementToShares/acceptShares.feature:154
+apiShareManagementToShares/acceptShares.feature:155
+apiShareManagementToShares/acceptShares.feature:156
+apiShareManagementToShares/acceptShares.feature:158
+apiShareManagementToShares/acceptShares.feature:171
+apiShareManagementToShares/acceptShares.feature:192
+apiShareManagementToShares/acceptShares.feature:210
+apiShareManagementToShares/acceptShares.feature:217
+apiShareManagementToShares/acceptShares.feature:241
+apiShareManagementToShares/acceptShares.feature:260
+apiShareManagementToShares/acceptShares.feature:269
+apiShareManagementToShares/acceptShares.feature:288
+apiShareManagementToShares/acceptShares.feature:310
+apiShareManagementToShares/acceptShares.feature:332
+apiShareManagementToShares/acceptShares.feature:368
+apiShareManagementToShares/acceptShares.feature:388
+apiShareManagementToShares/acceptShares.feature:407
+apiShareManagementToShares/acceptShares.feature:429
 #
 # https://github.com/owncloud/product/issues/208 After accepting a share data in the received file cannot be downloaded
-apiShareManagement/acceptSharesToSharesFolder.feature:15
+apiShareManagementToShares/acceptSharesToSharesFolder.feature:17
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
-apiShareManagement/acceptSharesToSharesFolder.feature:30
-apiShareManagement/acceptSharesToSharesFolder.feature:52
+apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
+apiShareManagementToShares/acceptSharesToSharesFolder.feature:48
 #
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
 # https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
@@ -358,26 +363,34 @@ apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 #
 # https://github.com/owncloud/ocis-reva/issues/260 Sharee retrieves the information about a share -but gets response containing all the shares
-apiShareOperations/accessToShare.feature:48
-apiShareOperations/accessToShare.feature:49
+apiShareOperationsToShares/accessToShare.feature:55
+apiShareOperationsToShares/accessToShare.feature:56
+#
+# https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
+apiShareOperationsToShares/gettingShares.feature:24
+apiShareOperationsToShares/gettingShares.feature:25
 #
 # https://github.com/owncloud/ocis-reva/issues/65 There is no such thing like a "super-user"
-apiShareOperations/gettingShares.feature:34
-apiShareOperations/gettingShares.feature:35
+apiShareOperationsToShares/gettingShares.feature:38
+apiShareOperationsToShares/gettingShares.feature:39
 #
 # https://github.com/owncloud/ocis-reva/issues/374 OCS error message for attempting to access share via share id as an unauthorized user is not informative
-apiShareOperations/gettingShares.feature:168
-apiShareOperations/gettingShares.feature:169
+apiShareOperationsToShares/gettingShares.feature:135
+apiShareOperationsToShares/gettingShares.feature:136
+apiShareOperationsToShares/gettingShares.feature:167
+apiShareOperationsToShares/gettingShares.feature:168
 #
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
-apiShareOperations/gettingShares.feature:204
-apiShareOperations/gettingShares.feature:205
+apiShareOperationsToShares/gettingShares.feature:180
+apiShareOperationsToShares/gettingShares.feature:181
+apiShareOperationsToShares/gettingShares.feature:219
+apiShareOperationsToShares/gettingShares.feature:220
 #
 # https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
-apiShareOperations/getWebDAVSharePermissions.feature:21
-apiShareOperations/getWebDAVSharePermissions.feature:22
-apiShareOperations/getWebDAVSharePermissions.feature:134
-apiShareOperations/getWebDAVSharePermissions.feature:135
+apiShareOperationsToShares/getWebDAVSharePermissions.feature:23
+apiShareOperationsToShares/getWebDAVSharePermissions.feature:24
+apiShareOperationsToShares/getWebDAVSharePermissions.feature:142
+apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 # https://github.com/owncloud/ocis-reva/issues/282 Split old public API webdav tests from new public webdav tests
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
@@ -479,30 +492,30 @@ apiSharePublicLink1/createPublicLinkShare.feature:590
 apiSharePublicLink1/createPublicLinkShare.feature:591
 #
 # https://github.com/owncloud/ocis-reva/issues/283 Prevent creating public share for the home root folder
-apiSharePublicLink1/createPublicLinkShare.feature:620
-apiSharePublicLink1/createPublicLinkShare.feature:621
+apiSharePublicLink1/createPublicLinkShare.feature:651
+apiSharePublicLink1/createPublicLinkShare.feature:652
 #
-apiSharePublicLink1/createPublicLinkShare.feature:634
-apiSharePublicLink1/createPublicLinkShare.feature:635
+apiSharePublicLink1/createPublicLinkShare.feature:665
+apiSharePublicLink1/createPublicLinkShare.feature:666
 #
-apiSharePublicLink1/createPublicLinkShare.feature:663
-apiSharePublicLink1/createPublicLinkShare.feature:664
+apiSharePublicLink1/createPublicLinkShare.feature:694
+apiSharePublicLink1/createPublicLinkShare.feature:695
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
-apiSharePublicLink1/createPublicLinkShare.feature:714
-apiSharePublicLink1/createPublicLinkShare.feature:715
+apiSharePublicLink1/createPublicLinkShare.feature:745
+apiSharePublicLink1/createPublicLinkShare.feature:746
 #
 # https://github.com/owncloud/ocis-reva/issues/199 Ability to return error messages in Webdav response bodies
-apiSharePublicLink1/createPublicLinkShare.feature:718
+apiSharePublicLink1/createPublicLinkShare.feature:749
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-apiSharePublicLink1/createPublicLinkShare.feature:727
+apiSharePublicLink1/createPublicLinkShare.feature:758
 #
 # https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
-apiSharePublicLink1/createPublicLinkShare.feature:779
+apiSharePublicLink1/createPublicLinkShare.feature:810
 #
 # https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
-apiSharePublicLink1/createPublicLinkShare.feature:793
+apiSharePublicLink1/createPublicLinkShare.feature:824
 #
 # https://github.com/owncloud/ocis-reva/issues/311 Deleting a public link after renaming a file
 apiSharePublicLink1/deletePublicLinkShare.feature:37
@@ -1215,10 +1228,10 @@ apiSharePublicLink1/changingPublicLinkShare.feature:174
 apiSharePublicLink1/changingPublicLinkShare.feature:185
 apiSharePublicLink1/changingPublicLinkShare.feature:209
 apiSharePublicLink1/changingPublicLinkShare.feature:255
-apiSharePublicLink1/createPublicLinkShare.feature:760
-apiSharePublicLink1/createPublicLinkShare.feature:761
-apiSharePublicLink1/createPublicLinkShare.feature:774
-apiSharePublicLink1/createPublicLinkShare.feature:775
+apiSharePublicLink1/createPublicLinkShare.feature:791
+apiSharePublicLink1/createPublicLinkShare.feature:792
+apiSharePublicLink1/createPublicLinkShare.feature:805
+apiSharePublicLink1/createPublicLinkShare.feature:806
 apiSharePublicLink1/deletePublicLinkShare.feature:20
 apiSharePublicLink1/deletePublicLinkShare.feature:21
 apiSharePublicLink1/deletePublicLinkShare.feature:53
