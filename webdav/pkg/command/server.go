@@ -131,6 +131,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+
 			{
 				server, err := http.Server(
 					http.Logger(logger),

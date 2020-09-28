@@ -127,7 +127,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "com.owncloud.web",
 			Usage:       "Set the base namespace for service discovery",
 			EnvVars:     []string{"WEBDAV_HTTP_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "service-name",
+			Value:       "webdav",
+			Usage:       "Service name",
+			EnvVars:     []string{"WEBDAV_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
@@ -135,6 +142,27 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"WEBDAV_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
+		},
+	}
+}
+
+
+// ListWebdavWithConfig applies the config to the list commands flagset.
+func ListWebdavWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "http-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for service discovery",
+			EnvVars:     []string{"WEBDAV_HTTP_NAMESPACE"},
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "service-name",
+			Value:       "webdav",
+			Usage:       "Service name",
+			EnvVars:     []string{"WEBDAV_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	svc "github.com/owncloud/ocis/webdav/pkg/service/v0"
-	"github.com/owncloud/ocis/webdav/pkg/version"
 )
 
 // Server initializes the http service and server.
@@ -13,9 +12,9 @@ func Server(opts ...Option) (http.Service, error) {
 
 	service := http.NewService(
 		http.Logger(options.Logger),
-		http.Namespace(options.Config.HTTP.Namespace),
-		http.Name("webdav"),
-		http.Version(version.String),
+		http.Namespace(options.Config.Service.Namespace),
+		http.Name(options.Config.Service.Name),
+		http.Version(options.Config.Service.Version),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
@@ -31,8 +30,8 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(
-				"webdav",
-				version.String,
+				options.Config.Service.Name,
+				options.Config.Service.Version,
 			),
 			middleware.Logger(
 				options.Logger,
