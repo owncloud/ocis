@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 )
 
 // GLAuthCommand is the entrypoint for the glauth command.
@@ -31,6 +32,7 @@ func configureGLAuth(cfg *config.Config) *svcconfig.Config {
 	cfg.GLAuth.Log.Level = cfg.Log.Level
 	cfg.GLAuth.Log.Pretty = cfg.Log.Pretty
 	cfg.GLAuth.Log.Color = cfg.Log.Color
+	cfg.GLAuth.Version = version.String
 
 	if cfg.Tracing.Enabled {
 		cfg.GLAuth.Tracing.Enabled = cfg.Tracing.Enabled

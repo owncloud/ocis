@@ -66,6 +66,7 @@ type Config struct {
 	Ldap    Ldap
 	Ldaps   Ldaps
 	Backend Backend
+	Version string
 }
 
 // New initializes a new configuration with or without defaults.
