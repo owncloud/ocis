@@ -4,9 +4,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocs/pkg/version"
 	"github.com/owncloud/ocis/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/ocs/pkg/config"
 )
 
 // Server initializes the debug service and server.
@@ -15,8 +14,8 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
-		debug.Name("ocs"),
-		debug.Version(version.String),
+		debug.Name(options.Config.Service.Name),
+		debug.Version(options.Config.Service.Version),
 		debug.Address(options.Config.Debug.Addr),
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),

@@ -128,7 +128,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       "com.owncloud.web",
 			Usage:       "Set the base namespace for the http namespace",
 			EnvVars:     []string{"OCS_NAMESPACE"},
-			Destination: &cfg.HTTP.Namespace,
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "ocs",
+			Usage:       "Service name",
+			EnvVars:     []string{"OCS_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
@@ -144,6 +151,26 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Used to dismantle the access token, should equal reva's jwt-secret",
 			EnvVars:     []string{"OCS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
+		},
+	}
+}
+
+// ListOcsWithConfig applies the config to the list commands flagset.
+func ListOcsWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "http-namespace",
+			Value:       "com.owncloud.web",
+			Usage:       "Set the base namespace for the http namespace",
+			EnvVars:     []string{"OCS_NAMESPACE"},
+			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "ocs",
+			Usage:       "Service name",
+			EnvVars:     []string{"OCS_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 	}
 }

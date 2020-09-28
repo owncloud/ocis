@@ -17,9 +17,15 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string
+	Addr string
+	Root string
+}
+
+// Service defines the available service configuration.
+type Service struct {
+	Name      string
 	Namespace string
-	Root      string
+	Version   string
 }
 
 // Tracing defines the available tracing configuration.
@@ -44,6 +50,7 @@ type Config struct {
 	HTTP         HTTP
 	Tracing      Tracing
 	TokenManager TokenManager
+	Service      Service
 }
 
 // New initializes a new configuration with or without defaults.
