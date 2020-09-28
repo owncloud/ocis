@@ -273,30 +273,32 @@ type Reva struct {
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
-	Frontend          FrontendPort
-	DataGateway       Port
-	Gateway           Gateway
-	StorageRegistry   StorageRegistry
-	Users             Users
-	AuthProvider      Users
-	AuthBasic         Port
-	AuthBearer        Port
-	Sharing           Sharing
-	StorageRoot       StoragePort
-	StorageRootData   StoragePort
-	StorageHome       StoragePort
-	StorageHomeData   StoragePort
-	StorageEOS        StoragePort
-	StorageEOSData    StoragePort
-	StorageOC         StoragePort
-	StorageOCData     StoragePort
-	StorageS3         StoragePort
-	StorageS3Data     StoragePort
-	StorageWND        StoragePort
-	StorageWNDData    StoragePort
-	StorageCustom     StoragePort
-	StorageCustomData StoragePort
-	StoragePublicLink PublicStorage
+	Frontend            FrontendPort
+	DataGateway         Port
+	Gateway             Gateway
+	StorageRegistry     StorageRegistry
+	Users               Users
+	AuthProvider        Users
+	AuthBasic           Port
+	AuthBearer          Port
+	Sharing             Sharing
+	StorageRoot         StoragePort
+	StorageRootData     StoragePort
+	StorageHome         StoragePort
+	StorageHomeData     StoragePort
+	StorageEOS          StoragePort
+	StorageEOSData      StoragePort
+	StorageOC           StoragePort
+	StorageOCData       StoragePort
+	StorageS3           StoragePort
+	StorageS3Data       StoragePort
+	StorageWND          StoragePort
+	StorageWNDData      StoragePort
+	StorageCustom       StoragePort
+	StorageCustomData   StoragePort
+	StoragePublicLink   PublicStorage
+	StorageMetadata     StoragePort
+	StorageMetadataData StoragePort
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}
