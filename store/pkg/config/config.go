@@ -17,9 +17,15 @@ type Debug struct {
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string
+	Addr string
+	Root string
+}
+
+// Service defines the available service configuration.
+type Service struct {
+	Name      string
 	Namespace string
-	Root      string
+	Version   string
 }
 
 // Tracing defines the available tracing configuration.
@@ -39,7 +45,7 @@ type Config struct {
 	GRPC     GRPC
 	Tracing  Tracing
 	Datapath string
-	Name     string
+	Service  Service
 }
 
 // New initializes a new configuration with or without defaults.

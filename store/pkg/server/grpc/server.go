@@ -11,8 +11,9 @@ func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
 	service := grpc.NewService(
-		grpc.Namespace("com.owncloud.api"),
-		grpc.Name("store"),
+		grpc.Namespace(options.Config.Service.Namespace),
+		grpc.Name(options.Config.Service.Name),
+		grpc.Version(options.Config.Service.Version),
 		grpc.Context(options.Context),
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Logger(options.Logger),

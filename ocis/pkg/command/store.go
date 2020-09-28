@@ -4,6 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/store/pkg/command"
 	svcconfig "github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/flagset"
@@ -18,6 +19,9 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start a go-micro store",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Store),
+		Subcommands: []*cli.Command{
+			command.PrintVersion(cfg.Store),
+		},
 		Action: func(ctx *cli.Context) error {
 			storeCommand := command.Server(configureStore(cfg))
 
@@ -34,6 +38,7 @@ func configureStore(cfg *config.Config) *svcconfig.Config {
 	cfg.Store.Log.Level = cfg.Log.Level
 	cfg.Store.Log.Pretty = cfg.Log.Pretty
 	cfg.Store.Log.Color = cfg.Log.Color
+	cfg.Store.Service.Version = version.String
 
 	if cfg.Tracing.Enabled {
 		cfg.Store.Tracing.Enabled = cfg.Tracing.Enabled
