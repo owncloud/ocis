@@ -773,10 +773,17 @@ github.com/ory/herodot v0.6.2/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJi
 github.com/ory/viper v1.5.6/go.mod h1:TYmpFpKLxjQwvT4f0QPpkOn4sDXU1kDgAwJpgLYiQ28=
 github.com/ory/x v0.0.85/go.mod h1:s44V8t3xyjWZREcU+mWlp4h302rTuM4aLXcW+y5FbQ8=
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
+github.com/owncloud/ocis v1.0.0-rc1 h1:5pxFes3myh5cwfvyZ0l6akN9wneSc9UxB5Veg2Xr1Rc=
+github.com/owncloud/ocis v1.0.0-rc1.0.20200918114005-1a0ddd2190ee h1:EXT7AIO8bc6HEcnvybGQUkzRXin2KagJBpuv12oZksM=
 github.com/owncloud/ocis-pkg/v2 v2.4.0/go.mod h1:FSzIvhx9HcZcq4jgNaDowNvM7PTX/XCyoMvyfzidUpE=
 github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872 h1:VGWM/eLIxXY6BJLDuzpdjSVa73Dj5S8pfUtT9Sb5Ono=
 github.com/owncloud/ocis-settings v0.3.2-0.20200828091056-47af10a0e872/go.mod h1:vRge9QDkOsc6j76gPBmZs1Z5uOPrV4DIkZCgZCEFwBA=
 github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee/go.mod h1:kukd3chd0ARpGNSLcIutgFywSvWIIdQcpyhPtVTyZbM=
+github.com/owncloud/ocis/ocis-pkg/ v2.4.0 h1:/3ZOd4txtwjiNKJA9iLT9BjrJw5YgHSX13fQR4BYfGY=
+github.com/owncloud/ocis/ocis-pkg/ v2.4.0/go.mod h1:FSzIvhx9HcZcq4jgNaDowNvM7PTX/XCyoMvyfzidUpE=
+github.com/owncloud/ocis/ocis-pkg/ v2.4.1-0.20200902134813-1e87c6173ada/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=
+github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee h1:LaKP3hCTJ6WwB3W40m5UhddvokMRIbOXrjogxON4jAI=
+github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee/go.mod h1:5w91idmyOd8LgYK3eGuqsFBOfVJnSDeEp7S6dHheW14=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=

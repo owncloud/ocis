@@ -99,6 +99,7 @@ type Config struct {
 	Reva                  Reva
 	PreSignedURL          PreSignedURL
 	AutoprovisionAccounts bool
+	EnableBasicAuth       bool
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request

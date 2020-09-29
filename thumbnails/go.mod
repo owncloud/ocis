@@ -19,6 +19,7 @@ require (
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
+	github.com/mwitkow/go-proto-validators v0.3.2 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/ogier/pflag v0.0.1
 	github.com/oklog/run v1.0.0
