@@ -266,6 +266,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		middleware.AccountsClient(accounts),
 		middleware.SettingsRoleService(roles),
 		middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
+		middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 	)
 
 	// the connection will be established in a non blocking fashion

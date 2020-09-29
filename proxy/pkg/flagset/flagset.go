@@ -219,6 +219,15 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   "--presignedurl-allow-method GET [--presignedurl-allow-method POST]",
 			EnvVars: []string{"PRESIGNEDURL_ALLOWED_METHODS"},
 		},
+
+		// Basic auth
+		&cli.BoolFlag{
+			Name:        "enable-basic-auth",
+			Value:       false,
+			Usage:       "enable basic authentication",
+			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
+			Destination: &cfg.EnableBasicAuth,
+		},
 	}
 
 }
