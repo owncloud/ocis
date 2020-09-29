@@ -2,13 +2,14 @@
   <div>
     <oc-table middle divider>
       <oc-table-group>
-        <oc-table-row>
+        <oc-table-row class="fix-table-header">
           <oc-table-cell shrink type="head">
             <oc-checkbox
               :value="areAllAccountsSelected"
               :label="$gettext('Select all users')"
               hide-label
               @change="toggleSelectionAll"
+              class="uk-margin-small-left"
             />
           </oc-table-cell>
           <oc-table-cell shrink type="head" />
@@ -57,3 +58,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.fix-table-header > th {
+  text-transform: none;
+}
+</style>

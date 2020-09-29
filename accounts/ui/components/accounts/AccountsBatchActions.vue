@@ -7,7 +7,7 @@
     </div>
     <oc-grid gutter="small" id="accounts-batch-actions">
       <div v-for="action in actions" :key="action.label">
-        <oc-alert v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'default'" noClose class="tmp-alert-fixes">
+        <oc-alert v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'default'" noClose class="uk-flex uk-flex-middle tmp-alert-fixes">
           <span>{{ action.confirmation.message }}</span>
           <oc-button size="small" :id="action.confirmation.cancel.id" @click="action.confirmation.cancel.handler" :variation="action.confirmation.cancel.variation || 'default'">
             {{ action.confirmation.cancel.label }}
@@ -117,16 +117,22 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tmp-alert-fixes {
-  padding: 5px 10px 4px !important;
+  padding: 4px 10px !important;
   border-radius: 3px !important;
   background-color: #fff !important;
   border: 1px solid rgb(224, 0, 0) !important;
   color: rgb(224, 0, 0) !important;
 
-  font-size: 1.125rem !important;
+  font-size: 1.1rem !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
+}
+.tmp-alert-fixes > *:not(:last-child) {
+  margin-right: 8px;
+}
+.tmp-alert-fixes > button {
+  padding: 0.2rem 0.5rem;
 }
 </style>

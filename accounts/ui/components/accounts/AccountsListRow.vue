@@ -1,7 +1,12 @@
 <template>
   <oc-table-row>
     <oc-table-cell>
-      <oc-checkbox :value="isAccountSelected" @change="TOGGLE_SELECTION_ACCOUNT(account)" :label="selectAccountLabel" hide-label />
+      <oc-checkbox
+        class="uk-margin-small-left"
+        :value="isAccountSelected"
+        @change="TOGGLE_SELECTION_ACCOUNT(account)"
+        :label="selectAccountLabel" hide-label
+      />
     </oc-table-cell>
     <oc-table-cell>
       <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
