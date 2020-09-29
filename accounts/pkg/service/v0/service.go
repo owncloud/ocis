@@ -51,12 +51,14 @@ func New(opts ...Option) (s *Service, err error) {
 		roleManager = &m
 	}
 
+	serviceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 	s = &Service{
-		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		id:          serviceID,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
 		RoleManager: roleManager,
+		repo:        createMetadataStorage(serviceID, cfg, logger),
 	}
 
 	// build an index
@@ -398,6 +400,19 @@ func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger 
 	return true
 }
 
+func createMetadataStorage(serviceID string, cfg *config.Config, logger log.Logger) storage.Repo {
+	// for now we detect the used storage implementation based on which storage is configured
+	// the config with defaults needs to be checked last
+	if cfg.Repo.Disk.Path != "" {
+		return storage.NewDiskRepo(serviceID, cfg, logger)
+	}
+	repo, err := storage.NewCS3Repo(serviceID, cfg)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("cs3 storage was configured but failed to start")
+	}
+	return repo
+}
+
 // Service implements the AccountsServiceHandler interface
 type Service struct {
 	id          string
@@ -406,7 +421,7 @@ type Service struct {
 	index       bleve.Index
 	RoleService settings.RoleService
 	RoleManager *roles.Manager
-	repo        storage.DiskRepo
+	repo        storage.Repo
 }
 
 func cleanupID(id string) (string, error) {

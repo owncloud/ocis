@@ -3,28 +3,30 @@ package storage
 import (
 	"context"
 	"encoding/json"
-	merrors "github.com/micro/go-micro/v2/errors"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/rs/zerolog"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	olog "github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 var groupLock sync.Mutex
 
 type DiskRepo struct {
 	serviceID string
-	dataPath  string
-	log       zerolog.Logger
+	cfg       *config.Config
+	log       olog.Logger
 }
 
-func New(serviceID string, dataPath string, log zerolog.Logger) DiskRepo {
+func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo {
 	return DiskRepo{
 		serviceID: serviceID,
-		dataPath:  dataPath,
-		log:       log.With().Str("id", serviceID).Logger(),
+		cfg:       cfg,
+		log:       log,
 	}
 }
 
@@ -38,7 +40,7 @@ func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error
 		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
 	}
 
-	path := filepath.Join(r.dataPath, "accounts", a.Id)
+	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, a.Id)
 
 	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
 		return merrors.InternalServerError(r.serviceID, "could not write account: %v", err.Error())
@@ -48,7 +50,7 @@ func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error
 
 // LoadAccount from the storage
 func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
-	path := filepath.Join(r.dataPath, "accounts", id)
+	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
 
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
@@ -61,6 +63,17 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 	return
 }
 
+// DeleteAccount from the storage
+func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
+	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
+	if err = os.Remove(path); err != nil {
+		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+		return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
+	}
+
+	return nil
+}
+
 // WriteGroup persists a given group to the storage
 func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	// leave only the member id
@@ -71,7 +84,7 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
 	}
 
-	path := filepath.Join(r.dataPath, "groups", g.Id)
+	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, g.Id)
 
 	groupLock.Lock()
 	defer groupLock.Unlock()
@@ -83,7 +96,7 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 
 // LoadGroup from the storage
 func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
-	path := filepath.Join(r.dataPath, "groups", id)
+	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
 
 	groupLock.Lock()
 	defer groupLock.Unlock()
@@ -99,12 +112,22 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 	return
 }
 
+func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
+	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
+	if err = os.Remove(path); err != nil {
+		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
+		return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
+	}
+
+	return nil
+}
+
 // deflateMemberOf replaces the groups of a user with an instance that only contains the id
 func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 	if a == nil {
 		return
 	}
-	deflated := []*proto.Group{}
+	var deflated []*proto.Group
 	for i := range a.MemberOf {
 		if a.MemberOf[i].Id != "" {
 			deflated = append(deflated, &proto.Group{Id: a.MemberOf[i].Id})
@@ -116,32 +139,12 @@ func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 	a.MemberOf = deflated
 }
 
-func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
-	path := filepath.Join(r.dataPath, "accounts", id)
-	if err = os.Remove(path); err != nil {
-		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
-		return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
-	}
-
-	return nil
-}
-
-func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
-	path := filepath.Join(r.dataPath, "groups", id)
-	if err = os.Remove(path); err != nil {
-		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-		return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
-	}
-
-	return nil
-}
-
 // deflateMembers replaces the users of a group with an instance that only contains the id
 func (r DiskRepo) deflateMembers(g *proto.Group) {
 	if g == nil {
 		return
 	}
-	deflated := []*proto.Account{}
+	var deflated []*proto.Account
 	for i := range g.Members {
 		if g.Members[i].Id != "" {
 			deflated = append(deflated, &proto.Account{Id: g.Members[i].Id})

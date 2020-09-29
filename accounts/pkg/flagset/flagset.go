@@ -99,6 +99,34 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+		&cli.StringFlag{
+			Name:        "storage-disk-path",
+			Value:       "",
+			Usage:       "Path on the local disk, e.g. /var/tmp/ocis-accounts",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"},
+			Destination: &cfg.Repo.CS3.ProviderAddr,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-provider-addr",
+			Value:       "0.0.0.0:9215",
+			Usage:       "bind address for the metadata storage provider",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"},
+			Destination: &cfg.Repo.CS3.ProviderAddr,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-driver-url",
+			Value:       "http://localhost:9216",
+			Usage:       "http endpoint of the metadata storage, without trailing slash",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DRIVER_URL"},
+			Destination: &cfg.Repo.CS3.DriverURL,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-data-prefix",
+			Value:       "data",
+			Usage:       "path prefix for the http endpoint of the metadata storage, without leading slash",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_PREFIX"},
+			Destination: &cfg.Repo.CS3.DataPrefix,
+		},
 	}
 }
 

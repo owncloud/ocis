@@ -2,13 +2,20 @@ package storage
 
 import (
 	"context"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+var cfg = &config.Config{
+	TokenManager: config.TokenManager{
+		JWTSecret: "Pive-Fumkiu4",
+	},
+}
+
 func TestCS3Repo_WriteAccount(t *testing.T) {
-	r, err := NewCS3Repo("fooo")
+	r, err := NewCS3Repo(cfg)
 	assert.NoError(t, err)
 
 	err = r.WriteAccount(context.Background(), &proto.Account{
@@ -22,7 +29,7 @@ func TestCS3Repo_WriteAccount(t *testing.T) {
 }
 
 func TestCS3Repo_LoadAccount(t *testing.T) {
-	r, err := NewCS3Repo("fooo")
+	r, err := NewCS3Repo(cfg)
 	assert.NoError(t, err)
 
 	err = r.WriteAccount(context.Background(), &proto.Account{
@@ -42,7 +49,7 @@ func TestCS3Repo_LoadAccount(t *testing.T) {
 }
 
 func TestCS3Repo_DeleteAccount(t *testing.T) {
-	r, err := NewCS3Repo("fooo")
+	r, err := NewCS3Repo(cfg)
 	assert.NoError(t, err)
 
 	err = r.WriteAccount(context.Background(), &proto.Account{
