@@ -122,22 +122,15 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 
-	ureq, err := http.NewRequest("DELETE", fmt.Sprintf("http://localhost:9187/data/accounts/%s", id), nil)
+	_, err = r.storageClient.Delete(ctx, &provider.DeleteRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/accounts/%s", id)},
+		},
+	})
+
 	if err != nil {
 		return err
 	}
-
-	ureq.Header.Add("x-access-token", t)
-	cl := http.Client{
-		Transport: http.DefaultTransport,
-	}
-
-	resp, err := cl.Do(ureq)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -149,7 +142,6 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	}
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
-
 	ureq, err := http.NewRequest("DELETE", fmt.Sprintf("http://localhost:9187/data/groups/%s", id), nil)
 	if err != nil {
 		return err
