@@ -35,28 +35,6 @@ import (
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
 
-func (s Service) indexAccounts(path string) (err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not open accounts folder")
-		return
-	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not list accounts folder")
-		return
-	}
-	for _, file := range list {
-		err = s.indexAccount(file.Name())
-		if err != nil {
-			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
-		}
-	}
-
-	return
-}
-
 func (s Service) indexAccount(id string) error {
 	a := &proto.BleveAccount{
 		BleveType: "account",
