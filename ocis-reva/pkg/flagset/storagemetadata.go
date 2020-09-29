@@ -56,7 +56,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			Value:       "local",
 			Usage:       "storage driver for data-provider mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_DATA_PROVIDER_DRIVER"},
-			Destination: &cfg.Reva.StorageMetadata.Driver,
+			Destination: &cfg.Reva.StorageMetadataData.Driver,
 		},
 	}
 
