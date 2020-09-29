@@ -61,15 +61,18 @@ type Log struct {
 	Color  bool
 }
 
+// Repo defines which storage implementation is to be used.
 type Repo struct {
 	Disk Disk
 	CS3  CS3
 }
 
+// Disk is the local disk implementation of the storage.
 type Disk struct {
 	Path string
 }
 
+// CS3 is the cs3 implementation of the storage.
 type CS3 struct {
 	ProviderAddr string
 	DriverURL    string

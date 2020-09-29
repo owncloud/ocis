@@ -16,12 +16,14 @@ import (
 
 var groupLock sync.Mutex
 
+// DiskRepo provides a local filesystem implementation of the Repo interface
 type DiskRepo struct {
 	serviceID string
 	cfg       *config.Config
 	log       olog.Logger
 }
 
+// NewDiskRepo creates a new disk repo
 func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo {
 	return DiskRepo{
 		serviceID: serviceID,
@@ -30,7 +32,7 @@ func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo
 	}
 }
 
-// WriteAccount to the storage
+// WriteAccount to the local filesystem
 func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
 	// leave only the group id
 	r.deflateMemberOf(a)
@@ -48,7 +50,7 @@ func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error
 	return
 }
 
-// LoadAccount from the storage
+// LoadAccount from the local filesystem
 func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
 
@@ -63,7 +65,7 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 	return
 }
 
-// DeleteAccount from the storage
+// DeleteAccount from the local filesystem
 func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
 	if err = os.Remove(path); err != nil {
@@ -74,7 +76,7 @@ func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
 	return nil
 }
 
-// WriteGroup persists a given group to the storage
+// WriteGroup to the local filesystem
 func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	// leave only the member id
 	r.deflateMembers(g)
@@ -94,7 +96,7 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	return
 }
 
-// LoadGroup from the storage
+// LoadGroup from the local filesystem
 func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
 
@@ -112,6 +114,7 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 	return
 }
 
+// DeleteGroup from the local filesystem
 func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
 	if err = os.Remove(path); err != nil {

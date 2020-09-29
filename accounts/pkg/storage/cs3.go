@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
 	serviceID     string
 	cfg           *config.Config
@@ -29,6 +30,7 @@ type CS3Repo struct {
 	storageClient provider.ProviderAPIClient
 }
 
+// NewCS3Repo creates a new cs3 repo
 func NewCS3Repo(serviceID string, cfg *config.Config) (Repo, error) {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
@@ -51,6 +53,7 @@ func NewCS3Repo(serviceID string, cfg *config.Config) (Repo, error) {
 	}, nil
 }
 
+// WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
 func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -67,7 +70,7 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
 	}
 
-	ureq, err := http.NewRequest("PUT", r.accountUrl(a.Id), bytes.NewReader(by))
+	ureq, err := http.NewRequest("PUT", r.accountURL(a.Id), bytes.NewReader(by))
 	if err != nil {
 		return err
 	}
@@ -84,15 +87,14 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 	return nil
 }
 
+// LoadAccount loads an account via cs3 by id and writes it to the provided account
 func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
-
-	ureq, err := http.NewRequest("GET", r.accountUrl(id), nil)
+	ureq, err := http.NewRequest("GET", r.accountURL(id), nil)
 	if err != nil {
 		return err
 	}
@@ -120,6 +122,7 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 	return nil
 }
 
+// DeleteAccount deletes an account via cs3 by id
 func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -130,17 +133,13 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	_, err = r.storageClient.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/accounts/%s", id)},
+			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", accountsFolder, id)},
 		},
 	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
+// WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -157,7 +156,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
 	}
 
-	ureq, err := http.NewRequest("PUT", r.groupUrl(g.Id), bytes.NewReader(by))
+	ureq, err := http.NewRequest("PUT", r.groupURL(g.Id), bytes.NewReader(by))
 	if err != nil {
 		return err
 	}
@@ -174,15 +173,14 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	return nil
 }
 
+// LoadGroup loads a group via cs3 by id and writes it to the provided group
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
-
-	ureq, err := http.NewRequest("GET", r.groupUrl(id), nil)
+	ureq, err := http.NewRequest("GET", r.groupURL(id), nil)
 	if err != nil {
 		return err
 	}
@@ -210,6 +208,7 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 	return nil
 }
 
+// DeleteGroup deletes a group via cs3 by id
 func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -217,24 +216,13 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	}
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
-	ureq, err := http.NewRequest("DELETE", r.groupUrl(id), nil)
-	if err != nil {
-		return err
-	}
 
-	ureq.Header.Add("x-access-token", t)
-	cl := http.Client{
-		Transport: http.DefaultTransport,
-	}
-
-	resp, err := cl.Do(ureq)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	return nil
+	_, err = r.storageClient.Delete(ctx, &provider.DeleteRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", groupsFolder, id)},
+		},
+	})
+	return err
 }
 
 func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
@@ -244,11 +232,11 @@ func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
 	})
 }
 
-func (r CS3Repo) accountUrl(id string) string {
+func (r CS3Repo) accountURL(id string) string {
 	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
 }
 
-func (r CS3Repo) groupUrl(id string) string {
+func (r CS3Repo) groupURL(id string) string {
 	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
 }
 

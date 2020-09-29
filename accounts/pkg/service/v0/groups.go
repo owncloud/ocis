@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
@@ -14,9 +13,6 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/provider"
 )
-
-// accLock mutually exclude readers from writers on group files
-var groupLock sync.Mutex
 
 func (s Service) indexGroups(path string) (err error) {
 	var f *os.File
