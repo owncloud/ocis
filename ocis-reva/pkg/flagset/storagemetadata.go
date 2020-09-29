@@ -3,7 +3,6 @@ package flagset
 import (
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"path"
 )
 
 // StorageMetadata applies cfg to the root flagset
@@ -58,6 +57,13 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_STORAGE_METADATA_DATA_PROVIDER_DRIVER"},
 			Destination: &cfg.Reva.StorageMetadataData.Driver,
 		},
+		&cli.StringFlag{
+			Name:        "storage-root",
+			Value:       "/var/tmp/ocis/metadata",
+			Usage:       "the path to the metadata storage root",
+			EnvVars:     []string{"REVA_STORAGE_METADATA_ROOT"},
+			Destination: &cfg.Reva.Storages.Common.Root,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)
@@ -67,12 +73,6 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DriverLocalWithConfig(cfg)...)
 	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
 	flags = append(flags, DriverOCISWithConfig(cfg)...)
-
-	// Metadata storage needs its own root
-	cfg.Reva.Storages.Common.Root = path.Join(cfg.Reva.Storages.Common.Root, "metadata")
-	cfg.Reva.Storages.OwnCloud.Root = path.Join(cfg.Reva.Storages.OwnCloud.Root, "metadata")
-	cfg.Reva.Storages.EOS.Root = path.Join(cfg.Reva.Storages.EOS.Root, "metadata")
-	cfg.Reva.Storages.Local.Root = path.Join(cfg.Reva.Storages.Local.Root, "metadata")
 
 	return flags
 

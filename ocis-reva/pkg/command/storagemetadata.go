@@ -25,9 +25,19 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		Usage:    "Start reva storage-metadata service",
 		Flags:    flagset.StorageMetadata(cfg),
 		Category: "Extensions",
+		Before: func(c *cli.Context) error {
+			storageRoot := c.String("storage-root")
+
+			cfg.Reva.Storages.OwnCloud.Root = storageRoot
+			cfg.Reva.Storages.EOS.Root = storageRoot
+			cfg.Reva.Storages.Local.Root = storageRoot
+			cfg.Reva.Storages.S3.Root = storageRoot
+			cfg.Reva.Storages.Home.Root = storageRoot
+
+			return nil
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
 				case "agent":
