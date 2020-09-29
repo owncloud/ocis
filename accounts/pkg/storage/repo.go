@@ -10,6 +10,7 @@ const (
 	groupsFolder = "groups"
 )
 
+// Repo defines the storage operations
 type Repo interface {
 	WriteAccount(ctx context.Context, a *proto.Account) (err error)
 	LoadAccount(ctx context.Context, id string, a *proto.Account) (err error)
