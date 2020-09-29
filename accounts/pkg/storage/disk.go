@@ -25,6 +25,19 @@ type DiskRepo struct {
 
 // NewDiskRepo creates a new disk repo
 func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo {
+	paths := []string{
+		filepath.Join(cfg.Repo.Disk.Path, accountsFolder),
+		filepath.Join(cfg.Repo.Disk.Path, groupsFolder),
+	}
+	for i := range paths {
+		if _, err := os.Stat(paths[i]); err != nil {
+			if os.IsNotExist(err) {
+				if err = os.MkdirAll(paths[i], 0700); err != nil {
+					log.Fatal().Err(err).Msgf("could not create data folder %v", paths[i])
+				}
+			}
+		}
+	}
 	return DiskRepo{
 		serviceID: serviceID,
 		cfg:       cfg,
