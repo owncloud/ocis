@@ -168,3 +168,23 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 	}
 }
+
+// ListThumbnailsWithConfig applies the config to the flagset for listing thumbnails services.
+func ListThumbnailsWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "grpc-name",
+			Value:       "thumbnails",
+			Usage:       "Name of the service",
+			EnvVars:     []string{"THUMBNAILS_GRPC_NAME"},
+			Destination: &cfg.Server.Name,
+		},
+		&cli.StringFlag{
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"THUMBNAILS_GRPC_NAMESPACE"},
+			Destination: &cfg.Server.Namespace,
+		},
+	}
+}

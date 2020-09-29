@@ -21,6 +21,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Address(options.Address),
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
+		grpc.Version(options.Config.Server.Version),
 	)
 
 	var thumbnail proto.ThumbnailServiceHandler

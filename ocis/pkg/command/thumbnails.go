@@ -4,6 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/command"
 	"github.com/owncloud/ocis/thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/config"
@@ -19,6 +20,9 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start thumbnails server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Thumbnails),
+		Subcommands: []*cli.Command{
+			command.PrintVersion(cfg.Thumbnails),
+		},
 		Action: func(c *cli.Context) error {
 			thumbnailsCommand := command.Server(configureThumbnails(cfg))
 
@@ -35,6 +39,7 @@ func configureThumbnails(cfg *config.Config) *svcconfig.Config {
 	cfg.Thumbnails.Log.Level = cfg.Log.Level
 	cfg.Thumbnails.Log.Pretty = cfg.Log.Pretty
 	cfg.Thumbnails.Log.Color = cfg.Log.Color
+	cfg.Thumbnails.Server.Version = version.String
 
 	if cfg.Tracing.Enabled {
 		cfg.Thumbnails.Tracing.Enabled = cfg.Tracing.Enabled

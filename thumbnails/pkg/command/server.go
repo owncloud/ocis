@@ -128,6 +128,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			metrics.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+
 			service := grpc.NewService(
 				grpc.Logger(logger),
 				grpc.Context(ctx),
