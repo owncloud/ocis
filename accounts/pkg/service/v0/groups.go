@@ -228,9 +228,9 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 			s.log.Error().Err(err).Str("groupid", id).Str("accountid", g.Members[i].Id).Msg("could not remove account memberof, skipping")
 		}
 	}
-	if err = os.Remove(path); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-		return merrors.InternalServerError(s.id, "could not remove group: %v", err.Error())
+
+	if err = s.repo.DeleteGroup(c, id); err != nil {
+		return err
 	}
 
 	if err = s.index.Delete(id); err != nil {

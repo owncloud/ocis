@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/rs/zerolog"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -113,6 +114,26 @@ func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 		}
 	}
 	a.MemberOf = deflated
+}
+
+func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
+	path := filepath.Join(r.dataPath, "accounts", id)
+	if err = os.Remove(path); err != nil {
+		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+		return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
+	}
+
+	return nil
+}
+
+func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
+	path := filepath.Join(r.dataPath, "groups", id)
+	if err = os.Remove(path); err != nil {
+		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
+		return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
+	}
+
+	return nil
 }
 
 // deflateMembers replaces the users of a group with an instance that only contains the id
