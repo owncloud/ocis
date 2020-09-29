@@ -24,7 +24,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "provider-addr",
-			Value:       "0.0.0.0:9250",
+			Value:       "0.0.0.0:9215",
 			Usage:       "Address to bind reva service",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_PROVIDER_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.Addr,
