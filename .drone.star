@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '2ccec3966abebc7cff54cfdbd0aa9942253584a7',
+    'phoenixCommit': '3204f23746b1e958ef9eb38464949ef8107e9b1f',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -471,7 +471,7 @@ def docker(ctx, arch):
         'temp': {},
       },
     ],
-    'depends_on': 
+    'depends_on':
       getTestSuiteNames() + [
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
