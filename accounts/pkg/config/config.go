@@ -61,6 +61,21 @@ type Log struct {
 	Color  bool
 }
 
+type Repo struct {
+	Disk Disk
+	CS3  CS3
+}
+
+type Disk struct {
+	Path string
+}
+
+type CS3 struct {
+	ProviderAddr string
+	DriverURL    string
+	DataPrefix   string
+}
+
 // Config merges all Account config parameters.
 type Config struct {
 	LDAP         LDAP
@@ -70,6 +85,7 @@ type Config struct {
 	Asset        Asset
 	Log          Log
 	TokenManager TokenManager
+	Repo         Repo
 }
 
 // New returns a new config.

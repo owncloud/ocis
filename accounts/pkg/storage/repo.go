@@ -5,6 +5,11 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 )
 
+const (
+	accountsFolder = "accounts"
+	groupsFolder = "groups"
+)
+
 type Repo interface {
 	WriteAccount(ctx context.Context, a *proto.Account) (err error)
 	LoadAccount(ctx context.Context, id string, a *proto.Account) (err error)
