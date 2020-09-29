@@ -23,7 +23,7 @@
           @keydown.enter="createAccount"
         />
       </label>
-      <label class="uk-margin-xsmall-right">
+      <label>
         <oc-text-input
           id="accounts-new-account-input-password"
           type="password"
@@ -38,14 +38,16 @@
         <oc-button
           v-text="$gettext('Cancel')"
           @click="cancelForm"
-          class="uk-margin-xsmall-right"
           :disabled="isRequestInProgress"
         />
+      </div>
+      <div>
         <oc-button
           id="accounts-new-account-button-confirm"
           variation="primary"
           :disabled="isRequestInProgress"
           @click="createAccount"
+          :class="{ 'border-ods-tmp-fix': !isRequestInProgress }"
         >
           <oc-spinner
             v-if="isRequestInProgress"
@@ -189,5 +191,11 @@ export default {
 #accounts-new-account-button-confirm > span {
   display: flex;
   align-items: center;
+}
+</style>
+<style scoped>
+.border-ods-tmp-fix {
+  /* TODO: somehow the primary button receives a 2px border-width. remove it until we fix it in ODS. */
+  border-width: 0 !important;
 }
 </style>
