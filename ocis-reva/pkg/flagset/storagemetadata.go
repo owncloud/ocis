@@ -10,7 +10,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	flags := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9184",
+			Value:       "0.0.0.0:9217",
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.DebugAddr,
@@ -24,21 +24,21 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "provider-addr",
-			Value:       "0.0.0.0:9185",
+			Value:       "0.0.0.0:9250",
 			Usage:       "Address to bind reva service",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_PROVIDER_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "data-server-url",
-			Value:       "http://localhost:9187",
+			Value:       "http://localhost:9216",
 			Usage:       "URL of the data-server the storage-provider uses",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageMetadata.DataServerURL,
 		},
 		&cli.StringFlag{
 			Name:        "data-server-addr",
-			Value:       "0.0.0.0:9187",
+			Value:       "0.0.0.0:9216",
 			Usage:       "Address to bind the metadata data-server to",
 			EnvVars:     []string{"REVA_STORAGE_METADATA_DATA_SERVER_ADDR"},
 			Destination: &cfg.Reva.StorageMetadataData.Addr,
