@@ -158,11 +158,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.GRPC.Namespace,
 		},
 		&cli.StringFlag{
+			Name:        "name",
+			Value:       "settings",
+			Usage:       "service name",
+			EnvVars:     []string{"SETTINGS_NAME"},
+			Destination: &cfg.Service.Name,
+		},
+		&cli.StringFlag{
 			Name:        "data-path",
 			Value:       "/var/tmp/ocis-settings",
 			Usage:       "Mount path for the storage",
 			EnvVars:     []string{"SETTINGS_DATA_PATH"},
-			Destination: &cfg.Storage.DataPath,
+			Destination: &cfg.Service.DataPath,
 		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",
@@ -170,6 +177,26 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
 			EnvVars:     []string{"SETTINGS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
+		},
+	}
+}
+
+// ListSettingsWithConfig applies list command flags to cfg
+func ListSettingsWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"SETTINGS_GRPC_NAMESPACE"},
+			Destination: &cfg.GRPC.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "settings",
+			Usage:       "service name",
+			EnvVars:     []string{"SETTINGS_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 	}
 }

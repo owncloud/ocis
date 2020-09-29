@@ -177,7 +177,7 @@ func init() {
 	)
 
 	cfg := config.New()
-	cfg.Storage.DataPath = dataPath
+	cfg.Service.DataPath = dataPath
 	handler = svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
 	err := proto.RegisterBundleServiceHandler(service.Server(), handler)
 	if err != nil {

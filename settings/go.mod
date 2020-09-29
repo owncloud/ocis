@@ -17,8 +17,10 @@ require (
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/mitchellh/gox v1.0.1
 	github.com/oklog/run v1.0.0
+	github.com/olekukonko/tablewriter v0.0.1
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee // indirect
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
+	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.6.1
@@ -31,6 +33,6 @@ require (
 )
 
 replace (
-	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 )
