@@ -14,6 +14,7 @@ import (
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"google.golang.org/grpc/metadata"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -95,19 +96,147 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		Transport: http.DefaultTransport,
 	}
 
-	if _, err = cl.Do(ureq); err != nil {
+	resp, err := cl.Do(ureq)
+	if err != nil {
+		return err
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if err := json.Unmarshal(b, &a); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+
+	ureq, err := http.NewRequest("DELETE", fmt.Sprintf("http://localhost:9187/data/accounts/%s", id), nil)
+	if err != nil {
+		return err
+	}
+
+	ureq.Header.Add("x-access-token", t)
+	cl := http.Client{
+		Transport: http.DefaultTransport,
+	}
+
+	resp, err := cl.Do(ureq)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+
+	ureq, err := http.NewRequest("DELETE", fmt.Sprintf("http://localhost:9187/data/groups/%s", id), nil)
+	if err != nil {
+		return err
+	}
+
+	ureq.Header.Add("x-access-token", t)
+	cl := http.Client{
+		Transport: http.DefaultTransport,
+	}
+
+	resp, err := cl.Do(ureq)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
-	panic("implement me")
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	if err := r.makeRootDirIfNotExist(ctx); err != nil {
+		return err
+	}
+
+	var by []byte
+	if by, err = json.Marshal(g); err != nil {
+		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
+	}
+
+	ureq, err := http.NewRequest("PUT", fmt.Sprintf("http://localhost:9187/data/groups/%s", g.Id), bytes.NewReader(by))
+	if err != nil {
+		return err
+	}
+
+	ureq.Header.Add("x-access-token", t)
+	cl := http.Client{
+		Transport: http.DefaultTransport,
+	}
+
+	if _, err := cl.Do(ureq); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
-	panic("implement me")
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+
+	ureq, err := http.NewRequest("GET", fmt.Sprintf("http://localhost:9187/data/groups/%s", id), nil)
+	if err != nil {
+		return err
+	}
+
+	ureq.Header.Add("x-access-token", t)
+	cl := http.Client{
+		Transport: http.DefaultTransport,
+	}
+
+	resp, err := cl.Do(ureq)
+	if err != nil {
+		return err
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if err := json.Unmarshal(b, &g); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {

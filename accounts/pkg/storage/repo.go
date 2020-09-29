@@ -8,6 +8,8 @@ import (
 type Repo interface {
 	WriteAccount(ctx context.Context, a *proto.Account) (err error)
 	LoadAccount(ctx context.Context, id string, a *proto.Account) (err error)
+	DeleteAccount(ctx context.Context, id string) (err error)
 	WriteGroup(ctx context.Context, g *proto.Group) (err error)
 	LoadGroup(ctx context.Context, id string, g *proto.Group) (err error)
+	DeleteGroup(ctx context.Context, id string) (err error)
 }
