@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 
 	"github.com/CiscoM31/godata"
@@ -13,28 +12,6 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/provider"
 )
-
-func (s Service) indexGroups(path string) (err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not open groups folder")
-		return
-	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not list groups folder")
-		return
-	}
-	for _, file := range list {
-		err = s.indexGroup(file.Name())
-		if err != nil {
-			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
-		}
-	}
-
-	return
-}
 
 func (s Service) indexGroup(id string) error {
 	g := &proto.BleveGroup{
