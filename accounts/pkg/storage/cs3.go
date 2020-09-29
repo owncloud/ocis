@@ -153,7 +153,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 
 	var by []byte
 	if by, err = json.Marshal(g); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
+		return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
 	}
 
 	ureq, err := http.NewRequest("PUT", r.groupURL(g.Id), bytes.NewReader(by))
