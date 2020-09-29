@@ -103,8 +103,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "storage-disk-path",
 			Value:       "",
 			Usage:       "Path on the local disk, e.g. /var/tmp/ocis-accounts",
-			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"},
-			Destination: &cfg.Repo.CS3.ProviderAddr,
+			EnvVars:     []string{"ACCOUNTS_STORAGE_DISK_PATH"},
+			Destination: &cfg.Repo.Disk.Path,
 		},
 		&cli.StringFlag{
 			Name:        "storage-cs3-provider-addr",

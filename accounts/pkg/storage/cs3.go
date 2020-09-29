@@ -5,6 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"path"
+	"strings"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -15,9 +20,6 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"google.golang.org/grpc/metadata"
-	"io/ioutil"
-	"net/http"
-	"path"
 )
 
 type CS3Repo struct {
@@ -243,11 +245,11 @@ func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
 }
 
 func (r CS3Repo) accountUrl(id string) string {
-	return path.Join(r.cfg.Repo.CS3.DriverURL, r.cfg.Repo.CS3.DataPrefix, accountsFolder, id)
+	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
 }
 
 func (r CS3Repo) groupUrl(id string) string {
-	return path.Join(r.cfg.Repo.CS3.DriverURL, r.cfg.Repo.CS3.DataPrefix, groupsFolder, id)
+	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
@@ -274,4 +276,17 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 	}
 
 	return nil
+}
+
+// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, "/")
+	bslash := strings.HasPrefix(b, "/")
+	switch {
+	case aslash && bslash:
+		return a + b[1:]
+	case !aslash && !bslash:
+		return a + "/" + b
+	}
+	return a + b
 }
