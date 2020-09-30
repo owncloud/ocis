@@ -102,7 +102,7 @@ def main(ctx):
     updateDeployment(ctx)
   ]
 
-  if '[docs-only]' in ctx.build.message:
+  if '[docs-only]' in ctx.build.title:
     pipelines = docs(ctx)
     pipelines['depends_on'] = []
   else:
@@ -812,7 +812,6 @@ def manifest(ctx):
   }
 
 def changelog(ctx):
-  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -821,30 +820,7 @@ def changelog(ctx):
       'os': 'linux',
       'arch': 'amd64',
     },
-    'clone': {
-      'disable': True,
-    },
     'steps': [
-      {
-        'name': 'clone',
-        'image': 'plugins/git-action:1',
-        'pull': 'always',
-        'settings': {
-          'actions': [
-            'clone',
-          ],
-          'remote': 'https://github.com/%s' % (repo_slug),
-          'branch': ctx.build.source if ctx.build.event == 'pull_request' else 'master',
-          'path': '/drone/src',
-          'netrc_machine': 'github.com',
-          'netrc_username': {
-            'from_secret': 'github_username',
-          },
-          'netrc_password': {
-            'from_secret': 'github_token',
-          },
-        },
-      },
       {
         'name': 'generate',
         'image': 'webhippie/golang:1.13',
