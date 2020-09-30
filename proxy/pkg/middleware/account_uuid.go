@@ -93,7 +93,10 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				if opt.EnableBasicAuth && ok {
 					l.Warn().Msg("basic auth enabled, use only for testing or development")
 					account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("login eq '%s' and password eq '%s'", strings.ReplaceAll(login, "'", "''"), strings.ReplaceAll(password, "'", "''")))
-					// fake claims for the subsequent code flow
+					if status != 0 {
+						w.WriteHeader(status)
+						return
+					}					// fake claims for the subsequent code flow
 					claims = &oidc.StandardClaims{
 						Iss: opt.OIDCIss,
 					}
