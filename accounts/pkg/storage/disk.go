@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 )
@@ -52,41 +51,40 @@ func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error
 
 	var bytes []byte
 	if bytes, err = json.Marshal(a); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
+		return err
 	}
 
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, a.Id)
-
-	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not write account: %v", err.Error())
-	}
-	return
+	return ioutil.WriteFile(path, bytes, 0600)
 }
 
 // LoadAccount from the local filesystem
 func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
-
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
-		return merrors.NotFound(r.serviceID, "could not read account: %v", err.Error())
+		if os.IsNotExist(err) {
+			err = &notFoundErr{"account", id}
+		}
+		return
 	}
 
-	if err = json.Unmarshal(data, a); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not unmarshal account: %v", err.Error())
-	}
-	return
+	return json.Unmarshal(data, a)
 }
 
 // DeleteAccount from the local filesystem
 func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
 	if err = os.Remove(path); err != nil {
-		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
-		return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
+		if os.IsNotExist(err) {
+			err = &notFoundErr{"account", id}
+		}
 	}
 
-	return nil
+	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+	//return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
+
+	return
 }
 
 // WriteGroup to the local filesystem
@@ -96,17 +94,19 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 
 	var bytes []byte
 	if bytes, err = json.Marshal(g); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
+		return err
 	}
 
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, g.Id)
 
 	groupLock.Lock()
 	defer groupLock.Unlock()
-	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not write group: %v", err.Error())
-	}
-	return
+
+	return ioutil.WriteFile(path, bytes, 0600)
+
+	//return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
+
+	//return merrors.InternalServerError(r.serviceID, "could not write group: %v", err.Error())
 }
 
 // LoadGroup from the local filesystem
@@ -117,25 +117,29 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 	defer groupLock.Unlock()
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
-		return merrors.NotFound(r.serviceID, "could not read group: %v", err.Error())
+		if os.IsNotExist(err) {
+			err = &notFoundErr{"group", id}
+		}
+
+		return
 	}
 
-	if err = json.Unmarshal(data, g); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not unmarshal group: %v", err.Error())
-	}
-
-	return
+	return json.Unmarshal(data, g)
 }
 
 // DeleteGroup from the local filesystem
 func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
 	if err = os.Remove(path); err != nil {
-		r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-		return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
+		if os.IsNotExist(err) {
+			err = &notFoundErr{"account", id}
+		}
 	}
 
 	return nil
+
+	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
+	//return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
 }
 
 // deflateMemberOf replaces the groups of a user with an instance that only contains the id

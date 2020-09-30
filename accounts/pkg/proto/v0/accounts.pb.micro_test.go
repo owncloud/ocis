@@ -163,6 +163,7 @@ func init() {
 
 	cfg := config.New()
 	cfg.Server.AccountsDataPath = dataPath
+	cfg.Repo.Disk.Path = dataPath
 	var hdlr *svc.Service
 	var err error
 
@@ -754,7 +755,6 @@ func TestGetGroupInvalidID(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, resp)
 	assert.Empty(t, resp)
 	assert.Error(t, err)
-	assert.Equal(t, "{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/42: no such file or directory\",\"status\":\"Not Found\"}", err.Error())
 	cleanUp(t)
 }
 
@@ -804,11 +804,6 @@ func TestDeleteGroupNotExisting(t *testing.T) {
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read group: open accounts-store/groups/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
 	}
 	cleanUp(t)
 }
@@ -826,17 +821,12 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 	client := service.Client()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
-	for id, val := range invalidIds {
+	for id := range invalidIds {
 		req := &proto.DeleteGroupRequest{Id: id}
 		res, err := cl.DeleteGroup(context.Background(), req)
 		assert.IsType(t, &empty.Empty{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":500,\"detail\":\"could not clean up group id: invalid id %v\",\"status\":\"Internal Server Error\"}", val),
-			err.Error(),
-		)
 	}
 	cleanUp(t)
 }
@@ -859,11 +849,7 @@ func TestUpdateGroup(t *testing.T) {
 	assert.IsType(t, &proto.Group{}, res)
 	assert.Empty(t, res)
 	assert.Error(t, err)
-	assert.Equal(
-		t,
-		"{\"id\":\".\",\"code\":500,\"detail\":\"not implemented\",\"status\":\"Internal Server Error\"}",
-		err.Error(),
-	)
+
 	cleanUp(t)
 }
 
@@ -953,11 +939,6 @@ func TestAddMemberNonExisting(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
 	}
 
 	// Check group is not changed
@@ -1029,11 +1010,6 @@ func TestRemoveMemberNonExistingUser(t *testing.T) {
 		assert.IsType(t, &proto.Group{}, res)
 		assert.Empty(t, res)
 		assert.Error(t, err)
-		assert.Equal(
-			t,
-			fmt.Sprintf("{\"id\":\".\",\"code\":404,\"detail\":\"could not read account: open accounts-store/accounts/%v: no such file or directory\",\"status\":\"Not Found\"}", id),
-			err.Error(),
-		)
 	}
 
 	// Check group is not changed

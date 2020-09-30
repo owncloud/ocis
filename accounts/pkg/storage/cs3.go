@@ -16,7 +16,6 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"google.golang.org/grpc/metadata"
@@ -67,7 +66,7 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 
 	var by []byte
 	if by, err = json.Marshal(a); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not marshal account: %v", err.Error())
+		return err
 	}
 
 	ureq, err := http.NewRequest("PUT", r.accountURL(a.Id), bytes.NewReader(by))
@@ -109,6 +108,10 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return err
 	}
 
+	if resp.StatusCode == http.StatusNotFound {
+		return &notFoundErr{"account", id}
+	}
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -131,12 +134,22 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 
-	_, err = r.storageClient.Delete(ctx, &provider.DeleteRequest{
+	resp, err := r.storageClient.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", accountsFolder, id)},
 		},
 	})
-	return err
+
+	if err != nil {
+		return err
+	}
+
+	// TODO Handle other error codes?
+	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
+		return &notFoundErr{"account", id}
+	}
+
+	return nil
 }
 
 // WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
@@ -153,7 +166,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 
 	var by []byte
 	if by, err = json.Marshal(g); err != nil {
-		return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
+		return err
 	}
 
 	ureq, err := http.NewRequest("PUT", r.groupURL(g.Id), bytes.NewReader(by))
@@ -195,6 +208,10 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return err
 	}
 
+	if resp.StatusCode == http.StatusNotFound {
+		return &notFoundErr{"group", id}
+	}
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -217,11 +234,21 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 
-	_, err = r.storageClient.Delete(ctx, &provider.DeleteRequest{
+	resp, err := r.storageClient.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", groupsFolder, id)},
 		},
 	})
+
+	if err != nil {
+		return err
+	}
+
+	// TODO Handle other error codes?
+	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
+		return &notFoundErr{"group", id}
+	}
+
 	return err
 }
 
