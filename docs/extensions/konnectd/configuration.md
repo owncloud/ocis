@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-09-30T17:30:16+0200"
+date: "2020-09-21T13:14:47+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
@@ -108,9 +108,6 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 --http-namespace | $KONNECTD_HTTP_NAMESPACE  
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
-
 --identity-manager | $KONNECTD_IDENTITY_MANAGER  
 : Identity manager (one of ldap,kc,cookie,dummy). Default: `ldap`.
 
@@ -176,16 +173,4 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
-
-### ocis-konnectd version
-
-Print the versions of the running instances
-
-Usage: `ocis-konnectd version [command options] [arguments...]`
-
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
 

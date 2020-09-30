@@ -17,7 +17,7 @@ func Execute() error {
 	cfg := config.New()
 
 	app := &cli.App{
-		Name:     "ocis-webdav",
+		Name:     "webdav",
 		Version:  version.String,
 		Usage:    "Serve WebDAV API for oCIS",
 		Compiled: version.Compiled(),

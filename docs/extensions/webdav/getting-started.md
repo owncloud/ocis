@@ -1,9 +1,13 @@
 ---
 title: "Getting Started"
 date: 2018-05-02T00:00:00+00:00
-anchor: "getting-started"
 weight: 20
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/webdav
+geekdocFilePath: getting-started.md
 ---
+
+{{< toc >}}
 
 ### Installation
 

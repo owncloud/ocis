@@ -987,6 +987,11 @@ def badges(ctx):
   }
 
 def docs(ctx):
+  generateConfigDocs = []
+
+  for module in config['modules']:
+    generateConfigDocs += ['cd /drone/src/%s' % (module), 'make config-docs-generate']
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1001,6 +1006,17 @@ def docs(ctx):
         'image': 'owncloudci/alpine:latest',
         'commands': [
           'make docs-copy'
+        ],
+      },
+      {
+        'name': 'generate-config-docs',
+        'image': 'webhippie/golang:1.13',
+        'commands': generateConfigDocs,
+        'volumes': [
+          {
+            'name': 'gopath',
+            'path': '/srv/app',
+          },
         ],
       },
       {
@@ -1063,6 +1079,12 @@ def docs(ctx):
     ],
     'depends_on': [
       'badges',
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
     ],
     'trigger': {
       'ref': [
