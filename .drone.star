@@ -259,14 +259,6 @@ def uploadCoverage(ctx):
         ]
       },
       {
-        'name': 'check',
-        'image': 'alpine',
-        'commands': [
-          'ls -la coverage/',
-          'cat coverage/*'
-        ]
-      },
-      {
         'name': 'codacy',
         'image': 'plugins/codacy:1',
         'pull': 'always',
@@ -275,7 +267,19 @@ def uploadCoverage(ctx):
             'from_secret': 'codacy_token',
           },
         },
-      }
+      },
+      {
+        'name': 'purge-cache',
+        'image': 'minio/mc',
+        'environment': {
+          'MC_HOST_cache': {
+            'from_secret': 'cache_s3_connection_url'
+          }
+        },
+        'commands': [
+          'mc rm --recursive --force cache/cache/%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+        ]
+      },
     ],
     'trigger': {
       'ref': [
