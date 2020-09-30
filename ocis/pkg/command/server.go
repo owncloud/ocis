@@ -57,6 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 				"reva-storage-oc",
 				"reva-storage-oc-data",
 				"reva-storage-public-link",
+				"reva-storage-metadata",
 			}, runtime.MicroServices...)...)
 		},
 	}
