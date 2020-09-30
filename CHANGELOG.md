@@ -19,6 +19,7 @@
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Enhancement - Add the accounts service: [#593](https://github.com/owncloud/ocis/pull/593)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
+* Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
 ## Details
@@ -204,6 +205,13 @@
    to use it.
 
    https://github.com/owncloud/ocis/pull/172
+
+* Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
+
+   In the future accounts, settings etc. should be stored in a dedicated metadata storage. The
+   services should talk to this storage directly, bypassing reva-gateway.
+
+   https://github.com/owncloud/ocis/pull/602
 
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
