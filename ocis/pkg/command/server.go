@@ -33,32 +33,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			r := runtime.New()
-			// TODO temporary service startup selection. Should go away and the runtime should take care of it.
-			return r.Start(append([]string{
-				"proxy",
-				"store",
-				"settings",
-				"phoenix",
-				"ocs",
-				"webdav",
-				"reva-frontend",
-				"reva-gateway",
-				"reva-users",
-				"reva-auth-basic",
-				"reva-auth-bearer",
-				"reva-storage-home",
-				"reva-storage-home-data",
-				"reva-storage-eos",
-				"reva-storage-eos-data",
-				"reva-storage-oc",
-				"reva-storage-oc-data",
-				"reva-storage-public-link",
-				"reva-storage-metadata",
-				"accounts",
-				"glauth",
-				"konnectd",
-				"thumbnails",
-			}, runtime.MicroServices...)...)
+			return r.Start()
 		},
 	}
 }
