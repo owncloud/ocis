@@ -2,7 +2,6 @@ SHELL := bash
 NAME := ocis
 IMPORT := github.com/owncloud/$(NAME)
 HUGO := hugo
-EXTENSIONS := accounts glauth graph konnectd ocis-phoenix ocis-reva ocs proxy settings store thumbnails webdav
 
 .PHONY: all
 all: build
@@ -15,25 +14,28 @@ sync:
 clean:
 	rm -rf $(HUGO)
 
-.PHONY: generate-docs $(EXTENSIONS)
-generate-docs: $(EXTENSIONS)
-$(EXTENSIONS):
-	$(MAKE) -C $@ docs; \
-	mkdir -p docs/extensions/$@; \
-	cp -R $@/docs/ docs/extensions/$@
+.PHONY: docs-copy
+docs-copy:
+	mkdir -p $(HUGO); \
+	mkdir -p $(HUGO)/content/; \
+	cd $(HUGO); \
+	git init; \
+	git remote rm origin; \
+	git remote add origin https://github.com/owncloud/owncloud.github.io; \
+	git fetch --depth=1; \
+	git checkout origin/source -f; \
+	rsync --delete -ax --exclude 'static' ../docs/ content/; \
 
-.PHONY: clean-docs
-clean-docs:
-	rm -rf docs
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| docs/configuration.md
 
-.PHONY: ocis-docs
-ocis-docs:
-	mkdir -p docs/ocis; \
-	$(MAKE) -C ocis docs; \
-	cp -R ocis/docs/ docs/ocis
+.PHONY: docs-build
+docs-build:
+	cd $(HUGO); hugo
 
 .PHONY: docs
-docs: clean-docs generate-docs ocis-docs
+docs: docs-copy docs-build
 
 BEHAT_BIN=vendor-bin/behat/vendor/bin/behat
 

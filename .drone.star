@@ -80,6 +80,7 @@ def getCoreApiTestPipelineNames():
   return names
 
 def main(ctx):
+  pipelines = []
   before = testPipelines(ctx)
 
   stages = [
@@ -97,11 +98,17 @@ def main(ctx):
     changelog(ctx),
     readme(ctx),
     badges(ctx),
-    website(ctx),
+    docs(ctx),
     updateDeployment(ctx)
   ]
 
-  return before + stages + after
+  if '[docs-only]' in ctx.build.message:
+    pipelines = docs(ctx)
+    pipelines['depends_on'] = []
+  else:
+    pipelines = before + stages + after
+  
+  return pipelines
 
 def testPipelines(ctx):
   pipelines = []
@@ -735,7 +742,7 @@ def manifest(ctx):
   }
 
 def changelog(ctx):
-  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
+  repo_slug = ctx.build.source if ctx.build.source else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -909,16 +916,38 @@ def badges(ctx):
     },
   }
 
-def website(ctx):
+def docs(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'website',
+    'name': 'docs',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
     'steps': [
+      {
+        'name': 'prepare',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'make docs-copy'
+        ],
+      },
+      {
+        'name': 'test',
+        'image': 'owncloudci/hugo:0.71.0',
+        'commands': [
+          'cd hugo',
+          'hugo',
+        ],
+      },
+      {
+        'name': 'list',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'tree hugo/public',
+        ],
+      },
       {
         'name': 'publish',
         'image': 'plugins/gh-pages:1',
