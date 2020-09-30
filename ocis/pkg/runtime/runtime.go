@@ -50,6 +50,7 @@ var (
 		"reva-storage-oc",
 		"reva-storage-oc-data",
 		"reva-storage-public-link",
+		"reva-storage-metadata",
 		"accounts",
 		"glauth",
 		"konnectd",
