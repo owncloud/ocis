@@ -362,7 +362,9 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
-          'PATH_TO_CORE': '/srv/app/testrunner'
+          'PATH_TO_CORE': '/srv/app/testrunner',
+          'ADMIN_USERNAME': 'moss',
+          'ADMIN_PASSWORD': 'moss',
         },
         'commands': [
           'cd ocis',
@@ -419,7 +421,9 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
+          'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
+          'ADMIN_USERNAME': 'moss',
+          'ADMIN_PASSWORD': 'moss',
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -485,6 +489,8 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
           'TEST_PATHS': paths,
+          'ADMIN_USERNAME': 'moss',
+          'ADMIN_PASSWORD': 'moss',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
