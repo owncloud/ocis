@@ -1,8 +1,25 @@
 package storage
 
+// Uncomment to test locally, requires started metadata-storage for now
+
+//import (
+//	"context"
+//	"github.com/owncloud/ocis/accounts/pkg/config"
+//	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+//	"github.com/stretchr/testify/assert"
+//	"testing"
+//)
+//
 //var cfg = &config.Config{
 //	TokenManager: config.TokenManager{
 //		JWTSecret: "Pive-Fumkiu4",
+//	},
+//	Repo: config.Repo{
+//		CS3:  config.CS3{
+//			ProviderAddr: "0.0.0.0:9215",
+//			DriverURL:    "http://localhost:9216",
+//			DataPrefix:   "data",
+//		},
 //	},
 //}
 //

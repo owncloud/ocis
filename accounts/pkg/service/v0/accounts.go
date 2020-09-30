@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	"os"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path/filepath"
 	"regexp"
 	"sync"
@@ -210,8 +210,12 @@ func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, ou
 	}
 
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
 	s.debugLogAccount(out).Msg("found account")
@@ -277,7 +281,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if err = s.repo.WriteAccount(ctx, acc); err != nil {
 		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
 		s.debugLogAccount(acc).Msg("could not persist new account")
-		return
+		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
 	if err = s.indexAccount(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
@@ -336,8 +340,13 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
+
 	}
 
 	t := time.Now()
@@ -391,7 +400,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 
 	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
-		return
+		return merrors.InternalServerError(s.id, "could not persist updated account: %v", err.Error())
 	}
 
 	if err = s.indexAccount(id); err != nil {
@@ -438,12 +447,15 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	a := &proto.Account{}
 	if err = s.repo.LoadAccount(ctx, id, a); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
 	// delete member relationship in groups
@@ -457,13 +469,17 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		}
 	}
 
-	if err = os.Remove(path); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+	if err = s.repo.DeleteAccount(ctx, id); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
+		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account")
 		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
 	}
 
 	if err = s.index.Delete(id); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
+		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account from index")
 		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
 	}
 
