@@ -84,7 +84,7 @@ generate:
 
 .PHONY: changelog
 changelog:
-	go run github.com/restic/calens >| CHANGELOG.md
+	go run github.com/restic/calens -i ../changelog -t ../changelog/CHANGELOG.tmpl >| ../CHANGELOG.md
 
 .PHONY: test
 test:
