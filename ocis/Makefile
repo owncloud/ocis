@@ -140,29 +140,9 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: docs-copy
-docs-copy:
-	mkdir -p $(HUGO); \
-	mkdir -p $(HUGO)/content/; \
-	cd $(HUGO); \
-	git init; \
-	git remote rm origin; \
-	git remote add origin https://github.com/owncloud/owncloud.github.io; \
-	git fetch --depth=1; \
-	git checkout origin/source -f; \
-	rsync --delete -ax --exclude 'static' ../docs/ content/$(NAME); \
-	rsync --delete -ax ../docs/static/ static/$(NAME); \
-
 .PHONY: config-docs-generate
 config-docs-generate:
-	go run github.com/owncloud/flaex >| docs/configuration.md
-
-.PHONY: docs-build
-docs-build:
-	cd $(HUGO); hugo
-
-.PHONY: docs
-docs: config-docs-generate docs-copy docs-build
+	go run github.com/owncloud/flaex >| ../docs/ocis/configuration.md
 
 .PHONY: watch
 watch:

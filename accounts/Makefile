@@ -135,6 +135,10 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
+.PHONY: config-docs-generate
+config-docs-generate:
+#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
+
 .PHONY: test-acceptance-webui
 test-acceptance-webui:
 	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)

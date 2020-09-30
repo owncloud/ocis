@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-09-21T13:14:56+0200"
+date: "2020-09-30T17:35:29+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
@@ -57,15 +57,6 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
---debug-addr | $OCIS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
 ### ocis server
 
 Start fullstack server
@@ -108,69 +99,114 @@ Usage: `ocis server [command options] [arguments...]`
 --grpc-addr | $OCIS_GRPC_ADDR  
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+--debug-addr | $OCIS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis konnectd
+#### ocis list
 
-Start konnectd server
-
-#### ocis run
-
-Runs an extension
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis reva-storage-eos-data
-
-Start reva storage data provider for eos mount
-
-#### ocis reva-storage-home-data
-
-Start reva storage data provider for home mount
-
-#### ocis kill
-
-Kill an extension by name
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis reva-auth-bearer
-
-Start reva auth-bearer service
-
-#### ocis reva-storage-oc-data
-
-Start reva storage data provider for oc mount
-
-#### ocis settings
-
-Start settings server
-
-#### ocis accounts
-
-Start accounts server
+Lists running ocis extensions
 
 #### ocis phoenix
 
 Start phoenix server
 
+#### ocis reva-gateway
+
+Start reva gateway
+
+#### ocis reva-storage-public-link
+
+Start reva public link storage
+
+#### ocis kill
+
+Kill an extension by name
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis reva-frontend
+
+Start reva frontend
+
+#### ocis reva-storage-eos-data
+
+Start reva storage data provider for eos mount
+
+#### ocis glauth
+
+Start glauth server
+
 #### ocis reva-storage-eos
 
 Start reva storage service for eos mount
+
+#### ocis reva-users
+
+Start reva users service
+
+#### ocis konnectd
+
+Start konnectd server
+
+#### ocis reva-storage-home-data
+
+Start reva storage data provider for home mount
+
+#### ocis reva-storage-root
+
+Start reva root storage
+
+#### ocis run
+
+Runs an extension
+
+#### ocis settings
+
+Start settings server
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis reva-auth-basic
+
+Start reva auth-basic service
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis reva-auth-bearer
+
+Start reva auth-bearer service
+
+#### ocis reva-sharing
+
+Start reva sharing service
 
 #### ocis reva-storage-home
 
@@ -180,43 +216,7 @@ Start reva storage service for home mount
 
 Start reva storage service for oc mount
 
-#### ocis reva-storage-root
+#### ocis reva-storage-oc-data
 
-Start reva root storage
-
-#### ocis reva-gateway
-
-Start reva gateway
-
-#### ocis reva-sharing
-
-Start reva sharing service
-
-#### ocis reva-users
-
-Start reva users service
-
-#### ocis list
-
-Lists running ocis extensions
-
-#### ocis reva-auth-basic
-
-Start reva auth-basic service
-
-#### ocis reva-frontend
-
-Start reva frontend
-
-#### ocis reva-storage-public-link
-
-Start reva public link storage
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis webdav
-
-Start webdav server
+Start reva storage data provider for oc mount
 
