@@ -43,6 +43,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			mtrcs.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+
 			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
 			if err != nil {
 				logger.Fatal().Err(err).Msg("could not initialize service handler")
