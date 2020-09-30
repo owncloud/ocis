@@ -81,9 +81,6 @@ func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
 		}
 	}
 
-	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
-	//return merrors.InternalServerError(r.serviceID, "could not remove account: %v", err.Error())
-
 	return
 }
 
@@ -103,10 +100,6 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	defer groupLock.Unlock()
 
 	return ioutil.WriteFile(path, bytes, 0600)
-
-	//return merrors.InternalServerError(r.serviceID, "could not marshal group: %v", err.Error())
-
-	//return merrors.InternalServerError(r.serviceID, "could not write group: %v", err.Error())
 }
 
 // LoadGroup from the local filesystem
