@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 // Unique ensures that only one document of the same type and key-value combination can exist in the index.
@@ -44,7 +45,7 @@ func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) Unique {
 		typeName:     typeName,
 		filesDir:     filesDir,
 		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, fmt.Sprintf("Unique%sBy%s", typeName, indexBy)),
+		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"unique", typeName, indexBy}, ".")),
 	}
 }
 

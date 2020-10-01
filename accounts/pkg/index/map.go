@@ -4,10 +4,11 @@ package index
 
 type indexMap map[tName]typeMapping
 type tName = string
+type fieldName = string
 
 type typeMapping struct {
 	pKFieldName    string
-	indicesByField map[string][]IndexType
+	indicesByField map[fieldName][]IndexType
 }
 
 func (m indexMap) addIndex(typeName string, pkName string, idx IndexType) {

@@ -39,7 +39,6 @@ func NewIndex(cfg *Config) *Index {
 	}
 }
 
-
 func (i Index) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
 	typeName := getTypeFQN(t)
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
@@ -62,23 +61,31 @@ func (i Index) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName s
 	return idx.Init()
 }
 
-
 // Add a new entry to the index
 func (i Index) Add(t interface{}) error {
 	typeName := getTypeFQN(t)
 
-	val, ok := i.indices[typeName]
+	fields, ok := i.indices[typeName]
 	if ok {
+		for _, indices := range fields.indicesByField {
+			for _, idx := range indices {
+				pkVal := valueOf(t, fields.pKFieldName)
+				idxByVal := valueOf(t, idx.IndexBy())
+				_, err := idx.Add(pkVal, idxByVal)
+				if err != nil {
+					return err
+				}
+			}
+
+		}
 
 	}
 
-
-
 	return nil
-
 
 }
 
+/*
 // Find a entry by type,field and value.
 //  // Find a User type by email
 //  man.Find("User", "Email", "foo@example.com")
@@ -102,10 +109,9 @@ func (i Index) Find(typeName, key, value string) (pk string, err error) {
 
 	return path.Base(res[0]), err
 }
+*/
 
 func (i Index) Delete(typeName, pk string) error {
 
 	return nil
 }
-
- */

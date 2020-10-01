@@ -1,13 +1,28 @@
 package index
 
 import (
-	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
+func TestIndexer_Add(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	err := indexer.Add(u)
+	assert.NoError(t, err)
+
+}
+
+/*
 func TestManagerQueryMultipleIndices(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")
 	man := NewIndex(&Config{
@@ -59,6 +74,9 @@ func TestManagerQueryMultipleIndices(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
+*/
+
+/*
 func TestManagerDelete(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")
 	man := NewIndex(&Config{
@@ -87,3 +105,5 @@ func TestManagerDelete(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 
 }
+
+*/
