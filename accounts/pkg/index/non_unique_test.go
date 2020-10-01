@@ -55,7 +55,7 @@ func TestNonUniqueIndexInit(t *testing.T) {
 	indexRootDir := path.Join(dataDir, "index.disk")
 	filesDir := path.Join(dataDir, "users")
 
-	uniq := NewNormalIndex("User", "DisplayName", filesDir, indexRootDir)
+	uniq := NewNonUniqueIndex("User", "DisplayName", filesDir, indexRootDir)
 	assert.Error(t, uniq.Init(), "Init should return an error about missing files-dir")
 
 	if err := os.Mkdir(filesDir, 0777); err != nil {
@@ -87,9 +87,9 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 	_ = os.RemoveAll(dataPath)
 }
 
-func getNonUniqueIdxSut(t *testing.T) (sut Type, dataPath string) {
+func getNonUniqueIdxSut(t *testing.T) (sut IndexType, dataPath string) {
 	dataPath = writeIndexTestData(t, testData, "Id")
-	sut = NewNormalIndex("Pet", "Color", path.Join(dataPath, "pets"), path.Join(dataPath, "index.disk"))
+	sut = NewNonUniqueIndex("Pet", "Color", path.Join(dataPath, "pets"), path.Join(dataPath, "index.disk"))
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)

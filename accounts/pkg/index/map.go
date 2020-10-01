@@ -1,16 +1,24 @@
 package index
 
 // indexMap stores the index layout at runtime.
-type indexMap map[tName]map[indexByKey][]Type
 
+type indexMap map[tName]typeMapping
 type tName = string
-type indexByKey = string
 
-func (m indexMap) addIndex(idx Type) {
-	typeName, indexBy := idx.TypeName(), idx.IndexBy()
-	if _, ok := m[typeName]; !ok {
-		m[typeName] = map[indexByKey][]Type{}
+type typeMapping struct {
+	pKFieldName    string
+	indicesByField map[string][]IndexType
+}
+
+func (m indexMap) addIndex(typeName string, pkName string, idx IndexType) {
+	if val, ok := m[typeName]; ok {
+		val.indicesByField[idx.IndexBy()] = append(val.indicesByField[idx.IndexBy()], idx)
+		return
 	}
-
-	m[typeName][indexBy] = append(m[typeName][indexBy], idx)
+	m[typeName] = typeMapping{
+		pKFieldName: pkName,
+		indicesByField: map[string][]IndexType{
+			pkName: {idx},
+		},
+	}
 }

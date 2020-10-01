@@ -18,9 +18,9 @@ type Config struct {
 	Log              zerolog.Logger
 }
 
-// Type can be implemented to create new index-strategies. See Unique for example.
+// IndexType can be implemented to create new index-strategies. See Unique for example.
 // Each index implementation is bound to one data-column (IndexBy) and a data-type (TypeName)
-type Type interface {
+type IndexType interface {
 	Init() error
 	Lookup(v string) ([]string, error)
 	Add(id, v string) (string, error)
@@ -39,63 +39,52 @@ func NewIndex(cfg *Config) *Index {
 	}
 }
 
-func (man Index) AddUniqueIndex(typeName, indexBy, entityDirName string) error {
-	fullDataPath := path.Join(man.config.DataDir, entityDirName)
-	indexPath := path.Join(man.config.DataDir, man.config.IndexRootDirName)
+
+func (i Index) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
+	typeName := getTypeFQN(t)
+	fullDataPath := path.Join(i.config.DataDir, entityDirName)
+	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
 	idx := NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
-	man.indices.addIndex(idx)
 
+	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
 }
 
-func (man Index) AddNormalIndex(typeName, indexBy, entityDirName string) error {
-	fullDataPath := path.Join(man.config.DataDir, entityDirName)
-	indexPath := path.Join(man.config.DataDir, man.config.IndexRootDirName)
+func (i Index) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
+	typeName := getTypeFQN(t)
+	fullDataPath := path.Join(i.config.DataDir, entityDirName)
+	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
-	idx := NewNormalIndex(typeName, indexBy, fullDataPath, indexPath)
-	man.indices.addIndex(idx)
+	idx := NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
 
+	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
 }
 
-func (man Index) AddIndex(idx Type) error {
-	man.indices.addIndex(idx)
-	return idx.Init()
-}
 
 // Add a new entry to the index
-func (man Index) Add(primaryKey string, entity interface{}) error {
-	t, err := getType(entity)
-	if err != nil {
-		return err
+func (i Index) Add(t interface{}) error {
+	typeName := getTypeFQN(t)
+
+	val, ok := i.indices[typeName]
+	if ok {
+
 	}
 
-	typeName := t.Type().Name()
 
-	if typeIndices, ok := man.indices[typeName]; ok {
-		for _, fieldIndices := range typeIndices {
-			for k := range fieldIndices {
-				curIdx := fieldIndices[k]
-				idxBy := curIdx.IndexBy()
-				val := valueOf(entity, idxBy)
-				_, err := curIdx.Add(primaryKey, val)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
 
 	return nil
+
+
 }
 
 // Find a entry by type,field and value.
 //  // Find a User type by email
 //  man.Find("User", "Email", "foo@example.com")
-func (man Index) Find(typeName, key, value string) (pk string, err error) {
+func (i Index) Find(typeName, key, value string) (pk string, err error) {
 	var res = []string{}
-	if indices, ok := man.indices[typeName][key]; ok {
+	if indices, ok := i.indices[typeName][key]; ok {
 		for _, idx := range indices {
 			if res, err = idx.Lookup(value); IsNotFoundErr(err) {
 				continue
@@ -114,7 +103,9 @@ func (man Index) Find(typeName, key, value string) (pk string, err error) {
 	return path.Base(res[0]), err
 }
 
-func (man Index) Delete(typeName, pk string) error {
+func (i Index) Delete(typeName, pk string) error {
 
 	return nil
 }
+
+ */

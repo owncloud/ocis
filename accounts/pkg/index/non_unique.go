@@ -27,9 +27,9 @@ type NonUniqueIndex struct {
 	indexRootDir string
 }
 
-// NewNormalIndex instantiates a new NonUniqueIndex instance. Init() should be
+// NewNonUniqueIndex instantiates a new NonUniqueIndex instance. Init() should be
 // called afterward to ensure correct on-disk structure.
-func NewNormalIndex(typeName, indexBy, filesDir, indexBaseDir string) NonUniqueIndex {
+func NewNonUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) NonUniqueIndex {
 	return NonUniqueIndex{
 		indexBy:      indexBy,
 		typeName:     typeName,

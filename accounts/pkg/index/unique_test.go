@@ -112,7 +112,7 @@ func TestErrors(t *testing.T) {
 	assert.True(t, IsNotFoundErr(&notFoundErr{}))
 }
 
-func getUniqueIdxSut(t *testing.T) (sut Type, dataPath string) {
+func getUniqueIdxSut(t *testing.T) (sut IndexType, dataPath string) {
 	dataPath = writeIndexTestData(t, testData, "Id")
 	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "index.disk"))
 	err := sut.Init()

@@ -2,7 +2,9 @@ package index
 
 import (
 	"errors"
+	"path"
 	"reflect"
+	"strings"
 )
 
 func getType(v interface{}) (reflect.Value, error) {
@@ -15,6 +17,13 @@ func getType(v interface{}) (reflect.Value, error) {
 	}
 
 	return rv, nil
+}
+
+func getTypeFQN(t interface{}) string {
+	typ, _ := getType(t)
+	typeName := path.Join(typ.Type().PkgPath(), typ.Type().Name())
+	typeName = strings.ReplaceAll(typeName, "/", ".")
+	return typeName
 }
 
 func valueOf(v interface{}, field string) string {
