@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-01T13:24:51+0000"
+date: "2020-09-21T13:14:51+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -57,18 +57,6 @@ Usage: `ocis-proxy [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis-proxy version
-
-Print the versions of the running instances
-
-Usage: `ocis-proxy version [command options] [arguments...]`
-
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
-
 ### ocis-proxy health
 
 Check health status
@@ -120,11 +108,8 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 --asset-path | $PROXY_ASSET_PATH  
 : Path to custom assets.
 
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
+--http-namespace | $PROXY_HTTP_NAMESPACE  
+: Set the base namespace for the http namespace. Default: `com.owncloud`.
 
 --transport-tls-cert | $PROXY_TRANSPORT_TLS_CERT  
 : Certificate file for transport encryption.

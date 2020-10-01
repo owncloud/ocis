@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-01T13:24:47+0000"
+date: "2020-09-21T13:14:47+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
@@ -57,6 +57,15 @@ Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis-konnectd health
+
+Check health status
+
+Usage: `ocis-konnectd health [command options] [arguments...]`
+
+--debug-addr | $KONNECTD_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
+
 ### ocis-konnectd server
 
 Start integrated server
@@ -98,9 +107,6 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 
 --http-namespace | $KONNECTD_HTTP_NAMESPACE  
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
 
 --identity-manager | $KONNECTD_IDENTITY_MANAGER  
 : Identity manager (one of ldap,kc,cookie,dummy). Default: `ldap`.
@@ -167,25 +173,4 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
-
-### ocis-konnectd version
-
-Print the versions of the running instances
-
-Usage: `ocis-konnectd version [command options] [arguments...]`
-
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
-
-### ocis-konnectd health
-
-Check health status
-
-Usage: `ocis-konnectd health [command options] [arguments...]`
-
---debug-addr | $KONNECTD_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
 
