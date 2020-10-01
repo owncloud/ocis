@@ -255,6 +255,7 @@ def uploadCoverage(ctx):
           }
         },
         'commands': [
+          'mkdir -p coverage',
           'mc mirror cache/cache/%s/%s/coverage coverage/' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
         ]
       },
