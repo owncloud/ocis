@@ -1,13 +1,13 @@
-// Package index provides symlink-based index for on-disk document-directories.
-package index
+// Package indexer provides symlink-based indexer for on-disk document-directories.
+package indexer
 
 import (
 	"github.com/rs/zerolog"
 	"path"
 )
 
-// Index is a facade to configure and query over multiple indices.
-type Index struct {
+// Indexer is a facade to configure and query over multiple indices.
+type Indexer struct {
 	config  *Config
 	indices indexMap
 }
@@ -18,8 +18,8 @@ type Config struct {
 	Log              zerolog.Logger
 }
 
-// IndexType can be implemented to create new index-strategies. See Unique for example.
-// Each index implementation is bound to one data-column (IndexBy) and a data-type (TypeName)
+// IndexType can be implemented to create new indexer-strategies. See Unique for example.
+// Each indexer implementation is bound to one data-column (IndexBy) and a data-type (TypeName)
 type IndexType interface {
 	Init() error
 	Lookup(v string) ([]string, error)
@@ -32,14 +32,14 @@ type IndexType interface {
 	FilesDir() string
 }
 
-func NewIndex(cfg *Config) *Index {
-	return &Index{
+func NewIndex(cfg *Config) *Indexer {
+	return &Indexer{
 		config:  cfg,
 		indices: indexMap{},
 	}
 }
 
-func (i Index) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
+func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
 	typeName := getTypeFQN(t)
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
@@ -50,7 +50,7 @@ func (i Index) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName stri
 	return idx.Init()
 }
 
-func (i Index) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
+func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
 	typeName := getTypeFQN(t)
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
@@ -61,8 +61,8 @@ func (i Index) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName s
 	return idx.Init()
 }
 
-// Add a new entry to the index
-func (i Index) Add(t interface{}) error {
+// Add a new entry to the indexer
+func (i Indexer) Add(t interface{}) error {
 	typeName := getTypeFQN(t)
 
 	fields, ok := i.indices[typeName]
@@ -89,7 +89,7 @@ func (i Index) Add(t interface{}) error {
 // Find a entry by type,field and value.
 //  // Find a User type by email
 //  man.Find("User", "Email", "foo@example.com")
-func (i Index) Find(typeName, key, value string) (pk string, err error) {
+func (i Indexer) Find(typeName, key, value string) (pk string, err error) {
 	var res = []string{}
 	if indices, ok := i.indices[typeName][key]; ok {
 		for _, idx := range indices {
@@ -111,7 +111,7 @@ func (i Index) Find(typeName, key, value string) (pk string, err error) {
 }
 */
 
-func (i Index) Delete(typeName, pk string) error {
+func (i Indexer) Delete(typeName, pk string) error {
 
 	return nil
 }

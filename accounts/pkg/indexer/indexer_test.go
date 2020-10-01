@@ -1,4 +1,4 @@
-package index
+package indexer
 
 import (
 	"github.com/rs/zerolog"

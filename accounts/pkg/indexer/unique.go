@@ -1,4 +1,4 @@
-package index
+package indexer
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 
 // Unique ensures that only one document of the same type and key-value combination can exist in the index.
 //
-// Modeled by creating a index-folder per entity and key with symlinks which point to respective documents which contain
+// Modeled by creating a indexer-folder per entity and key with symlinks which point to respective documents which contain
 // the link-filename as value.
 //
 // Directory Layout

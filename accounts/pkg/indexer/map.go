@@ -1,6 +1,6 @@
-package index
+package indexer
 
-// indexMap stores the index layout at runtime.
+// indexMap stores the indexer layout at runtime.
 
 type indexMap map[tName]typeMapping
 type tName = string

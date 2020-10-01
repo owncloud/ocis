@@ -1,4 +1,4 @@
-package index
+package indexer
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -114,7 +114,7 @@ func TestErrors(t *testing.T) {
 
 func getUniqueIdxSut(t *testing.T) (sut IndexType, dataPath string) {
 	dataPath = writeIndexTestData(t, testData, "Id")
-	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "index.disk"))
+	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "indexer.disk"))
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
