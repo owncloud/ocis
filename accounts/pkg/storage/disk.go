@@ -3,12 +3,12 @@ package storage
 import (
 	"context"
 	"encoding/json"
-	"github.com/owncloud/ocis/accounts/pkg/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
 
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 )

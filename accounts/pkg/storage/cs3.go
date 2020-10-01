@@ -218,11 +218,11 @@ func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
 }
 
 func (r CS3Repo) accountURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
+	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
 }
 
 func (r CS3Repo) groupURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DriverURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
+	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {

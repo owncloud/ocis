@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path/filepath"
 	"regexp"
 	"sync"
@@ -17,6 +16,7 @@ import (
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/provider"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
