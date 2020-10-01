@@ -19,7 +19,7 @@ func (m indexMap) addIndex(typeName string, pkName string, idx IndexType) {
 	m[typeName] = typeMapping{
 		pKFieldName: pkName,
 		indicesByField: map[string][]IndexType{
-			pkName: {idx},
+			idx.IndexBy(): {idx},
 		},
 	}
 }

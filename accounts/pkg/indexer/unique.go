@@ -81,6 +81,8 @@ func (idx Unique) Remove(id string, v string) (err error) {
 	return os.Remove(searchPath)
 }
 
+// unique.github.com.owncloud.ocis.accounts.pkg.indexer.User.UserName
+// unique.github.com.owncloud.ocis.accounts.pkg.indexer.User.UserName/UserName
 func (idx Unique) Lookup(v string) (resultPath []string, err error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err = isValidSymlink(searchPath); err != nil {

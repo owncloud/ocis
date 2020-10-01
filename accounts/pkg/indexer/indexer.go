@@ -64,54 +64,50 @@ func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName
 // Add a new entry to the indexer
 func (i Indexer) Add(t interface{}) error {
 	typeName := getTypeFQN(t)
-
-	fields, ok := i.indices[typeName]
-	if ok {
+	if fields, ok := i.indices[typeName]; ok {
 		for _, indices := range fields.indicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.pKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
-				_, err := idx.Add(pkVal, idxByVal)
-				if err != nil {
+				if _, err := idx.Add(pkVal, idxByVal); err != nil {
 					return err
 				}
 			}
-
 		}
-
 	}
 
 	return nil
-
 }
 
-/*
-// Find a entry by type,field and value.
-//  // Find a User type by email
-//  man.Find("User", "Email", "foo@example.com")
-func (i Indexer) Find(typeName, key, value string) (pk string, err error) {
-	var res = []string{}
-	if indices, ok := i.indices[typeName][key]; ok {
-		for _, idx := range indices {
-			if res, err = idx.Lookup(value); IsNotFoundErr(err) {
-				continue
+func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, error) {
+	typeName := getTypeFQN(t)
+	resultPaths := make([]string, 0)
+	if fields, ok := i.indices[typeName]; ok {
+		for _, idx := range fields.indicesByField[field] {
+			res, err := idx.Lookup(val)
+			if err != nil {
+				if IsNotFoundErr(err) {
+					continue
+				}
+
+				if err != nil {
+					return nil, err
+				}
 			}
 
-			if err != nil {
-				return
-			}
+			resultPaths = append(resultPaths, res...)
+
 		}
 	}
 
-	if len(res) == 0 {
-		return "", err
+	result := make([]string, 0, len(resultPaths))
+	for _, v := range resultPaths {
+		result = append(result, path.Base(v))
 	}
 
-	return path.Base(res[0]), err
+	return result, nil
 }
-*/
 
 func (i Indexer) Delete(typeName, pk string) error {
-
 	return nil
 }

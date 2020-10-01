@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIndexer_Add(t *testing.T) {
+func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
@@ -19,6 +19,51 @@ func TestIndexer_Add(t *testing.T) {
 	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err := indexer.Add(u)
 	assert.NoError(t, err)
+
+}
+
+func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	err := indexer.Add(u)
+	assert.NoError(t, err)
+
+	res, err := indexer.FindBy(User{}, "UserName", "mikey")
+	assert.NoError(t, err)
+	t.Log(res)
+}
+
+func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+
+	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+
+	err := indexer.Add(pet1)
+	assert.NoError(t, err)
+
+	err = indexer.Add(pet2)
+	assert.NoError(t, err)
+
+	res, err := indexer.FindBy(TestPet{}, "Kind", "Hog")
+	assert.NoError(t, err)
+
+	t.Log(res)
 
 }
 
