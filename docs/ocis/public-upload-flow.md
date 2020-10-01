@@ -12,4 +12,4 @@ geekdocFilePath: public-upload-flow.md
 
 The following diagram describes the flow of requests:
 
-{{< svg src="static/ocis/tus-public-upload.svg" >}}
+{{< svg src="ocis/static/tus-public-upload.svg" >}}

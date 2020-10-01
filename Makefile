@@ -24,7 +24,7 @@ docs-copy:
 	git remote add origin https://github.com/owncloud/owncloud.github.io; \
 	git fetch --depth=1; \
 	git checkout origin/source -f; \
-	rsync --delete -ax --exclude 'static' ../docs/ content/; \
+	rsync -ax ../docs/ content/; \
 
 .PHONY: config-docs-generate
 config-docs-generate:
