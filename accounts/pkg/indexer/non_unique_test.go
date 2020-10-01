@@ -29,10 +29,10 @@ func TestNonUniqueIndexAdd(t *testing.T) {
 func TestNonUniqueIndexUpdate(t *testing.T) {
 	sut, dataPath := getNonUniqueIdxSut(t)
 
-	err := sut.Update("goefe-789", "Green", "Black")
+	err := sut.Update("goefe-789", "", "Black")
 	assert.NoError(t, err)
 
-	err = sut.Update("xadaf-189", "Green", "Black")
+	err = sut.Update("xadaf-189", "", "Black")
 	assert.NoError(t, err)
 
 	assert.DirExists(t, path.Join(dataPath, "index.disk/PetByColor/Black"))

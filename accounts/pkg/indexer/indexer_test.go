@@ -114,6 +114,58 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 	t.Log(res)
 }
 
+func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+
+	user1 := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	user2 := &User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
+
+	err := indexer.Add(user1)
+	assert.NoError(t, err)
+
+	err = indexer.Add(user2)
+	assert.NoError(t, err)
+
+	// Update to non existing value
+	err = indexer.Update(user2, "UserName", "frank", "jane")
+	assert.NoError(t, err)
+
+	// Update to non existing value
+	err = indexer.Update(user2, "UserName", "mikey", "jane")
+	assert.Error(t, err)
+	assert.IsType(t, &alreadyExistsErr{}, err)
+}
+
+func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddNonUniqueIndex(&TestPet{}, "Name", "Id", "pets")
+
+	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+
+	err := indexer.Add(pet1)
+	assert.NoError(t, err)
+
+	err = indexer.Add(pet2)
+	assert.NoError(t, err)
+
+	err = indexer.Update(pet2, "Name", "Ricky", "Jonny")
+	assert.NoError(t, err)
+}
+
 /*
 func TestManagerQueryMultipleIndices(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")

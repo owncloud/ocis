@@ -54,16 +54,16 @@ func TestUniqueUpdate(t *testing.T) {
 	uniq, dataDir := getUniqueIdxSut(t)
 
 	t.Log("successful update")
-	err := uniq.Update("", "mikey@example.com", "mikey2@example.com")
+	err := uniq.Update("", "", "mikey2@example.com")
 	assert.NoError(t, err)
 
 	t.Log("failed update because already exists")
-	err = uniq.Update("", "frank@example.com", "mikey2@example.com")
+	err = uniq.Update("", "", "mikey2@example.com")
 	assert.Error(t, err)
 	assert.IsType(t, &alreadyExistsErr{}, err)
 
 	t.Log("failed update because not found")
-	err = uniq.Update("", "notexist@example.com", "something2@example.com")
+	err = uniq.Update("", "", "something2@example.com")
 	assert.Error(t, err)
 	assert.IsType(t, &notFoundErr{}, err)
 

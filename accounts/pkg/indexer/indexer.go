@@ -154,3 +154,17 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	return result, nil
 
 }
+
+func (i Indexer) Update(t interface{}, field, oldVal, newVal string) error {
+	typeName := getTypeFQN(t)
+	if fields, ok := i.indices[typeName]; ok {
+		for _, idx := range fields.indicesByField[field] {
+			pkVal := valueOf(t, fields.pKFieldName)
+			if err := idx.Update(pkVal, oldVal, newVal); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
