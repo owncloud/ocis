@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
 
@@ -102,6 +101,36 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	return s.RoleManager.FindPermissionByID(ctx, roleIDs, AccountManagementPermissionID) != nil
 }
 
+// serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
+func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
+	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
+		err := s.index.Index(s.Config.ServiceUser.UUID, &proto.BleveAccount{
+			BleveType: "account",
+			Account:   s.getInMemoryServiceUser(),
+		})
+		if err != nil {
+			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
+		} else {
+			return func() {
+				_ = s.index.Delete(s.Config.ServiceUser.UUID)
+			}
+		}
+	}
+	return func() {}
+}
+
+func (s Service) getInMemoryServiceUser() proto.Account {
+	return proto.Account{
+		AccountEnabled:           true,
+		Id:                       s.Config.ServiceUser.UUID,
+		PreferredName:            s.Config.ServiceUser.Username,
+		OnPremisesSamAccountName: s.Config.ServiceUser.Username,
+		DisplayName:              s.Config.ServiceUser.Username,
+		UidNumber:                s.Config.ServiceUser.UID,
+		GidNumber:                s.Config.ServiceUser.GID,
+	}
+}
+
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
@@ -113,6 +142,9 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	defer accLock.Unlock()
 	var password string
 
+	teardownServiceUser := s.serviceUserToIndex()
+	defer teardownServiceUser()
+
 	// check if this looks like an auth request
 	match := authQuery.FindStringSubmatch(in.Query)
 	if len(match) == 3 {
@@ -120,23 +152,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		password = match[2]
 		if password == "" {
 			return merrors.Unauthorized(s.id, "password must not be empty")
-		}
-
-		// hardcoded check against service user
-		if s.Config.ServiceUser.Username != "" &&
-			strings.EqualFold(match[1], s.Config.ServiceUser.Username) &&
-			match[2] == s.Config.ServiceUser.Password {
-			out.Accounts = []*proto.Account{
-				{
-					Id:             "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-					AccountEnabled: true,
-					PreferredName:  s.Config.ServiceUser.Username,
-					DisplayName:    s.Config.ServiceUser.Username,
-					UidNumber:      s.Config.ServiceUser.UID,
-					GidNumber:      s.Config.ServiceUser.GID,
-				},
-			}
-			return nil
 		}
 	}
 
@@ -179,7 +194,10 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	for _, hit := range searchResult.Hits {
 		a := &proto.Account{}
-		if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
+		if hit.ID == s.Config.ServiceUser.UUID {
+			acc := s.getInMemoryServiceUser()
+			a = &acc
+		} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
 			s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
 			continue
 		}

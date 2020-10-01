@@ -81,8 +81,8 @@ type CS3 struct {
 
 // ServiceUser defines the user required for EOS
 type ServiceUser struct {
+	UUID 	 string
 	Username string
-	Password string
 	UID      int64
 	GID      int64
 }

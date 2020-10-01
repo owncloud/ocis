@@ -128,18 +128,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Repo.CS3.DataPrefix,
 		},
 		&cli.StringFlag{
+			Name:        "service-user-uuid",
+			Value:       "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			Usage:       "uuid of the internal service user (required on EOS)",
+			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_UUID"},
+			Destination: &cfg.ServiceUser.UUID,
+		},
+		&cli.StringFlag{
 			Name:        "service-user-username",
 			Value:       "",
 			Usage:       "username of the internal service user (required on EOS)",
 			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_USERNAME"},
 			Destination: &cfg.ServiceUser.Username,
-		},
-		&cli.StringFlag{
-			Name:        "service-user-password",
-			Value:       "",
-			Usage:       "password of the internal service user (required on EOS)",
-			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_PASSWORD"},
-			Destination: &cfg.ServiceUser.Password,
 		},
 		&cli.Int64Flag{
 			Name:        "service-user-uid",
