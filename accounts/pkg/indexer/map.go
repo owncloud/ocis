@@ -1,24 +1,26 @@
 package indexer
 
-// indexMap stores the indexer layout at runtime.
+import "github.com/owncloud/ocis/accounts/pkg/indexer/index"
 
-type indexMap map[tName]typeMapping
+// typeMap stores the indexer layout at runtime.
+
+type typeMap map[tName]typeMapping
 type tName = string
 type fieldName = string
 
 type typeMapping struct {
-	pKFieldName    string
-	indicesByField map[fieldName][]IndexType
+	PKFieldName    string
+	IndicesByField map[fieldName][]index.Index
 }
 
-func (m indexMap) addIndex(typeName string, pkName string, idx IndexType) {
+func (m typeMap) addIndex(typeName string, pkName string, idx index.Index) {
 	if val, ok := m[typeName]; ok {
-		val.indicesByField[idx.IndexBy()] = append(val.indicesByField[idx.IndexBy()], idx)
+		val.IndicesByField[idx.IndexBy()] = append(val.IndicesByField[idx.IndexBy()], idx)
 		return
 	}
 	m[typeName] = typeMapping{
-		pKFieldName: pkName,
-		indicesByField: map[string][]IndexType{
+		PKFieldName: pkName,
+		IndicesByField: map[string][]index.Index{
 			idx.IndexBy(): {idx},
 		},
 	}

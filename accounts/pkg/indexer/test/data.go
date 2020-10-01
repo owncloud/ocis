@@ -1,4 +1,4 @@
-package indexer
+package test
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ type TestPet struct {
 	Id, Kind, Color, Name string
 }
 
-var testData = map[string][]interface{}{
+var TestData = map[string][]interface{}{
 	"users": {
 		User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
 		User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
@@ -31,8 +31,8 @@ var testData = map[string][]interface{}{
 	},
 }
 
-func writeIndexTestData(t *testing.T, m map[string][]interface{}, pk string) string {
-	rootDir := createTmpDir(t)
+func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) string {
+	rootDir := CreateTmpDir(t)
 	for dirName := range m {
 		fileTypePath := path.Join(rootDir, dirName)
 
@@ -45,7 +45,7 @@ func writeIndexTestData(t *testing.T, m map[string][]interface{}, pk string) str
 				t.Fatal(err)
 			}
 
-			pkVal := valueOf(u, pk)
+			pkVal := ValueOf(u, pk)
 			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
 				t.Fatal(err)
 			}
@@ -53,13 +53,4 @@ func writeIndexTestData(t *testing.T, m map[string][]interface{}, pk string) str
 	}
 
 	return rootDir
-}
-
-func createTmpDir(t *testing.T) string {
-	name, err := ioutil.TempDir("/var/tmp", "testfiles-*")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return name
 }

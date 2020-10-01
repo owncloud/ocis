@@ -2,6 +2,8 @@
 package indexer
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
 	"github.com/rs/zerolog"
 	"path"
 )
@@ -9,7 +11,7 @@ import (
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
 	config  *Config
-	indices indexMap
+	indices typeMap
 }
 
 type Config struct {
@@ -18,24 +20,10 @@ type Config struct {
 	Log              zerolog.Logger
 }
 
-// IndexType can be implemented to create new indexer-strategies. See Unique for example.
-// Each indexer implementation is bound to one data-column (IndexBy) and a data-type (TypeName)
-type IndexType interface {
-	Init() error
-	Lookup(v string) ([]string, error)
-	Add(id, v string) (string, error)
-	Remove(id string, v string) error
-	Update(id, oldV, newV string) error
-	Search(pattern string) ([]string, error)
-	IndexBy() string
-	TypeName() string
-	FilesDir() string
-}
-
 func NewIndex(cfg *Config) *Indexer {
 	return &Indexer{
 		config:  cfg,
-		indices: indexMap{},
+		indices: typeMap{},
 	}
 }
 
@@ -44,7 +32,7 @@ func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName st
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
-	idx := NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
+	idx := index.NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
 
 	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
@@ -55,7 +43,7 @@ func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
-	idx := NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
+	idx := index.NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
 
 	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
@@ -65,9 +53,9 @@ func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName
 func (i Indexer) Add(t interface{}) error {
 	typeName := getTypeFQN(t)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, indices := range fields.indicesByField {
+		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
-				pkVal := valueOf(t, fields.pKFieldName)
+				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
 				if _, err := idx.Add(pkVal, idxByVal); err != nil {
 					return err
@@ -83,10 +71,10 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.indicesByField[field] {
+		for _, idx := range fields.IndicesByField[field] {
 			res, err := idx.Lookup(val)
 			if err != nil {
-				if IsNotFoundErr(err) {
+				if errors.IsNotFoundErr(err) {
 					continue
 				}
 
@@ -111,9 +99,9 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 func (i Indexer) Delete(t interface{}) error {
 	typeName := getTypeFQN(t)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, indices := range fields.indicesByField {
+		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
-				pkVal := valueOf(t, fields.pKFieldName)
+				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
 				if err := idx.Remove(pkVal, idxByVal); err != nil {
 					return err
@@ -129,10 +117,10 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.indicesByField[field] {
+		for _, idx := range fields.IndicesByField[field] {
 			res, err := idx.Search(pattern)
 			if err != nil {
-				if IsNotFoundErr(err) {
+				if errors.IsNotFoundErr(err) {
 					continue
 				}
 
@@ -158,8 +146,8 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 func (i Indexer) Update(t interface{}, field, oldVal, newVal string) error {
 	typeName := getTypeFQN(t)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.indicesByField[field] {
-			pkVal := valueOf(t, fields.pKFieldName)
+		for _, idx := range fields.IndicesByField[field] {
+			pkVal := valueOf(t, fields.PKFieldName)
 			if err := idx.Update(pkVal, oldVal, newVal); err != nil {
 				return err
 			}

@@ -1,8 +1,9 @@
-package indexer
+package index
 
 import (
 	"errors"
 	"fmt"
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"io/ioutil"
 	"os"
 	"path"
@@ -55,7 +56,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	fi, err := ioutil.ReadDir(searchPath)
 	if os.IsNotExist(err) {
-		return []string{}, &notFoundErr{idx.typeName, idx.indexBy, v}
+		return []string{}, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
 	}
 
 	if err != nil {
@@ -68,7 +69,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	}
 
 	if len(ids) == 0 {
-		return []string{}, &notFoundErr{idx.typeName, idx.indexBy, v}
+		return []string{}, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
 	}
 
 	return ids, nil
@@ -84,7 +85,7 @@ func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 
 	err := os.Symlink(oldName, newName)
 	if errors.Is(err, os.ErrExist) {
-		return "", &alreadyExistsErr{idx.typeName, idx.indexBy, v}
+		return "", &idxerrs.AlreadyExistsErr{idx.typeName, idx.indexBy, v}
 	}
 
 	return newName, err
@@ -113,7 +114,7 @@ func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
 	newPath := path.Join(newDir, id)
 
 	if _, err = os.Stat(oldPath); os.IsNotExist(err) {
-		return &notFoundErr{idx.typeName, idx.indexBy, oldV}
+		return &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, oldV}
 	}
 
 	if err != nil {
@@ -151,7 +152,7 @@ func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
 	}
 
 	if len(paths) == 0 {
-		return nil, &notFoundErr{idx.typeName, idx.indexBy, pattern}
+		return nil, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, pattern}
 	}
 
 	return paths, nil

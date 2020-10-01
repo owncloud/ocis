@@ -1,58 +1,60 @@
 package indexer
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestIndexer_AddWithUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	indexer.AddUniqueIndex(&test.User{}, "UserName", "Id", "users")
 
-	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &test.User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err := indexer.Add(u)
 	assert.NoError(t, err)
 
 }
 
 func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	indexer.AddUniqueIndex(&test.User{}, "UserName", "Id", "users")
 
-	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &test.User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err := indexer.Add(u)
 	assert.NoError(t, err)
 
-	res, err := indexer.FindBy(User{}, "UserName", "mikey")
+	res, err := indexer.FindBy(test.User{}, "UserName", "mikey")
 	assert.NoError(t, err)
 	t.Log(res)
 }
 
 func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+	indexer.AddNonUniqueIndex(&test.TestPet{}, "Kind", "Id", "pets")
 
-	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := test.TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := test.TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err := indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -60,24 +62,24 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 	err = indexer.Add(pet2)
 	assert.NoError(t, err)
 
-	res, err := indexer.FindBy(TestPet{}, "Kind", "Hog")
+	res, err := indexer.FindBy(test.TestPet{}, "Kind", "Hog")
 	assert.NoError(t, err)
 
 	t.Log(res)
 }
 
 func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+	indexer.AddNonUniqueIndex(&test.TestPet{}, "Kind", "Id", "pets")
 
-	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := test.TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := test.TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err := indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -90,17 +92,17 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Name", "Id", "pets")
+	indexer.AddNonUniqueIndex(&test.TestPet{}, "Name", "Id", "pets")
 
-	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := test.TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := test.TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err := indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -115,17 +117,17 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	indexer.AddUniqueIndex(&test.User{}, "UserName", "Id", "users")
 
-	user1 := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	user2 := &User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
+	user1 := &test.User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	user2 := &test.User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
 
 	err := indexer.Add(user1)
 	assert.NoError(t, err)
@@ -140,21 +142,21 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 	// Update to non existing value
 	err = indexer.Update(user2, "UserName", "mikey", "jane")
 	assert.Error(t, err)
-	assert.IsType(t, &alreadyExistsErr{}, err)
+	assert.IsType(t, &errors.AlreadyExistsErr{}, err)
 }
 
 func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
-	dataDir := writeIndexTestData(t, testData, "Id")
+	dataDir := test.WriteIndexTestData(t, test.TestData, "Id")
 	indexer := NewIndex(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Name", "Id", "pets")
+	indexer.AddNonUniqueIndex(&test.TestPet{}, "Name", "Id", "pets")
 
-	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := test.TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := test.TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err := indexer.Add(pet1)
 	assert.NoError(t, err)

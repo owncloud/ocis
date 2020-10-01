@@ -1,6 +1,8 @@
-package indexer
+package index
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
@@ -20,7 +22,7 @@ func TestUniqueLookupSingleEntry(t *testing.T) {
 	t.Log("non-existing lookup")
 	resultPath, err = uniq.Lookup("doesnotExists@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &notFoundErr{}, err)
+	assert.IsType(t, &errors.NotFoundErr{}, err)
 	assert.Empty(t, resultPath)
 
 	_ = os.RemoveAll(dataDir)
@@ -32,7 +34,7 @@ func TestUniqueUniqueConstraint(t *testing.T) {
 
 	_, err := uniq.Add("abcdefg-123", "mikey@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &alreadyExistsErr{}, err)
+	assert.IsType(t, &errors.AlreadyExistsErr{}, err)
 
 	_ = os.RemoveAll(dataDir)
 }
@@ -45,7 +47,7 @@ func TestUniqueRemove(t *testing.T) {
 
 	_, err = uniq.Lookup("mikey@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &notFoundErr{}, err)
+	assert.IsType(t, &errors.NotFoundErr{}, err)
 
 	_ = os.RemoveAll(dataDir)
 }
@@ -60,18 +62,18 @@ func TestUniqueUpdate(t *testing.T) {
 	t.Log("failed update because already exists")
 	err = uniq.Update("", "", "mikey2@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &alreadyExistsErr{}, err)
+	assert.IsType(t, &errors.AlreadyExistsErr{}, err)
 
 	t.Log("failed update because not found")
 	err = uniq.Update("", "", "something2@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &notFoundErr{}, err)
+	assert.IsType(t, &errors.NotFoundErr{}, err)
 
 	_ = os.RemoveAll(dataDir)
 }
 
 func TestUniqueInit(t *testing.T) {
-	dataDir := createTmpDir(t)
+	dataDir := test.CreateTmpDir(t)
 	indexRootDir := path.Join(dataDir, "index.disk")
 	filesDir := path.Join(dataDir, "users")
 
@@ -102,27 +104,27 @@ func TestUniqueIndexSearch(t *testing.T) {
 
 	res, err = sut.Search("does-not-exist@example.com")
 	assert.Error(t, err)
-	assert.IsType(t, &notFoundErr{}, err)
+	assert.IsType(t, &errors.NotFoundErr{}, err)
 
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestErrors(t *testing.T) {
-	assert.True(t, IsAlreadyExistsErr(&alreadyExistsErr{}))
-	assert.True(t, IsNotFoundErr(&notFoundErr{}))
+	assert.True(t, errors.IsAlreadyExistsErr(&errors.AlreadyExistsErr{}))
+	assert.True(t, errors.IsNotFoundErr(&errors.NotFoundErr{}))
 }
 
-func getUniqueIdxSut(t *testing.T) (sut IndexType, dataPath string) {
-	dataPath = writeIndexTestData(t, testData, "Id")
+func getUniqueIdxSut(t *testing.T) (sut Index, dataPath string) {
+	dataPath = test.WriteIndexTestData(t, test.TestData, "Id")
 	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "indexer.disk"))
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, u := range testData["users"] {
-		pkVal := valueOf(u, "Id")
-		idxByVal := valueOf(u, "Email")
+	for _, u := range test.TestData["users"] {
+		pkVal := test.ValueOf(u, "Id")
+		idxByVal := test.ValueOf(u, "Email")
 		_, err := sut.Add(pkVal, idxByVal)
 		if err != nil {
 			t.Fatal(err)
