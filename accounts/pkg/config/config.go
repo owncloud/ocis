@@ -79,6 +79,14 @@ type CS3 struct {
 	DataPrefix   string
 }
 
+// ServiceUser defines the user required for EOS
+type ServiceUser struct {
+	Username string
+	Password string
+	UID      int64
+	GID      int64
+}
+
 // Config merges all Account config parameters.
 type Config struct {
 	LDAP         LDAP
@@ -89,6 +97,7 @@ type Config struct {
 	Log          Log
 	TokenManager TokenManager
 	Repo         Repo
+	ServiceUser  ServiceUser
 }
 
 // New returns a new config.
