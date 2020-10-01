@@ -108,17 +108,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-cs3-provider-addr",
-			Value:       "0.0.0.0:9215",
+			Value:       "localhost:9215",
 			Usage:       "bind address for the metadata storage provider",
 			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"},
 			Destination: &cfg.Repo.CS3.ProviderAddr,
 		},
 		&cli.StringFlag{
-			Name:        "storage-cs3-driver-url",
+			Name:        "storage-cs3-data-url",
 			Value:       "http://localhost:9216",
-			Usage:       "http endpoint of the metadata storage, without trailing slash",
-			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DRIVER_URL"},
-			Destination: &cfg.Repo.CS3.DriverURL,
+			Usage:       "http endpoint of the metadata storage",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_URL"},
+			Destination: &cfg.Repo.CS3.DataURL,
 		},
 		&cli.StringFlag{
 			Name:        "storage-cs3-data-prefix",

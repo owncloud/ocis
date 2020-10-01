@@ -75,7 +75,7 @@ type Disk struct {
 // CS3 is the cs3 implementation of the storage.
 type CS3 struct {
 	ProviderAddr string
-	DriverURL    string
+	DataURL      string
 	DataPrefix   string
 }
 
