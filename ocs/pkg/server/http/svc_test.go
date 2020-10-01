@@ -51,6 +51,18 @@ var DefaultUsers = []string{
   "058bff95-6708-4fe5-91e4-9ea3d377588b",
 }
 
+var DefaultGroups = []string{
+  "167cbee2-0518-455a-bfb2-031fe0621e5d",
+  "262982c1-2362-4afa-bfdf-8cbfef64a06e",
+  "34f38767-c937-4eb6-b847-1c175829a2a0",
+  "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+  "6040aa17-9c64-4fef-9bd0-77234d71bad0",
+  "7b87fd49-286e-4a5f-bafd-c535d5dd997a",
+  "a1726108-01f8-4c30-88df-2b1a9d1cba1a",
+  "cedc21aa-4072-4614-8676-fa9165f598ff",
+  "dd58e5ec-842e-498b-8800-61f2ec6f911f",
+}
+
 func getFormatString(format string) string {
   if format == "json" {
     return "?format=json"
@@ -110,6 +122,29 @@ func (u *User) getUserRequestString() string {
 
   if u.GIDNumber != 0 {
     res.Add("gidnumber", fmt.Sprint(u.GIDNumber))
+  }
+
+  return res.Encode()
+}
+
+type Group struct {
+  ID          string `json:"id" xml:"id"`
+  GIDNumber   int    `json:"gidnumber" xml:"gidnumber"`
+  Displayname string `json:"displayname" xml:"displayname"`
+}
+
+func (g *Group) getGroupRequestString() string {
+  res := url.Values{}
+
+  if g.ID != "" {
+    res.Add("groupid", g.ID)
+  }
+
+  if g.Displayname != "" {
+    res.Add("displayname", g.Displayname)
+  }
+  if g.GIDNumber != 0 {
+    res.Add("gidnumber", fmt.Sprint(g.GIDNumber))
   }
 
   return res.Encode()
@@ -193,6 +228,24 @@ func assertStatusCode(t *testing.T, statusCode int, res *httptest.ResponseRecord
   }
 }
 
+type GetGroupsResponse struct {
+  Ocs struct {
+    Meta Meta `json:"meta" xml:"meta"`
+    Data struct {
+      Groups []string `json:"groups" xml:"groups>element"`
+    } `json:"data" xml:"data"`
+  } `json:"ocs" xml:"ocs"`
+}
+
+type GetGroupMembersResponse struct {
+  Ocs struct {
+    Meta Meta `json:"meta" xml:"meta"`
+    Data struct {
+      Users []string `json:"users" xml:"users>element"`
+    } `json:"data" xml:"data"`
+  } `json:"ocs" xml:"ocs"`
+}
+
 func assertResponseMeta(t *testing.T, expected, actual Meta) {
   assert.Equal(t, expected.Status, actual.Status, "The status of response doesn't matches")
   assert.Equal(t, expected.StatusCode, actual.StatusCode, "The Status code of response doesn't matches")
@@ -236,6 +289,15 @@ func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
 
   req := &accountsProto.DeleteAccountRequest{Id: id}
   res, err := cl.DeleteAccount(context.Background(), req)
+  return res, err
+}
+
+func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
+  client := service.Client()
+  cl := accountsProto.NewGroupsService("com.owncloud.api.accounts", client)
+
+  req := &accountsProto.DeleteGroupRequest{Id: id}
+  res, err := cl.DeleteGroup(context.Background(), req)
   return res, err
 }
 
@@ -322,6 +384,27 @@ func cleanUp(t *testing.T) {
       deleteAccount(t, f.Name())
     }
   }
+
+  datastoreGroups := filepath.Join(dataPath, "groups")
+
+  files, err = ioutil.ReadDir(datastoreGroups)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  for _, f := range files {
+    found := false
+    for _, defGrp := range DefaultGroups {
+      if f.Name() == defGrp {
+        found = true
+        break
+      }
+    }
+
+    if !found {
+      deleteGroup(t, f.Name())
+    }
+  }
 }
 
 func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorder, error) {
@@ -347,8 +430,8 @@ func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorde
 func getService() svc.Service {
   c := &config.Config{
     HTTP: config.HTTP{
-      Root:      "/",
-      Addr:      "localhost:9110",
+      Root: "/",
+      Addr: "localhost:9110",
     },
     TokenManager: config.TokenManager{
       JWTSecret: "HELLO-secret",
@@ -373,6 +456,20 @@ func createUser(u User) error {
     "POST",
     "/v1.php/cloud/users?format=json",
     u.getUserRequestString(),
+    "admin:admin",
+  )
+
+  if err != nil {
+    return err
+  }
+  return nil
+}
+
+func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
+  _, err := sendRequest(
+    "POST",
+    "/v1.php/cloud/users?format=json",
+    g.getGroupRequestString(),
     "admin:admin",
   )
 
@@ -1759,4 +1856,340 @@ func TestGetConfig(t *testing.T) {
 			}, response.Ocs.Data)
 		}
 	}
+}
+func TestGetGroupsDefaultGroups(t *testing.T) {
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      formatpart := getFormatString(format)
+
+      res, err := sendRequest(
+        "GET",
+        fmt.Sprintf("/%s/cloud/groups%s", ocsVersion, formatpart),
+        "",
+        "admin:admin",
+      )
+
+      if err != nil {
+        t.Fatal(err)
+      }
+
+      var response GetGroupsResponse
+      if format == "json" {
+        if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+          t.Fatal(err)
+        }
+      } else {
+        if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+          t.Fatal(err)
+        }
+      }
+
+      assertStatusCode(t, 200, res, ocsVersion)
+      assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+      assert.Equal(t, DefaultGroups, response.Ocs.Data.Groups)
+    }
+  }
+}
+
+func TestCreateGroup(t *testing.T) {
+  testData := []struct {
+    group Group
+    err   *Meta
+  }{
+    // A simple group
+    {
+      Group{
+        ID:          "grp1",
+        GIDNumber:   32222,
+        Displayname: "Group Name",
+      },
+      &Meta{
+        Status:     "error",
+        StatusCode: 999,
+        Message:    "not implemented",
+      },
+    },
+  }
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      for _, data := range testData {
+        formatpart := getFormatString(format)
+        res, err := sendRequest(
+          "POST",
+          fmt.Sprintf("/%v/cloud/groups%v", ocsVersion, formatpart),
+          data.group.getGroupRequestString(),
+          "admin:admin",
+        )
+
+        if err != nil {
+          t.Fatal(err)
+        }
+
+        var response EmptyResponse
+
+        if format == "json" {
+          if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+            t.Fatal(err)
+          }
+        } else {
+          if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+            t.Fatal(err)
+          }
+        }
+
+        if data.err == nil {
+          assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        } else {
+          assertResponseMeta(t, *data.err, response.Ocs.Meta)
+        }
+
+        // Check the group exists of not
+        res, err = sendRequest(
+          "GET",
+          "/v2.php/cloud/groups?format=json",
+          "",
+          "admin:admin",
+        )
+        if err != nil {
+          t.Fatal(err)
+        }
+        var groupResponse GetGroupsResponse
+        if err := json.Unmarshal(res.Body.Bytes(), &groupResponse); err != nil {
+          t.Fatal(err)
+        }
+        if data.err == nil {
+          assert.Contains(t, groupResponse.Ocs.Data.Groups, data.group.ID)
+        } else {
+          assert.NotContains(t, groupResponse.Ocs.Data.Groups, data.group.ID)
+        }
+        cleanUp(t)
+      }
+    }
+  }
+}
+
+// Add group not implemented
+// Unskip this test after adding group is implemented.
+func TestDeleteGroup(t *testing.T) {
+  t.Skip()
+  testData := []Group{
+    {
+      ID:          "grp1",
+      GIDNumber:   32222,
+      Displayname: "Group Name",
+    },
+  }
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      formatpart := getFormatString(format)
+      for _, data := range testData {
+        err := createGroup(data)
+
+        res, err := sendRequest(
+          "DELETE",
+          fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data.ID, formatpart),
+          "groupid="+data.ID,
+          "admin:admin",
+        )
+        if err != nil {
+          t.Fatal(err)
+        }
+
+        var response EmptyResponse
+        if format == "json" {
+          if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+            t.Fatal(err)
+          }
+        } else {
+          if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+            t.Fatal(err)
+          }
+        }
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+
+        // Check the group does not exists
+        res, err = sendRequest(
+          "GET",
+          "/v2.php/cloud/groups?format=json",
+          "",
+          "admin:admin",
+        )
+        if err != nil {
+          t.Fatal(err)
+        }
+        var groupResponse GetGroupsResponse
+        if err := json.Unmarshal(res.Body.Bytes(), &groupResponse); err != nil {
+          t.Fatal(err)
+        }
+
+        assert.NotContains(t, groupResponse.Ocs.Data.Groups, data.ID)
+        cleanUp(t)
+      }
+    }
+  }
+}
+
+func TestDeleteGroupInvalidGroups(t *testing.T) {
+  testData := []string{
+    "1",
+    "invalid",
+    "3434234233",
+    "1am41validUs3r",
+    "_-@@--$$__",
+  }
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      formatpart := getFormatString(format)
+      for _, data := range testData {
+        res, err := sendRequest(
+          "DELETE",
+          fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data, formatpart),
+          "groupid="+data,
+          "admin:admin",
+        )
+
+        if err != nil {
+          t.Fatal(err)
+        }
+
+        var response EmptyResponse
+
+        if format == "json" {
+          if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+            t.Fatal(err)
+          }
+        } else {
+          if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+            t.Fatal(err)
+          }
+        }
+
+        assertStatusCode(t, 404, res, ocsVersion)
+        assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to fail but was successful")
+        assertResponseMeta(t, Meta{
+          "error",
+          998,
+          "The requested group could not be found",
+        }, response.Ocs.Meta)
+        cleanUp(t)
+      }
+    }
+  }
+}
+
+func TestGetGroupMembersDefaultGroups(t *testing.T) {
+  defaultGroups := map[string][]string{
+    "34f38767-c937-4eb6-b847-1c175829a2a0": {
+      "820ba2a1-3f54-4538-80a4-2d73007e30bf", // konnectd
+      "bc596f3c-c955-4328-80a0-60d018b4ad57", // reva
+    },
+    "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa": {
+      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
+      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    },
+    "6040aa17-9c64-4fef-9bd0-77234d71bad0": {
+      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+    },
+    "dd58e5ec-842e-498b-8800-61f2ec6f911f": {
+      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+    },
+    "cedc21aa-4072-4614-8676-fa9165f598ff": {
+      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
+    },
+    "a1726108-01f8-4c30-88df-2b1a9d1cba1a": {
+      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    },
+    "167cbee2-0518-455a-bfb2-031fe0621e5d": {
+      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    },
+    "262982c1-2362-4afa-bfdf-8cbfef64a06e": {
+      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
+      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    },
+  }
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      for group, members := range defaultGroups {
+        formatpart := getFormatString(format)
+        res, err := sendRequest(
+          "GET",
+          fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
+          "",
+          "admin:admin",
+        )
+
+        if err != nil {
+          t.Fatal(err)
+        }
+
+        var response GetGroupMembersResponse
+
+        if format == "json" {
+          if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+            t.Fatal(err)
+          }
+        } else {
+          if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+            t.Fatal(err)
+          }
+        }
+
+        assertStatusCode(t, 200, res, ocsVersion)
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.Equal(t, members, response.Ocs.Data.Users)
+
+        cleanUp(t)
+      }
+    }
+  }
+}
+
+func TestListMembersInvalidGroups(t *testing.T) {
+  testData := []string{
+    "1",
+    "invalid",
+    "3434234233",
+    "1am41validUs3r",
+    "_-@@--$$__",
+  }
+  for _, ocsVersion := range ocsVersions {
+    for _, format := range formats {
+      formatpart := getFormatString(format)
+      for _, group := range testData {
+        res, err := sendRequest(
+          "GET",
+          fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
+          "",
+          "admin:admin",
+        )
+
+        if err != nil {
+          t.Fatal(err)
+        }
+
+        var response EmptyResponse
+
+        if format == "json" {
+          if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+            t.Fatal(err)
+          }
+        } else {
+          if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+            t.Fatal(err)
+          }
+        }
+
+        assertStatusCode(t, 404, res, ocsVersion)
+        assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to fail but was successful")
+        assertResponseMeta(t, Meta{
+          "error",
+          998,
+          "The requested group could not be found",
+        }, response.Ocs.Meta)
+        cleanUp(t)
+      }
+    }
+  }
 }
