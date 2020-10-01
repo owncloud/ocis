@@ -2,7 +2,7 @@ package index
 
 import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/test"
+	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
@@ -73,7 +73,7 @@ func TestUniqueUpdate(t *testing.T) {
 }
 
 func TestUniqueInit(t *testing.T) {
-	dataDir := test.CreateTmpDir(t)
+	dataDir := CreateTmpDir(t)
 	indexRootDir := path.Join(dataDir, "index.disk")
 	filesDir := path.Join(dataDir, "users")
 
@@ -115,16 +115,16 @@ func TestErrors(t *testing.T) {
 }
 
 func getUniqueIdxSut(t *testing.T) (sut Index, dataPath string) {
-	dataPath = test.WriteIndexTestData(t, test.TestData, "Id")
+	dataPath = WriteIndexTestData(t, TestData, "Id")
 	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "indexer.disk"))
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, u := range test.TestData["users"] {
-		pkVal := test.ValueOf(u, "Id")
-		idxByVal := test.ValueOf(u, "Email")
+	for _, u := range TestData["users"] {
+		pkVal := ValueOf(u, "Id")
+		idxByVal := ValueOf(u, "Email")
 		_, err := sut.Add(pkVal, idxByVal)
 		if err != nil {
 			t.Fatal(err)

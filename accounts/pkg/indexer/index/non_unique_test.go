@@ -2,7 +2,7 @@ package index
 
 import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/test"
+	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
@@ -53,7 +53,7 @@ func TestNonUniqueIndexDelete(t *testing.T) {
 }
 
 func TestNonUniqueIndexInit(t *testing.T) {
-	dataDir := test.CreateTmpDir(t)
+	dataDir := CreateTmpDir(t)
 	indexRootDir := path.Join(dataDir, "index.disk")
 	filesDir := path.Join(dataDir, "users")
 
@@ -90,16 +90,16 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 }
 
 func getNonUniqueIdxSut(t *testing.T) (sut Index, dataPath string) {
-	dataPath = test.WriteIndexTestData(t, test.TestData, "Id")
+	dataPath = WriteIndexTestData(t, TestData, "Id")
 	sut = NewNonUniqueIndex("Pet", "Color", path.Join(dataPath, "pets"), path.Join(dataPath, "index.disk"))
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, u := range test.TestData["pets"] {
-		pkVal := test.ValueOf(u, "Id")
-		idxByVal := test.ValueOf(u, "Color")
+	for _, u := range TestData["pets"] {
+		pkVal := ValueOf(u, "Id")
+		idxByVal := ValueOf(u, "Color")
 		_, err := sut.Add(pkVal, idxByVal)
 		if err != nil {
 			t.Fatal(err)
