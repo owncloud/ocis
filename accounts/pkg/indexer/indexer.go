@@ -124,3 +124,33 @@ func (i Indexer) Delete(t interface{}) error {
 
 	return nil
 }
+
+func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]string, error) {
+	typeName := getTypeFQN(t)
+	resultPaths := make([]string, 0)
+	if fields, ok := i.indices[typeName]; ok {
+		for _, idx := range fields.indicesByField[field] {
+			res, err := idx.Search(pattern)
+			if err != nil {
+				if IsNotFoundErr(err) {
+					continue
+				}
+
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			resultPaths = append(resultPaths, res...)
+
+		}
+	}
+
+	result := make([]string, 0, len(resultPaths))
+	for _, v := range resultPaths {
+		result = append(result, path.Base(v))
+	}
+
+	return result, nil
+
+}
