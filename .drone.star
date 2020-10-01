@@ -26,17 +26,19 @@ config = {
         'webUICreateFilesFolders',
         'webUIDeleteFilesFolders',
         'webUIFavorites',
+      ],
+      'phoenixWebUI2' : [
         'webUIFiles',
         'webUILogin',
         'webUINotifications',
-      ],
-      'phoenixWebUI2': [
+        'webUIAccount',
         'webUIPrivateLinks',
+      ],
+      'phoenixWebUI3': [
         'webUIRenameFiles',
         'webUIRenameFolders',
         'webUITrashbin',
         'webUIUpload',
-        'webUIAccount',
         # All tests in the following suites are skipped currently
         # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
