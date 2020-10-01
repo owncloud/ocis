@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -119,6 +120,23 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		password = match[2]
 		if password == "" {
 			return merrors.Unauthorized(s.id, "password must not be empty")
+		}
+
+		// hardcoded check against service user
+		if s.Config.ServiceUser.Username != "" &&
+			strings.EqualFold(match[1], s.Config.ServiceUser.Username) &&
+			match[2] == s.Config.ServiceUser.Password {
+			out.Accounts = []*proto.Account{
+				{
+					Id:             "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+					AccountEnabled: true,
+					PreferredName:  s.Config.ServiceUser.Username,
+					DisplayName:    s.Config.ServiceUser.Username,
+					UidNumber:      s.Config.ServiceUser.UID,
+					GidNumber:      s.Config.ServiceUser.GID,
+				},
+			}
+			return nil
 		}
 	}
 
