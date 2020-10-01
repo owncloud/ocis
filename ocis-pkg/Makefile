@@ -68,3 +68,7 @@ test:
 .PHONY: build
 build:
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./...
+
+.PHONY: config-docs-generate
+config-docs-generate:
+#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md

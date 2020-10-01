@@ -1,9 +1,9 @@
 ---
 title: "Configuration"
-date: "2020-09-21T13:14:51+0200"
+date: "2020-09-30T22:51:03+0200"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-proxy
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/webdav
 geekdocFilePath: configuration.md
 ---
 
@@ -39,96 +39,87 @@ If you prefer to configure the service with commandline flags you can see the av
 
 ## Root Command
 
-proxy for Reva/oCIS
+Serve WebDAV API for oCIS
 
-Usage: `ocis-proxy [global options] command [command options] [arguments...]`
+Usage: `webdav [global options] command [command options] [arguments...]`
 
---config-file | $PROXY_CONFIG_FILE  
+--config-file | $WEBDAV_CONFIG_FILE  
 : Path to config file.
 
---log-level | $PROXY_LOG_LEVEL  
+--log-level | $WEBDAV_LOG_LEVEL  
 : Set logging level. Default: `info`.
 
---log-pretty | $PROXY_LOG_PRETTY  
+--log-pretty | $WEBDAV_LOG_PRETTY  
 : Enable pretty logging. Default: `true`.
 
---log-color | $PROXY_LOG_COLOR  
+--log-color | $WEBDAV_LOG_COLOR  
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
 
-### ocis-proxy health
+### webdav health
 
 Check health status
 
-Usage: `ocis-proxy health [command options] [arguments...]`
+Usage: `webdav health [command options] [arguments...]`
 
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
+--debug-addr | $WEBDAV_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9119`.
 
-### ocis-proxy server
+### webdav server
 
 Start integrated server
 
-Usage: `ocis-proxy server [command options] [arguments...]`
+Usage: `webdav server [command options] [arguments...]`
 
---tracing-enabled | $PROXY_TRACING_ENABLED  
+--tracing-enabled | $WEBDAV_TRACING_ENABLED  
 : Enable sending traces.
 
---tracing-type | $PROXY_TRACING_TYPE  
+--tracing-type | $WEBDAV_TRACING_TYPE  
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $PROXY_TRACING_ENDPOINT  
+--tracing-endpoint | $WEBDAV_TRACING_ENDPOINT  
 : Endpoint for the agent.
 
---tracing-collector | $PROXY_TRACING_COLLECTOR  
-: Endpoint for the collector. Default: `http://localhost:14268/api/traces`.
+--tracing-collector | $WEBDAV_TRACING_COLLECTOR  
+: Endpoint for the collector.
 
---tracing-service | $PROXY_TRACING_SERVICE  
-: Service name for tracing. Default: `proxy`.
+--tracing-service | $WEBDAV_TRACING_SERVICE  
+: Service name for tracing. Default: `webdav`.
 
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9205`.
+--debug-addr | $WEBDAV_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9119`.
 
---debug-token | $PROXY_DEBUG_TOKEN  
+--debug-token | $WEBDAV_DEBUG_TOKEN  
 : Token to grant metrics access.
 
---debug-pprof | $PROXY_DEBUG_PPROF  
+--debug-pprof | $WEBDAV_DEBUG_PPROF  
 : Enable pprof debugging.
 
---debug-zpages | $PROXY_DEBUG_ZPAGES  
+--debug-zpages | $WEBDAV_DEBUG_ZPAGES  
 : Enable zpages debugging.
 
---http-addr | $PROXY_HTTP_ADDR  
-: Address to bind http server. Default: `0.0.0.0:9200`.
+--http-addr | $WEBDAV_HTTP_ADDR  
+: Address to bind http server. Default: `0.0.0.0:9115`.
 
---http-root | $PROXY_HTTP_ROOT  
+--http-namespace | $WEBDAV_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--service-name | $WEBDAV_SERVICE_NAME  
+: Service name. Default: `webdav`.
+
+--http-root | $WEBDAV_HTTP_ROOT  
 : Root path of http server. Default: `/`.
 
---asset-path | $PROXY_ASSET_PATH  
-: Path to custom assets.
+### webdav version
 
---http-namespace | $PROXY_HTTP_NAMESPACE  
-: Set the base namespace for the http namespace. Default: `com.owncloud`.
+Print the versions of the running instances
 
---transport-tls-cert | $PROXY_TRANSPORT_TLS_CERT  
-: Certificate file for transport encryption.
+Usage: `webdav version [command options] [arguments...]`
 
---transport-tls-key | $PROXY_TRANSPORT_TLS_KEY  
-: Secret file for transport encryption.
+--http-namespace | $WEBDAV_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
---tls | $PROXY_TLS  
-: Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).. Default: `true`.
-
---jwt-secret | $PROXY_JWT_SECRET  
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
-
---reva-gateway-addr | $PROXY_REVA_GATEWAY_ADDR  
-: REVA Gateway Endpoint. Default: `127.0.0.1:9142`.
-
---oidc-issuer | $PROXY_OIDC_ISSUER  
-: OIDC issuer. Default: `https://localhost:9200`.
-
---oidc-insecure | $PROXY_OIDC_INSECURE  
-: OIDC allow insecure communication. Default: `true`.
+--service-name | $WEBDAV_SERVICE_NAME  
+: Service name. Default: `webdav`.
 

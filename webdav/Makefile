@@ -130,9 +130,9 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: docs
-docs:
-	cd docs; hugo
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: watch
 watch:

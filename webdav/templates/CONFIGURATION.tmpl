@@ -1,13 +1,25 @@
 ---
 title: "Configuration"
-date: "2020-07-01T11:10:52+0200"
+date: "{{ date "2006-01-02T15:04:05-0700" now }}"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/webdav
 geekdocFilePath: configuration.md
 ---
+{{- define "options"}}
+{{ $fnName := (last . ).Flags -}}
+{{ range $opt := first . }}{{ with list $fnName $opt -}}
+{{ $o := last . -}}
+{{ if eq $o.FnName $fnName -}}
+--{{ $o.Name }} | ${{ index $o.Env 0 }}  
+: {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
-{{< toc >}}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{ end }}
+
+{{`{{< toc >}}`}}
 
 ## Configuration
 
@@ -37,48 +49,30 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### ocis-reva server
+{{ $options := .Options -}}
+{{ range $com := .Commands }}{{ with (list $options $com) -}}
+{{ $c := last . -}}
+{{ if eq $c.Name "webdav" -}}
+## Root Command
 
-Start ocis accounts service
+{{ $c.Usage }}
 
-Usage: `ocis-reva server [command options] [arguments...]`
+Usage: `webdav [global options] command [command options] [arguments...]`
+{{ template "options" . -}}
+## Sub Commands
 
---http-namespace | $ACCOUNTS_HTTP_NAMESPACE  
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range $com := .Commands }}{{ with (list $options $com) -}}
+{{- $c := last . }}
+{{- if ne $c.Name "webdav" -}}
+### webdav {{ $c.Name }}
 
---http-addr | $ACCOUNTS_HTTP_ADDR  
-: Address to bind http server. Default: `localhost:9181`.
+{{ $c.Usage }}
 
---http-root | $ACCOUNTS_HTTP_ROOT  
-: Root path of http server. Default: `/`.
-
---grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---grpc-addr | $ACCOUNTS_GRPC_ADDR  
-: Address to bind grpc server. Default: `localhost:9180`.
-
---name | $ACCOUNTS_NAME  
-: service name. Default: `accounts`.
-
---accounts-data-path | $ACCOUNTS_DATA_PATH  
-: accounts folder. Default: `/var/tmp/ocis-accounts`.
-
---asset-path | $HELLO_ASSET_PATH  
-: Path to custom assets.
-
-### ocis-reva ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `ocis-reva ocis-accounts [command options] [arguments...]`
-
---log-level | $ACCOUNTS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $ACCOUNTS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $ACCOUNTS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
+Usage: `webdav {{ $c.Name }} [command options] [arguments...]`
+{{ template "options" . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

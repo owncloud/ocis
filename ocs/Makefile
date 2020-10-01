@@ -3,7 +3,6 @@ NAME := ocs
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
-HUGO := hugo
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -59,7 +58,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST) $(HUGO)
+	rm -rf $(BIN) $(DIST)
 
 .PHONY: fmt
 fmt:
@@ -132,24 +131,9 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: docs-copy
-docs-copy:
-	mkdir -p $(HUGO); \
-	mkdir -p $(HUGO)/content/extensions; \
-	cd $(HUGO); \
-	git init; \
-	git remote rm origin; \
-	git remote add origin https://github.com/owncloud/owncloud.github.io; \
-	git fetch; \
-	git checkout origin/source -f; \
-	rsync --delete -ax ../docs/ content/extensions/$(NAME)
-
-.PHONY: docs-build
-docs-build:
-	cd $(HUGO); hugo
-
-.PHONY: docs
-docs: docs-copy docs-build
+.PHONY: config-docs-generate
+config-docs-generate:
+#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: watch
 watch:

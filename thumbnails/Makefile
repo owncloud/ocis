@@ -3,7 +3,6 @@ NAME := thumbnails
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
-HUGO := hugo
 PROTO_VERSION := v0
 PROTO_SRC := pkg/proto/$(PROTO_VERSION)/*.proto
 
@@ -60,7 +59,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST) $(HUGO)
+	rm -rf $(BIN) $(DIST)
 
 .PHONY: fmt
 fmt:
@@ -138,24 +137,9 @@ proto-docs-build:
 	go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc; \
 	protoc --doc_out=./docs --doc_opt=./templates/grpc.tmpl,grpc.md $(PROTO_SRC)
 
-.PHONY: docs-copy
-docs-copy:
-	mkdir -p $(HUGO); \
-	mkdir -p $(HUGO)/content/extensions; \
-	cd $(HUGO); \
-	git init; \
-	git remote rm origin; \
-	git remote add origin https://github.com/owncloud/owncloud.github.io; \
-	git fetch; \
-	git checkout origin/source -f; \
-	rsync --delete -ax ../docs/ content/extensions/$(NAME)
-
-.PHONY: docs-build
-docs-build:
-	cd $(HUGO); hugo
-
-.PHONY: docs
-docs: proto-docs-build docs-copy docs-build
+.PHONY: config-docs-generate
+config-docs-generate:
+#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: watch
 watch:
