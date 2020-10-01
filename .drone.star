@@ -117,6 +117,7 @@ def testPipelines(ctx):
     pipelines.append(testing(ctx, module))
 
   pipelines += [
+    uploadCoverage(ctx),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
   ]
@@ -182,6 +183,7 @@ def testing(ctx, module):
         'commands': [
           'cd %s' % (module),
           'make test',
+          'mv coverage.out %s_coverage.out' % (module),
         ],
         'volumes': [
           {
@@ -191,15 +193,25 @@ def testing(ctx, module):
         ],
       },
       {
-        'name': 'codacy',
-        'image': 'plugins/codacy:1',
-        'pull': 'always',
+        'name': 'coverage-cache',
+        'image': 'plugins/s3',
         'settings': {
-          'token': {
-            'from_secret': 'codacy_token',
+          'endpoint': {
+            'from_secret': 'cache_s3_endpoint'
           },
-        },
-      },
+          'bucket': 'cache',
+          'source': '%s/%s_coverage.out' % (module, module),
+          'target': '%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+          'path_style': True,
+          'strip_prefix': module,
+          'access_key': {
+            'from_secret': 'cache_s3_access_key'
+          },
+          'secret_key': {
+            'from_secret': 'cache_s3_secret_key'
+          }
+        }
+      }
   ]
 
   if config['modules'][module] == 'frontend':
@@ -222,6 +234,62 @@ def testing(ctx, module):
         'refs/pull/**',
       ],
     },
+  }
+
+def uploadCoverage(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'upload-coverage',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'sync-from-cache',
+        'image': 'minio/mc',
+        'environment': {
+          'MC_HOST_cache': {
+            'from_secret': 'cache_s3_connection_url'
+          }
+        },
+        'commands': [
+          'mkdir -p coverage',
+          'mc mirror cache/cache/%s/%s/coverage coverage/' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+        ]
+      },
+      {
+        'name': 'codacy',
+        'image': 'plugins/codacy:1',
+        'pull': 'always',
+        'settings': {
+          'token': {
+            'from_secret': 'codacy_token',
+          },
+        },
+      },
+      {
+        'name': 'purge-cache',
+        'image': 'minio/mc',
+        'environment': {
+          'MC_HOST_cache': {
+            'from_secret': 'cache_s3_connection_url'
+          }
+        },
+        'commands': [
+          'mc rm --recursive --force cache/cache/%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+        ]
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+    'depends_on': getTestSuiteNames(),
   }
 
 def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
@@ -480,6 +548,7 @@ def docker(ctx, arch):
     ],
     'depends_on':
       getTestSuiteNames() + [
+      'upload-coverage',
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
@@ -635,6 +704,7 @@ def binary(ctx, name):
     ],
     'depends_on':
       getTestSuiteNames() + [
+      'upload-coverage',
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
     ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
@@ -742,7 +812,7 @@ def manifest(ctx):
   }
 
 def changelog(ctx):
-  repo_slug = ctx.build.source if ctx.build.source else ctx.repo.slug
+  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
   return {
     'kind': 'pipeline',
     'type': 'docker',
