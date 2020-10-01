@@ -108,6 +108,19 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	return result, nil
 }
 
-func (i Indexer) Delete(typeName, pk string) error {
+func (i Indexer) Delete(t interface{}) error {
+	typeName := getTypeFQN(t)
+	if fields, ok := i.indices[typeName]; ok {
+		for _, indices := range fields.indicesByField {
+			for _, idx := range indices {
+				pkVal := valueOf(t, fields.pKFieldName)
+				idxByVal := valueOf(t, idx.IndexBy())
+				if err := idx.Remove(pkVal, idxByVal); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return nil
 }

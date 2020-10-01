@@ -64,7 +64,29 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Log(res)
+}
 
+func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
+	dataDir := writeIndexTestData(t, testData, "Id")
+	indexer := NewIndex(&Config{
+		DataDir:          dataDir,
+		IndexRootDirName: "index.disk",
+		Log:              zerolog.Logger{},
+	})
+
+	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+
+	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+
+	err := indexer.Add(pet1)
+	assert.NoError(t, err)
+
+	err = indexer.Add(pet2)
+	assert.NoError(t, err)
+
+	err = indexer.Delete(pet2)
+	assert.NoError(t, err)
 }
 
 /*
