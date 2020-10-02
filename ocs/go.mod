@@ -32,6 +32,7 @@ require (
 replace (
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/store => ../store
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 )
