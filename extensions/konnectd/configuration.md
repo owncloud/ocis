@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-09-21T13:14:47+0200"
+date: "2020-10-02T12:06:42+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
@@ -57,6 +57,18 @@ Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis-konnectd version
+
+Print the versions of the running instances
+
+Usage: `ocis-konnectd version [command options] [arguments...]`
+
+--http-namespace | $KONNECTD_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
+
 ### ocis-konnectd health
 
 Check health status
@@ -107,6 +119,9 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 
 --http-namespace | $KONNECTD_HTTP_NAMESPACE  
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
 
 --identity-manager | $KONNECTD_IDENTITY_MANAGER  
 : Identity manager (one of ldap,kc,cookie,dummy). Default: `ldap`.
