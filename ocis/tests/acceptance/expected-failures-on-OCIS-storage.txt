@@ -1192,6 +1192,79 @@ apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:103
 apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:104
 apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:105
 #
+# https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
+apiWebdavEtagPropagation/deleteFileFolder.feature:19
+apiWebdavEtagPropagation/deleteFileFolder.feature:22
+apiWebdavEtagPropagation/deleteFileFolder.feature:35
+apiWebdavEtagPropagation/deleteFileFolder.feature:38
+apiWebdavEtagPropagation/deleteFileFolder.feature:52
+apiWebdavEtagPropagation/deleteFileFolder.feature:55
+#
+# https://github.com/owncloud/product/issues/238 renaming a files does not change etag of containing folder
+apiWebdavEtagPropagation/moveFileFolder.feature:16
+apiWebdavEtagPropagation/moveFileFolder.feature:17
+apiWebdavEtagPropagation/moveFileFolder.feature:18
+apiWebdavEtagPropagation/moveFileFolder.feature:19
+#
+# https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
+apiWebdavEtagPropagation/moveFileFolder.feature:31
+apiWebdavEtagPropagation/moveFileFolder.feature:32
+apiWebdavEtagPropagation/moveFileFolder.feature:34
+apiWebdavEtagPropagation/moveFileFolder.feature:35
+apiWebdavEtagPropagation/moveFileFolder.feature:48
+apiWebdavEtagPropagation/moveFileFolder.feature:49
+apiWebdavEtagPropagation/moveFileFolder.feature:51
+apiWebdavEtagPropagation/moveFileFolder.feature:52
+#
+# https://github.com/owncloud/product/issues/240 MOVE operation on folders do not change etags for parents
+apiWebdavEtagPropagation/moveFileFolder.feature:64
+apiWebdavEtagPropagation/moveFileFolder.feature:65
+apiWebdavEtagPropagation/moveFileFolder.feature:66
+apiWebdavEtagPropagation/moveFileFolder.feature:67
+apiWebdavEtagPropagation/moveFileFolder.feature:79
+apiWebdavEtagPropagation/moveFileFolder.feature:80
+apiWebdavEtagPropagation/moveFileFolder.feature:81
+apiWebdavEtagPropagation/moveFileFolder.feature:82
+apiWebdavEtagPropagation/moveFileFolder.feature:83
+apiWebdavEtagPropagation/moveFileFolder.feature:84
+apiWebdavEtagPropagation/moveFileFolder.feature:96
+apiWebdavEtagPropagation/moveFileFolder.feature:97
+apiWebdavEtagPropagation/moveFileFolder.feature:98
+apiWebdavEtagPropagation/moveFileFolder.feature:99
+apiWebdavEtagPropagation/moveFileFolder.feature:100
+apiWebdavEtagPropagation/moveFileFolder.feature:101
+#
+# https://github.com/owncloud/product/issues/209 trash not implemented
+apiWebdavEtagPropagation/restoreFromTrash.feature:19
+apiWebdavEtagPropagation/restoreFromTrash.feature:20
+apiWebdavEtagPropagation/restoreFromTrash.feature:21
+apiWebdavEtagPropagation/restoreFromTrash.feature:22
+apiWebdavEtagPropagation/restoreFromTrash.feature:23
+apiWebdavEtagPropagation/restoreFromTrash.feature:24
+apiWebdavEtagPropagation/restoreFromTrash.feature:38
+apiWebdavEtagPropagation/restoreFromTrash.feature:39
+apiWebdavEtagPropagation/restoreFromTrash.feature:40
+apiWebdavEtagPropagation/restoreFromTrash.feature:41
+apiWebdavEtagPropagation/restoreFromTrash.feature:42
+apiWebdavEtagPropagation/restoreFromTrash.feature:43
+apiWebdavEtagPropagation/restoreFromTrash.feature:55
+apiWebdavEtagPropagation/restoreFromTrash.feature:56
+apiWebdavEtagPropagation/restoreFromTrash.feature:57
+apiWebdavEtagPropagation/restoreFromTrash.feature:58
+apiWebdavEtagPropagation/restoreFromTrash.feature:59
+apiWebdavEtagPropagation/restoreFromTrash.feature:60
+apiWebdavEtagPropagation/restoreFromTrash.feature:74
+apiWebdavEtagPropagation/restoreFromTrash.feature:75
+apiWebdavEtagPropagation/restoreFromTrash.feature:76
+apiWebdavEtagPropagation/restoreFromTrash.feature:77
+apiWebdavEtagPropagation/restoreFromTrash.feature:78
+apiWebdavEtagPropagation/restoreFromTrash.feature:79
+#
+# https://github.com/owncloud/product/issues/210 versions not implemented
+apiWebdavEtagPropagation/restoreVersion.feature:19
+apiWebdavEtagPropagation/restoreVersion.feature:20
+apiWebdavEtagPropagation/restoreVersion.feature:21
+#
 # Failures that need to be investigated
 apiShareManagementBasic/createShare.feature:85
 apiShareManagementBasic/createShare.feature:86

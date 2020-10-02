@@ -15,7 +15,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '2c5bb68fc689d7e9dd912125680c0fad99528fa9',
+    'coreCommit': '1840b100a5e1990ba0db5b4ce881ab7bb3799698',
     'numberOfParts': 4
   },
   'uiTests': {
@@ -122,7 +122,7 @@ def main(ctx):
     pipelines['depends_on'] = []
   else:
     pipelines = before + stages + after
-  
+
   return pipelines
 
 def testPipelines(ctx):
