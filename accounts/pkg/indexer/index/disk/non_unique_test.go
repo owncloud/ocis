@@ -1,7 +1,8 @@
-package index
+package disk
 
 import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -89,7 +90,7 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 	_ = os.RemoveAll(dataPath)
 }
 
-func getNonUniqueIdxSut(t *testing.T) (sut Index, dataPath string) {
+func getNonUniqueIdxSut(t *testing.T) (sut index.Index, dataPath string) {
 	dataPath = WriteIndexTestData(t, TestData, "Id")
 	sut = NewNonUniqueIndex("Pet", "Color", path.Join(dataPath, "pets"), path.Join(dataPath, "index.disk"))
 	err := sut.Init()

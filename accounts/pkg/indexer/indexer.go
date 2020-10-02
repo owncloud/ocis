@@ -3,7 +3,7 @@ package indexer
 
 import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
 	"github.com/rs/zerolog"
 	"path"
 )
@@ -32,7 +32,7 @@ func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName st
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
-	idx := index.NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
+	idx := disk.NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
 
 	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
@@ -43,7 +43,7 @@ func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName
 	fullDataPath := path.Join(i.config.DataDir, entityDirName)
 	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
 
-	idx := index.NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
+	idx := disk.NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
 
 	i.indices.addIndex(typeName, pkName, idx)
 	return idx.Init()
