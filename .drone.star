@@ -1036,7 +1036,7 @@ def docs(ctx):
         'name': 'downstream',
         'image': 'plugins/downstream',
         'settings': {
-          'server': 'https://cloud.drone.io/',
+          'server': 'https://drone.owncloud.com/',
           'token': {
             'from_secret': 'drone_token',
           },
