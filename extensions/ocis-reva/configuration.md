@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-05T11:04:01+0000"
+date: "2020-10-05T15:31:44+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-reva
 geekdocEditPath: edit/master/docs
@@ -57,6 +57,72 @@ Usage: `ocis-reva [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis-reva storage-oc
+
+Start reva storage-oc service
+
+Usage: `ocis-reva storage-oc [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_OC_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9163`.
+
+--network | $REVA_STORAGE_OC_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_OC_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_STORAGE_OC_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9162`.
+
+--url | $REVA_STORAGE_OC_URL  
+: URL to use for the reva service. Default: `localhost:9162`.
+
+--driver | $REVA_STORAGE_OC_DRIVER  
+: storage driver for oc mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
+
+--mount-path | $REVA_STORAGE_OC_MOUNT_PATH  
+: mount path. Default: `/oc`.
+
+--mount-id | $REVA_STORAGE_OC_MOUNT_ID  
+: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009162`.
+
+--expose-data-server | $REVA_STORAGE_OC_EXPOSE_DATA_SERVER  
+: exposes a dedicated data server. Default: `false`.
+
+--data-server-url | $REVA_STORAGE_OC_DATA_SERVER_URL  
+: data server url. Default: `http://localhost:9164/data`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
+
+### ocis-reva reva-storage-public-link
+
+Start reva storage-public-link service
+
+Usage: `ocis-reva reva-storage-public-link [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_PUBLIC_LINK_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9179`.
+
+--network | $REVA_STORAGE_PUBLIC_LINK_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_PUBLIC_LINK_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_STORAGE_PUBLIC_LINK_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9178`.
+
+--url | $REVA_STORAGE_PUBLIC_LINK_URL  
+: Address to bind reva service. Default: `localhost:9178`.
+
+--mount-path | $REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH  
+: mount path. Default: `/public/`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
 ### ocis-reva storage-root
 
 Start reva storage-root service
@@ -93,6 +159,183 @@ Usage: `ocis-reva storage-root [command options] [arguments...]`
 --data-server-url | $REVA_STORAGE_ROOT_DATA_SERVER_URL  
 : data server url.
 
+### ocis-reva storage-eos
+
+Start reva storage-eos service
+
+Usage: `ocis-reva storage-eos [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_EOS_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9159`.
+
+--network | $REVA_STORAGE_EOS_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_EOS_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_STORAGE_EOS_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9158`.
+
+--url | $REVA_STORAGE_EOS_URL  
+: URL to use for the reva service. Default: `localhost:9158`.
+
+--driver | $REVA_STORAGE_EOS_DRIVER  
+: storage driver for eos mount: eg. local, eos, owncloud, ocis or s3. Default: `eos`.
+
+--mount-path | $REVA_STORAGE_EOS_MOUNT_PATH  
+: mount path. Default: `/eos`.
+
+--mount-id | $REVA_STORAGE_EOS_MOUNT_ID  
+: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009158`.
+
+--expose-data-server | $REVA_STORAGE_EOS_EXPOSE_DATA_SERVER  
+: exposes a dedicated data server. Default: `false`.
+
+--data-server-url | $REVA_STORAGE_EOS_DATA_SERVER_URL  
+: data server url. Default: `http://localhost:9160/data`.
+
+### ocis-reva auth-bearer
+
+Start reva authprovider for bearer auth
+
+Usage: `ocis-reva auth-bearer [command options] [arguments...]`
+
+--debug-addr | $REVA_AUTH_BEARER_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9149`.
+
+--oidc-issuer | $REVA_OIDC_ISSUER  
+: OIDC issuer. Default: `https://localhost:9200`.
+
+--oidc-insecure | $REVA_OIDC_INSECURE  
+: OIDC allow insecure communication. Default: `true`.
+
+--oidc-id-claim | $REVA_OIDC_ID_CLAIM  
+: OIDC id claim. Default: `preferred_username`.
+
+--oidc-uid-claim | $REVA_OIDC_UID_CLAIM  
+: OIDC uid claim.
+
+--oidc-gid-claim | $REVA_OIDC_GID_CLAIM  
+: OIDC gid claim.
+
+--network | $REVA_AUTH_BEARER_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_AUTH_BEARER_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_AUTH_BEARER_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9148`.
+
+--url | $REVA_AUTH_BEARER_URL  
+: URL to use for the reva service. Default: `localhost:9148`.
+
+### ocis-reva storage-home-data
+
+Start reva storage-home-data service
+
+Usage: `ocis-reva storage-home-data [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_HOME_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9157`.
+
+--network | $REVA_STORAGE_HOME_DATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_HOME_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
+
+--addr | $REVA_STORAGE_HOME_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9156`.
+
+--url | $REVA_STORAGE_HOME_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9156`.
+
+--driver | $REVA_STORAGE_HOME_DATA_DRIVER  
+: storage driver for home data mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
+
+--prefix | $REVA_STORAGE_HOME_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
+
+--temp-folder | $REVA_STORAGE_HOME_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
+
+--enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
+: enable the creation of home directories. Default: `true`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
+
+### ocis-reva storage-oc-data
+
+Start reva storage-oc-data service
+
+Usage: `ocis-reva storage-oc-data [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9165`.
+
+--network | $REVA_STORAGE_OC_DATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_OC_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
+
+--addr | $REVA_STORAGE_OC_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9164`.
+
+--url | $REVA_STORAGE_OC_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9164`.
+
+--driver | $REVA_STORAGE_OC_DATA_DRIVER  
+: storage driver for oc data mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
+
+--prefix | $REVA_STORAGE_OC_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
+
+--temp-folder | $REVA_STORAGE_OC_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
+
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
+
+### ocis-reva reva-storage-metadata
+
+Start reva storage-metadata service
+
+Usage: `ocis-reva reva-storage-metadata [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_METADATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9217`.
+
+--network | $REVA_STORAGE_METADATA_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--provider-addr | $REVA_STORAGE_METADATA_PROVIDER_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9215`.
+
+--data-server-url | $REVA_STORAGE_METADATA_DATA_SERVER_URL  
+: URL of the data-server the storage-provider uses. Default: `http://localhost:9216`.
+
+--data-server-addr | $REVA_STORAGE_METADATA_DATA_SERVER_ADDR  
+: Address to bind the metadata data-server to. Default: `0.0.0.0:9216`.
+
+--storage-provider-driver | $REVA_STORAGE_METADATA_PROVIDER_DRIVER  
+: storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3. Default: `local`.
+
+--data-provider-driver | $REVA_STORAGE_METADATA_DATA_PROVIDER_DRIVER  
+: storage driver for data-provider mount: eg. local, eos, owncloud, ocis or s3. Default: `local`.
+
+--storage-root | $REVA_STORAGE_METADATA_ROOT  
+: the path to the metadata storage root. Default: `/var/tmp/ocis/metadata`.
+
 ### ocis-reva sharing
 
 Start reva sharing service
@@ -122,6 +365,57 @@ Usage: `ocis-reva sharing [command options] [arguments...]`
 
 --public-driver | $REVA_SHARING_PUBLIC_DRIVER  
 : driver to use for the PublicShareProvider. Default: `json`.
+
+### ocis-reva health
+
+Check health status
+
+Usage: `ocis-reva health [command options] [arguments...]`
+
+--debug-addr | $REVA_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
+
+### ocis-reva storage-home
+
+Start reva storage-home service
+
+Usage: `ocis-reva storage-home [command options] [arguments...]`
+
+--debug-addr | $REVA_STORAGE_HOME_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9155`.
+
+--network | $REVA_STORAGE_HOME_NETWORK  
+: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--protocol | $REVA_STORAGE_HOME_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+
+--addr | $REVA_STORAGE_HOME_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9154`.
+
+--url | $REVA_STORAGE_HOME_URL  
+: URL to use for the reva service. Default: `localhost:9154`.
+
+--driver | $REVA_STORAGE_HOME_DRIVER  
+: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
+
+--mount-path | $REVA_STORAGE_HOME_MOUNT_PATH  
+: mount path. Default: `/home`.
+
+--mount-id | $REVA_STORAGE_HOME_MOUNT_ID  
+: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009162`.
+
+--expose-data-server | $REVA_STORAGE_HOME_EXPOSE_DATA_SERVER  
+: exposes a dedicated data server. Default: `false`.
+
+--data-server-url | $REVA_STORAGE_HOME_DATA_SERVER_URL  
+: data server url. Default: `http://localhost:9156/data`.
+
+--enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
+: enable the creation of home directories. Default: `true`.
+
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
 ### ocis-reva gateway
 
@@ -273,204 +567,6 @@ Usage: `ocis-reva frontend [command options] [arguments...]`
 --upload-http-method-override | $REVA_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE  
 : Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
 
-### ocis-reva auth-bearer
-
-Start reva authprovider for bearer auth
-
-Usage: `ocis-reva auth-bearer [command options] [arguments...]`
-
---debug-addr | $REVA_AUTH_BEARER_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9149`.
-
---oidc-issuer | $REVA_OIDC_ISSUER  
-: OIDC issuer. Default: `https://localhost:9200`.
-
---oidc-insecure | $REVA_OIDC_INSECURE  
-: OIDC allow insecure communication. Default: `true`.
-
---oidc-id-claim | $REVA_OIDC_ID_CLAIM  
-: OIDC id claim. Default: `preferred_username`.
-
---oidc-uid-claim | $REVA_OIDC_UID_CLAIM  
-: OIDC uid claim.
-
---oidc-gid-claim | $REVA_OIDC_GID_CLAIM  
-: OIDC gid claim.
-
---network | $REVA_AUTH_BEARER_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_AUTH_BEARER_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_AUTH_BEARER_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9148`.
-
---url | $REVA_AUTH_BEARER_URL  
-: URL to use for the reva service. Default: `localhost:9148`.
-
-### ocis-reva storage-home-data
-
-Start reva storage-home-data service
-
-Usage: `ocis-reva storage-home-data [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_HOME_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9157`.
-
---network | $REVA_STORAGE_HOME_DATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_HOME_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_STORAGE_HOME_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9156`.
-
---url | $REVA_STORAGE_HOME_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9156`.
-
---driver | $REVA_STORAGE_HOME_DATA_DRIVER  
-: storage driver for home data mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
-
---prefix | $REVA_STORAGE_HOME_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_HOME_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
-: enable the creation of home directories. Default: `true`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
---users-url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
-### ocis-reva storage-home
-
-Start reva storage-home service
-
-Usage: `ocis-reva storage-home [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_HOME_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9155`.
-
---network | $REVA_STORAGE_HOME_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_HOME_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_STORAGE_HOME_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9154`.
-
---url | $REVA_STORAGE_HOME_URL  
-: URL to use for the reva service. Default: `localhost:9154`.
-
---driver | $REVA_STORAGE_HOME_DRIVER  
-: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
-
---mount-path | $REVA_STORAGE_HOME_MOUNT_PATH  
-: mount path. Default: `/home`.
-
---mount-id | $REVA_STORAGE_HOME_MOUNT_ID  
-: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009162`.
-
---expose-data-server | $REVA_STORAGE_HOME_EXPOSE_DATA_SERVER  
-: exposes a dedicated data server. Default: `false`.
-
---data-server-url | $REVA_STORAGE_HOME_DATA_SERVER_URL  
-: data server url. Default: `http://localhost:9156/data`.
-
---enable-home | $REVA_STORAGE_HOME_ENABLE_HOME  
-: enable the creation of home directories. Default: `true`.
-
---users-url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
-### ocis-reva storage-oc-data
-
-Start reva storage-oc-data service
-
-Usage: `ocis-reva storage-oc-data [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9165`.
-
---network | $REVA_STORAGE_OC_DATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_OC_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_STORAGE_OC_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9164`.
-
---url | $REVA_STORAGE_OC_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9164`.
-
---driver | $REVA_STORAGE_OC_DATA_DRIVER  
-: storage driver for oc data mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
-
---prefix | $REVA_STORAGE_OC_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_OC_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
---users-url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
-### ocis-reva storage-eos-data
-
-Start reva storage-eos-data service
-
-Usage: `ocis-reva storage-eos-data [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9161`.
-
---network | $REVA_STORAGE_EOS_DATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_EOS_DATA_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
-
---addr | $REVA_STORAGE_EOS_DATA_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9160`.
-
---url | $REVA_STORAGE_EOS_DATA_URL  
-: URL to use for the reva service. Default: `localhost:9160`.
-
---driver | $REVA_STORAGE_EOS_DATA_DRIVER  
-: storage driver for eos data mount: eg. local, eos, owncloud, ocis or s3. Default: `eos`.
-
---prefix | $REVA_STORAGE_EOS_DATA_PREFIX  
-: prefix for the http endpoint, without leading slash. Default: `data`.
-
---temp-folder | $REVA_STORAGE_EOS_DATA_TEMP_FOLDER  
-: temp folder. Default: `/var/tmp/`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
---users-url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
-### ocis-reva health
-
-Check health status
-
-Usage: `ocis-reva health [command options] [arguments...]`
-
---debug-addr | $REVA_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
-
 ### ocis-reva users
 
 Start reva users service
@@ -525,72 +621,6 @@ Usage: `ocis-reva users [command options] [arguments...]`
 --rest-target-api | $REVA_REST_TARGET_API  
 : The target application.
 
-### ocis-reva storage-oc
-
-Start reva storage-oc service
-
-Usage: `ocis-reva storage-oc [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_OC_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9163`.
-
---network | $REVA_STORAGE_OC_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_OC_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_STORAGE_OC_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9162`.
-
---url | $REVA_STORAGE_OC_URL  
-: URL to use for the reva service. Default: `localhost:9162`.
-
---driver | $REVA_STORAGE_OC_DRIVER  
-: storage driver for oc mount: eg. local, eos, owncloud, ocis or s3. Default: `owncloud`.
-
---mount-path | $REVA_STORAGE_OC_MOUNT_PATH  
-: mount path. Default: `/oc`.
-
---mount-id | $REVA_STORAGE_OC_MOUNT_ID  
-: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009162`.
-
---expose-data-server | $REVA_STORAGE_OC_EXPOSE_DATA_SERVER  
-: exposes a dedicated data server. Default: `false`.
-
---data-server-url | $REVA_STORAGE_OC_DATA_SERVER_URL  
-: data server url. Default: `http://localhost:9164/data`.
-
---users-url | $REVA_USERS_URL  
-: URL to use for the reva service. Default: `localhost:9144`.
-
-### ocis-reva reva-storage-public-link
-
-Start reva storage-public-link service
-
-Usage: `ocis-reva reva-storage-public-link [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_PUBLIC_LINK_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9179`.
-
---network | $REVA_STORAGE_PUBLIC_LINK_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---protocol | $REVA_STORAGE_PUBLIC_LINK_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
-
---addr | $REVA_STORAGE_PUBLIC_LINK_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9178`.
-
---url | $REVA_STORAGE_PUBLIC_LINK_URL  
-: Address to bind reva service. Default: `localhost:9178`.
-
---mount-path | $REVA_STORAGE_PUBLIC_LINK_MOUNT_PATH  
-: mount path. Default: `/public/`.
-
---gateway-url | $REVA_GATEWAY_URL  
-: URL to use for the reva gateway service. Default: `localhost:9142`.
-
 ### ocis-reva auth-basic
 
 Start reva authprovider for basic auth
@@ -618,69 +648,39 @@ Usage: `ocis-reva auth-basic [command options] [arguments...]`
 --url | $REVA_AUTH_BASIC_URL  
 : URL to use for the reva service. Default: `localhost:9146`.
 
-### ocis-reva storage-eos
+### ocis-reva storage-eos-data
 
-Start reva storage-eos service
+Start reva storage-eos-data service
 
-Usage: `ocis-reva storage-eos [command options] [arguments...]`
+Usage: `ocis-reva storage-eos-data [command options] [arguments...]`
 
---debug-addr | $REVA_STORAGE_EOS_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9159`.
+--debug-addr | $REVA_STORAGE_OC_DATA_DEBUG_ADDR  
+: Address to bind debug server. Default: `0.0.0.0:9161`.
 
---network | $REVA_STORAGE_EOS_NETWORK  
+--network | $REVA_STORAGE_EOS_DATA_NETWORK  
 : Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---protocol | $REVA_STORAGE_EOS_PROTOCOL  
-: protocol for reva service, can be 'http' or 'grpc'. Default: `grpc`.
+--protocol | $REVA_STORAGE_EOS_DATA_PROTOCOL  
+: protocol for reva service, can be 'http' or 'grpc'. Default: `http`.
 
---addr | $REVA_STORAGE_EOS_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9158`.
+--addr | $REVA_STORAGE_EOS_DATA_ADDR  
+: Address to bind reva service. Default: `0.0.0.0:9160`.
 
---url | $REVA_STORAGE_EOS_URL  
-: URL to use for the reva service. Default: `localhost:9158`.
+--url | $REVA_STORAGE_EOS_DATA_URL  
+: URL to use for the reva service. Default: `localhost:9160`.
 
---driver | $REVA_STORAGE_EOS_DRIVER  
-: storage driver for eos mount: eg. local, eos, owncloud, ocis or s3. Default: `eos`.
+--driver | $REVA_STORAGE_EOS_DATA_DRIVER  
+: storage driver for eos data mount: eg. local, eos, owncloud, ocis or s3. Default: `eos`.
 
---mount-path | $REVA_STORAGE_EOS_MOUNT_PATH  
-: mount path. Default: `/eos`.
+--prefix | $REVA_STORAGE_EOS_DATA_PREFIX  
+: prefix for the http endpoint, without leading slash. Default: `data`.
 
---mount-id | $REVA_STORAGE_EOS_MOUNT_ID  
-: mount id. Default: `1284d238-aa92-42ce-bdc4-0b0000009158`.
+--temp-folder | $REVA_STORAGE_EOS_DATA_TEMP_FOLDER  
+: temp folder. Default: `/var/tmp/`.
 
---expose-data-server | $REVA_STORAGE_EOS_EXPOSE_DATA_SERVER  
-: exposes a dedicated data server. Default: `false`.
+--gateway-url | $REVA_GATEWAY_URL  
+: URL to use for the reva gateway service. Default: `localhost:9142`.
 
---data-server-url | $REVA_STORAGE_EOS_DATA_SERVER_URL  
-: data server url. Default: `http://localhost:9160/data`.
-
-### ocis-reva reva-storage-metadata
-
-Start reva storage-metadata service
-
-Usage: `ocis-reva reva-storage-metadata [command options] [arguments...]`
-
---debug-addr | $REVA_STORAGE_METADATA_DEBUG_ADDR  
-: Address to bind debug server. Default: `0.0.0.0:9217`.
-
---network | $REVA_STORAGE_METADATA_NETWORK  
-: Network to use for the reva service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---provider-addr | $REVA_STORAGE_METADATA_PROVIDER_ADDR  
-: Address to bind reva service. Default: `0.0.0.0:9215`.
-
---data-server-url | $REVA_STORAGE_METADATA_DATA_SERVER_URL  
-: URL of the data-server the storage-provider uses. Default: `http://localhost:9216`.
-
---data-server-addr | $REVA_STORAGE_METADATA_DATA_SERVER_ADDR  
-: Address to bind the metadata data-server to. Default: `0.0.0.0:9216`.
-
---storage-provider-driver | $REVA_STORAGE_METADATA_PROVIDER_DRIVER  
-: storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3. Default: `local`.
-
---data-provider-driver | $REVA_STORAGE_METADATA_DATA_PROVIDER_DRIVER  
-: storage driver for data-provider mount: eg. local, eos, owncloud, ocis or s3. Default: `local`.
-
---storage-root | $REVA_STORAGE_METADATA_ROOT  
-: the path to the metadata storage root. Default: `/var/tmp/ocis/metadata`.
+--users-url | $REVA_USERS_URL  
+: URL to use for the reva service. Default: `localhost:9144`.
 
