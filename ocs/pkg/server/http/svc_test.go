@@ -249,6 +249,11 @@ func init() {
     Server: accountsCfg.Server{
       AccountsDataPath: dataPath,
     },
+    Repo: accountsCfg.Repo{
+    	Disk: accountsCfg.Disk{
+    		Path: dataPath,
+		},
+	},
     Log: accountsCfg.Log{
       Level:  "info",
       Pretty: true,
