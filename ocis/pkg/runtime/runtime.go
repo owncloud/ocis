@@ -122,13 +122,14 @@ OUT:
 }
 
 // RunService sends a Service.Start command with the given service name  to pman
-func RunService(client *rpc.Client, service string) (reply int) {
+func RunService(client *rpc.Client, service string) int {
 	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
 
+	var reply int
 	if err := client.Call("Service.Start", args, &reply); err != nil {
 		golog.Fatal(err)
 	}
-	return
+	return reply
 }
 
 // AddMicroPlatform adds the micro subcommands to the cli app
