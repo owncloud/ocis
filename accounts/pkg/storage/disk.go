@@ -17,13 +17,12 @@ var groupLock sync.Mutex
 
 // DiskRepo provides a local filesystem implementation of the Repo interface
 type DiskRepo struct {
-	serviceID string
 	cfg       *config.Config
 	log       olog.Logger
 }
 
 // NewDiskRepo creates a new disk repo
-func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo {
+func NewDiskRepo(cfg *config.Config, log olog.Logger) DiskRepo {
 	paths := []string{
 		filepath.Join(cfg.Repo.Disk.Path, accountsFolder),
 		filepath.Join(cfg.Repo.Disk.Path, groupsFolder),
@@ -38,7 +37,6 @@ func NewDiskRepo(serviceID string, cfg *config.Config, log olog.Logger) DiskRepo
 		}
 	}
 	return DiskRepo{
-		serviceID: serviceID,
 		cfg:       cfg,
 		log:       log,
 	}

@@ -195,7 +195,6 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "group not found: %v", err.Error())
 		}
-		s.log.Error().Err(err).Str("id", id).Msg("could not load group")
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
@@ -246,7 +245,6 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "group not found: %v", err.Error())
 		}
-		s.log.Error().Err(err).Str("id", accountID).Msg("could not load account")
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
@@ -255,7 +253,6 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "could not load group: %v", err.Error())
 		}
-		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
@@ -283,11 +280,9 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 	}
 
 	if err = s.repo.WriteAccount(c, a); err != nil {
-		s.log.Error().Err(err).Interface("account", a).Msg("could not persist account")
-		return merrors.InternalServerError(s.id, "could not persist updated account: %v", err.Error())
+		return merrors.InternalServerError(s.id, "could not persist account: %v", err.Error())
 	}
 	if err = s.repo.WriteGroup(c, g); err != nil {
-		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
 		return merrors.InternalServerError(s.id, "could not persist group: %v", err.Error())
 	}
 	// FIXME update index!

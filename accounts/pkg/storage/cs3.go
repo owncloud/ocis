@@ -24,7 +24,6 @@ import (
 
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
-	serviceID       string
 	cfg             *config.Config
 	tm              token.Manager
 	storageProvider provider.ProviderAPIClient
@@ -32,7 +31,7 @@ type CS3Repo struct {
 }
 
 // NewCS3Repo creates a new cs3 repo
-func NewCS3Repo(serviceID string, cfg *config.Config) (Repo, error) {
+func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
 	})
@@ -47,7 +46,6 @@ func NewCS3Repo(serviceID string, cfg *config.Config) (Repo, error) {
 	}
 
 	return CS3Repo{
-		serviceID:       serviceID,
 		cfg:             cfg,
 		tm:              tokenManager,
 		storageProvider: client,

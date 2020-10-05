@@ -48,14 +48,13 @@ func New(opts ...Option) (s *Service, err error) {
 		roleManager = &m
 	}
 
-	serviceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 	s = &Service{
-		id:          serviceID,
+		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
 		RoleManager: roleManager,
-		repo:        createMetadataStorage(serviceID, cfg, logger),
+		repo:        createMetadataStorage(cfg, logger),
 	}
 
 	if s.index, err = s.buildIndex(); err != nil {
@@ -357,13 +356,13 @@ func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger 
 	return true
 }
 
-func createMetadataStorage(serviceID string, cfg *config.Config, logger log.Logger) storage.Repo {
+func createMetadataStorage(cfg *config.Config, logger log.Logger) storage.Repo {
 	// for now we detect the used storage implementation based on which storage is configured
 	// the config with defaults needs to be checked last
 	if cfg.Repo.Disk.Path != "" {
-		return storage.NewDiskRepo(serviceID, cfg, logger)
+		return storage.NewDiskRepo(cfg, logger)
 	}
-	repo, err := storage.NewCS3Repo(serviceID, cfg)
+	repo, err := storage.NewCS3Repo(cfg)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("cs3 storage was configured but failed to start")
 	}
