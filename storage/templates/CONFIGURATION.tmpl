@@ -2,8 +2,8 @@
 title: "Configuration"
 date: "{{ date "2006-01-02T15:04:05-0700" now }}"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: configuration.md
 ---
 {{- define "options"}}
@@ -11,7 +11,7 @@ geekdocFilePath: configuration.md
 {{ range $opt := first . }}{{ with list $fnName $opt -}}
 {{ $o := last . -}}
 {{ if eq $o.FnName $fnName -}}
---{{ $o.Name }} | ${{ index $o.Env 0 }}  
+--{{ $o.Name }} | ${{ index $o.Env 0 }}
 : {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
 {{ end -}}
@@ -52,12 +52,12 @@ If you prefer to configure the service with commandline flags you can see the av
 {{ $options := .Options -}}
 {{ range $com := .Commands }}{{ with (list $options $com) -}}
 {{ $c := last . -}}
-{{ if eq $c.Name "ocis-reva" -}}
+{{ if eq $c.Name "storage" -}}
 ## Root Command
 
 {{ $c.Usage }}
 
-Usage: `ocis-reva [global options] command [command options] [arguments...]`
+Usage: `storage [global options] command [command options] [arguments...]`
 {{ template "options" . -}}
 ## Sub Commands
 
@@ -67,11 +67,11 @@ Usage: `ocis-reva [global options] command [command options] [arguments...]`
 {{- range $com := .Commands }}{{ with (list $options $com) -}}
 {{- $c := last . }}
 {{- if ne $c.Name "ocis-reva" -}}
-### ocis-reva {{ $c.Name }}
+### storage {{ $c.Name }}
 
 {{ $c.Usage }}
 
-Usage: `ocis-reva {{ $c.Name }} [command options] [arguments...]`
+Usage: `storage {{ $c.Name }} [command options] [arguments...]`
 {{ template "options" . }}
 {{- end -}}
 {{- end -}}
