@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -93,17 +92,13 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return &notFoundErr{"account", id}
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
 	defer resp.Body.Close()
-
-	if err := json.Unmarshal(b, &a); err != nil {
+	dec := json.NewDecoder(resp.Body)
+	var b []byte
+	if err = dec.Decode(&b); err != nil {
 		return err
 	}
-
-	return nil
+	return json.Unmarshal(b, &a)
 }
 
 // DeleteAccount deletes an account via cs3 by id
@@ -170,13 +165,12 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return &notFoundErr{"group", id}
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+	var b []byte
+	if err = dec.Decode(&b); err != nil {
 		return err
 	}
-
-	defer resp.Body.Close()
-
 	return json.Unmarshal(b, &g)
 }
 
