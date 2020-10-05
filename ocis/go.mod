@@ -5,18 +5,18 @@ go 1.13
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
-	contrib.go.opencensus.io/exporter/zipkin v0.1.1
+	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/go-test/deep v1.0.6 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/micro/v2 v2.8.0
-	github.com/openzipkin/zipkin-go v0.2.2
+	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853
-	github.com/owncloud/ocis-migration v0.2.0 // indirect
-	github.com/owncloud/ocis-proxy v0.7.1-0.20200907105449-201b9a652685 // indirect
-	github.com/owncloud/ocis/accounts v0.4.2-0.20200901074457-6a27781a2741
+	github.com/owncloud/ocis/accounts v0.5.2
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-phoenix v0.0.0-00010101000000-000000000000

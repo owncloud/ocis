@@ -159,27 +159,15 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
 			Destination: &cfg.Ldaps.Key,
 		},
-		&cli.StringFlag{
-			Name:  "backend-datastore",
-			Value: "accounts",
-			// TODO bring back config / flat file support
-			Usage:       "datastore to use as the backend. one of accounts, ldap or owncloud",
-			EnvVars:     []string{"GLAUTH_BACKEND_DATASTORE"},
-			Destination: &cfg.Backend.Datastore,
-		},
+
+		// backend config
+
 		&cli.StringFlag{
 			Name:        "backend-basedn",
 			Value:       "dc=example,dc=org",
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_BASEDN"},
 			Destination: &cfg.Backend.BaseDN,
-		},
-		&cli.BoolFlag{
-			Name:        "backend-insecure",
-			Value:       false,
-			Usage:       "Allow insecure requests to the datastore",
-			EnvVars:     []string{"GLAUTH_BACKEND_INSECURE"},
-			Destination: &cfg.Backend.Insecure,
 		},
 		&cli.StringFlag{
 			Name:        "backend-name-format",
@@ -195,12 +183,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_BACKEND_GROUP_FORMAT"},
 			Destination: &cfg.Backend.GroupFormat,
 		},
-		&cli.StringSliceFlag{
-			Name:    "backend-server",
-			Value:   cli.NewStringSlice("https://demo.owncloud.com"),
-			Usage:   `--backend-server http://internal1.example.com [--backend-server http://internal2.example.com]`,
-			EnvVars: []string{"GLAUTH_BACKEND_SERVERS"},
-		},
 		&cli.StringFlag{
 			Name:        "backend-ssh-key-attr",
 			Value:       "sshPublicKey",
@@ -208,12 +190,92 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_BACKEND_SSH_KEY_ATTR"},
 			Destination: &cfg.Backend.SSHKeyAttr,
 		},
+		&cli.StringFlag{
+			Name:  "backend-datastore",
+			Value: "accounts",
+			// TODO bring back config / flat file support
+			Usage:       "datastore to use as the backend. one of accounts, ldap or owncloud",
+			EnvVars:     []string{"GLAUTH_BACKEND_DATASTORE"},
+			Destination: &cfg.Backend.Datastore,
+		},
+		&cli.BoolFlag{
+			Name:        "backend-insecure",
+			Value:       false,
+			Usage:       "Allow insecure requests to the datastore",
+			EnvVars:     []string{"GLAUTH_BACKEND_INSECURE"},
+			Destination: &cfg.Backend.Insecure,
+		},
+		&cli.StringSliceFlag{
+			Name:    "backend-server",
+			Value:   cli.NewStringSlice("https://demo.owncloud.com/apps/graphapi/v1.0"),
+			Usage:   `--backend-server http://internal1.example.com [--backend-server http://internal2.example.com]`,
+			EnvVars: []string{"GLAUTH_BACKEND_SERVERS"},
+		},
 		&cli.BoolFlag{
 			Name:        "backend-use-graphapi",
 			Value:       true,
 			Usage:       "use Graph API, only for owncloud datastore",
 			EnvVars:     []string{"GLAUTH_BACKEND_USE_GRAPHAPI"},
 			Destination: &cfg.Backend.UseGraphAPI,
+		},
+
+		// fallback config
+
+		&cli.StringFlag{
+			Name:        "fallback-basedn",
+			Value:       "dc=example,dc=org",
+			Usage:       "base distinguished name to expose",
+			EnvVars:     []string{"GLAUTH_FALLBACK_BASEDN"},
+			Destination: &cfg.Fallback.BaseDN,
+		},
+		&cli.StringFlag{
+			Name:        "fallback-name-format",
+			Value:       "cn",
+			Usage:       "name attribute for entries to expose. typically cn or uid",
+			EnvVars:     []string{"GLAUTH_FALLBACK_NAME_FORMAT"},
+			Destination: &cfg.Fallback.NameFormat,
+		},
+		&cli.StringFlag{
+			Name:        "fallback-group-format",
+			Value:       "ou",
+			Usage:       "name attribute for entries to expose. typically ou, cn or dc",
+			EnvVars:     []string{"GLAUTH_FALLBACK_GROUP_FORMAT"},
+			Destination: &cfg.Fallback.GroupFormat,
+		},
+		&cli.StringFlag{
+			Name:        "fallback-ssh-key-attr",
+			Value:       "sshPublicKey",
+			Usage:       "ssh key attribute for entries to expose",
+			EnvVars:     []string{"GLAUTH_FALLBACK_SSH_KEY_ATTR"},
+			Destination: &cfg.Fallback.SSHKeyAttr,
+		},
+		&cli.StringFlag{
+			Name:  "fallback-datastore",
+			Value: "",
+			// TODO bring back config / flat file support
+			Usage:       "datastore to use as the fallback. one of accounts, ldap or owncloud",
+			EnvVars:     []string{"GLAUTH_FALLBACK_DATASTORE"},
+			Destination: &cfg.Fallback.Datastore,
+		},
+		&cli.BoolFlag{
+			Name:        "fallback-insecure",
+			Value:       false,
+			Usage:       "Allow insecure requests to the datastore",
+			EnvVars:     []string{"GLAUTH_FALLBACK_INSECURE"},
+			Destination: &cfg.Fallback.Insecure,
+		},
+		&cli.StringSliceFlag{
+			Name:    "fallback-server",
+			Value:   cli.NewStringSlice("https://demo.owncloud.com/apps/graphapi/v1.0"),
+			Usage:   `--fallback-server http://internal1.example.com [--fallback-server http://internal2.example.com]`,
+			EnvVars: []string{"GLAUTH_FALLBACK_SERVERS"},
+		},
+		&cli.BoolFlag{
+			Name:        "fallback-use-graphapi",
+			Value:       true,
+			Usage:       "use Graph API, only for owncloud datastore",
+			EnvVars:     []string{"GLAUTH_FALLBACK_USE_GRAPHAPI"},
+			Destination: &cfg.Fallback.UseGraphAPI,
 		},
 	}
 }

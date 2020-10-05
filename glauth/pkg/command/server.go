@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
-	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/glauth/pkg/metrics"
 
 	"github.com/owncloud/ocis/glauth/pkg/crypto"
 
@@ -42,6 +43,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			cfg.Backend.Servers = c.StringSlice("backend-server")
+			cfg.Fallback.Servers = c.StringSlice("fallback-server")
 
 			return ParseConfig(c, cfg)
 		},
@@ -143,17 +145,20 @@ func Server(cfg *config.Config) *cli.Command {
 			metrics.BuildInfo.WithLabelValues(cfg.Version).Set(1)
 
 			{
-				cfg := glauthcfg.Config{
-					LDAP: glauthcfg.LDAP{
-						Enabled: cfg.Ldap.Enabled,
-						Listen:  cfg.Ldap.Address,
-					},
-					LDAPS: glauthcfg.LDAPS{
-						Enabled: cfg.Ldaps.Enabled,
-						Listen:  cfg.Ldaps.Address,
-						Cert:    cfg.Ldaps.Cert,
-						Key:     cfg.Ldaps.Key,
-					},
+
+				lcfg := glauthcfg.LDAP{
+					Enabled: cfg.Ldap.Enabled,
+					Listen:  cfg.Ldap.Address,
+				}
+				lscfg := glauthcfg.LDAPS{
+					Enabled: cfg.Ldaps.Enabled,
+					Listen:  cfg.Ldaps.Address,
+					Cert:    cfg.Ldaps.Cert,
+					Key:     cfg.Ldaps.Key,
+				}
+				bcfg := glauthcfg.Config{
+					LDAP:  lcfg,  // TODO remove LDAP from the backend config upstream
+					LDAPS: lscfg, // TODO remove LDAP from the backend config upstream
 					Backend: glauthcfg.Backend{
 						Datastore:   cfg.Backend.Datastore,
 						BaseDN:      cfg.Backend.BaseDN,
@@ -165,8 +170,22 @@ func Server(cfg *config.Config) *cli.Command {
 						UseGraphAPI: cfg.Backend.UseGraphAPI,
 					},
 				}
+				fcfg := glauthcfg.Config{
+					LDAP:  lcfg,  // TODO remove LDAP from the backend config upstream
+					LDAPS: lscfg, // TODO remove LDAP from the backend config upstream
+					Backend: glauthcfg.Backend{
+						Datastore:   cfg.Fallback.Datastore,
+						BaseDN:      cfg.Fallback.BaseDN,
+						Insecure:    cfg.Fallback.Insecure,
+						NameFormat:  cfg.Fallback.NameFormat,
+						GroupFormat: cfg.Fallback.GroupFormat,
+						Servers:     cfg.Fallback.Servers,
+						SSHKeyAttr:  cfg.Fallback.SSHKeyAttr,
+						UseGraphAPI: cfg.Fallback.UseGraphAPI,
+					},
+				}
 
-				if cfg.LDAPS.Enabled {
+				if lscfg.Enabled {
 					// GenCert has side effects as it writes 2 files to the binary running location
 					if err := crypto.GenCert("ldap.crt", "ldap.key", logger); err != nil {
 						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
@@ -182,7 +201,10 @@ func Server(cfg *config.Config) *cli.Command {
 					glauth.AccountsService(as),
 					glauth.GroupsService(gs),
 					glauth.Logger(logger),
-					glauth.Config(&cfg),
+					glauth.LDAP(&lcfg),
+					glauth.LDAPS(&lscfg),
+					glauth.Backend(&bcfg),
+					glauth.Fallback(&fcfg),
 				)
 
 				if err != nil {

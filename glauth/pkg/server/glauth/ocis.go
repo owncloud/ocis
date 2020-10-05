@@ -2,13 +2,11 @@ package glauth
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"strconv"
 	"strings"
 
-	"github.com/glauth/glauth/pkg/config"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
@@ -25,19 +23,22 @@ const (
 )
 
 type ocisHandler struct {
-	as  accounts.AccountsService
-	gs  accounts.GroupsService
-	log log.Logger
-	cfg *config.Config
+	as          accounts.AccountsService
+	gs          accounts.GroupsService
+	log         log.Logger
+	basedn      string
+	nameFormat  string
+	groupFormat string
 }
 
 func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAPResultCode, error) {
 	bindDN = strings.ToLower(bindDN)
-	baseDN := strings.ToLower("," + h.cfg.Backend.BaseDN)
+	baseDN := strings.ToLower("," + h.basedn)
 
 	h.log.Debug().
+		Str("handler", "ocis").
 		Str("binddn", bindDN).
-		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("basedn", h.basedn).
 		Interface("src", conn.RemoteAddr()).
 		Msg("Bind request")
 
@@ -46,8 +47,9 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	// parse the bindDN - ensure that the bindDN ends with the BaseDN
 	if !strings.HasSuffix(bindDN, baseDN) {
 		h.log.Error().
+			Str("handler", "ocis").
 			Str("binddn", bindDN).
-			Str("basedn", h.cfg.Backend.BaseDN).
+			Str("basedn", h.basedn).
 			Interface("src", conn.RemoteAddr()).
 			Msg("BindDN not part of our BaseDN")
 		return ldap.LDAPResultInvalidCredentials, nil
@@ -55,6 +57,7 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	parts := strings.Split(strings.TrimSuffix(bindDN, baseDN), ",")
 	if len(parts) > 2 {
 		h.log.Error().
+			Str("handler", "ocis").
 			Str("binddn", bindDN).
 			Int("numparts", len(parts)).
 			Interface("src", conn.RemoteAddr()).
@@ -73,6 +76,7 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	})
 	if err != nil || len(res.Accounts) == 0 {
 		h.log.Error().
+			Str("handler", "ocis").
 			Str("username", userName).
 			Str("binddn", bindDN).
 			Interface("src", conn.RemoteAddr()).
@@ -82,6 +86,7 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 
 	stats.Frontend.Add("bind_successes", 1)
 	h.log.Debug().
+		Str("handler", "ocis").
 		Str("binddn", bindDN).
 		Interface("src", conn.RemoteAddr()).
 		Msg("Bind success")
@@ -90,11 +95,12 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 
 func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn net.Conn) (ldap.ServerSearchResult, error) {
 	bindDN = strings.ToLower(bindDN)
-	baseDN := strings.ToLower("," + h.cfg.Backend.BaseDN)
+	baseDN := strings.ToLower("," + h.basedn)
 	searchBaseDN := strings.ToLower(searchReq.BaseDN)
 	h.log.Debug().
+		Str("handler", "ocis").
 		Str("binddn", bindDN).
-		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("basedn", h.basedn).
 		Str("filter", searchReq.Filter).
 		Interface("src", conn.RemoteAddr()).
 		Msg("Search request")
@@ -109,12 +115,12 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 	if !strings.HasSuffix(bindDN, baseDN) {
 		return ldap.ServerSearchResult{
 			ResultCode: ldap.LDAPResultInsufficientAccessRights,
-		}, fmt.Errorf("search error: BindDN %s not in our BaseDN %s", bindDN, h.cfg.Backend.BaseDN)
+		}, fmt.Errorf("search error: BindDN %s not in our BaseDN %s", bindDN, h.basedn)
 	}
-	if !strings.HasSuffix(searchBaseDN, h.cfg.Backend.BaseDN) {
+	if !strings.HasSuffix(searchBaseDN, h.basedn) {
 		return ldap.ServerSearchResult{
 			ResultCode: ldap.LDAPResultInsufficientAccessRights,
-		}, fmt.Errorf("search error: search BaseDN %s is not in our BaseDN %s", searchBaseDN, h.cfg.Backend.BaseDN)
+		}, fmt.Errorf("search error: search BaseDN %s is not in our BaseDN %s", searchBaseDN, h.basedn)
 	}
 
 	var qtype queryType = ""
@@ -127,21 +133,23 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		var cf *ber.Packet
 		cf, err = ldap.CompileFilter(searchReq.Filter)
 		if err != nil {
-			h.log.Debug().
+			h.log.Error().
+				Err(err).
+				Str("handler", "ocis").
 				Str("binddn", bindDN).
-				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("basedn", h.basedn).
 				Str("filter", searchReq.Filter).
 				Interface("src", conn.RemoteAddr()).
 				Msg("could not compile filter")
 			return ldap.ServerSearchResult{
 				ResultCode: ldap.LDAPResultOperationsError,
-			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+			}, fmt.Errorf("Search Error: error compiling filter: %s, error: %s", searchReq.Filter, err.Error())
 		}
 		qtype, query, code, err = parseFilter(cf)
 		if err != nil {
 			return ldap.ServerSearchResult{
 				ResultCode: code,
-			}, fmt.Errorf("Search Error: error parsing filter: %s", searchReq.Filter)
+			}, fmt.Errorf("Search Error: error parsing filter: %s, error: %s", searchReq.Filter, err.Error())
 		}
 
 		// check if the searchBaseDN already has a username and add it to the query
@@ -156,8 +164,9 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 
 	entries := []*ldap.Entry{}
 	h.log.Debug().
+		Str("handler", "ocis").
 		Str("binddn", bindDN).
-		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("basedn", h.basedn).
 		Str("filter", searchReq.Filter).
 		Str("qtype", string(qtype)).
 		Str("query", query).
@@ -170,8 +179,9 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		if err != nil {
 			h.log.Error().
 				Err(err).
+				Str("handler", "ocis").
 				Str("binddn", bindDN).
-				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("basedn", h.basedn).
 				Str("filter", searchReq.Filter).
 				Str("query", query).
 				Interface("src", conn.RemoteAddr()).
@@ -179,7 +189,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 
 			return ldap.ServerSearchResult{
 				ResultCode: ldap.LDAPResultOperationsError,
-			}, errors.New("search error: error listing users")
+			}, fmt.Errorf("search error: error listing users")
 		}
 		entries = append(entries, h.mapAccounts(accounts.Accounts)...)
 	case groupsQuery:
@@ -189,8 +199,9 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		if err != nil {
 			h.log.Error().
 				Err(err).
+				Str("handler", "ocis").
 				Str("binddn", bindDN).
-				Str("basedn", h.cfg.Backend.BaseDN).
+				Str("basedn", h.basedn).
 				Str("filter", searchReq.Filter).
 				Str("query", query).
 				Interface("src", conn.RemoteAddr()).
@@ -198,15 +209,17 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 
 			return ldap.ServerSearchResult{
 				ResultCode: ldap.LDAPResultOperationsError,
-			}, errors.New("search error: error listing groups")
+			}, fmt.Errorf("search error: error listing groups")
 		}
 		entries = append(entries, h.mapGroups(groups.Groups)...)
 	}
 
 	stats.Frontend.Add("search_successes", 1)
 	h.log.Debug().
+		Str("handler", "ocis").
+		Int("num_entries", len(entries)).
 		Str("binddn", bindDN).
-		Str("basedn", h.cfg.Backend.BaseDN).
+		Str("basedn", h.basedn).
 		Str("filter", searchReq.Filter).
 		Interface("src", conn.RemoteAddr()).
 		Msg("AP: Search OK")
@@ -254,11 +267,11 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 		}
 
 		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
-			h.cfg.Backend.NameFormat,
+			h.nameFormat,
 			accounts[i].PreferredName,
-			h.cfg.Backend.GroupFormat,
+			h.groupFormat,
 			"users",
-			h.cfg.Backend.BaseDN,
+			h.basedn,
 		)
 		entries = append(entries, &ldap.Entry{DN: dn, Attributes: attrs})
 	}
@@ -284,11 +297,11 @@ func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
 		}
 
 		dn := fmt.Sprintf("%s=%s,%s=%s,%s",
-			h.cfg.Backend.NameFormat,
+			h.nameFormat,
 			groups[i].OnPremisesSamAccountName,
-			h.cfg.Backend.GroupFormat,
+			h.groupFormat,
 			"groups",
-			h.cfg.Backend.BaseDN,
+			h.basedn,
 		)
 
 		memberUids := make([]string, len(groups[i].Members))
@@ -318,9 +331,20 @@ func parseFilter(f *ber.Packet) (queryType, string, ldap.LDAPResultCode, error) 
 	var code ldap.LDAPResultCode
 	var err error
 	switch ldap.FilterMap[f.Tag] {
+	case "Present":
+		if len(f.Children) != 0 {
+			return "", "", ldap.LDAPResultOperationsError, fmt.Errorf("equality match must have no children, got %+v", f)
+		}
+		attribute := strings.ToLower(f.Data.String())
+
+		if attribute == "objectclass" {
+			// TODO implement proper present odata query, for now fall back to listing users
+			return "users", q, code, err
+		}
+		return qtype, q, ldap.LDAPResultUnwillingToPerform, fmt.Errorf("%s filter match for %s not implemented", ldap.FilterMap[f.Tag], attribute)
 	case "Equality Match":
 		if len(f.Children) != 2 {
-			return "", "", ldap.LDAPResultOperationsError, errors.New("equality match must have exactly two children")
+			return "", "", ldap.LDAPResultOperationsError, fmt.Errorf("equality match must have exactly two children")
 		}
 		attribute := strings.ToLower(f.Children[0].Value.(string))
 		value := f.Children[1].Value.(string)
@@ -333,6 +357,9 @@ func parseFilter(f *ber.Packet) (queryType, string, ldap.LDAPResultCode, error) 
 				qtype = usersQuery
 			case "posixgroup", "groups":
 				qtype = groupsQuery
+			case "*":
+				// TODO not implemented yet
+				qtype = usersQuery
 			default:
 				qtype = ""
 			}
@@ -367,7 +394,7 @@ func parseFilter(f *ber.Packet) (queryType, string, ldap.LDAPResultCode, error) 
 		return qtype, q, code, err
 	case "Substrings":
 		if len(f.Children) != 2 {
-			return "", "", ldap.LDAPResultOperationsError, errors.New("substrings filter must have exactly two children")
+			return "", "", ldap.LDAPResultOperationsError, fmt.Errorf("substrings filter must have exactly two children")
 		}
 		attribute := strings.ToLower(f.Children[0].Value.(string))
 		if len(f.Children[1].Children) != 1 {
@@ -424,7 +451,7 @@ func parseFilter(f *ber.Packet) (queryType, string, ldap.LDAPResultCode, error) 
 		return qtype, strings.Join(subQueries, " "+strings.ToLower(ldap.FilterMap[f.Tag])+" "), ldap.LDAPResultSuccess, nil
 	case "Not":
 		if len(f.Children) != 1 {
-			return "", "", ldap.LDAPResultOperationsError, errors.New("not filter match must have exactly one child")
+			return "", "", ldap.LDAPResultOperationsError, fmt.Errorf("not filter match must have exactly one child")
 		}
 		qtype, subQuery, code, err := parseFilter(f.Children[0])
 		if err != nil {
@@ -448,15 +475,32 @@ func (h ocisHandler) Close(boundDN string, conn net.Conn) error {
 	return nil
 }
 
+// Add is not yet supported for the ocis backend
+func (h ocisHandler) Add(boundDN string, req ldap.AddRequest, conn net.Conn) (result ldap.LDAPResultCode, err error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
+// Modify is not yet supported for the ocis backend
+func (h ocisHandler) Modify(boundDN string, req ldap.ModifyRequest, conn net.Conn) (result ldap.LDAPResultCode, err error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
+// Delete is not yet supported for the ocis backend
+func (h ocisHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (result ldap.LDAPResultCode, err error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
 // NewOCISHandler implements a glauth backend with ocis-accounts as the datasource
 func NewOCISHandler(opts ...Option) handler.Handler {
 	options := newOptions(opts...)
 
 	handler := ocisHandler{
-		log: options.Logger,
-		cfg: options.Config,
-		as:  options.AccountsService,
-		gs:  options.GroupsService,
+		log:         options.Logger,
+		as:          options.AccountsService,
+		gs:          options.GroupsService,
+		basedn:      options.BaseDN,
+		nameFormat:  options.NameFormat,
+		groupFormat: options.GroupFormat,
 	}
 	return handler
 }
