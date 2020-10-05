@@ -54,3 +54,27 @@ func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) str
 
 	return rootDir
 }
+
+func WriteIndexTestDataCS3(t *testing.T, m map[string][]interface{}, pk string) string {
+	rootDir := "/var/tmp/ocis/root/data"
+	for dirName := range m {
+		fileTypePath := path.Join(rootDir, dirName)
+
+		if err := os.MkdirAll(fileTypePath, 0777); err != nil {
+			t.Fatal(err)
+		}
+		for _, u := range m[dirName] {
+			data, err := json.Marshal(u)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			pkVal := ValueOf(u, pk)
+			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
+	return rootDir
+}
