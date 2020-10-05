@@ -14,6 +14,7 @@ import (
 	"path"
 	"fmt"
 	"context"
+	"path/filepath"
 	"strings"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 )
@@ -32,9 +33,7 @@ type NonUnique struct {
 	cs3conf *Config
 }
 
-// NewNonUniqueIndex instantiates a new UniqueIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
-//
+// NewNonUniqueIndex instantiates a new NonUniqueIndex instance.
 // /var/tmp/ocis-accounts/index.cs3/Pets/Bro*
 // ├── Brown/
 // │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
@@ -95,17 +94,42 @@ func (idx *NonUnique) Init() error {
 	return nil
 }
 
-func (idx NonUnique) Lookup(v string) ([]string, error) {
-	panic("implement me")
+func (idx *NonUnique) Lookup(v string) ([]string, error) {
+	var matches = make([]string, 0)
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir, v)},
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range res.Infos {
+		matches = append(matches, path.Base(info.Path))
+	}
+
+	return matches, nil
 }
 
-func (idx NonUnique) Add(id, v string) (string, error) {
-	newName := singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir, v))
-	if err := idx.makeDirIfNotExists(context.TODO(), newName); err != nil {
+func (idx *NonUnique) Add(id, v string) (string, error) {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
 		return "", err
-
 	}
-	if err := idx.createSymlink(id, path.Join(newName, id)); err != nil {
+
+	newName := path.Join(idx.indexRootDir, v)
+	if err := idx.makeDirIfNotExists(ctx, newName); err != nil {
+		return "", err
+	}
+
+	if err := idx.createSymlink(id, singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, newName, id))); err != nil {
 		if os.IsExist(err) {
 			return "", &idxerrs.AlreadyExistsErr{idx.typeName, idx.indexBy, v}
 		}
@@ -116,28 +140,91 @@ func (idx NonUnique) Add(id, v string) (string, error) {
 	return newName, nil
 }
 
-func (idx NonUnique) Remove(id string, v string) error {
-	panic("implement me")
+func (idx *NonUnique) Remove(id string, v string) error {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+
+	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
+	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: deletePath},
+		},
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
+		return &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+	}
+
+	return nil
 }
 
-func (idx NonUnique) Update(id, oldV, newV string) error {
-	panic("implement me")
+func (idx *NonUnique) Update(id, oldV, newV string) error {
+	if err := idx.Remove(id, oldV); err != nil {
+		return err
+	}
+
+	if _, err := idx.Add(id, newV); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (idx NonUnique) Search(pattern string) ([]string, error) {
-	panic("implement me")
+func (idx *NonUnique) Search(pattern string) ([]string, error) {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	foldersMatched := make([]string, 0)
+	matches := make([]string, 0)
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+		},
+	})
+
+	for _, i := range res.Infos {
+		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
+			if err != nil {
+				return nil, err
+			}
+
+			foldersMatched = append(foldersMatched, i.Path)
+		}
+	}
+
+	for i := range foldersMatched {
+		res, _ := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{Path: foldersMatched[i]},
+			},
+		})
+
+		for _, info := range res.Infos {
+			matches = append(matches, path.Base(info.Path))
+		}
+	}
+
+	return matches, nil
 }
 
-func (idx NonUnique) IndexBy() string {
-	panic("implement me")
+func (idx *NonUnique) IndexBy() string {
+	return idx.indexBy
 }
 
-func (idx NonUnique) TypeName() string {
-	panic("implement me")
+func (idx *NonUnique) TypeName() string {
+	return idx.typeName
 }
 
-func (idx NonUnique) FilesDir() string {
-	panic("implement me")
+func (idx *NonUnique) FilesDir() string {
+	return idx.filesDir
 }
 
 func (idx *NonUnique) authenticate(ctx context.Context) (token string, err error) {
@@ -221,4 +308,13 @@ func (idx *NonUnique) resolveSymlink(name string) (string, error) {
 
 	}
 	return string(b), err
+}
+
+func (idx *NonUnique) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
+	t, err := idx.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	return ctx, nil
 }
