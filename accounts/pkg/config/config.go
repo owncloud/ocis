@@ -61,6 +61,32 @@ type Log struct {
 	Color  bool
 }
 
+// Repo defines which storage implementation is to be used.
+type Repo struct {
+	Disk Disk
+	CS3  CS3
+}
+
+// Disk is the local disk implementation of the storage.
+type Disk struct {
+	Path string
+}
+
+// CS3 is the cs3 implementation of the storage.
+type CS3 struct {
+	ProviderAddr string
+	DataURL      string
+	DataPrefix   string
+}
+
+// ServiceUser defines the user required for EOS
+type ServiceUser struct {
+	UUID 	 string
+	Username string
+	UID      int64
+	GID      int64
+}
+
 // Config merges all Account config parameters.
 type Config struct {
 	LDAP         LDAP
@@ -70,6 +96,8 @@ type Config struct {
 	Asset        Asset
 	Log          Log
 	TokenManager TokenManager
+	Repo         Repo
+	ServiceUser  ServiceUser
 }
 
 // New returns a new config.

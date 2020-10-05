@@ -2,10 +2,7 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"regexp"
 	"sync"
@@ -19,6 +16,7 @@ import (
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/provider"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
@@ -37,33 +35,11 @@ import (
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
 
-func (s Service) indexAccounts(path string) (err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not open accounts folder")
-		return
-	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not list accounts folder")
-		return
-	}
-	for _, file := range list {
-		err = s.indexAccount(file.Name())
-		if err != nil {
-			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
-		}
-	}
-
-	return
-}
-
 func (s Service) indexAccount(id string) error {
 	a := &proto.BleveAccount{
 		BleveType: "account",
 	}
-	if err := s.loadAccount(id, &a.Account); err != nil {
+	if err := s.repo.LoadAccount(context.Background(), id, &a.Account); err != nil {
 		s.log.Error().Err(err).Str("account", id).Msg("could not load account")
 		return err
 	}
@@ -79,37 +55,6 @@ func (s Service) indexAccount(id string) error {
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
 var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
 
-func (s Service) loadAccount(id string, a *proto.Account) (err error) {
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
-	var data []byte
-	if data, err = ioutil.ReadFile(path); err != nil {
-		return merrors.NotFound(s.id, "could not read account: %v", err.Error())
-	}
-
-	if err = json.Unmarshal(data, a); err != nil {
-		return merrors.InternalServerError(s.id, "could not unmarshal account: %v", err.Error())
-	}
-	return
-}
-
-func (s Service) writeAccount(a *proto.Account) (err error) {
-	// leave only the group id
-	s.deflateMemberOf(a)
-
-	var bytes []byte
-	if bytes, err = json.Marshal(a); err != nil {
-		return merrors.InternalServerError(s.id, "could not marshal account: %v", err.Error())
-	}
-
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", a.Id)
-
-	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
-		return merrors.InternalServerError(s.id, "could not write account: %v", err.Error())
-	}
-	return
-}
-
 func (s Service) expandMemberOf(a *proto.Account) {
 	if a == nil {
 		return
@@ -118,7 +63,7 @@ func (s Service) expandMemberOf(a *proto.Account) {
 	for i := range a.MemberOf {
 		g := &proto.Group{}
 		// TODO resolve by name, when a create or update is issued they may not have an id? fall back to searching the group id in the index?
-		if err := s.loadGroup(a.MemberOf[i].Id, g); err == nil {
+		if err := s.repo.LoadGroup(context.Background(), a.MemberOf[i].Id, g); err == nil {
 			g.Members = nil // always hide members when expanding
 			expanded = append(expanded, g)
 		} else {
@@ -127,23 +72,6 @@ func (s Service) expandMemberOf(a *proto.Account) {
 		}
 	}
 	a.MemberOf = expanded
-}
-
-// deflateMemberOf replaces the groups of a user with an instance that only contains the id
-func (s Service) deflateMemberOf(a *proto.Account) {
-	if a == nil {
-		return
-	}
-	deflated := []*proto.Group{}
-	for i := range a.MemberOf {
-		if a.MemberOf[i].Id != "" {
-			deflated = append(deflated, &proto.Group{Id: a.MemberOf[i].Id})
-		} else {
-			// TODO fetch and use an id when group only has a name but no id
-			s.log.Error().Str("id", a.Id).Interface("group", a.MemberOf[i]).Msg("resolving groups by name is not implemented yet")
-		}
-	}
-	a.MemberOf = deflated
 }
 
 func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
@@ -173,6 +101,36 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	return s.RoleManager.FindPermissionByID(ctx, roleIDs, AccountManagementPermissionID) != nil
 }
 
+// serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
+func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
+	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
+		err := s.index.Index(s.Config.ServiceUser.UUID, &proto.BleveAccount{
+			BleveType: "account",
+			Account:   s.getInMemoryServiceUser(),
+		})
+		if err != nil {
+			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
+		} else {
+			return func() {
+				_ = s.index.Delete(s.Config.ServiceUser.UUID)
+			}
+		}
+	}
+	return func() {}
+}
+
+func (s Service) getInMemoryServiceUser() proto.Account {
+	return proto.Account{
+		AccountEnabled:           true,
+		Id:                       s.Config.ServiceUser.UUID,
+		PreferredName:            s.Config.ServiceUser.Username,
+		OnPremisesSamAccountName: s.Config.ServiceUser.Username,
+		DisplayName:              s.Config.ServiceUser.Username,
+		UidNumber:                s.Config.ServiceUser.UID,
+		GidNumber:                s.Config.ServiceUser.GID,
+	}
+}
+
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
@@ -183,6 +141,9 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	accLock.Lock()
 	defer accLock.Unlock()
 	var password string
+
+	teardownServiceUser := s.serviceUserToIndex()
+	defer teardownServiceUser()
 
 	// check if this looks like an auth request
 	match := authQuery.FindStringSubmatch(in.Query)
@@ -233,7 +194,10 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	for _, hit := range searchResult.Hits {
 		a := &proto.Account{}
-		if err = s.loadAccount(hit.ID, a); err != nil {
+		if hit.ID == s.Config.ServiceUser.UUID {
+			acc := s.getInMemoryServiceUser()
+			a = &acc
+		} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
 			s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
 			continue
 		}
@@ -281,9 +245,13 @@ func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, ou
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	if err = s.loadAccount(id, out); err != nil {
+	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
 	s.debugLogAccount(out).Msg("found account")
@@ -346,10 +314,10 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	// TODO groups should be ignored during create, use groups.AddMember? return error?
 
 	// write and index account - note: don't do anything else in between!
-	if err = s.writeAccount(acc); err != nil {
+	if err = s.repo.WriteAccount(ctx, acc); err != nil {
 		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
 		s.debugLogAccount(acc).Msg("could not persist new account")
-		return
+		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
 	if err = s.indexAccount(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
@@ -407,9 +375,14 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
-	if err = s.loadAccount(id, out); err != nil {
+	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
+
 	}
 
 	t := time.Now()
@@ -461,9 +434,9 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
 
-	if err = s.writeAccount(out); err != nil {
+	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
-		return
+		return merrors.InternalServerError(s.id, "could not persist updated account: %v", err.Error())
 	}
 
 	if err = s.indexAccount(id); err != nil {
@@ -510,12 +483,15 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
 
 	a := &proto.Account{}
-	if err = s.loadAccount(id, a); err != nil {
+	if err = s.repo.LoadAccount(ctx, id, a); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
 	// delete member relationship in groups
@@ -529,13 +505,17 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		}
 	}
 
-	if err = os.Remove(path); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account")
+	if err = s.repo.DeleteAccount(ctx, id); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "account not found: %v", err.Error())
+		}
+
+		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account")
 		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
 	}
 
 	if err = s.index.Delete(id); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove account from index")
+		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account from index")
 		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
 	}
 

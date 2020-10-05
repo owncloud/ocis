@@ -5,6 +5,8 @@ go 1.13
 require (
 	github.com/CiscoM31/godata v0.0.0-20191007193734-c2c4ebb1b415
 	github.com/blevesearch/bleve v1.0.9
+	github.com/cs3org/go-cs3apis v0.0.0-20200730121022-c4f3d4f7ddfd
+	github.com/cs3org/reva v1.1.0
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 // indirect
 	github.com/cznic/strutil v0.0.0-20181122101858-275e90344537 // indirect
@@ -32,6 +34,7 @@ require (
 	github.com/tredoe/osutil v1.0.5
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
+	google.golang.org/grpc v1.31.0
 	google.golang.org/protobuf v1.25.0
 )
 

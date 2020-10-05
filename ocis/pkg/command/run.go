@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"github.com/owncloud/ocis/ocis/pkg/runtime"
 	"log"
 	"net"
 	"net/rpc"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
-	"github.com/refs/pman/pkg/process"
 )
 
 // RunCommand is the entrypoint for the run command.
@@ -40,13 +40,7 @@ func RunCommand(cfg *config.Config) *cli.Command {
 				log.Fatal("dialing:", err)
 			}
 
-			proc := process.NewProcEntry(os.Args[2], os.Environ(), []string{os.Args[2]}...)
-			var res int
-
-			if err := client.Call("Service.Start", proc, &res); err != nil {
-				log.Fatal(err)
-			}
-
+			res := runtime.RunService(client, os.Args[2])
 			fmt.Println(res)
 			return nil
 		},
