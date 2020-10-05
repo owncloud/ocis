@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -118,7 +117,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", accountsFolder, id)},
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder, id)},
 		},
 	})
 
@@ -192,7 +191,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%s/%s", groupsFolder, id)},
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder, id)},
 		},
 	})
 
@@ -229,7 +228,7 @@ func (r CS3Repo) groupURL(id string) string {
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%v", folder)},
+		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
 	}
 
 	resp, err := r.storageProvider.Stat(ctx, &provider.StatRequest{
