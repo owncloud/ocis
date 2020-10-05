@@ -48,7 +48,7 @@ func NewNonUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string, cfg *Co
 		typeName:     typeName,
 		filesDir:     filesDir,
 		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"unique", typeName, indexBy}, ".")),
+		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"non_unique", typeName, indexBy}, ".")),
 		cs3conf:      cfg,
 		dataProvider: dataProviderClient{
 			client: http.Client{
