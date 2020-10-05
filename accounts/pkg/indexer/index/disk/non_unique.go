@@ -56,7 +56,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	fi, err := ioutil.ReadDir(searchPath)
 	if os.IsNotExist(err) {
-		return []string{}, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+		return []string{}, &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
 	if err != nil {
@@ -69,7 +69,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	}
 
 	if len(ids) == 0 {
-		return []string{}, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+		return []string{}, &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
 	return ids, nil
@@ -85,7 +85,7 @@ func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 
 	err := os.Symlink(oldName, newName)
 	if errors.Is(err, os.ErrExist) {
-		return "", &idxerrs.AlreadyExistsErr{idx.typeName, idx.indexBy, v}
+		return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
 	return newName, err
@@ -114,7 +114,7 @@ func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
 	newPath := path.Join(newDir, id)
 
 	if _, err = os.Stat(oldPath); os.IsNotExist(err) {
-		return &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, oldV}
+		return &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: oldV}
 	}
 
 	if err != nil {
@@ -152,7 +152,7 @@ func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
 	}
 
 	if len(paths) == 0 {
-		return nil, &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, pattern}
+		return nil, &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: pattern}
 	}
 
 	return paths, nil

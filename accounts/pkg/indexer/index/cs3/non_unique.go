@@ -1,22 +1,22 @@
 package cs3
 
 import (
+	"context"
+	"fmt"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"google.golang.org/grpc/metadata"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
-	"fmt"
-	"context"
 	"path/filepath"
 	"strings"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
 )
 
 type NonUnique struct {
@@ -131,7 +131,7 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 
 	if err := idx.createSymlink(id, singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, newName, id))); err != nil {
 		if os.IsExist(err) {
-			return "", &idxerrs.AlreadyExistsErr{idx.typeName, idx.indexBy, v}
+			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}
 
 		return "", err
@@ -158,7 +158,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	}
 
 	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
-		return &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+		return &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
 	return nil
@@ -189,6 +189,10 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
 		},
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, i := range res.Infos {
 		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {

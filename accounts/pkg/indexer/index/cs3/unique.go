@@ -102,7 +102,7 @@ func (idx *Unique) Add(id, v string) (string, error) {
 	newName := idx.indexURL(v)
 	if err := idx.createSymlink(id, newName); err != nil {
 		if os.IsExist(err) {
-			return "", &idxerrs.AlreadyExistsErr{idx.typeName, idx.indexBy, v}
+			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}
 
 		return "", err
@@ -116,7 +116,7 @@ func (idx *Unique) Lookup(v string) ([]string, error) {
 	oldname, err := idx.resolveSymlink(searchPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+			err = &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}
 
 		return nil, err
@@ -131,7 +131,7 @@ func (idx *Unique) Remove(id string, v string) error {
 	_, err := idx.resolveSymlink(searchPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = &idxerrs.NotFoundErr{idx.typeName, idx.indexBy, v}
+			err = &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}
 
 		return err
@@ -189,9 +189,13 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 		},
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	searchPath := singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir))
 
-	matches := []string{}
+	matches := make([]string, 0)
 	for _, i := range res.GetInfos() {
 		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
 			if err != nil {
