@@ -51,6 +51,7 @@ func NewNonUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string, cfg *Co
 		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"non_unique", typeName, indexBy}, ".")),
 		cs3conf:      cfg,
 		dataProvider: dataProviderClient{
+			baseURL: singleJoiningSlash(cfg.DataURL, cfg.DataPrefix),
 			client: http.Client{
 				Transport: http.DefaultTransport,
 			},
@@ -129,7 +130,7 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 		return "", err
 	}
 
-	if err := idx.createSymlink(id, singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, newName, id))); err != nil {
+	if err := idx.createSymlink(id, path.Join(newName, id)); err != nil {
 		if os.IsExist(err) {
 			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}

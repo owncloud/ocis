@@ -11,7 +11,6 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"google.golang.org/grpc/metadata"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -54,6 +53,7 @@ func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string, cfg *Confi
 		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"unique", typeName, indexBy}, ".")),
 		cs3conf:      cfg,
 		dataProvider: dataProviderClient{
+			baseURL: singleJoiningSlash(cfg.DataURL, cfg.DataPrefix),
 			client: http.Client{
 				Transport: http.DefaultTransport,
 			},
@@ -99,7 +99,7 @@ func (idx *Unique) Init() error {
 
 // Add adds a value to the index, returns the path to the root-document
 func (idx *Unique) Add(id, v string) (string, error) {
-	newName := idx.indexURL(v)
+	newName := path.Join(idx.indexRootDir, v)
 	if err := idx.createSymlink(id, newName); err != nil {
 		if os.IsExist(err) {
 			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
@@ -112,7 +112,7 @@ func (idx *Unique) Add(id, v string) (string, error) {
 }
 
 func (idx *Unique) Lookup(v string) ([]string, error) {
-	searchPath := singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir, v))
+	searchPath := path.Join(idx.indexRootDir, v)
 	oldname, err := idx.resolveSymlink(searchPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -127,7 +127,7 @@ func (idx *Unique) Lookup(v string) ([]string, error) {
 
 // 97d28b57
 func (idx *Unique) Remove(id string, v string) error {
-	searchPath := singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir, v))
+	searchPath := path.Join(idx.indexRootDir, v)
 	_, err := idx.resolveSymlink(searchPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -193,8 +193,7 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 		return nil, err
 	}
 
-	searchPath := singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir))
-
+	searchPath := idx.indexRootDir
 	matches := make([]string, 0)
 	for _, i := range res.GetInfos() {
 		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
@@ -202,7 +201,7 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 				return nil, err
 			}
 
-			oldPath, err := idx.resolveSymlink(singleJoiningSlash(searchPath, path.Base(i.Path)))
+			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Path)))
 			if err != nil {
 				return nil, err
 			}
@@ -298,23 +297,6 @@ func (idx *Unique) makeDirIfNotExists(ctx context.Context, folder string) error 
 	return nil
 }
 
-func (idx *Unique) indexURL(id string) string {
-	return singleJoiningSlash(idx.cs3conf.DataURL, path.Join(idx.cs3conf.DataPrefix, idx.indexRootDir, id))
-}
-
-// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
-}
-
 func (idx *Unique) authenticate(ctx context.Context) (token string, err error) {
 	u := &user.User{
 		Id:     &user.UserId{},
@@ -324,28 +306,4 @@ func (idx *Unique) authenticate(ctx context.Context) (token string, err error) {
 		u.Id.OpaqueId = idx.cs3conf.ServiceUserUUID
 	}
 	return idx.tokenManager.MintToken(ctx, u)
-}
-
-type dataProviderClient struct {
-	client http.Client
-}
-
-func (d dataProviderClient) put(url string, body io.Reader, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPut, url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("x-access-token", token)
-	return d.client.Do(req)
-}
-
-func (d dataProviderClient) get(url string, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("x-access-token", token)
-	return d.client.Do(req)
 }
