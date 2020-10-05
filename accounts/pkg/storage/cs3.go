@@ -92,10 +92,12 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return &notFoundErr{"account", id}
 	}
 
-	defer resp.Body.Close()
 	dec := json.NewDecoder(resp.Body)
 	var b []byte
 	if err = dec.Decode(&b); err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
 		return err
 	}
 	return json.Unmarshal(b, &a)
@@ -165,10 +167,12 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return &notFoundErr{"group", id}
 	}
 
-	defer resp.Body.Close()
 	dec := json.NewDecoder(resp.Body)
 	var b []byte
 	if err = dec.Decode(&b); err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
 		return err
 	}
 	return json.Unmarshal(b, &g)
