@@ -65,7 +65,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "user-json-file",
-			Value:       "/var/tmp/storage/shares.json",
+			Value:       "/var/tmp/ocis/shares.json",
 			Usage:       "file used to persist shares for the UserShareProvider",
 			EnvVars:     []string{"STORAGE_SHARING_USER_JSON_FILE"},
 			Destination: &cfg.Reva.Sharing.UserJSONFile,

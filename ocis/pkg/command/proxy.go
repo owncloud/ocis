@@ -48,8 +48,8 @@ func configureProxy(cfg *config.Config) *svcconfig.Config {
 		cfg.Proxy.Tracing.Service = cfg.Tracing.Service
 	}
 
-	if cfg.Reva.Reva.JWTSecret != "" {
-		cfg.Proxy.TokenManager.JWTSecret = cfg.Reva.Reva.JWTSecret
+	if cfg.Storage.Reva.JWTSecret != "" {
+		cfg.Proxy.TokenManager.JWTSecret = cfg.Storage.Reva.JWTSecret
 	}
 
 	return cfg.Proxy

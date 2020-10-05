@@ -4,12 +4,12 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/command"
 	svcconfig "github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
 // SettingsCommand is the entry point for the settings command.
@@ -48,8 +48,8 @@ func configureSettings(cfg *config.Config) *svcconfig.Config {
 		cfg.Settings.Tracing.Service = cfg.Tracing.Service
 	}
 
-	if cfg.Reva.Reva.JWTSecret != "" {
-		cfg.Settings.TokenManager.JWTSecret = cfg.Reva.Reva.JWTSecret
+	if cfg.Storage.Reva.JWTSecret != "" {
+		cfg.Settings.TokenManager.JWTSecret = cfg.Storage.Reva.JWTSecret
 	}
 
 	return cfg.Settings

@@ -3,7 +3,7 @@ title: "Configuration"
 date: "{{ date "2006-01-02T15:04:05-0700" now }}"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: configuration.md
 ---
 {{- define "options"}}
@@ -11,7 +11,7 @@ geekdocFilePath: configuration.md
 {{ range $opt := first . }}{{ with list $fnName $opt -}}
 {{ $o := last . -}}
 {{ if eq $o.FnName $fnName -}}
---{{ $o.Name }} | ${{ index $o.Env 0 }}  
+--{{ $o.Name }} | ${{ index $o.Env 0 }}
 : {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
 {{ end -}}
@@ -66,7 +66,7 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 {{ end -}}
 {{- range $com := .Commands }}{{ with (list $options $com) -}}
 {{- $c := last . }}
-{{- if eq $c.Name "server" "health" -}}
+{{- if eq $c.Name "server" "health" "kill" "list" "run" -}}
 {{- if ne $c.FnName "Simple" -}}
 ### ocis {{ $c.Name }}
 
@@ -84,7 +84,7 @@ Usage: `ocis {{ $c.Name }} [command options] [arguments...]`
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
 {{ range $com := .Commands }}{{ with $com -}}
-{{ if and (ne .Name "health") (ne .Name "server") (ne .Name "ocis") -}}
+{{ if and (ne .Name "health") (ne .Name "server") (ne .Name "ocis") (ne .Name "kill") (ne .Name "list") (ne .Name "run")   -}}
 #### ocis {{ .Name }}
 
 {{ .Usage }}
