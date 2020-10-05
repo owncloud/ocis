@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -92,9 +93,8 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return &notFoundErr{"account", id}
 	}
 
-	dec := json.NewDecoder(resp.Body)
-	var b []byte
-	if err = dec.Decode(&b); err != nil {
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return err
 	}
 	if err = resp.Body.Close(); err != nil {
@@ -167,9 +167,8 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return &notFoundErr{"group", id}
 	}
 
-	dec := json.NewDecoder(resp.Body)
-	var b []byte
-	if err = dec.Decode(&b); err != nil {
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return err
 	}
 	if err = resp.Body.Close(); err != nil {
