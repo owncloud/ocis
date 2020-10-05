@@ -85,19 +85,20 @@ type Reva struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File           string
-	Log            Log
-	Debug          Debug
-	HTTP           HTTP
-	Service        Service
-	Tracing        Tracing
-	Asset          Asset
-	Policies       []Policy
-	OIDC           OIDC
-	TokenManager   TokenManager
-	PolicySelector *PolicySelector `mapstructure:"policy_selector"`
-	Reva           Reva
-	PreSignedURL   PreSignedURL
+	File                  string
+	Log                   Log
+	Debug                 Debug
+	HTTP                  HTTP
+	Service               Service
+	Tracing               Tracing
+	Asset                 Asset
+	Policies              []Policy
+	OIDC                  OIDC
+	TokenManager          TokenManager
+	PolicySelector        *PolicySelector `mapstructure:"policy_selector"`
+	Reva                  Reva
+	PreSignedURL          PreSignedURL
+	AutoprovisionAccounts bool
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
