@@ -17,7 +17,7 @@ func Execute() error {
 	cfg := config.New()
 
 	app := &cli.App{
-		Name:     "ocis-reva",
+		Name:     "storage",
 		Version:  version.String,
 		Usage:    "Example service for Reva/oCIS",
 		Compiled: version.Compiled(),
@@ -35,7 +35,7 @@ func Execute() error {
 			logger := NewLogger(cfg)
 
 			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-			viper.SetEnvPrefix("REVA")
+			viper.SetEnvPrefix("STORAGE")
 			viper.AutomaticEnv()
 
 			if c.IsSet("config-file") {

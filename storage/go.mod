@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis/ocis-reva
+module github.com/owncloud/ocis/storage
 
 go 1.13
 

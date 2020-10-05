@@ -1,7 +1,7 @@
 */coverage.out
 
-/ocis/bin
-/ocis/dist
+/**/bin
+/**/dist
 /hugo
 *.key
 *crt
