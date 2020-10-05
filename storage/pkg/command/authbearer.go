@@ -11,16 +11,16 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
-	"github.com/owncloud/ocis/ocis-reva/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
 func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
-		Usage: "Start reva authprovider for bearer auth",
+		Usage: "Start authprovider for bearer auth",
 		Flags: flagset.AuthBearerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
@@ -35,17 +35,17 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				case "agent":
 					logger.Error().
 						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+						Msg("Storage only supports the jaeger tracing backend")
 
 				case "jaeger":
 					logger.Info().
 						Str("type", t).
-						Msg("configuring reva to use the jaeger tracing backend")
+						Msg("configuring storage to use the jaeger tracing backend")
 
 				case "zipkin":
 					logger.Error().
 						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+						Msg("Storage only supports the jaeger tracing backend")
 
 				default:
 					logger.Warn().

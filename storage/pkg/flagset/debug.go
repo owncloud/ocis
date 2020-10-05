@@ -2,7 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
 // DebugWithConfig applies common debug config cfg to the flagset
@@ -12,19 +12,19 @@ func DebugWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "debug-token",
 			Value:       "",
 			Usage:       "Token to grant metrics access",
-			EnvVars:     []string{"REVA_DEBUG_TOKEN"},
+			EnvVars:     []string{"STORAGE_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
 		},
 		&cli.BoolFlag{
 			Name:        "debug-pprof",
 			Usage:       "Enable pprof debugging",
-			EnvVars:     []string{"REVA_DEBUG_PPROF"},
+			EnvVars:     []string{"STORAGE_DEBUG_PPROF"},
 			Destination: &cfg.Debug.Pprof,
 		},
 		&cli.BoolFlag{
 			Name:        "debug-zpages",
 			Usage:       "Enable zpages debugging",
-			EnvVars:     []string{"REVA_DEBUG_ZPAGES"},
+			EnvVars:     []string{"STORAGE_DEBUG_ZPAGES"},
 			Destination: &cfg.Debug.Zpages,
 		},
 	}

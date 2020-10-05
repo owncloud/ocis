@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocis-reva
+NAME := storage
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist

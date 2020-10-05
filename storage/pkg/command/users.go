@@ -11,16 +11,16 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
-	"github.com/owncloud/ocis/ocis-reva/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
 // Users is the entrypoint for the sharing command.
 func Users(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "users",
-		Usage: "Start reva users service",
+		Usage: "Start users service",
 		Flags: flagset.UsersWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Users.Services = c.StringSlice("service")
@@ -40,7 +40,7 @@ func Users(cfg *config.Config) *cli.Command {
 				case "jaeger":
 					logger.Info().
 						Str("type", t).
-						Msg("configuring reva to use the jaeger tracing backend")
+						Msg("configuring storage to use the jaeger tracing backend")
 
 				case "zipkin":
 					logger.Error().

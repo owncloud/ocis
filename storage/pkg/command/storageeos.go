@@ -11,16 +11,16 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
-	"github.com/owncloud/ocis/ocis-reva/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
 // StorageEOS is the entrypoint for the storage-eos command.
 func StorageEOS(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-eos",
-		Usage: "Start reva storage-eos service",
+		Usage: "Start storage-eos service",
 		Flags: flagset.StorageEOSWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.StorageEOS.Services = c.StringSlice("service")
@@ -35,17 +35,17 @@ func StorageEOS(cfg *config.Config) *cli.Command {
 				case "agent":
 					logger.Error().
 						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+						Msg("Storage only supports the jaeger tracing backend")
 
 				case "jaeger":
 					logger.Info().
 						Str("type", t).
-						Msg("configuring reva to use the jaeger tracing backend")
+						Msg("configuring storage to use the jaeger tracing backend")
 
 				case "zipkin":
 					logger.Error().
 						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+						Msg("Storage only supports the jaeger tracing backend")
 
 				default:
 					logger.Warn().

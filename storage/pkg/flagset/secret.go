@@ -2,7 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
 // SecretWithConfig applies cfg to the root flagset
@@ -12,7 +12,7 @@ func SecretWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Shared jwt secret for reva service communication",
-			EnvVars:     []string{"REVA_JWT_SECRET"},
+			EnvVars:     []string{"STORAGE_JWT_SECRET"},
 			Destination: &cfg.Reva.JWTSecret,
 		},
 	}

@@ -13,16 +13,16 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
-	"github.com/owncloud/ocis/ocis-reva/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
 // Frontend is the entrypoint for the frontend command.
 func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
-		Usage: "Start reva frontend service",
+		Usage: "Start frontend service",
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
@@ -42,7 +42,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				case "jaeger":
 					logger.Info().
 						Str("type", t).
-						Msg("configuring reva to use the jaeger tracing backend")
+						Msg("configuring storage to use the jaeger tracing backend")
 
 				case "zipkin":
 					logger.Error().
@@ -127,7 +127,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 							},
 							"ocdav": map[string]interface{}{
 								"prefix":           cfg.Reva.Frontend.OCDavPrefix,
-								"chunk_folder":     "/var/tmp/reva/chunks",
+								"chunk_folder":     "/var/tmp/ocis/chunks",
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 								"timeout":          86400,

@@ -6,20 +6,20 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-reva/pkg/config"
-	"github.com/owncloud/ocis/ocis-reva/pkg/flagset"
-	"github.com/owncloud/ocis/ocis-reva/pkg/version"
+	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/owncloud/ocis/storage/pkg/version"
 	"github.com/spf13/viper"
 )
 
-// Execute is the entry point for the ocis-reva command.
+// Execute is the entry point for the storage command.
 func Execute() error {
 	cfg := config.New()
 
 	app := &cli.App{
 		Name:     "storage",
 		Version:  version.String,
-		Usage:    "Example service for Reva/oCIS",
+		Usage:    "Storage service for oCIS",
 		Compiled: version.Compiled(),
 
 		Authors: []*cli.Author{
@@ -41,7 +41,7 @@ func Execute() error {
 			if c.IsSet("config-file") {
 				viper.SetConfigFile(c.String("config-file"))
 			} else {
-				viper.SetConfigName("reva")
+				viper.SetConfigName("storage")
 
 				viper.AddConfigPath("/etc/ocis")
 				viper.AddConfigPath("$HOME/.ocis")
@@ -109,7 +109,7 @@ func Execute() error {
 // NewLogger initializes a service-specific logger instance.
 func NewLogger(cfg *config.Config) log.Logger {
 	return log.NewLogger(
-		log.Name("reva"),
+		log.Name("storage"),
 		log.Level(cfg.Log.Level),
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
