@@ -2,18 +2,18 @@
 title: "Storages"
 date: 2020-04-27T18:46:00+01:00
 weight: 37
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: storages.md
 ---
 
 ## Storage commands
 
-`ocis-reva` has multiple storage provider commands to preconfigure different default configurations for the reva *storage provider* service. While you could rerun `ocis-reva storage-oc` multiple times with different flags to get multiple instances we are giving the different commands the necessary default configuration to allow the `ocis` binary to simply start them and not deal with configuration.
+`storage` has multiple storage provider commands to preconfigure different default configurations for the reva *storage provider* service. While you could rerun `storage storage-oc` multiple times with different flags to get multiple instances we are giving the different commands the necessary default configuration to allow the `ocis` binary to simply start them and not deal with configuration.
 
 ## Storage providers
 
-To manage the file tree ocis uses reva *storage providers* that are accessing the underlying storage using a *storage driver*. The driver can be used to change the implementation of a storage aspect to better reflect the actual underlying storage capabilities. As an example a move operation on a POSIX filesystem ([theoretically](https://danluu.com/deconstruct-files/)) is an atomic operation. When trying to implement a file tree on top of S3 there is no native move operation that can be used. A naive implementation might fall back on a COPY and DELETE. Some S3 implementations provide a COPY operation that uses an existing key as the source, so the file at least does not need to be reuploaded. In the worst case scenario, which is renaming a folder with hundreds of thousands of objects, a reupload for every file has to be made. Instead of hiding this complexity a better choice might be to disable renaming of files or at least folders on S3. There are however implementations of filesystems on top of S3 that store the tree metadata in dedicated objects or use a completely different persistence mechanism like a distributed key value store to implement the file tree aspect of a storage.
+To manage the file tree ocis uses storage *storage providers* that are accessing the underlying storage using a *storage driver*. The driver can be used to change the implementation of a storage aspect to better reflect the actual underlying storage capabilities. As an example a move operation on a POSIX filesystem ([theoretically](https://danluu.com/deconstruct-files/)) is an atomic operation. When trying to implement a file tree on top of S3 there is no native move operation that can be used. A naive implementation might fall back on a COPY and DELETE. Some S3 implementations provide a COPY operation that uses an existing key as the source, so the file at least does not need to be reuploaded. In the worst case scenario, which is renaming a folder with hundreds of thousands of objects, a reupload for every file has to be made. Instead of hiding this complexity a better choice might be to disable renaming of files or at least folders on S3. There are however implementations of filesystems on top of S3 that store the tree metadata in dedicated objects or use a completely different persistence mechanism like a distributed key value store to implement the file tree aspect of a storage.
 
 
 {{< hint info >}}
@@ -120,7 +120,7 @@ To provide the other storage aspects we plan to implement a FUSE overlay filesys
 This is the current default storage driver. While it implements the file tree (using redis, including id based lookup), ETag propagation, trash, versions and sharing (including expiry) using the data directory layout of ownCloud 10 it has [known limitations](https://github.com/owncloud/core/issues/28095) that cannot be fixed without changing the actual layout on disk.
 
 To setup it up properly in a distributed fashion, the storage-home and the storage-oc need to share the same underlying FS. Their "data" counterparts also need access to the same shared FS.
-For a simple docker-compose setup, you can create a volume which will be used by the "ocis-reva-storage-home", "ocis-reva-storage-home-data", "ocis-reva-storage-oc" and "ocis-reva-storage-oc-data" containers. Using the `owncloud/ocis-reva` docker image, the volume would need to be hooked in the `/var/tmp/reva` folder insde the containers.
+For a simple docker-compose setup, you can create a volume which will be used by the "storage-storage-home", "storage-storage-home-data", "storage-storage-oc" and "storage-storage-oc-data" containers. Using the `owncloud/ocis` docker image, the volume would need to be hooked in the `/var/tmp/ocis` folder insde the containers.
 
 - tree provided by a POSIX filesystem
   - file layout is mapped to the old ownCloud 10 layout
@@ -155,20 +155,20 @@ For a simple docker-compose setup, you can create a volume which will be used by
 
 ### EOS Storage Driver
 
-The CERN eos storage has evolved with ownCloud and natively supports id based lookup, ETag propagation, subtree size accounting, sharing, trash and versions. To use it you need to change the default configuration of the `ocis-reva storage-home` command (or have a look at the Makefile ̀ eos-start` target):
+The CERN eos storage has evolved with ownCloud and natively supports id based lookup, ETag propagation, subtree size accounting, sharing, trash and versions. To use it you need to change the default configuration of the `storage storage-home` command (or have a look at the Makefile ̀ eos-start` target):
 
 ```
-export REVA_STORAGE_HOME_DRIVER=eos
-export REVA_STORAGE_EOS_NAMESPACE=/eos
-export REVA_STORAGE_EOS_MASTER_URL="root://eos-mgm1.eoscluster.cern.ch:1094"
-export REVA_STORAGE_EOS_ENABLE_HOME=true
-export REVA_STORAGE_EOS_LAYOUT="dockertest/{{.Username}}"
+export STORAGE_STORAGE_HOME_DRIVER=eos
+export STORAGE_STORAGE_EOS_NAMESPACE=/eos
+export STORAGE_STORAGE_EOS_MASTER_URL="root://eos-mgm1.eoscluster.cern.ch:1094"
+export STORAGE_STORAGE_EOS_ENABLE_HOME=true
+export STORAGE_STORAGE_EOS_LAYOUT="dockertest/{{.Username}}"
 ```
 
 Running it locally also requires the `eos` and `xrootd` binaries. Running it using `make eos-start` will use CentOS based containers that already have the necessary packages installed.
 
 {{< hint info >}}
-Pull requests to add explicit `reva storage-(s3|custom|...)` commands with working defaults are welcome.
+Pull requests to add explicit `storage storage-(s3|custom|...)` commands with working defaults are welcome.
 {{< /hint >}}
 
 ### S3 Storage Driver
@@ -177,7 +177,7 @@ A naive driver that treats the keys in an S3 capable storage as `/` delimited pa
 
 ## Data Providers
 
-Clients using the CS3 API use an [InitiateFileDownload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileDownloadRequest) and ]InitiateUpload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileUploadRequest) request at the [reva gateway](https://cs3org.github.io/cs3apis/#cs3.gateway.v1beta1.GatewayAPI) to obtain a URL endpoint that can be used to either GET the file content or upload content using the resumable [tus.io](https://tus.io) protocol.
+Clients using the CS3 API use an [InitiateFileDownload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileDownloadRequest) and ]InitiateUpload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileUploadRequest) request at the [storage gateway](https://cs3org.github.io/cs3apis/#cs3.gateway.v1beta1.GatewayAPI) to obtain a URL endpoint that can be used to either GET the file content or upload content using the resumable [tus.io](https://tus.io) protocol.
 
 The *data provider* uses the same *storage driver* as the *storage provider* but can be scaled independently.
 

@@ -2,8 +2,8 @@
 title: "Testing"
 date: 2018-05-02T00:00:00+00:00
 weight: 37
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: testing.md
 ---
 
@@ -41,37 +41,37 @@ File versions need a redis server. Start one with docker by using:
 
 ### Run ocis-reva with that ldap server
 
-`ocis-reva` provides multiple subcommands. To configure them all via env vars you can export these environment variables.
+`storage` provides multiple subcommands. To configure them all via env vars you can export these environment variables.
 
 ```
-export REVA_USERS_DRIVER=ldap
-export REVA_LDAP_HOSTNAME=localhost
-export REVA_LDAP_PORT=636
-export REVA_LDAP_BASE_DN='dc=owncloud,dc=com'
-export REVA_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
-export REVA_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
-export REVA_LDAP_BIND_DN='cn=admin,dc=owncloud,dc=com'
-export REVA_LDAP_BIND_PASSWORD=admin
-export REVA_LDAP_SCHEMA_UID=uid
-export REVA_LDAP_SCHEMA_MAIL=mail
-export REVA_LDAP_SCHEMA_DISPLAYNAME=displayName
-export REVA_LDAP_SCHEMA_CN=cn
-export REVA_FRONTEND_URL=http://localhost:9140 # needed because the proxy is not started
-export REVA_DATAGATEWAY_URL=http://localhost:9140/data # needed because the proxy is not started
+export STORAGE_USERS_DRIVER=ldap
+export STORAGE_LDAP_HOSTNAME=localhost
+export STORAGE_LDAP_PORT=636
+export STORAGE_LDAP_BASE_DN='dc=owncloud,dc=com'
+export STORAGE_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
+export STORAGE_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
+export STORAGE_LDAP_BIND_DN='cn=admin,dc=owncloud,dc=com'
+export STORAGE_LDAP_BIND_PASSWORD=admin
+export STORAGE_LDAP_SCHEMA_UID=uid
+export STORAGE_LDAP_SCHEMA_MAIL=mail
+export STORAGE_LDAP_SCHEMA_DISPLAYNAME=displayName
+export STORAGE_LDAP_SCHEMA_CN=cn
+export STORAGE_FRONTEND_URL=http://localhost:9140 # needed because the proxy is not started
+export STORAGE_DATAGATEWAY_URL=http://localhost:9140/data # needed because the proxy is not started
 ```
 
 Then you need to start the ocis-reva services
 ```
-bin/ocis-reva frontend & \
-bin/ocis-reva gateway & \
-bin/ocis-reva auth-basic & \
-bin/ocis-reva auth-bearer & \
-bin/ocis-reva sharing & \
-bin/ocis-reva storage-home & \
-bin/ocis-reva storage-home-data & \
-bin/ocis-reva storage-oc & \
-bin/ocis-reva storage-oc-data & \
-bin/ocis-reva users &
+bin/storage frontend & \
+bin/storage gateway & \
+bin/storage auth-basic & \
+bin/storage auth-bearer & \
+bin/storage sharing & \
+bin/storage storage-home & \
+bin/storage storage-home-data & \
+bin/storage storage-oc & \
+bin/storage storage-oc-data & \
+bin/storage users &
 ```
 
 ### Run the API acceptance tests
@@ -141,7 +141,7 @@ If you want to work on a specific issue
 9.  make a PR that has the fixed code, relevant lines removed from the expected failures file and bug demonstration tests deleted.
 
     If the changes also affect the `ocis` repository make sure the changes get ported over there.
-    That will need the fixed code in `ocis-reva` to be applied to `ocis` along with the test-related changes.
+    That will need the fixed code in `storage` to be applied to `ocis` along with the test-related changes.
 
 ### Notes
 - in a normal case the test-code cleans up users after the test-run, but if a test-run is interrupted (e.g. by CTRL+C) users might have been left on the LDAP server. In that case rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users. This can be done by simply running `docker stop docker-slapd && docker rm docker-slapd` and [restarting the LDAP server container](#run-a-ldap-server-in-a-docker-container)
