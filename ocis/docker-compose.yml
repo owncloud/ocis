@@ -21,6 +21,17 @@ services:
       - testnet
     volumes:
       - .:/ocis
+      - ../accounts:/accounts
+      - ../glauth:/glauth
+      - ../konnectd:/konnectd
+      - ../ocis-phoenix:/ocis-phoenix
+      - ../ocis-pkg:/ocis-pkg
+      - ../ocs:/ocs
+      - ../proxy:/proxy
+      - ../settings:/settings
+      - ../store:/store
+      - ../thumbnails:/thumbnails
+      - ../webdav:/webdav
       - ../ocis-reva:/ocis-reva
       - ../reva:/reva
     environment:
