@@ -64,7 +64,12 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
-			JWTSecret: opts.JWTSecret,
+			ProviderAddr:    opts.ProviderAddr,
+			DataURL:         opts.DataURL,
+			DataPrefix:      opts.DataPrefix,
+			JWTSecret:       opts.JWTSecret,
+			ServiceUserName: "",
+			ServiceUserUUID: "",
 		},
 		dataProvider: dataProviderClient{
 			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),

@@ -14,9 +14,10 @@ type Options struct {
 	EntityDirName string
 
 	// CS3 options
-	DataURL    string
-	DataPrefix string
-	JWTSecret  string
+	DataURL      string
+	DataPrefix   string
+	JWTSecret    string
+	ProviderAddr string
 }
 
 // newOptions initializes the available default options.
@@ -81,5 +82,10 @@ func WithIndexBaseDir(val string) Option {
 func WithFilesDir(val string) Option {
 	return func(o *Options) {
 		o.FilesDir = val
+	}
+}
+func WithProviderAddr(val string) Option {
+	return func(o *Options) {
+		o.ProviderAddr = val
 	}
 }

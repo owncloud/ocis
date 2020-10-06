@@ -7,6 +7,7 @@ import (
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -28,7 +29,7 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
-	_ = WriteIndexTestDataCS3(t, TestData, "Id")
+	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			CS3: config.CS3{
@@ -46,7 +47,7 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 	err := indexer.Add(u)
 	assert.NoError(t, err)
 
-	//_ = os.RemoveAll(dataDir)
+	_ = os.RemoveAll(dataDir)
 }
 
 func TestIndexer_FindByWithUniqueIndex(t *testing.T) {

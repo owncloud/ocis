@@ -68,6 +68,7 @@ func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName st
 			option.WithDataURL(i.newConfig.Repo.CS3.DataURL),
 			option.WithDataPrefix(i.newConfig.Repo.CS3.DataPrefix),
 			option.WithJWTSecret(i.newConfig.Repo.CS3.JWTSecret),
+			option.WithProviderAddr(i.newConfig.Repo.CS3.ProviderAddr),
 		)
 	}
 
