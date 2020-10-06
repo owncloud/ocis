@@ -10,6 +10,9 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"google.golang.org/grpc/metadata"
 	"io/ioutil"
 	"net/http"
@@ -18,6 +21,10 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+func init() {
+	registry.IndexConstructorRegistry["cs3"]["non_unique"] = NewNonUniqueIndexWithOptions
+}
 
 type NonUnique struct {
 	indexBy      string
@@ -31,6 +38,37 @@ type NonUnique struct {
 	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
 
 	cs3conf *Config
+}
+
+// NewNonUniqueIndexWithOptions instantiates a new UniqueIndex instance. Init() should be
+// called afterward to ensure correct on-disk structure.
+func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
+	opts := &option.Options{}
+	for _, opt := range o {
+		opt(opts)
+	}
+
+	return &NonUnique{
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"non_unique", opts.TypeName, opts.IndexBy}, ".")),
+		cs3conf: &Config{
+			ProviderAddr:    opts.ProviderAddr,
+			DataURL:         opts.DataURL,
+			DataPrefix:      opts.DataPrefix,
+			JWTSecret:       opts.JWTSecret,
+			ServiceUserName: "",
+			ServiceUserUUID: "",
+		},
+		dataProvider: dataProviderClient{
+			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
+			client: http.Client{
+				Transport: http.DefaultTransport,
+			},
+		},
+	}
 }
 
 // NewNonUniqueIndex instantiates a new NonUniqueIndex instance.

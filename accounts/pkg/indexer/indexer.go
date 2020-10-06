@@ -79,12 +79,27 @@ func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName st
 func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
 	strategy := getRegistryStrategy(i.newConfig)
 	f := registry.IndexConstructorRegistry[strategy]["non_unique"]
-	idx := f(
-		option.WithTypeName(getTypeFQN(t)),
-		option.WithIndexBy(indexBy),
-		option.WithFilesDir(path.Join(i.config.DataDir, entityDirName)),
-		option.WithIndexBaseDir(path.Join(i.config.DataDir, i.config.IndexRootDirName)),
-	)
+	var idx index.Index
+
+	if strategy == "disk" {
+		idx = f(
+			option.WithTypeName(getTypeFQN(t)),
+			option.WithIndexBy(indexBy),
+			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+		)
+	} else if strategy == "cs3" {
+		idx = f(
+			option.WithTypeName(getTypeFQN(t)),
+			option.WithIndexBy(indexBy),
+			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+			option.WithDataURL(i.newConfig.Repo.CS3.DataURL),
+			option.WithDataPrefix(i.newConfig.Repo.CS3.DataPrefix),
+			option.WithJWTSecret(i.newConfig.Repo.CS3.JWTSecret),
+			option.WithProviderAddr(i.newConfig.Repo.CS3.ProviderAddr),
+		)
+	}
 
 	i.indices.addIndex(getTypeFQN(t), pkName, idx)
 	return idx.Init()

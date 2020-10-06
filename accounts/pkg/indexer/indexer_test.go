@@ -50,6 +50,29 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
+func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
+	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
+	indexer := CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			CS3: config.CS3{
+				ProviderAddr: "0.0.0.0:9215",
+				DataURL:      "http://localhost:9216",
+				DataPrefix:   "data",
+				JWTSecret:    "Pive-Fumkiu4",
+			},
+		},
+	})
+
+	err := indexer.AddNonUniqueIndex(&User{}, "UserName", "Id", "users")
+	assert.NoError(t, err)
+
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	err = indexer.Add(u)
+	assert.NoError(t, err)
+
+	_ = os.RemoveAll(dataDir)
+}
+
 func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
 	indexer := NewIndexer(&Config{
