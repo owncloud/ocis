@@ -2,8 +2,8 @@
 title: "Configuration"
 date: "2020-09-21T13:14:47+0200"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-konnectd
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/konnectd
 geekdocFilePath: configuration.md
 ---
 

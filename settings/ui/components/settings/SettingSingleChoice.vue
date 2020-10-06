@@ -1,12 +1,13 @@
 <template>
   <div>
-    <oc-button :id="buttonElementId" class="uk-width-expand">
+    <oc-button :id="buttonElementId" class="uk-width-expand" justify-content="space-between">
       <span v-if="selectedOption">
         {{ selectedOption.displayValue }}
       </span>
       <span v-else>
         {{ setting.placeholder || $gettext('Please select') }}
       </span>
+      <oc-icon name="expand_more" />
     </oc-button>
     <oc-drop
       :drop-id="dropElementId"
@@ -21,17 +22,12 @@
           v-for="(option, index) in setting.singleChoiceValue.options"
           :key="getOptionElementId(index)"
         >
-          <label :for="getOptionElementId(index)">
-            <input
-              :id="getOptionElementId(index)"
-              type="radio"
-              class="oc-radiobutton"
-              v-model="selectedOption"
-              :value="option"
-              @change="onSelectedOption"
-            />
-            {{ option.displayValue }}
-          </label>
+          <oc-radio
+            v-model="selectedOption"
+            :option="option"
+            @input="onSelectedOption"
+            :label="option.displayValue"
+          />
         </li>
       </ul>
     </oc-drop>

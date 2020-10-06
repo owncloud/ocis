@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 date: 2020-02-27T20:35:00+01:00
-weight: 15
+weight: -15
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs
 geekdocFilePath: getting-started.md

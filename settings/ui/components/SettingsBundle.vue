@@ -1,6 +1,6 @@
 <template>
-  <div class="uk-width-1-1 uk-width-2-3@m uk-width-1-2@l">
-    <div class="uk-text-bold uk-margin-small-bottom">
+  <div class="uk-width-1-1 uk-width-2-3@m uk-width-1-2@l uk-width-1-3@xl">
+    <div class="oc-text-bold oc-mb-s">
       <translate>{{ bundle.displayName }}</translate>
     </div>
     <oc-grid gutter="small">

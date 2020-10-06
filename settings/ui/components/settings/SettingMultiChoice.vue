@@ -1,12 +1,13 @@
 <template>
   <div>
-    <oc-button :id="buttonElementId" class="uk-width-expand">
+    <oc-button :id="buttonElementId" class="uk-width-expand" justify-content="space-between">
       <span v-if="selectedOptions !== null && selectedOptions.length > 0">
         {{ selectedOptionsDisplayValues }}
       </span>
       <span v-else>
         {{ setting.placeholder || $gettext('Please select') }}
       </span>
+      <oc-icon name="expand_more" />
     </oc-button>
     <oc-drop
       :drop-id="dropElementId"
@@ -20,17 +21,12 @@
           v-for="(option, index) in setting.multiChoiceValue.options"
           :key="getOptionElementId(index)"
         >
-          <label :for="getOptionElementId(index)">
-            <input
-              :id="getOptionElementId(index)"
-              type="checkbox"
-              class="oc-checkbox"
-              :value="option"
-              v-model="selectedOptions"
-              @change="onSelectedOption"
-            />
-            {{ option.displayValue }}
-          </label>
+          <oc-checkbox
+            v-model="selectedOptions"
+            :option="option"
+            @input="onSelectedOption"
+            :label="option.displayValue"
+          />
         </li>
       </ul>
     </oc-drop>
