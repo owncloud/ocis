@@ -1,12 +1,13 @@
 <template>
   <div>
-    <oc-button :id="buttonElementId" class="uk-width-expand">
+    <oc-button :id="buttonElementId" class="uk-width-expand" justify-content="space-between">
       <span v-if="selectedOptions !== null && selectedOptions.length > 0">
         {{ selectedOptionsDisplayValues }}
       </span>
       <span v-else>
         {{ setting.placeholder || $gettext('Please select') }}
       </span>
+      <oc-icon name="expand_more" />
     </oc-button>
     <oc-drop
       :drop-id="dropElementId"
