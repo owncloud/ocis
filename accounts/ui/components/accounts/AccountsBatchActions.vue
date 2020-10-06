@@ -119,7 +119,7 @@ export default {
 
 <style lang="scss" scoped>
 .tmp-alert-fixes {
-  padding: 4px 10px !important;
+  padding: 4px 11px 5px !important;
   border-radius: 3px !important;
   background-color: #fff !important;
   border: 1px solid rgb(224, 0, 0) !important;
