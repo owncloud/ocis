@@ -42,7 +42,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		// this can eg. be set to /eos/users
 		&cli.StringFlag{
 			Name:        "dav-files-namespace",
-			Value:       "/oc/",
+			Value:       "/users/",
 			Usage:       "Namespace prefix for the webdav /dav/files endpoint",
 			EnvVars:     []string{"DAV_FILES_NAMESPACE"},
 			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
