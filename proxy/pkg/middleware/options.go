@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"net/http"
+
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -36,6 +37,8 @@ type Options struct {
 	Store storepb.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
+	// AutoprovisionAccounts when an account does not exist.
+	AutoprovisionAccounts bool
 }
 
 // newOptions initializes the available default options.
@@ -116,5 +119,12 @@ func Store(sc storepb.StoreService) Option {
 func PreSignedURLConfig(cfg config.PreSignedURL) Option {
 	return func(o *Options) {
 		o.PreSignedURLConfig = cfg
+	}
+}
+
+// AutoprovisionAccounts provides a function to set the AutoprovisionAccounts config
+func AutoprovisionAccounts(val bool) Option {
+	return func(o *Options) {
+		o.AutoprovisionAccounts = val
 	}
 }

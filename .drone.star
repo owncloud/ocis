@@ -20,23 +20,27 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '3204f23746b1e958ef9eb38464949ef8107e9b1f',
+    'phoenixCommit': '42c2a372aceb31eb17e13ebae08e2e25e2447dfe',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
         'webUIDeleteFilesFolders',
         'webUIFavorites',
+      ],
+      'phoenixWebUI2' : [
         'webUIFiles',
         'webUILogin',
         'webUINotifications',
-      ],
-      'phoenixWebUI2': [
         'webUIPrivateLinks',
+      ],
+      'phoenixWebUI3': [
+        'webUIAccount',
         'webUIRenameFiles',
         'webUIRenameFolders',
+      ],
+       'phoenixWebUI4': [
         'webUITrashbin',
         'webUIUpload',
-        'webUIAccount',
         # All tests in the following suites are skipped currently
         # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
@@ -78,6 +82,17 @@ def getCoreApiTestPipelineNames():
     names.append('Core-API-Tests-owncloud-storage-%s' % runPart)
     names.append('Core-API-Tests-ocis-storage-%s' % runPart)
   return names
+
+def getDependsOnAllTestPipelines(ctx):
+  dependencies = getTestSuiteNames() + [ 'upload-coverage' ]
+  if ctx.build.ref != "refs/heads/master":
+    dependencies = getTestSuiteNames() + [
+      'upload-coverage',
+      'localApiTests-owncloud-storage',
+      'localApiTests-ocis-storage',
+    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames()
+
+  return dependencies
 
 def main(ctx):
   pipelines = []
@@ -339,7 +354,6 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     ],
     'trigger': {
       'ref': [
-        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -395,7 +409,6 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     ],
     'trigger': {
       'ref': [
-        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -476,7 +489,6 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     ],
     'trigger': {
       'ref': [
-        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -546,12 +558,7 @@ def docker(ctx, arch):
         'temp': {},
       },
     ],
-    'depends_on':
-      getTestSuiteNames() + [
-      'upload-coverage',
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
+    'depends_on': getDependsOnAllTestPipelines(ctx),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -702,12 +709,7 @@ def binary(ctx, name):
         'temp': {},
       },
     ],
-    'depends_on':
-      getTestSuiteNames() + [
-      'upload-coverage',
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames(),
+    'depends_on': getDependsOnAllTestPipelines(ctx),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1036,7 +1038,7 @@ def docs(ctx):
         'name': 'downstream',
         'image': 'plugins/downstream',
         'settings': {
-          'server': 'https://cloud.drone.io/',
+          'server': 'https://drone.owncloud.com/',
           'token': {
             'from_secret': 'drone_token',
           },

@@ -104,7 +104,7 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 			if status != 0 || account == nil {
-				if status == http.StatusNotFound {
+				if opt.AutoprovisionAccounts && status == http.StatusNotFound {
 					account, status = createAccount(l, claims, opt.AccountsClient)
 					if status != 0 {
 						w.WriteHeader(status)

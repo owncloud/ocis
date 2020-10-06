@@ -202,6 +202,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
+
+		&cli.BoolFlag{
+			Name:        "autoprovision-accounts",
+			Value:       false,
+			Usage:       "create accounts from OIDC access tokens to learn new users",
+			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
+			Destination: &cfg.AutoprovisionAccounts,
+		},
+
+		// Presigned URLs
+
 		&cli.StringSliceFlag{
 			Name:    "presignedurl-allow-method",
 			Value:   cli.NewStringSlice("GET"),
