@@ -3,16 +3,20 @@ package indexer
 
 import (
 	"fmt"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"github.com/rs/zerolog"
 	"path"
 )
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
-	config  *Config
-	indices typeMap
+	newConfig *config.Config
+	config    *Config
+	indices   typeMap
 }
 
 type Config struct {
@@ -21,32 +25,67 @@ type Config struct {
 	Log              zerolog.Logger
 }
 
-func NewIndex(cfg *Config) *Indexer {
+func NewIndexer(cfg *Config) *Indexer {
 	return &Indexer{
 		config:  cfg,
 		indices: typeMap{},
 	}
 }
 
+func CreateIndexer(cfg *config.Config) *Indexer {
+	return &Indexer{
+		newConfig: cfg,
+		indices:   typeMap{},
+	}
+}
+
+func getRegistryStrategy(cfg *config.Config) string {
+	if cfg.Repo.Disk.Path != "" {
+		return "disk"
+	}
+
+	return "cs3"
+}
+
 func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
-	typeName := getTypeFQN(t)
-	fullDataPath := path.Join(i.config.DataDir, entityDirName)
-	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
+	strategy := getRegistryStrategy(i.newConfig)
+	f := registry.IndexConstructorRegistry[strategy]["unique"]
+	var idx index.Index
 
-	idx := disk.NewUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
+	if strategy == "disk" {
+		idx = f(
+			option.WithTypeName(getTypeFQN(t)),
+			option.WithIndexBy(indexBy),
+			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+		)
+	} else if strategy == "cs3" {
+		idx = f(
+			option.WithTypeName(getTypeFQN(t)),
+			option.WithIndexBy(indexBy),
+			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+			option.WithDataURL(i.newConfig.Repo.CS3.DataURL),
+			option.WithDataPrefix(i.newConfig.Repo.CS3.DataPrefix),
+			option.WithJWTSecret(i.newConfig.Repo.CS3.JWTSecret),
+		)
+	}
 
-	i.indices.addIndex(typeName, pkName, idx)
+	i.indices.addIndex(getTypeFQN(t), pkName, idx)
 	return idx.Init()
 }
 
 func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
-	typeName := getTypeFQN(t)
-	fullDataPath := path.Join(i.config.DataDir, entityDirName)
-	indexPath := path.Join(i.config.DataDir, i.config.IndexRootDirName)
+	strategy := getRegistryStrategy(i.newConfig)
+	f := registry.IndexConstructorRegistry[strategy]["non_unique"]
+	idx := f(
+		option.WithTypeName(getTypeFQN(t)),
+		option.WithIndexBy(indexBy),
+		option.WithFilesDir(path.Join(i.config.DataDir, entityDirName)),
+		option.WithIndexBaseDir(path.Join(i.config.DataDir, i.config.IndexRootDirName)),
+	)
 
-	idx := disk.NewNonUniqueIndex(typeName, indexBy, fullDataPath, indexPath)
-
-	i.indices.addIndex(typeName, pkName, idx)
+	i.indices.addIndex(getTypeFQN(t), pkName, idx)
 	return idx.Init()
 }
 

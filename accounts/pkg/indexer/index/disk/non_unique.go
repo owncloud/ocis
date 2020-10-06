@@ -4,10 +4,14 @@ import (
 	"errors"
 	"fmt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 // NonUniqueIndex is able to index an document by a key which might contain non-unique values
@@ -26,6 +30,27 @@ type NonUniqueIndex struct {
 	filesDir     string
 	indexBaseDir string
 	indexRootDir string
+}
+
+func init() {
+	registry.IndexConstructorRegistry["disk"]["non_unique"] = NewNonUniqueIndexWithOptions
+}
+
+// NewNonUniqueIndexWithOptions instantiates a new UniqueIndex instance. Init() should be
+// called afterward to ensure correct on-disk structure.
+func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
+	opts := &option.Options{}
+	for _, opt := range o {
+		opt(opts)
+	}
+
+	return NonUniqueIndex{
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		indexBaseDir: opts.IndexBaseDir,
+		indexRootDir: path.Join(opts.IndexBaseDir, strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+	}
 }
 
 // NewNonUniqueIndex instantiates a new NonUniqueIndex instance. Init() should be

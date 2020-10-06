@@ -10,6 +10,9 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"google.golang.org/grpc/metadata"
 	"io/ioutil"
 	"net/http"
@@ -40,6 +43,38 @@ type Config struct {
 	JWTSecret       string
 	ServiceUserName string
 	ServiceUserUUID string
+}
+
+func init() {
+	registry.IndexConstructorRegistry["cs3"]["unique"] = NewUniqueIndexWithOptions
+}
+
+// NewUniqueIndexWithOptions instantiates a new UniqueIndex instance. Init() should be
+// called afterward to ensure correct on-disk structure.
+func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
+	opts := &option.Options{}
+	for _, opt := range o {
+		opt(opts)
+	}
+
+	u := &Unique{
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+		cs3conf: &Config{
+			JWTSecret: opts.JWTSecret,
+		},
+		dataProvider: dataProviderClient{
+			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
+			client: http.Client{
+				Transport: http.DefaultTransport,
+			},
+		},
+	}
+
+	return u
 }
 
 // NewUniqueIndex instantiates a new UniqueIndex instance. Init() should be

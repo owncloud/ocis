@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"os"
 	"path"
 	"path/filepath"
@@ -38,6 +41,29 @@ type Unique struct {
 	indexRootDir string
 }
 
+func init() {
+	registry.IndexConstructorRegistry["disk"]["unique"] = NewUniqueIndexWithOptions
+}
+
+// NewUniqueIndexWithOptions instantiates a new UniqueIndex instance. Init() should be
+// called afterward to ensure correct on-disk structure.
+func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
+	opts := &option.Options{}
+	for _, opt := range o {
+		opt(opts)
+	}
+
+	u := &Unique{
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+	}
+
+	return u
+}
+
 // NewUniqueIndex instantiates a new UniqueIndex instance. Init() should be
 // called afterward to ensure correct on-disk structure.
 func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) Unique {
@@ -50,7 +76,7 @@ func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) Unique {
 	}
 }
 
-func (idx Unique) Init() error {
+func (idx *Unique) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
 	}

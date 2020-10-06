@@ -1,6 +1,9 @@
 package indexer
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/cs3"
+	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -9,10 +12,32 @@ import (
 
 func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
-		DataDir:          dataDir,
-		IndexRootDirName: "index.disk",
-		Log:              zerolog.Logger{},
+	indexer := CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataDir,
+			},
+		},
+	})
+
+	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	err := indexer.Add(u)
+	assert.NoError(t, err)
+}
+
+func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
+	_ = WriteIndexTestDataCS3(t, TestData, "Id")
+	indexer := CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			CS3: config.CS3{
+				ProviderAddr: "0.0.0.0:9215",
+				DataURL:      "http://localhost:9216",
+				DataPrefix:   "data",
+				JWTSecret:    "Pive-Fumkiu4",
+			},
+		},
 	})
 
 	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
@@ -21,11 +46,12 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 	err := indexer.Add(u)
 	assert.NoError(t, err)
 
+	//_ = os.RemoveAll(dataDir)
 }
 
 func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -44,7 +70,7 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 
 func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -69,7 +95,7 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 
 func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -92,7 +118,7 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 
 func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -117,7 +143,7 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 
 func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -171,7 +197,7 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 
 func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, TestData, "Id")
-	indexer := NewIndex(&Config{
+	indexer := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -192,7 +218,7 @@ func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
 /*
 func TestManagerQueryMultipleIndices(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")
-	man := NewIndex(&Config{
+	man := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},
@@ -246,7 +272,7 @@ func TestManagerQueryMultipleIndices(t *testing.T) {
 /*
 func TestManagerDelete(t *testing.T) {
 	dataDir := writeIndexTestData(t, testData, "Id")
-	man := NewIndex(&Config{
+	man := NewIndexer(&Config{
 		DataDir:          dataDir,
 		IndexRootDirName: "index.disk",
 		Log:              zerolog.Logger{},

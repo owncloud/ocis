@@ -77,11 +77,12 @@ type CS3 struct {
 	ProviderAddr string
 	DataURL      string
 	DataPrefix   string
+	JWTSecret    string
 }
 
 // ServiceUser defines the user required for EOS
 type ServiceUser struct {
-	UUID 	 string
+	UUID     string
 	Username string
 	UID      int64
 	GID      int64
