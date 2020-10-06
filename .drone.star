@@ -327,8 +327,8 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
@@ -1163,7 +1163,7 @@ def ocisServer(storage):
         'STORAGE_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
         'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
-        'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud',
+        'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
         'STORAGE_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
         'STORAGE_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
         'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
@@ -1180,9 +1180,7 @@ def ocisServer(storage):
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
-        'mkdir -p /srv/app/tmp/ocis/',
-        'mkdir -p /srv/app/tmp/ocis/owncloud/',
-        'mkdir -p /srv/app/tmp/ocis/storage/',
+        'mkdir -p /srv/app/tmp/ocis/owncloud/data/',
         'mkdir -p /srv/app/tmp/ocis/storage/users/',
         'ocis/bin/ocis server'
       ],
