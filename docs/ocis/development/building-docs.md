@@ -26,7 +26,13 @@ hugo -D server
 
 Then open "http://localhost:1313/"
 
-When making changes to the docs, run `make docs` again and the server will pick up the changes and reload the page automatically
+When making changes to the docs, run 
+
+```bash
+rsync -ax --delete ../docs/ content/
+``` 
+
+in the hugo folder and the server will pick up the changes and reload the page automatically.
 
 ### Deploying the documentation
 
