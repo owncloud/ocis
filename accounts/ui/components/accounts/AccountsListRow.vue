@@ -2,10 +2,13 @@
   <oc-table-row>
     <oc-table-cell>
       <oc-checkbox
-        class="uk-margin-small-left"
-        :value="isAccountSelected"
-        @change="TOGGLE_SELECTION_ACCOUNT(account)"
-        :label="selectAccountLabel" hide-label
+        class="oc-ml-s"
+        size="large"
+        :value="selectedAccounts"
+        :option="account"
+        @input="TOGGLE_SELECTION_ACCOUNT(account)"
+        :label="selectAccountLabel"
+        hide-label
       />
     </oc-table-cell>
     <oc-table-cell>
@@ -94,10 +97,6 @@ export default {
   computed: {
     ...mapGetters(['user', 'configuration']),
     ...mapState('Accounts', ['roles', 'selectedAccounts']),
-
-    isAccountSelected () {
-      return this.selectedAccounts.indexOf(this.account) > -1
-    },
 
     selectAccountLabel () {
       const translated = this.$gettext('Select %{ account }')

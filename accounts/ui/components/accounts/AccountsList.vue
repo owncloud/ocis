@@ -3,13 +3,13 @@
     <oc-table middle divider>
       <oc-table-group>
         <oc-table-row class="fix-table-header">
-          <oc-table-cell shrink type="head">
+          <oc-table-cell shrink type="head" class="uk-text-center">
             <oc-checkbox
-              :value="areAllAccountsSelected"
-              :label="$gettext('Select all users')"
-              hide-label
-              @change="toggleSelectionAll"
-              class="uk-margin-small-left"
+                class="oc-ml-s"
+                :value="areAllAccountsSelected"
+                @input="toggleSelectionAll"
+                :label="$gettext('Select all users')"
+                hide-label
             />
           </oc-table-cell>
           <oc-table-cell shrink type="head" />
