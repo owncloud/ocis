@@ -3,8 +3,8 @@ title: "Getting Started with Development"
 date: 2020-07-07T20:35:00+01:00
 weight: 15
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
-geekdocFilePath: development.md
+geekdocEditPath: edit/master/docs/development
+geekdocFilePath: getting-started.md
 ---
 
 {{< toc >}}

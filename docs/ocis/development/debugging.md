@@ -3,7 +3,7 @@ title: "Debugging"
 date: 2020-03-19T08:21:00+01:00
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/development
 geekdocFilePath: debugging.md
 ---
 
