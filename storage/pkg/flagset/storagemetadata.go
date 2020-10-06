@@ -57,13 +57,6 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER"},
 			Destination: &cfg.Reva.StorageMetadata.Driver,
 		},
-		&cli.StringFlag{
-			Name:        "storage-root",
-			Value:       "/var/tmp/ocis/metadata",
-			Usage:       "the path to the metadata storage root",
-			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
-			Destination: &cfg.Reva.Storages.Common.Root,
-		},
 
 		// some drivers need to look up users at the gateway
 
@@ -95,7 +88,15 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DriverLocalWithConfig(cfg)...)
 	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
 	flags = append(flags, DriverOCISWithConfig(cfg)...)
-
+	flags = append(flags,
+		&cli.StringFlag{
+			Name:        "storage-root",
+			Value:       "/var/tmp/ocis/metadata",
+			Usage:       "the path to the metadata storage root",
+			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
+			Destination: &cfg.Reva.Storages.Common.Root,
+		},
+	)
 	return flags
 
 }
