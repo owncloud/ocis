@@ -1,8 +1,6 @@
 FROM golang:alpine as build
 
-WORKDIR /build
-
-ADD ./ /build/
+COPY ./ /ocis/
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 
@@ -11,10 +9,11 @@ RUN apk update && \
 	apk add make gcc bash && \
 	rm -rf /var/cache/apk/*
 
-RUN cd ocis && make clean generate build
+WORKDIR /ocis/ocis
+RUN make clean generate build
 
 
-FROM amd64/alpine:latest
+FROM amd64/alpine
 
 RUN apk update && \
 	apk upgrade && \
@@ -30,4 +29,4 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
 ENTRYPOINT ["/usr/bin/ocis"]
 CMD ["server"]
 
-COPY --from=build /build/ocis/bin/ocis /usr/bin/ocis
+COPY --from=build /ocis/ocis/bin/ocis /usr/bin/ocis
