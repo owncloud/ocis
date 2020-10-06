@@ -10,7 +10,7 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-owncloud-datadir",
-			Value:       "/var/tmp/ocis/data",
+			Value:       "/var/tmp/ocis/owncloud",
 			Usage:       "the path to the owncloud data directory",
 			EnvVars:     []string{"STORAGE_STORAGE_OWNCLOUD_DATADIR"},
 			Destination: &cfg.Reva.Storages.OwnCloud.Root,
