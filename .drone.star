@@ -122,7 +122,7 @@ def main(ctx):
     pipelines['depends_on'] = []
   else:
     pipelines = before + stages + after
-  
+
   return pipelines
 
 def testPipelines(ctx):
@@ -328,7 +328,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
@@ -381,7 +381,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/reva/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/root/nodes/root/*'),
+          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage',
@@ -1156,22 +1156,22 @@ def ocisServer(storage):
       'detach': True,
       'environment' : {
         #'OCIS_LOG_LEVEL': 'debug',
-        'REVA_STORAGE_HOME_DRIVER': '%s' % (storage),
-        'REVA_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
-        'REVA_STORAGE_OC_DRIVER': '%s' % (storage),
-        'REVA_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
-        'REVA_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-        'REVA_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/root',
-        'REVA_STORAGE_LOCAL_ROOT': '/srv/app/tmp/reva/root',
-        'REVA_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/reva/data',
-        'REVA_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-        'REVA_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-        'REVA_LDAP_IDP': 'https://ocis-server:9200',
-        'REVA_OIDC_ISSUER': 'https://ocis-server:9200',
+        'STORAGE_STORAGE_HOME_DRIVER': '%s' % (storage),
+        'STORAGE_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
+        'STORAGE_STORAGE_OC_DRIVER': '%s' % (storage),
+        'STORAGE_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
+        'STORAGE_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users/nodes/root/',
+        'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
+        'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/ownclooud',
+        'STORAGE_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
+        'STORAGE_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+        'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
+        'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
         'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
-        'REVA_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
-        'REVA_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
-        'REVA_FRONTEND_URL': 'https://ocis-server:9200',
+        'STORAGE_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
+        'STORAGE_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
+        'STORAGE_FRONTEND_URL': 'https://ocis-server:9200',
         'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
@@ -1180,8 +1180,9 @@ def ocisServer(storage):
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
-        'mkdir -p /srv/app/tmp/reva',
-        'mkdir -p /srv/app/tmp/ocis/root/nodes',
+        'mkdir -p /srv/app/tmp/ocis/',
+        'mkdir -p /srv/app/tmp/ocis/storage/',
+        'mkdir -p /srv/app/tmp/ocis/storage/users/',
         'ocis/bin/ocis server'
       ],
       'volumes': [
