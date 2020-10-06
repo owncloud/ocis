@@ -380,7 +380,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/reva/' if storage == 'owncloud' else ''),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
           'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'TEST_OCIS':'true',
@@ -445,7 +445,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/reva',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
