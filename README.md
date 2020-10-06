@@ -49,7 +49,6 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 ## Quickstart
 
 - Make sure that the binary was built with the above steps.
-
 - Now start all services with the following command
 
 ```console
@@ -57,9 +56,7 @@ mkdir -p /var/tmp/reva/root/{home,oc}
 ```
 
 - Open <https://localhost:9200>
-
 - Accept the self-signed certificate (it is regenerated every time the server starts)
-
 - Login using one of the demo accounts:
 
 ```console
@@ -79,7 +76,7 @@ docker build -t owncloud/ocis:dev .
 - To run it, execute
 
 ```console
-docker run --rm -ti owncloud/ocis:test
+docker run --rm -ti owncloud/ocis:dev
 ```
 
 - The image can be tagged however you like, just make sure you run the right one then
