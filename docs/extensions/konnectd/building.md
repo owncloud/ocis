@@ -2,8 +2,8 @@
 title: "Building"
 date: 2020-02-21T00:00:00+00:00
 weight: 30
-geekdocRepo: https://github.com/owncloud/ocis-konnectd
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/konnectd
 geekdocFilePath: building.md
 ---
 

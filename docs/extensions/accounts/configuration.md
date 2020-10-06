@@ -2,8 +2,8 @@
 title: "Configuration"
 date: "2020-07-01T11:10:52+0200"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/accounts
 geekdocFilePath: configuration.md
 ---
 

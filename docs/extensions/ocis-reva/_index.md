@@ -2,8 +2,8 @@
 title: "Reva"
 date: 2018-05-02T00:00:00+00:00
 weight: 10
-geekdocRepo: https://github.com/owncloud/ocis-reva
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/reva
 geekdocFilePath: _index.md
 ---
 

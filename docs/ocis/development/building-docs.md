@@ -3,11 +3,9 @@ title: "Building the documentation"
 date: 2020-07-27T08:39:38+00:00
 weight: 99
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/development
 geekdocFilePath: building-docs.md
 ---
-
-{{< toc >}}
 
 ## Buildling the documentation
 
