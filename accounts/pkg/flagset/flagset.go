@@ -99,6 +99,62 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+		&cli.StringFlag{
+			Name:        "storage-disk-path",
+			Value:       "",
+			Usage:       "Path on the local disk, e.g. /var/tmp/ocis-accounts",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_DISK_PATH"},
+			Destination: &cfg.Repo.Disk.Path,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-provider-addr",
+			Value:       "localhost:9215",
+			Usage:       "bind address for the metadata storage provider",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"},
+			Destination: &cfg.Repo.CS3.ProviderAddr,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-data-url",
+			Value:       "http://localhost:9216",
+			Usage:       "http endpoint of the metadata storage",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_URL"},
+			Destination: &cfg.Repo.CS3.DataURL,
+		},
+		&cli.StringFlag{
+			Name:        "storage-cs3-data-prefix",
+			Value:       "data",
+			Usage:       "path prefix for the http endpoint of the metadata storage, without leading slash",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_PREFIX"},
+			Destination: &cfg.Repo.CS3.DataPrefix,
+		},
+		&cli.StringFlag{
+			Name:        "service-user-uuid",
+			Value:       "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			Usage:       "uuid of the internal service user (required on EOS)",
+			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_UUID"},
+			Destination: &cfg.ServiceUser.UUID,
+		},
+		&cli.StringFlag{
+			Name:        "service-user-username",
+			Value:       "",
+			Usage:       "username of the internal service user (required on EOS)",
+			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_USERNAME"},
+			Destination: &cfg.ServiceUser.Username,
+		},
+		&cli.Int64Flag{
+			Name:        "service-user-uid",
+			Value:       0,
+			Usage:       "uid of the internal service user (required on EOS)",
+			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_UID"},
+			Destination: &cfg.ServiceUser.UID,
+		},
+		&cli.Int64Flag{
+			Name:        "service-user-gid",
+			Value:       0,
+			Usage:       "gid of the internal service user (required on EOS)",
+			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_GID"},
+			Destination: &cfg.ServiceUser.GID,
+		},
 	}
 }
 

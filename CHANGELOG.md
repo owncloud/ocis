@@ -14,6 +14,7 @@
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
+* Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
@@ -130,6 +131,16 @@
    https://github.com/owncloud/ocis-accounts/pull/95
    https://github.com/owncloud/ocis-accounts/pull/100
    https://github.com/owncloud/ocis-accounts/pull/102
+
+* Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
+
+   We updated phoenix to v0.18.0. Please refer to the changelog (linked) for details on the
+   phoenix release. With the ODS release brought in by phoenix we now have proper oc-checkbox and
+   oc-radio components for the settings and accounts UI.
+
+   https://github.com/owncloud/ocis/pull/651
+   https://github.com/owncloud/phoenix/releases/tag/v0.18.0
+   https://github.com/owncloud/owncloud-design-system/releases/tag/v1.12.1
 
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 

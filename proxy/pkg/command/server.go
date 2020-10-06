@@ -265,6 +265,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		middleware.TokenManagerConfig(cfg.TokenManager),
 		middleware.AccountsClient(accounts),
 		middleware.SettingsRoleService(roles),
+		middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 	)
 
 	// the connection will be established in a non blocking fashion

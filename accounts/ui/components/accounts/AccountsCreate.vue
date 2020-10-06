@@ -47,13 +47,13 @@
           variation="primary"
           :disabled="isRequestInProgress"
           @click="createAccount"
+          gap-size="small"
           :class="{ 'border-ods-tmp-fix': !isRequestInProgress }"
         >
           <oc-spinner
             v-if="isRequestInProgress"
             key="account-creation-in-progress"
-            size="xsmall"
-            class="uk-margin-xsmall-right"
+            size="small"
             aria-hidden="true"
           />
           <span v-text="isRequestInProgress ? $gettext('Creating') : $gettext('Create')" />
@@ -65,10 +65,11 @@
         <oc-button
           id="accounts-new-account-trigger"
           key="create-accounts-button"
-          icon="add"
           variation="primary"
+          gap-size="small"
           @click="setFormInProgress(true)"
         >
+          <oc-icon name="add" />
           <translate>Create new account</translate>
         </oc-button>
       </div>
