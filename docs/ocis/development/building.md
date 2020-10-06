@@ -1,5 +1,5 @@
 ---
-title: "Building"
+title: "Build ocis"
 date: 2020-02-27T20:35:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
@@ -20,7 +20,7 @@ git clone https://github.com/owncloud/ocis.git
 cd ocis
 {{< / highlight >}}
 
-# Build the `ocis` binary
+## Build the ocis binary
 
 The ocis binary source is in the ocis/ocis folder. In this folder you can build the ocis binary:
 
