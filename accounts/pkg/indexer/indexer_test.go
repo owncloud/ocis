@@ -1,7 +1,6 @@
 package indexer
 
 import (
-	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -124,25 +123,50 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	assert.NoError(t, err)
+
+	err = indexer.AddUniqueIndex(&User{}, "Email", "Id", "users")
+	assert.NoError(t, err)
 
 	user1 := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	user2 := &User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
 
-	err := indexer.Add(user1)
+	err = indexer.Add(user1)
 	assert.NoError(t, err)
 
 	err = indexer.Add(user2)
 	assert.NoError(t, err)
 
-	// Update to non existing value
-	err = indexer.Update(user2, "UserName", "frank", "jane")
+	err = indexer.Update(user1, &User{
+		Id:       "abcdefg-123",
+		UserName: "mikey-new",
+		Email:    "mikey@example.com",
+	})
 	assert.NoError(t, err)
+	v, err1 := indexer.FindBy(&User{}, "UserName", "mikey-new")
+	assert.NoError(t, err1)
+	assert.Len(t, v, 1)
+	v, err2 := indexer.FindBy(&User{}, "UserName", "mikey")
+	assert.NoError(t, err2)
+	assert.Len(t, v, 0)
 
-	// Update to non existing value
-	err = indexer.Update(user2, "UserName", "mikey", "jane")
-	assert.Error(t, err)
-	assert.IsType(t, &errors.AlreadyExistsErr{}, err)
+	err1 = indexer.Update(&User{
+		Id:       "abcdefg-123",
+		UserName: "mikey-new",
+		Email:    "mikey@example.com",
+	}, &User{
+		Id:       "abcdefg-123",
+		UserName: "mikey-newest",
+		Email:    "mikey-new@example.com",
+	})
+	assert.NoError(t, err1)
+	fbUserName, err2 := indexer.FindBy(&User{}, "UserName", "mikey-newest")
+	assert.NoError(t, err2)
+	assert.Len(t, fbUserName, 1)
+	fbEmail, err3 := indexer.FindBy(&User{}, "Email", "mikey-new@example.com")
+	assert.NoError(t, err3)
+	assert.Len(t, fbEmail, 1)
 }
 
 func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
@@ -162,9 +186,6 @@ func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = indexer.Add(pet2)
-	assert.NoError(t, err)
-
-	err = indexer.Update(pet2, "Name", "Ricky", "Jonny")
 	assert.NoError(t, err)
 }
 

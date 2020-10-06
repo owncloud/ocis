@@ -2,6 +2,7 @@
 package indexer
 
 import (
+	"fmt"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
 	"github.com/rs/zerolog"
@@ -143,13 +144,25 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 
 }
 
-func (i Indexer) Update(t interface{}, field, oldVal, newVal string) error {
-	typeName := getTypeFQN(t)
-	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.IndicesByField[field] {
-			pkVal := valueOf(t, fields.PKFieldName)
-			if err := idx.Update(pkVal, oldVal, newVal); err != nil {
-				return err
+func (i Indexer) Update(from, to interface{}) error {
+	typeNameFrom := getTypeFQN(from)
+	typeNameTo := getTypeFQN(to)
+	if typeNameFrom != typeNameTo {
+		return fmt.Errorf("update types do not match: from %v to %v", typeNameFrom, typeNameTo)
+	}
+
+	if fields, ok := i.indices[typeNameFrom]; ok {
+		for fName, indices := range fields.IndicesByField {
+			oldV := valueOf(from, fName)
+			newV := valueOf(to, fName)
+			pkVal := valueOf(from, fields.PKFieldName)
+			for _, index := range indices {
+				if oldV == newV {
+					continue
+				}
+				if err := index.Update(pkVal, oldV, newV); err != nil {
+					return err
+				}
 			}
 		}
 	}
