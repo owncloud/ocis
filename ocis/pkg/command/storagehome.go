@@ -11,25 +11,25 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 )
 
-// StorageStorageEOSCommand is the entrypoint for the reva-storage-oc command.
-func StorageStorageEOSCommand(cfg *config.Config) *cli.Command {
+// StorageHomeCommand is the entrypoint for the storage-home command.
+func StorageHomeCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-storage-eos",
-		Usage:    "Start storage storage service for eos mount",
+		Name:     "storage-home",
+		Usage:    "Start storage and data provider for /home mount",
 		Category: "Extensions",
-		Flags:    flagset.StorageEOSWithConfig(cfg.Storage),
+		Flags:    flagset.StorageHomeWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageStorageEOS(cfg)
+			scfg := configureStorageHome(cfg)
 
 			return cli.HandleAction(
-				command.StorageEOS(scfg).Action,
+				command.StorageHome(scfg).Action,
 				c,
 			)
 		},
 	}
 }
 
-func configureStorageStorageEOS(cfg *config.Config) *svcconfig.Config {
+func configureStorageHome(cfg *config.Config) *svcconfig.Config {
 	cfg.Storage.Log.Level = cfg.Log.Level
 	cfg.Storage.Log.Pretty = cfg.Log.Pretty
 	cfg.Storage.Log.Color = cfg.Log.Color
@@ -46,5 +46,5 @@ func configureStorageStorageEOS(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(StorageStorageEOSCommand)
+	register.AddCommand(StorageHomeCommand)
 }

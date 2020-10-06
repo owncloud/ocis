@@ -4,32 +4,32 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
-// StorageStorageRootCommand is the entrypoint for the reva-storage-root command.
-func StorageStorageRootCommand(cfg *config.Config) *cli.Command {
+// StoragePublicLinkCommand is the entrypoint for the reva-storage-oc command.
+func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-storage-root",
-		Usage:    "Start storage root storage",
+		Name:     "storage-storage-public-link",
+		Usage:    "Start storage public link storage",
 		Category: "Extensions",
-		Flags:    flagset.StorageRootWithConfig(cfg.Storage),
+		Flags:    flagset.StoragePublicLink(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageStorageRoot(cfg)
+			scfg := configureStoragePublicLink(cfg)
 
 			return cli.HandleAction(
-				command.StorageRoot(scfg).Action,
+				command.StoragePublicLink(scfg).Action,
 				c,
 			)
 		},
 	}
 }
 
-func configureStorageStorageRoot(cfg *config.Config) *svcconfig.Config {
+func configureStoragePublicLink(cfg *config.Config) *svcconfig.Config {
 	cfg.Storage.Log.Level = cfg.Log.Level
 	cfg.Storage.Log.Pretty = cfg.Log.Pretty
 	cfg.Storage.Log.Color = cfg.Log.Color
@@ -46,5 +46,5 @@ func configureStorageStorageRoot(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(StorageStorageRootCommand)
+	register.AddCommand(StoragePublicLinkCommand)
 }

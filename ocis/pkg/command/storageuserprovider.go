@@ -4,32 +4,32 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
-// StorageStorageOCDataCommand is the entrypoint for the reva-storage-oc-data command.
-func StorageStorageOCDataCommand(cfg *config.Config) *cli.Command {
+// StorageUserProviderCommand is the entrypoint for the storage-userprovider command.
+func StorageUserProviderCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-storage-oc-data",
-		Usage:    "Start storage storage data provider for oc mount",
+		Name:     "storage-userprovider",
+		Usage:    "Start storage userprovider service",
 		Category: "Extensions",
-		Flags:    flagset.StorageOCDataWithConfig(cfg.Storage),
+		Flags:    flagset.UsersWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageStorageOCData(cfg)
+			scfg := configureStorageUserProvider(cfg)
 
 			return cli.HandleAction(
-				command.StorageOCData(scfg).Action,
+				command.Users(scfg).Action,
 				c,
 			)
 		},
 	}
 }
 
-func configureStorageStorageOCData(cfg *config.Config) *svcconfig.Config {
+func configureStorageUserProvider(cfg *config.Config) *svcconfig.Config {
 	cfg.Storage.Log.Level = cfg.Log.Level
 	cfg.Storage.Log.Pretty = cfg.Log.Pretty
 	cfg.Storage.Log.Color = cfg.Log.Color
@@ -46,5 +46,5 @@ func configureStorageStorageOCData(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(StorageStorageOCDataCommand)
+	register.AddCommand(StorageUserProviderCommand)
 }
