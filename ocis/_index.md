@@ -1,5 +1,5 @@
 ---
-title: "Infinite Scale"
+title: "oCIS"
 date: 2020-02-27T20:35:00+01:00
 weight: -10
 geekdocRepo: https://github.com/owncloud/ocis
@@ -7,7 +7,19 @@ geekdocEditPath: edit/master/docs
 geekdocFilePath: _index.md
 ---
 
-This tool provides a single entrypoint for the whole ownCloud Infinite Scale stack.
+{{< figure class="floatright" src="/media/is.png" width="70%" height="auto" >}}
+
+## ownCloud Infinite Scale
+
+Welcome to oCIS! We develop a modern file-sync and share plattform, based on our knowledge and experience with the PHP ownCloud server project.
+
+### oCIS Server
+
+The oCIS server implementation follows go-lang best practices and is based on the [go-micro](https://go-micro.dev/) framework and [REVA](https://reva.link/). We love and stick to [12 Factor](https://12factor.net/). 
+oCIS is a micro-service based server, which allows scale-out of individual services to meet your specific performance requirements.
+We run a huge test suite, which was originated in ownCloud 10 and continues to grow.
+
+### Architecture Overview
 
 {{< mermaid class="text-center">}}
 graph TD
