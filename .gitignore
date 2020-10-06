@@ -5,5 +5,7 @@
 /hugo
 *.key
 *crt
+node_modules/
+/*/assets
 
 .idea
