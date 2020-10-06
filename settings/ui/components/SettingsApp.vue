@@ -1,38 +1,40 @@
 <template>
-  <div>
-    <div v-if="initialized" class="uk-width-3-4@m uk-container uk-padding">
-      <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
-        <p class="uk-flex uk-flex-middle">
-          <oc-icon name="info" class="uk-margin-xsmall-right" />
-          <translate>No settings available</translate>
-        </p>
-      </oc-alert>
-      <template v-else>
-        <template v-if="selectedExtensionName">
-          <div class="uk-flex uk-flex-between uk-flex-middle">
-            <h1 class="oc-page-title">
-              {{ selectedExtensionName }}
-            </h1>
+  <div class="oc-p">
+    <div class="uk-flex uk-flex-column" id="settings-app">
+      <template v-if="initialized">
+        <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
+          <p class="uk-flex uk-flex-middle">
+            <oc-icon name="info" class="oc-mr-s" />
+            <translate>No settings available</translate>
+          </p>
+        </oc-alert>
+        <template v-else>
+          <template v-if="selectedExtensionName">
+            <div class="uk-flex uk-flex-between uk-flex-middle">
+              <h1 class="oc-page-title">
+                {{ selectedExtensionName }}
+              </h1>
+            </div>
+            <hr />
+          </template>
+          <template v-if="settingsValuesLoaded">
+            <settings-bundle
+              v-for="bundle in selectedBundles"
+              :key="'bundle-' + bundle.id"
+              :bundle="bundle"
+              class="oc-mt"
+            />
+          </template>
+          <div class="oc-mt" v-else>
+            <oc-loader :aria-label="$gettext('Loading personal settings')" />
+            <oc-alert :aria-hidden="true" varition="primary" no-close>
+              <p v-translate>Loading personal settings...</p>
+            </oc-alert>
           </div>
-          <hr />
         </template>
-        <template v-if="settingsValuesLoaded">
-          <settings-bundle
-            v-for="bundle in selectedBundles"
-            :key="'bundle-' + bundle.id"
-            :bundle="bundle"
-            class="uk-margin-top"
-          />
-        </template>
-        <div class="uk-margin-top" v-else>
-          <oc-loader :aria-label="$gettext('Loading personal settings')" />
-          <oc-alert :aria-hidden="true" varition="primary" no-close>
-            <p v-translate>Loading personal settings...</p>
-          </oc-alert>
-        </div>
       </template>
+      <oc-loader v-else />
     </div>
-    <oc-loader v-else />
   </div>
 </template>
 
