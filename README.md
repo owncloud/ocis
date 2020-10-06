@@ -70,15 +70,15 @@ richard:superfluidity
 
 ## Create a local Docker image for testing
 
-- Navigate into the root folder of the repository and execute
+  - Navigate into the root folder of the repository and execute
 ```console
 docker build -t owncloud/ocis:dev .
 ```
-- To run it, execute
+  - To run it, execute
 ```console
 docker run --rm -ti owncloud/ocis:test
 ```
-- The image can be tagged however you like, just make sure you run the right one then
+  - The image can be tagged however you like, just make sure you run the right one then
 
 ## Running single extensions
 
