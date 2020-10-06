@@ -64,6 +64,26 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_STORAGE_METADATA_ROOT"},
 			Destination: &cfg.Reva.Storages.Common.Root,
 		},
+
+		// Gateway
+
+		&cli.StringFlag{
+			Name:        "gateway-url",
+			Value:       "localhost:9142",
+			Usage:       "URL to use for the reva gateway service",
+			EnvVars:     []string{"REVA_GATEWAY_URL"},
+			Destination: &cfg.Reva.Gateway.URL,
+		},
+
+		// User provider
+
+		&cli.StringFlag{
+			Name:        "users-url",
+			Value:       "localhost:9144",
+			Usage:       "URL to use for the reva service",
+			EnvVars:     []string{"REVA_USERS_URL"},
+			Destination: &cfg.Reva.Users.URL,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)
