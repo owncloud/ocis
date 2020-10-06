@@ -1,8 +1,8 @@
 ---
 title: "Releasing"
 weight: 40
-geekdocRepo: https://github.com/owncloud/ocis-phoenix
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/ocis-phoenix
 geekdocFilePath: releasing.md
 ---
 

@@ -1,13 +1,11 @@
 ---
-title: "Building the documentation"
+title: "Build the documentation"
 date: 2020-07-27T08:39:38+00:00
 weight: 99
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/development
 geekdocFilePath: building-docs.md
 ---
-
-{{< toc >}}
 
 ## Buildling the documentation
 
@@ -28,9 +26,15 @@ hugo -D server
 
 Then open "http://localhost:1313/"
 
-When making changes to the docs, run `make docs` again and the server will pick up the changes and reload the page automatically
+When making changes to the docs, run 
+
+```bash
+rsync -ax --delete ../docs/ content/
+``` 
+
+in the hugo folder and the server will pick up the changes and reload the page automatically.
 
 ### Deploying the documentation
 
-The documentation is automatically deployed from the master branch to https://owncloud.github.io/phoenix/
+The documentation is automatically deployed from the master branch to https://owncloud.github.io
 
