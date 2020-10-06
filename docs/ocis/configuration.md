@@ -1,9 +1,9 @@
 ---
 title: "Configuration"
-date: "2020-09-21T13:14:56+0200"
+date: "2020-10-05T21:19:39+0200"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: configuration.md
 ---
 
@@ -43,28 +43,25 @@ ownCloud Infinite Scale Stack
 
 Usage: `ocis [global options] command [command options] [arguments...]`
 
---config-file | $OCIS_CONFIG_FILE  
+--config-file | $OCIS_CONFIG_FILE
 : Path to config file.
 
---log-level | $OCIS_LOG_LEVEL  
+--log-level | $OCIS_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $OCIS_LOG_PRETTY  
+--log-pretty | $OCIS_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $OCIS_LOG_COLOR  
+--log-color | $OCIS_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
 
-### ocis health
+### ocis kill
 
-Check health status
+Kill an extension by name
 
-Usage: `ocis health [command options] [arguments...]`
-
---debug-addr | $OCIS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
+Usage: `ocis kill [command options] [arguments...]`
 
 ### ocis server
 
@@ -72,41 +69,62 @@ Start fullstack server
 
 Usage: `ocis server [command options] [arguments...]`
 
---tracing-enabled | $OCIS_TRACING_ENABLED  
+--tracing-enabled | $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $OCIS_TRACING_TYPE  
+--tracing-type | $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $OCIS_TRACING_ENDPOINT  
+--tracing-endpoint | $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent. Default: `localhost:6831`.
 
---tracing-collector | $OCIS_TRACING_COLLECTOR  
+--tracing-collector | $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector. Default: `http://localhost:14268/api/traces`.
 
---tracing-service | $OCIS_TRACING_SERVICE  
+--tracing-service | $OCIS_TRACING_SERVICE
 : Service name for tracing. Default: `ocis`.
 
---debug-addr | $OCIS_DEBUG_ADDR  
+--debug-addr | $OCIS_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9010`.
 
---debug-token | $OCIS_DEBUG_TOKEN  
+--debug-token | $OCIS_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $OCIS_DEBUG_PPROF  
+--debug-pprof | $OCIS_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $OCIS_DEBUG_ZPAGES  
+--debug-zpages | $OCIS_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---http-addr | $OCIS_HTTP_ADDR  
+--http-addr | $OCIS_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9000`.
 
---http-root | $OCIS_HTTP_ROOT  
+--http-root | $OCIS_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
---grpc-addr | $OCIS_GRPC_ADDR  
+--grpc-addr | $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+### ocis run
+
+Runs an extension
+
+Usage: `ocis run [command options] [arguments...]`
+
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+--debug-addr | $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
 
 ### List of available Extension subcommands
 
@@ -116,9 +134,29 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start konnectd server
 
-#### ocis run
+#### ocis storage-frontend
 
-Runs an extension
+Start storage frontend
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis storage-storage-root
+
+Start storage root storage
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-storage-home
+
+Start storage storage service for home mount
+
+#### ocis storage-storage-public-link
+
+Start storage public link storage
 
 #### ocis store
 
@@ -128,95 +166,67 @@ Start a go-micro store
 
 Start glauth server
 
-#### ocis ocs
+#### ocis storage-auth-bearer
 
-Start ocs server
+Start storage auth-bearer service
 
-#### ocis reva-storage-eos-data
+#### ocis storage-sharing
 
-Start reva storage data provider for eos mount
+Start storage sharing service
 
-#### ocis reva-storage-home-data
+#### ocis webdav
 
-Start reva storage data provider for home mount
+Start webdav server
 
-#### ocis kill
+#### ocis storage-storage-oc-data
 
-Kill an extension by name
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis reva-auth-bearer
-
-Start reva auth-bearer service
-
-#### ocis reva-storage-oc-data
-
-Start reva storage data provider for oc mount
-
-#### ocis settings
-
-Start settings server
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis phoenix
-
-Start phoenix server
-
-#### ocis reva-storage-eos
-
-Start reva storage service for eos mount
-
-#### ocis reva-storage-home
-
-Start reva storage service for home mount
-
-#### ocis reva-storage-oc
-
-Start reva storage service for oc mount
-
-#### ocis reva-storage-root
-
-Start reva root storage
-
-#### ocis reva-gateway
-
-Start reva gateway
-
-#### ocis reva-sharing
-
-Start reva sharing service
-
-#### ocis reva-users
-
-Start reva users service
-
-#### ocis list
-
-Lists running ocis extensions
-
-#### ocis reva-auth-basic
-
-Start reva auth-basic service
-
-#### ocis reva-frontend
-
-Start reva frontend
-
-#### ocis reva-storage-public-link
-
-Start reva public link storage
+Start storage storage data provider for oc mount
 
 #### ocis thumbnails
 
 Start thumbnails server
 
-#### ocis webdav
+#### ocis proxy
 
-Start webdav server
+Start proxy server
+
+#### ocis settings
+
+Start settings server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-storage-metadata
+
+Start storage storage service for metadata mount
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-storage-eos
+
+Start storage storage service for eos mount
+
+#### ocis storage-storage-eos-data
+
+Start storage storage data provider for eos mount
+
+#### ocis storage-storage-home-data
+
+Start storage storage data provider for home mount
+
+#### ocis storage-storage-oc
+
+Start storage storage service for oc mount
+
+#### ocis storage-users
+
+Start storage users service
+
+#### ocis phoenix
+
+Start phoenix server
 

@@ -21,7 +21,7 @@ require (
 	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-phoenix v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-pkg v0.1.0
-	github.com/owncloud/ocis/ocis-reva v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/storage v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/proxy v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
@@ -40,7 +40,7 @@ replace (
 	github.com/owncloud/ocis/konnectd => ../konnectd
 	github.com/owncloud/ocis/ocis-phoenix => ../ocis-phoenix
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
-	github.com/owncloud/ocis/ocis-reva => ../ocis-reva
+	github.com/owncloud/ocis/storage => ../storage
 	github.com/owncloud/ocis/ocs => ../ocs
 	github.com/owncloud/ocis/proxy => ../proxy
 	github.com/owncloud/ocis/settings => ../settings
