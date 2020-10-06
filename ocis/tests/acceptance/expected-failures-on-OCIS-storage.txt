@@ -1192,6 +1192,84 @@ apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:103
 apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:104
 apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:105
 #
+# https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
+apiWebdavEtagPropagation1/deleteFileFolder.feature:25
+apiWebdavEtagPropagation1/deleteFileFolder.feature:26
+apiWebdavEtagPropagation1/deleteFileFolder.feature:43
+apiWebdavEtagPropagation1/deleteFileFolder.feature:44
+apiWebdavEtagPropagation1/deleteFileFolder.feature:62
+apiWebdavEtagPropagation1/deleteFileFolder.feature:63
+apiWebdavEtagPropagation1/deleteFileFolder.feature:185
+apiWebdavEtagPropagation1/deleteFileFolder.feature:199
+#
+# https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
+# https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
+apiWebdavEtagPropagation1/deleteFileFolder.feature:91
+apiWebdavEtagPropagation1/deleteFileFolder.feature:92
+apiWebdavEtagPropagation1/deleteFileFolder.feature:120
+apiWebdavEtagPropagation1/deleteFileFolder.feature:121
+apiWebdavEtagPropagation1/deleteFileFolder.feature:151
+apiWebdavEtagPropagation1/deleteFileFolder.feature:152
+apiWebdavEtagPropagation1/deleteFileFolder.feature:182
+apiWebdavEtagPropagation1/deleteFileFolder.feature:183
+#
+# https://github.com/owncloud/product/issues/238 renaming a files does not change etag of containing folder
+apiWebdavEtagPropagation1/moveFileFolder.feature:20
+apiWebdavEtagPropagation1/moveFileFolder.feature:21
+apiWebdavEtagPropagation1/moveFileFolder.feature:74
+apiWebdavEtagPropagation1/moveFileFolder.feature:75
+apiWebdavEtagPropagation1/moveFileFolder.feature:93
+apiWebdavEtagPropagation1/moveFileFolder.feature:94
+apiWebdavEtagPropagation1/moveFileFolder.feature:112
+apiWebdavEtagPropagation1/moveFileFolder.feature:113
+apiWebdavEtagPropagation1/moveFileFolder.feature:306
+apiWebdavEtagPropagation1/moveFileFolder.feature:321
+#
+# https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
+apiWebdavEtagPropagation1/moveFileFolder.feature:39
+apiWebdavEtagPropagation1/moveFileFolder.feature:40
+apiWebdavEtagPropagation1/moveFileFolder.feature:58
+apiWebdavEtagPropagation1/moveFileFolder.feature:59
+#
+# https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
+apiWebdavEtagPropagation1/moveFileFolder.feature:139
+apiWebdavEtagPropagation1/moveFileFolder.feature:140
+apiWebdavEtagPropagation1/moveFileFolder.feature:166
+apiWebdavEtagPropagation1/moveFileFolder.feature:167
+apiWebdavEtagPropagation1/moveFileFolder.feature:201
+apiWebdavEtagPropagation1/moveFileFolder.feature:202
+apiWebdavEtagPropagation1/moveFileFolder.feature:235
+apiWebdavEtagPropagation1/moveFileFolder.feature:236
+apiWebdavEtagPropagation1/moveFileFolder.feature:269
+apiWebdavEtagPropagation1/moveFileFolder.feature:270
+apiWebdavEtagPropagation1/moveFileFolder.feature:303
+apiWebdavEtagPropagation1/moveFileFolder.feature:304
+apiWebdavEtagPropagation2/createFolder.feature:63
+apiWebdavEtagPropagation2/createFolder.feature:64
+apiWebdavEtagPropagation2/createFolder.feature:87
+apiWebdavEtagPropagation2/createFolder.feature:88
+apiWebdavEtagPropagation2/upload.feature:63
+apiWebdavEtagPropagation2/upload.feature:64
+apiWebdavEtagPropagation2/upload.feature:86
+apiWebdavEtagPropagation2/upload.feature:87
+apiWebdavEtagPropagation2/upload.feature:110
+apiWebdavEtagPropagation2/upload.feature:111
+apiWebdavEtagPropagation2/upload.feature:134
+apiWebdavEtagPropagation2/upload.feature:135
+#
+# https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
+apiWebdavEtagPropagation2/restoreFromTrash.feature:25
+apiWebdavEtagPropagation2/restoreFromTrash.feature:26
+apiWebdavEtagPropagation2/restoreFromTrash.feature:46
+apiWebdavEtagPropagation2/restoreFromTrash.feature:47
+apiWebdavEtagPropagation2/restoreFromTrash.feature:65
+apiWebdavEtagPropagation2/restoreFromTrash.feature:66
+apiWebdavEtagPropagation2/restoreFromTrash.feature:86
+apiWebdavEtagPropagation2/restoreFromTrash.feature:87
+#
+# https://github.com/owncloud/product/issues/210 Implement Versions Feature for ocis storage
+apiWebdavEtagPropagation2/restoreVersion.feature:10
+#
 # Failures that need to be investigated
 apiShareManagementBasic/createShare.feature:85
 apiShareManagementBasic/createShare.feature:86
