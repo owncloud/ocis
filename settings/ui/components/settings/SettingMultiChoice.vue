@@ -21,17 +21,12 @@
           v-for="(option, index) in setting.multiChoiceValue.options"
           :key="getOptionElementId(index)"
         >
-          <label :for="getOptionElementId(index)">
-            <input
-              :id="getOptionElementId(index)"
-              type="checkbox"
-              class="oc-checkbox"
-              :value="option"
-              v-model="selectedOptions"
-              @change="onSelectedOption"
-            />
-            {{ option.displayValue }}
-          </label>
+          <oc-checkbox
+            v-model="selectedOptions"
+            :option="option"
+            @input="onSelectedOption"
+            :label="option.displayValue"
+          />
         </li>
       </ul>
     </oc-drop>

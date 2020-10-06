@@ -22,17 +22,12 @@
           v-for="(option, index) in setting.singleChoiceValue.options"
           :key="getOptionElementId(index)"
         >
-          <label :for="getOptionElementId(index)">
-            <input
-              :id="getOptionElementId(index)"
-              type="radio"
-              class="oc-radiobutton"
-              v-model="selectedOption"
-              :value="option"
-              @change="onSelectedOption"
-            />
-            {{ option.displayValue }}
-          </label>
+          <oc-radio
+            v-model="selectedOption"
+            :option="option"
+            @input="onSelectedOption"
+            :label="option.displayValue"
+          />
         </li>
       </ul>
     </oc-drop>
