@@ -1,5 +1,5 @@
 ---
-title: "Building the documentation"
+title: "Build the documentation"
 date: 2020-07-27T08:39:38+00:00
 weight: 99
 geekdocRepo: https://github.com/owncloud/ocis
@@ -30,5 +30,5 @@ When making changes to the docs, run `make docs` again and the server will pick 
 
 ### Deploying the documentation
 
-The documentation is automatically deployed from the master branch to https://owncloud.github.io/phoenix/
+The documentation is automatically deployed from the master branch to https://owncloud.github.io
 
