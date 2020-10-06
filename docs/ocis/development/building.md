@@ -36,7 +36,7 @@ Finally, you should have the binary within the `bin/` folder now, give it a try 
 If you are developing on a local branch based on docker / docker-compose setup, here is how to build a new ocis image. In the root folder:
 
 {{< highlight txt >}}
-docker build -t owncloud/ocis:local .
+docker build -t owncloud/ocis:dev .
 {{< / highlight >}}
 
 Then you can test as usual via
