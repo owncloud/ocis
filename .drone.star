@@ -1181,6 +1181,7 @@ def ocisServer(storage):
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/ocis/',
+        'mkdir -p /srv/app/tmp/ocis/owncloud/',
         'mkdir -p /srv/app/tmp/ocis/storage/',
         'mkdir -p /srv/app/tmp/ocis/storage/users/',
         'ocis/bin/ocis server'
