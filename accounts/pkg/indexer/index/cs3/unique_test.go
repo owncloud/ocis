@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	ctx, cancelFunc = context.WithCancel(context.Background())
-)
+func init() {
+	go setupMetadataStorage()
+}
 
 func setupMetadataStorage() {
 	cfg := mcfg.New()
@@ -27,12 +27,11 @@ func setupMetadataStorage() {
 		Commands: []*cli.Command{command.StorageMetadata(cfg)},
 	}
 
-	_ = app.Command("storage-metadata").Run(cli.NewContext(&app, &flag.FlagSet{}, &cli.Context{Context: ctx}))
+	_ = app.Command("storage-metadata").Run(cli.NewContext(&app, &flag.FlagSet{}, &cli.Context{Context: context.Background()}))
 }
 
 func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
-	go setupMetadataStorage()
-	defer cancelFunc()
+	//go setupMetadataStorage()
 
 	dataDir := WriteIndexTestDataCS3(t,Data, "Id")
 	cfg := config.Config{
@@ -80,11 +79,12 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 	assert.Equal(t, searchRes[0], "abcdefg-123")
 
 	_ = os.RemoveAll(dataDir)
+
+	//cancelFunc()
 }
 
 func TestCS3UniqueIndexSearch(t *testing.T) {
-	go setupMetadataStorage()
-	defer cancelFunc()
+	//go setupMetadataStorage()
 
 	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
 	cfg := config.Config{
@@ -126,4 +126,6 @@ func TestCS3UniqueIndexSearch(t *testing.T) {
 	t.Log(res)
 
 	_ = os.RemoveAll(dataDir)
+
+	//cancelFunc()
 }

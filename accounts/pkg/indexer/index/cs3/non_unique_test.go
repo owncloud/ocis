@@ -11,8 +11,8 @@ import (
 )
 
 func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
-	go setupMetadataStorage()
-	defer cancelFunc()
+	//go setupMetadataStorage()
+	//defer cancelFunc()
 
 	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
 	cfg := config.Config{
