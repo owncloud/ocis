@@ -44,12 +44,12 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 		opt(opts)
 	}
 
-	return NonUniqueIndex{
+	return &NonUniqueIndex{
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
-		indexBaseDir: opts.IndexBaseDir,
-		indexRootDir: path.Join(opts.IndexBaseDir, strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"non_unique", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
 

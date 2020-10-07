@@ -53,15 +53,13 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 		opt(opts)
 	}
 
-	u := &Unique{
+	return &Unique{
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
 		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
 	}
-
-	return u
 }
 
 // NewUniqueIndex instantiates a new UniqueIndex instance. Init() should be

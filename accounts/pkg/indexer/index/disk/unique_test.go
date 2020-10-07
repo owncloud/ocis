@@ -1,8 +1,10 @@
 package disk
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -11,7 +13,7 @@ import (
 )
 
 func TestUniqueLookupSingleEntry(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t)
+	uniq, dataDir := getUniqueIdxSut(t, "Email")
 	filesDir := path.Join(dataDir, "users")
 
 	t.Log("existing lookup")
@@ -31,7 +33,7 @@ func TestUniqueLookupSingleEntry(t *testing.T) {
 }
 
 func TestUniqueUniqueConstraint(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t)
+	uniq, dataDir := getUniqueIdxSut(t, "Email")
 
 	_, err := uniq.Add("abcdefg-123", "mikey@example.com")
 	assert.Error(t, err)
@@ -41,7 +43,7 @@ func TestUniqueUniqueConstraint(t *testing.T) {
 }
 
 func TestUniqueRemove(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t)
+	uniq, dataDir := getUniqueIdxSut(t, "Email")
 
 	err := uniq.Remove("", "mikey@example.com")
 	assert.NoError(t, err)
@@ -54,46 +56,27 @@ func TestUniqueRemove(t *testing.T) {
 }
 
 func TestUniqueUpdate(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t)
+	uniq, dataDir := getUniqueIdxSut(t, "Email")
 
 	t.Log("successful update")
-	err := uniq.Update("", "", "mikey2@example.com")
+	err := uniq.Update("", "mikey@example.com", "mikey2@example.com")
 	assert.NoError(t, err)
 
 	t.Log("failed update because already exists")
-	err = uniq.Update("", "", "mikey2@example.com")
+	err = uniq.Update("", "mikey2@example.com", "mikey2@example.com")
 	assert.Error(t, err)
 	assert.IsType(t, &errors.AlreadyExistsErr{}, err)
 
 	t.Log("failed update because not found")
-	err = uniq.Update("", "", "something2@example.com")
+	err = uniq.Update("", "nonexisting@example.com", "something2@example.com")
 	assert.Error(t, err)
 	assert.IsType(t, &errors.NotFoundErr{}, err)
 
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestUniqueInit(t *testing.T) {
-	dataDir := CreateTmpDir(t)
-	indexRootDir := path.Join(dataDir, "index.disk")
-	filesDir := path.Join(dataDir, "users")
-
-	uniq := NewUniqueIndex("User", "Email", filesDir, indexRootDir)
-	assert.Error(t, uniq.Init(), "Init should return an error about missing files-dir")
-
-	if err := os.Mkdir(filesDir, 0777); err != nil {
-		t.Fatalf("Could not create test data-dir %s", err)
-	}
-
-	assert.NoError(t, uniq.Init(), "Init shouldn't return an error")
-	assert.DirExists(t, indexRootDir)
-	assert.DirExists(t, path.Join(indexRootDir, "UniqueUserByEmail"))
-
-	_ = os.RemoveAll(dataDir)
-}
-
 func TestUniqueIndexSearch(t *testing.T) {
-	sut, dataPath := getUniqueIdxSut(t)
+	sut, dataDir := getUniqueIdxSut(t, "Email")
 
 	res, err := sut.Search("j*@example.com")
 
@@ -107,7 +90,7 @@ func TestUniqueIndexSearch(t *testing.T) {
 	assert.Error(t, err)
 	assert.IsType(t, &errors.NotFoundErr{}, err)
 
-	_ = os.RemoveAll(dataPath)
+	_ = os.RemoveAll(dataDir)
 }
 
 func TestErrors(t *testing.T) {
@@ -115,9 +98,22 @@ func TestErrors(t *testing.T) {
 	assert.True(t, errors.IsNotFoundErr(&errors.NotFoundErr{}))
 }
 
-func getUniqueIdxSut(t *testing.T) (sut index.Index, dataPath string) {
-	dataPath = WriteIndexTestData(t, TestData, "Id")
-	sut = NewUniqueIndex("User", "Email", path.Join(dataPath, "users"), path.Join(dataPath, "indexer.disk"))
+func getUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
+	dataPath := WriteIndexTestData(t, TestData, "Id")
+	cfg := config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataPath,
+			},
+		},
+	}
+
+	sut := NewUniqueIndexWithOptions(
+		option.WithTypeName("test.Users.Disk"),
+		option.WithIndexBy(indexBy),
+		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "users")),
+		option.WithDataDir(cfg.Repo.Disk.Path),
+	)
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
@@ -132,5 +128,5 @@ func getUniqueIdxSut(t *testing.T) (sut index.Index, dataPath string) {
 		}
 	}
 
-	return
+	return sut, dataPath
 }

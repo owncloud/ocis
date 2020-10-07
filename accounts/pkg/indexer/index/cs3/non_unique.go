@@ -200,6 +200,28 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		return &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
+	toStat := path.Join("/meta", idx.indexRootDir, v)
+	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: toStat},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(lcResp.Infos) == 0 {
+		deletePath = path.Join("/meta", idx.indexRootDir, v)
+		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{Path: deletePath},
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

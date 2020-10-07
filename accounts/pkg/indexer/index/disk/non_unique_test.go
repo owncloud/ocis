@@ -1,8 +1,10 @@
 package disk
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -11,7 +13,7 @@ import (
 )
 
 func TestNonUniqueIndexAdd(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t)
+	sut, dataPath := getNonUniqueIdxSut(t, "Color")
 
 	ids, err := sut.Lookup("Green")
 	assert.NoError(t, err)
@@ -30,50 +32,31 @@ func TestNonUniqueIndexAdd(t *testing.T) {
 }
 
 func TestNonUniqueIndexUpdate(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t)
+	sut, dataPath := getNonUniqueIdxSut(t, "Color")
 
-	err := sut.Update("goefe-789", "", "Black")
+	err := sut.Update("goefe-789", "Green", "Black")
 	assert.NoError(t, err)
 
-	err = sut.Update("xadaf-189", "", "Black")
+	err = sut.Update("xadaf-189", "Green", "Black")
 	assert.NoError(t, err)
 
-	assert.DirExists(t, path.Join(dataPath, "index.disk/PetByColor/Black"))
-	assert.NoDirExists(t, path.Join(dataPath, "index.disk/PetByColor/Green"))
+	assert.DirExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Black"))
+	assert.NoDirExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green"))
 
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestNonUniqueIndexDelete(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t)
-	assert.FileExists(t, path.Join(dataPath, "index.disk/PetByColor/Green/goefe-789"))
+	sut, dataPath := getNonUniqueIdxSut(t, "Color")
+	assert.FileExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green/goefe-789"))
 	err := sut.Remove("goefe-789", "")
 	assert.NoError(t, err)
-	assert.NoFileExists(t, path.Join(dataPath, "index.disk/PetByColor/Green/goefe-789"))
+	assert.NoFileExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green/goefe-789"))
 	_ = os.RemoveAll(dataPath)
 }
 
-func TestNonUniqueIndexInit(t *testing.T) {
-	dataDir := CreateTmpDir(t)
-	indexRootDir := path.Join(dataDir, "index.disk")
-	filesDir := path.Join(dataDir, "users")
-
-	uniq := NewNonUniqueIndex("User", "DisplayName", filesDir, indexRootDir)
-	assert.Error(t, uniq.Init(), "Init should return an error about missing files-dir")
-
-	if err := os.Mkdir(filesDir, 0777); err != nil {
-		t.Fatalf("Could not create test data-dir %s", err)
-	}
-
-	assert.NoError(t, uniq.Init(), "Init shouldn't return an error")
-	assert.DirExists(t, indexRootDir)
-	assert.DirExists(t, path.Join(indexRootDir, "UserByDisplayName"))
-
-	_ = os.RemoveAll(dataDir)
-}
-
 func TestNonUniqueIndexSearch(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t)
+	sut, dataPath := getNonUniqueIdxSut(t, "Email")
 
 	res, err := sut.Search("Gr*")
 
@@ -90,9 +73,22 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 	_ = os.RemoveAll(dataPath)
 }
 
-func getNonUniqueIdxSut(t *testing.T) (sut index.Index, dataPath string) {
-	dataPath = WriteIndexTestData(t, TestData, "Id")
-	sut = NewNonUniqueIndex("Pet", "Color", path.Join(dataPath, "pets"), path.Join(dataPath, "index.disk"))
+func getNonUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
+	dataPath := WriteIndexTestData(t, TestData, "Id")
+	cfg := config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataPath,
+			},
+		},
+	}
+
+	sut := NewNonUniqueIndexWithOptions(
+		option.WithTypeName("test.Users.Disk"),
+		option.WithIndexBy(indexBy),
+		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "pets")),
+		option.WithDataDir(cfg.Repo.Disk.Path),
+	)
 	err := sut.Init()
 	if err != nil {
 		t.Fatal(err)
@@ -107,5 +103,5 @@ func getNonUniqueIdxSut(t *testing.T) (sut index.Index, dataPath string) {
 		}
 	}
 
-	return
+	return sut, dataPath
 }

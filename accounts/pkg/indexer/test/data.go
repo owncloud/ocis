@@ -56,7 +56,7 @@ func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) str
 }
 
 func WriteIndexTestDataCS3(t *testing.T, m map[string][]interface{}, pk string) string {
-	rootDir := "/var/tmp/ocis/root/data"
+	rootDir := "/var/tmp/ocis/storage/users/data"
 	for dirName := range m {
 		fileTypePath := path.Join(rootDir, dirName)
 
