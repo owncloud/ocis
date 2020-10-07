@@ -86,7 +86,7 @@ func TestUniqueIndexSearch(t *testing.T) {
 	assert.Equal(t, "ewf4ofk-555", path.Base(res[0]))
 	assert.Equal(t, "rulan54-777", path.Base(res[1]))
 
-	res, err = sut.Search("does-not-exist@example.com")
+	_, err = sut.Search("does-not-exist@example.com")
 	assert.Error(t, err)
 	assert.IsType(t, &errors.NotFoundErr{}, err)
 

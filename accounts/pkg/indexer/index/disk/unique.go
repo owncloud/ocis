@@ -159,7 +159,7 @@ func (idx Unique) Search(pattern string) ([]string, error) {
 		return nil, &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: pattern}
 	}
 
-	res := make([]string, 0, 0)
+	res := make([]string, 0)
 	for _, p := range paths {
 		if err := isValidSymlink(p); err != nil {
 			return nil, err

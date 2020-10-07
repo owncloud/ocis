@@ -20,17 +20,6 @@ type Options struct {
 	ProviderAddr string
 }
 
-// newOptions initializes the available default options.
-func newOptions(opts ...Option) Options {
-	opt := Options{}
-
-	for _, o := range opts {
-		o(&opt)
-	}
-
-	return opt
-}
-
 func WithJWTSecret(val string) Option {
 	return func(o *Options) {
 		o.JWTSecret = val

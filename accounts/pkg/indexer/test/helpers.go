@@ -43,10 +43,3 @@ func GetTypeFQN(t interface{}) string {
 	typeName = strings.ReplaceAll(typeName, "/", ".")
 	return typeName
 }
-
-func valueOf(v interface{}, field string) string {
-	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).FieldByName(field)
-
-	return f.String()
-}
