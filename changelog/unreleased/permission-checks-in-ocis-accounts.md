@@ -1,5 +1,7 @@
 Change: Account management permissions for Admin role
 
+Tags: accounts, settings
+
 We created an `AccountManagement` permission and added it to the default admin role. There are permission
 checks in place to protected http endpoints in ocis-accounts against requests without the permission.
 All existing default users (einstein, marie, richard) have the default user role now (doesn't have the

@@ -1,4 +1,6 @@
-Change: Add glauth service to the monorepo
+Enhancement: Add the glauth service
+
+Tags: glauth
 
 * Bugfix - Return invalid credentials when user was not found: [#30](https://github.com/owncloud/ocis/glauth/pull/30)
 * Bugfix - Query numeric attribute values without quotes: [#28](https://github.com/owncloud/ocis/glauth/issues/28)
@@ -16,3 +18,5 @@ Change: Add glauth service to the monorepo
 * Enhancement - Provide additional tls-endpoint: [#12](https://github.com/owncloud/ocis/glauth/pull/12)
 * Change - Use physicist demo users: [#5](https://github.com/owncloud/ocis/glauth/issues/5)
 * Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis/glauth/pull/6)
+
+https://github.com/owncloud/product/issues/244

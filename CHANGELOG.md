@@ -6,7 +6,6 @@
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
-* Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Improve reva service descriptions: [#536](https://github.com/owncloud/ocis/pull/536)
@@ -19,7 +18,6 @@
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
-* Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#593](https://github.com/owncloud/ocis/pull/593)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
@@ -54,14 +52,6 @@
    ARM builds were failing when built on alpine:edge, so we switched to alpine:latest instead.
 
    https://github.com/owncloud/ocis/pull/416
-
-* Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
-
-   We improved the UX of the accounts UI by showing a message information the user about missing
-   permissions when the accounts or roles fail to load. This was showing an indeterminate
-   progress bar before.
-
-   https://github.com/owncloud/ocis/pull/656
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -176,12 +166,6 @@
    https://github.com/owncloud/ocis/pull/337
    https://github.com/owncloud/ocis/pull/338
    https://github.com/owncloud/ocis/ocis-reva/pull/891
-
-* Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
-
-   We moved settings and accounts to the user menu.
-
-   https://github.com/owncloud/ocis/pull/656
 
 * Enhancement - Add the accounts service: [#593](https://github.com/owncloud/ocis/pull/593)
 
