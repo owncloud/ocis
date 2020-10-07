@@ -25,6 +25,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
+	github.com/prometheus/client_golang v1.7.1
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
