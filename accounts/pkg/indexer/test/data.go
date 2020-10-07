@@ -10,27 +10,27 @@ import (
 
 // User is a user.
 type User struct {
-	Id, UserName, Email string
+	ID, UserName, Email string
 }
 
 // TestPet is a pet.
 type TestPet struct {
-	Id, Kind, Color, Name string
+	ID, Kind, Color, Name string
 }
 
 // TestData mock data.
 var TestData = map[string][]interface{}{
 	"users": {
-		User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
-		User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
-		User{Id: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com"},
-		User{Id: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
+		User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
+		User{ID: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
+		User{ID: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com"},
+		User{ID: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
 	},
 	"pets": {
-		TestPet{Id: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},
-		TestPet{Id: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
-		TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
-		TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
+		TestPet{ID: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},
+		TestPet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
+		TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
+		TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
 	},
 }
 
