@@ -1,16 +1,39 @@
 package cs3
 
 import (
-	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
-	"github.com/stretchr/testify/assert"
+	"context"
+	"flag"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
+	"github.com/owncloud/ocis/storage/pkg/command"
+	mcfg "github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/stretchr/testify/assert"
 )
 
+var (
+	ctx, cancelFunc = context.WithCancel(context.Background())
+)
+
+func setupMetadataStorage() {
+	cfg := mcfg.New()
+	app := cli.App{
+		Name:     "storage-metadata-for-tests",
+		Commands: []*cli.Command{command.StorageMetadata(cfg)},
+	}
+
+	_ = app.Command("storage-metadata").Run(cli.NewContext(&app, &flag.FlagSet{}, &cli.Context{Context: ctx}))
+}
+
 func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
+	go setupMetadataStorage()
+	defer cancelFunc()
+
 	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
@@ -60,6 +83,9 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 }
 
 func TestCS3UniqueIndexSearch(t *testing.T) {
+	go setupMetadataStorage()
+	defer cancelFunc()
+
 	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
