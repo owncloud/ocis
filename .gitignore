@@ -1,12 +1,12 @@
 */coverage.out
 
-/**/config
-/**/bin
-/**/dist
+ocis/config/identifier-registration.yaml
+*/bin
+*/dist
 /hugo
 *.key
 *crt
 node_modules/
-/*/assets
+*/assets
 
 .idea
