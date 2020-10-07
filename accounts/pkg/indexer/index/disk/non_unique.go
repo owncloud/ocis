@@ -2,7 +2,6 @@ package disk
 
 import (
 	"errors"
-	"fmt"
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
@@ -53,18 +52,7 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 	}
 }
 
-// NewNonUniqueIndex instantiates a new NonUniqueIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
-func NewNonUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) NonUniqueIndex {
-	return NonUniqueIndex{
-		indexBy:      indexBy,
-		typeName:     typeName,
-		filesDir:     filesDir,
-		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, fmt.Sprintf("%sBy%s", typeName, indexBy)),
-	}
-}
-
+// Init initializes a unique index.
 func (idx NonUniqueIndex) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
@@ -77,6 +65,7 @@ func (idx NonUniqueIndex) Init() error {
 	return nil
 }
 
+// Lookup exact lookup by value.
 func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	fi, err := ioutil.ReadDir(searchPath)
@@ -100,6 +89,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 	return ids, nil
 }
 
+// Add adds a value to the index, returns the path to the root-document
 func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v, id)
@@ -117,6 +107,7 @@ func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 
 }
 
+// Remove a value v from an index.
 func (idx NonUniqueIndex) Remove(id string, v string) error {
 	res, err := filepath.Glob(path.Join(idx.indexRootDir, "/*/", id))
 	if err != nil {
@@ -132,6 +123,7 @@ func (idx NonUniqueIndex) Remove(id string, v string) error {
 	return nil
 }
 
+// Update index from <oldV> to <newV>.
 func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
 	oldDir := path.Join(idx.indexRootDir, oldV)
 	oldPath := path.Join(oldDir, id)
@@ -170,6 +162,7 @@ func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
 
 }
 
+// Search allows for glob search on the index.
 func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern, "*"))
 	if err != nil {
@@ -183,14 +176,17 @@ func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
 	return paths, nil
 }
 
+// IndexBy undocumented.
 func (idx NonUniqueIndex) IndexBy() string {
 	return idx.indexBy
 }
 
+// TypeName undocumented.
 func (idx NonUniqueIndex) TypeName() string {
 	return idx.typeName
 }
 
+// FilesDir undocumented.
 func (idx NonUniqueIndex) FilesDir() string {
 	return idx.filesDir
 }

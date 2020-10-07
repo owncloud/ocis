@@ -22,6 +22,7 @@ import (
 	"strings"
 )
 
+// Unique are fields for an index of type non_unique.
 type Unique struct {
 	indexBy      string
 	typeName     string
@@ -36,6 +37,7 @@ type Unique struct {
 	cs3conf *Config
 }
 
+// Config represents cs3conf. Should be deprecated in favor of config.Config.
 type Config struct {
 	ProviderAddr    string
 	DataURL         string
@@ -82,25 +84,7 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 	return u
 }
 
-// NewUniqueIndex instantiates a new UniqueIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
-func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string, cfg *Config) Unique {
-	return Unique{
-		indexBy:      indexBy,
-		typeName:     typeName,
-		filesDir:     filesDir,
-		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"unique", typeName, indexBy}, ".")),
-		cs3conf:      cfg,
-		dataProvider: dataProviderClient{
-			baseURL: singleJoiningSlash(cfg.DataURL, cfg.DataPrefix),
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
-		},
-	}
-}
-
+// Init initializes a unique index.
 func (idx *Unique) Init() error {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": idx.cs3conf.JWTSecret,
@@ -151,6 +135,7 @@ func (idx *Unique) Add(id, v string) (string, error) {
 	return newName, nil
 }
 
+// Lookup exact lookup by value.
 func (idx *Unique) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	oldname, err := idx.resolveSymlink(searchPath)
@@ -165,7 +150,7 @@ func (idx *Unique) Lookup(v string) ([]string, error) {
 	return []string{oldname}, nil
 }
 
-// 97d28b57
+// Remove a value v from an index.
 func (idx *Unique) Remove(id string, v string) error {
 	searchPath := path.Join(idx.indexRootDir, v)
 	_, err := idx.resolveSymlink(searchPath)
@@ -203,6 +188,7 @@ func (idx *Unique) Remove(id string, v string) error {
 	return err
 }
 
+// Update index from <oldV> to <newV>.
 func (idx *Unique) Update(id, oldV, newV string) error {
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
@@ -215,6 +201,7 @@ func (idx *Unique) Update(id, oldV, newV string) error {
 	return nil
 }
 
+// Search allows for glob search on the index.
 func (idx *Unique) Search(pattern string) ([]string, error) {
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
@@ -253,14 +240,17 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 
 }
 
+// IndexBy undocumented.
 func (idx *Unique) IndexBy() string {
 	return idx.indexBy
 }
 
+// TypeName undocumented.
 func (idx *Unique) TypeName() string {
 	return idx.typeName
 }
 
+// FilesDir undocumented.
 func (idx *Unique) FilesDir() string {
 	return idx.filesDir
 }

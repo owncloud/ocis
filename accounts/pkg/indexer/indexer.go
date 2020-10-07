@@ -8,34 +8,20 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
-	"github.com/rs/zerolog"
 	"path"
 )
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
-	repoConfig *config.Config
-	config     *Config
-	indices    typeMap
+	config  *config.Config
+	indices typeMap
 }
 
-type Config struct {
-	DataDir          string
-	IndexRootDirName string
-	Log              zerolog.Logger
-}
-
-func NewIndexer(cfg *Config) *Indexer {
+// CreateIndexer creates a new Indexer.
+func CreateIndexer(cfg *config.Config) *Indexer {
 	return &Indexer{
 		config:  cfg,
 		indices: typeMap{},
-	}
-}
-
-func CreateIndexer(cfg *config.Config) *Indexer {
-	return &Indexer{
-		repoConfig: cfg,
-		indices:    typeMap{},
 	}
 }
 
@@ -47,8 +33,9 @@ func getRegistryStrategy(cfg *config.Config) string {
 	return "cs3"
 }
 
+// AddIndex adds a new index to the indexer receiver.
 func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string) error {
-	strategy := getRegistryStrategy(i.repoConfig)
+	strategy := getRegistryStrategy(i.config)
 	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
@@ -56,19 +43,19 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
+			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.config.Repo.Disk.Path),
 		)
 	} else if strategy == "cs3" {
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
-			option.WithDataURL(i.repoConfig.Repo.CS3.DataURL),
-			option.WithDataPrefix(i.repoConfig.Repo.CS3.DataPrefix),
-			option.WithJWTSecret(i.repoConfig.Repo.CS3.JWTSecret),
-			option.WithProviderAddr(i.repoConfig.Repo.CS3.ProviderAddr),
+			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.config.Repo.Disk.Path),
+			option.WithDataURL(i.config.Repo.CS3.DataURL),
+			option.WithDataPrefix(i.config.Repo.CS3.DataPrefix),
+			option.WithJWTSecret(i.config.Repo.CS3.JWTSecret),
+			option.WithProviderAddr(i.config.Repo.CS3.ProviderAddr),
 		)
 	}
 
@@ -94,6 +81,7 @@ func (i Indexer) Add(t interface{}) error {
 	return nil
 }
 
+// FindBy finds a value on an index by field and value.
 func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, error) {
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
@@ -123,6 +111,7 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	return result, nil
 }
 
+// Delete deletes all indexed fields of a given type t on the Indexer.
 func (i Indexer) Delete(t interface{}) error {
 	typeName := getTypeFQN(t)
 	if fields, ok := i.indices[typeName]; ok {
@@ -140,6 +129,7 @@ func (i Indexer) Delete(t interface{}) error {
 	return nil
 }
 
+// FindByPartial allows for glob search across all indexes.
 func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]string, error) {
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
@@ -170,6 +160,7 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 
 }
 
+// Update updates all indexes on a value <from> to a value <to>.
 func (i Indexer) Update(from, to interface{}) error {
 	typeNameFrom := getTypeFQN(from)
 	typeNameTo := getTypeFQN(to)

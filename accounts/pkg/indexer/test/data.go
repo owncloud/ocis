@@ -8,14 +8,17 @@ import (
 	"testing"
 )
 
+// TestUser is a user.
 type TestUser struct {
 	Id, UserName, Email string
 }
 
+// TestPet is a pet.
 type TestPet struct {
 	Id, Kind, Color, Name string
 }
 
+// TestData mock data.
 var TestData = map[string][]interface{}{
 	"users": {
 		TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
@@ -31,6 +34,7 @@ var TestData = map[string][]interface{}{
 	},
 }
 
+// WriteIndexTestData writes mock data to disk.
 func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) string {
 	rootDir := CreateTmpDir(t)
 	for dirName := range m {
@@ -55,6 +59,7 @@ func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) str
 	return rootDir
 }
 
+// WriteIndexTestDataCS3 writes more data to disk.
 func WriteIndexTestDataCS3(t *testing.T, m map[string][]interface{}, pk string) string {
 	rootDir := "/var/tmp/ocis/storage/users/data"
 	for dirName := range m {

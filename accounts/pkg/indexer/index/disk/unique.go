@@ -62,18 +62,7 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 	}
 }
 
-// NewUniqueIndex instantiates a new UniqueIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
-func NewUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string) Unique {
-	return Unique{
-		indexBy:      indexBy,
-		typeName:     typeName,
-		filesDir:     filesDir,
-		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"unique", typeName, indexBy}, ".")),
-	}
-}
-
+// Init initializes a unique index.
 func (idx *Unique) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
@@ -86,6 +75,7 @@ func (idx *Unique) Init() error {
 	return nil
 }
 
+// Add adds a value to the index, returns the path to the root-document
 func (idx Unique) Add(id, v string) (string, error) {
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v)
@@ -97,6 +87,7 @@ func (idx Unique) Add(id, v string) (string, error) {
 	return newName, err
 }
 
+// Remove a value v from an index.
 func (idx Unique) Remove(id string, v string) (err error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err = isValidSymlink(searchPath); err != nil {
@@ -106,8 +97,7 @@ func (idx Unique) Remove(id string, v string) (err error) {
 	return os.Remove(searchPath)
 }
 
-// unique.github.com.owncloud.ocis.accounts.pkg.indexer.User.UserName
-// unique.github.com.owncloud.ocis.accounts.pkg.indexer.User.UserName/UserName
+// Lookup exact lookup by value.
 func (idx Unique) Lookup(v string) (resultPath []string, err error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err = isValidSymlink(searchPath); err != nil {
@@ -127,6 +117,7 @@ func (idx Unique) Lookup(v string) (resultPath []string, err error) {
 
 }
 
+// Update index from <oldV> to <newV>.
 func (idx Unique) Update(id, oldV, newV string) (err error) {
 	oldPath := path.Join(idx.indexRootDir, oldV)
 	if err = isValidSymlink(oldPath); err != nil {
@@ -149,6 +140,7 @@ func (idx Unique) Update(id, oldV, newV string) (err error) {
 	return
 }
 
+// Search allows for glob search on the index.
 func (idx Unique) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
 	if err != nil {
@@ -176,14 +168,17 @@ func (idx Unique) Search(pattern string) ([]string, error) {
 	return res, nil
 }
 
+// IndexBy undocumented.
 func (idx Unique) IndexBy() string {
 	return idx.indexBy
 }
 
+// TypeName undocumented.
 func (idx Unique) TypeName() string {
 	return idx.typeName
 }
 
+// FilesDir undocumented.
 func (idx Unique) FilesDir() string {
 	return idx.filesDir
 }

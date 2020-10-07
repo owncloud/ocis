@@ -26,6 +26,7 @@ func init() {
 	registry.IndexConstructorRegistry["cs3"]["non_unique"] = NewNonUniqueIndexWithOptions
 }
 
+// NonUnique are fields for an index of type non_unique.
 type NonUnique struct {
 	indexBy      string
 	typeName     string
@@ -40,8 +41,15 @@ type NonUnique struct {
 	cs3conf *Config
 }
 
-// NewNonUniqueIndexWithOptions instantiates a new UniqueIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
+// NewNonUniqueIndexWithOptions instantiates a new NonUniqueIndex instance.
+// /var/tmp/ocis-accounts/index.cs3/Pets/Bro*
+// ├── Brown/
+// │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
+// ├── Green/
+// │    ├── goefe-789 -> /var/tmp/testfiles-395764020/pets/goefe-789
+// │    └── xadaf-189 -> /var/tmp/testfiles-395764020/pets/xadaf-189
+// └── White/
+//     └── wefwe-456 -> /var/tmp/testfiles-395764020/pets/wefwe-456
 func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 	opts := &option.Options{}
 	for _, opt := range o {
@@ -71,32 +79,7 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 	}
 }
 
-// NewNonUniqueIndex instantiates a new NonUniqueIndex instance.
-// /var/tmp/ocis-accounts/index.cs3/Pets/Bro*
-// ├── Brown/
-// │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
-// ├── Green/
-// │    ├── goefe-789 -> /var/tmp/testfiles-395764020/pets/goefe-789
-// │    └── xadaf-189 -> /var/tmp/testfiles-395764020/pets/xadaf-189
-// └── White/
-//     └── wefwe-456 -> /var/tmp/testfiles-395764020/pets/wefwe-456
-func NewNonUniqueIndex(typeName, indexBy, filesDir, indexBaseDir string, cfg *Config) NonUnique {
-	return NonUnique{
-		indexBy:      indexBy,
-		typeName:     typeName,
-		filesDir:     filesDir,
-		indexBaseDir: indexBaseDir,
-		indexRootDir: path.Join(indexBaseDir, strings.Join([]string{"non_unique", typeName, indexBy}, ".")),
-		cs3conf:      cfg,
-		dataProvider: dataProviderClient{
-			baseURL: singleJoiningSlash(cfg.DataURL, cfg.DataPrefix),
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
-		},
-	}
-}
-
+// Init initializes a non_unique index.
 func (idx *NonUnique) Init() error {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": idx.cs3conf.JWTSecret,
@@ -133,6 +116,7 @@ func (idx *NonUnique) Init() error {
 	return nil
 }
 
+// Lookup exact lookup by value.
 func (idx *NonUnique) Lookup(v string) ([]string, error) {
 	var matches = make([]string, 0)
 	ctx, err := idx.getAuthenticatedContext(context.Background())
@@ -157,6 +141,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 	return matches, nil
 }
 
+// Add a new value to the index.
 func (idx *NonUnique) Add(id, v string) (string, error) {
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
@@ -179,6 +164,7 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 	return newName, nil
 }
 
+// Remove a value v from an index.
 func (idx *NonUnique) Remove(id string, v string) error {
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
@@ -225,6 +211,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	return nil
 }
 
+// Update index from <oldV> to <newV>.
 func (idx *NonUnique) Update(id, oldV, newV string) error {
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
@@ -237,6 +224,7 @@ func (idx *NonUnique) Update(id, oldV, newV string) error {
 	return nil
 }
 
+// Search allows for glob search on the index.
 func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
@@ -280,14 +268,17 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	return matches, nil
 }
 
+// IndexBy undocumented.
 func (idx *NonUnique) IndexBy() string {
 	return idx.indexBy
 }
 
+// TypeName undocumented.
 func (idx *NonUnique) TypeName() string {
 	return idx.typeName
 }
 
+// FilesDir  undocumented.
 func (idx *NonUnique) FilesDir() string {
 	return idx.filesDir
 }
