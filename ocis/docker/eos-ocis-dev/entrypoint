@@ -1,4 +1,6 @@
 #!/bin/sh
 
 make build
+/start-ldap &
+
 exec bin/ocis server

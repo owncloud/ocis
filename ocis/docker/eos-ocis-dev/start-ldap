@@ -1,5 +1,8 @@
 #!/bin/sh
 
+LDAP_BINDDN=${LDAP_BINDDN:-cn=reva,ou=sysusers,dc=example,dc=org}
+LDAP_BINDPW=${LDAP_BINDPW:-reva}
+
 echo "Waiting for EOS MGM"
 echo "until nc -z -w 3 $EOS_MGM_ALIAS 1094; do sleep 2; done;" > /wait-for-mgm
 chmod +x /wait-for-mgm

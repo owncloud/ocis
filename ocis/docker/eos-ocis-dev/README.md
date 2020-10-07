@@ -53,13 +53,7 @@ docker-compose exec ocis ./bin/ocis list
 docker-compose up -d
 ```
 
-2. Start the ldap authentication
-
-```
-docker-compose exec -d ocis /start-ldap
-```
-
-3. Configure to use eos storage driver instead of default storage driver
+2. Configure to use eos storage driver instead of default storage driver
 
 - kill the home storage and data providers. we need to switch them to the eoshome driver:
 
