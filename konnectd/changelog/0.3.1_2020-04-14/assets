@@ -1,5 +1,0 @@
-Bugfix: Include the assets for #62
-
-PR 62 introduced new client names. These assets needs to be generated in the embed.go file.
-
-https://github.com/owncloud/ocis/konnectd/pull/64
