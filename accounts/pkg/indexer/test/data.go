@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-type User struct {
+type TestUser struct {
 	Id, UserName, Email string
 }
 
@@ -18,10 +18,10 @@ type TestPet struct {
 
 var TestData = map[string][]interface{}{
 	"users": {
-		User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
-		User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
-		User{Id: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com"},
-		User{Id: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
+		TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
+		TestUser{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
+		TestUser{Id: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com"},
+		TestUser{Id: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
 	},
 	"pets": {
 		TestPet{Id: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},

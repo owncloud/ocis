@@ -1,6 +1,7 @@
 package disk
 
 import (
+	"fmt"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestNonUniqueIndexAdd(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, "Color")
+	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
 
 	ids, err := sut.Lookup("Green")
 	assert.NoError(t, err)
@@ -32,7 +33,7 @@ func TestNonUniqueIndexAdd(t *testing.T) {
 }
 
 func TestNonUniqueIndexUpdate(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, "Color")
+	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
 
 	err := sut.Update("goefe-789", "Green", "Black")
 	assert.NoError(t, err)
@@ -40,23 +41,25 @@ func TestNonUniqueIndexUpdate(t *testing.T) {
 	err = sut.Update("xadaf-189", "Green", "Black")
 	assert.NoError(t, err)
 
-	assert.DirExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Black"))
-	assert.NoDirExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green"))
+	assert.DirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Black", GetTypeFQN(TestPet{}))))
+	assert.NoDirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green", GetTypeFQN(TestPet{}))))
 
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestNonUniqueIndexDelete(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, "Color")
-	assert.FileExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green/goefe-789"))
+	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
+	assert.FileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(TestPet{}))))
+
 	err := sut.Remove("goefe-789", "")
 	assert.NoError(t, err)
-	assert.NoFileExists(t, path.Join(dataPath, "index.disk/non_unique.test.Users.Disk.Color/Green/goefe-789"))
+	assert.NoFileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(TestPet{}))))
+
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestNonUniqueIndexSearch(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, "Email")
+	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Email")
 
 	res, err := sut.Search("Gr*")
 
@@ -73,7 +76,8 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 	_ = os.RemoveAll(dataPath)
 }
 
-func getNonUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
+// entity: used to get the fully qualified name for the index root path.
+func getNonUniqueIdxSut(t *testing.T, entity interface{}, indexBy string) (index.Index, string) {
 	dataPath := WriteIndexTestData(t, TestData, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
@@ -84,7 +88,7 @@ func getNonUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
 	}
 
 	sut := NewNonUniqueIndexWithOptions(
-		option.WithTypeName("test.Users.Disk"),
+		option.WithTypeName(GetTypeFQN(entity)),
 		option.WithIndexBy(indexBy),
 		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "pets")),
 		option.WithDataDir(cfg.Repo.Disk.Path),

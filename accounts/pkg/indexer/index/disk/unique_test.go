@@ -13,7 +13,7 @@ import (
 )
 
 func TestUniqueLookupSingleEntry(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t, "Email")
+	uniq, dataDir := getUniqueIdxSut(t, "Email", TestUser{})
 	filesDir := path.Join(dataDir, "users")
 
 	t.Log("existing lookup")
@@ -33,7 +33,7 @@ func TestUniqueLookupSingleEntry(t *testing.T) {
 }
 
 func TestUniqueUniqueConstraint(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t, "Email")
+	uniq, dataDir := getUniqueIdxSut(t, "Email", TestUser{})
 
 	_, err := uniq.Add("abcdefg-123", "mikey@example.com")
 	assert.Error(t, err)
@@ -43,7 +43,7 @@ func TestUniqueUniqueConstraint(t *testing.T) {
 }
 
 func TestUniqueRemove(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t, "Email")
+	uniq, dataDir := getUniqueIdxSut(t, "Email", TestUser{})
 
 	err := uniq.Remove("", "mikey@example.com")
 	assert.NoError(t, err)
@@ -56,7 +56,7 @@ func TestUniqueRemove(t *testing.T) {
 }
 
 func TestUniqueUpdate(t *testing.T) {
-	uniq, dataDir := getUniqueIdxSut(t, "Email")
+	uniq, dataDir := getUniqueIdxSut(t, "Email", TestUser{})
 
 	t.Log("successful update")
 	err := uniq.Update("", "mikey@example.com", "mikey2@example.com")
@@ -76,7 +76,7 @@ func TestUniqueUpdate(t *testing.T) {
 }
 
 func TestUniqueIndexSearch(t *testing.T) {
-	sut, dataDir := getUniqueIdxSut(t, "Email")
+	sut, dataDir := getUniqueIdxSut(t, "Email", TestUser{})
 
 	res, err := sut.Search("j*@example.com")
 
@@ -98,7 +98,7 @@ func TestErrors(t *testing.T) {
 	assert.True(t, errors.IsNotFoundErr(&errors.NotFoundErr{}))
 }
 
-func getUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
+func getUniqueIdxSut(t *testing.T, indexBy string, entityType interface{}) (index.Index, string) {
 	dataPath := WriteIndexTestData(t, TestData, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
@@ -109,7 +109,7 @@ func getUniqueIdxSut(t *testing.T, indexBy string) (index.Index, string) {
 	}
 
 	sut := NewUniqueIndexWithOptions(
-		option.WithTypeName("test.Users.Disk"),
+		option.WithTypeName(GetTypeFQN(entityType)),
 		option.WithIndexBy(indexBy),
 		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "users")),
 		option.WithDataDir(cfg.Repo.Disk.Path),

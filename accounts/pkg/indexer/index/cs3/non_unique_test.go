@@ -31,7 +31,7 @@ func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
 	}
 
 	sut := NewNonUniqueIndexWithOptions(
-		option.WithTypeName("test.Users.Cs3"),
+		option.WithTypeName(GetTypeFQN(TestUser{})),
 		option.WithIndexBy("UserName"),
 		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "/meta")),
 		option.WithDataDir(cfg.Repo.Disk.Path),
