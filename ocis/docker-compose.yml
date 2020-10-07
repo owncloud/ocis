@@ -32,8 +32,7 @@ services:
       - ../store:/store
       - ../thumbnails:/thumbnails
       - ../webdav:/webdav
-      - ../ocis-reva:/ocis-reva
-      - ../reva:/reva
+      - ../storage:/storage
     environment:
       # ocis log level will be used for all services
       OCIS_LOG_LEVEL: debug
