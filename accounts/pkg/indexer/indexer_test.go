@@ -20,10 +20,10 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestUser{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	u := &TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err = indexer.Add(u)
 	assert.NoError(t, err)
 
@@ -43,10 +43,10 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestUser{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	u := &TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err = indexer.Add(u)
 	assert.NoError(t, err)
 
@@ -66,10 +66,10 @@ func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestUser{}, "UserName", "Id", "users", "non_unique")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "non_unique")
 	assert.NoError(t, err)
 
-	u := &TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err = indexer.Add(u)
 	assert.NoError(t, err)
 
@@ -86,14 +86,14 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestUser{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	u := &TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
 	err = indexer.Add(u)
 	assert.NoError(t, err)
 
-	res, err := indexer.FindBy(TestUser{}, "UserName", "mikey")
+	res, err := indexer.FindBy(User{}, "UserName", "mikey")
 	assert.NoError(t, err)
 	t.Log(res)
 
@@ -195,14 +195,14 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestUser{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	err = indexer.AddIndex(&TestUser{}, "Email", "Id", "users", "unique")
+	err = indexer.AddIndex(&User{}, "Email", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	user1 := &TestUser{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	user2 := &TestUser{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
+	user1 := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	user2 := &User{Id: "hijklmn-456", UserName: "frank", Email: "frank@example.com"}
 
 	err = indexer.Add(user1)
 	assert.NoError(t, err)
@@ -210,33 +210,33 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 	err = indexer.Add(user2)
 	assert.NoError(t, err)
 
-	err = indexer.Update(user1, &TestUser{
+	err = indexer.Update(user1, &User{
 		Id:       "abcdefg-123",
 		UserName: "mikey-new",
 		Email:    "mikey@example.com",
 	})
 	assert.NoError(t, err)
-	v, err1 := indexer.FindBy(&TestUser{}, "UserName", "mikey-new")
+	v, err1 := indexer.FindBy(&User{}, "UserName", "mikey-new")
 	assert.NoError(t, err1)
 	assert.Len(t, v, 1)
-	v, err2 := indexer.FindBy(&TestUser{}, "UserName", "mikey")
+	v, err2 := indexer.FindBy(&User{}, "UserName", "mikey")
 	assert.NoError(t, err2)
 	assert.Len(t, v, 0)
 
-	err1 = indexer.Update(&TestUser{
+	err1 = indexer.Update(&User{
 		Id:       "abcdefg-123",
 		UserName: "mikey-new",
 		Email:    "mikey@example.com",
-	}, &TestUser{
+	}, &User{
 		Id:       "abcdefg-123",
 		UserName: "mikey-newest",
 		Email:    "mikey-new@example.com",
 	})
 	assert.NoError(t, err1)
-	fbUserName, err2 := indexer.FindBy(&TestUser{}, "UserName", "mikey-newest")
+	fbUserName, err2 := indexer.FindBy(&User{}, "UserName", "mikey-newest")
 	assert.NoError(t, err2)
 	assert.Len(t, fbUserName, 1)
-	fbEmail, err3 := indexer.FindBy(&TestUser{}, "Email", "mikey-new@example.com")
+	fbEmail, err3 := indexer.FindBy(&User{}, "Email", "mikey-new@example.com")
 	assert.NoError(t, err3)
 	assert.Len(t, fbEmail, 1)
 

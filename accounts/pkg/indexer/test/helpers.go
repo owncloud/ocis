@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// CreateTmpDir creates a temporary dir for tests data.
 func CreateTmpDir(t *testing.T) string {
 	name, err := ioutil.TempDir("/var/tmp", "testfiles-*")
 	if err != nil {
@@ -18,6 +19,7 @@ func CreateTmpDir(t *testing.T) string {
 	return name
 }
 
+// ValueOf gets the value of a type v on a given field <field>.
 func ValueOf(v interface{}, field string) string {
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
@@ -37,6 +39,7 @@ func getType(v interface{}) (reflect.Value, error) {
 	return rv, nil
 }
 
+// GetTypeFQN formats a valid name from a type <t>.
 func GetTypeFQN(t interface{}) string {
 	typ, _ := getType(t)
 	typeName := path.Join(typ.Type().PkgPath(), typ.Type().Name())

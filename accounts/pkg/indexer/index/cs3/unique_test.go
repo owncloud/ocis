@@ -50,7 +50,7 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 	}
 
 	sut := NewUniqueIndexWithOptions(
-		option.WithTypeName(GetTypeFQN(TestUser{})),
+		option.WithTypeName(GetTypeFQN(User{})),
 		option.WithIndexBy("UserName"),
 		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "/meta")),
 		option.WithDataDir(cfg.Repo.Disk.Path),
@@ -102,7 +102,7 @@ func TestCS3UniqueIndexSearch(t *testing.T) {
 	}
 
 	sut := NewUniqueIndexWithOptions(
-		option.WithTypeName(GetTypeFQN(TestUser{})),
+		option.WithTypeName(GetTypeFQN(User{})),
 		option.WithIndexBy("UserName"),
 		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "/meta")),
 		option.WithDataDir(cfg.Repo.Disk.Path),
