@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make build
+exec bin/ocis server
