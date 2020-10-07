@@ -21,10 +21,11 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	assert.NoError(t, err)
 
 	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	err := indexer.Add(u)
+	err = indexer.Add(u)
 	assert.NoError(t, err)
 }
 
@@ -41,10 +42,11 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	assert.NoError(t, err)
 
 	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	err := indexer.Add(u)
+	err = indexer.Add(u)
 	assert.NoError(t, err)
 
 	_ = os.RemoveAll(dataDir)
@@ -63,7 +65,7 @@ func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddNonUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "non_unique")
 	assert.NoError(t, err)
 
 	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -81,10 +83,11 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	assert.NoError(t, err)
 
 	u := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	err := indexer.Add(u)
+	err = indexer.Add(u)
 	assert.NoError(t, err)
 
 	res, err := indexer.FindBy(User{}, "UserName", "mikey")
@@ -100,12 +103,13 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+	err := indexer.AddIndex(&TestPet{}, "Kind", "Id", "pets", "non_unique")
+	assert.NoError(t, err)
 
 	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
 	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
-	err := indexer.Add(pet1)
+	err = indexer.Add(pet1)
 	assert.NoError(t, err)
 
 	err = indexer.Add(pet2)
@@ -125,12 +129,13 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Kind", "Id", "pets")
+	err := indexer.AddIndex(&TestPet{}, "Kind", "Id", "pets", "non_unique")
+	assert.NoError(t, err)
 
 	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
 	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
-	err := indexer.Add(pet1)
+	err = indexer.Add(pet1)
 	assert.NoError(t, err)
 
 	err = indexer.Add(pet2)
@@ -148,12 +153,13 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Name", "Id", "pets")
+	err := indexer.AddIndex(&TestPet{}, "Name", "Id", "pets", "non_unique")
+	assert.NoError(t, err)
 
 	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
 	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
-	err := indexer.Add(pet1)
+	err = indexer.Add(pet1)
 	assert.NoError(t, err)
 
 	err = indexer.Add(pet2)
@@ -173,10 +179,10 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	err := indexer.AddUniqueIndex(&User{}, "UserName", "Id", "users")
+	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
 	assert.NoError(t, err)
 
-	err = indexer.AddUniqueIndex(&User{}, "Email", "Id", "users")
+	err = indexer.AddIndex(&User{}, "Email", "Id", "users", "unique")
 	assert.NoError(t, err)
 
 	user1 := &User{Id: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -227,12 +233,13 @@ func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	indexer.AddNonUniqueIndex(&TestPet{}, "Name", "Id", "pets")
+	err := indexer.AddIndex(&TestPet{}, "Name", "Id", "pets", "non_unique")
+	assert.NoError(t, err)
 
 	pet1 := TestPet{Id: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
 	pet2 := TestPet{Id: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
-	err := indexer.Add(pet1)
+	err = indexer.Add(pet1)
 	assert.NoError(t, err)
 
 	err = indexer.Add(pet2)
@@ -248,16 +255,16 @@ func TestManagerQueryMultipleIndices(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	err := man.AddUniqueIndex("User", "Email", "users")
+	err := man.AddIndex("User", "Email", "users")
 	assert.NoError(t, err)
 
-	err = man.AddUniqueIndex("User", "UserName", "users")
+	err = man.AddIndex("User", "UserName", "users")
 	assert.NoError(t, err)
 
 	err = man.AddNormalIndex("TestPet", "Color", "pets")
 	assert.NoError(t, err)
 
-	err = man.AddUniqueIndex("TestPet", "Name", "pets")
+	err = man.AddIndex("TestPet", "Name", "pets")
 	assert.NoError(t, err)
 
 	for path := range testData {
@@ -302,13 +309,13 @@ func TestManagerDelete(t *testing.T) {
 		Log:              zerolog.Logger{},
 	})
 
-	err := man.AddUniqueIndex("User", "Email", "users")
+	err := man.AddIndex("User", "Email", "users")
 	assert.NoError(t, err)
 
-	err = man.AddUniqueIndex("User", "UserName", "users")
+	err = man.AddIndex("User", "UserName", "users")
 	assert.NoError(t, err)
 
-	err = man.AddUniqueIndex("TestPet", "Name", "pets")
+	err = man.AddIndex("TestPet", "Name", "pets")
 	assert.NoError(t, err)
 
 	for path := range testData {

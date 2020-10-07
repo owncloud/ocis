@@ -14,9 +14,9 @@ import (
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
-	newConfig *config.Config
-	config    *Config
-	indices   typeMap
+	repoConfig *config.Config
+	config     *Config
+	indices    typeMap
 }
 
 type Config struct {
@@ -34,8 +34,8 @@ func NewIndexer(cfg *Config) *Indexer {
 
 func CreateIndexer(cfg *config.Config) *Indexer {
 	return &Indexer{
-		newConfig: cfg,
-		indices:   typeMap{},
+		repoConfig: cfg,
+		indices:    typeMap{},
 	}
 }
 
@@ -47,28 +47,28 @@ func getRegistryStrategy(cfg *config.Config) string {
 	return "cs3"
 }
 
-func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
-	strategy := getRegistryStrategy(i.newConfig)
-	f := registry.IndexConstructorRegistry[strategy]["unique"]
+func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string) error {
+	strategy := getRegistryStrategy(i.repoConfig)
+	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
 	if strategy == "disk" {
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
 		)
 	} else if strategy == "cs3" {
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.newConfig.Repo.Disk.Path),
-			option.WithDataURL(i.newConfig.Repo.CS3.DataURL),
-			option.WithDataPrefix(i.newConfig.Repo.CS3.DataPrefix),
-			option.WithJWTSecret(i.newConfig.Repo.CS3.JWTSecret),
-			option.WithProviderAddr(i.newConfig.Repo.CS3.ProviderAddr),
+			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
+			option.WithDataURL(i.repoConfig.Repo.CS3.DataURL),
+			option.WithDataPrefix(i.repoConfig.Repo.CS3.DataPrefix),
+			option.WithJWTSecret(i.repoConfig.Repo.CS3.JWTSecret),
+			option.WithProviderAddr(i.repoConfig.Repo.CS3.ProviderAddr),
 		)
 	}
 
@@ -76,28 +76,28 @@ func (i Indexer) AddUniqueIndex(t interface{}, indexBy, pkName, entityDirName st
 	return idx.Init()
 }
 
-func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName string) error {
-	strategy := getRegistryStrategy(i.newConfig)
-	f := registry.IndexConstructorRegistry[strategy]["non_unique"]
+func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName, indexType string) error {
+	strategy := getRegistryStrategy(i.repoConfig)
+	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
 	if strategy == "disk" {
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.newConfig.Repo.Disk.Path),
+			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
 		)
 	} else if strategy == "cs3" {
 		idx = f(
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.newConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.newConfig.Repo.Disk.Path),
-			option.WithDataURL(i.newConfig.Repo.CS3.DataURL),
-			option.WithDataPrefix(i.newConfig.Repo.CS3.DataPrefix),
-			option.WithJWTSecret(i.newConfig.Repo.CS3.JWTSecret),
-			option.WithProviderAddr(i.newConfig.Repo.CS3.ProviderAddr),
+			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
+			option.WithDataURL(i.repoConfig.Repo.CS3.DataURL),
+			option.WithDataPrefix(i.repoConfig.Repo.CS3.DataPrefix),
+			option.WithJWTSecret(i.repoConfig.Repo.CS3.JWTSecret),
+			option.WithProviderAddr(i.repoConfig.Repo.CS3.ProviderAddr),
 		)
 	}
 
