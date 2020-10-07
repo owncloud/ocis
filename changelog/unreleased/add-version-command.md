@@ -1,6 +1,6 @@
 Enhancement: add a command to list the versions of running instances
 
-Tags: accounts, ocis
+Tags: accounts
 
 Added a micro command to list the versions of running accounts services.
 

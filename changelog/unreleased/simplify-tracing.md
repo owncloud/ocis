@@ -1,7 +1,5 @@
 Enhancement: Simplify tracing config
 
-Tags: ocis
-
 We now apply the oCIS tracing config to all services which have tracing. With this it is possible
 to set one tracing config for all services at the same time.
 
