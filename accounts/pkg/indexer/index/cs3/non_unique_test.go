@@ -1,21 +1,20 @@
 package cs3
 
 import (
-	"os"
-	"path"
-	"testing"
-
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"path"
+	"testing"
 )
 
 func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
 	go setupMetadataStorage()
 	defer cancelFunc()
 
-	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
+	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{

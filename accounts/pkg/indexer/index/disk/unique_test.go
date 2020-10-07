@@ -99,7 +99,7 @@ func TestErrors(t *testing.T) {
 }
 
 func getUniqueIdxSut(t *testing.T, indexBy string, entityType interface{}) (index.Index, string) {
-	dataPath := WriteIndexTestData(t, TestData, "Id")
+	dataPath := WriteIndexTestData(t, Data, "ID")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -119,8 +119,8 @@ func getUniqueIdxSut(t *testing.T, indexBy string, entityType interface{}) (inde
 		t.Fatal(err)
 	}
 
-	for _, u := range TestData["users"] {
-		pkVal := ValueOf(u, "Id")
+	for _, u := range Data["users"] {
+		pkVal := ValueOf(u, "ID")
 		idxByVal := ValueOf(u, "Email")
 		_, err := sut.Add(pkVal, idxByVal)
 		if err != nil {

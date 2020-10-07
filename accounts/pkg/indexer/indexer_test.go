@@ -11,7 +11,7 @@ import (
 )
 
 func TestIndexer_AddWithUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -20,7 +20,7 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -31,7 +31,7 @@ func TestIndexer_AddWithUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
-	dir := WriteIndexTestDataCS3(t, TestData, "Id")
+	dir := WriteIndexTestDataCS3(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			CS3: config.CS3{
@@ -43,7 +43,7 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -54,7 +54,7 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 }
 
 func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
+	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			CS3: config.CS3{
@@ -66,7 +66,7 @@ func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "non_unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique")
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -77,7 +77,7 @@ func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
 }
 
 func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -86,7 +86,7 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -101,7 +101,7 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -110,11 +110,11 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestPet{}, "Kind", "Id", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique")
 	assert.NoError(t, err)
 
-	pet1 := TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err = indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -122,14 +122,14 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 	err = indexer.Add(pet2)
 	assert.NoError(t, err)
 
-	res, err := indexer.FindBy(TestPet{}, "Kind", "Hog")
+	res, err := indexer.FindBy(Pet{}, "Kind", "Hog")
 	assert.NoError(t, err)
 
 	t.Log(res)
 }
 
 func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -138,11 +138,11 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestPet{}, "Kind", "Id", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique")
 	assert.NoError(t, err)
 
-	pet1 := TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err = indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -157,7 +157,7 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -166,11 +166,11 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestPet{}, "Name", "Id", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique")
 	assert.NoError(t, err)
 
-	pet1 := TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err = indexer.Add(pet1)
 	assert.NoError(t, err)
@@ -186,7 +186,7 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -195,10 +195,10 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "Id", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
 	assert.NoError(t, err)
 
-	err = indexer.AddIndex(&User{}, "Email", "Id", "users", "unique")
+	err = indexer.AddIndex(&User{}, "Email", "ID", "users", "unique")
 	assert.NoError(t, err)
 
 	user1 := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -244,7 +244,7 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 }
 
 func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, TestData, "Id")
+	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -253,11 +253,11 @@ func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&TestPet{}, "Name", "Id", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique")
 	assert.NoError(t, err)
 
-	pet1 := TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
-	pet2 := TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
+	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
+	pet2 := Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"}
 
 	err = indexer.Add(pet1)
 	assert.NoError(t, err)

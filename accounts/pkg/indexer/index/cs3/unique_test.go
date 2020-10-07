@@ -34,7 +34,7 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 	go setupMetadataStorage()
 	defer cancelFunc()
 
-	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
+	dataDir := WriteIndexTestDataCS3(t,Data, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -86,7 +86,7 @@ func TestCS3UniqueIndexSearch(t *testing.T) {
 	go setupMetadataStorage()
 	defer cancelFunc()
 
-	dataDir := WriteIndexTestDataCS3(t, TestData, "Id")
+	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{

@@ -13,13 +13,13 @@ type User struct {
 	ID, UserName, Email string
 }
 
-// TestPet is a pet.
-type TestPet struct {
+// Pet is a pet.
+type Pet struct {
 	ID, Kind, Color, Name string
 }
 
-// TestData mock data.
-var TestData = map[string][]interface{}{
+// Data mock data.
+var Data = map[string][]interface{}{
 	"users": {
 		User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
 		User{ID: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
@@ -27,10 +27,10 @@ var TestData = map[string][]interface{}{
 		User{ID: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
 	},
 	"pets": {
-		TestPet{ID: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},
-		TestPet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
-		TestPet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
-		TestPet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
+		Pet{ID: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},
+		Pet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
+		Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
+		Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
 	},
 }
 

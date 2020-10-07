@@ -14,7 +14,7 @@ import (
 )
 
 func TestNonUniqueIndexAdd(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
+	sut, dataPath := getNonUniqueIdxSut(t, Pet{}, "Color")
 
 	ids, err := sut.Lookup("Green")
 	assert.NoError(t, err)
@@ -33,7 +33,7 @@ func TestNonUniqueIndexAdd(t *testing.T) {
 }
 
 func TestNonUniqueIndexUpdate(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
+	sut, dataPath := getNonUniqueIdxSut(t, Pet{}, "Color")
 
 	err := sut.Update("goefe-789", "Green", "Black")
 	assert.NoError(t, err)
@@ -41,25 +41,25 @@ func TestNonUniqueIndexUpdate(t *testing.T) {
 	err = sut.Update("xadaf-189", "Green", "Black")
 	assert.NoError(t, err)
 
-	assert.DirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Black", GetTypeFQN(TestPet{}))))
-	assert.NoDirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green", GetTypeFQN(TestPet{}))))
+	assert.DirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Black", GetTypeFQN(Pet{}))))
+	assert.NoDirExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green", GetTypeFQN(Pet{}))))
 
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestNonUniqueIndexDelete(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Color")
-	assert.FileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(TestPet{}))))
+	sut, dataPath := getNonUniqueIdxSut(t, Pet{}, "Color")
+	assert.FileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(Pet{}))))
 
 	err := sut.Remove("goefe-789", "")
 	assert.NoError(t, err)
-	assert.NoFileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(TestPet{}))))
+	assert.NoFileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(Pet{}))))
 
 	_ = os.RemoveAll(dataPath)
 }
 
 func TestNonUniqueIndexSearch(t *testing.T) {
-	sut, dataPath := getNonUniqueIdxSut(t, TestPet{}, "Email")
+	sut, dataPath := getNonUniqueIdxSut(t, Pet{}, "Email")
 
 	res, err := sut.Search("Gr*")
 
@@ -78,7 +78,7 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 
 // entity: used to get the fully qualified name for the index root path.
 func getNonUniqueIdxSut(t *testing.T, entity interface{}, indexBy string) (index.Index, string) {
-	dataPath := WriteIndexTestData(t, TestData, "Id")
+	dataPath := WriteIndexTestData(t, Data, "ID")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -98,8 +98,8 @@ func getNonUniqueIdxSut(t *testing.T, entity interface{}, indexBy string) (index
 		t.Fatal(err)
 	}
 
-	for _, u := range TestData["pets"] {
-		pkVal := ValueOf(u, "Id")
+	for _, u := range Data["pets"] {
+		pkVal := ValueOf(u, "ID")
 		idxByVal := ValueOf(u, "Color")
 		_, err := sut.Add(pkVal, idxByVal)
 		if err != nil {
