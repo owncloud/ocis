@@ -1,8 +1,0 @@
-Bugfix: Use opaque ID of a user for signing keys
-
-OCIS switched from user the user's opaque ID (UUID) everywhere,
-so to keep compatible we have adjusted the signing keys endpoint
-to also use the UUID when storing and generating the keys.
-
-https://github.com/owncloud/ocis/issues/436
-https://github.com/owncloud/ocis/ocs/pull/32

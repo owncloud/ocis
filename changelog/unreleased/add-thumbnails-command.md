@@ -1,4 +1,6 @@
-Change: add the thumbnails command 
+Change: add the thumbnails command
+
+Tags: thumbnails
 
 Added the thumbnails command so that the thumbnails service can get started via ocis.
 
