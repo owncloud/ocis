@@ -5,11 +5,11 @@
         <oc-table-row class="fix-table-header">
           <oc-table-cell shrink type="head" class="uk-text-center">
             <oc-checkbox
-                class="oc-ml-s"
-                :value="areAllAccountsSelected"
-                @input="toggleSelectionAll"
-                :label="$gettext('Select all users')"
-                hide-label
+              class="oc-ml-s"
+              :value="areAllAccountsSelected"
+              @input="toggleSelectionAll"
+              :label="$gettext('Select all users')"
+              hide-label
             />
           </oc-table-cell>
           <oc-table-cell shrink type="head" />
