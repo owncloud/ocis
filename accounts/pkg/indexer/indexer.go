@@ -76,35 +76,6 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 	return idx.Init()
 }
 
-func (i Indexer) AddNonUniqueIndex(t interface{}, indexBy, pkName, entityDirName, indexType string) error {
-	strategy := getRegistryStrategy(i.repoConfig)
-	f := registry.IndexConstructorRegistry[strategy][indexType]
-	var idx index.Index
-
-	if strategy == "disk" {
-		idx = f(
-			option.WithTypeName(getTypeFQN(t)),
-			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
-		)
-	} else if strategy == "cs3" {
-		idx = f(
-			option.WithTypeName(getTypeFQN(t)),
-			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.repoConfig.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.repoConfig.Repo.Disk.Path),
-			option.WithDataURL(i.repoConfig.Repo.CS3.DataURL),
-			option.WithDataPrefix(i.repoConfig.Repo.CS3.DataPrefix),
-			option.WithJWTSecret(i.repoConfig.Repo.CS3.JWTSecret),
-			option.WithProviderAddr(i.repoConfig.Repo.CS3.ProviderAddr),
-		)
-	}
-
-	i.indices.addIndex(getTypeFQN(t), pkName, idx)
-	return idx.Init()
-}
-
 // Add a new entry to the indexer
 func (i Indexer) Add(t interface{}) error {
 	typeName := getTypeFQN(t)
