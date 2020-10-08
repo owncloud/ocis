@@ -14,22 +14,6 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/provider"
 )
 
-func (s Service) indexGroup(id string) error {
-	g := &proto.BleveGroup{
-		BleveType: "group",
-	}
-	if err := s.repo.LoadGroup(context.Background(), id, &g.Group); err != nil {
-		s.log.Error().Err(err).Str("group", id).Msg("could not load group")
-		return err
-	}
-	s.log.Debug().Interface("group", g).Msg("found group")
-	if err := s.index.Index(g.Id, g); err != nil {
-		s.log.Error().Err(err).Interface("group", g).Msg("could not index group")
-		return err
-	}
-	return nil
-}
-
 func (s Service) expandMembers(g *proto.Group) {
 	if g == nil {
 		return
@@ -93,9 +77,10 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 
 	s.log.Debug().Interface("query", query).Msg("using query")
 
-	searchRequest := bleve.NewSearchRequest(query)
+	//searchRequest := bleve.NewSearchRequest(query)
 	var searchResult *bleve.SearchResult
-	searchResult, err = s.index.Search(searchRequest)
+	//searchResult, err = s.index.Search(searchRequest)
+	searchResult = &bleve.SearchResult{}
 	if err != nil {
 		s.log.Error().Err(err).Msg("could not execute bleve search")
 		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
@@ -150,7 +135,7 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 
 // CreateGroup implements the GroupsServiceHandler interface
 func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
-	var id string
+	var _ string
 	if in.Group == nil {
 		return merrors.BadRequest(s.id, "account missing")
 	}
@@ -158,7 +143,9 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		in.Group.Id = uuid.Must(uuid.NewV4()).String()
 	}
 
-	if id, err = cleanupID(in.Group.Id); err != nil {
+	_ = in.Group.Id
+
+	if _, err = cleanupID(in.Group.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
@@ -170,7 +157,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		return merrors.InternalServerError(s.id, "could not persist new group: %v", err.Error())
 	}
 
-	if err = s.indexGroup(id); err != nil {
+	if err = s.index.Add(in.Group); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
 	}
 

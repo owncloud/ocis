@@ -3,19 +3,18 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoM31/godata"
 	"path/filepath"
 	"regexp"
 	"sync"
 	"time"
 
-	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/provider"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
@@ -36,15 +35,14 @@ import (
 var accLock sync.Mutex
 
 func (s Service) indexAccount(id string) error {
-	a := &proto.BleveAccount{
-		BleveType: "account",
-	}
-	if err := s.repo.LoadAccount(context.Background(), id, &a.Account); err != nil {
+	a := &proto.Account{}
+
+	if err := s.repo.LoadAccount(context.Background(), id, a); err != nil {
 		s.log.Error().Err(err).Str("account", id).Msg("could not load account")
 		return err
 	}
 	s.log.Debug().Interface("account", a).Msg("found account")
-	if err := s.index.Index(a.Id, a); err != nil {
+	if err := s.index.Add(a); err != nil {
 		s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
 		return err
 	}
@@ -104,15 +102,12 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 // serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
 func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
 	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
-		err := s.index.Index(s.Config.ServiceUser.UUID, &proto.BleveAccount{
-			BleveType: "account",
-			Account:   s.getInMemoryServiceUser(),
-		})
+		err := s.index.Add(s.getInMemoryServiceUser())
 		if err != nil {
 			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
 		} else {
 			return func() {
-				_ = s.index.Delete(s.Config.ServiceUser.UUID)
+				_ = s.index.Delete(s.getInMemoryServiceUser())
 			}
 		}
 	}
@@ -159,8 +154,9 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	tq := bleve.NewTermQuery("account")
 	tq.SetField("bleve_type")
 
-	query := bleve.NewConjunctionQuery(tq)
-
+	/*
+		query := bleve.NewConjunctionQuery(tq)
+	*/
 	if in.Query != "" {
 		// parse the query like an odata filter
 		var q *godata.GoDataFilterQuery
@@ -169,65 +165,76 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
 		}
 
-		// convert to bleve query
-		bq, err := provider.BuildBleveQuery(q)
+		fmt.Print(q)
+	}
+	/*
+
+
+			// convert to bleve query
+			bq, err := provider.BuildBleveQuery(q)
+			if err != nil {
+				s.log.Error().Err(err).Msg("could not build bleve query")
+				return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
+			}
+			query.AddQuery(bq)
+		}
+
+		s.log.Debug().Interface("query", query).Msg("using query")
+
+		searchRequest := bleve.NewSearchRequest(query)
+		var searchResult *bleve.SearchResult
+		searchResult, err = s.index.Search(searchRequest)
+
+
 		if err != nil {
-			s.log.Error().Err(err).Msg("could not build bleve query")
-			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
-		}
-		query.AddQuery(bq)
-	}
-
-	s.log.Debug().Interface("query", query).Msg("using query")
-
-	searchRequest := bleve.NewSearchRequest(query)
-	var searchResult *bleve.SearchResult
-	searchResult, err = s.index.Search(searchRequest)
-	if err != nil {
-		s.log.Error().Err(err).Msg("could not execute bleve search")
-		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
-	}
-
-	s.log.Debug().Interface("result", searchResult).Msg("result")
-
-	out.Accounts = make([]*proto.Account, 0)
-
-	for _, hit := range searchResult.Hits {
-		a := &proto.Account{}
-		if hit.ID == s.Config.ServiceUser.UUID {
-			acc := s.getInMemoryServiceUser()
-			a = &acc
-		} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
-			s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
-			continue
-		}
-		var currentHash string
-		if a.PasswordProfile != nil {
-			currentHash = a.PasswordProfile.Password
+			s.log.Error().Err(err).Msg("could not execute bleve search")
+			return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
 		}
 
-		s.debugLogAccount(a).Msg("found account")
+		s.log.Debug().Interface("result", searchResult).Msg("result")
 
-		if password != "" {
-			if a.PasswordProfile == nil {
-				s.debugLogAccount(a).Msg("no password profile")
-				return merrors.Unauthorized(s.id, "invalid password")
+		out.Accounts = make([]*proto.Account, 0)
+
+		for _, hit := range searchResult.Hits {
+			a := &proto.Account{}
+			if hit.ID == s.Config.ServiceUser.UUID {
+				acc := s.getInMemoryServiceUser()
+				a = &acc
+			} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
+				s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
+				continue
 			}
-			if !s.passwordIsValid(currentHash, password) {
-				return merrors.Unauthorized(s.id, "invalid password")
+			var currentHash string
+			if a.PasswordProfile != nil {
+				currentHash = a.PasswordProfile.Password
 			}
-		}
-		// TODO add groups if requested
-		// if in.FieldMask ...
-		s.expandMemberOf(a)
 
-		// remove password before returning
-		if a.PasswordProfile != nil {
-			a.PasswordProfile.Password = ""
+			s.debugLogAccount(a).Msg("found account")
+
+			if password != "" {
+				if a.PasswordProfile == nil {
+					s.debugLogAccount(a).Msg("no password profile")
+					return merrors.Unauthorized(s.id, "invalid password")
+				}
+				if !s.passwordIsValid(currentHash, password) {
+					return merrors.Unauthorized(s.id, "invalid password")
+				}
+			}
+
+
+			// TODO add groups if requested
+			// if in.FieldMask ...
+			s.expandMemberOf(a)
+
+			// remove password before returning
+			if a.PasswordProfile != nil {
+				a.PasswordProfile.Password = ""
+			}
+
+			out.Accounts = append(out.Accounts, a)
 		}
 
-		out.Accounts = append(out.Accounts, a)
-	}
+	*/
 
 	return
 }
@@ -319,7 +326,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		s.debugLogAccount(acc).Msg("could not persist new account")
 		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
-	if err = s.indexAccount(acc.Id); err != nil {
+	if err = s.index.Add(acc); err != nil {
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 	s.log.Debug().Interface("account", acc).Msg("account after indexing")
@@ -434,12 +441,19 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
 
+	// We need to reload the old account state to be able to compute the update
+	old := &proto.Account{}
+	if err = s.repo.LoadAccount(ctx, id, old); err != nil {
+		s.log.Error().Err(err).Str("id", out.Id).Msg("could not load old account representation during update, maybe the account got deleted meanwhile?")
+		return merrors.InternalServerError(s.id, "could not load current account for update: %v", err.Error())
+	}
+
 	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
 		return merrors.InternalServerError(s.id, "could not persist updated account: %v", err.Error())
 	}
 
-	if err = s.indexAccount(id); err != nil {
+	if err = s.index.Update(old, out); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not index new account")
 		return merrors.InternalServerError(s.id, "could not index updated account: %v", err.Error())
 	}

@@ -3,21 +3,15 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/analysis/analyzer/custom"
-	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
-	"github.com/blevesearch/bleve/analysis/analyzer/simple"
-	"github.com/blevesearch/bleve/analysis/analyzer/standard"
-	"github.com/blevesearch/bleve/analysis/token/lowercase"
-	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -72,6 +66,41 @@ func New(opts ...Option) (s *Service, err error) {
 	return
 }
 
+func (s Service) buildIndex() (*indexer.Indexer, error) {
+	s.Config.Repo.CS3.JWTSecret = "Pive-Fumkiu4"
+	idx := indexer.CreateIndexer(s.Config)
+
+	// Accounts
+
+	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "unique"); err != nil {
+		return nil, err
+	}
+	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique"); err != nil {
+		return nil, err
+	}
+
+	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "non_unique"); err != nil {
+		return nil, err
+	}
+
+	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique"); err != nil {
+		return nil, err
+	}
+
+	// Groups
+	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique"); err != nil {
+		return nil, err
+	}
+
+	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "accounts", "non_unique"); err != nil {
+		return nil, err
+	}
+
+	return idx, nil
+
+}
+
+/*
 func (s Service) buildIndex() (index bleve.Index, err error) {
 	indexDir := filepath.Join(s.Config.Server.AccountsDataPath, "index.bleve")
 	if index, err = bleve.Open(indexDir); err != nil {
@@ -159,6 +188,8 @@ func (s Service) buildIndex() (index bleve.Index, err error) {
 	}
 	return
 }
+
+*/
 
 func (s Service) createDefaultAccounts() (err error) {
 	accounts := []proto.Account{
@@ -276,7 +307,11 @@ func (s Service) createDefaultAccounts() (err error) {
 		}
 
 		if err := s.indexAccount(accounts[i].Id); err != nil {
-			return err
+			if idxerrs.IsAlreadyExistsErr(err) {
+				continue
+			} else {
+				return err
+			}
 		}
 	}
 
@@ -337,8 +372,12 @@ func (s Service) createDefaultGroups() (err error) {
 			return err
 		}
 
-		if err := s.indexGroup(groups[i].Id); err != nil {
-			return err
+		if err := s.index.Add(&groups[i]); err != nil {
+			if idxerrs.IsAlreadyExistsErr(err) {
+				continue
+			} else {
+				return err
+			}
 		}
 	}
 	return nil
@@ -374,7 +413,7 @@ type Service struct {
 	id          string
 	log         log.Logger
 	Config      *config.Config
-	index       bleve.Index
+	index       *indexer.Indexer
 	RoleService settings.RoleService
 	RoleManager *roles.Manager
 	repo        storage.Repo

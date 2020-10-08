@@ -6,6 +6,8 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/cs3"
+	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"path"
