@@ -85,6 +85,41 @@ func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
 	return c.Verify(hash, []byte(pwd)) == nil
 }
 
+func (s Service) accountExists(ctx context.Context, username, mail, id string) (exists bool, err error) {
+	// only search for accounts
+	tq := bleve.NewTermQuery("account")
+	tq.SetField("bleve_type")
+	query := bleve.NewConjunctionQuery(tq)
+
+	// parse the query like an odata filter
+	var q *godata.GoDataFilterQuery
+	queryUsername := fmt.Sprintf("on_premises_sam_account_name eq '%s'", username)
+	queryMail := fmt.Sprintf("mail eq '%s'", mail)
+	queryID := fmt.Sprintf("id eq '%s'", id)
+	if q, err = godata.ParseFilterString(queryUsername + " or " + queryMail + " or " + queryID); err != nil {
+		s.log.Error().Err(err).Msg("could not parse query")
+		return false, merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
+	}
+
+	// convert to bleve query
+	bq, err := provider.BuildBleveQuery(q)
+	if err != nil {
+		s.log.Error().Err(err).Msg("could not build bleve query")
+		return false, merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
+	}
+	query.AddQuery(bq)
+
+	searchRequest := bleve.NewSearchRequest(query)
+	var searchResult *bleve.SearchResult
+	searchResult, err = s.index.Search(searchRequest)
+	if err != nil {
+		s.log.Error().Err(err).Msg("could not execute bleve search")
+		return false, merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
+	}
+
+	return searchResult.Total > 0, nil
+}
+
 func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	// get roles from context
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
@@ -293,6 +328,14 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 
 	if id, err = cleanupID(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
+	}
+
+	exists, err := s.accountExists(ctx, acc.PreferredName, acc.Mail, acc.Id)
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
+	}
+	if exists {
+		return merrors.BadRequest(s.id, "account already exists")
 	}
 
 	if acc.PasswordProfile != nil {
