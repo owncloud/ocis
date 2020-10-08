@@ -520,7 +520,7 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
 	}
 
-	if err = s.index.Delete(id); err != nil {
+	if err = s.index.Delete(a); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account from index")
 		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
 	}
