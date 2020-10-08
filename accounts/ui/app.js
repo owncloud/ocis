@@ -27,7 +27,8 @@ const navItems = [
     route: {
       name: 'accounts',
       path: `/${appInfo.id}/`
-    }
+    },
+    menu: 'user'
   }
 ]
 

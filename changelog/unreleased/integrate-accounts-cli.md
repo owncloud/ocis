@@ -1,5 +1,7 @@
 Change: Add cli-commands to manage accounts
 
+Tags: accounts
+
 COMMANDS:
 
 * list, ls        List existing accounts

@@ -38,19 +38,19 @@ var (
 		"graph-explorer",
 		"ocs",
 		"webdav",
-		"reva-frontend",
-		"reva-gateway",
-		"reva-users",
-		"reva-auth-basic",
-		"reva-auth-bearer",
-		"reva-storage-home",
-		"reva-storage-home-data",
-		"reva-storage-eos",
-		"reva-storage-eos-data",
-		"reva-storage-oc",
-		"reva-storage-oc-data",
-		"reva-storage-public-link",
-		"accounts",
+		"storage-frontend",
+		"storage-gateway",
+		"storage-users",
+		"storage-auth-basic",
+		"storage-auth-bearer",
+		"storage-storage-home",
+		"storage-storage-home-data",
+		"storage-storage-eos",
+		"storage-storage-eos-data",
+		"storage-storage-oc",
+		"storage-storage-oc-data",
+		"storage-storage-public-link",
+		"storage-storage-metadata",
 		"glauth",
 		"konnectd",
 		"thumbnails",
@@ -58,7 +58,8 @@ var (
 
 	// There seem to be a race condition when reva-sharing needs to read the sharing.json file and the parent folder is not present.
 	dependants = []string{
-		"reva-sharing",
+		"accounts",
+		"storage-sharing",
 	}
 
 	// Maximum number of retries until getting a connection to the rpc runtime service.
@@ -74,13 +75,13 @@ func New() Runtime {
 }
 
 // Start rpc runtime
-func (r *Runtime) Start(services ...string) error {
-	go r.Launch(services)
+func (r *Runtime) Start() error {
+	go r.Launch()
 	return service.Start()
 }
 
 // Launch ocis default ocis extensions.
-func (r *Runtime) Launch(services []string) {
+func (r *Runtime) Launch() {
 	var client *rpc.Client
 	var err error
 	var try int
@@ -100,30 +101,35 @@ func (r *Runtime) Launch(services []string) {
 	}
 
 OUT:
-	for _, v := range services {
-		args := process.NewProcEntry(v, os.Environ(), []string{v}...)
-		var reply int
-
-		if err := client.Call("Service.Start", args, &reply); err != nil {
-			golog.Fatal(err)
-		}
+	for _, v := range MicroServices {
+		RunService(client, v)
 	}
 
-	// TODO(refs) this should disappear and tackled at the runtime (pman) level.
-	// see https://github.com/cs3org/reva/issues/795 for race condition.
-	// dependants might not be needed on a ocis_simple build, therefore
-	// it should not be started under these circumstances.
-	if len(services) >= len(Extensions) { // it will not run for ocis_simple builds.
+	for _, v := range Extensions {
+		RunService(client, v)
+	}
+
+	if len(dependants) > 0 {
+		// TODO(refs) this should disappear and tackled at the runtime (pman) level.
+		// see https://github.com/cs3org/reva/issues/795 for race condition.
+		// dependants might not be needed on a ocis_simple build, therefore
+		// it should not be started under these circumstances.
 		time.Sleep(2 * time.Second)
 		for _, v := range dependants {
-			args := process.NewProcEntry(v, os.Environ(), []string{v}...)
-			var reply int
-
-			if err := client.Call("Service.Start", args, &reply); err != nil {
-				golog.Fatal(err)
-			}
+			RunService(client, v)
 		}
 	}
+}
+
+// RunService sends a Service.Start command with the given service name  to pman
+func RunService(client *rpc.Client, service string) int {
+	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
+
+	var reply int
+	if err := client.Call("Service.Start", args, &reply); err != nil {
+		golog.Fatal(err)
+	}
+	return reply
 }
 
 // AddMicroPlatform adds the micro subcommands to the cli app

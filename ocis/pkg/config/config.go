@@ -1,17 +1,17 @@
 package config
 
 import (
-	accounts "github.com/owncloud/ocis/accounts/pkg/config"
-	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis-graph/pkg/config"
 	hello "github.com/owncloud/ocis-hello/pkg/config"
+	accounts "github.com/owncloud/ocis/accounts/pkg/config"
+	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	konnectd "github.com/owncloud/ocis/konnectd/pkg/config"
-	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	phoenix "github.com/owncloud/ocis/ocis-phoenix/pkg/config"
+	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
-	reva "github.com/owncloud/ocis/ocis-reva/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
+	storage "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
@@ -71,7 +71,7 @@ type Config struct {
 	OCS           *ocs.Config
 	Phoenix       *phoenix.Config
 	Proxy         *proxy.Config
-	Reva          *reva.Config
+	Storage       *storage.Config
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
 	Settings      *settings.Config
@@ -90,7 +90,7 @@ func New() *Config {
 		OCS:           ocs.New(),
 		Phoenix:       phoenix.New(),
 		WebDAV:        webdav.New(),
-		Reva:          reva.New(),
+		Storage:       storage.New(),
 		GLAuth:        glauth.New(),
 		Proxy:         proxy.New(),
 		Thumbnails:    thumbnails.New(),

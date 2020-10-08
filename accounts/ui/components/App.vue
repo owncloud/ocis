@@ -16,6 +16,12 @@
           </div>
         </oc-grid>
       </template>
+      <template v-else-if="hasFailed">
+        <oc-alert variation="warning" no-close class="oc-m">
+          <oc-icon name="warning" variation="warning" class="uk-float-left oc-mr-s" />
+          <translate>You don't have permissions to manage accounts.</translate>
+        </oc-alert>
+      </template>
       <oc-loader v-else />
     </div>
   </div>
@@ -31,7 +37,7 @@ export default {
   name: 'App',
   components: { AccountsBatchActions, AccountsList, AccountsCreate },
   computed: {
-    ...mapGetters('Accounts', ['isInitialized', 'getAccountsSorted', 'isAnyAccountSelected']),
+    ...mapGetters('Accounts', ['isInitialized', 'hasFailed', 'getAccountsSorted', 'isAnyAccountSelected']),
     ...mapState('Accounts', ['selectedAccounts']),
 
     accounts () {

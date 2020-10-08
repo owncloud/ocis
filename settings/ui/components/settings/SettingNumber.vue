@@ -12,10 +12,10 @@
       />
     </div>
     <div v-if="isChanged">
-      <oc-button @click="cancel" class="uk-margin-xsmall-left">
+      <oc-button @click="cancel" class="oc-ml-s">
         <translate>Cancel</translate>
       </oc-button>
-      <oc-button @click="applyValue" class="uk-margin-xsmall-left" variation="primary">
+      <oc-button @click="applyValue" class="oc-ml-s" variation="primary">
         <translate>Save</translate>
       </oc-button>
     </div>

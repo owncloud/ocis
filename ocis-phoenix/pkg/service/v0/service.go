@@ -71,12 +71,12 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 		if p.config.Phoenix.Config.ExternalApps == nil {
 			p.config.Phoenix.Config.ExternalApps = []config.ExternalApp{
 				{
-					ID:   "accounts",
-					Path: "/accounts.js",
-				},
-				{
 					ID:   "settings",
 					Path: "/settings.js",
+				},
+				{
+					ID:   "accounts",
+					Path: "/accounts.js",
 				},
 			}
 		}

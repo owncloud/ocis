@@ -21,8 +21,18 @@ services:
       - testnet
     volumes:
       - .:/ocis
-      - ../ocis-reva:/ocis-reva
-      - ../reva:/reva
+      - ../accounts:/accounts
+      - ../glauth:/glauth
+      - ../konnectd:/konnectd
+      - ../ocis-phoenix:/ocis-phoenix
+      - ../ocis-pkg:/ocis-pkg
+      - ../ocs:/ocs
+      - ../proxy:/proxy
+      - ../settings:/settings
+      - ../store:/store
+      - ../thumbnails:/thumbnails
+      - ../webdav:/webdav
+      - ../storage:/storage
     environment:
       # ocis log level will be used for all services
       OCIS_LOG_LEVEL: debug

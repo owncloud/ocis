@@ -170,6 +170,21 @@ type GetUsersGroupsResponse struct {
   } `json:"ocs" xml:"ocs"`
 }
 
+type OcsConfig struct {
+	Version string `json:"version" xml:"version"`
+	Website string `json:"website" xml:"website"`
+	Host    string `json:"host" xml:"host"`
+	Contact string `json:"contact" xml:"contact"`
+	Ssl     string `json:"ssl" xml:"ssl"`
+}
+
+type GetConfigResponse struct {
+	Ocs struct {
+		Meta Meta      `json:"meta" xml:"meta"`
+		Data OcsConfig `json:"data" xml:"data"`
+	} `json:"ocs" xml:"ocs"`
+}
+
 func assertStatusCode(t *testing.T, statusCode int, res *httptest.ResponseRecorder, ocsVersion string) {
   if ocsVersion == "v1.php" {
     assert.Equal(t, 200, res.Code)
@@ -249,6 +264,11 @@ func init() {
     Server: accountsCfg.Server{
       AccountsDataPath: dataPath,
     },
+    Repo: accountsCfg.Repo{
+    	Disk: accountsCfg.Disk{
+    		Path: dataPath,
+		},
+	},
     Log: accountsCfg.Log{
       Level:  "info",
       Pretty: true,
@@ -1666,4 +1686,77 @@ func TestRemoveUserFromGroup(t *testing.T) {
       cleanUp(t)
     }
   }
+}
+
+// Issue: https://github.com/owncloud/ocis-ocs/issues/59 - cloud/capabilities endpoint not implemented
+func TestCapablilities(t *testing.T) {
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			res, err := sendRequest(
+				"GET",
+				fmt.Sprintf("/%s/cloud/capabilities%s", ocsVersion, formatpart),
+				"",
+				"admin:admin",
+			)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var response EmptyResponse
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			assertStatusCode(t, 404, res, ocsVersion)
+			assertResponseMeta(t, Meta{
+				"error",
+				998,
+				"not found",
+			}, response.Ocs.Meta)
+			assert.Empty(t, response.Ocs.Data)
+		}
+	}
+}
+
+func TestGetConfig(t *testing.T) {
+	for _, ocsVersion := range ocsVersions {
+		for _, format := range formats {
+			formatpart := getFormatString(format)
+			res, err := sendRequest(
+				"GET",
+				fmt.Sprintf("/%s/config%s", ocsVersion, formatpart),
+				"",
+				"admin:admin",
+			)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var response GetConfigResponse
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			assertStatusCode(t, 200, res, ocsVersion)
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+			assert.Equal(t, OcsConfig{
+				"1.7", "ocis", "", "", "true",
+			}, response.Ocs.Data)
+		}
+	}
 }

@@ -1,9 +1,12 @@
 */coverage.out
 
-/ocis/bin
-/ocis/dist
+/**/config
+/**/bin
+/**/dist
 /hugo
 *.key
 *crt
+node_modules/
+/*/assets
 
 .idea

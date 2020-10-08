@@ -2,11 +2,8 @@ package service
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
-	"os"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path/filepath"
-	"sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/blevesearch/bleve"
@@ -17,36 +14,11 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/provider"
 )
 
-// accLock mutually exclude readers from writers on group files
-var groupLock sync.Mutex
-
-func (s Service) indexGroups(path string) (err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not open groups folder")
-		return
-	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		s.log.Error().Err(err).Str("dir", path).Msg("could not list groups folder")
-		return
-	}
-	for _, file := range list {
-		err = s.indexGroup(file.Name())
-		if err != nil {
-			s.log.Error().Err(err).Str("file", file.Name()).Msg("could not index account")
-		}
-	}
-
-	return
-}
-
 func (s Service) indexGroup(id string) error {
 	g := &proto.BleveGroup{
 		BleveType: "group",
 	}
-	if err := s.loadGroup(id, &g.Group); err != nil {
+	if err := s.repo.LoadGroup(context.Background(), id, &g.Group); err != nil {
 		s.log.Error().Err(err).Str("group", id).Msg("could not load group")
 		return err
 	}
@@ -58,43 +30,6 @@ func (s Service) indexGroup(id string) error {
 	return nil
 }
 
-func (s Service) loadGroup(id string, g *proto.Group) (err error) {
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
-
-	groupLock.Lock()
-	defer groupLock.Unlock()
-	var data []byte
-	if data, err = ioutil.ReadFile(path); err != nil {
-		return merrors.NotFound(s.id, "could not read group: %v", err.Error())
-	}
-
-	if err = json.Unmarshal(data, g); err != nil {
-		return merrors.InternalServerError(s.id, "could not unmarshal group: %v", err.Error())
-	}
-
-	return
-}
-
-func (s Service) writeGroup(g *proto.Group) (err error) {
-
-	// leave only the member id
-	s.deflateMembers(g)
-
-	var bytes []byte
-	if bytes, err = json.Marshal(g); err != nil {
-		return merrors.InternalServerError(s.id, "could not marshal group: %v", err.Error())
-	}
-
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", g.Id)
-
-	groupLock.Lock()
-	defer groupLock.Unlock()
-	if err = ioutil.WriteFile(path, bytes, 0600); err != nil {
-		return merrors.InternalServerError(s.id, "could not write group: %v", err.Error())
-	}
-	return
-}
-
 func (s Service) expandMembers(g *proto.Group) {
 	if g == nil {
 		return
@@ -103,7 +38,7 @@ func (s Service) expandMembers(g *proto.Group) {
 	for i := range g.Members {
 		// TODO resolve by name, when a create or update is issued they may not have an id? fall back to searching the group id in the index?
 		a := &proto.Account{}
-		if err := s.loadAccount(g.Members[i].Id, a); err == nil {
+		if err := s.repo.LoadAccount(context.Background(), g.Members[i].Id, a); err == nil {
 			expanded = append(expanded, a)
 		} else {
 			// log errors but continue execution for now
@@ -173,7 +108,7 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 	for _, hit := range searchResult.Hits {
 
 		g := &proto.Group{}
-		if err = s.loadGroup(hit.ID, g); err != nil {
+		if err = s.repo.LoadGroup(c, hit.ID, g); err != nil {
 			s.log.Error().Err(err).Str("group", hit.ID).Msg("could not load group, skipping")
 			continue
 		}
@@ -196,9 +131,13 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
 	}
 
-	if err = s.loadGroup(id, out); err != nil {
+	if err = s.repo.LoadGroup(c, id, out); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "group not found: %v", err.Error())
+		}
+
 		s.log.Error().Err(err).Str("id", id).Msg("could not load group")
-		return
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 	s.log.Debug().Interface("group", out).Msg("found group")
 
@@ -226,9 +165,9 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 	// extract member id
 	s.deflateMembers(in.Group)
 
-	if err = s.writeGroup(in.Group); err != nil {
+	if err = s.repo.WriteGroup(c, in.Group); err != nil {
 		s.log.Error().Err(err).Interface("group", in.Group).Msg("could not persist new group")
-		return
+		return merrors.InternalServerError(s.id, "could not persist new group: %v", err.Error())
 	}
 
 	if err = s.indexGroup(id); err != nil {
@@ -252,9 +191,11 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
 
 	g := &proto.Group{}
-	if err = s.loadGroup(id, g); err != nil {
-		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
-		return
+	if err = s.repo.LoadGroup(c, id, g); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "group not found: %v", err.Error())
+		}
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	// delete memberof relationship in users
@@ -267,9 +208,13 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 			s.log.Error().Err(err).Str("groupid", id).Str("accountid", g.Members[i].Id).Msg("could not remove account memberof, skipping")
 		}
 	}
-	if err = os.Remove(path); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-		return merrors.InternalServerError(s.id, "could not remove group: %v", err.Error())
+
+	if err = s.repo.DeleteGroup(c, id); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "group not found: %v", err.Error())
+		}
+
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	if err = s.index.Delete(id); err != nil {
@@ -283,7 +228,6 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 
 // AddMember implements the GroupsServiceHandler interface
 func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *proto.Group) (err error) {
-
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.GroupId); err != nil {
@@ -297,15 +241,19 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 
 	// load structs
 	a := &proto.Account{}
-	if err = s.loadAccount(accountID, a); err != nil {
-		s.log.Error().Err(err).Str("id", accountID).Msg("could not load account")
-		return
+	if err = s.repo.LoadAccount(c, accountID, a); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "group not found: %v", err.Error())
+		}
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	g := &proto.Group{}
-	if err = s.loadGroup(groupID, g); err != nil {
-		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
-		return
+	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "could not load group: %v", err.Error())
+		}
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	// check if we need to add the account to the group
@@ -331,13 +279,11 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		a.MemberOf = append(a.MemberOf, g)
 	}
 
-	if err = s.writeAccount(a); err != nil {
-		s.log.Error().Err(err).Interface("account", a).Msg("could not persist account")
-		return
+	if err = s.repo.WriteAccount(c, a); err != nil {
+		return merrors.InternalServerError(s.id, "could not persist account: %v", err.Error())
 	}
-	if err = s.writeGroup(g); err != nil {
-		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
-		return
+	if err = s.repo.WriteGroup(c, g); err != nil {
+		return merrors.InternalServerError(s.id, "could not persist group: %v", err.Error())
 	}
 	// FIXME update index!
 	// TODO rollback changes when only one of them failed?
@@ -362,15 +308,21 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 
 	// load structs
 	a := &proto.Account{}
-	if err = s.loadAccount(accountID, a); err != nil {
+	if err = s.repo.LoadAccount(c, accountID, a); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "could not load account: %v", err.Error())
+		}
 		s.log.Error().Err(err).Str("id", accountID).Msg("could not load account")
-		return
+		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
 	g := &proto.Group{}
-	if err = s.loadGroup(groupID, g); err != nil {
+	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "could not load group: %v", err.Error())
+		}
 		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
-		return
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	//remove the account from the group if it exists
@@ -391,13 +343,13 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 	}
 	a.MemberOf = newGroups
 
-	if err = s.writeAccount(a); err != nil {
+	if err = s.repo.WriteAccount(c, a); err != nil {
 		s.log.Error().Err(err).Interface("account", a).Msg("could not persist account")
-		return
+		return merrors.InternalServerError(s.id, "could not persist account: %v", err.Error())
 	}
-	if err = s.writeGroup(g); err != nil {
+	if err = s.repo.WriteGroup(c, g); err != nil {
 		s.log.Error().Err(err).Interface("group", g).Msg("could not persist group")
-		return
+		return merrors.InternalServerError(s.id, "could not persist group: %v", err.Error())
 	}
 	// FIXME update index!
 	// TODO rollback changes when only one of them failed?
@@ -408,7 +360,6 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 
 // ListMembers implements the GroupsServiceHandler interface
 func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, out *proto.ListMembersResponse) (err error) {
-
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.Id); err != nil {
@@ -416,16 +367,17 @@ func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, ou
 	}
 
 	g := &proto.Group{}
-	if err = s.loadGroup(groupID, g); err != nil {
+	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
+		if storage.IsNotFoundErr(err) {
+			return merrors.NotFound(s.id, "group not found: %v", err.Error())
+		}
 		s.log.Error().Err(err).Str("id", groupID).Msg("could not load group")
-		return
+		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
 	// TODO only expand accounts if requested
 	// if in.FieldMask ...
 	s.expandMembers(g)
-
 	out.Members = g.Members
-
 	return
 }

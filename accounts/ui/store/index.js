@@ -12,6 +12,7 @@ import { injectAuthToken } from '../helpers/auth'
 const state = {
   config: null,
   initialized: false,
+  failed: false,
   accounts: {},
   roles: null,
   selectedAccounts: []
@@ -20,6 +21,7 @@ const state = {
 const getters = {
   config: state => state.config,
   isInitialized: state => state.initialized,
+  hasFailed: state => state.failed,
   getAccountsSorted: state => {
     return Object.values(state.accounts).sort((a1, a2) => {
       if (a1.onPremisesSamAccountName === a2.onPremisesSamAccountName) {
@@ -39,6 +41,9 @@ const mutations = {
   SET_INITIALIZED (state, value) {
     state.initialized = value
   },
+  SET_FAILED (state, value) {
+    state.failed = value
+  },
   SET_ACCOUNTS (state, accounts) {
     state.accounts = accounts
   },
@@ -47,7 +52,6 @@ const mutations = {
   },
   TOGGLE_SELECTION_ACCOUNT (state, account) {
     const accountIndex = state.selectedAccounts.indexOf(account)
-
     accountIndex > -1 ? state.selectedAccounts.splice(accountIndex, 1) : state.selectedAccounts.push(account)
   },
   SET_SELECTED_ACCOUNTS (state, accounts) {
@@ -80,49 +84,48 @@ const actions = {
     commit('LOAD_CONFIG', config)
   },
 
-  async initialize ({ commit, dispatch }) {
-    await dispatch('fetchAccounts')
-    await dispatch('fetchRoles')
-    commit('SET_INITIALIZED', true)
-  },
-
-  async fetchAccounts ({ commit, dispatch, rootGetters }) {
-    injectAuthToken(rootGetters.user.token)
-    const response = await AccountsService_ListAccounts({
-      $domain: rootGetters.configuration.server,
-      body: {}
-    })
-    if (response.status === 201) {
-      const accounts = response.data.accounts
-      commit('SET_ACCOUNTS', accounts || [])
-    } else {
-      dispatch('showMessage', {
-        title: 'Failed to fetch accounts.',
-        desc: response.statusText,
-        status: 'danger'
-      }, { root: true })
+  async initialize ({ commit, dispatch, getters }) {
+    await Promise.all([
+      dispatch('fetchAccounts'),
+      dispatch('fetchRoles')
+    ])
+    if (!getters.hasFailed) {
+      commit('SET_INITIALIZED', true)
     }
   },
 
-  async fetchRoles ({ commit, dispatch, rootGetters }) {
+  async fetchAccounts ({ commit, rootGetters }) {
     injectAuthToken(rootGetters.user.token)
-
-    const response = await RoleService_ListRoles({
-      $domain: rootGetters.configuration.server,
-      body: {}
-    })
-
-    if (response.status === 201) {
-      const roles = response.data.bundles
-
-      commit('SET_ROLES', roles || [])
-    } else {
-      dispatch('showMessage', {
-        title: 'Failed to fetch roles.',
-        desc: response.statusText,
-        status: 'danger'
-      }, { root: true })
+    try {
+      const response = await AccountsService_ListAccounts({
+        $domain: rootGetters.configuration.server,
+        body: {}
+      })
+      if (response.status === 201) {
+        const accounts = response.data.accounts
+        commit('SET_ACCOUNTS', accounts || [])
+        return
+      }
+    } catch (e) {
     }
+    commit('SET_FAILED', true)
+  },
+
+  async fetchRoles ({ commit, rootGetters }) {
+    injectAuthToken(rootGetters.user.token)
+    try {
+      const response = await RoleService_ListRoles({
+        $domain: rootGetters.configuration.server,
+        body: {}
+      })
+      if (response.status === 201) {
+        const roles = response.data.bundles
+        commit('SET_ROLES', roles || [])
+        return
+      }
+    } catch (e) {
+    }
+    commit('SET_FAILED', true)
   },
 
   toggleSelectionAll ({ commit, getters, state }) {

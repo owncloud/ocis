@@ -1,5 +1,7 @@
 Enhancement: Add the accounts service
 
+Tags: accounts
+
 * Bugfix - Initialize roleService client in GRPC server: [#114](https://github.com/owncloud/ocis-accounts/pull/114)
 * Bugfix - Cleanup separated indices in memory: [#224](https://github.com/owncloud/product/issues/224)
 * Change - Set user role on builtin users: [#102](https://github.com/owncloud/ocis-accounts/pull/102)
@@ -38,4 +40,4 @@ Enhancement: Add the accounts service
 * Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-accounts/issues/1)
 * Enhancement - Configuration: [#15](https://github.com/owncloud/ocis-accounts/pull/15)
 
-https://github.com/owncloud/ocis/pull/593
+https://github.com/owncloud/product/issues/244
