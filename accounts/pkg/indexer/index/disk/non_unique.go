@@ -120,6 +120,19 @@ func (idx NonUniqueIndex) Remove(id string, v string) error {
 		}
 	}
 
+	// Remove value directory if it is empty
+	valueDir := path.Join(idx.indexRootDir, v)
+	fi, err := ioutil.ReadDir(valueDir)
+	if err != nil {
+		return err
+	}
+
+	if len(fi) == 0 {
+		if err := os.RemoveAll(valueDir); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
