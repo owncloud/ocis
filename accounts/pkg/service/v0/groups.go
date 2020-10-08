@@ -204,7 +204,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
-	if err = s.index.Delete(id); err != nil {
+	if err = s.index.Delete(g); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group from index")
 		return merrors.InternalServerError(s.id, "could not remove group from index: %v", err.Error())
 	}
