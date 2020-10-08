@@ -33,8 +33,7 @@ Then('the displayed role of user {string} should be {string} on the WebUI', func
 Then('the user should not be able to see the accounts list on the WebUI', async function () {
   return client.page.accountsPage()
     .waitForAjaxCallsToStartAndFinish()
-    .waitForElementVisible('@loadingAccountsList')
-    .waitForElementNotPresent('@accountsListTable')
+    .waitForElementVisible('@loadingAccountsListFailed')
 })
 
 When('the user disables user/users {string} using the WebUI', function (usernames) {

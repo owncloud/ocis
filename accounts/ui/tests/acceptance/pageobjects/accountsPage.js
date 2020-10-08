@@ -117,7 +117,7 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     roleInRolesDropdown: {
-      selector: '//label[contains(@class, "accounts-roles-dropdown-role") and normalize-space()="%s"]',
+      selector: '//label[contains(@class, "accounts-roles-dropdown-role")]/span[normalize-space()="%s"]',
       locateStrategy: 'xpath'
     },
     rolesDropdownTrigger: {
@@ -125,8 +125,10 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     loadingAccountsList: {
-      selector: '//div[contains(@class, "oc-loader")]',
-      locateStrategy: 'xpath'
+      selector: '#accounts-list-loader'
+    },
+    loadingAccountsListFailed: {
+      selector: '#accounts-list-loading-failed'
     },
     rowCheckbox: {
       selector: '//input[@class="oc-checkbox"]',
