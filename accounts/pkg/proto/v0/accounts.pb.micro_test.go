@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,12 +26,44 @@ import (
 
 var service = grpc.Service{}
 
-const dataPath = "/var/tmp/accounts-store-test"
+var dataPath = createTmpDir()
 
 var newCreatedAccounts = []string{}
 var newCreatedGroups = []string{}
 
 var mockedRoleAssignment = map[string]string{}
+
+func init() {
+	service = grpc.NewService(
+		grpc.Namespace("com.owncloud.api"),
+		grpc.Name("accounts"),
+		grpc.Address("localhost:9180"),
+	)
+
+	cfg := config.New()
+	cfg.Server.AccountsDataPath = dataPath
+	cfg.Repo.Disk.Path = dataPath
+	var hdlr *svc.Service
+	var err error
+
+	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+		log.Fatalf("Could not create new service")
+	}
+
+	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
+	if err != nil {
+		log.Fatal("could not register the Accounts handler")
+	}
+	err = proto.RegisterGroupsServiceHandler(service.Server(), hdlr)
+	if err != nil {
+		log.Fatal("could not register the Groups handler")
+	}
+
+	err = service.Server().Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func getAccount(user string) *proto.Account {
 	switch user {
@@ -152,38 +185,6 @@ func getTestGroups(group string) *proto.Group {
 		}}
 	}
 	return nil
-}
-
-func init() {
-	service = grpc.NewService(
-		grpc.Namespace("com.owncloud.api"),
-		grpc.Name("accounts"),
-		grpc.Address("localhost:9180"),
-	)
-
-	cfg := config.New()
-	cfg.Server.AccountsDataPath = dataPath
-	cfg.Repo.Disk.Path = dataPath
-	var hdlr *svc.Service
-	var err error
-
-	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
-		log.Fatalf("Could not create new service")
-	}
-
-	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
-	if err != nil {
-		log.Fatal("could not register the Accounts handler")
-	}
-	err = proto.RegisterGroupsServiceHandler(service.Server(), hdlr)
-	if err != nil {
-		log.Fatal("could not register the Groups handler")
-	}
-
-	err = service.Server().Start()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func buildRoleServiceMock() settings.RoleService {
@@ -389,6 +390,16 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 	return res, err
 }
 
+// createTmpDir creates a temporary dir for tests data.
+func createTmpDir() string {
+	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-*")
+	if err != nil {
+		panic(err)
+	}
+
+	return name
+}
+
 // https://github.com/owncloud/ocis/accounts/issues/61
 func TestCreateAccount(t *testing.T) {
 	resp, err := createAccount(t, "user1")
@@ -531,6 +542,7 @@ func TestUpdateAccount(t *testing.T) {
 			assert.IsType(t, &proto.Account{}, resp)
 			assertAccountsSame(t, tt.userAccount, resp)
 			assertUserExists(t, tt.userAccount)
+			_, _ = deleteAccount(t, "f9149a32-2b8e-4f04-9e8d-937d81712b9a")
 			cleanUp(t)
 		})
 	}
