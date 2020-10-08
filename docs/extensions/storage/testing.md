@@ -83,7 +83,7 @@ make test-acceptance-api \
 TEST_SERVER_URL=http://localhost:9140 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
-OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
@@ -128,7 +128,7 @@ If you want to work on a specific issue
     TEST_SERVER_URL=http://localhost:9140 \
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
-    OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+    OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
