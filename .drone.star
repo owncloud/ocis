@@ -90,7 +90,7 @@ def getDependsOnAllTestPipelines(ctx):
       'upload-coverage',
       'localApiTests-owncloud-storage',
       'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames()
+    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
 
@@ -513,7 +513,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'accountsUiTests',
+    'name': 'accountsUITests',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
