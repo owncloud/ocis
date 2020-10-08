@@ -142,7 +142,7 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
-  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'], 'ocis'))
+  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'], 'owncloud'))
   return pipelines
 
 def testing(ctx, module):
