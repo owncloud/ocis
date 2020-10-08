@@ -245,6 +245,7 @@ func assertResponseContainsUser(t *testing.T, response *proto.ListAccountsRespon
 	assertAccountsSame(t, account, result)
 }
 
+/*
 func assertResponseNotContainsUser(t *testing.T, response *proto.ListAccountsResponse, account *proto.Account) {
 	for _, a := range response.Accounts {
 		if a.Id == account.Id || a.PreferredName == account.PreferredName {
@@ -252,6 +253,8 @@ func assertResponseNotContainsUser(t *testing.T, response *proto.ListAccountsRes
 		}
 	}
 }
+
+*/
 
 func assertAccountsSame(t *testing.T, acc1, acc2 *proto.Account) {
 	assert.Equal(t, acc1.Id, acc2.Id)

@@ -78,9 +78,8 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 	s.log.Debug().Interface("query", query).Msg("using query")
 
 	//searchRequest := bleve.NewSearchRequest(query)
-	var searchResult *bleve.SearchResult
+	var searchResult = &bleve.SearchResult{}
 	//searchResult, err = s.index.Search(searchRequest)
-	searchResult = &bleve.SearchResult{}
 	if err != nil {
 		s.log.Error().Err(err).Msg("could not execute bleve search")
 		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
