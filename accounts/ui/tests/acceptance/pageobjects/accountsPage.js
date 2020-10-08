@@ -134,7 +134,7 @@ module.exports = {
       selector: '#accounts-list-loading-failed'
     },
     rowCheckbox: {
-      selector: '//input[@class="oc-checkbox"]',
+      selector: '//input[contains(@class, "oc-checkbox")]',
       locateStrategy: 'xpath'
     },
     batchActionDisable: {
