@@ -32,7 +32,8 @@ const navItems = [
     route: {
       name: 'settings',
       path: `/${appInfo.id}/`
-    }
+    },
+    menu: 'user'
   }
 ]
 
