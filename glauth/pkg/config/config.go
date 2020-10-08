@@ -58,15 +58,16 @@ type Backend struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
-	Ldap    Ldap
-	Ldaps   Ldaps
-	Backend Backend
-	Version string
+	File     string
+	Log      Log
+	Debug    Debug
+	HTTP     HTTP
+	Tracing  Tracing
+	Ldap     Ldap
+	Ldaps    Ldaps
+	Backend  Backend
+	Fallback Backend
+	Version  string
 }
 
 // New initializes a new configuration with or without defaults.

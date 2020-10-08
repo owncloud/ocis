@@ -15,7 +15,13 @@ type Option func(o *Options)
 type Options struct {
 	Logger          log.Logger
 	Context         context.Context
-	Config          *config.Config
+	LDAP            *config.LDAP
+	LDAPS           *config.LDAPS
+	Backend         *config.Config
+	Fallback        *config.Config
+	BaseDN          string
+	NameFormat      string
+	GroupFormat     string
 	AccountsService accounts.AccountsService
 	GroupsService   accounts.GroupsService
 }
@@ -45,10 +51,52 @@ func Context(val context.Context) Option {
 	}
 }
 
-// Config provides a function to set the config option.
-func Config(val *config.Config) Option {
+// LDAP provides a function to set the LDAP option.
+func LDAP(val *config.LDAP) Option {
 	return func(o *Options) {
-		o.Config = val
+		o.LDAP = val
+	}
+}
+
+// LDAPS provides a function to set the LDAPS option.
+func LDAPS(val *config.LDAPS) Option {
+	return func(o *Options) {
+		o.LDAPS = val
+	}
+}
+
+// Backend provides a function to set the backend option.
+func Backend(val *config.Config) Option {
+	return func(o *Options) {
+		o.Backend = val
+	}
+}
+
+// Fallback provides a strring to set the fallback option.
+func Fallback(val *config.Config) Option {
+	return func(o *Options) {
+		o.Fallback = val
+	}
+}
+
+// BaseDN provides a strring to set the BaseDN option.
+func BaseDN(val string) Option {
+	return func(o *Options) {
+		o.BaseDN = val
+	}
+}
+
+// NameFormat provides a strring to set the NameFormat option.
+func NameFormat(val string) Option {
+	return func(o *Options) {
+		o.NameFormat = val
+	}
+}
+
+// GroupFormat provides a strring to set the GroupFormat option.
+func GroupFormat(val string) Option {
+	return func(o *Options) {
+		o.GroupFormat = val
 	}
 }
 
