@@ -25,14 +25,17 @@ module.exports = {
     },
 
     selectRole: function (username, role) {
+      const roleTrigger =
+          util.format(this.elements.rowByUsername.selector, username) +
+          this.elements.rolesDropdownTrigger.selector
       const roleSelector =
         util.format(this.elements.rowByUsername.selector, username) +
         util.format(this.elements.roleInRolesDropdown.selector, role)
 
       return this
         .initAjaxCounters()
-        .waitForElementVisible('@rolesDropdownTrigger')
-        .click('@rolesDropdownTrigger')
+        .waitForElementVisible(roleTrigger)
+        .click(roleTrigger)
         .waitForElementVisible(roleSelector)
         .click(roleSelector)
         .waitForOutstandingAjaxCalls()
