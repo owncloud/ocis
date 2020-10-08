@@ -90,10 +90,6 @@ func (idx Unique) Add(id, v string) (string, error) {
 // Remove a value v from an index.
 func (idx Unique) Remove(id string, v string) (err error) {
 	searchPath := path.Join(idx.indexRootDir, v)
-	if err = isValidSymlink(searchPath); err != nil {
-		return
-	}
-
 	return os.Remove(searchPath)
 }
 
