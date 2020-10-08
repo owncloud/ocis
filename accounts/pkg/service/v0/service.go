@@ -92,7 +92,7 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "accounts", "non_unique"); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique"); err != nil {
 		return nil, err
 	}
 
