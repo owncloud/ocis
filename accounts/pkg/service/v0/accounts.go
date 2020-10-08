@@ -3,17 +3,16 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoM31/godata"
 	"path/filepath"
 	"regexp"
 	"sync"
 	"time"
 
-	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -43,6 +42,9 @@ func (s Service) indexAccount(id string) error {
 	}
 	s.log.Debug().Interface("account", a).Msg("found account")
 	if err := s.index.Add(a); err != nil {
+		if idxerrs.IsAlreadyExistsErr(err) {
+			return nil
+		}
 		s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
 		return err
 	}
@@ -136,6 +138,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	accLock.Lock()
 	defer accLock.Unlock()
 	var password string
+	var searchResults []string
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
@@ -148,93 +151,82 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		if password == "" {
 			return merrors.Unauthorized(s.id, "password must not be empty")
 		}
-	}
 
-	// only search for accounts
-	tq := bleve.NewTermQuery("account")
-	tq.SetField("bleve_type")
-
-	/*
-		query := bleve.NewConjunctionQuery(tq)
-	*/
-	if in.Query != "" {
-		// parse the query like an odata filter
-		var q *godata.GoDataFilterQuery
-		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			s.log.Error().Err(err).Msg("could not parse query")
-			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
-		}
-
-		fmt.Print(q)
-	}
-	/*
-
-
-			// convert to bleve query
-			bq, err := provider.BuildBleveQuery(q)
-			if err != nil {
-				s.log.Error().Err(err).Msg("could not build bleve query")
-				return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
-			}
-			query.AddQuery(bq)
-		}
-
-		s.log.Debug().Interface("query", query).Msg("using query")
-
-		searchRequest := bleve.NewSearchRequest(query)
-		var searchResult *bleve.SearchResult
-		searchResult, err = s.index.Search(searchRequest)
-
-
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
 		if err != nil {
-			s.log.Error().Err(err).Msg("could not execute bleve search")
-			return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
+			return err
+		}
+	}
+
+	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
+	match = onPremQuery.FindStringSubmatch(in.Query)
+	if len(match) == 2 {
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+	}
+
+	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
+	match = mailQuery.FindStringSubmatch(in.Query)
+	if len(match) == 2 {
+		searchResults, err = s.index.FindBy(&proto.Account{}, "Mail", match[1])
+	}
+
+	// startswith(on_premises_sam_account_name,'mar') or startswith(display_name,'mar') or startswith(mail,'mar')
+	var searchQuery = regexp.MustCompile(`^startswith\(on_premises_sam_account_name,'(.*)'\) or startswith\(display_name,'(.*)'\) or startswith\(mail,'(.*)'\)$`)
+
+	match = searchQuery.FindStringSubmatch(in.Query)
+	if len(match) == 4 {
+		resSam, _ := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
+		resDisp, _ := s.index.FindByPartial(&proto.Account{}, "DisplayName", match[2]+"*")
+		resMail, _ := s.index.FindByPartial(&proto.Account{}, "Mail", match[3]+"*")
+
+		searchResults = append(resSam, append(resDisp, resMail...)...)
+		searchResults = unique(searchResults)
+
+	}
+
+	if in.Query == "" {
+		searchResults, _ = s.index.FindByPartial(&proto.Account{}, "Mail", "*")
+	}
+
+	out.Accounts = make([]*proto.Account, 0, len(searchResults))
+
+	for _, hit := range searchResults {
+		a := &proto.Account{}
+		if hit == s.Config.ServiceUser.UUID {
+			acc := s.getInMemoryServiceUser()
+			a = &acc
+		} else if err = s.repo.LoadAccount(ctx, hit, a); err != nil {
+			s.log.Error().Err(err).Str("account", hit).Msg("could not load account, skipping")
+			continue
+		}
+		var currentHash string
+		if a.PasswordProfile != nil {
+			currentHash = a.PasswordProfile.Password
 		}
 
-		s.log.Debug().Interface("result", searchResult).Msg("result")
+		s.debugLogAccount(a).Msg("found account")
 
-		out.Accounts = make([]*proto.Account, 0)
-
-		for _, hit := range searchResult.Hits {
-			a := &proto.Account{}
-			if hit.ID == s.Config.ServiceUser.UUID {
-				acc := s.getInMemoryServiceUser()
-				a = &acc
-			} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
-				s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
-				continue
+		if password != "" {
+			if a.PasswordProfile == nil {
+				s.debugLogAccount(a).Msg("no password profile")
+				return merrors.Unauthorized(s.id, "invalid password")
 			}
-			var currentHash string
-			if a.PasswordProfile != nil {
-				currentHash = a.PasswordProfile.Password
+			if !s.passwordIsValid(currentHash, password) {
+				return merrors.Unauthorized(s.id, "invalid password")
 			}
-
-			s.debugLogAccount(a).Msg("found account")
-
-			if password != "" {
-				if a.PasswordProfile == nil {
-					s.debugLogAccount(a).Msg("no password profile")
-					return merrors.Unauthorized(s.id, "invalid password")
-				}
-				if !s.passwordIsValid(currentHash, password) {
-					return merrors.Unauthorized(s.id, "invalid password")
-				}
-			}
-
-
-			// TODO add groups if requested
-			// if in.FieldMask ...
-			s.expandMemberOf(a)
-
-			// remove password before returning
-			if a.PasswordProfile != nil {
-				a.PasswordProfile.Password = ""
-			}
-
-			out.Accounts = append(out.Accounts, a)
 		}
 
-	*/
+		// TODO add groups if requested
+		// if in.FieldMask ...
+		s.expandMemberOf(a)
+
+		// remove password before returning
+		if a.PasswordProfile != nil {
+			a.PasswordProfile.Password = ""
+		}
+
+		out.Accounts = append(out.Accounts, a)
+	}
 
 	return
 }
@@ -626,4 +618,16 @@ func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
 		"CreatedDateTime":              a.CreatedDateTime,
 		"DeletedDateTime":              a.DeletedDateTime,
 	})
+}
+
+func unique(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
