@@ -36,6 +36,7 @@
 * Enhancement - Add the thumbnails service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add a command to list the versions of running instances: [#226](https://github.com/owncloud/product/issues/226)
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
+* Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
@@ -1206,6 +1207,20 @@
   * Enhancement - Implement preview API: [#13](https://github.com/owncloud/ocis-webdav/pull/13)
 
    https://github.com/owncloud/product/issues/244
+
+* Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
+
+   We introduced the `fallback-datastore` config option and the corresponding options to allow
+   configuring a simple chain of two handlers.
+
+   Simple, because it is intended for bind and single result search queries. Merging large sets of
+   results is currently out of scope. For now, the implementation will only search the fallback
+   backend if the default backend returns an error or the number of results is 0. This is sufficient
+   to allow an IdP to authenticate users from ocis as well as owncloud 10 as described in the [bridge
+   scenario](https://owncloud.github.io/ocis/deployment/bridge/).
+
+   https://github.com/owncloud/ocis-glauth/issues/18
+   https://github.com/owncloud/ocis/pull/649
 
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 
