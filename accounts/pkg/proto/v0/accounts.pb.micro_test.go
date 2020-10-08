@@ -208,8 +208,8 @@ func cleanUp(t *testing.T) {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			continue
 		}
-		_, err := deleteAccount(t, id)
-		checkError(t, err)
+		_, _ = deleteAccount(t, id)
+		//checkError(t, err)
 	}
 
 	datastore = filepath.Join(dataPath, "groups")
@@ -219,8 +219,7 @@ func cleanUp(t *testing.T) {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			continue
 		}
-		_, err := deleteGroup(t, id)
-		checkError(t, err)
+		_, _ = deleteGroup(t, id)
 	}
 
 	newCreatedAccounts = []string{}
@@ -245,7 +244,6 @@ func assertResponseContainsUser(t *testing.T, response *proto.ListAccountsRespon
 	assertAccountsSame(t, account, result)
 }
 
-/*
 func assertResponseNotContainsUser(t *testing.T, response *proto.ListAccountsResponse, account *proto.Account) {
 	for _, a := range response.Accounts {
 		if a.Id == account.Id || a.PreferredName == account.PreferredName {
@@ -253,8 +251,6 @@ func assertResponseNotContainsUser(t *testing.T, response *proto.ListAccountsRes
 		}
 	}
 }
-
-*/
 
 func assertAccountsSame(t *testing.T, acc1, acc2 *proto.Account) {
 	assert.Equal(t, acc1.Id, acc2.Id)
@@ -458,8 +454,6 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	_, _ = createAccount(t, "user1")
-
 	tests := []struct {
 		name        string
 		userAccount *proto.Account
@@ -467,44 +461,44 @@ func TestUpdateAccount(t *testing.T) {
 		{
 			"Update user (demonstration of updatable fields)",
 			&proto.Account{
-				DisplayName:                 "Alice Hansen",
-				PreferredName:               "Wonderful Alice",
-				OnPremisesDistinguishedName: "Alice",
-				UidNumber:                   20010,
-				GidNumber:                   30001,
-				Mail:                        "alice@example.com",
+				DisplayName:              "Alice Hansen",
+				PreferredName:            "Wonderful Alice",
+				OnPremisesSamAccountName: "Alice",
+				UidNumber:                20010,
+				GidNumber:                30001,
+				Mail:                     "alice@example.com",
 			},
 		},
 		{
 			"Update user with unicode data",
 			&proto.Account{
-				DisplayName:                 "एलिस हेन्सेन",
-				PreferredName:               "अद्भुत एलिस",
-				OnPremisesDistinguishedName: "एलिस",
-				UidNumber:                   20010,
-				GidNumber:                   30001,
-				Mail:                        "एलिस@उदाहरण.com",
+				DisplayName:              "एलिस हेन्सेन",
+				PreferredName:            "अद्भुत एलिस",
+				OnPremisesSamAccountName: "एलिस",
+				UidNumber:                20010,
+				GidNumber:                30001,
+				Mail:                     "एलिस@उदाहरण.com",
 			},
 		},
 		{
 			"Update user with empty data values",
 			&proto.Account{
-				DisplayName:                 "",
-				PreferredName:               "",
-				OnPremisesDistinguishedName: "",
-				UidNumber:                   0,
-				GidNumber:                   0,
-				Mail:                        "",
+				DisplayName:              "",
+				PreferredName:            "",
+				OnPremisesSamAccountName: "",
+				UidNumber:                0,
+				GidNumber:                0,
+				Mail:                     "",
 			},
 		},
 		{
 			"Update user with strange data",
 			&proto.Account{
-				DisplayName:                 "12345",
-				PreferredName:               "12345",
-				OnPremisesDistinguishedName: "54321",
-				UidNumber:                   1000,
-				GidNumber:                   1000,
+				DisplayName:              "12345",
+				PreferredName:            "12345",
+				OnPremisesSamAccountName: "54321",
+				UidNumber:                1000,
+				GidNumber:                1000,
 				// No email validation
 				// https://github.com/owncloud/ocis/accounts/issues/77
 				Mail: "1.2@3.c_@",
@@ -526,6 +520,7 @@ func TestUpdateAccount(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
+			_, _ = createAccount(t, "user1")
 			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
 			tt.userAccount.AccountEnabled = false
 			tt.userAccount.IsResourceAccount = false
@@ -536,10 +531,9 @@ func TestUpdateAccount(t *testing.T) {
 			assert.IsType(t, &proto.Account{}, resp)
 			assertAccountsSame(t, tt.userAccount, resp)
 			assertUserExists(t, tt.userAccount)
+			cleanUp(t)
 		})
 	}
-
-	cleanUp(t)
 }
 
 func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
@@ -626,8 +620,7 @@ func TestListAccounts(t *testing.T) {
 
 func TestListWithoutUserCreation(t *testing.T) {
 	resp, err := listAccounts(t)
-
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	// Only 5 default users
 	assert.Equal(t, 6, len(resp.Accounts))
@@ -652,7 +645,7 @@ func TestGetAccount(t *testing.T) {
 }
 
 //TODO: This segfaults! WIP
-/*
+
 func TestDeleteAccount(t *testing.T) {
 	createAccount(t, "user1")
 	createAccount(t, "user2")
@@ -673,8 +666,6 @@ func TestDeleteAccount(t *testing.T) {
 
 	cleanUp(t)
 }
-
-*/
 
 func TestListGroups(t *testing.T) {
 	req := &proto.ListGroupsRequest{}
