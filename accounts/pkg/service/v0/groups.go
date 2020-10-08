@@ -5,13 +5,10 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path/filepath"
 
-	"github.com/CiscoM31/godata"
-	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/provider"
 )
 
 func (s Service) expandMembers(g *proto.Group) {
@@ -51,49 +48,21 @@ func (s Service) deflateMembers(g *proto.Group) {
 
 // ListGroups implements the GroupsServiceHandler interface
 func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
-
-	// only search for groups
-	tq := bleve.NewTermQuery("group")
-	tq.SetField("bleve_type")
-
-	query := bleve.NewConjunctionQuery(tq)
-
-	if in.Query != "" {
-		// parse the query like an odata filter
-		var q *godata.GoDataFilterQuery
-		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			s.log.Error().Err(err).Msg("could not parse query")
-			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
-		}
-
-		// convert to bleve query
-		bq, err := provider.BuildBleveQuery(q)
-		if err != nil {
-			s.log.Error().Err(err).Msg("could not build bleve query")
-			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
-		}
-		query.AddQuery(bq)
-	}
-
-	s.log.Debug().Interface("query", query).Msg("using query")
-
-	//searchRequest := bleve.NewSearchRequest(query)
-	var searchResult = &bleve.SearchResult{}
-	//searchResult, err = s.index.Search(searchRequest)
+	var searchResults []string
 	if err != nil {
 		s.log.Error().Err(err).Msg("could not execute bleve search")
 		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
 	}
 
-	s.log.Debug().Interface("result", searchResult).Msg("result")
-
 	out.Groups = make([]*proto.Group, 0)
+	if in.Query == "" {
+		searchResults, _ = s.index.FindByPartial(&proto.Group{}, "DisplayName", "*")
+	}
 
-	for _, hit := range searchResult.Hits {
-
+	for _, hit := range searchResults {
 		g := &proto.Group{}
-		if err = s.repo.LoadGroup(c, hit.ID, g); err != nil {
-			s.log.Error().Err(err).Str("group", hit.ID).Msg("could not load group, skipping")
+		if err = s.repo.LoadGroup(c, hit, g); err != nil {
+			s.log.Error().Err(err).Str("group", hit).Msg("could not load group, skipping")
 			continue
 		}
 		s.log.Debug().Interface("group", g).Msg("found group")
