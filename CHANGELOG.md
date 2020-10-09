@@ -20,6 +20,7 @@
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -227,6 +228,16 @@
 
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
+
+* Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
+
+   Tags: web
+
+   We updated phoenix to v0.20.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/674
+   https://github.com/owncloud/phoenix/releases/tag/v0.20.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
