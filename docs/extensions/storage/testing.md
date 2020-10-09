@@ -80,10 +80,10 @@ In the ownCloud 10 core repo run
 
 ```
 make test-acceptance-api \
-TEST_SERVER_URL=http://localhost:9140 \
+TEST_SERVER_URL=https://localhost:9200 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
-OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
@@ -125,10 +125,10 @@ If you want to work on a specific issue
     E.g.:
     ```
     make test-acceptance-api \
-    TEST_SERVER_URL=http://localhost:9140 \
+    TEST_SERVER_URL=https://localhost:9200 \
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
-    OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+    OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
