@@ -32,35 +32,62 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
+const ocsV1 string = "v1.php"
+const ocsV2 string = "v2.php"
+
+const adminBasicAuth string = "admin:admin"
+
+const userProvisioningEndPoint string = "/v1.php/cloud/users?format=json"
+const groupProvisioningEndPoint string = "/v1.php/cloud/groups?format=json"
+
+const unsuccessfulResponseText string = "The response was expected to be successful but was not"
+
+const userIDEinstein string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
+const userIDMarie string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
+const userIDFeynman string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
+const userIDKonnectd string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
+const userIDReva string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
+const userIDMoss string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
+
+const groupPhilosophyHaters = "167cbee2-0518-455a-bfb2-031fe0621e5d"
+const groupPhysicsLovers = "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+const groupPoloniumLovers = "cedc21aa-4072-4614-8676-fa9165f598ff"
+const groupQuantumLovers = "a1726108-01f8-4c30-88df-2b1a9d1cba1a"
+const groupRadiumLovers = "7b87fd49-286e-4a5f-bafd-c535d5dd997a"
+const groupSailingLovers = "6040aa17-9c64-4fef-9bd0-77234d71bad0"
+const groupViolinHaters = "dd58e5ec-842e-498b-8800-61f2ec6f911f"
+const groupUsers = "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+const groupSysUsers = "34f38767-c937-4eb6-b847-1c175829a2a0"
+
 var service = grpc.Service{}
 
 var mockedRoleAssignment = map[string]string{}
 
-var ocsVersions = []string{"v1.php", "v2.php"}
+var ocsVersions = []string{ocsV1, ocsV2}
 
 var formats = []string{"json", "xml"}
 
 const dataPath = "./accounts-store"
 
 var DefaultUsers = []string{
-  "4c510ada-c86b-4815-8820-42cdf82c3d51",
-  "820ba2a1-3f54-4538-80a4-2d73007e30bf",
-  "932b4540-8d16-481e-8ef4-588e4b6b151c",
-  "bc596f3c-c955-4328-80a0-60d018b4ad57",
-  "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
-  "058bff95-6708-4fe5-91e4-9ea3d377588b",
+  userIDEinstein,
+  userIDKonnectd,
+  userIDFeynman,
+  userIDReva,
+  userIDMarie,
+  userIDMoss,
 }
 
 var DefaultGroups = []string{
-  "167cbee2-0518-455a-bfb2-031fe0621e5d",
-  "262982c1-2362-4afa-bfdf-8cbfef64a06e",
-  "34f38767-c937-4eb6-b847-1c175829a2a0",
-  "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
-  "6040aa17-9c64-4fef-9bd0-77234d71bad0",
-  "7b87fd49-286e-4a5f-bafd-c535d5dd997a",
-  "a1726108-01f8-4c30-88df-2b1a9d1cba1a",
-  "cedc21aa-4072-4614-8676-fa9165f598ff",
-  "dd58e5ec-842e-498b-8800-61f2ec6f911f",
+  groupPhilosophyHaters,
+  groupPhysicsLovers,
+  groupSysUsers,
+  groupUsers,
+  groupSailingLovers,
+  groupRadiumLovers,
+  groupQuantumLovers,
+  groupPoloniumLovers,
+  groupViolinHaters,
 }
 
 func getFormatString(format string) string {
@@ -157,15 +184,15 @@ type Meta struct {
 }
 
 func (m *Meta) Success(ocsVersion string) bool {
-  if !(ocsVersion == "v1.php" || ocsVersion == "v2.php") {
+  if !(ocsVersion == ocsV1 || ocsVersion == ocsV2) {
     return false
   }
   if m.Status != "ok" {
     return false
   }
-  if ocsVersion == "v1.php" && m.StatusCode != 100 {
+  if ocsVersion == ocsV1 && m.StatusCode != 100 {
     return false
-  } else if ocsVersion == "v2.php" && m.StatusCode != 200 {
+  } else if ocsVersion == ocsV2 && m.StatusCode != 200 {
     return false
   } else {
     return true
@@ -221,7 +248,7 @@ type GetConfigResponse struct {
 }
 
 func assertStatusCode(t *testing.T, statusCode int, res *httptest.ResponseRecorder, ocsVersion string) {
-  if ocsVersion == "v1.php" {
+  if ocsVersion == ocsV1 {
     assert.Equal(t, 200, res.Code)
   } else {
     assert.Equal(t, statusCode, res.Code)
@@ -454,9 +481,9 @@ func getService() svc.Service {
 func createUser(u User) error {
   _, err := sendRequest(
     "POST",
-    "/v1.php/cloud/users?format=json",
+    userProvisioningEndPoint,
     u.getUserRequestString(),
-    "admin:admin",
+    adminBasicAuth,
   )
 
   if err != nil {
@@ -468,9 +495,9 @@ func createUser(u User) error {
 func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
   _, err := sendRequest(
     "POST",
-    "/v1.php/cloud/groups?format=json",
+    groupProvisioningEndPoint,
     g.getGroupRequestString(),
-    "admin:admin",
+    adminBasicAuth,
   )
 
   if err != nil {
@@ -660,7 +687,7 @@ func TestCreateUser(t *testing.T) {
           "POST",
           fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
           data.user.getUserRequestString(),
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -680,7 +707,7 @@ func TestCreateUser(t *testing.T) {
         }
 
         if data.err == nil {
-          assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+          assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
           assertStatusCode(t, 200, res, ocsVersion)
           assertUserSame(t, data.user, response.Ocs.Data, false)
         } else {
@@ -697,9 +724,9 @@ func TestCreateUser(t *testing.T) {
 
         res, err = sendRequest(
           "GET",
-          "/v1.php/cloud/users?format=json",
+          userProvisioningEndPoint,
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -711,7 +738,7 @@ func TestCreateUser(t *testing.T) {
           t.Fatal(err)
         }
 
-        assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+        assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
 
         if data.err == nil {
           assert.Contains(t, usersResponse.Ocs.Data.Users, id)
@@ -756,7 +783,7 @@ func TestGetUsers(t *testing.T) {
         "GET",
         fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -776,7 +803,7 @@ func TestGetUsers(t *testing.T) {
       }
 
       assertStatusCode(t, 200, res, ocsVersion)
-      assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+      assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
       for _, user := range users {
         assert.Contains(t, response.Ocs.Data.Users, user.Username)
       }
@@ -793,7 +820,7 @@ func TestGetUsersDefaultUsers(t *testing.T) {
         "GET",
         fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -813,7 +840,7 @@ func TestGetUsersDefaultUsers(t *testing.T) {
       }
 
       assertStatusCode(t, 200, res, ocsVersion)
-      assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+      assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
       for _, user := range DefaultUsers {
         assert.Contains(t, response.Ocs.Data.Users, user)
       }
@@ -855,7 +882,7 @@ func TestGetUser(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user.ID, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -898,7 +925,7 @@ func TestGetUserInvalidId(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/user/%s%s", ocsVersion, user, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -960,7 +987,7 @@ func TestDeleteUser(t *testing.T) {
         "DELETE",
         fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -979,15 +1006,15 @@ func TestDeleteUser(t *testing.T) {
       }
 
       assertStatusCode(t, 200, res, ocsVersion)
-      assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+      assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
       assert.Empty(t, response.Ocs.Data)
 
       // Check deleted user doesn't exist and the other user does
       res, err = sendRequest(
         "GET",
-        "/v1.php/cloud/users?format=json",
+        userProvisioningEndPoint,
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -999,7 +1026,7 @@ func TestDeleteUser(t *testing.T) {
         t.Fatal(err)
       }
 
-      assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+      assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
       assert.Contains(t, usersResponse.Ocs.Data.Users, "thomson")
       assert.NotContains(t, usersResponse.Ocs.Data.Users, "rutherford")
 
@@ -1025,7 +1052,7 @@ func TestDeleteUserInvalidId(t *testing.T) {
           "DELETE",
           fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1178,7 +1205,7 @@ func TestUpdateUser(t *testing.T) {
           "PUT",
           fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
           params.Encode(),
-          "admin:admin",
+          adminBasicAuth,
         )
 
         updatedUser := user
@@ -1217,7 +1244,7 @@ func TestUpdateUser(t *testing.T) {
           assertResponseMeta(t, *data.Error, response.Ocs.Meta)
           assertStatusCode(t, 400, res, ocsVersion)
         } else {
-          assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+          assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
           assertStatusCode(t, 200, res, ocsVersion)
         }
 
@@ -1226,7 +1253,7 @@ func TestUpdateUser(t *testing.T) {
           "GET",
           "/v1.php/cloud/users/rutherford?format=json",
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1238,7 +1265,7 @@ func TestUpdateUser(t *testing.T) {
           t.Fatal(err)
         }
 
-        assert.True(t, usersResponse.Ocs.Meta.Success("v1.php"), "The response was expected to be successful but was not")
+        assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
         if data.Error == nil {
           assertUserSame(t, updatedUser, usersResponse.Ocs.Data, true)
         } else {
@@ -1370,7 +1397,7 @@ func AddUserToGroup(userid, groupid string) error {
     "POST",
     fmt.Sprintf("/v2.php/cloud/users/%s/groups", userid),
     fmt.Sprintf("groupid=%v", groupid),
-    "admin:admin",
+    adminBasicAuth,
   )
   if err != nil {
     return err
@@ -1412,7 +1439,7 @@ func TestListUsersGroupNewUsers(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1431,7 +1458,7 @@ func TestListUsersGroupNewUsers(t *testing.T) {
         }
 
         assertStatusCode(t, 200, res, ocsVersion)
-        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
         assert.Empty(t, response.Ocs.Data.Groups)
 
         cleanUp(t)
@@ -1442,32 +1469,32 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 
 func TestListUsersGroupDefaultUsers(t *testing.T) {
   DefaultGroups := map[string][]string{
-    "4c510ada-c86b-4815-8820-42cdf82c3d51": {
-      "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
-      "6040aa17-9c64-4fef-9bd0-77234d71bad0",
-      "dd58e5ec-842e-498b-8800-61f2ec6f911f",
-      "262982c1-2362-4afa-bfdf-8cbfef64a06e",
+    userIDEinstein: {
+      groupUsers,
+      groupSailingLovers,
+      groupViolinHaters,
+      groupPhysicsLovers,
     },
-    "820ba2a1-3f54-4538-80a4-2d73007e30bf": {
-      "34f38767-c937-4eb6-b847-1c175829a2a0",
+    userIDKonnectd: {
+      groupSysUsers,
     },
-    "932b4540-8d16-481e-8ef4-588e4b6b151c": {
-      "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
-      "a1726108-01f8-4c30-88df-2b1a9d1cba1a",
-      "167cbee2-0518-455a-bfb2-031fe0621e5d",
-      "262982c1-2362-4afa-bfdf-8cbfef64a06e",
+    userIDFeynman: {
+      groupUsers,
+      groupQuantumLovers,
+      groupPhilosophyHaters,
+      groupPhysicsLovers,
     },
-    "bc596f3c-c955-4328-80a0-60d018b4ad57": {
-      "34f38767-c937-4eb6-b847-1c175829a2a0",
+    userIDReva: {
+      groupSysUsers,
     },
-    "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c": {
-      "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
-      "7b87fd49-286e-4a5f-bafd-c535d5dd997a",
-      "cedc21aa-4072-4614-8676-fa9165f598ff",
-      "262982c1-2362-4afa-bfdf-8cbfef64a06e",
+    userIDMarie: {
+      groupUsers,
+      groupRadiumLovers,
+      groupPoloniumLovers,
+      groupPhysicsLovers,
     },
-    "058bff95-6708-4fe5-91e4-9ea3d377588b": {
-      "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa",
+    userIDMoss: {
+      groupUsers,
     },
   }
 
@@ -1479,7 +1506,7 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1498,7 +1525,7 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
         }
 
         assertStatusCode(t, 200, res, ocsVersion)
-        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 
         assert.Equal(t, DefaultGroups[user], response.Ocs.Data.Groups)
       }
@@ -1524,7 +1551,7 @@ func TestGetGroupForUserInvalidUserId(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1543,7 +1570,7 @@ func TestGetGroupForUserInvalidUserId(t *testing.T) {
         }
 
         assertStatusCode(t, 404, res, ocsVersion)
-        assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.False(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
         assertResponseMeta(t, Meta{
           Status:     "error",
           StatusCode: 998,
@@ -1584,13 +1611,13 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
         }
 
         // group id for Physics lover
-        groupid := "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+        groupid := groupPhysicsLovers
 
         res, err := sendRequest(
           "POST",
           fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
           "groupid="+groupid,
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1609,7 +1636,7 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
         }
 
         assertStatusCode(t, 200, res, ocsVersion)
-        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
         assert.Empty(t, response.Ocs.Data)
 
         // Check the user is in the group
@@ -1617,7 +1644,7 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
           "GET",
           fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
         if err != nil {
           t.Fatal(err)
@@ -1665,7 +1692,7 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
           "POST",
           fmt.Sprintf("/%s/cloud/users/rutherford/groups%s", ocsVersion, formatpart),
           "groupid="+groupid,
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1708,9 +1735,9 @@ func TestRemoveUserFromGroup(t *testing.T) {
   }
 
   groups := []string{
-    "7b87fd49-286e-4a5f-bafd-c535d5dd997a", // radium-lovers
-    "cedc21aa-4072-4614-8676-fa9165f598ff", // polonium-lovers
-    "262982c1-2362-4afa-bfdf-8cbfef64a06e", // physics-lovers
+    groupRadiumLovers,
+    groupPoloniumLovers,
+    groupPhysicsLovers,
   }
 
   var err error
@@ -1734,7 +1761,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
         "DELETE",
         fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
         "groupid="+groups[0],
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -1765,7 +1792,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
         "GET",
         fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
       if err != nil {
         t.Fatal(err)
@@ -1794,7 +1821,7 @@ func TestCapabilities(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/cloud/capabilities%s", ocsVersion, formatpart),
 				"",
-				"admin:admin",
+				adminBasicAuth,
 			)
 
 			if err != nil {
@@ -1831,7 +1858,7 @@ func TestGetConfig(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/config%s", ocsVersion, formatpart),
 				"",
-				"admin:admin",
+				adminBasicAuth,
 			)
 
 			if err != nil {
@@ -1850,7 +1877,7 @@ func TestGetConfig(t *testing.T) {
 			}
 
 			assertStatusCode(t, 200, res, ocsVersion)
-			assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 			assert.Equal(t, OcsConfig{
 				"1.7", "ocis", "", "", "true",
 			}, response.Ocs.Data)
@@ -1866,7 +1893,7 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
         "GET",
         fmt.Sprintf("/%s/cloud/groups%s", ocsVersion, formatpart),
         "",
-        "admin:admin",
+        adminBasicAuth,
       )
 
       if err != nil {
@@ -1885,7 +1912,7 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
       }
 
       assertStatusCode(t, 200, res, ocsVersion)
-      assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but failed")
+      assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
       assert.Equal(t, DefaultGroups, response.Ocs.Data.Groups)
     }
   }
@@ -1918,7 +1945,7 @@ func TestCreateGroup(t *testing.T) {
           "POST",
           fmt.Sprintf("/%v/cloud/groups%v", ocsVersion, formatpart),
           data.group.getGroupRequestString(),
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -1938,7 +1965,7 @@ func TestCreateGroup(t *testing.T) {
         }
 
         if data.err == nil {
-          assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+          assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
         } else {
           assertResponseMeta(t, *data.err, response.Ocs.Meta)
         }
@@ -1948,7 +1975,7 @@ func TestCreateGroup(t *testing.T) {
           "GET",
           "/v2.php/cloud/groups?format=json",
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
         if err != nil {
           t.Fatal(err)
@@ -1989,7 +2016,7 @@ func TestDeleteGroup(t *testing.T) {
           "DELETE",
           fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data.ID, formatpart),
           "groupid="+data.ID,
-          "admin:admin",
+          adminBasicAuth,
         )
         if err != nil {
           t.Fatal(err)
@@ -2005,14 +2032,14 @@ func TestDeleteGroup(t *testing.T) {
             t.Fatal(err)
           }
         }
-        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 
         // Check the group does not exists
         res, err = sendRequest(
           "GET",
           "/v2.php/cloud/groups?format=json",
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
         if err != nil {
           t.Fatal(err)
@@ -2045,7 +2072,7 @@ func TestDeleteGroupInvalidGroups(t *testing.T) {
           "DELETE",
           fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data, formatpart),
           "groupid="+data,
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -2079,34 +2106,34 @@ func TestDeleteGroupInvalidGroups(t *testing.T) {
 
 func TestGetGroupMembersDefaultGroups(t *testing.T) {
   defaultGroups := map[string][]string{
-    "34f38767-c937-4eb6-b847-1c175829a2a0": {
-      "820ba2a1-3f54-4538-80a4-2d73007e30bf", // konnectd
-      "bc596f3c-c955-4328-80a0-60d018b4ad57", // reva
+    groupSysUsers: {
+      userIDKonnectd,
+      userIDReva,
     },
-    "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa": {
-      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
-      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
-      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    groupUsers: {
+      userIDEinstein,
+      userIDMarie,
+      userIDFeynman,
     },
-    "6040aa17-9c64-4fef-9bd0-77234d71bad0": {
-      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+    groupSailingLovers: {
+      userIDEinstein,
     },
-    "dd58e5ec-842e-498b-8800-61f2ec6f911f": {
-      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
+    groupViolinHaters: {
+      userIDEinstein,
     },
-    "cedc21aa-4072-4614-8676-fa9165f598ff": {
-      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
+    groupPoloniumLovers: {
+      userIDMarie,
     },
-    "a1726108-01f8-4c30-88df-2b1a9d1cba1a": {
-      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    groupQuantumLovers: {
+      userIDFeynman,
     },
-    "167cbee2-0518-455a-bfb2-031fe0621e5d": {
-      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    groupPhilosophyHaters: {
+      userIDFeynman,
     },
-    "262982c1-2362-4afa-bfdf-8cbfef64a06e": {
-      "4c510ada-c86b-4815-8820-42cdf82c3d51", // einstein
-      "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // marie
-      "932b4540-8d16-481e-8ef4-588e4b6b151c", // feynman
+    groupPhysicsLovers: {
+      userIDEinstein,
+      userIDMarie,
+      userIDFeynman,
     },
   }
   for _, ocsVersion := range ocsVersions {
@@ -2117,7 +2144,7 @@ func TestGetGroupMembersDefaultGroups(t *testing.T) {
           "GET",
           fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
@@ -2137,7 +2164,7 @@ func TestGetGroupMembersDefaultGroups(t *testing.T) {
         }
 
         assertStatusCode(t, 200, res, ocsVersion)
-        assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be successful but was not")
+        assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
         assert.Equal(t, members, response.Ocs.Data.Users)
 
         cleanUp(t)
@@ -2162,7 +2189,7 @@ func TestListMembersInvalidGroups(t *testing.T) {
           "GET",
           fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
           "",
-          "admin:admin",
+          adminBasicAuth,
         )
 
         if err != nil {
