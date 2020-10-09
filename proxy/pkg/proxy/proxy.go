@@ -26,7 +26,7 @@ type MultiHostReverseProxy struct {
 	config         *config.Config
 }
 
-// NewMultiHostReverseProxy undocummented
+// NewMultiHostReverseProxy creates a new MultiHostReverseProxy
 func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	options := newOptions(opts...)
 
@@ -41,7 +41,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		rp.logger.Info().Str("source", "runtime").Msg("Policies")
 		options.Config.Policies = defaultPolicies()
 	} else {
-		rp.logger.Info().Str("source", "file").Msg("Policies")
+		rp.logger.Info().Str("source", "file").Str("src", options.Config.File).Msg("policies")
 	}
 
 	if options.Config.PolicySelector == nil {
