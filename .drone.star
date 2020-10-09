@@ -16,7 +16,7 @@ config = {
   'apiTests': {
     'coreBranch': 'master',
     'coreCommit': '35c53c096f40dd15ae15940c589965379e921857',
-    'numberOfParts': 4
+    'numberOfParts': 6
   },
   'uiTests': {
     'phoenixBranch': 'master',
