@@ -18,6 +18,19 @@ geekdocFilePath: configuration.md
 {{ end -}}
 {{ end -}}
 {{ end }}
+{{- define "option"}}
+{{- $options := first . }}
+{{- $oName := last . }}
+{{- range $o := $options }}{{ with (list $o $oName) -}}
+{{- $o := first . }}
+{{- if eq $o.FnName (last .) -}}
+--{{ $o.Name }} | ${{ index $o.Env 0 }}
+: {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
+
+{{ end -}}
+{{- end -}}
+{{- end -}}
+{{ end }}
 
 {{`{{< toc >}}`}}
 
@@ -76,3 +89,27 @@ Usage: `storage {{ $c.Name }} [command options] [arguments...]`
 {{- end -}}
 {{- end -}}
 {{- end -}}
+## Config for the different Storage Drivers
+
+You can set different storage drivers for the Storage Providers. Please check the storage provider configuration.
+
+Example: Set the home Storage Provider to `ocis`
+
+`STORAGE_STORAGE_HOME_DRIVER=ocis`
+`STORAGE_STORAGE_HOME_DATA_DRIVER=ocis`
+
+### Local Driver
+
+{{ template "option" (list .Options "DriverLocalWithConfig") -}}
+
+### Eos Driver
+
+{{ template "option" (list .Options "DriverEOSWithConfig") -}}
+
+### owCloud Driver
+
+{{ template "option" (list .Options "DriverOwnCloudWithConfig") -}}
+
+### Ocis Driver
+
+{{ template "option" (list .Options "DriverOCISWithConfig") -}}
