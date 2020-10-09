@@ -17,12 +17,12 @@
         </oc-grid>
       </template>
       <template v-else-if="hasFailed">
-        <oc-alert variation="warning" no-close class="oc-m">
+        <oc-alert variation="warning" no-close class="oc-m" id="accounts-list-loading-failed">
           <oc-icon name="warning" variation="warning" class="uk-float-left oc-mr-s" />
           <translate>You don't have permissions to manage accounts.</translate>
         </oc-alert>
       </template>
-      <oc-loader v-else />
+      <oc-loader id="accounts-list-loader" v-else />
     </div>
   </div>
 </template>

@@ -25,14 +25,20 @@ module.exports = {
     },
 
     selectRole: function (username, role) {
+      const roleTrigger =
+          util.format(this.elements.rowByUsername.selector, username) +
+          this.elements.rolesDropdownTrigger.selector
       const roleSelector =
         util.format(this.elements.rowByUsername.selector, username) +
         util.format(this.elements.roleInRolesDropdown.selector, role)
 
       return this
-        .click('@rolesDropdownTrigger')
+        .initAjaxCounters()
+        .waitForElementVisible(roleTrigger)
+        .click(roleTrigger)
         .waitForElementVisible(roleSelector)
         .click(roleSelector)
+        .waitForOutstandingAjaxCalls()
     },
 
     checkUsersRole: function (username, role) {
@@ -114,7 +120,7 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     roleInRolesDropdown: {
-      selector: '//label[contains(@class, "accounts-roles-dropdown-role") and normalize-space()="%s"]',
+      selector: '//label[contains(@class, "accounts-roles-dropdown-role")]/span[normalize-space()="%s"]',
       locateStrategy: 'xpath'
     },
     rolesDropdownTrigger: {
@@ -122,11 +128,13 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     loadingAccountsList: {
-      selector: '//div[contains(@class, "oc-loader")]',
-      locateStrategy: 'xpath'
+      selector: '#accounts-list-loader'
+    },
+    loadingAccountsListFailed: {
+      selector: '#accounts-list-loading-failed'
     },
     rowCheckbox: {
-      selector: '//input[@class="oc-checkbox"]',
+      selector: '//input[contains(@class, "oc-checkbox")]',
       locateStrategy: 'xpath'
     },
     batchActionDisable: {
