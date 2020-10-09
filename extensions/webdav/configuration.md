@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-09T12:12:01+0000"
+date: "2020-10-09T14:08:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/webdav
@@ -56,6 +56,15 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+--debug-addr | $WEBDAV_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9119`.
 
 ### webdav version
 
@@ -113,13 +122,4 @@ Usage: `webdav server [command options] [arguments...]`
 
 --http-root | $WEBDAV_HTTP_ROOT  
 : Root path of http server. Default: `/`.
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
---debug-addr | $WEBDAV_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9119`.
 
