@@ -468,7 +468,7 @@ func createUser(u User) error {
 func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
   _, err := sendRequest(
     "POST",
-    "/v1.php/cloud/users?format=json",
+    "/v1.php/cloud/groups?format=json",
     g.getGroupRequestString(),
     "admin:admin",
   )
