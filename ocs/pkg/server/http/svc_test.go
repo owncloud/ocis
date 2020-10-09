@@ -525,7 +525,7 @@ func TestCreateUser(t *testing.T) {
       nil,
     },
 
-    // User withoutl password
+    // User without password
     // https://github.com/owncloud/ocis/ocs/issues/50
     {
       User{
@@ -1786,7 +1786,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 }
 
 // Issue: https://github.com/owncloud/ocis-ocs/issues/59 - cloud/capabilities endpoint not implemented
-func TestCapablilities(t *testing.T) {
+func TestCapabilities(t *testing.T) {
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {
 			formatpart := getFormatString(format)
