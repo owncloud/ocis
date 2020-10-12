@@ -192,6 +192,8 @@ github.com/cs3org/reva v1.2.2-0.20201006093611-4a9be347ac29 h1:bGdr8WQI3khh8/Uo7
 github.com/cs3org/reva v1.2.2-0.20201006093611-4a9be347ac29/go.mod h1:c0MYy0goE5OGC8WPb5LLMZtCqymwSk2fiKVQANzy0zg=
 github.com/cs3org/reva v1.2.2-0.20201007135248-bccddc4b5a48 h1:ICRTh96BemJ+oOSgp8j4EM32Ye10jh+UWjMxKbVr30g=
 github.com/cs3org/reva v1.2.2-0.20201007135248-bccddc4b5a48/go.mod h1:A4Q/nQ8Vs+HeAduSFnM37fqxEM3uXVxhaHrNL+gWcBY=
+github.com/cs3org/reva v1.3.1-0.20201009145025-fb08084ce5d4 h1:zWu5iNGr6l3IAIbZJaUW4u6qNqb5bznD0DwqfxCUATI=
+github.com/cs3org/reva v1.3.1-0.20201009145025-fb08084ce5d4/go.mod h1:aZyarc9hwSGDYZXf0ucVS8uk0OUtK2Q5VK/m5ZaULf8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -772,6 +774,7 @@ github.com/ory/fosite v0.32.2/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20
 github.com/ory/fosite v0.33.0 h1:tK+3Luazv4vIBJY3uagOBryAQ3IG3cs6kfo8piGBhAY=
 github.com/ory/fosite v0.33.0/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
 github.com/ory/fosite v0.34.0/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
+github.com/ory/fosite v0.35.0/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
 github.com/ory/go-acc v0.2.1 h1:Pwcmwd/cSnwJsYN76+w3HU7oXeWFTkwj/KUj1qGDrVw=
 github.com/ory/go-acc v0.2.1/go.mod h1:0omgy2aa3nDBJ45VAKeLHH8ccPBudxLeic4xiDRtug0=
@@ -1014,6 +1017,7 @@ go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.opencensus.io v0.22.3/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.opencensus.io v0.22.4 h1:LYy1Hy3MJdrCdMwwzxA/dRok4ejH+RwNGbuoD9fCjto=
 go.opencensus.io v0.22.4/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
+go.opencensus.io v0.22.5/go.mod h1:5pWMHQbX5EPX2/62yrJeAkowc+lfs/XD7Uxpq3pI6kk=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.5.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=
