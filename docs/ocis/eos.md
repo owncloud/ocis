@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Docker dev environment for eos storage
 
-We begin with the docker-compose.yml found in https://github.com/owncloud/ocis/ and 
+We begin with the docker-compose.yml found in https://github.com/owncloud/ocis/ and
 switch it to eos-storage.
 
 ### 1. Start eos & ocis containers
@@ -49,10 +49,10 @@ uid=20000(einstein) gid=30000(users) groups=30000(users),30001(sailing-lovers),3
 If the user is not found at first you might need to wait a few more minutes in case the ocis container is still compiling.
 {{< /hint >}}
 
-We also need to restart the reva-users service so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
+We also need to restart the storage-users service, so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
 ```
-docker-compose exec ocis ./bin/ocis kill reva-users
-docker-compose exec ocis ./bin/ocis run reva-users
+docker-compose exec ocis ./bin/ocis kill storage-users
+docker-compose exec ocis ./bin/ocis run storage-users
 ```
 
 ### 3. Home storage
@@ -60,8 +60,8 @@ docker-compose exec ocis ./bin/ocis run reva-users
 Kill the home storage. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
 
 ```
-docker-compose exec ocis ./bin/ocis kill reva-storage-home
-docker-compose exec -e REVA_STORAGE_HOME_DRIVER=eoshome -e REVA_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 ocis ./bin/ocis run reva-storage-home
+docker-compose exec ocis ./bin/ocis kill storage-storage-home
+docker-compose exec -e STORAGE_STORAGE_HOME_DRIVER=eoshome -e STORAGE_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 ocis ./bin/ocis run storage-storage-home
 ```
 
 ### 4. Home data provider
@@ -69,8 +69,8 @@ docker-compose exec -e REVA_STORAGE_HOME_DRIVER=eoshome -e REVA_STORAGE_HOME_MOU
 Kill the home data provider. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
 
 ```
-docker-compose exec ocis ./bin/ocis kill reva-storage-home-data
-docker-compose exec -e REVA_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home-data
+docker-compose exec ocis ./bin/ocis kill storage-storage-home-data
+docker-compose exec -e STORAGE_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run storage-storage-home-data
 ```
 
 {{< hint info >}}
@@ -199,7 +199,7 @@ The ocis logs can be accessed using `docker-compose logs ocis`. Add `-f` for fol
 1. `docker-compose exec ocis make clean build` to update the binary
 2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
 3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
-  `docker-compose exec -e REVA_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e REVA_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run reva-storage-home`
+  `docker-compose exec -e STORAGE_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e STORAGE_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run storage-storage-home`
 
 ### Creation and upload of files does not work
 
