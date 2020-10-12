@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Docker dev environment for eos storage
 
-We begin with the docker-compose.yml found in https://github.com/owncloud/ocis/ and
+We begin with the docker-compose.yml found in https://github.com/owncloud/ocis/tree/master/ocis/ and
 switch it to eos-storage.
 
 ### 1. Start eos & ocis containers
