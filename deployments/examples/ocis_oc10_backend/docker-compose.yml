@@ -110,8 +110,8 @@ services:
       ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts # Accounts fails to start when cs3 backend is used atm
       # Konnectd ldap setup
       LDAP_URI: ldap://localhost:9125
-      LDAP_BINDDN: "cn=konnectd,dc=example,dc=org"
-      LDAP_BINDPW: "konnectd"
+      LDAP_BINDDN: "cn=admin,dc=example,dc=org"
+      LDAP_BINDPW: "admin"
       LDAP_BASEDN: "dc=example,dc=org"
       LDAP_SCOPE: sub
       LDAP_LOGIN_ATTRIBUTE: uid
