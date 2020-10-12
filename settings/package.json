@@ -17,7 +17,7 @@
     "watch": "rollup -c -w",
     "test": "echo 'Not implemented'",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/settings.swagger.json --moduleName settings --destination ui/client/settings/index.js",
-    "acceptance-tests": "cucumber-js --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
+    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",

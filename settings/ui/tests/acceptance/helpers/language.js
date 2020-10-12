@@ -3,43 +3,47 @@ const filesMenu = {
     'All files',
     'Shared with me',
     'Shared with others',
-    'Trash bin'
+    'Deleted files'
   ],
   Deutsch: [
     'Alle Dateien',
     'Mit mir geteilt',
     'Mit anderen geteilt',
-    'Papierkorb'
+    'Gelöschte Dateien'
   ],
   Español: [
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
-    'Papelera de reciclaje'
+    'Ficheiros eliminados'
   ],
   Français: [
     'Tous les fichiers',
     'Partagé avec moi',
     'Partagé avec autres',
-    'Corbeille'
+    'Fichiers supprimés'
   ]
 }
 
 const accountMenu = {
   English: [
-    'Manage your account',
+    'Profile',
+    'Settings',
     'Log out'
   ],
   Deutsch: [
-    'Verwalten Sie Ihr Benutzerkonto',
+    'Profil',
+    'Einstellungen',
     'Abmelden'
   ],
   Español: [
-    'Administra tu cuenta',
+    'Perfil',
+    'Ajustes',
     'Salir'
   ],
   Français: [
-    'Modifier votre compte',
+    'Profil',
+    'Paramètres',
     'Se déconnecter'
   ]
 }
