@@ -1913,7 +1913,7 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
 
 			assertStatusCode(t, 200, res, ocsVersion)
 			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-			assert.Equal(t, DefaultGroups, response.Ocs.Data.Groups)
+			assert.Subset(t, DefaultGroups, response.Ocs.Data.Groups)
 		}
 	}
 }
