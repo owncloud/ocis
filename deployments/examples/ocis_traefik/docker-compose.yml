@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    networks:
+      - ocisnet
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.ocis.acme.tlschallenge=true"
+      - "--certificatesresolvers.ocis.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.ocis.acme.email=user@${OCIS_DOMAIN}"
+      - "--certificatesresolvers.ocis.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "~/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  ocis:
+    container_name: ocis
+    image: owncloud/ocis:latest
+    ports:
+      - 9200:9200
+    hostname: ocis
+    networks:
+      - ocisnet
+    volumes:
+      - ./config:/etc/ocis
+    environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN}
+      PROXY_TLS: "false"
+      PROXY_HTTP_ADDR: 0.0.0.0:9200
+      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
+      PROXY_OIDC_INSECURE: "true"
+      KONNECTD_ISS: https://${OCIS_DOMAIN}
+      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/etc/ocis/identifier-registration.yml"
+      KONNECTD_TLS: 1
+      GRAPH_OIDC_ENDPOINT: https://${OCIS_DOMAIN}
+      PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN}
+      PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN}/.well-known/openid-configuration
+      PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN}
+      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
+      STORAGE_TRANSFER_EXPIRES: 86400
+      STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
+      STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
+      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
+      - "traefik.http.routers.ocis.entrypoints=websecure"
+      - "traefik.http.routers.ocis.tls.certresolver=ocis"
+      - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+      - "traefik.docker.network=ocisnet"
+      - "traefik.protocol=https"
+
+networks:
+  ocisnet:
