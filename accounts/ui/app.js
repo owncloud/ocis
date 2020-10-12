@@ -28,7 +28,7 @@ const navItems = [
       name: 'accounts',
       path: `/${appInfo.id}/`
     },
-    menu: 'user'
+    menu: 'apps'
   }
 ]
 
