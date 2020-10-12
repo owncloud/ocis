@@ -3,7 +3,7 @@ title: "Tracing"
 date: 2020-05-13T12:09:00+01:00
 weight: 55
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/development
+geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: tracing.md
 ---
 
