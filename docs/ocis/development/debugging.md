@@ -3,7 +3,7 @@ title: "Debugging"
 date: 2020-03-19T08:21:00+01:00
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/development
+geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: debugging.md
 ---
 
@@ -13,7 +13,7 @@ As a single binary for easy deployment running `ocis server` just forks itself t
 
 Ultimately, we want to be able to stop a single service using eg. `ocis kill phoenix` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
 
-### Start ocis 
+### Start ocis
 
 For debugging there are two workflows that work well, depending on your preferences.
 
@@ -146,7 +146,7 @@ This popped up when I tried to add `marie` as a collaborator in phoenix. That tr
 
 ```console
 # curl 'https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares' -d 'shareType=0&shareWith=marie&path=%2FNeuer+Ordner&permissions=1' -u einstein:relativity -k -v | xmllint -format -
-[... headers ...] 
+[... headers ...]
 <?xml version="1.0" encoding="UTF-8"?>
 <ocs>
   <meta>
@@ -182,7 +182,7 @@ The last line gives us a hint where the log message originated: `.../github.com/
 89: // WriteOCSResponse handles writing ocs responses in json and xml
 90: func WriteOCSResponse(w http.ResponseWriter, r *http.Request, res *Response, err error) {
 91: 	var encoded []byte
-92: 
+92:
 93: 	if err != nil {
 94: 		appctx.GetLogger(r.Context()).Error().Err(err).Msg(res.OCS.Meta.Message)
 95:     }
