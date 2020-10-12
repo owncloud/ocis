@@ -15,14 +15,13 @@ geekdocFilePath: ocis_traefik.md
 ## Overview
 ocis running on a hcloud node behind traefik as reverse proxy
 * Cloudflare DNS is resolving the domain
-* Letsencrypt is providing a valid ssl certificate for the domain
+* Letsencrypt provides a ssl certificate for the domain
 * Traefik docker container terminates ssl and forwards http requests to ocis
-* ocis docker container serves owncloud backend and delivers phoenix client
 
 ## Node
 
 ### Requirements
-* Server running Ubuntu 20.04 is public availible with a static ip address
+* Server running Ubuntu 20.04 is public availible with an static ip address
 * An A-record for domain is pointing on the servers ip address
 * Create user `$sudo adduser username`
 * Add user to sudo group `$sudo usermod -aG sudo username`
@@ -67,10 +66,10 @@ A folder for letsencypt to store the certificate needs to be created
 `$ mkdir ~/letsencrypt`
 This folder is bind to the docker container and the certificate is persistently stored into it.
 
-In this example, ssl is terminated from traefik and inside of the docker network, the services are comunicating via http. For this `PROXY_TLS: "false"` as environment parameter for ocis has to be set.
+In this example, ssl is terminated from traefik while inside of the docker network the services are comunicating via http. For this `PROXY_TLS: "false"` as environment parameter for ocis has to be set.
 
 For ocis to work properly it's neccesary to provide one config file.
-Changes need to be done in identifier-registration.yml to match your domain
+Change identifier-registration.yml to match your domain.
 
 ```
 ---
@@ -90,7 +89,9 @@ clients:
       - http://your.domain.com
       - https://your.domain.com
 ```
-To provide the file to ocis container the following two lines are needed in the compose file.
+
+To make it availible for ocis inside of the container, `config` hast to be mounted as volume.
+
 ```
     ...
     volumes:
