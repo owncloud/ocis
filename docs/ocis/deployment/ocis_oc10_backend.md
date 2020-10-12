@@ -16,34 +16,10 @@ This deployment scenario shows how to use ocis as frontend for a existing ownclo
 ocis will allow owncloud 10 users to log in and work with their files.
 
 ## Overview
-### Local Setup
-* ocis and oc10 running as docker containers with from ocis generated ssl certificate
 ### Node Setup
 ocis and oc10 running as docker containers behind traefik as reverse proxy
 * Cloudflare DNS is resolving one domain for ocis and one for oc10
 * Letsencrypt is providing valid ssl certificate for both domains
-
-## Local Deployment
-
-### Run
-Add ```127.0.0.1 ocis``` to /etc/host
-Add ```127.0.0.1 oc10``` to /etc/host
-
-Change in `.env`
-
-```
-OCIS_DOMAIN=ocis:9200
-OC10_DOMAIN=oc10:8080
-```
-
-```bash
-docker-compose up -f docker-compose-local.yml
-```
-
-Visit https://oc10:8080 and log in with admin:admin
-Create an owncloud 10 user including a email adress.
-
-Visit https://ocis:9200 and log in with the new users credentials.
 
 ## Node Deployment
 
