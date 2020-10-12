@@ -3,14 +3,14 @@ title: "Deployment"
 date: 2020-10-01T20:35:00+01:00
 weight: -10
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/deployment
+geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: _index.md
 ---
 
 {{< toc >}}
 
 ## Deployments Scenarios and Examples
-This section handles deployments and operations for admins. If you are looking for a development setup, start with 
+This section handles deployments and operations for admins. If you are looking for a development setup, start with
 
 ### Setup oCIS
 oCIS deployments are super simple, yet there are many configrations possible for advanced setups.

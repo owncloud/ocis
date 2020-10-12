@@ -3,7 +3,7 @@ title: "Build ocis"
 date: 2020-02-27T20:35:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/development
+geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: building.md
 ---
 
@@ -11,7 +11,7 @@ geekdocFilePath: building.md
 
 All required tools besides `go` and `make` are bundled or getting automatically installed within the `GOPATH`. All commands to build this project are part of our `Makefile`.
 
-The installation of Go is out of the scope of this document, please follow the official documentation for [Go](https://golang.org/doc/install), to build this project you have to install Go >= v1.13. 
+The installation of Go is out of the scope of this document, please follow the official documentation for [Go](https://golang.org/doc/install), to build this project you have to install Go >= v1.13.
 
 ## Get the sources
 

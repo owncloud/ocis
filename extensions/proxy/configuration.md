@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-12T07:48:22+0000"
+date: "2020-10-12T08:16:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -56,15 +56,6 @@ Usage: `ocis-proxy [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
-
-### ocis-proxy health
-
-Check health status
-
-Usage: `ocis-proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
 ### ocis-proxy version
 
@@ -149,4 +140,13 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 
 --autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
+
+### ocis-proxy health
+
+Check health status
+
+Usage: `ocis-proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
