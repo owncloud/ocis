@@ -67,7 +67,7 @@ var ocsVersions = []string{ocsV1, ocsV2}
 
 var formats = []string{"json", "xml"}
 
-const dataPath = "./accounts-store"
+var dataPath = createTmpDir()
 
 var DefaultUsers = []string{
 	userIDEinstein,
@@ -98,6 +98,15 @@ func getFormatString(format string) string {
 	} else {
 		panic("Invalid format received")
 	}
+}
+
+func createTmpDir() string {
+	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-*")
+	if err != nil {
+		panic(err)
+	}
+
+	return name
 }
 
 type Quota struct {
@@ -538,7 +547,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User with different username and Id
 		{
 			User{
@@ -551,7 +559,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User without password
 		// https://github.com/owncloud/ocis/ocs/issues/50
 		{
@@ -564,7 +571,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User with special character in username
 		// https://github.com/owncloud/ocis/ocs/issues/49
 		{
@@ -582,7 +588,6 @@ func TestCreateUser(t *testing.T) {
 				Message:    "preferred_name 'schrödinger' must be at least the local part of an email",
 			},
 		},
-
 		// User with different userid and email
 		{
 			User{
@@ -595,7 +600,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User with different userid and email and username
 		{
 			User{
@@ -608,7 +612,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User without displayname
 		{
 			User{
@@ -620,7 +623,6 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
 		// User wit invalid email
 		{
 			User{
@@ -636,7 +638,6 @@ func TestCreateUser(t *testing.T) {
 				Message:    "mail 'not_a_email' must be a valid email",
 			},
 		},
-
 		// User without email
 		{
 			User{
@@ -651,7 +652,6 @@ func TestCreateUser(t *testing.T) {
 				Message:    "mail '' must be a valid email",
 			},
 		},
-
 		// User without username
 		{
 			User{
@@ -666,7 +666,6 @@ func TestCreateUser(t *testing.T) {
 				Message:    "preferred_name '' must be at least the local part of an email",
 			},
 		},
-
 		// User without userid
 		{
 			User{
