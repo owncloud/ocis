@@ -237,7 +237,6 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 	}
 
 	return matches, nil
-
 }
 
 // IndexBy undocumented.

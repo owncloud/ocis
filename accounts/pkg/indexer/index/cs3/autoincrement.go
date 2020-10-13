@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -112,7 +113,17 @@ func (idx *AutoincrementIndex) Init() error {
 }
 
 func (idx AutoincrementIndex) Lookup(v string) ([]string, error) {
-	panic("implement me")
+	searchPath := path.Join(idx.indexRootDir, v)
+	oldname, err := idx.resolveSymlink(searchPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
+		}
+
+		return nil, err
+	}
+
+	return []string{oldname}, nil
 }
 
 func (idx AutoincrementIndex) Add(id, v string) (string, error) {
@@ -133,27 +144,101 @@ func (idx AutoincrementIndex) Add(id, v string) (string, error) {
 }
 
 func (idx AutoincrementIndex) Remove(id string, v string) error {
-	panic("implement me")
+	searchPath := path.Join(idx.indexRootDir, v)
+	_, err := idx.resolveSymlink(searchPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
+		}
+
+		return err
+	}
+
+	ctx := context.Background()
+	t, err := idx.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	deletePath := path.Join("/meta", idx.indexRootDir, v)
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: deletePath},
+		},
+	})
+
+	if err != nil {
+		return err
+	}
+
+	// TODO Handle other error codes?
+	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
+		return &idxerrs.NotFoundErr{}
+	}
+
+	return err
 }
 
 func (idx AutoincrementIndex) Update(id, oldV, newV string) error {
-	panic("implement me")
+	if err := idx.Remove(id, oldV); err != nil {
+		return err
+	}
+
+	if _, err := idx.Add(id, newV); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (idx AutoincrementIndex) Search(pattern string) ([]string, error) {
-	panic("implement me")
+	ctx := context.Background()
+	t, err := idx.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	searchPath := idx.indexRootDir
+	matches := make([]string, 0)
+	for _, i := range res.GetInfos() {
+		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
+			if err != nil {
+				return nil, err
+			}
+
+			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Path)))
+			if err != nil {
+				return nil, err
+			}
+			matches = append(matches, oldPath)
+		}
+	}
+
+	return matches, nil
 }
 
 func (idx AutoincrementIndex) IndexBy() string {
-	panic("implement me")
+	return idx.indexBy
 }
 
 func (idx AutoincrementIndex) TypeName() string {
-	panic("implement me")
+	return idx.typeName
 }
 
 func (idx AutoincrementIndex) FilesDir() string {
-	panic("implement me")
+	return idx.filesDir
 }
 
 func (idx *AutoincrementIndex) createSymlink(oldname, newname string) error {
