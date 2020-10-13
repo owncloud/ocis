@@ -1404,6 +1404,7 @@ def ocisServer(storage):
       'environment' : {
         'OCIS_LOG_LEVEL': 'debug',
         'STORAGE_HOME_DRIVER': '%s' % (storage),
+        'STORAGE_USERS_DRIVER': '%s' % (storage),
         'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
         'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
         'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
