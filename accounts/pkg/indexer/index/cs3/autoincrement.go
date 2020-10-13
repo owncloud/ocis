@@ -3,10 +3,13 @@ package cs3
 import (
 	"context"
 	"fmt"
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"sort"
+	"strconv"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -113,7 +116,20 @@ func (idx AutoincrementIndex) Lookup(v string) ([]string, error) {
 }
 
 func (idx AutoincrementIndex) Add(id, v string) (string, error) {
-	panic("implement me")
+	next, err := idx.next()
+	if err != nil {
+		return "", err
+	}
+	newName := path.Join(idx.indexRootDir, strconv.Itoa(next))
+	if err := idx.createSymlink(id, newName); err != nil {
+		if os.IsExist(err) {
+			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
+		}
+
+		return "", err
+	}
+
+	return newName, nil
 }
 
 func (idx AutoincrementIndex) Remove(id string, v string) error {
@@ -221,4 +237,40 @@ func (idx *AutoincrementIndex) authenticate(ctx context.Context) (token string, 
 		u.Id.OpaqueId = idx.cs3conf.ServiceUserUUID
 	}
 	return idx.tokenManager.MintToken(ctx, u)
+}
+
+func (idx AutoincrementIndex) next() (int, error) {
+	ctx := context.Background()
+	t, err := idx.authenticate(ctx)
+	if err != nil {
+		return -1, err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+		},
+	})
+
+	if err != nil {
+		return -1, err
+	}
+
+	if len(res.GetInfos()) == 0 {
+		return 0, nil
+	}
+
+	infos := res.GetInfos()
+	sort.Slice(infos, func(i, j int) bool {
+		a, _ := strconv.Atoi(path.Base(infos[i].Path))
+		b, _ := strconv.Atoi(path.Base(infos[j].Path))
+		return a < b
+	})
+
+	latest, err := strconv.Atoi(path.Base(infos[len(infos)-1].Path)) // would returning a string be a better interface?
+	if err != nil {
+		return -1, err
+	}
+	return latest + 1, nil
 }
