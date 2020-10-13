@@ -14,7 +14,7 @@ func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
 	//go setupMetadataStorage()
 	//defer cancelFunc()
 
-	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
+	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{

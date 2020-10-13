@@ -12,7 +12,7 @@ import (
 )
 
 func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t,Data, "Id")
+	dataDir := WriteIndexTestDataCS3(t,Data, "ID")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -61,7 +61,7 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 }
 
 func TestCS3UniqueIndexSearch(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t, Data, "Id")
+	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
