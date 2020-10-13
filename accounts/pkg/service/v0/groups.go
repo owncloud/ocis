@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path/filepath"
+	"regexp"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -57,6 +58,12 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 	out.Groups = make([]*proto.Group, 0)
 	if in.Query == "" {
 		searchResults, _ = s.index.FindByPartial(&proto.Group{}, "DisplayName", "*")
+	}
+
+	var startsWithIDQuery = regexp.MustCompile(`^startswith\(id,'(.*)'\)$`)
+	match := startsWithIDQuery.FindStringSubmatch(in.Query)
+	if len(match) == 2 {
+		searchResults = []string{match[1]}
 	}
 
 	for _, hit := range searchResults {
