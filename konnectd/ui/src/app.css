@@ -1,0 +1,69 @@
+/* additional css on top of kpop */
+html {
+  font-family: 'Open Sans', sans-serif;
+}
+
+strong {
+  font-weight: 600;
+}
+
+.oc-logo {
+  position: absolute;
+  top: -140px;
+  left: 50%;
+  height: 120px;
+  transform: translateX(-50%);
+}
+
+.oc-input {
+  background-color: white;
+  border: 0;
+  border-radius: 6px;
+  width: 300px;
+  height: 40px;
+  padding: 12px 8px;
+  box-sizing: border-box;
+  font-size: 1.125rem;
+}
+
+.oc-input:focus {
+  outline: none;
+}
+
+.oc-input + .oc-input {
+  margin-top: 10px;
+}
+
+.oc-button-primary {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4e85c8 !important;
+}
+
+.oc-button-primary:hover,
+.oc-button-primary:focus {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #306db5 !important;
+}
+
+.oc-footer-message {
+  color: white;
+  padding: 10px;
+  font-size: 0.8rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .oc-logo {
+    height: 100px;
+    top: -120px;
+  }
+}
+
+/* Helpers */
+
+.oc-w-100 {
+  width: 100% !important;
+}
+
+.oc-mt-s {
+  margin-top: 10px !important;
+}

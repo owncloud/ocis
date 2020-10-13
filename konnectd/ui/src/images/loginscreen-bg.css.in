@@ -1,0 +1,6 @@
+#bg-thumb {
+  /* NOTE(longsleep): This is the base64 encoded svg, inlined directly to show
+     this image as early as possible.
+  */
+  background-image: url("data:image/svg+xml;base64,${IMAGE_DATA}");
+}
