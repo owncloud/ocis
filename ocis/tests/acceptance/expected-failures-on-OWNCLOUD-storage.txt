@@ -388,9 +388,6 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:98
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:115
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:116
-#
-# These currently pass in owncloud/ocis-reva and should start passing here in ocis soon
-#
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:135
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
@@ -404,7 +401,7 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:343
 apiShareManagementBasicToShares/deleteShareFromShares.feature:58
 apiShareManagementBasicToShares/deleteShareFromShares.feature:72
 
-# TODO: user can delete from read only share
+# https://github.com/owncloud/product/issues/270 share permissions are not enforced
 apiShareManagementBasicToShares/deleteShareFromShares.feature:107
 
 # cannot share a folder with create permission
@@ -470,10 +467,10 @@ apiSharePublicLink1/changingPublicLinkShare.feature:85
 apiSharePublicLink1/changingPublicLinkShare.feature:96
 
 #
-# TODO:Old webdav api doens't works with public link
+# https://github.com/owncloud/product/issues/272 Old webdav api doens't works with public link
 # 
-apiSharePublicLink1/changingPublicLinkShare.feature:107
 apiSharePublicLink1/changingPublicLinkShare.feature:63
+apiSharePublicLink1/changingPublicLinkShare.feature:107
 apiSharePublicLink1/changingPublicLinkShare.feature:128
 apiSharePublicLink1/changingPublicLinkShare.feature:151
 apiSharePublicLink1/changingPublicLinkShare.feature:174
@@ -621,8 +618,7 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:217
 apiSharePublicLink2/uploadToPublicLinkShare.feature:238
 apiSharePublicLink2/uploadToPublicLinkShare.feature:255
 #
-#
-# user can reshare even if they dont have permissions to share
+# https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
 apiShareReshareToShares1/reShare.feature:23
 apiShareReshareToShares1/reShare.feature:24
@@ -664,7 +660,9 @@ apiShareReshareToShares1/reShare.feature:206
 apiShareReshareToShares1/reShare.feature:207
 apiShareReshareToShares1/reShare.feature:208
 apiShareReshareToShares1/reShare.feature:209
-# Can set more permission on reshare
+#
+# https://github.com/owncloud/product/issues/270 share permissions are not enforced
+#
 apiShareReshareToShares2/reShareSubfolder.feature:46
 apiShareReshareToShares2/reShareSubfolder.feature:47
 apiShareReshareToShares2/reShareSubfolder.feature:48
@@ -701,7 +699,9 @@ apiShareReshareToShares2/reShareSubfolder.feature:81
 apiShareReshareToShares2/reShareSubfolder.feature:82
 apiShareReshareToShares2/reShareSubfolder.feature:83
 apiShareReshareToShares2/reShareSubfolder.feature:84
-# Permissions not enforced
+#
+# https://github.com/owncloud/product/issues/270 share permissions are not enforced
+#
 apiShareReshareToShares3/reShareUpdate.feature:25
 apiShareReshareToShares3/reShareUpdate.feature:26
 apiShareReshareToShares3/reShareUpdate.feature:59
@@ -770,12 +770,12 @@ apiShareReshareToShares3/reShareWithExpiryDate.feature:402
 apiShareReshareToShares3/reShareWithExpiryDate.feature:403
 apiShareReshareToShares3/reShareWithExpiryDate.feature:404
 apiShareReshareToShares3/reShareWithExpiryDate.feature:405
-apiShareReshareToShares3/reShareWithExpiryDate.feature:438
-apiShareReshareToShares3/reShareWithExpiryDate.feature:439
-apiShareReshareToShares3/reShareWithExpiryDate.feature:440
-apiShareReshareToShares3/reShareWithExpiryDate.feature:441
-apiShareReshareToShares3/reShareWithExpiryDate.feature:469
-apiShareReshareToShares3/reShareWithExpiryDate.feature:470
+apiShareReshareToShares3/reShareWithExpiryDate.feature:434
+apiShareReshareToShares3/reShareWithExpiryDate.feature:435
+apiShareReshareToShares3/reShareWithExpiryDate.feature:436
+apiShareReshareToShares3/reShareWithExpiryDate.feature:437
+apiShareReshareToShares3/reShareWithExpiryDate.feature:465
+apiShareReshareToShares3/reShareWithExpiryDate.feature:466
 # 
 # https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
 # 
@@ -831,16 +831,13 @@ apiShareReshareToShares3/reShareWithExpiryDate.feature:335
 apiShareReshareToShares3/reShareWithExpiryDate.feature:336
 apiShareReshareToShares3/reShareWithExpiryDate.feature:337
 apiShareReshareToShares3/reShareWithExpiryDate.feature:338
-
 #
-# Share receiver cannot get share by id
-# https://github.com/owncloud/product/issues/253
+# https://github.com/owncloud/product/issues/253 Share receiver cannot get share by id
 #
 apiShareReshareToShares3/reShareWithExpiryDate.feature:270
 apiShareReshareToShares3/reShareWithExpiryDate.feature:271
 apiShareReshareToShares3/reShareWithExpiryDate.feature:272
 apiShareReshareToShares3/reShareWithExpiryDate.feature:273
-
 #
 # https://github.com/owncloud/product/issues/254 empty trashbin doesn't works
 # https://github.com/owncloud/product/issues/254 delete from trashbin doesn't works
@@ -853,53 +850,46 @@ apiTrashbin/trashbinDelete.feature:37
 apiTrashbin/trashbinDelete.feature:50
 apiTrashbin/trashbinDelete.feature:67
 #
-
-#
 # https://github.com/owncloud/product/issues/255 trashbin filename invalid for nested files/folders
 #
 apiTrashbin/trashbinFilesFolders.feature:44
 apiTrashbin/trashbinFilesFolders.feature:45
 apiTrashbin/trashbinFilesFolders.feature:60
 apiTrashbin/trashbinFilesFolders.feature:61
+apiTrashbin/trashbinFilesFolders.feature:135
+apiTrashbin/trashbinFilesFolders.feature:136
 #
-# cannot share to root 
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
 apiTrashbin/trashbinFilesFolders.feature:89
 apiTrashbin/trashbinFilesFolders.feature:90
 apiTrashbin/trashbinFilesFolders.feature:104
 apiTrashbin/trashbinFilesFolders.feature:105
 #
-# https://github.com/owncloud/product/issues/256 delete multiple elements concurrently doens't works
+# https://github.com/owncloud/product/issues/273 invalid webdav responses for unauthorized requests.
 #
-apiTrashbin/trashbinFilesFolders.feature:135
-apiTrashbin/trashbinFilesFolders.feature:136
-apiTrashbin/trashbinFilesFolders.feature:215
-apiTrashbin/trashbinFilesFolders.feature:216
-apiTrashbin/trashbinFilesFolders.feature:233
-apiTrashbin/trashbinFilesFolders.feature:234
-apiTrashbin/trashbinFilesFolders.feature:257
-apiTrashbin/trashbinFilesFolders.feature:258
-apiTrashbin/trashbinFilesFolders.feature:271
-apiTrashbin/trashbinFilesFolders.feature:272
-apiTrashbin/trashbinFilesFolders.feature:285
-apiTrashbin/trashbinFilesFolders.feature:286
-apiTrashbin/trashbinFilesFolders.feature:300
-apiTrashbin/trashbinFilesFolders.feature:301
-
-#
-# https://github.com/owncloud/product/issues/257 listing another users trashbin shows empty response with 405
-#
-
+apiTrashbin/trashbinFilesFolders.feature:184
+apiTrashbin/trashbinFilesFolders.feature:185
+apiTrashbin/trashbinFilesFolders.feature:202
+apiTrashbin/trashbinFilesFolders.feature:203
+apiTrashbin/trashbinFilesFolders.feature:226
+apiTrashbin/trashbinFilesFolders.feature:227
+apiTrashbin/trashbinFilesFolders.feature:240
+apiTrashbin/trashbinFilesFolders.feature:241
+apiTrashbin/trashbinFilesFolders.feature:254
+apiTrashbin/trashbinFilesFolders.feature:255
 #
 # https://github.com/owncloud/product/issues/187
 # Cannot create user with different username and emails
 #
-apiTrashbin/trashbinFilesFolders.feature:302
-apiTrashbin/trashbinFilesFolders.feature:306
-apiTrashbin/trashbinFilesFolders.feature:307
-apiTrashbin/trashbinFilesFolders.feature:308
+apiTrashbin/trashbinFilesFolders.feature:269
+apiTrashbin/trashbinFilesFolders.feature:270
+apiTrashbin/trashbinFilesFolders.feature:271
+apiTrashbin/trashbinFilesFolders.feature:275
+apiTrashbin/trashbinFilesFolders.feature:276
+apiTrashbin/trashbinFilesFolders.feature:277
 #
-# sharing to root and auto accept
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 # 
 apiTrashbin/trashbinRestore.feature:31
 apiTrashbin/trashbinRestore.feature:32
@@ -1027,7 +1017,7 @@ apiWebdavMove1/moveFolderToExcludedDirectory.feature:35
 apiWebdavMove1/moveFolderToExcludedDirectory.feature:70
 apiWebdavMove1/moveFolderToExcludedDirectory.feature:71
 #
-# Share folder and auto accept share
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
 apiWebdavMove2/moveFile.feature:89
 apiWebdavMove2/moveFile.feature:90
@@ -1070,7 +1060,7 @@ apiWebdavMove2/moveFileToExcludedDirectory.feature:29
 apiWebdavMove2/moveFileToExcludedDirectory.feature:63
 apiWebdavMove2/moveFileToExcludedDirectory.feature:64
 #
-# Share folder and auto accept share 
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
 apiWebdavOperations/deleteFolder.feature:67
 apiWebdavOperations/deleteFolder.feature:68
@@ -1080,20 +1070,16 @@ apiWebdavOperations/deleteFolder.feature:91
 apiWebdavOperations/deleteFolder.feature:92
 #
 # https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
-# Share folder and auto accept share 
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 # 
 apiWebdavOperations/downloadFile.feature:29
 apiWebdavOperations/downloadFile.feature:30
-#
 apiWebdavOperations/downloadFile.feature:72
 apiWebdavOperations/downloadFile.feature:73
-#
 apiWebdavOperations/downloadFile.feature:84
 apiWebdavOperations/downloadFile.feature:85
-#
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
-#
 apiWebdavOperations/refuseAccess.feature:33
 apiWebdavOperations/refuseAccess.feature:34
 #
@@ -1122,7 +1108,7 @@ apiWebdavOperations/search.feature:211
 apiWebdavOperations/search.feature:213
 apiWebdavOperations/search.feature:229
 #
-# Share folder and auto accept share 
+# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
 apiWebdavProperties1/copyFile.feature:65
 apiWebdavProperties1/copyFile.feature:66
