@@ -111,27 +111,70 @@ func (idx Autoincrement) Add(id, v string) (string, error) {
 }
 
 func (idx Autoincrement) Remove(id string, v string) error {
-	panic("implement me")
+	searchPath := path.Join(idx.indexRootDir, v)
+	return os.Remove(searchPath)
 }
 
 func (idx Autoincrement) Update(id, oldV, newV string) error {
-	panic("implement me")
+	oldPath := path.Join(idx.indexRootDir, oldV)
+	if err := isValidSymlink(oldPath); err != nil {
+		if os.IsNotExist(err) {
+			return &idxerrs.NotFoundErr{TypeName: idx.TypeName(), Key: idx.IndexBy(), Value: oldV}
+		}
+
+		return err
+	}
+
+	newPath := path.Join(idx.indexRootDir, newV)
+	err := isValidSymlink(newPath)
+	if err == nil {
+		return &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: newV}
+	}
+
+	if os.IsNotExist(err) {
+		err = os.Rename(oldPath, newPath)
+	}
+
+	return err
 }
 
 func (idx Autoincrement) Search(pattern string) ([]string, error) {
-	panic("implement me")
+	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
+	if err != nil {
+		return nil, err
+	}
+
+	if len(paths) == 0 {
+		return nil, &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: pattern}
+	}
+
+	res := make([]string, 0)
+	for _, p := range paths {
+		if err := isValidSymlink(p); err != nil {
+			return nil, err
+		}
+
+		src, err := os.Readlink(p)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, src)
+	}
+
+	return res, nil
 }
 
 func (idx Autoincrement) IndexBy() string {
-	panic("implement me")
+	return idx.indexBy
 }
 
 func (idx Autoincrement) TypeName() string {
-	panic("implement me")
+	return idx.typeName
 }
 
 func (idx Autoincrement) FilesDir() string {
-	panic("implement me")
+	return idx.filesDir
 }
 
 func isValidKind(k reflect.Kind) bool {

@@ -110,7 +110,6 @@ func (idx Unique) Lookup(v string) (resultPath []string, err error) {
 	}
 
 	return []string{p}, err
-
 }
 
 // Update index from <oldV> to <newV>.
@@ -191,5 +190,4 @@ func isValidSymlink(path string) (err error) {
 	}
 
 	return
-
 }
