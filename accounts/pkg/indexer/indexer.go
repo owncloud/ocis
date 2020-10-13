@@ -73,6 +73,9 @@ func (i Indexer) Add(t interface{}) error {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
+				if idxByVal == "" {
+					continue
+				}
 				if _, err := idx.Add(pkVal, idxByVal); err != nil {
 					return err
 				}
