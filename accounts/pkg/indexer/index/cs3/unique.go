@@ -121,20 +121,6 @@ func (idx *Unique) Init() error {
 	return nil
 }
 
-// Add adds a value to the index, returns the path to the root-document
-func (idx *Unique) Add(id, v string) (string, error) {
-	newName := path.Join(idx.indexRootDir, v)
-	if err := idx.createSymlink(id, newName); err != nil {
-		if os.IsExist(err) {
-			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
-		}
-
-		return "", err
-	}
-
-	return newName, nil
-}
-
 // Lookup exact lookup by value.
 func (idx *Unique) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
@@ -148,6 +134,20 @@ func (idx *Unique) Lookup(v string) ([]string, error) {
 	}
 
 	return []string{oldname}, nil
+}
+
+// Add adds a value to the index, returns the path to the root-document
+func (idx *Unique) Add(id, v string) (string, error) {
+	newName := path.Join(idx.indexRootDir, v)
+	if err := idx.createSymlink(id, newName); err != nil {
+		if os.IsExist(err) {
+			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
+		}
+
+		return "", err
+	}
+
+	return newName, nil
 }
 
 // Remove a value v from an index.
