@@ -490,97 +490,65 @@ apiSharePublicLink1/changingPublicLinkShare.feature:289
 apiSharePublicLink1/changingPublicLinkShare.feature:300
 apiSharePublicLink1/createPublicLinkShare.feature:34
 apiSharePublicLink1/createPublicLinkShare.feature:35
+apiSharePublicLink1/createPublicLinkShare.feature:183
+apiSharePublicLink1/createPublicLinkShare.feature:184
+apiSharePublicLink1/createPublicLinkShare.feature:214
+apiSharePublicLink1/createPublicLinkShare.feature:215
+apiSharePublicLink1/createPublicLinkShare.feature:307
+apiSharePublicLink1/createPublicLinkShare.feature:308
+apiSharePublicLink1/createPublicLinkShare.feature:370
+apiSharePublicLink1/createPublicLinkShare.feature:371
 #
 # https://github.com/owncloud/ocis-reva/issues/12 Range Header is not obeyed when downloading a file
 apiSharePublicLink1/createPublicLinkShare.feature:63
 apiSharePublicLink1/createPublicLinkShare.feature:64
-#
 apiSharePublicLink1/createPublicLinkShare.feature:95
 apiSharePublicLink1/createPublicLinkShare.feature:96
+apiSharePublicLink1/createPublicLinkShare.feature:245
+apiSharePublicLink1/createPublicLinkShare.feature:246
+apiSharePublicLink1/createPublicLinkShare.feature:276
+apiSharePublicLink1/createPublicLinkShare.feature:277
 #
 # https://github.com/owncloud/ocis-reva/issues/199 Ability to return error messages in Webdav response bodies
 apiSharePublicLink1/createPublicLinkShare.feature:127
 apiSharePublicLink1/createPublicLinkShare.feature:128
-#
 apiSharePublicLink1/createPublicLinkShare.feature:155
 apiSharePublicLink1/createPublicLinkShare.feature:156
-#
-# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-apiSharePublicLink1/createPublicLinkShare.feature:183
-apiSharePublicLink1/createPublicLinkShare.feature:184
-#
-apiSharePublicLink1/createPublicLinkShare.feature:214
-apiSharePublicLink1/createPublicLinkShare.feature:215
-#
-# https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
-apiSharePublicLink1/createPublicLinkShare.feature:245
-apiSharePublicLink1/createPublicLinkShare.feature:246
-#
-apiSharePublicLink1/createPublicLinkShare.feature:276
-apiSharePublicLink1/createPublicLinkShare.feature:277
-#
-# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-apiSharePublicLink1/createPublicLinkShare.feature:307
-apiSharePublicLink1/createPublicLinkShare.feature:308
-#
-apiSharePublicLink1/createPublicLinkShare.feature:370
-apiSharePublicLink1/createPublicLinkShare.feature:371
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:389
 apiSharePublicLink1/createPublicLinkShare.feature:390
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:410
 apiSharePublicLink1/createPublicLinkShare.feature:411
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:431
 apiSharePublicLink1/createPublicLinkShare.feature:432
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:454
 apiSharePublicLink1/createPublicLinkShare.feature:455
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:477
 apiSharePublicLink1/createPublicLinkShare.feature:478
 apiSharePublicLink1/createPublicLinkShare.feature:479
 apiSharePublicLink1/createPublicLinkShare.feature:480
 apiSharePublicLink1/createPublicLinkShare.feature:481
 apiSharePublicLink1/createPublicLinkShare.feature:482
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:502
 apiSharePublicLink1/createPublicLinkShare.feature:503
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:518
 apiSharePublicLink1/createPublicLinkShare.feature:519
-#
 apiSharePublicLink1/createPublicLinkShare.feature:537
 apiSharePublicLink1/createPublicLinkShare.feature:538
-#
 apiSharePublicLink1/createPublicLinkShare.feature:574
 apiSharePublicLink1/createPublicLinkShare.feature:575
-#
 apiSharePublicLink1/createPublicLinkShare.feature:635
 apiSharePublicLink1/createPublicLinkShare.feature:636
-#
 apiSharePublicLink1/createPublicLinkShare.feature:649
 apiSharePublicLink1/createPublicLinkShare.feature:650
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink1/createPublicLinkShare.feature:678
 apiSharePublicLink1/createPublicLinkShare.feature:679
-#
 apiSharePublicLink1/createPublicLinkShare.feature:729
 apiSharePublicLink1/createPublicLinkShare.feature:730
 #
 # https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
 apiSharePublicLink1/createPublicLinkShare.feature:733
-#
-# https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
 apiSharePublicLink1/createPublicLinkShare.feature:742
 #
 # https://github.com/owncloud/ocis-reva/issues/311 Deleting a public link after renaming a file
@@ -589,109 +557,69 @@ apiSharePublicLink1/deletePublicLinkShare.feature:38
 #
 # https://github.com/owncloud/ocis-reva/issues/373 copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file
 apiSharePublicLink2/copyFromPublicLink.feature:60
-#
-# https://github.com/owncloud/ocis-reva/issues/368 copying a file from within a public link folder to "/" overwrites the parent folder
 apiSharePublicLink2/copyFromPublicLink.feature:167
 apiSharePublicLink2/copyFromPublicLink.feature:168
-#
-# https://github.com/owncloud/ocis-reva/issues/368 copying a file from within a public link folder to "/" overwrites the parent folder
 apiSharePublicLink2/copyFromPublicLink.feature:183
 apiSharePublicLink2/copyFromPublicLink.feature:184
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:44
 apiSharePublicLink2/updatePublicLinkShare.feature:45
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:93
 apiSharePublicLink2/updatePublicLinkShare.feature:94
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:284
 apiSharePublicLink2/updatePublicLinkShare.feature:285
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 apiSharePublicLink2/updatePublicLinkShare.feature:303
 apiSharePublicLink2/updatePublicLinkShare.feature:304
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:322
 apiSharePublicLink2/updatePublicLinkShare.feature:323
-#
-# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 apiSharePublicLink2/updatePublicLinkShare.feature:341
 apiSharePublicLink2/updatePublicLinkShare.feature:342
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:360
 apiSharePublicLink2/updatePublicLinkShare.feature:361
-#
-# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 apiSharePublicLink2/updatePublicLinkShare.feature:379
 apiSharePublicLink2/updatePublicLinkShare.feature:380
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:398
 apiSharePublicLink2/updatePublicLinkShare.feature:399
-#
-# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 apiSharePublicLink2/updatePublicLinkShare.feature:417
 apiSharePublicLink2/updatePublicLinkShare.feature:418
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:439
 apiSharePublicLink2/updatePublicLinkShare.feature:440
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
 apiSharePublicLink2/updatePublicLinkShare.feature:461
 apiSharePublicLink2/updatePublicLinkShare.feature:462
-#
 apiSharePublicLink2/updatePublicLinkShare.feature:486
 apiSharePublicLink2/updatePublicLinkShare.feature:487
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:9
+apiSharePublicLink2/uploadToPublicLinkShare.feature:74
+apiSharePublicLink2/uploadToPublicLinkShare.feature:83
+apiSharePublicLink2/uploadToPublicLinkShare.feature:103
+apiSharePublicLink2/uploadToPublicLinkShare.feature:121
+apiSharePublicLink2/uploadToPublicLinkShare.feature:139
 #
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 apiSharePublicLink2/uploadToPublicLinkShare.feature:23
+apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 #
 # https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
 apiSharePublicLink2/uploadToPublicLinkShare.feature:62
 apiSharePublicLink2/uploadToPublicLinkShare.feature:63
-#
-# https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
 apiSharePublicLink2/uploadToPublicLinkShare.feature:66
-#
-# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-apiSharePublicLink2/uploadToPublicLinkShare.feature:74
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:83
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:103
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:121
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:139
 #
 # https://github.com/owncloud/ocis-reva/issues/195 Set quota over settings
 apiSharePublicLink2/uploadToPublicLinkShare.feature:148
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:158
-#
-# https://github.com/owncloud/ocis-reva/issues/195 Set quota over settings
 apiSharePublicLink2/uploadToPublicLinkShare.feature:167
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:177
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink2/uploadToPublicLinkShare.feature:186
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:196
-#
-# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 apiSharePublicLink2/uploadToPublicLinkShare.feature:206
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:217
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:238
-#
 apiSharePublicLink2/uploadToPublicLinkShare.feature:255
-#
-# https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
-apiSharePublicLink2/uploadToPublicLinkShare.feature:273
-
 #
 #
 # user can reshare even if they dont have permissions to share
@@ -842,12 +770,12 @@ apiShareReshareToShares3/reShareWithExpiryDate.feature:402
 apiShareReshareToShares3/reShareWithExpiryDate.feature:403
 apiShareReshareToShares3/reShareWithExpiryDate.feature:404
 apiShareReshareToShares3/reShareWithExpiryDate.feature:405
-apiShareReshareToShares3/reShareWithExpiryDate.feature:434
-apiShareReshareToShares3/reShareWithExpiryDate.feature:435
-apiShareReshareToShares3/reShareWithExpiryDate.feature:436
-apiShareReshareToShares3/reShareWithExpiryDate.feature:437
-apiShareReshareToShares3/reShareWithExpiryDate.feature:465
-apiShareReshareToShares3/reShareWithExpiryDate.feature:466
+apiShareReshareToShares3/reShareWithExpiryDate.feature:438
+apiShareReshareToShares3/reShareWithExpiryDate.feature:439
+apiShareReshareToShares3/reShareWithExpiryDate.feature:440
+apiShareReshareToShares3/reShareWithExpiryDate.feature:441
+apiShareReshareToShares3/reShareWithExpiryDate.feature:469
+apiShareReshareToShares3/reShareWithExpiryDate.feature:470
 # 
 # https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
 # 
@@ -1198,9 +1126,6 @@ apiWebdavOperations/search.feature:229
 #
 apiWebdavProperties1/copyFile.feature:65
 apiWebdavProperties1/copyFile.feature:66
-#
-# Share folder and auto accept share 
-#
 apiWebdavProperties1/copyFile.feature:85
 apiWebdavProperties1/copyFile.feature:86
 #
