@@ -12,12 +12,20 @@ type Options struct {
 	IndexBaseDir  string
 	DataDir       string
 	EntityDirName string
+	Entity        interface{}
 
 	// CS3 options
 	DataURL      string
 	DataPrefix   string
 	JWTSecret    string
 	ProviderAddr string
+}
+
+// WithEntity sets the JWTSecret field.
+func WithEntity(val interface{}) Option {
+	return func(o *Options) {
+		o.Entity = val
+	}
 }
 
 // WithJWTSecret sets the JWTSecret field.
