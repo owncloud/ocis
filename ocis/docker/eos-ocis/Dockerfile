@@ -21,7 +21,7 @@ RUN cd ocis && go build -v -o bin/ocis -toolexec '/usr/bin/time -v' ./cmd/ocis
 
 # build user lookup test program
 RUN mkdir -p /build
-ADD user.go /build/user.go
+COPY user.go /build/user.go
 RUN cd /build && go build -o user user.go
 
 
