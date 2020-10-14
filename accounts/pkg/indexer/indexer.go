@@ -42,13 +42,15 @@ func getRegistryStrategy(cfg *config.Config) string {
 }
 
 // AddIndex adds a new index to the indexer receiver.
-func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string) error {
+func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound) error {
 	strategy := getRegistryStrategy(i.config)
 	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
 	if strategy == "disk" {
 		idx = f(
+			option.WithEntity(t),
+			option.WithBounds(bound),
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
 			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
@@ -56,6 +58,8 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 		)
 	} else if strategy == "cs3" {
 		idx = f(
+			option.WithEntity(t),
+			option.WithBounds(bound),
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
 			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
@@ -84,7 +88,7 @@ func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 				if err != nil {
 					return []IdxAddResult{}, err
 				}
-				results = append(results, IdxAddResult{Field: fields.PKFieldName, Value: value})
+				results = append(results, IdxAddResult{Field: idx.IndexBy(), Value: value})
 			}
 		}
 	}

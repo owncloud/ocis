@@ -8,6 +8,7 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	//. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
+	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -214,6 +215,38 @@ func TestLowerBound(t *testing.T) {
 
 			_ = os.RemoveAll(tmpDir)
 		})
+	}
+}
+
+func TestAdd(t *testing.T) {
+	tmpDir, err := createTmpDirStr()
+	assert.NoError(t, err)
+
+	err = os.MkdirAll(filepath.Join(tmpDir, "data"), 0777)
+	assert.NoError(t, err)
+
+	tmpFile, err := os.Create(filepath.Join(tmpDir, "data", "test-example"))
+	assert.NoError(t, err)
+	assert.NoError(t, tmpFile.Close())
+
+	i := NewAutoincrementIndex(
+		option.WithBounds(&option.Bound{
+			Lower: 0,
+			Upper: 0,
+		}),
+		option.WithDataDir(tmpDir),
+		option.WithFilesDir(filepath.Join(tmpDir, "data")),
+		option.WithEntity(&proto.Account{}),
+		option.WithTypeName("owncloud.Account"),
+		option.WithIndexBy("UidNumber"),
+	)
+
+	err = i.Init()
+	assert.NoError(t, err)
+
+	_, err = i.Add("test-example", "")
+	if err != nil {
+		t.Error(err)
 	}
 }
 

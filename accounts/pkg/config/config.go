@@ -80,12 +80,21 @@ type CS3 struct {
 	JWTSecret    string
 }
 
-// ServiceUser defines the user required for EOS
+// ServiceUser defines the user required for EOS.
 type ServiceUser struct {
 	UUID     string
 	Username string
 	UID      int64
 	GID      int64
+}
+
+// Index defines config for indexes.
+type Index struct {
+	UID, GID Bound
+}
+
+type Bound struct {
+	Lower, Upper int64
 }
 
 // Config merges all Account config parameters.
@@ -98,6 +107,7 @@ type Config struct {
 	Log          Log
 	TokenManager TokenManager
 	Repo         Repo
+	Index        Index
 	ServiceUser  ServiceUser
 }
 

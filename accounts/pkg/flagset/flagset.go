@@ -155,6 +155,34 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_GID"},
 			Destination: &cfg.ServiceUser.GID,
 		},
+		&cli.Int64Flag{
+			Name:        "uid-index-lower-bound",
+			Value:       0,
+			Usage:       "define a starting point for the account UID",
+			EnvVars:     []string{"ACCOUNTS_UID_INDEX_LOWER_BOUND"},
+			Destination: &cfg.Index.UID.Lower,
+		},
+		&cli.Int64Flag{
+			Name:        "gid-index-lower-bound",
+			Value:       1000,
+			Usage:       "define a starting point for the account GID",
+			EnvVars:     []string{"ACCOUNTS_GID_INDEX_LOWER_BOUND"},
+			Destination: &cfg.Index.GID.Lower,
+		},
+		&cli.Int64Flag{
+			Name:        "uid-index-upper-bound",
+			Value:       0,
+			Usage:       "define an ending point for the account UID",
+			EnvVars:     []string{"ACCOUNTS_UID_INDEX_UPPER_BOUND"},
+			Destination: &cfg.Index.UID.Upper,
+		},
+		&cli.Int64Flag{
+			Name:        "gid-index-upper-bound",
+			Value:       1000,
+			Usage:       "define an ending point for the account GID",
+			EnvVars:     []string{"ACCOUNTS_GID_INDEX_UPPER_BOUND"},
+			Destination: &cfg.Index.GID.Upper,
+		},
 	}
 }
 

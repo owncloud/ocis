@@ -1,14 +1,15 @@
 package indexer
 
 import (
+	"os"
+	"path"
+	"testing"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/cs3"
 	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/disk"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path"
-	"testing"
 )
 
 func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
@@ -24,7 +25,7 @@ func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -47,7 +48,7 @@ func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -67,7 +68,7 @@ func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -91,7 +92,7 @@ func TestIndexer_Disk_AddWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -111,7 +112,7 @@ func TestIndexer_Disk_AddWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -141,7 +142,7 @@ func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement")
+	err := indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", nil)
 	assert.NoError(t, err)
 
 	res1, err := indexer.Add(Data["users"][0])
@@ -172,7 +173,7 @@ func TestIndexer_Disk_DeleteWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -200,7 +201,7 @@ func TestIndexer_Disk_SearchWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -229,10 +230,10 @@ func TestIndexer_Disk_UpdateWithUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
 
-	err = indexer.AddIndex(&User{}, "Email", "ID", "users", "unique")
+	err = indexer.AddIndex(&User{}, "Email", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
 
 	user1 := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -287,7 +288,7 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique")
+	err := indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}

@@ -69,6 +69,7 @@ var (
 		reflect.Int8,
 		reflect.Int16,
 		reflect.Int32,
+		reflect.Int64,
 	}
 )
 
@@ -200,8 +201,6 @@ func isValidKind(k reflect.Kind) bool {
 
 func getKind(i interface{}, field string) (reflect.Kind, error) {
 	r := reflect.ValueOf(i)
-	// TODO reflect.FieldByName panics. Recover from it.
-	// further read: https://blog.golang.org/defer-panic-and-recover
 	return reflect.Indirect(r).FieldByName(field).Kind(), nil
 }
 
@@ -236,6 +235,10 @@ func (idx Autoincrement) next() (int, error) {
 	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name()))
 	if err != nil {
 		return -1, err
+	}
+
+	if int64(latest) < idx.bound.Lower {
+		return int(idx.bound.Lower), nil
 	}
 
 	return latest + 1, nil

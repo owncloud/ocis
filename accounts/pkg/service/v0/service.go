@@ -3,13 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+
+	"github.com/owncloud/ocis/accounts/pkg/indexer"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -73,38 +76,41 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 	idx := indexer.CreateIndexer(s.Config)
 
 	// Accounts
-	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique"); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique", nil); err != nil {
 		return nil, err
 	}
-	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique"); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "unique"); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique", nil); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique"); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "unique", nil); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Account{}, "UidNumber", "Id", "accounts", "autoincrement"); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique", nil); err != nil {
 		return nil, err
 	}
-	if err := idx.AddIndex(&proto.Account{}, "GidNumber", "Id", "accounts", "autoincrement"); err != nil {
+
+	if err := idx.AddIndex(&proto.Account{}, "UidNumber", "Id", "accounts", "autoincrement", &option.Bound{
+		Lower: s.Config.Index.UID.Lower,
+		Upper: s.Config.Index.UID.Upper,
+	}); err != nil {
 		return nil, err
 	}
 
 	// Groups
-	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique"); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique"); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Group{}, "GidNumber", "Id", "groups", "autoincrement"); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "GidNumber", "Id", "groups", "autoincrement", &option.Bound{
+		Lower: s.Config.Index.GID.Lower,
+		Upper: s.Config.Index.GID.Upper,
+	}); err != nil {
 		return nil, err
 	}
 
