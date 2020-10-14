@@ -87,7 +87,7 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 // serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
 func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
 	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
-		err := s.index.Add(s.getInMemoryServiceUser())
+		_, err := s.index.Add(s.getInMemoryServiceUser())
 		if err != nil {
 			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
 		} else {

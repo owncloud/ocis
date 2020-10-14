@@ -236,6 +236,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			}
 		}
 
+		// TODO: can be removed again as soon as we respect the predefined UIDs and GIDs from the account. Then no autoincrement is happening, therefore we don't need to update accounts.
 		changed := false
 		for _, r := range results {
 			if r.Field == "UidNumber" || r.Field == "GidNumber" {
@@ -324,6 +325,7 @@ func (s Service) createDefaultGroups() (err error) {
 			}
 		}
 
+		// TODO: can be removed again as soon as we respect the predefined GIDs from the group. Then no autoincrement is happening, therefore we don't need to update groups.
 		for _, r := range results {
 			if r.Field == "GidNumber" {
 				gid, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
