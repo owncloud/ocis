@@ -15,7 +15,7 @@ const filesMenu = {
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
-    'Ficheiros eliminados'
+    'Archivos borrados'
   ],
   Français: [
     'Tous les fichiers',
@@ -32,8 +32,8 @@ const accountMenu = {
     'Log out'
   ],
   Deutsch: [
-    'Profil',
-    'Einstellungen',
+    'Profile',
+    'Settings',
     'Abmelden'
   ],
   Español: [
