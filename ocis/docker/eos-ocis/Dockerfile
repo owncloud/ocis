@@ -16,7 +16,7 @@ RUN ln -s /usr/local/go/bin/* /usr/local/bin
 RUN git clone https://github.com/owncloud/ocis.git
 RUN cd ocis && git checkout ${BRANCH}
 RUN cd ocis && git log -n 1
-RUN cd ocis && go build -v -o bin/ocis -toolexec '/usr/bin/time -v' ./cmd/ocis
+RUN cd ocis/ocis && go build -v -o ../bin/ocis -toolexec '/usr/bin/time -v' ./cmd/ocis
 # RUN cd ocis && make generate bin/ocis
 
 # build user lookup test program
