@@ -787,7 +787,6 @@ def dockerEos(ctx):
             },
             'auto_tag': True,
             'context': 'ocis/docker/eos-ocis',
-            'auto_tag_suffix': 'linux-amd64',
             'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
             'repo': 'owncloud/eos-ocis',
           },
