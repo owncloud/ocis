@@ -1408,6 +1408,7 @@ def ocisServer(storage):
         'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
         'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
         'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
+        'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
         'STORAGE_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
         'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
         'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
