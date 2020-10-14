@@ -12,19 +12,7 @@ import (
 
 func TestAutoincrementIndexAdd(t *testing.T) {
 	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
-	cfg := config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: "",
-			},
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	}
+	cfg := generateConfig()
 
 	sut := NewAutoincrementIndex(
 		option.WithTypeName(GetTypeFQN(User{})),
@@ -49,19 +37,7 @@ func TestAutoincrementIndexAdd(t *testing.T) {
 
 func BenchmarkAutoincrementIndexAdd(b *testing.B) {
 	dataDir := WriteIndexBenchmarkDataCS3(b, Data, "ID")
-	cfg := config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: "",
-			},
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	}
+	cfg := generateConfig()
 
 	sut := NewAutoincrementIndex(
 		option.WithTypeName(GetTypeFQN(User{})),
@@ -84,4 +60,20 @@ func BenchmarkAutoincrementIndexAdd(b *testing.B) {
 	}
 
 	_ = os.RemoveAll(dataDir)
+}
+
+func generateConfig() config.Config {
+	return config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: "",
+			},
+			CS3: config.CS3{
+				ProviderAddr: "0.0.0.0:9215",
+				DataURL:      "http://localhost:9216",
+				DataPrefix:   "data",
+				JWTSecret:    "Pive-Fumkiu4",
+			},
+		},
+	}
 }

@@ -21,7 +21,7 @@ type Options struct {
 	ProviderAddr string
 }
 
-// WithEntity sets the JWTSecret field.
+// WithEntity sets the Entity field.
 func WithEntity(val interface{}) Option {
 	return func(o *Options) {
 		o.Entity = val

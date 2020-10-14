@@ -127,11 +127,16 @@ func (idx AutoincrementIndex) Lookup(v string) ([]string, error) {
 }
 
 func (idx AutoincrementIndex) Add(id, v string) (string, error) {
-	next, err := idx.next()
-	if err != nil {
-		return "", err
+	var newName string
+	if v == "" {
+		next, err := idx.next()
+		if err != nil {
+			return "", err
+		}
+		newName = path.Join(idx.indexRootDir, strconv.Itoa(next))
+	} else {
+		newName = path.Join(idx.indexRootDir, v)
 	}
-	newName := path.Join(idx.indexRootDir, strconv.Itoa(next))
 	if err := idx.createSymlink(id, newName); err != nil {
 		if os.IsExist(err) {
 			return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}

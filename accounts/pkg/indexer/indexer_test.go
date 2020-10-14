@@ -7,31 +7,12 @@ import (
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"path"
 	"testing"
 )
 
-func TestIndexer_AddWithUniqueIndex(t *testing.T) {
-	dataDir := WriteIndexTestData(t, Data, "ID")
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
-
-	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
-	assert.NoError(t, err)
-
-	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	_, err = indexer.Add(u)
-	assert.NoError(t, err)
-
-	_ = os.RemoveAll(dataDir)
-}
-
-func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
-	dir := WriteIndexTestDataCS3(t, Data, "ID")
+func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
+	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
 			CS3: config.CS3{
@@ -50,10 +31,10 @@ func TestIndexer_AddWithUniqueIndexCS3(t *testing.T) {
 	_, err = indexer.Add(u)
 	assert.NoError(t, err)
 
-	_ = os.RemoveAll(dir)
+	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
+func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -76,7 +57,7 @@ func TestIndexer_AddWithNonUniqueIndexCS3(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -100,7 +81,27 @@ func TestIndexer_FindByWithUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_AddWithUniqueIndex(t *testing.T) {
+	dataDir := WriteIndexTestData(t, Data, "ID")
+	indexer := CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataDir,
+			},
+		},
+	})
+
+	err := indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique")
+	assert.NoError(t, err)
+
+	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+	_, err = indexer.Add(u)
+	assert.NoError(t, err)
+
+	_ = os.RemoveAll(dataDir)
+}
+
+func TestIndexer_Disk_AddWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -126,9 +127,42 @@ func TestIndexer_AddWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Log(res)
+
+	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
+	dataDir := WriteIndexTestData(t, Data, "ID")
+	indexer := CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataDir,
+			},
+		},
+	})
+
+	err := indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement")
+	assert.NoError(t, err)
+
+	res1, err := indexer.Add(Data["users"][0])
+	assert.NoError(t, err)
+	assert.Equal(t, "UID", res1[0].Field)
+	assert.Equal(t, "0", path.Base(res1[0].Value))
+
+	res2, err := indexer.Add(Data["users"][1])
+	assert.NoError(t, err)
+	assert.Equal(t, "UID", res2[0].Field)
+	assert.Equal(t, "1", path.Base(res2[0].Value))
+
+	resFindBy, err := indexer.FindBy(User{}, "UID", "1")
+	assert.NoError(t, err)
+	assert.Equal(t, "hijklmn-456", resFindBy[0])
+	t.Log(resFindBy)
+
+	_ = os.RemoveAll(dataDir)
+}
+
+func TestIndexer_Disk_DeleteWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -156,7 +190,7 @@ func TestIndexer_DeleteWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_SearchWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -185,7 +219,7 @@ func TestIndexer_SearchWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_UpdateWithUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{
@@ -243,7 +277,7 @@ func TestIndexer_UpdateWithUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_UpdateWithNonUniqueIndex(t *testing.T) {
+func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	dataDir := WriteIndexTestData(t, Data, "ID")
 	indexer := CreateIndexer(&config.Config{
 		Repo: config.Repo{

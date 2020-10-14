@@ -101,7 +101,12 @@ func (idx Autoincrement) Lookup(v string) ([]string, error) {
 
 func (idx Autoincrement) Add(id, v string) (string, error) {
 	oldName := filepath.Join(idx.filesDir, id)
-	newName := filepath.Join(idx.indexRootDir, strconv.Itoa(idx.next()))
+	var newName string
+	if v == "" {
+		newName = filepath.Join(idx.indexRootDir, strconv.Itoa(idx.next()))
+	} else {
+		newName = filepath.Join(idx.indexRootDir, v)
+	}
 	err := os.Symlink(oldName, newName)
 	if errors.Is(err, os.ErrExist) {
 		return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
