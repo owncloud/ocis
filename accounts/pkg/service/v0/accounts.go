@@ -185,10 +185,20 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	}
 
 	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
-	var idOrQuery = regexp.MustCompile(`^$id eq '(.*)' or on_premises_sam_account_name eq '(.*)'`)
+	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
 	match = idOrQuery.FindStringSubmatch(in.Query)
 	if len(match) == 3 {
-		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[2])
+		qId, qSam := match[1], match[2]
+		tmp := &proto.Account{}
+		_ = s.repo.LoadAccount(ctx, qId, tmp)
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
+
+		if tmp.Id != "" {
+			searchResults = append(searchResults, tmp.Id)
+		}
+
+		searchResults = unique(searchResults)
+
 	}
 
 	if in.Query == "" {
