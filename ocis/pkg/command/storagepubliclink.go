@@ -14,7 +14,7 @@ import (
 // StoragePublicLinkCommand is the entrypoint for the reva-storage-oc command.
 func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-storage-public-link",
+		Name:     "storage-public-link",
 		Usage:    "Start storage public link storage",
 		Category: "Extensions",
 		Flags:    flagset.StoragePublicLink(cfg.Storage),
