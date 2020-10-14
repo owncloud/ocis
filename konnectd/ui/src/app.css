@@ -9,9 +9,9 @@ strong {
 
 .oc-logo {
   position: absolute;
-  top: -140px;
+  top: -120px;
   left: 50%;
-  height: 120px;
+  height: 100px;
   transform: translateX(-50%);
 }
 
@@ -53,8 +53,8 @@ strong {
 
 @media only screen and (max-width: 768px) {
   .oc-logo {
-    height: 100px;
-    top: -120px;
+    height: 80px;
+    top: -95px;
   }
 }
 
