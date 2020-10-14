@@ -321,7 +321,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	}
 	indexResults, err := s.index.Add(acc)
 	if err != nil {
-		// TODO: delete account when failed to add to indices
+		 s.rollbackCreateAccount(ctx, acc)
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 	s.log.Debug().Interface("account", acc).Msg("account after indexing")
@@ -365,6 +365,18 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	}
 
 	return
+}
+
+// rollbackCreateAccount tries to rollback changes made by `CreateAccount` if parts of it failed.
+func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) {
+	err := s.index.Delete(acc)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback account from indices")
+	}
+	err = s.repo.DeleteAccount(ctx, acc.Id)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback account from repo")
+	}
 }
 
 // UpdateAccount implements the AccountsServiceHandler interface
