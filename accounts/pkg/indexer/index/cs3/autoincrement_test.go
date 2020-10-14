@@ -27,7 +27,7 @@ func TestAutoincrementIndexAdd(t *testing.T) {
 	assert.NoError(t, err)
 
 	for i := 0; i < 5; i++ {
-		res, err := sut.Add("abcdefg-123", "ignored")
+		res, err := sut.Add("abcdefg-123", "")
 		assert.NoError(t, err)
 		t.Log(res)
 	}
@@ -52,7 +52,7 @@ func BenchmarkAutoincrementIndexAdd(b *testing.B) {
 	assert.NoError(b, err)
 
 	for n := 0; n < b.N; n++ {
-		_, err := sut.Add("abcdefg-123", "ignored")
+		_, err := sut.Add("abcdefg-123", "")
 		if err != nil {
 			b.Error(err)
 		}

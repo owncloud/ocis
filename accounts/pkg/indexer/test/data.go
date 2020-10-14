@@ -23,16 +23,16 @@ type Pet struct {
 // Data mock data.
 var Data = map[string][]interface{}{
 	"users": {
-		User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com", UID: -1},
-		User{ID: "hijklmn-456", UserName: "frank", Email: "frank@example.com", UID: -1},
-		User{ID: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com", UID: -1},
-		User{ID: "rulan54-777", UserName: "jones", Email: "jones@example.com", UID: -1},
+		User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"},
+		User{ID: "hijklmn-456", UserName: "frank", Email: "frank@example.com"},
+		User{ID: "ewf4ofk-555", UserName: "jacky", Email: "jacky@example.com"},
+		User{ID: "rulan54-777", UserName: "jones", Email: "jones@example.com"},
 	},
 	"pets": {
-		Pet{ID: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo", UID: -1},
-		Pet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy", UID: -1},
-		Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky", UID: -1},
-		Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky", UID: -1},
+		Pet{ID: "rebef-123", Kind: "Dog", Color: "Brown", Name: "Waldo"},
+		Pet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
+		Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
+		Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
 	},
 }
 

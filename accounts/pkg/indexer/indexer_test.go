@@ -1,6 +1,7 @@
 package indexer
 
 import (
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"os"
 	"path"
 	"testing"
@@ -142,20 +143,20 @@ func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
 		},
 	})
 
-	err := indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", nil)
+	err := indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", &option.Bound{Lower: 5})
 	assert.NoError(t, err)
 
 	res1, err := indexer.Add(Data["users"][0])
 	assert.NoError(t, err)
 	assert.Equal(t, "UID", res1[0].Field)
-	assert.Equal(t, "0", path.Base(res1[0].Value))
+	assert.Equal(t, "5", path.Base(res1[0].Value))
 
 	res2, err := indexer.Add(Data["users"][1])
 	assert.NoError(t, err)
 	assert.Equal(t, "UID", res2[0].Field)
-	assert.Equal(t, "1", path.Base(res2[0].Value))
+	assert.Equal(t, "6", path.Base(res2[0].Value))
 
-	resFindBy, err := indexer.FindBy(User{}, "UID", "1")
+	resFindBy, err := indexer.FindBy(User{}, "UID", "6")
 	assert.NoError(t, err)
 	assert.Equal(t, "hijklmn-456", resFindBy[0])
 	t.Log(resFindBy)

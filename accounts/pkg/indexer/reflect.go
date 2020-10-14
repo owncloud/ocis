@@ -4,6 +4,7 @@ import (
 	"errors"
 	"path"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -30,5 +31,11 @@ func valueOf(v interface{}, field string) string {
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
 
-	return f.String()
+	if f.Kind() == reflect.String {
+		return f.String()
+	}
+	if f.IsZero() {
+		return ""
+	}
+	return strconv.Itoa(int(f.Int()))
 }
