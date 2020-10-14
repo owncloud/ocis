@@ -184,6 +184,13 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	}
 
+	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
+	var idOrQuery = regexp.MustCompile(`^$id eq '(.*)' or on_premises_sam_account_name eq '(.*)'`)
+	match = idOrQuery.FindStringSubmatch(in.Query)
+	if len(match) == 3 {
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[2])
+	}
+
 	if in.Query == "" {
 		searchResults, _ = s.index.FindByPartial(&proto.Account{}, "Mail", "*")
 	}
