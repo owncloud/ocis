@@ -1,8 +1,8 @@
 ---
   exclude_paths:
-    - 'scripts'
-    - 'ui_config'
-    - 'assets'
+    - 'scripts/**/*'
+    - 'ui_config/**/*'
+    - 'assets/**/*'
     - '.bundle/**'
     - 'spec/**/*'
     - 'benchmarks/**/*'
