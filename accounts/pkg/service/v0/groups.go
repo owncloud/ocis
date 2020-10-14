@@ -139,6 +139,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 
 	indexResults, err := s.index.Add(in.Group)
 	if err != nil {
+		s.rollbackCreateGroup(c, in.Group)
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
 	}
 
@@ -153,7 +154,21 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		}
 	}
 
+	out = in.Group
+
 	return
+}
+
+// rollbackCreateGroup tries to rollback changes made by `CreateGroup` if parts of it failed.
+func (s Service) rollbackCreateGroup(ctx context.Context, group *proto.Group) {
+	err := s.index.Delete(group)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback group from indices")
+	}
+	err = s.repo.DeleteGroup(ctx, group.Id)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback group from repo")
+	}
 }
 
 // UpdateGroup implements the GroupsServiceHandler interface
