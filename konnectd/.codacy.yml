@@ -1,0 +1,8 @@
+---
+  exclude_paths:
+    - 'assets'
+    - '.bundle/**'
+    - 'spec/**/*'
+    - 'benchmarks/**/*'
+    - '**.min.js'
+    - '**/tests/**'
