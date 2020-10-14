@@ -10,5 +10,7 @@ exclude_paths:
   - 'konnectd/assets/identifier/**'
   - 'settings/rollup.config.js'
   - 'accounts/rollup.config.js'
+  - 'ocis/docker/eos-ocis/Dockerfile'
+  - 'ocis/docker/eos-ocis-dev/Dockerfile'
 
 ...

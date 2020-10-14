@@ -102,6 +102,7 @@ def main(ctx):
     docker(ctx, 'amd64'),
     docker(ctx, 'arm64'),
     docker(ctx, 'arm'),
+    dockerEos(ctx),
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
@@ -117,7 +118,7 @@ def main(ctx):
     updateDeployment(ctx)
   ]
 
-  if '[docs-only]' in ctx.build.title:
+  if '[docs-only]' in (ctx.build.title + ctx.build.message):
     pipelines = docs(ctx)
     pipelines['depends_on'] = []
   else:
@@ -742,6 +743,79 @@ def docker(ctx, arch):
     },
   }
 
+def dockerEos(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'docker-eos-ocis',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate('ocis') +
+      build() + [
+        {
+          'name': 'dryrun-eos-ocis',
+          'image': 'plugins/docker:18.09',
+          'pull': 'always',
+          'settings': {
+            'dry_run': True,
+            'context': 'ocis/docker/eos-ocis',
+            'tags': 'linux-eos-ocis',
+            'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
+            'repo': 'owncloud/eos-ocis',
+          },
+          'when': {
+            'ref': {
+              'include': [
+                'refs/pull/**',
+              ],
+            },
+          },
+        },
+        {
+          'name': 'docker-eos-ocis',
+          'image': 'plugins/docker:18.09',
+          'pull': 'always',
+          'settings': {
+            'username': {
+              'from_secret': 'docker_username',
+            },
+            'password': {
+              'from_secret': 'docker_password',
+            },
+            'auto_tag': True,
+            'context': 'ocis/docker/eos-ocis',
+            'auto_tag_suffix': 'linux-amd64',
+            'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
+            'repo': 'owncloud/eos-ocis',
+          },
+          'when': {
+            'ref': {
+              'exclude': [
+                'refs/pull/**',
+              ],
+            },
+          },
+        },
+      ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
 def binary(ctx, name):
   if ctx.build.event == "tag":
     settings = {
@@ -975,6 +1049,7 @@ def manifest(ctx):
       'docker-amd64',
       'docker-arm64',
       'docker-arm',
+      'docker-eos-ocis',
       'binaries-linux',
       'binaries-darwin',
       'binaries-windows',
@@ -1129,6 +1204,7 @@ def badges(ctx):
       'docker-amd64',
       'docker-arm64',
       'docker-arm',
+      'docker-eos-ocis',
     ],
     'trigger': {
       'ref': [
