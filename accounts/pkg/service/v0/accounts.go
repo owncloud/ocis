@@ -321,30 +321,40 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	}
 	indexResults, err := s.index.Add(acc)
 	if err != nil {
-		 s.rollbackCreateAccount(ctx, acc)
+		s.rollbackCreateAccount(ctx, acc)
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 	s.log.Debug().Interface("account", acc).Msg("account after indexing")
 
-	changed := false
 	for _, r := range indexResults {
-		if r.Field == "UidNumber" || r.Field == "GidNumber" {
-			id, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+		if r.Field == "UidNumber" {
+			id, err := strconv.Atoi(path.Base(r.Value))
 			if err != nil {
+				s.rollbackCreateAccount(ctx, acc)
 				return err
 			}
-			if r.Field == "UidNumber" {
-				acc.UidNumber = id
-			} else {
-				acc.GidNumber = id
-			}
-			changed = true
+			acc.UidNumber = int64(id)
+			break
 		}
 	}
-	if changed {
-		if err := s.repo.WriteAccount(context.Background(), acc); err != nil {
-			return err
-		}
+
+	group := proto.Group{}
+	err = s.CreateGroup(ctx, &proto.CreateGroupRequest{
+		Group: &proto.Group{
+			DisplayName:              acc.DisplayName,
+			OnPremisesSamAccountName: acc.OnPremisesSamAccountName,
+			Members:                  []*proto.Account{acc},
+			Owners:                   []*proto.Account{acc},
+		},
+	}, &group)
+	if err != nil {
+		s.rollbackCreateAccount(ctx, acc)
+		return merrors.InternalServerError(s.id, "could not create primary group for account: %v", err.Error())
+	}
+	acc.GidNumber = group.GidNumber
+	acc.MemberOf = append(acc.MemberOf, &group)
+	if err := s.repo.WriteAccount(context.Background(), acc); err != nil {
+		return err
 	}
 
 	if acc.PasswordProfile != nil {

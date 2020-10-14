@@ -145,11 +145,12 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 
 	for _, r := range indexResults {
 		if r.Field == "GidNumber" {
-			gid, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+			gid, err := strconv.Atoi(path.Base(r.Value))
 			if err != nil {
+				s.rollbackCreateGroup(c, in.Group)
 				return err
 			}
-			in.Group.GidNumber = gid
+			in.Group.GidNumber = int64(gid)
 			return s.repo.WriteGroup(context.Background(), in.Group)
 		}
 	}

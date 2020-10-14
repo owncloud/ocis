@@ -56,7 +56,7 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
 		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr:    opts.ProviderAddr,
 			DataURL:         opts.DataURL,
