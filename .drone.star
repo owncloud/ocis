@@ -565,6 +565,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
           'PHOENIX_WEB_CONFIG': '/drone/src/accounts/ui/tests/config/drone/ocis-config.json',
           'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/accounts/ui/tests/config/drone/identifier-registration.yml',
           'KONNECTD_ISS': 'https://ocis-server:9200',
+          'STORAGE_STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/storage/users',
           #'ACCOUNTS_STORAGE_DISK_PATH': '/srv/app/tmp/ocis-accounts', # Temporary workaround, don't use metadata storage
         },
         'commands': [
