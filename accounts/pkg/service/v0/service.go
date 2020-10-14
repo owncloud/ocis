@@ -5,7 +5,9 @@ import (
 	"errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -71,7 +73,6 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 	idx := indexer.CreateIndexer(s.Config)
 
 	// Accounts
-
 	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique"); err != nil {
 		return nil, err
 	}
@@ -87,12 +88,23 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 		return nil, err
 	}
 
+	if err := idx.AddIndex(&proto.Account{}, "UidNumber", "Id", "accounts", "autoincrement"); err != nil {
+		return nil, err
+	}
+	if err := idx.AddIndex(&proto.Account{}, "GidNumber", "Id", "accounts", "autoincrement"); err != nil {
+		return nil, err
+	}
+
 	// Groups
 	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique"); err != nil {
 		return nil, err
 	}
 
 	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique"); err != nil {
+		return nil, err
+	}
+
+	if err := idx.AddIndex(&proto.Group{}, "GidNumber", "Id", "groups", "autoincrement"); err != nil {
 		return nil, err
 	}
 
@@ -215,10 +227,32 @@ func (s Service) createDefaultAccounts() (err error) {
 			return err
 		}
 
-		if err := s.indexAccount(accounts[i].Id); err != nil {
+		results, err := s.index.Add(&accounts[i])
+		if err != nil {
 			if idxerrs.IsAlreadyExistsErr(err) {
 				continue
 			} else {
+				return err
+			}
+		}
+
+		changed := false
+		for _, r := range results {
+			if r.Field == "UidNumber" || r.Field == "GidNumber" {
+				id, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+				if err != nil {
+					return err
+				}
+				if r.Field == "UidNumber" {
+					accounts[i].UidNumber = id
+				} else {
+					accounts[i].GidNumber = id
+				}
+				changed = true
+			}
+		}
+		if changed {
+			if err := s.repo.WriteAccount(context.Background(), &accounts[i]); err != nil {
 				return err
 			}
 		}
@@ -281,11 +315,26 @@ func (s Service) createDefaultGroups() (err error) {
 			return err
 		}
 
-		if err := s.index.Add(&groups[i]); err != nil {
+		results, err := s.index.Add(&groups[i])
+		if err != nil {
 			if idxerrs.IsAlreadyExistsErr(err) {
 				continue
 			} else {
 				return err
+			}
+		}
+
+		for _, r := range results {
+			if r.Field == "GidNumber" {
+				gid, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+				if err != nil {
+					return err
+				}
+				groups[i].GidNumber = gid
+				if err := s.repo.WriteGroup(context.Background(), &groups[i]); err != nil {
+					return err
+				}
+				break
 			}
 		}
 	}

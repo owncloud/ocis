@@ -3,6 +3,8 @@ package indexer
 
 import (
 	"fmt"
+	"path"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
@@ -10,13 +12,17 @@ import (
 	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/disk" // to populate index
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
-	"path"
 )
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
 	config  *config.Config
 	indices typeMap
+}
+
+// IdxAddResult represents the result of an Add call on an index
+type IdxAddResult struct {
+	Field, Value string
 }
 
 // CreateIndexer creates a new Indexer.
@@ -66,24 +72,24 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 }
 
 // Add a new entry to the indexer
-func (i Indexer) Add(t interface{}) error {
+func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 	typeName := getTypeFQN(t)
+	var results []IdxAddResult
 	if fields, ok := i.indices[typeName]; ok {
 		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
-				if idxByVal == "" {
-					continue
+				value, err := idx.Add(pkVal, idxByVal)
+				if err != nil {
+					return []IdxAddResult{}, err
 				}
-				if _, err := idx.Add(pkVal, idxByVal); err != nil {
-					return err
-				}
+				results = append(results, IdxAddResult{Field: fields.PKFieldName, Value: value})
 			}
 		}
 	}
 
-	return nil
+	return results, nil
 }
 
 // FindBy finds a value on an index by field and value.

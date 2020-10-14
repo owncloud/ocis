@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
@@ -12,7 +14,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -32,24 +33,6 @@ import (
 
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
-
-func (s Service) indexAccount(id string) error {
-	a := &proto.Account{}
-
-	if err := s.repo.LoadAccount(context.Background(), id, a); err != nil {
-		s.log.Error().Err(err).Str("account", id).Msg("could not load account")
-		return err
-	}
-	s.log.Debug().Interface("account", a).Msg("found account")
-	if err := s.index.Add(a); err != nil {
-		if idxerrs.IsAlreadyExistsErr(err) {
-			return nil
-		}
-		s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
-		return err
-	}
-	return nil
-}
 
 // an auth request is currently hardcoded and has to match this regex
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
@@ -336,10 +319,33 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		s.debugLogAccount(acc).Msg("could not persist new account")
 		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
-	if err = s.index.Add(acc); err != nil {
+	indexResults, err := s.index.Add(acc)
+	if err != nil {
+		// TODO: delete account when failed to add to indices
 		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
 	}
 	s.log.Debug().Interface("account", acc).Msg("account after indexing")
+
+	changed := false
+	for _, r := range indexResults {
+		if r.Field == "UidNumber" || r.Field == "GidNumber" {
+			id, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+			if err != nil {
+				return err
+			}
+			if r.Field == "UidNumber" {
+				acc.UidNumber = id
+			} else {
+				acc.GidNumber = id
+			}
+			changed = true
+		}
+	}
+	if changed {
+		if err := s.repo.WriteAccount(context.Background(), acc); err != nil {
+			return err
+		}
+	}
 
 	if acc.PasswordProfile != nil {
 		acc.PasswordProfile.Password = ""

@@ -2,12 +2,16 @@ package service
 
 import (
 	"context"
+	"path"
+	"path/filepath"
+	"strconv"
+
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
-	"path/filepath"
 )
 
 func (s Service) expandMembers(g *proto.Group) {
@@ -133,8 +137,20 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		return merrors.InternalServerError(s.id, "could not persist new group: %v", err.Error())
 	}
 
-	if err = s.index.Add(in.Group); err != nil {
+	indexResults, err := s.index.Add(in.Group)
+	if err != nil {
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
+	}
+
+	for _, r := range indexResults {
+		if r.Field == "GidNumber" {
+			gid, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+			if err != nil {
+				return err
+			}
+			in.Group.GidNumber = gid
+			return s.repo.WriteGroup(context.Background(), in.Group)
+		}
 	}
 
 	return
