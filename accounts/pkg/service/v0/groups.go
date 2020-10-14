@@ -2,14 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
-	"path/filepath"
-	"regexp"
-
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"path/filepath"
 )
 
 func (s Service) expandMembers(g *proto.Group) {
@@ -60,11 +58,14 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 		searchResults, _ = s.index.FindByPartial(&proto.Group{}, "DisplayName", "*")
 	}
 
-	var startsWithIDQuery = regexp.MustCompile(`^startswith\(id,'(.*)'\)$`)
-	match := startsWithIDQuery.FindStringSubmatch(in.Query)
-	if len(match) == 2 {
-		searchResults = []string{match[1]}
-	}
+	/*
+		var startsWithIDQuery = regexp.MustCompile(`^startswith\(id,'(.*)'\)$`)
+		match := startsWithIDQuery.FindStringSubmatch(in.Query)
+		if len(match) == 2 {
+			searchResults = []string{match[1]}
+		}
+
+	*/
 
 	for _, hit := range searchResults {
 		g := &proto.Group{}
