@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-13T15:26:14+0000"
+date: "2020-10-14T04:56:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/webdav
@@ -69,6 +69,15 @@ Usage: `webdav version [command options] [arguments...]`
 --service-name | $WEBDAV_SERVICE_NAME  
 : Service name. Default: `webdav`.
 
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+--debug-addr | $WEBDAV_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9119`.
+
 ### webdav server
 
 Start integrated server
@@ -113,13 +122,4 @@ Usage: `webdav server [command options] [arguments...]`
 
 --http-root | $WEBDAV_HTTP_ROOT  
 : Root path of http server. Default: `/`.
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
---debug-addr | $WEBDAV_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9119`.
 

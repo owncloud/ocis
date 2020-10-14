@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-13T15:26:13+0000"
+date: "2020-10-14T04:56:34+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -57,15 +57,6 @@ Usage: `ocis-proxy [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis-proxy health
-
-Check health status
-
-Usage: `ocis-proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
-
 ### ocis-proxy version
 
 Print the versions of the running instances
@@ -77,6 +68,15 @@ Usage: `ocis-proxy version [command options] [arguments...]`
 
 --service-name | $PROXY_SERVICE_NAME  
 : Service name. Default: `proxy`.
+
+### ocis-proxy health
+
+Check health status
+
+Usage: `ocis-proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
 ### ocis-proxy server
 
