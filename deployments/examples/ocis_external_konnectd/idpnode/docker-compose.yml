@@ -1,0 +1,59 @@
+version: '3.7'
+
+services:
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    networks:
+      - idpnet
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.idp.acme.tlschallenge=true"
+      - "--certificatesresolvers.idp.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.idp.acme.email=postmaster@${IDP_DOMAIN}"
+      - "--certificatesresolvers.idp.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "~/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  konnectd:
+    container_name: konnectd
+    image: owncloud/ocis-konnectd:latest
+    networks:
+      - idpnet
+    ports:
+      - "9130:9130"
+    volumes:
+      - ./config:/etc/ocis
+    environment:
+      OCIS_LOG_LEVEL: debug
+      KONNECTD_ISS: https://${IDP_DOMAIN}
+      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/etc/ocis/identifier-registration.yml"
+      KONNECTD_LOG_LEVEL: debug
+      KONNECTD_TLS: '0'
+      LDAP_URI: ldap://${OCIS_DOMAIN}:9125
+      LDAP_BINDDN: cn=konnectd,ou=sysusers,dc=example,dc=org
+      LDAP_BINDPW: konnectd
+      LDAP_BASEDN: ou=users,dc=example,dc=org
+      LDAP_SCOPE: sub
+      LDAP_LOGIN_ATTRIBUTE: cn
+      LDAP_EMAIL_ATTRIBUTE: mail
+      LDAP_NAME_ATTRIBUTE=: n
+      LDAP_UUID_ATTRIBUTE: uid
+      LDAP_UUID_ATTRIBUTE_TYPE: text
+      LDAP_FILTER: (objectClass=posixaccount)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.idp.rule=Host(`${IDP_DOMAIN}`)"
+      - "traefik.http.routers.idp.entrypoints=websecure"
+      - "traefik.http.routers.idp.tls.certresolver=idp"
+      - "traefik.docker.network=idpnet"
+      - "traefik.port=9130"
+      - "traefik.protocol=https"
