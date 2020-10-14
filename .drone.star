@@ -117,7 +117,7 @@ def main(ctx):
     updateDeployment(ctx)
   ]
 
-  if '[docs-only]' in ctx.build.title:
+  if '[docs-only]' in (ctx.build.title + ctx.build.message):
     pipelines = docs(ctx)
     pipelines['depends_on'] = []
   else:
@@ -691,6 +691,25 @@ def docker(ctx, arch):
           'tags': 'linux-%s' % (arch),
           'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
           'repo': ctx.repo.slug,
+        },
+        'when': {
+          'ref': {
+            'include': [
+              'refs/pull/**',
+            ],
+          },
+        },
+      },
+      {
+        'name': 'dryrun-eos-docker',
+        'image': 'plugins/docker:18.09',
+        'pull': 'always',
+        'settings': {
+          'dry_run': True,
+          'context': 'ocis/docker/eos-ocis',
+          'tags': 'linux-%s' % (arch),
+          'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
+          'repo': 'owncloud/eos-ocis',
         },
         'when': {
           'ref': {
