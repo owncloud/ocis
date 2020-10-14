@@ -116,6 +116,10 @@ func TestNext(t *testing.T) {
 			assert.NoError(t, err)
 
 			i := NewAutoincrementIndex(
+				option.WithBounds(&option.Bound{
+					Lower: 0,
+					Upper: 0,
+				}),
 				option.WithDataDir(tmpDir),
 				option.WithFilesDir(filepath.Join(tmpDir, "data")),
 				option.WithEntity(scenario.entity),
@@ -132,15 +136,80 @@ func TestNext(t *testing.T) {
 
 			oldName, err := i.Add("test-example", "")
 			assert.NoError(t, err)
-			assert.Equal(t, filepath.Base(oldName), 0)
+			assert.Equal(t, "0", filepath.Base(oldName))
 
 			oldName, err = i.Add("test-example", "")
 			assert.NoError(t, err)
-			assert.Equal(t, filepath.Base(oldName), 1)
+			assert.Equal(t, "1", filepath.Base(oldName))
 
 			oldName, err = i.Add("test-example", "")
 			assert.NoError(t, err)
-			assert.Equal(t, filepath.Base(oldName), 2)
+			assert.Equal(t, "2", filepath.Base(oldName))
+			t.Log(oldName)
+
+			_ = os.RemoveAll(tmpDir)
+		})
+	}
+}
+
+func TestLowerBound(t *testing.T) {
+	scenarios := []struct {
+		name     string
+		expected int
+		indexBy  string
+		entity   interface{}
+	}{
+		{
+			name:     "get next value with a lower bound specified",
+			expected: 0,
+			indexBy:  "Number",
+			entity: struct {
+				Number      int
+				Name        string
+				NumberFloat float32
+			}{
+				Name: "tesy-mc-testace",
+			},
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			tmpDir, err := createTmpDirStr()
+			assert.NoError(t, err)
+
+			err = os.MkdirAll(filepath.Join(tmpDir, "data"), 0777)
+			assert.NoError(t, err)
+
+			i := NewAutoincrementIndex(
+				option.WithBounds(&option.Bound{
+					Lower: 1000,
+				}),
+				option.WithDataDir(tmpDir),
+				option.WithFilesDir(filepath.Join(tmpDir, "data")),
+				option.WithEntity(scenario.entity),
+				option.WithTypeName("LambdaType"),
+				option.WithIndexBy(scenario.indexBy),
+			)
+
+			err = i.Init()
+			assert.NoError(t, err)
+
+			tmpFile, err := os.Create(filepath.Join(tmpDir, "data", "test-example"))
+			assert.NoError(t, err)
+			assert.NoError(t, tmpFile.Close())
+
+			oldName, err := i.Add("test-example", "")
+			assert.NoError(t, err)
+			assert.Equal(t, "1000", filepath.Base(oldName))
+
+			oldName, err = i.Add("test-example", "")
+			assert.NoError(t, err)
+			assert.Equal(t, "1001", filepath.Base(oldName))
+
+			oldName, err = i.Add("test-example", "")
+			assert.NoError(t, err)
+			assert.Equal(t, "1002", filepath.Base(oldName))
 			t.Log(oldName)
 
 			_ = os.RemoveAll(tmpDir)
@@ -160,6 +229,10 @@ func BenchmarkAdd(b *testing.B) {
 	assert.NoError(b, tmpFile.Close())
 
 	i := NewAutoincrementIndex(
+		option.WithBounds(&option.Bound{
+			Lower: 0,
+			Upper: 0,
+		}),
 		option.WithDataDir(tmpDir),
 		option.WithFilesDir(filepath.Join(tmpDir, "data")),
 		option.WithEntity(struct {

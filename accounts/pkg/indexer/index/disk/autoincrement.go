@@ -24,6 +24,8 @@ type Autoincrement struct {
 	indexBaseDir string
 	indexRootDir string
 	entity       interface{}
+
+	bound *option.Bound
 }
 
 // - Creating an autoincrement index has to be thread safe.
@@ -55,6 +57,7 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
+		bound:        opts.Bound,
 		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 	}
@@ -100,14 +103,18 @@ func (idx Autoincrement) Lookup(v string) ([]string, error) {
 }
 
 func (idx Autoincrement) Add(id, v string) (string, error) {
+	nextID, err := idx.next()
+	if err != nil {
+		return "", err
+	}
 	oldName := filepath.Join(idx.filesDir, id)
-	var newName string
+	newName := filepath.Join(idx.indexRootDir, strconv.Itoa(nextID))
 	if v == "" {
-		newName = filepath.Join(idx.indexRootDir, strconv.Itoa(idx.next()))
+		newName = filepath.Join(idx.indexRootDir, strconv.Itoa(nextID))
 	} else {
 		newName = filepath.Join(idx.indexRootDir, v)
 	}
-	err := os.Symlink(oldName, newName)
+	err = os.Symlink(oldName, newName)
 	if errors.Is(err, os.ErrExist) {
 		return "", &idxerrs.AlreadyExistsErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
@@ -216,19 +223,20 @@ func readDir(dirname string) ([]os.FileInfo, error) {
 	return list, nil
 }
 
-func (idx Autoincrement) next() int {
+func (idx Autoincrement) next() (int, error) {
 	files, err := readDir(idx.indexRootDir)
 	if err != nil {
-		// hello handle me pls.
+		return -1, err
 	}
 
 	if len(files) == 0 {
-		return 0
+		return int(idx.bound.Lower), nil
 	}
 
-	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name())) // would returning a string be a better interface?
+	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name()))
 	if err != nil {
-		// handle me daddy
+		return -1, err
 	}
-	return latest + 1
+
+	return latest + 1, nil
 }
