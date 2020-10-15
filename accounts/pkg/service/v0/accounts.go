@@ -319,10 +319,11 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		s.debugLogAccount(acc).Msg("could not persist new account")
 		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
-	indexResults, err2 := s.index.Add(acc)
-	if err2 != nil {
-		//s.rollbackCreateAccount(ctx, acc)
-		return merrors.InternalServerError(s.id, "could not index new account: %v", err2.Error())
+	indexResults, err := s.index.Add(acc)
+	if err != nil {
+		s.rollbackCreateAccount(ctx, acc)
+		return merrors.BadRequest(s.id, "Account already exists %v", err.Error())
+
 	}
 	s.log.Debug().Interface("account", acc).Msg("account after indexing")
 
