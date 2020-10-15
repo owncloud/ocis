@@ -4,32 +4,16 @@ import { connect } from 'react-redux';
 
 import { BrowserRouter } from 'react-router-dom';
 
-import { withStyles } from '@material-ui/core/styles';
-
-import { enhanceBodyBackground } from './utils';
 import Routes from './Routes';
-
-// Trigger loading of background image.
-enhanceBodyBackground();
-
-const styles = () => ({
-  root: {
-    position: 'relative',
-    display: 'flex',
-    flex: 1
-  }
-});
 
 class App extends PureComponent {
   render() {
     const { classes, hello, pathPrefix } = this.props;
 
     return (
-      <div className={classes.root}>
-        <BrowserRouter basename={pathPrefix}>
-          <Routes hello={hello}/>
-        </BrowserRouter>
-      </div>
+      <BrowserRouter basename={pathPrefix}>
+        <Routes hello={hello}/>
+      </BrowserRouter>
     );
   }
 
@@ -58,4 +42,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(App));
+export default connect(mapStateToProps)(App);

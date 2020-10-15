@@ -7,6 +7,20 @@ strong {
   font-weight: 600;
 }
 
+.oc-login-bg {
+  background-image: url(./images/background.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+#loader {
+  /* NOTE(longsleep): White here needed because of the background image */
+  color: white;
+  text-shadow: #000 0 0 1px;
+}
+
 .oc-logo {
   position: absolute;
   top: -120px;
@@ -16,18 +30,23 @@ strong {
 }
 
 .oc-input {
-  background-color: white;
-  border: 0;
-  border-radius: 6px;
+  background-color: #042047;
+  border: 1px solid rgba(78,133,200,.8);
+  border-radius: 3px;
+  color: rgba(255,255,255,.8);
   width: 300px;
   height: 40px;
-  padding: 12px 8px;
+  padding: 16px;
   box-sizing: border-box;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .oc-input:focus {
   outline: none;
+}
+
+.oc-input::placeholder {
+  color: rgba(78,133,200,.8);
 }
 
 .oc-input + .oc-input {
@@ -64,6 +83,6 @@ strong {
   width: 100% !important;
 }
 
-.oc-mt-s {
-  margin-top: 10px !important;
+.oc-mt-m {
+  margin-top: 20px !important;
 }
