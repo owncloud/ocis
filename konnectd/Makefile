@@ -24,6 +24,10 @@ GENERATE ?= $(PACKAGES)
 
 TAGS ?=
 
+# Assets
+LOGO_URL = https://raw.githubusercontent.com/owncloud/assets/main/logo.svg
+FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
+
 ifndef OUTPUT
 	ifneq ($(DRONE_TAG),)
 		OUTPUT ?= $(subst v,,$(DRONE_TAG))
@@ -77,8 +81,12 @@ lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate:
+generate: assets
 	go generate $(GENERATE)
+
+assets:
+	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
+	curl -o assets/identifier/static/favicon.ico ${LOGO_URL}
 
 .PHONY: changelog
 changelog:
