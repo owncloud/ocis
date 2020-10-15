@@ -6,17 +6,16 @@ import (
 	"path"
 	"reflect"
 	"strings"
-	"testing"
 )
 
 // CreateTmpDir creates a temporary dir for tests data.
-func CreateTmpDir(t *testing.T) string {
+func CreateTmpDir() (string, error) {
 	name, err := ioutil.TempDir("/var/tmp", "testfiles-")
 	if err != nil {
-		t.Fatal(err)
+		return "", err
 	}
 
-	return name
+	return name, nil
 }
 
 // ValueOf gets the value of a type v on a given field <field>.
@@ -39,7 +38,8 @@ func getType(v interface{}) (reflect.Value, error) {
 	return rv, nil
 }
 
-// GetTypeFQN formats a valid name from a type <t>.
+// GetTypeFQN formats a valid name from a type <t>. This is a duplication of the already existing function in the
+// indexer package, but since there is a circular dependency we chose to duplicate it.
 func GetTypeFQN(t interface{}) string {
 	typ, _ := getType(t)
 	typeName := path.Join(typ.Type().PkgPath(), typ.Type().Name())

@@ -2,15 +2,16 @@ package disk
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"testing"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path"
-	"testing"
 )
 
 func TestNonUniqueIndexAdd(t *testing.T) {
@@ -78,7 +79,7 @@ func TestNonUniqueIndexSearch(t *testing.T) {
 
 // entity: used to get the fully qualified name for the index root path.
 func getNonUniqueIdxSut(t *testing.T, entity interface{}, indexBy string) (index.Index, string) {
-	dataPath := WriteIndexTestData(t, Data, "ID")
+	dataPath, _ := WriteIndexTestData(Data, "ID", "")
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{

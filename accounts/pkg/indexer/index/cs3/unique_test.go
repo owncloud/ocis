@@ -12,7 +12,8 @@ import (
 )
 
 func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t,Data, "ID")
+	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+	assert.NoError(t, err)
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -38,7 +39,7 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 		option.WithProviderAddr(cfg.Repo.CS3.ProviderAddr),
 	)
 
-	err := sut.Init()
+	err = sut.Init()
 	assert.NoError(t, err)
 
 	res, err := sut.Add("abcdefg-123", "mikey")
@@ -61,7 +62,8 @@ func TestCS3UniqueIndex_FakeSymlink(t *testing.T) {
 }
 
 func TestCS3UniqueIndexSearch(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
+	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+	assert.NoError(t, err)
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -87,7 +89,7 @@ func TestCS3UniqueIndexSearch(t *testing.T) {
 		option.WithProviderAddr(cfg.Repo.CS3.ProviderAddr),
 	)
 
-	err := sut.Init()
+	err = sut.Init()
 	assert.NoError(t, err)
 
 	_, err = sut.Add("hijklmn-456", "mikey")

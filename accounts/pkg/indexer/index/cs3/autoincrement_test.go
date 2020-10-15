@@ -10,8 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+
 func TestAutoincrementIndexAdd(t *testing.T) {
-	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
+	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+	assert.NoError(t, err)
 	cfg := generateConfig()
 
 	sut := NewAutoincrementIndex(
@@ -23,8 +26,7 @@ func TestAutoincrementIndexAdd(t *testing.T) {
 		option.WithProviderAddr(cfg.Repo.CS3.ProviderAddr),
 	)
 
-	err := sut.Init()
-	assert.NoError(t, err)
+	assert.NoError(t, sut.Init())
 
 	for i := 0; i < 5; i++ {
 		res, err := sut.Add("abcdefg-123", "")
@@ -36,7 +38,8 @@ func TestAutoincrementIndexAdd(t *testing.T) {
 }
 
 func BenchmarkAutoincrementIndexAdd(b *testing.B) {
-	dataDir := WriteIndexBenchmarkDataCS3(b, Data, "ID")
+	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+	assert.NoError(b, err)
 	cfg := generateConfig()
 
 	sut := NewAutoincrementIndex(
@@ -48,7 +51,7 @@ func BenchmarkAutoincrementIndexAdd(b *testing.B) {
 		option.WithProviderAddr(cfg.Repo.CS3.ProviderAddr),
 	)
 
-	err := sut.Init()
+	err = sut.Init()
 	assert.NoError(b, err)
 
 	for n := 0; n < b.N; n++ {

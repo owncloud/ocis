@@ -1,20 +1,19 @@
 package cs3
 
 import (
+	"os"
+	"path"
+	"testing"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path"
-	"testing"
 )
 
 func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
-	//go setupMetadataStorage()
-	//defer cancelFunc()
-
-	dataDir := WriteIndexTestDataCS3(t, Data, "ID")
+	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+	assert.NoError(t, err)
 	cfg := config.Config{
 		Repo: config.Repo{
 			Disk: config.Disk{
@@ -40,7 +39,7 @@ func TestCS3NonUniqueIndex_FakeSymlink(t *testing.T) {
 		option.WithProviderAddr(cfg.Repo.CS3.ProviderAddr),
 	)
 
-	err := sut.Init()
+	err = sut.Init()
 	assert.NoError(t, err)
 
 	res, err := sut.Add("abcdefg-123", "mikey")

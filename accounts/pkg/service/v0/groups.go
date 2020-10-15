@@ -25,7 +25,7 @@ func (s Service) expandMembers(g *proto.Group) {
 		if err := s.repo.LoadAccount(context.Background(), g.Members[i].Id, a); err == nil {
 			expanded = append(expanded, a)
 		} else {
-			// log errors but continue execution for now
+			// log errors but con/var/tmp/ocis-accounts-store-408341811tinue execution for now
 			s.log.Error().Err(err).Str("id", g.Members[i].Id).Msg("could not load account")
 		}
 	}

@@ -5,19 +5,18 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"testing"
 )
 
 // User is a user.
 type User struct {
 	ID, UserName, Email string
-	UID int
+	UID                 int
 }
 
 // Pet is a pet.
 type Pet struct {
 	ID, Kind, Color, Name string
-	UID int
+	UID                   int
 }
 
 // Data mock data.
@@ -37,76 +36,57 @@ var Data = map[string][]interface{}{
 }
 
 // WriteIndexTestData writes mock data to disk.
-func WriteIndexTestData(t *testing.T, m map[string][]interface{}, pk string) string {
-	rootDir := CreateTmpDir(t)
-	for dirName := range m {
-		fileTypePath := path.Join(rootDir, dirName)
-
-		if err := os.MkdirAll(fileTypePath, 0777); err != nil {
-			t.Fatal(err)
-		}
-		for _, u := range m[dirName] {
-			data, err := json.Marshal(u)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			pkVal := ValueOf(u, pk)
-			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
-				t.Fatal(err)
-			}
-		}
+func WriteIndexTestData(m map[string][]interface{}, privateKey, dir string) (string, error) {
+	rootDir, err := getRootDir(dir)
+	if err != nil {
+		return "", err
 	}
 
-	return rootDir
+	err = writeData(m, privateKey, rootDir)
+	if err != nil {
+		return "", err
+	}
+
+	return rootDir, nil
 }
 
-// WriteIndexTestDataCS3 writes more data to disk.
-func WriteIndexTestDataCS3(t *testing.T, m map[string][]interface{}, pk string) string {
-	rootDir := "/var/tmp/ocis/storage/users/data"
-	for dirName := range m {
-		fileTypePath := path.Join(rootDir, dirName)
+// getRootDir allows for some minimal behavior on destination on disk. Testing the cs3 api behavior locally means
+// keeping track of where the cs3 data lives on disk, this function allows for multiplexing whether or not to use a
+// temporary folder or an already defined one.
+func getRootDir(dir string) (string, error) {
+	var rootDir string
+	var err error
 
-		if err := os.MkdirAll(fileTypePath, 0777); err != nil {
-			t.Fatal(err)
-		}
-		for _, u := range m[dirName] {
-			data, err := json.Marshal(u)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			pkVal := ValueOf(u, pk)
-			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
-				t.Fatal(err)
-			}
+	if dir != "" {
+		rootDir = dir
+	} else {
+		rootDir, err = CreateTmpDir()
+		if err != nil {
+			return "", err
 		}
 	}
-
-	return rootDir
+	return rootDir, nil
 }
 
-// WriteIndexBenchmarkDataCS3 writes more data to disk.
-func WriteIndexBenchmarkDataCS3(b *testing.B, m map[string][]interface{}, pk string) string {
-	rootDir := "/var/tmp/ocis/storage/users/data"
+// writeData writes test data to disk on rootDir location Marshaled as json.
+func writeData(m map[string][]interface{}, privateKey string, rootDir string) error {
 	for dirName := range m {
 		fileTypePath := path.Join(rootDir, dirName)
 
 		if err := os.MkdirAll(fileTypePath, 0777); err != nil {
-			b.Fatal(err)
+			return err
 		}
 		for _, u := range m[dirName] {
 			data, err := json.Marshal(u)
 			if err != nil {
-				b.Fatal(err)
+				return err
 			}
 
-			pkVal := ValueOf(u, pk)
+			pkVal := ValueOf(u, privateKey)
 			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
-				b.Fatal(err)
+				return err
 			}
 		}
 	}
-
-	return rootDir
+	return nil
 }
