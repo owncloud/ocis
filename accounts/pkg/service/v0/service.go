@@ -24,6 +24,9 @@ import (
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
+// userDefaultGID is the default integer representing the "users" group.
+const userDefaultGID = 30000
+
 // New returns a new instance of Service
 func New(opts ...Option) (s *Service, err error) {
 	options := newOptions(opts...)

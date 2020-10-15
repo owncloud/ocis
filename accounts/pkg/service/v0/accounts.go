@@ -338,22 +338,23 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		}
 	}
 
-	// Note: creating the group needs to be the last step. Otherwise rollbackCreateAccount would need to rollback the group as well.
-	group := proto.Group{}
-	err = s.CreateGroup(ctx, &proto.CreateGroupRequest{
-		Group: &proto.Group{
-			DisplayName:              acc.DisplayName,
-			OnPremisesSamAccountName: acc.OnPremisesSamAccountName,
-			Members:                  []*proto.Account{acc},
-			Owners:                   []*proto.Account{acc},
-		},
-	}, &group)
-	if err != nil {
-		s.rollbackCreateAccount(ctx, acc)
-		return merrors.InternalServerError(s.id, "could not create primary group for account: %v", err.Error())
+	if in.Account.GidNumber == 0 {
+		in.Account.GidNumber = userDefaultGID
 	}
-	acc.GidNumber = group.GidNumber
-	acc.MemberOf = append(acc.MemberOf, &group)
+
+	r := proto.ListGroupsResponse{}
+	err = s.ListGroups(ctx, &proto.ListGroupsRequest{}, &r)
+	if err != nil {
+		// rollback account creation
+		return err
+	}
+
+	for _, group := range r.Groups {
+		if group.GidNumber == in.Account.GidNumber {
+			in.Account.MemberOf = append(in.Account.MemberOf, group)
+		}
+	}
+	//acc.MemberOf = append(acc.MemberOf, &group)
 	if err := s.repo.WriteAccount(context.Background(), acc); err != nil {
 		return err
 	}
