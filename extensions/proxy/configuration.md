@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-14T16:33:28+0000"
+date: "2020-10-15T02:39:30+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -57,14 +57,17 @@ Usage: `ocis-proxy [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis-proxy health
+### ocis-proxy version
 
-Check health status
+Print the versions of the running instances
 
-Usage: `ocis-proxy health [command options] [arguments...]`
+Usage: `ocis-proxy version [command options] [arguments...]`
 
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
+--service-namespace | $PROXY_SERVICE_NAMESPACE  
+: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
+
+--service-name | $PROXY_SERVICE_NAME  
+: Service name. Default: `proxy`.
 
 ### ocis-proxy server
 
@@ -138,15 +141,12 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 --autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
 
-### ocis-proxy version
+### ocis-proxy health
 
-Print the versions of the running instances
+Check health status
 
-Usage: `ocis-proxy version [command options] [arguments...]`
+Usage: `ocis-proxy health [command options] [arguments...]`
 
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
