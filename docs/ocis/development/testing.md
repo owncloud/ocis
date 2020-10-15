@@ -45,7 +45,7 @@ Then run the api acceptance tests with the  following command:
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
-OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
@@ -88,7 +88,7 @@ If you want to work on a specific issue
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
-    OCIS_REVA_DATA_ROOT=/var/tmp/reva/ \
+    OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
