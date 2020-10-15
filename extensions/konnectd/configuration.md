@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-15T09:14:59+0000"
+date: "2020-10-15T10:51:29+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
@@ -56,6 +56,18 @@ Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
+
+### ocis-konnectd version
+
+Print the versions of the running instances
+
+Usage: `ocis-konnectd version [command options] [arguments...]`
+
+--http-namespace | $KONNECTD_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
 
 ### ocis-konnectd server
 
@@ -167,18 +179,6 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
-
-### ocis-konnectd version
-
-Print the versions of the running instances
-
-Usage: `ocis-konnectd version [command options] [arguments...]`
-
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
 
 ### ocis-konnectd health
 
