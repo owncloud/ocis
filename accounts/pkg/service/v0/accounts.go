@@ -362,7 +362,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		acc.PasswordProfile.Password = ""
 	}
 
-	out = acc
+	*out = *acc
 
 	// TODO: assign user role to all new users for now, as create Account request does not have any role field
 	if s.RoleService == nil {
