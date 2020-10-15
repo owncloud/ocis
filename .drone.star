@@ -1402,7 +1402,7 @@ def ocisServer(storage):
       'pull': 'always',
       'detach': True,
       'environment' : {
-        'OCIS_LOG_LEVEL': 'debug',
+        #'OCIS_LOG_LEVEL': 'debug',
         'STORAGE_HOME_DRIVER': '%s' % (storage),
         'STORAGE_USERS_DRIVER': '%s' % (storage),
         'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',

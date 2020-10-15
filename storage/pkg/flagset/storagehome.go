@@ -85,7 +85,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Name: "mount-id",
 			// This is the mount id of the storage provider using the same storage driver
 			// as /home but withoud home enabled.
-			Value:       "1284d238-aa92-42ce-bdc4-0b0000009154", // /users
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", // /users
 			Usage:       "mount id",
 			EnvVars:     []string{"STORAGE_HOME_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageHome.MountID,
