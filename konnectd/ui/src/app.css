@@ -23,9 +23,9 @@ strong {
 
 .oc-logo {
   position: absolute;
-  top: -120px;
+  top: -110px;
   left: 50%;
-  height: 100px;
+  height: 80px;
   transform: translateX(-50%);
 }
 
@@ -72,8 +72,8 @@ strong {
 
 @media only screen and (max-width: 768px) {
   .oc-logo {
-    height: 80px;
-    top: -95px;
+    height: 60px;
+    top: -80px;
   }
 }
 
