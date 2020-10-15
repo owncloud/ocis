@@ -183,7 +183,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
 		UIDNumber:         account.UidNumber,
-		GIDNumber:         account.UidNumber,
+		GIDNumber:         account.GidNumber,
 		Enabled:           enabled,
 	}))
 }

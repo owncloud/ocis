@@ -312,8 +312,12 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 		assert.Equal(t, expected.Quota, actual.Quota, "Quota match for user %v", expected.Username)
 	}
 
-	assert.Equal(t, expected.UIDNumber, actual.UIDNumber, "UidNumber doesn't match for user %v", expected.Username)
-	assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %v", expected.Username)
+	if expected.UIDNumber != 0 {
+		assert.Equal(t, expected.UIDNumber, actual.UIDNumber, "UidNumber doesn't match for user %s", expected.Username)
+	}
+	if expected.GIDNumber != 0 {
+		assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %s", expected.Username)
+	}
 
 }
 
