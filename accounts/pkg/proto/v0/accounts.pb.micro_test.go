@@ -414,12 +414,11 @@ func TestCreateAccount(t *testing.T) {
 
 // https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateExistingUser(t *testing.T) {
-	r, err := createAccount(t, "user1")
+	var err error
+	_, err = createAccount(t, "user1")
 	assert.NoError(t, err)
 
-	r, err = createAccount(t, "user1")
-	t.Log(r)
-
+	_, err = createAccount(t, "user1")
 	assert.Error(t, err)
 	assertUserExists(t, getAccount("user1"))
 
@@ -427,7 +426,7 @@ func TestCreateExistingUser(t *testing.T) {
 }
 
 // All tests fail after running this
-// https://github.com/owncloud/ocis/accounts/issues/62
+// https://github.com/owncloud/ocis/accounts-issues/62
 func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	resp, err := listAccounts(t)

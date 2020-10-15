@@ -109,7 +109,7 @@ func (idx Autoincrement) Add(id, v string) (string, error) {
 		return "", err
 	}
 	oldName := filepath.Join(idx.filesDir, id)
-	newName := filepath.Join(idx.indexRootDir, strconv.Itoa(nextID))
+	var newName string
 	if v == "" {
 		newName = filepath.Join(idx.indexRootDir, strconv.Itoa(nextID))
 	} else {

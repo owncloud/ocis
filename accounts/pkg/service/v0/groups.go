@@ -155,7 +155,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		}
 	}
 
-	out = in.Group
+	*out = *in.Group
 
 	return
 }

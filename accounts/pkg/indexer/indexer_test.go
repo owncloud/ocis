@@ -5,8 +5,6 @@ import (
 	"path"
 	"testing"
 
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -21,16 +19,7 @@ const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
 func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	})
+	indexer := createCs3Indexer()
 
 	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
@@ -45,16 +34,7 @@ func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	})
+	indexer := createCs3Indexer()
 
 	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil)
 	assert.NoError(t, err)
@@ -69,13 +49,7 @@ func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
@@ -94,13 +68,7 @@ func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_AddWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
@@ -115,13 +83,7 @@ func TestIndexer_Disk_AddWithUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_AddWithNonUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
@@ -146,13 +108,7 @@ func TestIndexer_Disk_AddWithNonUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", &option.Bound{Lower: 5})
 	assert.NoError(t, err)
@@ -178,13 +134,7 @@ func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
 func TestIndexer_Disk_DeleteWithNonUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
@@ -207,13 +157,7 @@ func TestIndexer_Disk_DeleteWithNonUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_SearchWithNonUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
@@ -237,13 +181,7 @@ func TestIndexer_Disk_SearchWithNonUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_UpdateWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
 	assert.NoError(t, err)
@@ -296,13 +234,7 @@ func TestIndexer_Disk_UpdateWithUniqueIndex(t *testing.T) {
 func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
-	indexer := CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			Disk: config.Disk{
-				Path: dataDir,
-			},
-		},
-	})
+	indexer := createDiskIndexer(dataDir)
 
 	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
 	assert.NoError(t, err)
@@ -319,31 +251,25 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func TestIndexer_Disk_AutoIncrementIndex(t *testing.T) {
-	scenarios := []struct {
-		name    string
-		indexOn string
-		entity  *proto.Account
-	}{
-		{
-			name:    "create an index on a valid autoincrement field",
-			indexOn: "Number",
-			entity:  &proto.Account{},
+func createCs3Indexer() *Indexer {
+	return CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			CS3: config.CS3{
+				ProviderAddr: "0.0.0.0:9215",
+				DataURL:      "http://localhost:9216",
+				DataPrefix:   "data",
+				JWTSecret:    "Pive-Fumkiu4",
+			},
 		},
-	}
-
-	for i := range scenarios {
-		t.Run(scenarios[i].name, func(t *testing.T) {
-
-		})
-	}
+	})
 }
 
-func setup() error {
-	//dataDir := WriteIndexTestData(t, Data, "ID")
-	return nil
-}
-
-func teardown() error {
-	return nil
+func createDiskIndexer(dataDir string) *Indexer {
+	return CreateIndexer(&config.Config{
+		Repo: config.Repo{
+			Disk: config.Disk{
+				Path: dataDir,
+			},
+		},
+	})
 }
