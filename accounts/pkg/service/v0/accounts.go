@@ -439,8 +439,20 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		return merrors.BadRequest(s.id, "%s", err)
 	}
 
-	if err = validateAccount(s.id, *in.Account); err != nil {
-		return err
+	if _, exists := validMask.Filter("PreferredName"); exists {
+		if err = validateAccountPreferredName(s.id, *in.Account); err != nil {
+			return err
+		}
+	}
+	if _, exists := validMask.Filter("OnPremisesSamAccountName"); exists {
+		if err = validateAccountOnPremisesSamAccountName(s.id, *in.Account); err != nil {
+			return err
+		}
+	}
+	if _, exists := validMask.Filter("Mail"); exists {
+		if err = validateAccountEmail(s.id, *in.Account); err != nil {
+			return err
+		}
 	}
 
 	if err := fieldmask_utils.StructToStruct(validMask, in.Account, out); err != nil {
@@ -578,9 +590,33 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 }
 
 func validateAccount(serviceID string, a proto.Account) error {
+	if err := validateAccountPreferredName(serviceID, a); err != nil {
+		return err
+	}
+	if err := validateAccountOnPremisesSamAccountName(serviceID, a); err != nil {
+		return err
+	}
+	if err := validateAccountEmail(serviceID, a); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateAccountPreferredName(serviceID string, a proto.Account) error {
 	if !isValidUsername(a.PreferredName) {
 		return merrors.BadRequest(serviceID, "preferred_name '%s' must be at least the local part of an email", a.PreferredName)
 	}
+	return nil
+}
+
+func validateAccountOnPremisesSamAccountName(serviceID string, a proto.Account) error {
+	if !isValidUsername(a.OnPremisesSamAccountName) {
+		return merrors.BadRequest(serviceID, "on_premises_sam_account_name '%s' must be at least the local part of an email", a.OnPremisesSamAccountName)
+	}
+	return nil
+}
+
+func validateAccountEmail(serviceID string, a proto.Account) error {
 	if !isValidEmail(a.Mail) {
 		return merrors.BadRequest(serviceID, "mail '%s' must be a valid email", a.Mail)
 	}
