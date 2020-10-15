@@ -338,6 +338,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		}
 	}
 
+	// Note: creating the group needs to be the last step. Otherwise rollbackCreateAccount would need to rollback the group as well.
 	group := proto.Group{}
 	err = s.CreateGroup(ctx, &proto.CreateGroupRequest{
 		Group: &proto.Group{
