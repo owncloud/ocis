@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"sync"
@@ -284,15 +283,20 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if acc.Id == "" {
 		acc.Id = uuid.Must(uuid.NewV4()).String()
 	}
-	if !s.isValidUsername(acc.PreferredName) {
-		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", acc.PreferredName)
-	}
-	if !s.isValidEmail(acc.Mail) {
-		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", acc.Mail)
+	if err = validateAccount(s.id, *acc); err != nil {
+		return err
 	}
 
 	if id, err = cleanupID(acc.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
+	}
+
+	exists, err := s.accountExists(ctx, acc.PreferredName, acc.Mail, acc.Id)
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
+	}
+	if exists {
+		return merrors.BadRequest(s.id, "account already exists")
 	}
 
 	if acc.PasswordProfile != nil {
@@ -414,8 +418,6 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "account not found: %v", err.Error())
@@ -435,6 +437,10 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	validMask, err := validateUpdate(in.UpdateMask, updatableAccountPaths)
 	if err != nil {
 		return merrors.BadRequest(s.id, "%s", err)
+	}
+
+	if err = validateAccount(s.id, *in.Account); err != nil {
+		return err
 	}
 
 	if err := fieldmask_utils.StructToStruct(validMask, in.Account, out); err != nil {
@@ -488,7 +494,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	}
 
 	if err = s.index.Update(old, out); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not index new account")
+		s.log.Error().Err(err).Str("id", id).Msg("could not index new account")
 		return merrors.InternalServerError(s.id, "could not index updated account: %v", err.Error())
 	}
 
@@ -571,12 +577,22 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	return
 }
 
+func validateAccount(serviceID string, a proto.Account) error {
+	if !isValidUsername(a.PreferredName) {
+		return merrors.BadRequest(serviceID, "preferred_name '%s' must be at least the local part of an email", a.PreferredName)
+	}
+	if !isValidEmail(a.Mail) {
+		return merrors.BadRequest(serviceID, "mail '%s' must be a valid email", a.Mail)
+	}
+	return nil
+}
+
 // We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow intergration with our glauth LDAP service
 // so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
 // names should not start with numbers
 var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
 
-func (s Service) isValidUsername(e string) bool {
+func isValidUsername(e string) bool {
 	if len(e) < 1 && len(e) > 254 {
 		return false
 	}
@@ -586,7 +602,7 @@ func (s Service) isValidUsername(e string) bool {
 // regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-func (s Service) isValidEmail(e string) bool {
+func isValidEmail(e string) bool {
 	if len(e) < 3 && len(e) > 254 {
 		return false
 	}
@@ -672,4 +688,41 @@ func unique(strSlice []string) []string {
 		}
 	}
 	return list
+}
+
+func (s Service) accountExists(ctx context.Context, username, mail, id string) (exists bool, err error) {
+	var ids []string
+	ids, err = s.index.FindBy(&proto.Account{}, "preferred_name", username)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	ids, err = s.index.FindBy(&proto.Account{}, "on_premises_sam_account_name", username)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	ids, err = s.index.FindBy(&proto.Account{}, "mail", mail)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	a := &proto.Account{}
+	err = s.repo.LoadAccount(ctx, id, a)
+	if err == nil {
+		return true, nil
+	}
+	if !storage.IsNotFoundErr(err) {
+		return true, err
+	}
+	return false, nil
 }

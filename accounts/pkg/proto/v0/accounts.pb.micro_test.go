@@ -74,11 +74,11 @@ func getAccount(user string) *proto.Account {
 			IsResourceAccount:        true,
 			CreationType:             "",
 			DisplayName:              "User One",
-			PreferredName:            "user1",
-			OnPremisesSamAccountName: "user1",
+			PreferredName:            user,
+			OnPremisesSamAccountName: user,
 			UidNumber:                20009,
 			GidNumber:                30000,
-			Mail:                     "user1@example.com",
+			Mail:                     fmt.Sprintf("%s@example.com", user),
 			Identities:               []*proto.Identities{nil},
 			PasswordProfile:          &proto.PasswordProfile{Password: "heysdjfsdlk"},
 			MemberOf: []*proto.Group{
@@ -92,11 +92,11 @@ func getAccount(user string) *proto.Account {
 			IsResourceAccount:        true,
 			CreationType:             "",
 			DisplayName:              "User Two",
-			PreferredName:            "user2",
-			OnPremisesSamAccountName: "user2",
+			PreferredName:            user,
+			OnPremisesSamAccountName: user,
 			UidNumber:                20010,
 			GidNumber:                30000,
-			Mail:                     "user2@example.com",
+			Mail:                     fmt.Sprintf("%s@example.com", user),
 			Identities:               []*proto.Identities{nil},
 			PasswordProfile:          &proto.PasswordProfile{Password: "hello123"},
 			MemberOf: []*proto.Group{
@@ -392,7 +392,7 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 
 // createTmpDir creates a temporary dir for tests data.
 func createTmpDir() string {
-	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-*")
+	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-")
 	if err != nil {
 		panic(err)
 	}
@@ -468,30 +468,33 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 
 func TestUpdateAccount(t *testing.T) {
 	tests := []struct {
-		name        string
-		userAccount *proto.Account
+		name                string
+		userAccount         *proto.Account
+		expectedErrOnUpdate error
 	}{
 		{
 			"Update user (demonstration of updatable fields)",
 			&proto.Account{
 				DisplayName:              "Alice Hansen",
-				PreferredName:            "Wonderful Alice",
+				PreferredName:            "Wonderful-Alice",
 				OnPremisesSamAccountName: "Alice",
 				UidNumber:                20010,
 				GidNumber:                30001,
 				Mail:                     "alice@example.com",
 			},
+			nil,
 		},
 		{
 			"Update user with unicode data",
 			&proto.Account{
 				DisplayName:              "एलिस हेन्सेन",
-				PreferredName:            "अद्भुत एलिस",
+				PreferredName:            "अद्भुत-एलिस",
 				OnPremisesSamAccountName: "एलिस",
 				UidNumber:                20010,
 				GidNumber:                30001,
 				Mail:                     "एलिस@उदाहरण.com",
 			},
+			merrors.BadRequest(".", "preferred_name 'अद्भुत-एलिस' must be at least the local part of an email"),
 		},
 		{
 			"Update user with empty data values",
@@ -503,19 +506,19 @@ func TestUpdateAccount(t *testing.T) {
 				GidNumber:                0,
 				Mail:                     "",
 			},
+			merrors.BadRequest(".", "preferred_name '' must be at least the local part of an email"),
 		},
 		{
 			"Update user with strange data",
 			&proto.Account{
 				DisplayName:              "12345",
-				PreferredName:            "12345",
+				PreferredName:            "a12345",
 				OnPremisesSamAccountName: "54321",
 				UidNumber:                1000,
 				GidNumber:                1000,
-				// No email validation
-				// https://github.com/owncloud/ocis/accounts/issues/77
-				Mail: "1.2@3.c_@",
+				Mail:                     "1.2@3.c_@",
 			},
+			merrors.BadRequest(".", "mail '1.2@3.c_@' must be a valid email"),
 		},
 	}
 
@@ -533,18 +536,22 @@ func TestUpdateAccount(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
-			_, _ = createAccount(t, "user1")
-			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
+			acc, err := createAccount(t, "user1")
+			assert.NoError(t, err)
+
+			tt.userAccount.Id = acc.Id
 			tt.userAccount.AccountEnabled = false
 			tt.userAccount.IsResourceAccount = false
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
-
-			assert.NoError(t, err)
-
-			assert.IsType(t, &proto.Account{}, resp)
-			assertAccountsSame(t, tt.userAccount, resp)
-			assertUserExists(t, tt.userAccount)
-			_, _ = deleteAccount(t, "f9149a32-2b8e-4f04-9e8d-937d81712b9a")
+			if tt.expectedErrOnUpdate != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErrOnUpdate, err)
+			} else {
+				assert.NoError(t, err)
+				assert.IsType(t, &proto.Account{}, resp)
+				assertAccountsSame(t, tt.userAccount, resp)
+				assertUserExists(t, tt.userAccount)
+			}
 			cleanUp(t)
 		})
 	}

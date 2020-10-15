@@ -191,11 +191,23 @@ func (i Indexer) Update(from, to interface{}) error {
 			oldV := valueOf(from, fName)
 			newV := valueOf(to, fName)
 			pkVal := valueOf(from, fields.PKFieldName)
-			for _, index := range indices {
+			for _, idx := range indices {
 				if oldV == newV {
 					continue
 				}
-				if err := index.Update(pkVal, oldV, newV); err != nil {
+				if oldV == "" {
+					if _, err := idx.Add(pkVal, newV); err != nil {
+						return err
+					}
+					continue
+				}
+				if newV == "" {
+					if err := idx.Remove(pkVal, oldV); err != nil {
+						return err
+					}
+					continue
+				}
+				if err := idx.Update(pkVal, oldV, newV); err != nil {
 					return err
 				}
 			}
