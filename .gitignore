@@ -12,3 +12,6 @@ node_modules/
 .idea
 
 */yarn-error.log
+
+# Konnectd
+konnectd/assets/identifier
