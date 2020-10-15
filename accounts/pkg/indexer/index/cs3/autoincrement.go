@@ -26,7 +26,8 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 )
 
-type AutoincrementIndex struct {
+// Autoincrement are fields for an index of type autoincrement.
+type Autoincrement struct {
 	indexBy      string
 	typeName     string
 	filesDir     string
@@ -51,7 +52,7 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		opt(opts)
 	}
 
-	u := &AutoincrementIndex{
+	u := &Autoincrement{
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
@@ -76,7 +77,8 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	return u
 }
 
-func (idx *AutoincrementIndex) Init() error {
+// Init initializes an autoincrement index.
+func (idx *Autoincrement) Init() error {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": idx.cs3conf.JWTSecret,
 	})
@@ -112,7 +114,8 @@ func (idx *AutoincrementIndex) Init() error {
 	return nil
 }
 
-func (idx AutoincrementIndex) Lookup(v string) ([]string, error) {
+// Lookup exact lookup by value.
+func (idx Autoincrement) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	oldname, err := idx.resolveSymlink(searchPath)
 	if err != nil {
@@ -126,7 +129,8 @@ func (idx AutoincrementIndex) Lookup(v string) ([]string, error) {
 	return []string{oldname}, nil
 }
 
-func (idx AutoincrementIndex) Add(id, v string) (string, error) {
+// Add a new value to the index.
+func (idx Autoincrement) Add(id, v string) (string, error) {
 	var newName string
 	if v == "" {
 		next, err := idx.next()
@@ -148,7 +152,8 @@ func (idx AutoincrementIndex) Add(id, v string) (string, error) {
 	return newName, nil
 }
 
-func (idx AutoincrementIndex) Remove(id string, v string) error {
+// Remove a value v from an index.
+func (idx Autoincrement) Remove(id string, v string) error {
 	searchPath := path.Join(idx.indexRootDir, v)
 	_, err := idx.resolveSymlink(searchPath)
 	if err != nil {
@@ -185,7 +190,8 @@ func (idx AutoincrementIndex) Remove(id string, v string) error {
 	return err
 }
 
-func (idx AutoincrementIndex) Update(id, oldV, newV string) error {
+// Update index from <oldV> to <newV>.
+func (idx Autoincrement) Update(id, oldV, newV string) error {
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
 	}
@@ -197,7 +203,8 @@ func (idx AutoincrementIndex) Update(id, oldV, newV string) error {
 	return nil
 }
 
-func (idx AutoincrementIndex) Search(pattern string) ([]string, error) {
+// Search allows for glob search on the index.
+func (idx Autoincrement) Search(pattern string) ([]string, error) {
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
 	if err != nil {
@@ -234,19 +241,22 @@ func (idx AutoincrementIndex) Search(pattern string) ([]string, error) {
 	return matches, nil
 }
 
-func (idx AutoincrementIndex) IndexBy() string {
+// IndexBy undocumented.
+func (idx Autoincrement) IndexBy() string {
 	return idx.indexBy
 }
 
-func (idx AutoincrementIndex) TypeName() string {
+// TypeName undocumented.
+func (idx Autoincrement) TypeName() string {
 	return idx.typeName
 }
 
-func (idx AutoincrementIndex) FilesDir() string {
+// FilesDir  undocumented.
+func (idx Autoincrement) FilesDir() string {
 	return idx.filesDir
 }
 
-func (idx *AutoincrementIndex) createSymlink(oldname, newname string) error {
+func (idx *Autoincrement) createSymlink(oldname, newname string) error {
 	t, err := idx.authenticate(context.TODO())
 	if err != nil {
 		return err
@@ -265,7 +275,7 @@ func (idx *AutoincrementIndex) createSymlink(oldname, newname string) error {
 
 }
 
-func (idx *AutoincrementIndex) resolveSymlink(name string) (string, error) {
+func (idx *Autoincrement) resolveSymlink(name string) (string, error) {
 	t, err := idx.authenticate(context.TODO())
 	if err != nil {
 		return "", err
@@ -292,7 +302,7 @@ func (idx *AutoincrementIndex) resolveSymlink(name string) (string, error) {
 	return string(b), err
 }
 
-func (idx *AutoincrementIndex) makeDirIfNotExists(ctx context.Context, folder string) error {
+func (idx *Autoincrement) makeDirIfNotExists(ctx context.Context, folder string) error {
 	var rootPathRef = &provider.Reference{
 		Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%v", folder)},
 	}
@@ -318,7 +328,7 @@ func (idx *AutoincrementIndex) makeDirIfNotExists(ctx context.Context, folder st
 	return nil
 }
 
-func (idx *AutoincrementIndex) authenticate(ctx context.Context) (token string, err error) {
+func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err error) {
 	u := &user.User{
 		Id:     &user.UserId{},
 		Groups: []string{},
@@ -329,7 +339,7 @@ func (idx *AutoincrementIndex) authenticate(ctx context.Context) (token string, 
 	return idx.tokenManager.MintToken(ctx, u)
 }
 
-func (idx AutoincrementIndex) next() (int, error) {
+func (idx Autoincrement) next() (int, error) {
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
 	if err != nil {

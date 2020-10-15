@@ -93,6 +93,7 @@ type Index struct {
 	UID, GID Bound
 }
 
+// Bound defines a lower and upper bound.
 type Bound struct {
 	Lower, Upper int64
 }

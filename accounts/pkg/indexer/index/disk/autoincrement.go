@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 )
 
+// Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
 	indexBy      string
 	typeName     string
@@ -34,7 +35,7 @@ func init() {
 	registry.IndexConstructorRegistry["disk"]["autoincrement"] = NewAutoincrementIndex
 }
 
-// NewAutoincrementIndex instantiates a new UniqueIndex instance. Init() should be
+// NewAutoincrementIndex instantiates a new AutoincrementIndex instance. Init() should be
 // called afterward to ensure correct on-disk structure.
 func NewAutoincrementIndex(o ...option.Option) index.Index {
 	opts := &option.Options{}
@@ -72,6 +73,7 @@ var (
 	}
 )
 
+// Init initializes an autoincrement index.
 func (idx Autoincrement) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
@@ -84,6 +86,7 @@ func (idx Autoincrement) Init() error {
 	return nil
 }
 
+// Lookup exact lookup by value.
 func (idx Autoincrement) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err := isValidSymlink(searchPath); err != nil {
@@ -102,6 +105,7 @@ func (idx Autoincrement) Lookup(v string) ([]string, error) {
 	return []string{p}, err
 }
 
+// Add a new value to the index.
 func (idx Autoincrement) Add(id, v string) (string, error) {
 	nextID, err := idx.next()
 	if err != nil {
@@ -122,11 +126,13 @@ func (idx Autoincrement) Add(id, v string) (string, error) {
 	return newName, err
 }
 
+// Remove a value v from an index.
 func (idx Autoincrement) Remove(id string, v string) error {
 	searchPath := path.Join(idx.indexRootDir, v)
 	return os.Remove(searchPath)
 }
 
+// Update index from <oldV> to <newV>.
 func (idx Autoincrement) Update(id, oldV, newV string) error {
 	oldPath := path.Join(idx.indexRootDir, oldV)
 	if err := isValidSymlink(oldPath); err != nil {
@@ -150,6 +156,7 @@ func (idx Autoincrement) Update(id, oldV, newV string) error {
 	return err
 }
 
+// Search allows for glob search on the index.
 func (idx Autoincrement) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
 	if err != nil {
@@ -177,14 +184,17 @@ func (idx Autoincrement) Search(pattern string) ([]string, error) {
 	return res, nil
 }
 
+// IndexBy undocumented.
 func (idx Autoincrement) IndexBy() string {
 	return idx.indexBy
 }
 
+// TypeName undocumented.
 func (idx Autoincrement) TypeName() string {
 	return idx.typeName
 }
 
+// FilesDir  undocumented.
 func (idx Autoincrement) FilesDir() string {
 	return idx.filesDir
 }
