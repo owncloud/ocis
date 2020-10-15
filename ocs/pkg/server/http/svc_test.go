@@ -101,7 +101,7 @@ func getFormatString(format string) string {
 }
 
 func createTmpDir() string {
-	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-*")
+	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-")
 	if err != nil {
 		panic(err)
 	}
@@ -312,10 +312,8 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 		assert.Equal(t, expected.Quota, actual.Quota, "Quota match for user %v", expected.Username)
 	}
 
-	// FIXME: gidnumber and Uidnumber are always 0
-	// https://github.com/owncloud/ocis/ocs/issues/45
-	assert.Equal(t, 0, actual.UIDNumber, "UidNumber doesn't match for user %v", expected.Username)
-	assert.Equal(t, 0, actual.GIDNumber, "GIDNumber doesn't match for user %v", expected.Username)
+	assert.Equal(t, expected.UIDNumber, actual.UIDNumber, "UidNumber doesn't match for user %v", expected.Username)
+	assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %v", expected.Username)
 
 }
 
@@ -1458,7 +1456,7 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-				assert.Empty(t, response.Ocs.Data.Groups)
+				assert.Equal(t, []string{groupUsers}, response.Ocs.Data.Groups)
 
 				cleanUp(t)
 			}
