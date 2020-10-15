@@ -283,9 +283,9 @@ type GetGroupMembersResponse struct {
 }
 
 func assertResponseMeta(t *testing.T, expected, actual Meta) {
-	assert.Equal(t, expected.Status, actual.Status, "The status of response doesn't matches")
-	assert.Equal(t, expected.StatusCode, actual.StatusCode, "The Status code of response doesn't matches")
-	assert.Equal(t, expected.Message, actual.Message, "The Message of response doesn't matches")
+	assert.Equal(t, expected.Status, actual.Status, "The status of response doesn't match")
+	assert.Equal(t, expected.StatusCode, actual.StatusCode, "The Status code of response doesn't match")
+	assert.Equal(t, expected.Message, actual.Message, "The Message of response doesn't match")
 }
 
 func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
@@ -1114,12 +1114,14 @@ func TestUpdateUser(t *testing.T) {
 			"ford@user.org",
 			nil,
 		},
-		// Invalid email doesn't gives error
-		// https://github.com/owncloud/ocis/ocs/issues/46
 		{
 			"email",
 			"not_a_valid_email",
-			nil,
+			&Meta{
+				Status:     "error",
+				StatusCode: 400,
+				Message:    "mail 'not_a_valid_email' must be a valid email",
+			},
 		},
 		{
 			"password",
@@ -1131,24 +1133,29 @@ func TestUpdateUser(t *testing.T) {
 			"e_rutherford",
 			nil,
 		},
-		// Empty values doesn't gives error
-		// https://github.com/owncloud/ocis/ocs/issues/51
 		{
 			"email",
 			"",
-			nil,
+			&Meta{
+				Status:     "error",
+				StatusCode: 400,
+				Message:    "mail '' must be a valid email",
+			},
 		},
 		{
 			"username",
 			"",
-			nil,
+			&Meta{
+				Status:     "error",
+				StatusCode: 400,
+				Message:    "preferred_name '' must be at least the local part of an email",
+			},
 		},
 		{
 			"password",
 			"",
 			nil,
 		},
-
 		// Invalid Keys
 		{
 			"invalid_key",
