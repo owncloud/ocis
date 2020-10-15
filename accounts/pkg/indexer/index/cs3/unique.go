@@ -138,6 +138,9 @@ func (idx *Unique) Lookup(v string) ([]string, error) {
 
 // Add adds a value to the index, returns the path to the root-document
 func (idx *Unique) Add(id, v string) (string, error) {
+	if v == "" {
+		return "", nil
+	}
 	newName := path.Join(idx.indexRootDir, v)
 	if err := idx.createSymlink(id, newName); err != nil {
 		if os.IsExist(err) {
