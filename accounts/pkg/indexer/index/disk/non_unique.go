@@ -2,15 +2,16 @@ package disk
 
 import (
 	"errors"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 )
 
 // NonUniqueIndex is able to index an document by a key which might contain non-unique values
@@ -91,6 +92,9 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 
 // Add adds a value to the index, returns the path to the root-document
 func (idx NonUniqueIndex) Add(id, v string) (string, error) {
+	if v == "" {
+		return "", nil
+	}
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v, id)
 

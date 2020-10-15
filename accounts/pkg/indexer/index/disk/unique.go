@@ -3,14 +3,15 @@ package disk
 import (
 	"errors"
 	"fmt"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
+	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 )
 
 // Unique ensures that only one document of the same type and key-value combination can exist in the index.
@@ -77,6 +78,9 @@ func (idx *Unique) Init() error {
 
 // Add adds a value to the index, returns the path to the root-document
 func (idx Unique) Add(id, v string) (string, error) {
+	if v == "" {
+		return "", nil
+	}
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v)
 	err := os.Symlink(oldName, newName)

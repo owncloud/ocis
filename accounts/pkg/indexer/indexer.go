@@ -85,6 +85,9 @@ func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
 				value, err := idx.Add(pkVal, idxByVal)
+				if value == "" {
+					continue
+				}
 				if err != nil {
 					return []IdxAddResult{}, err
 				}

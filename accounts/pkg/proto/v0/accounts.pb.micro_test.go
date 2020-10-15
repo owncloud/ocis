@@ -94,7 +94,7 @@ func getAccount(user string) *proto.Account {
 			DisplayName:              "User Two",
 			PreferredName:            "user2",
 			OnPremisesSamAccountName: "user2",
-			UidNumber:                20009,
+			UidNumber:                20010,
 			GidNumber:                30000,
 			Mail:                     "user2@example.com",
 			Identities:               []*proto.Identities{nil},
@@ -419,7 +419,7 @@ func TestCreateAccount(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis/accounts/issues/62
+// https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateExistingUser(t *testing.T) {
 	r, err := createAccount(t, "user1")
 	assert.NoError(t, err)
@@ -427,8 +427,7 @@ func TestCreateExistingUser(t *testing.T) {
 	r, err = createAccount(t, "user1")
 	t.Log(r)
 
-	// Should give error but it does not
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	assertUserExists(t, getAccount("user1"))
 
 	cleanUp(t)
