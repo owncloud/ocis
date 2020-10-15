@@ -100,7 +100,3 @@ If you want to work on a specific issue
 7.  run each of the local tests that were demonstrating the **buggy** behavior. They should fail.
 8.  delete each of the local tests that were demonstrating the **buggy** behavior.
 9.  make a PR that has the fixed code, relevant lines removed from the expected failures file and bug demonstration tests deleted.
-
-### Notes
-- in a normal case the test-code cleans up users after the test-run, but if a test-run is interrupted (e.g. by CTRL+C) users might have been left on the LDAP server. In that case rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users.
-- the tests usually create users in the OU `TestUsers` with usernames specified in the feature file. If not defined in the feature file, most users have the password `123456`, defined by `regularUserPassword` in `behat.yml`, but other passwords are also used, see [`\FeatureContext::getPasswordForUser()`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L386) for mapping and [`\FeatureContext::__construct`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L1668) for the password definitions.
