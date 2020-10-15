@@ -23,7 +23,6 @@ type Autoincrement struct {
 	filesDir     string
 	indexBaseDir string
 	indexRootDir string
-	entity       interface{}
 
 	bound *option.Bound
 }
@@ -45,12 +44,12 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 
 	// validate the field
 	if opts.Entity == nil {
-		// return error: entity needed for field validation
+		panic("invalid autoincrement index: configured without entity")
 	}
 
 	k, err := getKind(opts.Entity, opts.IndexBy)
 	if !isValidKind(k) || err != nil {
-		panic("invalid index in non-numeric field")
+		panic("invalid autoincrement index: configured on non-numeric field")
 	}
 
 	return &Autoincrement{
