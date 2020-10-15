@@ -14,8 +14,8 @@ config = {
     'webdav':'',
   },
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': '641102bf2422227b35c23bc1c1f227ed17d7673a',
+    'coreBranch': 'uid-gid-user-create',
+    'coreCommit': '',
     'numberOfParts': 6
   },
   'uiTests': {
