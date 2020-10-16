@@ -19,7 +19,6 @@ Feature: files and folders can be deleted from the trashbin
   @issue-product-179
   Scenario Outline: Trashbin cannot be emptied
   # after fixing all issues delete this Scenario and use the one from oC10 core
-  # because of @issue-product-178 we cannot perform this test using new dav, so only old dav is being used
     Given user "Alice" has uploaded file with content "file with comma" to "sample,0.txt"
     And user "Alice" has uploaded file with content "file with comma" to "sample,1.txt"
     And using <dav-path> DAV path
