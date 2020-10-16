@@ -381,10 +381,6 @@ apiShareManagementBasicToShares/deleteShareFromShares.feature:46
 #
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:100
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:101
-apiShareManagementBasicToShares/createShareToSharesFolder.feature:115
-apiShareManagementBasicToShares/createShareToSharesFolder.feature:116
-apiShareManagementBasicToShares/createShareToSharesFolder.feature:130
-apiShareManagementBasicToShares/createShareToSharesFolder.feature:131
 #
 # https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
 #
