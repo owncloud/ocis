@@ -590,6 +590,8 @@ apiSharePublicLink1/createPublicLinkShare.feature:127
 apiSharePublicLink1/createPublicLinkShare.feature:128
 apiSharePublicLink1/createPublicLinkShare.feature:155
 apiSharePublicLink1/createPublicLinkShare.feature:156
+apiSharePublicLink1/createPublicLinkShare.feature:733
+apiSharePublicLink1/createPublicLinkShare.feature:742
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 #
@@ -623,11 +625,6 @@ apiSharePublicLink1/createPublicLinkShare.feature:678
 apiSharePublicLink1/createPublicLinkShare.feature:679
 apiSharePublicLink1/createPublicLinkShare.feature:729
 apiSharePublicLink1/createPublicLinkShare.feature:730
-#
-# https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
-#
-apiSharePublicLink1/createPublicLinkShare.feature:733
-apiSharePublicLink1/createPublicLinkShare.feature:742
 #
 # https://github.com/owncloud/ocis-reva/issues/311 Deleting a public link after renaming a file
 #
