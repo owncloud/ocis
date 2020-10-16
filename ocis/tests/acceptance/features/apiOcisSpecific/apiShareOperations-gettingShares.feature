@@ -2,14 +2,15 @@
 Feature: sharing
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given these users have been created with default attributes and skeleton files:
+      | username |
+      | Alice    |
+      | Brian    |
 
   @issue-ocis-reva-374
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Get a share with a user that didn't receive the share
-    Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     When user "Carol" gets the info of the last share using the sharing API
@@ -24,9 +25,7 @@ Feature: sharing
   @issue-ocis-reva-372
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: getting all the shares inside the folder
-    Given user "Alice" has created folder "/PARENT"
-    And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared file "PARENT/parent.txt" with user "Brian"
     When user "Alice" gets all the shares inside the folder "PARENT/parent.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"

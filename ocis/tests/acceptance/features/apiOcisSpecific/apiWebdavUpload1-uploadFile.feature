@@ -8,7 +8,7 @@ Feature: upload file
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-265
+  @skipOnOcis-OC-Storage @issue-ocis-reva-265 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: upload a file and check download content
     Given using <dav_version> DAV path
@@ -19,7 +19,7 @@ Feature: upload file
       | old         | "file ?2.txt"       |
       | new         | "file ?2.txt"       |
 
-  @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-product-127
+  @skipOnOcis-OC-Storage @issue-product-127 @skipOnOcis-OCIS-Storage
   # this scenario passes/fails intermittently on OC storage, so do not run it in CI
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: uploading a file inside a folder changes its etag
