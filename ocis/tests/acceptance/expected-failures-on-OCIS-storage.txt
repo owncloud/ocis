@@ -974,11 +974,6 @@ apiTrashbin/trashbinFilesFolders.feature:45
 apiTrashbin/trashbinFilesFolders.feature:60
 apiTrashbin/trashbinFilesFolders.feature:61
 #
-# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
-#
-apiTrashbin/trashbinFilesFolders.feature:105
-apiTrashbin/trashbinFilesFolders.feature:106
-#
 # https://github.com/owncloud/product/issues/273 invalid webdav responses for unauthorized requests.
 #
 apiTrashbin/trashbinFilesFolders.feature:154
