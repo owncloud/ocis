@@ -52,10 +52,6 @@ func (s Service) deflateMembers(g *proto.Group) {
 // ListGroups implements the GroupsServiceHandler interface
 func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
 	var searchResults []string
-	if err != nil {
-		s.log.Error().Err(err).Msg("could not execute bleve search")
-		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
-	}
 
 	out.Groups = make([]*proto.Group, 0)
 	if in.Query == "" {
@@ -68,7 +64,6 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 		if len(match) == 2 {
 			searchResults = []string{match[1]}
 		}
-
 	*/
 
 	for _, hit := range searchResults {

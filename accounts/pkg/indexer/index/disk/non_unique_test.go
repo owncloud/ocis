@@ -52,9 +52,10 @@ func TestNonUniqueIndexDelete(t *testing.T) {
 	sut, dataPath := getNonUniqueIdxSut(t, Pet{}, "Color")
 	assert.FileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(Pet{}))))
 
-	err := sut.Remove("goefe-789", "")
+	err := sut.Remove("goefe-789", "Green")
 	assert.NoError(t, err)
 	assert.NoFileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/goefe-789", GetTypeFQN(Pet{}))))
+	assert.FileExists(t, path.Join(dataPath, fmt.Sprintf("index.disk/non_unique.%v.Color/Green/xadaf-189", GetTypeFQN(Pet{}))))
 
 	_ = os.RemoveAll(dataPath)
 }
