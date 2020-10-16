@@ -15,9 +15,9 @@ Feature: upload file
     When user "Alice" uploads file with content "uploaded content" to <file_name> using the WebDAV API
     Then the content of file <file_name> for user "Alice" should be ""
     Examples:
-      | dav_version | file_name           |
-      | old         | "file ?2.txt"       |
-      | new         | "file ?2.txt"       |
+      | dav_version | file_name     |
+      | old         | "file ?2.txt" |
+      | new         | "file ?2.txt" |
 
   @skipOnOcis-OC-Storage @issue-product-127 @skipOnOcis-OCIS-Storage
   # this scenario passes/fails intermittently on OC storage, so do not run it in CI

@@ -59,18 +59,18 @@ Feature: sharing
     When user "Brian" moves folder "/Alice-folder/folder2" to "/Carol-folder/folder2" using the WebDAV API
     And user "Carol" gets the info of the last share using the sharing API
     Then the fields of the last response to user "Carol" sharing with user "Brian" should include
-      | id                | A_STRING             |
-      | item_type         | folder               |
-      | item_source       | A_STRING             |
-      | share_type        | user                 |
-      | file_source       | A_STRING             |
-      | file_target       | /Carol-folder        |
-      | permissions       | all                  |
-      | stime             | A_NUMBER             |
-      | storage           | A_STRING             |
-      | mail_send         | 0                    |
-      | uid_owner         | %username%           |
-      | mimetype          | httpd/unix-directory |
+      | id          | A_STRING             |
+      | item_type   | folder               |
+      | item_source | A_STRING             |
+      | share_type  | user                 |
+      | file_source | A_STRING             |
+      | file_target | /Carol-folder        |
+      | permissions | all                  |
+      | stime       | A_NUMBER             |
+      | storage     | A_STRING             |
+      | mail_send   | 0                    |
+      | uid_owner   | %username%           |
+      | mimetype    | httpd/unix-directory |
     And as "Alice" folder "/Alice-folder/folder2" should exist
     And as "Carol" folder "/Carol-folder/folder2" should not exist
 

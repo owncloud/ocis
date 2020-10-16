@@ -22,37 +22,37 @@ Feature: auth
 
   Scenario: send DELETE requests to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "DELETE" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v1.php/cloud/users/%username%                              |
-      | /ocs/v1.php/cloud/users/%username%/subadmins                    |
+      | endpoint                                     |
+      | /ocs/v1.php/cloud/users/%username%           |
+      | /ocs/v1.php/cloud/users/%username%/subadmins |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "998"
 
   Scenario: send DELETE requests to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "DELETE" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users/%username%                              |
+      | endpoint                           |
+      | /ocs/v2.php/cloud/users/%username% |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"
 
   Scenario: send DELETE requests to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "DELETE" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v1.php/cloud/users/%username%/groups                       |
+      | endpoint                                  |
+      | /ocs/v1.php/cloud/users/%username%/groups |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "996"
 
   Scenario: send DELETE requests to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "DELETE" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users/%username%/groups                       |
+      | endpoint                                  |
+      | /ocs/v2.php/cloud/users/%username%/groups |
     Then the HTTP status code of responses on all endpoints should be "500"
     And the OCS status code of responses on all endpoints should be "996"
 
   Scenario: send DELETE requests to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "DELETE" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users/%username%                              |
-      | /ocs/v2.php/cloud/users/%username%/subadmins                    |
+      | endpoint                                     |
+      | /ocs/v2.php/cloud/users/%username%           |
+      | /ocs/v2.php/cloud/users/%username%/subadmins |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"

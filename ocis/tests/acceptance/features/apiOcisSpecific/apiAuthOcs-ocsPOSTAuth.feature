@@ -31,13 +31,13 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send POST requests to OCS endpoints as normal user with wrong password
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v1.php/cloud/users                                         |
+      | endpoint                |
+      | /ocs/v1.php/cloud/users |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "400"
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users                                         |
+      | endpoint                |
+      | /ocs/v2.php/cloud/users |
     Then the HTTP status code of responses on all endpoints should be "400"
     And the OCS status code of responses on all endpoints should be "400"
 
@@ -45,13 +45,13 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send POST requests to OCS endpoints as normal user with wrong password
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v1.php/cloud/users/%username%/groups                       |
+      | endpoint                                  |
+      | /ocs/v1.php/cloud/users/%username%/groups |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "400"
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users/%username%/groups                       |
+      | endpoint                                  |
+      | /ocs/v2.php/cloud/users/%username%/groups |
     Then the HTTP status code of responses on all endpoints should be "400"
     And the OCS status code of responses on all endpoints should be "400"
 
@@ -59,12 +59,12 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send POST requests to OCS endpoints as normal user with wrong password
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v1.php/cloud/users/%username%/subadmins                    |
+      | endpoint                                     |
+      | /ocs/v1.php/cloud/users/%username%/subadmins |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "998"
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                                        |
-      | /ocs/v2.php/cloud/users/%username%/subadmins                    |
+      | endpoint                                     |
+      | /ocs/v2.php/cloud/users/%username%/subadmins |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"
