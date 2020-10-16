@@ -113,6 +113,9 @@ func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 
 // Remove a value v from an index.
 func (idx NonUniqueIndex) Remove(id string, v string) error {
+	if v == "" {
+		return nil
+	}
 	res, err := filepath.Glob(path.Join(idx.indexRootDir, "/*/", id))
 	if err != nil {
 		return err

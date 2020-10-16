@@ -155,6 +155,9 @@ func (idx *Unique) Add(id, v string) (string, error) {
 
 // Remove a value v from an index.
 func (idx *Unique) Remove(id string, v string) error {
+	if v == "" {
+		return nil
+	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	_, err := idx.resolveSymlink(searchPath)
 	if err != nil {

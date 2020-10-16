@@ -169,6 +169,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 
 // Remove a value v from an index.
 func (idx *NonUnique) Remove(id string, v string) error {
+	if v == "" {
+		return nil
+	}
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return err
