@@ -33,6 +33,43 @@ var newCreatedGroups = []string{}
 
 var mockedRoleAssignment = map[string]string{}
 
+var (
+	user1 = proto.Account{
+		Id:                       "f9149a32-2b8e-4f04-9e8d-937d81712b9a",
+		AccountEnabled:           true,
+		IsResourceAccount:        true,
+		CreationType:             "",
+		DisplayName:              "User One",
+		PreferredName:            "user1",
+		OnPremisesSamAccountName: "user1",
+		UidNumber:                20009,
+		GidNumber:                30000,
+		Mail:                     "user1@example.com",
+		Identities:               []*proto.Identities{nil},
+		PasswordProfile:          &proto.PasswordProfile{Password: "heysdjfsdlk"},
+		MemberOf: []*proto.Group{
+			{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+		},
+	}
+	user2 = proto.Account{
+		Id:                       "e9149a32-2b8e-4f04-9e8d-937d81712b9a",
+		AccountEnabled:           true,
+		IsResourceAccount:        true,
+		CreationType:             "",
+		DisplayName:              "User Two",
+		PreferredName:            "user2",
+		OnPremisesSamAccountName: "user2",
+		UidNumber:                20010,
+		GidNumber:                30000,
+		Mail:                     "user2@example.com",
+		Identities:               []*proto.Identities{nil},
+		PasswordProfile:          &proto.PasswordProfile{Password: "hello123"},
+		MemberOf: []*proto.Group{
+			{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+		},
+	}
+)
+
 func init() {
 	service = grpc.NewService(
 		grpc.Namespace("com.owncloud.api"),
@@ -68,41 +105,9 @@ func init() {
 func getAccount(user string) *proto.Account {
 	switch user {
 	case "user1":
-		return &proto.Account{
-			Id:                       "f9149a32-2b8e-4f04-9e8d-937d81712b9a",
-			AccountEnabled:           true,
-			IsResourceAccount:        true,
-			CreationType:             "",
-			DisplayName:              "User One",
-			PreferredName:            user,
-			OnPremisesSamAccountName: user,
-			UidNumber:                20009,
-			GidNumber:                30000,
-			Mail:                     fmt.Sprintf("%s@example.com", user),
-			Identities:               []*proto.Identities{nil},
-			PasswordProfile:          &proto.PasswordProfile{Password: "heysdjfsdlk"},
-			MemberOf: []*proto.Group{
-				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
-			},
-		}
+		return &user1
 	case "user2":
-		return &proto.Account{
-			Id:                       "e9149a32-2b8e-4f04-9e8d-937d81712b9a",
-			AccountEnabled:           true,
-			IsResourceAccount:        true,
-			CreationType:             "",
-			DisplayName:              "User Two",
-			PreferredName:            user,
-			OnPremisesSamAccountName: user,
-			UidNumber:                20010,
-			GidNumber:                30000,
-			Mail:                     fmt.Sprintf("%s@example.com", user),
-			Identities:               []*proto.Identities{nil},
-			PasswordProfile:          &proto.PasswordProfile{Password: "hello123"},
-			MemberOf: []*proto.Group{
-				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
-			},
-		}
+		return &user2
 	default:
 		return &proto.Account{
 			Id:                fmt.Sprintf("new-id-%s", user),
@@ -563,6 +568,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"CreationType",
 			},
 			&proto.Account{
+				Id:           user1.Id,
 				CreationType: "Type Test",
 			},
 		},
@@ -572,6 +578,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"PasswordProfile",
 			},
 			&proto.Account{
+				Id:              user1.Id,
 				PasswordProfile: &proto.PasswordProfile{Password: "new password"},
 			},
 		},
@@ -581,6 +588,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"MemberOf",
 			},
 			&proto.Account{
+				Id: user1.Id,
 				MemberOf: []*proto.Group{
 					{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"},
 				},
@@ -589,7 +597,6 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
 			res, err := updateAccount(t, tt.userAccount, tt.updateMask)
 			if err == nil {
 				t.Fatalf("Expected error while updating non updatable field, but found none.")
@@ -640,13 +647,102 @@ func TestListWithoutUserCreation(t *testing.T) {
 	cleanUp(t)
 }
 
+func TestListAccountsWithFilterQuery(t *testing.T) {
+	scenarios := []struct {
+		name        string
+		query       string
+		expectedIDs []string
+	}{
+		{
+			name:        "ListAccounts with exact match on preferred_name",
+			query:       "preferred_name eq 'user1'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on on_premises_sam_account_name",
+			query:       "on_premises_sam_account_name eq 'user1'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on mail",
+			query:       "mail eq 'user1@example.org'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on id",
+			query:       "id eq 'f9149a32-2b8e-4f04-9e8d-937d81712b9a'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts without match on preferred_name",
+			query:       "preferred_name eq 'wololo'",
+			expectedIDs: []string{},
+		},
+		{
+			name:        "ListAccounts with exact match on preferred_name AND mail",
+			query:       "preferred_name eq 'user1' and mail eq 'user1@example.org'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts without match on preferred_name AND mail",
+			query:       "preferred_name eq 'user1' and mail eq 'wololo@example.org'",
+			expectedIDs: []string{},
+		},
+		{
+			name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail exists",
+			query:       "preferred_name eq 'user1' or mail eq 'user1@example.org'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail does not exist",
+			query:       "preferred_name eq 'user1' or mail eq 'wololo@example.org'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name does not exists, mail exists",
+			query:       "preferred_name eq 'wololo' or mail eq 'user1@example.org'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts without match on preferred_name OR mail, preferred_name and mail do not exist",
+			query:       "preferred_name eq 'wololo' or mail eq 'wololo@example.org'",
+			expectedIDs: []string{},
+		},
+		{
+			name:        "ListAccounts with multiple matches on preferred_name",
+			query:       "startswith(preferred_name,'user*')",
+			expectedIDs: []string{user1.Id, user2.Id},
+		},
+	}
+
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", service.Client())
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			_, err := createAccount(t, "user1")
+			assert.NoError(t, err)
+			_, err = createAccount(t, "user2")
+			assert.NoError(t, err)
+
+			req := &proto.ListAccountsRequest{Query: scenario.query}
+			res, err := cl.ListAccounts(context.Background(), req)
+			assert.NoError(t, err)
+			ids := make([]string, 0)
+			for _, acc := range res.Accounts {
+				ids = append(ids, acc.Id)
+			}
+			assert.Equal(t, scenario.expectedIDs, ids)
+			cleanUp(t)
+		})
+	}
+}
+
 func TestGetAccount(t *testing.T) {
 	createAccount(t, "user1")
 
 	req := &proto.GetAccountRequest{Id: getAccount("user1").Id}
 
-	client := service.Client()
-	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
 	resp, err := cl.GetAccount(context.Background(), req)
 
