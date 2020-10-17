@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"path"
 	"regexp"
 	"strconv"
@@ -54,17 +55,6 @@ func (s Service) expandMemberOf(a *proto.Account) {
 		}
 	}
 	a.MemberOf = expanded
-}
-
-func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
-	defer func() {
-		if r := recover(); r != nil {
-			s.log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
-		}
-	}()
-
-	c := crypt.NewFromHash(hash)
-	return c.Verify(hash, []byte(pwd)) == nil
 }
 
 func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
@@ -119,25 +109,34 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	accLock.Lock()
 	defer accLock.Unlock()
-	var password string
 	var searchResults []string
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
 
-	// check if this looks like an auth request
-	match := authQuery.FindStringSubmatch(in.Query)
-	if len(match) == 3 {
-		in.Query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", match[1]) // todo fetch email? make query configurable
-		password = match[2]
-		if password == "" {
-			return merrors.Unauthorized(s.id, "password must not be empty")
+	match, authRequest := getAuthQueryMatch(in.Query)
+	if authRequest {
+		password := match[2]
+		if len(password) == 0 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
 
-		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
-		if err != nil {
-			return err
+		ids, err := s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+		if err != nil || len(ids) != 1 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
+
+		a := &proto.Account{}
+		err = s.repo.LoadAccount(ctx, ids[0], a)
+		if err != nil || a.PasswordProfile == nil || len(a.PasswordProfile.Password) == 0 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+		}
+		if !isPasswordValid(s.log, a.PasswordProfile.Password, password) {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+		}
+		a.PasswordProfile.Password = ""
+		out.Accounts = []*proto.Account{a}
+		return nil
 	}
 
 	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
@@ -199,22 +198,8 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			s.log.Error().Err(err).Str("account", hit).Msg("could not load account, skipping")
 			continue
 		}
-		var currentHash string
-		if a.PasswordProfile != nil {
-			currentHash = a.PasswordProfile.Password
-		}
 
 		s.debugLogAccount(a).Msg("found account")
-
-		if password != "" {
-			if a.PasswordProfile == nil {
-				s.debugLogAccount(a).Msg("no password profile")
-				return merrors.Unauthorized(s.id, "invalid password")
-			}
-			if !s.passwordIsValid(currentHash, password) {
-				return merrors.Unauthorized(s.id, "invalid password")
-			}
-		}
 
 		// TODO add groups if requested
 		// if in.FieldMask ...
@@ -761,4 +746,20 @@ func (s Service) accountExists(ctx context.Context, username, mail, id string) (
 		return true, err
 	}
 	return false, nil
+}
+
+func getAuthQueryMatch(query string) (match []string, authRequest bool) {
+	match = authQuery.FindStringSubmatch(query)
+	return match, len(match) == 3
+}
+
+func isPasswordValid(logger log.Logger, hash string, pwd string) (ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
+		}
+	}()
+
+	c := crypt.NewFromHash(hash)
+	return c.Verify(hash, []byte(pwd)) == nil
 }
