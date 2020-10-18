@@ -29,8 +29,8 @@ const styles = theme => ({
   },
   wrapper: {
     position: 'relative',
-    display: 'inline-block',
-    width: '100%'
+    width: '100%',
+    textAlign: 'center'
   },
   message: {
     marginTop: 5,
@@ -65,37 +65,35 @@ class Login extends React.PureComponent {
 
     return (
       <form action="" onSubmit={(event) => this.logon(event)}>
-        <div>
-          <TextInput
-            autoFocus
-            autoCapitalize="off"
-            spellCheck="false"
-            value={username}
-            onChange={this.handleChange('username')}
-            autoComplete="kopano-account username"
-            placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Username" })}
-          />
-          <TextInput
-            type="password"
-            margin="normal"
-            onChange={this.handleChange('password')}
-            autoComplete="kopano-account current-password"
-            placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Password" })}
-          />
-          {hasError && <Typography variant="subtitle2" color="error" className={classes.message}>{errorMessage}</Typography>}
-          <div className={classes.wrapper}>
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              className="oc-button-primary oc-w-100 oc-mt-m"
-              disabled={!!loading}
-              onClick={(event) => this.logon(event)}
-            >
-              <FormattedMessage id="konnect.login.nextButton.label" defaultMessage="Log in"></FormattedMessage>
-            </Button>
-            {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-          </div>
+        <TextInput
+          autoFocus
+          autoCapitalize="off"
+          spellCheck="false"
+          value={username}
+          onChange={this.handleChange('username')}
+          autoComplete="kopano-account username"
+          placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Username" })}
+        />
+        <TextInput
+          type="password"
+          margin="normal"
+          onChange={this.handleChange('password')}
+          autoComplete="kopano-account current-password"
+          placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Password" })}
+        />
+        {hasError && <Typography variant="subtitle2" color="error" className={classes.message}>{errorMessage}</Typography>}
+        <div className={classes.wrapper}>
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            className="oc-button-primary oc-mt-l"
+            disabled={!!loading}
+            onClick={(event) => this.logon(event)}
+          >
+            <FormattedMessage id="konnect.login.nextButton.label" defaultMessage="Log in"></FormattedMessage>
+          </Button>
+          {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
         </div>
       </form>
     );

@@ -23,7 +23,7 @@ strong {
 
 .oc-logo {
   position: absolute;
-  top: -110px;
+  top: -130px;
   left: 50%;
   height: 80px;
   transform: translateX(-50%);
@@ -31,14 +31,13 @@ strong {
 
 .oc-input {
   background-color: #042047;
-  border: 1px solid rgba(78,133,200,.8);
+  border: 1px solid rgba(78, 133, 200, 0.8);
   border-radius: 3px;
-  color: rgba(255,255,255,.8);
+  color: rgba(255, 255, 255, 0.8);
   width: 300px;
-  height: 40px;
   padding: 16px;
   box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 0.8125rem;
 }
 
 .oc-input:focus {
@@ -46,11 +45,16 @@ strong {
 }
 
 .oc-input::placeholder {
-  color: rgba(78,133,200,.8);
+  color: rgba(78, 133, 200, 0.8);
 }
 
 .oc-input + .oc-input {
-  margin-top: 10px;
+  margin-top: 15px;
+}
+
+.oc-button {
+  /* Needs to be important to overwrite material-ui */
+  font-size: 1.0625rem !important;
 }
 
 .oc-button-primary {
@@ -73,16 +77,11 @@ strong {
 @media only screen and (max-width: 768px) {
   .oc-logo {
     height: 60px;
-    top: -80px;
+    top: -90px;
   }
 }
 
 /* Helpers */
-
-.oc-w-100 {
-  width: 100% !important;
-}
-
-.oc-mt-m {
-  margin-top: 20px !important;
+.oc-mt-l {
+  margin-top: 30px !important;
 }
