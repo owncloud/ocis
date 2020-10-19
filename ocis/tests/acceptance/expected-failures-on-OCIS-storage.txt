@@ -1516,6 +1516,8 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:20
 apiWebdavEtagPropagation1/moveFileFolder.feature:21
+apiWebdavEtagPropagation1/moveFileFolder.feature:58
+apiWebdavEtagPropagation1/moveFileFolder.feature:59
 apiWebdavEtagPropagation1/moveFileFolder.feature:74
 apiWebdavEtagPropagation1/moveFileFolder.feature:75
 apiWebdavEtagPropagation1/moveFileFolder.feature:93
