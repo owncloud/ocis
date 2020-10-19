@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/owncloud/ocis/ocis-pkg/log"
 	"path"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/log"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -179,20 +180,9 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		}
 	}
 
-	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
-	match := onPremQuery.FindStringSubmatch(query)
-	if len(match) == 2 {
-		return s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
-	}
-
-	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
-	match = mailQuery.FindStringSubmatch(query)
-	if len(match) == 2 {
-		return s.index.FindBy(&proto.Account{}, "Mail", match[1])
-	}
-
+	// TODO: more explicit queries have to be on top
 	var onPremOrMailQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)' or mail eq '(.*)'$`)
-	match = onPremOrMailQuery.FindStringSubmatch(query)
+	match := onPremOrMailQuery.FindStringSubmatch(query)
 	if len(match) == 3 {
 		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
 		if err != nil {
@@ -249,6 +239,18 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		}
 
 		return unique(searchResults), nil
+	}
+
+	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
+	match = onPremQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+	}
+
+	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
+	match = mailQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "Mail", match[1])
 	}
 
 	return nil, merrors.BadRequest(s.id, "unsupported query %s", query)
@@ -473,8 +475,10 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		}
 	}
 	if _, exists := validMask.Filter("Mail"); exists {
-		if err = validateAccountEmail(s.id, *in.Account); err != nil {
-			return err
+		if in.Account.Mail != "" {
+			if err = validateAccountEmail(s.id, *in.Account); err != nil {
+				return err
+			}
 		}
 	}
 
