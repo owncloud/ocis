@@ -174,10 +174,7 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 	var err error
 
 	if query == "" {
-		searchResults, err = s.index.FindByPartial(&proto.Account{}, "Mail", "*")
-		if err != nil {
-			return nil, err
-		}
+		return s.index.FindByPartial(&proto.Account{}, "Mail", "*")
 	}
 
 	// TODO: more explicit queries have to be on top
