@@ -18,6 +18,7 @@
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
@@ -209,6 +210,15 @@
    https://github.com/owncloud/ocis/pull/651
    https://github.com/owncloud/phoenix/releases/tag/v0.18.0
    https://github.com/owncloud/owncloud-design-system/releases/tag/v1.12.1
+
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
+
+   Tags: web
+
+   We changed the default apps for ownCloud Web to be only files and media-viewer.
+   Markdown-editor and draw-io have been removed as defaults.
+
+   https://github.com/owncloud/ocis/pull/688
 
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 
