@@ -305,7 +305,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if acc.Id == "" {
 		acc.Id = uuid.Must(uuid.NewV4()).String()
 	}
-	if err = validateAccount(s.id, *acc); err != nil {
+	if err = validateAccount(s.id, acc); err != nil {
 		return err
 	}
 
@@ -613,14 +613,14 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	return
 }
 
-func validateAccount(serviceID string, a proto.Account) error {
-	if err := validateAccountPreferredName(serviceID, a); err != nil {
+func validateAccount(serviceID string, a *proto.Account) error {
+	if err := validateAccountPreferredName(serviceID, *a); err != nil {
 		return err
 	}
-	if err := validateAccountOnPremisesSamAccountName(serviceID, a); err != nil {
+	if err := validateAccountOnPremisesSamAccountName(serviceID, *a); err != nil {
 		return err
 	}
-	if err := validateAccountEmail(serviceID, a); err != nil {
+	if err := validateAccountEmail(serviceID, *a); err != nil {
 		return err
 	}
 	return nil
