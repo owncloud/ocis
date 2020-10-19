@@ -191,11 +191,7 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 				}
 
-				as, gs, err := getAccountsServices()
-				if err != nil {
-					return err
-				}
-
+				as, gs := getAccountsServices()
 				server, err := glauth.Server(
 					glauth.AccountsService(as),
 					glauth.GroupsService(gs),
@@ -311,8 +307,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 // getAccountsServices returns an ocis-accounts service
-func getAccountsServices() (accounts.AccountsService, accounts.GroupsService, error) {
+func getAccountsServices() (accounts.AccountsService, accounts.GroupsService) {
 	return accounts.NewAccountsService("com.owncloud.api.accounts", client.DefaultClient),
-		accounts.NewGroupsService("com.owncloud.api.accounts", client.DefaultClient),
-		nil
+		accounts.NewGroupsService("com.owncloud.api.accounts", client.DefaultClient)
 }
