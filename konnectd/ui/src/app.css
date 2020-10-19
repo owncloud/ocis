@@ -31,7 +31,7 @@ strong {
 
 .oc-progress {
   /* Needs to be important to overwrite material-ui */
-  background-color: rgba(78,133,200,.8) !important;
+  background-color: rgba(78, 133, 200, 0.8) !important;
   height: 4px;
   width: 100px;
 }
@@ -100,5 +100,5 @@ strong {
 }
 
 .oc-light {
-  color: #ffffff !important;
+  color: #fff !important;
 }
