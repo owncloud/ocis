@@ -46,10 +46,11 @@ strong {
   border: 1px solid rgba(78, 133, 200, 0.8);
   border-radius: 3px;
   color: rgba(255, 255, 255, 0.8);
+  height: 40px;
   width: 300px;
   padding: 16px;
   box-sizing: border-box;
-  font-size: 0.8125rem;
+  font-size: 1rem;
 }
 
 .oc-input:focus {
