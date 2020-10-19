@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -71,6 +72,15 @@
    accordingly.
 
    https://github.com/owncloud/ocis/pull/625
+
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+
+   Tags: glauth
+
+   We found a file descriptor leak in the glauth connections to the accounts service. Fixed it by
+   using the micro default client.
+
+   https://github.com/owncloud/ocis/pull/718
 
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 
