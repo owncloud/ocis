@@ -13,14 +13,13 @@ import renderIf from 'render-if';
 import { retryHello } from '../actions/common';
 import { ErrorMessage } from '../errors';
 
-function retry(event, dispatch) {
-  event.preventDefault();
-
-  dispatch(retryHello());
-}
-
 function Loading(props) {
   const { error } = props;
+
+  const retry = (event) => {
+    event.preventDefault();
+    dispatch(retryHello());
+  }
 
   return (
     <Grid item align="center">
@@ -40,7 +39,7 @@ function Loading(props) {
             color="primary"
             variant="contained"
             className="oc-button-primary oc-mt-l"
-            onClick={(event) => retry(event, props.dispatch)}
+            onClick={(event) => retry(event)}
           >
             <FormattedMessage id="konnect.login.retryButton.label" defaultMessage="Retry" />
           </Button>

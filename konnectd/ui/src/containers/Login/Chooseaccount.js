@@ -32,20 +32,6 @@ const styles = theme => ({
   }
 });
 
-function logon(event, { hello, dispatch, history }) {
-  event.preventDefault();
-  dispatch(executeLogonIfFormValid(hello.username, '', true)).then((response) => {
-    if (response.success) {
-      dispatch(advanceLogonFlow(response.success, history));
-    }
-  });
-}
-
-function logoff(event, history) {
-  event.preventDefault();
-  history.push(`/identifier${history.location.search}${history.location.hash}`);
-}
-
 function Chooseaccount(props) {
   const { loading, errors, classes, hello, history } = props;
 
@@ -69,6 +55,20 @@ function Chooseaccount(props) {
     username = hello.username;
   }
 
+  const logon = (event) => {
+    event.preventDefault();
+    dispatch(executeLogonIfFormValid(hello.username, '', true)).then((response) => {
+      if (response.success) {
+        dispatch(advanceLogonFlow(response.success, history));
+      }
+    });
+  }
+
+  const logoff = (event) => {
+    event.preventDefault();
+    history.push(`/identifier${history.location.search}${history.location.hash}`);
+  }
+
   return (
     <div>
       <Typography variant="h5" component="h3">
@@ -79,14 +79,14 @@ function Chooseaccount(props) {
         </FormattedMessage>
       </Typography>
 
-      <form action="" onSubmit={(event) => logon(event, props)}>
+      <form action="" onSubmit={(event) => logon(event)}>
         <List disablePadding className={classes.accountList}>
           <ListItem
             button
             disableGutters
             className={classes.accountListItem}
             disabled={!!loading}
-            onClick={(event) => logon(event, props)}
+            onClick={(event) => logon(event)}
           ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
             <ListItemText primary={username} />
           </ListItem>
@@ -95,7 +95,7 @@ function Chooseaccount(props) {
             disableGutters
             className={classes.accountListItem}
             disabled={!!loading}
-            onClick={(event) => logoff(event, history)}
+            onClick={(event) => logoff(event)}
           >
             <ListItemAvatar>
               <Avatar>
