@@ -336,8 +336,11 @@ func (idx *NonUnique) createSymlink(oldname, newname string) error {
 		return os.ErrExist
 	}
 
-	_, err = idx.dataProvider.put(newname, strings.NewReader(oldname), t)
+	resp, err := idx.dataProvider.put(newname, strings.NewReader(oldname), t)
 	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
 		return err
 	}
 
@@ -367,7 +370,9 @@ func (idx *NonUnique) resolveSymlink(name string) (string, error) {
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
-
+	}
+	if err = resp.Body.Close(); err != nil {
+		return "", err
 	}
 	return string(b), err
 }

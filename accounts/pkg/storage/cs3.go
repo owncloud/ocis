@@ -73,8 +73,14 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	_, err = r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
-	return err
+	resp, err := r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // LoadAccount loads an account via cs3 by id and writes it to the provided account
@@ -147,8 +153,14 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	_, err = r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
-	return err
+	resp, err := r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // LoadGroup loads a group via cs3 by id and writes it to the provided group
