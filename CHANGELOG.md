@@ -22,6 +22,7 @@
 * Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -248,6 +249,14 @@
 
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
+
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
+
+   Tags: konnectd
+
+   We've styled our konnectd login page to reflect ownCloud theme.
+
+   https://github.com/owncloud/ocis/pull/698
 
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 
