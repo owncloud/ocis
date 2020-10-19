@@ -15,12 +15,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '0d2e3d07f52b10245521e1c29c8c7faeb6387b23',
+    'coreCommit': '1df47648f944ab21521f6c8d538dc183e1e8f1ea',
     'numberOfParts': 6
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '1e278d85962cdd172886aeb222532f72c3972774',
+    'phoenixCommit': '693fa6d275243fc860b4b82e5146d25f62d927fb',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -342,7 +342,8 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
+          'STORAGE_DRIVER': '%s' % ('OWNCLOUD' if storage == 'owncloud' else 'OCIS'),
           'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
@@ -396,7 +397,8 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
+          'STORAGE_DRIVER': '%s' % ('OWNCLOUD' if storage == 'owncloud' else 'OCIS'),
           'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
@@ -565,8 +567,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
           'PHOENIX_WEB_CONFIG': '/drone/src/accounts/ui/tests/config/drone/ocis-config.json',
           'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/accounts/ui/tests/config/drone/identifier-registration.yml',
           'KONNECTD_ISS': 'https://ocis-server:9200',
-          #'STORAGE_STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/storage/users',
-          #'ACCOUNTS_STORAGE_DISK_PATH': '/srv/app/tmp/ocis-accounts', # Temporary workaround, don't use metadata storage
+          'ACCOUNTS_STORAGE_DISK_PATH': '/srv/app/tmp/ocis-accounts', # Temporary workaround, don't use metadata storage
         },
         'commands': [
           'mkdir -p /srv/app/tmp/reva',
@@ -788,7 +789,6 @@ def dockerEos(ctx):
             },
             'auto_tag': True,
             'context': 'ocis/docker/eos-ocis',
-            'auto_tag_suffix': 'linux-amd64',
             'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
             'repo': 'owncloud/eos-ocis',
           },
@@ -1427,7 +1427,7 @@ def ocisServer(storage):
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
-        #'ACCOUNTS_DATA_PATH': '/srv/app/tmp/ocis-accounts/',
+        'ACCOUNTS_DATA_PATH': '/srv/app/tmp/ocis-accounts/',
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types

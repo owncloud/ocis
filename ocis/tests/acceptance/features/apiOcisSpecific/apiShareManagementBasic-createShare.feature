@@ -53,8 +53,8 @@ Feature: sharing
     And as "Brian" file "randomfile.txt" should not exist
     Examples:
       | ocs_api_version | http_status_code_ocs | http_status_code_eos |
-      | 1               | 200                | 500                |
-      | 2               | 200                | 500                |
+      | 1               | 200                  | 500                  |
+      | 2               | 200                  | 500                  |
 
   @skipOnOcis-OC-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-301 @issue-ocis-reva-302
   # after fixing all issues delete this Scenario and use the one from oC10 core
@@ -66,16 +66,16 @@ Feature: sharing
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" sharing with user "Brian" should include
-      | share_with             | %username%           |
-      | file_target            | /FOLDER              |
-      | path                   | /FOLDER              |
-      | permissions            | all                  |
-      | uid_owner              | %username%           |
-      | displayname_owner      |                      |
-      | item_type              | folder               |
-      | mimetype               | httpd/unix-directory |
-      | storage_id             | ANY_VALUE            |
-      | share_type             | user                 |
+      | share_with        | %username%           |
+      | file_target       | /FOLDER              |
+      | path              | /FOLDER              |
+      | permissions       | all                  |
+      | uid_owner         | %username%           |
+      | displayname_owner |                      |
+      | item_type         | folder               |
+      | mimetype          | httpd/unix-directory |
+      | storage_id        | ANY_VALUE            |
+      | share_type        | user                 |
     And the fields of the last response should not include
       | share_with_displayname | %displayname% |
     Examples:
