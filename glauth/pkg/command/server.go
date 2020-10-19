@@ -17,7 +17,6 @@ import (
 	glauthcfg "github.com/glauth/glauth/pkg/config"
 
 	"github.com/micro/cli/v2"
-	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
@@ -313,18 +312,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 // getAccountsServices returns an ocis-accounts service
 func getAccountsServices() (accounts.AccountsService, accounts.GroupsService, error) {
-	service := micro.NewService()
-
-	// parse command line flags
-	service.Init()
-
-	err := service.Client().Init(
-		client.ContentType("application/json"),
-	)
-	if err != nil {
-		return nil, nil, err
-	}
-	return accounts.NewAccountsService("com.owncloud.api.accounts", service.Client()),
-		accounts.NewGroupsService("com.owncloud.api.accounts", service.Client()),
+	return accounts.NewAccountsService("com.owncloud.api.accounts", client.DefaultClient),
+		accounts.NewGroupsService("com.owncloud.api.accounts", client.DefaultClient),
 		nil
 }
