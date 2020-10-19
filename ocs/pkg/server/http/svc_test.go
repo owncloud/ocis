@@ -1136,11 +1136,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			"email",
 			"",
-			&Meta{
-				Status:     "error",
-				StatusCode: 400,
-				Message:    "mail '' must be a valid email",
-			},
+			nil,
 		},
 		{
 			"username",
