@@ -32,46 +32,44 @@ const styles = theme => ({
   }
 });
 
-class Loading extends React.PureComponent {
-  render() {
-    const { classes, error } = this.props;
+function retry(event, dispatch) {
+  event.preventDefault();
 
-    return (
-      <Grid container direction="column" alignItems="center" justify="center" spacing={0} className={classes.root}>
-        <Grid item align="center">
-          {renderIf(error === null)(() => (
-            <LinearProgress className={classes.progress} />
-          ))}
-          {renderIf(error !== null)(() => (
-            <div>
-              <Typography variant="h5" gutterBottom align="center">
-                <FormattedMessage id="konnect.loading.error.headline" defaultMessage="Failed to connect to server">
-                </FormattedMessage>
-              </Typography>
-              <Typography  gutterBottom align="center" color="error">
-                <ErrorMessage error={error}></ErrorMessage>
-              </Typography>
-              <Button
-                autoFocus
-                color="primary"
-                variant="outlined"
-                className={classes.button}
-                onClick={(event) => this.retry(event)}
-              >
-                <FormattedMessage id="konnect.login.retryButton.label" defaultMessage="Retry"></FormattedMessage>
-              </Button>
-            </div>
-          ))}
-        </Grid>
+  dispatch(retryHello());
+}
+
+function Loading(props) {
+  const { classes, error } = props;
+
+  return (
+    <Grid container direction="column" alignItems="center" justify="center" spacing={0} className={classes.root}>
+      <Grid item align="center">
+        {renderIf(error === null)(() => (
+          <LinearProgress className={classes.progress} />
+        ))}
+        {renderIf(error !== null)(() => (
+          <div>
+            <Typography variant="h5" gutterBottom align="center">
+              <FormattedMessage id="konnect.loading.error.headline" defaultMessage="Failed to connect to server">
+              </FormattedMessage>
+            </Typography>
+            <Typography  gutterBottom align="center" color="error">
+              <ErrorMessage error={error}></ErrorMessage>
+            </Typography>
+            <Button
+              autoFocus
+              color="primary"
+              variant="outlined"
+              className={classes.button}
+              onClick={(event) => retry(event, props.dispatch)}
+            >
+              <FormattedMessage id="konnect.login.retryButton.label" defaultMessage="Retry"></FormattedMessage>
+            </Button>
+          </div>
+        ))}
       </Grid>
-    );
-  }
-
-  retry(event) {
-    event.preventDefault();
-
-    this.props.dispatch(retryHello());
-  }
+    </Grid>
+  );
 }
 
 Loading.propTypes = {
