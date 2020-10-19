@@ -139,6 +139,32 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		return nil
 	}
 
+	// FIXME: create a unique Index for IDs, so that we can search ids by partial
+	searchFields := map[string]string{
+		"id":                           "ID",
+		"on_premises_sam_account_name": "OnPremisesSamAccountName",
+		"preferred_name":               "PreferredName",
+		"display_name":                 "DisplayName",
+		"mail":                         "Mail",
+		"uid_number":                   "UidNumber",
+		"gid_number":                   "GidNumber",
+	}
+	// step1: replace fragments in query by $number, can be full matches or partial matches
+	// step2: find full and partial matches
+	// step3: combine matches by "or"s and "and"s from query
+
+	var queries map[string]string
+	for _, field := range searchFields {
+		regexpEq := field + " eq '(.*)'"
+		matchesEq := 
+
+		regexpStartsWith := "startswith(" + field + ",'(.*)')"
+
+
+	}
+
+
+
 	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
 	match = onPremQuery.FindStringSubmatch(in.Query)
 	if len(match) == 2 {
