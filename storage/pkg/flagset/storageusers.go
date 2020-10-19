@@ -82,7 +82,7 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "mount-id",
-			Value:       "1284d238-aa92-42ce-bdc4-0b0000009162", // /users
+			Value:       "1284d238-aa92-42ce-bdc4-0b0000009157", // /users
 			Usage:       "mount id",
 			EnvVars:     []string{"STORAGE_USERS_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageUsers.MountID,
