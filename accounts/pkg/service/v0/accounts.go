@@ -109,7 +109,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	accLock.Lock()
 	defer accLock.Unlock()
-	var searchResults []string
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
@@ -139,54 +138,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		return nil
 	}
 
-	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
-	match = onPremQuery.FindStringSubmatch(in.Query)
-	if len(match) == 2 {
-		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
-	}
-
-	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
-	match = mailQuery.FindStringSubmatch(in.Query)
-	if len(match) == 2 {
-		searchResults, err = s.index.FindBy(&proto.Account{}, "Mail", match[1])
-	}
-
-	// startswith(on_premises_sam_account_name,'mar') or startswith(display_name,'mar') or startswith(mail,'mar')
-	var searchQuery = regexp.MustCompile(`^startswith\(on_premises_sam_account_name,'(.*)'\) or startswith\(display_name,'(.*)'\) or startswith\(mail,'(.*)'\)$`)
-
-	match = searchQuery.FindStringSubmatch(in.Query)
-	if len(match) == 4 {
-		resSam, _ := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
-		resDisp, _ := s.index.FindByPartial(&proto.Account{}, "DisplayName", match[2]+"*")
-		resMail, _ := s.index.FindByPartial(&proto.Account{}, "Mail", match[3]+"*")
-
-		searchResults = append(resSam, append(resDisp, resMail...)...)
-		searchResults = unique(searchResults)
-
-	}
-
-	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
-	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
-	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
-	match = idOrQuery.FindStringSubmatch(in.Query)
-	if len(match) == 3 {
-		qID, qSam := match[1], match[2]
-		tmp := &proto.Account{}
-		_ = s.repo.LoadAccount(ctx, qID, tmp)
-		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
-
-		if tmp.Id != "" {
-			searchResults = append(searchResults, tmp.Id)
-		}
-
-		searchResults = unique(searchResults)
-
-	}
-
-	if in.Query == "" {
-		searchResults, _ = s.index.FindByPartial(&proto.Account{}, "Mail", "*")
-	}
-
+	searchResults, err := s.findAccountsByQuery(ctx, in.Query)
 	out.Accounts = make([]*proto.Account, 0, len(searchResults))
 
 	for _, hit := range searchResults {
@@ -214,6 +166,92 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	}
 
 	return
+}
+
+func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
+	var searchResults []string
+	var err error
+
+	if query == "" {
+		searchResults, err = s.index.FindByPartial(&proto.Account{}, "Mail", "*")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
+	match := onPremQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+	}
+
+	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
+	match = mailQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "Mail", match[1])
+	}
+
+	var onPremOrMailQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)' or mail eq '(.*)'$`)
+	match = onPremOrMailQuery.FindStringSubmatch(query)
+	if len(match) == 3 {
+		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[2]+"*")
+		if err != nil {
+			return nil, err
+		}
+
+		searchResults = append(resSam, resMail...)
+		return unique(searchResults), nil
+	}
+
+	// startswith(on_premises_sam_account_name,'mar') or startswith(display_name,'mar') or startswith(mail,'mar')
+	var searchQuery = regexp.MustCompile(`^startswith\(on_premises_sam_account_name,'(.*)'\) or startswith\(display_name,'(.*)'\) or startswith\(mail,'(.*)'\)$`)
+	match = searchQuery.FindStringSubmatch(query)
+	if len(match) == 4 {
+		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resDisp, err := s.index.FindByPartial(&proto.Account{}, "DisplayName", match[2]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[3]+"*")
+		if err != nil {
+			return nil, err
+		}
+
+		searchResults = append(resSam, append(resDisp, resMail...)...)
+		return unique(searchResults), nil
+	}
+
+	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
+	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
+	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
+	match = idOrQuery.FindStringSubmatch(query)
+	if len(match) == 3 {
+		qID, qSam := match[1], match[2]
+		tmp := &proto.Account{}
+		err = s.repo.LoadAccount(ctx, qID, tmp)
+		if err != nil {
+			return nil, err
+		}
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
+		if err != nil {
+			return nil, err
+		}
+
+		if tmp.Id != "" {
+			searchResults = append(searchResults, tmp.Id)
+		}
+
+		return unique(searchResults), nil
+	}
+
+	return nil, merrors.BadRequest(s.id, "unsupported query %s", query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface
