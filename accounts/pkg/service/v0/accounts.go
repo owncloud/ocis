@@ -122,8 +122,14 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		}
 
 		ids, err := s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
-		if err != nil || len(ids) != 1 {
+		if err != nil || len(ids) > 1 {
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+		}
+		if len(ids) == 0 {
+			ids, err = s.index.FindBy(&proto.Account{}, "Mail", match[1])
+			if err != nil || len(ids) != 1 {
+				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+			}
 		}
 
 		a := &proto.Account{}
