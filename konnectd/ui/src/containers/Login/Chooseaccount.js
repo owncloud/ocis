@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -32,97 +32,92 @@ const styles = theme => ({
   }
 });
 
-class Chooseaccount extends React.PureComponent {
-  componentDidMount() {
-    const { hello, history } = this.props;
+function logon(event, { hello, dispatch, history }) {
+  event.preventDefault();
+  dispatch(executeLogonIfFormValid(hello.username, '', true)).then((response) => {
+    if (response.success) {
+      dispatch(advanceLogonFlow(response.success, history));
+    }
+  });
+}
+
+function logoff(event, history) {
+  event.preventDefault();
+  history.push(`/identifier${history.location.search}${history.location.hash}`);
+}
+
+function Chooseaccount(props) {
+  const { loading, errors, classes, hello, history } = props;
+
+  useEffect(() => {
     if ((!hello || !hello.state) && history.action !== 'PUSH') {
       history.replace(`/identifier${history.location.search}${history.location.hash}`);
     }
+  });
+
+  let errorMessage = null;
+
+  if (errors.http) {
+    errorMessage = <Typography color="error" className={classes.message}>
+      <ErrorMessage error={errors.http}></ErrorMessage>
+    </Typography>;
   }
 
-  render() {
-    const { loading, errors, classes, hello } = this.props;
+  let username = '';
 
-    let errorMessage = null;
-    if (errors.http) {
-      errorMessage = <Typography color="error" className={classes.message}>
-        <ErrorMessage error={errors.http}></ErrorMessage>
-      </Typography>;
-    }
-
-    let username = '';
-    if (hello && hello.state) {
-      username = hello.username;
-    }
-
-    return (
-      <div>
-        <Typography variant="h5" component="h3">
-          <FormattedMessage id="konnect.chooseaccount.headline" defaultMessage="Choose an account"></FormattedMessage>
-        </Typography>
-        <Typography variant="subtitle1" className={classes.subHeader}>
-          <FormattedMessage id="konnect.chooseaccount.subHeader" defaultMessage="to sign in to Kopano">
-          </FormattedMessage>
-        </Typography>
-
-        <form action="" onSubmit={(event) => this.logon(event)}>
-          <List disablePadding className={classes.accountList}>
-            <ListItem
-              button
-              disableGutters
-              className={classes.accountListItem}
-              disabled={!!loading}
-              onClick={(event) => this.logon(event)}
-            ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
-              <ListItemText primary={username} />
-            </ListItem>
-            <ListItem
-              button
-              disableGutters
-              className={classes.accountListItem}
-              disabled={!!loading}
-              onClick={(event) => this.logoff(event)}
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  <FormattedMessage id="konnect.chooseaccount.useOther.persona.label" defaultMessage="?">
-                  </FormattedMessage>
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <FormattedMessage
-                    id="konnect.chooseaccount.useOther.label"
-                    defaultMessage="Use another account">
-                  </FormattedMessage>
-                }
-              />
-            </ListItem>
-          </List>
-
-          {errorMessage}
-        </form>
-      </div>
-    );
+  if (hello && hello.state) {
+    username = hello.username;
   }
 
-  logon(event) {
-    event.preventDefault();
+  return (
+    <div>
+      <Typography variant="h5" component="h3">
+        <FormattedMessage id="konnect.chooseaccount.headline" defaultMessage="Choose an account"></FormattedMessage>
+      </Typography>
+      <Typography variant="subtitle1" className={classes.subHeader}>
+        <FormattedMessage id="konnect.chooseaccount.subHeader" defaultMessage="to sign in to Kopano">
+        </FormattedMessage>
+      </Typography>
 
-    const { hello, dispatch, history } = this.props;
-    dispatch(executeLogonIfFormValid(hello.username, '', true)).then((response) => {
-      if (response.success) {
-        dispatch(advanceLogonFlow(response.success, history));
-      }
-    });
-  }
+      <form action="" onSubmit={(event) => logon(event, props)}>
+        <List disablePadding className={classes.accountList}>
+          <ListItem
+            button
+            disableGutters
+            className={classes.accountListItem}
+            disabled={!!loading}
+            onClick={(event) => logon(event, props)}
+          ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
+            <ListItemText primary={username} />
+          </ListItem>
+          <ListItem
+            button
+            disableGutters
+            className={classes.accountListItem}
+            disabled={!!loading}
+            onClick={(event) => logoff(event, history)}
+          >
+            <ListItemAvatar>
+              <Avatar>
+                <FormattedMessage id="konnect.chooseaccount.useOther.persona.label" defaultMessage="?">
+                </FormattedMessage>
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              primary={
+                <FormattedMessage
+                  id="konnect.chooseaccount.useOther.label"
+                  defaultMessage="Use another account">
+                </FormattedMessage>
+              }
+            />
+          </ListItem>
+        </List>
 
-  logoff(event) {
-    event.preventDefault();
-
-    const { history} = this.props;
-    history.push(`/identifier${history.location.search}${history.location.hash}`);
-  }
+        {errorMessage}
+      </form>
+    </div>
+  );
 }
 
 Chooseaccount.propTypes = {
