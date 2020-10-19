@@ -10,3 +10,8 @@ node_modules/
 */assets
 
 .idea
+
+*/yarn-error.log
+
+# Konnectd
+konnectd/assets/identifier
