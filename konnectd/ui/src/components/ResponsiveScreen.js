@@ -15,7 +15,8 @@ const styles = theme => ({
     flex: 1
   },
   content: {
-    position: 'relative'
+    position: 'relative',
+    width: '100%'
   },
   actions: {
     marginTop: -40,

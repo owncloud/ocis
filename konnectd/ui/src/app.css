@@ -29,6 +29,18 @@ strong {
   transform: translateX(-50%);
 }
 
+.oc-progress {
+  /* Needs to be important to overwrite material-ui */
+  background-color: rgba(78,133,200,.8) !important;
+  height: 4px;
+  width: 100px;
+}
+
+.oc-progress > div {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4e85c8 !important;
+}
+
 .oc-input {
   background-color: #042047;
   border: 1px solid rgba(78, 133, 200, 0.8);
@@ -84,4 +96,8 @@ strong {
 /* Helpers */
 .oc-mt-l {
   margin-top: 30px !important;
+}
+
+.oc-light {
+  color: #ffffff !important;
 }
