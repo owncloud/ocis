@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 )
 
-// NonUniqueIndex is able to index an document by a key which might contain non-unique values
+// NonUnique is able to index an document by a key which might contain non-unique values
 //
 // /var/tmp/testfiles-395764020/index.disk/PetByColor/
 // ├── Brown
@@ -24,12 +24,13 @@ import (
 // │    └── xadaf-189 -> /var/tmp/testfiles-395764020/pets/xadaf-189
 // └── White
 //     └── wefwe-456 -> /var/tmp/testfiles-395764020/pets/wefwe-456
-type NonUniqueIndex struct {
-	indexBy      string
-	typeName     string
-	filesDir     string
-	indexBaseDir string
-	indexRootDir string
+type NonUnique struct {
+	caseInsensitive bool
+	indexBy         string
+	typeName        string
+	filesDir        string
+	indexBaseDir    string
+	indexRootDir    string
 }
 
 func init() {
@@ -44,17 +45,18 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 		opt(opts)
 	}
 
-	return &NonUniqueIndex{
-		indexBy:      opts.IndexBy,
-		typeName:     opts.TypeName,
-		filesDir:     opts.FilesDir,
-		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"non_unique", opts.TypeName, opts.IndexBy}, ".")),
+	return &NonUnique{
+		caseInsensitive: opts.CaseInsensitive,
+		indexBy:         opts.IndexBy,
+		typeName:        opts.TypeName,
+		filesDir:        opts.FilesDir,
+		indexBaseDir:    path.Join(opts.DataDir, "index.disk"),
+		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"non_unique", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
 
 // Init initializes a unique index.
-func (idx NonUniqueIndex) Init() error {
+func (idx *NonUnique) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
 	}
@@ -67,7 +69,7 @@ func (idx NonUniqueIndex) Init() error {
 }
 
 // Lookup exact lookup by value.
-func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
+func (idx *NonUnique) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	fi, err := ioutil.ReadDir(searchPath)
 	if os.IsNotExist(err) {
@@ -91,7 +93,7 @@ func (idx NonUniqueIndex) Lookup(v string) ([]string, error) {
 }
 
 // Add adds a value to the index, returns the path to the root-document
-func (idx NonUniqueIndex) Add(id, v string) (string, error) {
+func (idx *NonUnique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
@@ -112,7 +114,7 @@ func (idx NonUniqueIndex) Add(id, v string) (string, error) {
 }
 
 // Remove a value v from an index.
-func (idx NonUniqueIndex) Remove(id string, v string) error {
+func (idx *NonUnique) Remove(id string, v string) error {
 	if v == "" {
 		return nil
 	}
@@ -144,7 +146,7 @@ func (idx NonUniqueIndex) Remove(id string, v string) error {
 }
 
 // Update index from <oldV> to <newV>.
-func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
+func (idx *NonUnique) Update(id, oldV, newV string) (err error) {
 	oldDir := path.Join(idx.indexRootDir, oldV)
 	oldPath := path.Join(oldDir, id)
 	newDir := path.Join(idx.indexRootDir, newV)
@@ -183,7 +185,7 @@ func (idx NonUniqueIndex) Update(id, oldV, newV string) (err error) {
 }
 
 // Search allows for glob search on the index.
-func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
+func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern, "*"))
 	if err != nil {
 		return nil, err
@@ -196,17 +198,22 @@ func (idx NonUniqueIndex) Search(pattern string) ([]string, error) {
 	return paths, nil
 }
 
+// CaseInsensitive undocumented.
+func (idx *NonUnique) CaseInsensitive() bool {
+	return idx.caseInsensitive
+}
+
 // IndexBy undocumented.
-func (idx NonUniqueIndex) IndexBy() string {
+func (idx *NonUnique) IndexBy() string {
 	return idx.indexBy
 }
 
 // TypeName undocumented.
-func (idx NonUniqueIndex) TypeName() string {
+func (idx *NonUnique) TypeName() string {
 	return idx.typeName
 }
 
 // FilesDir undocumented.
-func (idx NonUniqueIndex) FilesDir() string {
+func (idx *NonUnique) FilesDir() string {
 	return idx.filesDir
 }

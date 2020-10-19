@@ -4,6 +4,7 @@ package indexer
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
@@ -42,13 +43,14 @@ func getRegistryStrategy(cfg *config.Config) string {
 }
 
 // AddIndex adds a new index to the indexer receiver.
-func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound) error {
+func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
 	strategy := getRegistryStrategy(i.config)
 	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
 	if strategy == "disk" {
 		idx = f(
+			option.CaseInsensitive(caseInsensitive),
 			option.WithEntity(t),
 			option.WithBounds(bound),
 			option.WithTypeName(getTypeFQN(t)),
@@ -58,6 +60,7 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 		)
 	} else if strategy == "cs3" {
 		idx = f(
+			option.CaseInsensitive(caseInsensitive),
 			option.WithEntity(t),
 			option.WithBounds(bound),
 			option.WithTypeName(getTypeFQN(t)),
@@ -84,6 +87,9 @@ func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
+				if idx.CaseInsensitive() {
+					idxByVal = strings.ToLower(idxByVal)
+				}
 				value, err := idx.Add(pkVal, idxByVal)
 				if err != nil {
 					return []IdxAddResult{}, err
@@ -105,7 +111,11 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[field] {
-			res, err := idx.Lookup(val)
+			idxVal := val
+			if idx.CaseInsensitive() {
+				idxVal = strings.ToLower(idxVal)
+			}
+			res, err := idx.Lookup(idxVal)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
 					continue
@@ -137,6 +147,9 @@ func (i Indexer) Delete(t interface{}) error {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
+				if idx.CaseInsensitive() {
+					idxByVal = strings.ToLower(idxByVal)
+				}
 				if err := idx.Remove(pkVal, idxByVal); err != nil {
 					return err
 				}
@@ -153,6 +166,10 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[field] {
+			idxPattern := pattern
+			if idx.CaseInsensitive() {
+				idxPattern = strings.ToLower(idxPattern)
+			}
 			res, err := idx.Search(pattern)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
@@ -194,6 +211,10 @@ func (i Indexer) Update(from, to interface{}) error {
 			for _, idx := range indices {
 				if oldV == newV {
 					continue
+				}
+				if idx.CaseInsensitive() {
+					oldV = strings.ToLower(oldV)
+					newV = strings.ToLower(newV)
 				}
 				if oldV == "" {
 					if _, err := idx.Add(pkVal, newV); err != nil {

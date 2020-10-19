@@ -35,11 +35,12 @@ import (
 // 		}
 //
 type Unique struct {
-	indexBy      string
-	typeName     string
-	filesDir     string
-	indexBaseDir string
-	indexRootDir string
+	caseInsensitive bool
+	indexBy         string
+	typeName        string
+	filesDir        string
+	indexBaseDir    string
+	indexRootDir    string
 }
 
 func init() {
@@ -55,11 +56,12 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 	}
 
 	return &Unique{
-		indexBy:      opts.IndexBy,
-		typeName:     opts.TypeName,
-		filesDir:     opts.FilesDir,
-		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+		caseInsensitive: opts.CaseInsensitive,
+		indexBy:         opts.IndexBy,
+		typeName:        opts.TypeName,
+		filesDir:        opts.FilesDir,
+		indexBaseDir:    path.Join(opts.DataDir, "index.disk"),
+		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
 
@@ -77,7 +79,7 @@ func (idx *Unique) Init() error {
 }
 
 // Add adds a value to the index, returns the path to the root-document
-func (idx Unique) Add(id, v string) (string, error) {
+func (idx *Unique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
@@ -92,7 +94,7 @@ func (idx Unique) Add(id, v string) (string, error) {
 }
 
 // Remove a value v from an index.
-func (idx Unique) Remove(id string, v string) (err error) {
+func (idx *Unique) Remove(id string, v string) (err error) {
 	if v == "" {
 		return nil
 	}
@@ -101,7 +103,7 @@ func (idx Unique) Remove(id string, v string) (err error) {
 }
 
 // Lookup exact lookup by value.
-func (idx Unique) Lookup(v string) (resultPath []string, err error) {
+func (idx *Unique) Lookup(v string) (resultPath []string, err error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err = isValidSymlink(searchPath); err != nil {
 		if os.IsNotExist(err) {
@@ -120,7 +122,7 @@ func (idx Unique) Lookup(v string) (resultPath []string, err error) {
 }
 
 // Update index from <oldV> to <newV>.
-func (idx Unique) Update(id, oldV, newV string) (err error) {
+func (idx *Unique) Update(id, oldV, newV string) (err error) {
 	oldPath := path.Join(idx.indexRootDir, oldV)
 	if err = isValidSymlink(oldPath); err != nil {
 		if os.IsNotExist(err) {
@@ -143,7 +145,7 @@ func (idx Unique) Update(id, oldV, newV string) (err error) {
 }
 
 // Search allows for glob search on the index.
-func (idx Unique) Search(pattern string) ([]string, error) {
+func (idx *Unique) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
 	if err != nil {
 		return nil, err
@@ -170,18 +172,23 @@ func (idx Unique) Search(pattern string) ([]string, error) {
 	return res, nil
 }
 
+// CaseInsensitive undocumented.
+func (idx *Unique) CaseInsensitive() bool {
+	return idx.caseInsensitive
+}
+
 // IndexBy undocumented.
-func (idx Unique) IndexBy() string {
+func (idx *Unique) IndexBy() string {
 	return idx.indexBy
 }
 
 // TypeName undocumented.
-func (idx Unique) TypeName() string {
+func (idx *Unique) TypeName() string {
 	return idx.typeName
 }
 
 // FilesDir undocumented.
-func (idx Unique) FilesDir() string {
+func (idx *Unique) FilesDir() string {
 	return idx.filesDir
 }
 

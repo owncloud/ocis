@@ -75,45 +75,44 @@ func New(opts ...Option) (s *Service, err error) {
 }
 
 func (s Service) buildIndex() (*indexer.Indexer, error) {
-	s.Config.Repo.CS3.JWTSecret = "Pive-Fumkiu4"
 	idx := indexer.CreateIndexer(s.Config)
 
 	// Accounts
-	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique", nil); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique", nil, true); err != nil {
 		return nil, err
 	}
-	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique", nil); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "unique", nil); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique", nil, true); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique", nil); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "unique", nil, true); err != nil {
+		return nil, err
+	}
+
+	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique", nil, true); err != nil {
 		return nil, err
 	}
 
 	if err := idx.AddIndex(&proto.Account{}, "UidNumber", "Id", "accounts", "autoincrement", &option.Bound{
 		Lower: s.Config.Index.UID.Lower,
 		Upper: s.Config.Index.UID.Upper,
-	}); err != nil {
+	}, false); err != nil {
 		return nil, err
 	}
 
 	// Groups
-	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil, true); err != nil {
 		return nil, err
 	}
 
-	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil, true); err != nil {
 		return nil, err
 	}
 
 	if err := idx.AddIndex(&proto.Group{}, "GidNumber", "Id", "groups", "autoincrement", &option.Bound{
 		Lower: s.Config.Index.GID.Lower,
 		Upper: s.Config.Index.GID.Upper,
-	}); err != nil {
+	}, false); err != nil {
 		return nil, err
 	}
 

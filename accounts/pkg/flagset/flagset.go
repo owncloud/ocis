@@ -128,6 +128,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Repo.CS3.DataPrefix,
 		},
 		&cli.StringFlag{
+			Name:        "storage-cs3-jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_JWT_SECRET"},
+			Destination: &cfg.Repo.CS3.JWTSecret,
+		},
+		&cli.StringFlag{
 			Name:        "service-user-uuid",
 			Value:       "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 			Usage:       "uuid of the internal service user (required on EOS)",

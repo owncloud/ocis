@@ -9,6 +9,7 @@ type Index interface {
 	Remove(id string, v string) error
 	Update(id, oldV, newV string) error
 	Search(pattern string) ([]string, error)
+	CaseInsensitive() bool
 	IndexBy() string
 	TypeName() string
 	FilesDir() string

@@ -28,11 +28,11 @@ import (
 
 // Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
-	indexBy      string
-	typeName     string
-	filesDir     string
-	indexBaseDir string
-	indexRootDir string
+	indexBy         string
+	typeName        string
+	filesDir        string
+	indexBaseDir    string
+	indexRootDir    string
 
 	tokenManager    token.Manager
 	storageProvider provider.ProviderAPIClient
@@ -53,11 +53,11 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	}
 
 	u := &Autoincrement{
-		indexBy:      opts.IndexBy,
-		typeName:     opts.TypeName,
-		filesDir:     opts.FilesDir,
-		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
+		indexBy:         opts.IndexBy,
+		typeName:        opts.TypeName,
+		filesDir:        opts.FilesDir,
+		indexBaseDir:    path.Join(opts.DataDir, "index.cs3"),
+		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr:    opts.ProviderAddr,
 			DataURL:         opts.DataURL,
@@ -115,7 +115,7 @@ func (idx *Autoincrement) Init() error {
 }
 
 // Lookup exact lookup by value.
-func (idx Autoincrement) Lookup(v string) ([]string, error) {
+func (idx *Autoincrement) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	oldname, err := idx.resolveSymlink(searchPath)
 	if err != nil {
@@ -130,7 +130,7 @@ func (idx Autoincrement) Lookup(v string) ([]string, error) {
 }
 
 // Add a new value to the index.
-func (idx Autoincrement) Add(id, v string) (string, error) {
+func (idx *Autoincrement) Add(id, v string) (string, error) {
 	var newName string
 	if v == "" {
 		next, err := idx.next()
@@ -153,7 +153,7 @@ func (idx Autoincrement) Add(id, v string) (string, error) {
 }
 
 // Remove a value v from an index.
-func (idx Autoincrement) Remove(id string, v string) error {
+func (idx *Autoincrement) Remove(id string, v string) error {
 	if v == "" {
 		return nil
 	}
@@ -194,7 +194,7 @@ func (idx Autoincrement) Remove(id string, v string) error {
 }
 
 // Update index from <oldV> to <newV>.
-func (idx Autoincrement) Update(id, oldV, newV string) error {
+func (idx *Autoincrement) Update(id, oldV, newV string) error {
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
 	}
@@ -207,7 +207,7 @@ func (idx Autoincrement) Update(id, oldV, newV string) error {
 }
 
 // Search allows for glob search on the index.
-func (idx Autoincrement) Search(pattern string) ([]string, error) {
+func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
 	if err != nil {
@@ -244,18 +244,23 @@ func (idx Autoincrement) Search(pattern string) ([]string, error) {
 	return matches, nil
 }
 
+// CaseInsensitive undocumented.
+func (idx *Autoincrement) CaseInsensitive() bool {
+	return false
+}
+
 // IndexBy undocumented.
-func (idx Autoincrement) IndexBy() string {
+func (idx *Autoincrement) IndexBy() string {
 	return idx.indexBy
 }
 
 // TypeName undocumented.
-func (idx Autoincrement) TypeName() string {
+func (idx *Autoincrement) TypeName() string {
 	return idx.typeName
 }
 
 // FilesDir  undocumented.
-func (idx Autoincrement) FilesDir() string {
+func (idx *Autoincrement) FilesDir() string {
 	return idx.filesDir
 }
 
@@ -347,7 +352,7 @@ func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err e
 	return idx.tokenManager.MintToken(ctx, u)
 }
 
-func (idx Autoincrement) next() (int, error) {
+func (idx *Autoincrement) next() (int, error) {
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
 	if err != nil {

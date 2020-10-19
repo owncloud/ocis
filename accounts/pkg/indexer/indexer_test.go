@@ -21,7 +21,7 @@ func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createCs3Indexer()
 
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
+	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -36,7 +36,7 @@ func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createCs3Indexer()
 
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil)
+	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil, false)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -51,7 +51,7 @@ func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
+	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -70,7 +70,7 @@ func TestIndexer_Disk_AddWithUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
+	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
 	assert.NoError(t, err)
 
 	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -85,7 +85,7 @@ func TestIndexer_Disk_AddWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
+	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil, false)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -110,7 +110,7 @@ func TestIndexer_Disk_AddWithAutoincrementIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", &option.Bound{Lower: 5})
+	err = indexer.AddIndex(&User{}, "UID", "ID", "users", "autoincrement", &option.Bound{Lower: 5}, false)
 	assert.NoError(t, err)
 
 	res1, err := indexer.Add(Data["users"][0])
@@ -136,7 +136,7 @@ func TestIndexer_Disk_DeleteWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil)
+	err = indexer.AddIndex(&Pet{}, "Kind", "ID", "pets", "non_unique", nil, false)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -159,7 +159,7 @@ func TestIndexer_Disk_SearchWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
+	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil, false)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}
@@ -183,10 +183,10 @@ func TestIndexer_Disk_UpdateWithUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil)
+	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
 	assert.NoError(t, err)
 
-	err = indexer.AddIndex(&User{}, "Email", "ID", "users", "unique", nil)
+	err = indexer.AddIndex(&User{}, "Email", "ID", "users", "unique", nil, false)
 	assert.NoError(t, err)
 
 	user1 := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
@@ -236,7 +236,7 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
 
-	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil)
+	err = indexer.AddIndex(&Pet{}, "Name", "ID", "pets", "non_unique", nil, false)
 	assert.NoError(t, err)
 
 	pet1 := Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"}

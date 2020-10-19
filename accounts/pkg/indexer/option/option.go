@@ -12,6 +12,9 @@ type Bound struct {
 
 // Options defines the available options for this package.
 type Options struct {
+	CaseInsensitive bool
+	Bound         *Bound
+
 	// Disk Options
 	TypeName      string
 	IndexBy       string
@@ -20,13 +23,19 @@ type Options struct {
 	DataDir       string
 	EntityDirName string
 	Entity        interface{}
-	Bound         *Bound
 
 	// CS3 options
 	DataURL      string
 	DataPrefix   string
 	JWTSecret    string
 	ProviderAddr string
+}
+
+// CaseInsensitive sets the CaseInsensitive field.
+func CaseInsensitive(val bool) Option {
+	return func(o *Options) {
+		o.CaseInsensitive = val
+	}
 }
 
 // WithBounds sets the Bounds field.

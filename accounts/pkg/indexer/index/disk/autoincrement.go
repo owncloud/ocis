@@ -19,11 +19,11 @@ import (
 
 // Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
-	indexBy      string
-	typeName     string
-	filesDir     string
-	indexBaseDir string
-	indexRootDir string
+	indexBy         string
+	typeName        string
+	filesDir        string
+	indexBaseDir    string
+	indexRootDir    string
 
 	bound *option.Bound
 }
@@ -54,12 +54,12 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	}
 
 	return &Autoincrement{
-		indexBy:      opts.IndexBy,
-		typeName:     opts.TypeName,
-		filesDir:     opts.FilesDir,
-		bound:        opts.Bound,
-		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
+		indexBy:         opts.IndexBy,
+		typeName:        opts.TypeName,
+		filesDir:        opts.FilesDir,
+		bound:           opts.Bound,
+		indexBaseDir:    path.Join(opts.DataDir, "index.disk"),
+		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
 
@@ -74,7 +74,7 @@ var (
 )
 
 // Init initializes an autoincrement index.
-func (idx Autoincrement) Init() error {
+func (idx *Autoincrement) Init() error {
 	if _, err := os.Stat(idx.filesDir); err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (idx Autoincrement) Init() error {
 }
 
 // Lookup exact lookup by value.
-func (idx Autoincrement) Lookup(v string) ([]string, error) {
+func (idx *Autoincrement) Lookup(v string) ([]string, error) {
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err := isValidSymlink(searchPath); err != nil {
 		if os.IsNotExist(err) {
@@ -106,7 +106,7 @@ func (idx Autoincrement) Lookup(v string) ([]string, error) {
 }
 
 // Add a new value to the index.
-func (idx Autoincrement) Add(id, v string) (string, error) {
+func (idx *Autoincrement) Add(id, v string) (string, error) {
 	nextID, err := idx.next()
 	if err != nil {
 		return "", err
@@ -127,7 +127,7 @@ func (idx Autoincrement) Add(id, v string) (string, error) {
 }
 
 // Remove a value v from an index.
-func (idx Autoincrement) Remove(id string, v string) error {
+func (idx *Autoincrement) Remove(id string, v string) error {
 	if v == "" {
 		return nil
 	}
@@ -136,7 +136,7 @@ func (idx Autoincrement) Remove(id string, v string) error {
 }
 
 // Update index from <oldV> to <newV>.
-func (idx Autoincrement) Update(id, oldV, newV string) error {
+func (idx *Autoincrement) Update(id, oldV, newV string) error {
 	oldPath := path.Join(idx.indexRootDir, oldV)
 	if err := isValidSymlink(oldPath); err != nil {
 		if os.IsNotExist(err) {
@@ -160,7 +160,7 @@ func (idx Autoincrement) Update(id, oldV, newV string) error {
 }
 
 // Search allows for glob search on the index.
-func (idx Autoincrement) Search(pattern string) ([]string, error) {
+func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
 	if err != nil {
 		return nil, err
@@ -187,18 +187,23 @@ func (idx Autoincrement) Search(pattern string) ([]string, error) {
 	return res, nil
 }
 
+// CaseInsensitive undocumented.
+func (idx *Autoincrement) CaseInsensitive() bool {
+	return false
+}
+
 // IndexBy undocumented.
-func (idx Autoincrement) IndexBy() string {
+func (idx *Autoincrement) IndexBy() string {
 	return idx.indexBy
 }
 
 // TypeName undocumented.
-func (idx Autoincrement) TypeName() string {
+func (idx *Autoincrement) TypeName() string {
 	return idx.typeName
 }
 
 // FilesDir  undocumented.
-func (idx Autoincrement) FilesDir() string {
+func (idx *Autoincrement) FilesDir() string {
 	return idx.filesDir
 }
 
@@ -234,7 +239,7 @@ func readDir(dirname string) ([]os.FileInfo, error) {
 	return list, nil
 }
 
-func (idx Autoincrement) next() (int, error) {
+func (idx *Autoincrement) next() (int, error) {
 	files, err := readDir(idx.indexRootDir)
 	if err != nil {
 		return -1, err

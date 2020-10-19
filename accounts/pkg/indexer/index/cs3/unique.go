@@ -24,11 +24,12 @@ import (
 
 // Unique are fields for an index of type non_unique.
 type Unique struct {
-	indexBy      string
-	typeName     string
-	filesDir     string
-	indexBaseDir string
-	indexRootDir string
+	caseInsensitive bool
+	indexBy         string
+	typeName        string
+	filesDir        string
+	indexBaseDir    string
+	indexRootDir    string
 
 	tokenManager    token.Manager
 	storageProvider provider.ProviderAPIClient
@@ -60,11 +61,12 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 	}
 
 	u := &Unique{
-		indexBy:      opts.IndexBy,
-		typeName:     opts.TypeName,
-		filesDir:     opts.FilesDir,
-		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
-		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
+		caseInsensitive: opts.CaseInsensitive,
+		indexBy:         opts.IndexBy,
+		typeName:        opts.TypeName,
+		filesDir:        opts.FilesDir,
+		indexBaseDir:    path.Join(opts.DataDir, "index.cs3"),
+		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr:    opts.ProviderAddr,
 			DataURL:         opts.DataURL,
@@ -243,6 +245,11 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 	}
 
 	return matches, nil
+}
+
+// CaseInsensitive undocumented.
+func (idx *Unique) CaseInsensitive() bool {
+	return idx.caseInsensitive
 }
 
 // IndexBy undocumented.
