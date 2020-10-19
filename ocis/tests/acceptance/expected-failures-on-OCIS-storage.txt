@@ -433,10 +433,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:343
 apiShareManagementBasicToShares/deleteShareFromShares.feature:58
 apiShareManagementBasicToShares/deleteShareFromShares.feature:72
 #
-# https://github.com/owncloud/product/issues/270 share permissions are not enforced
-#
-apiShareManagementBasicToShares/deleteShareFromShares.feature:107
-#
 # cannot share a folder with create permission
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
 #
@@ -1533,11 +1529,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:321
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:39
 apiWebdavEtagPropagation1/moveFileFolder.feature:40
-#
-# https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
-#
-apiWebdavEtagPropagation1/moveFileFolder.feature:139
-apiWebdavEtagPropagation1/moveFileFolder.feature:140
 apiWebdavEtagPropagation1/moveFileFolder.feature:201
 apiWebdavEtagPropagation1/moveFileFolder.feature:202
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
@@ -1546,8 +1537,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:269
 apiWebdavEtagPropagation1/moveFileFolder.feature:270
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
-apiWebdavEtagPropagation2/upload.feature:110
-apiWebdavEtagPropagation2/upload.feature:111
 #
 # https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
 #
