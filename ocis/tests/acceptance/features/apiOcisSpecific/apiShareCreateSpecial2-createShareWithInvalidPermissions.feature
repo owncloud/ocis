@@ -21,8 +21,8 @@ Feature: cannot share resources with invalid permissions
     And as "Brian" entry "textfile0.txt" should not exist
     Examples:
       | ocs_api_version | ocs_status_code | eos_status_code | http_status_code_ocs | http_status_code_eos |
-      | 1               | 100               | 996               | 200                | 500                |
-      | 2               | 200               | 996               | 200                | 500                |
+      | 1               | 100             | 996             | 200                  | 500                  |
+      | 2               | 200             | 996             | 200                  | 500                  |
 
   @issue-ocis-reva-45 @issue-ocis-reva-243
   # after fixing all issues delete this Scenario and use the one from oC10 core
@@ -38,8 +38,8 @@ Feature: cannot share resources with invalid permissions
     And the HTTP status code should be "<http_status_code_ocs>" or "<http_status_code_eos>"
     And as "Brian" entry "textfile0.txt" should not exist
     Examples:
-      | ocs_api_version | eos_status_code | ocs_status_code | http_status_code_ocs | http_status_code_eos | permissions    |
-      | 1               | 100               | 996               | 200                | 500                | delete         |
-      | 2               | 200               | 996               |  200               | 500                |  delete        |
-      | 1               | 100               | 996               |  200               | 500                |  create,delete |
-      | 2               | 200               | 996               |  200               | 500                |  create,delete |
+      | ocs_api_version | eos_status_code | ocs_status_code | http_status_code_ocs | http_status_code_eos | permissions   |
+      | 1               | 100             | 996             | 200                  | 500                  | delete        |
+      | 2               | 200             | 996             | 200                  | 500                  | delete        |
+      | 1               | 100             | 996             | 200                  | 500                  | create,delete |
+      | 2               | 200             | 996             | 200                  | 500                  | create,delete |

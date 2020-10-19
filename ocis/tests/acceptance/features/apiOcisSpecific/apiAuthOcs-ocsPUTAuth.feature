@@ -17,13 +17,13 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send PUT request to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                         |
-      | /ocs/v1.php/cloud/users/%username%               |
+      | endpoint                           |
+      | /ocs/v1.php/cloud/users/%username% |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "103"
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                         |
-      | /ocs/v2.php/cloud/users/%username%               |
+      | endpoint                           |
+      | /ocs/v2.php/cloud/users/%username% |
     Then the HTTP status code of responses on all endpoints should be "400"
     And the OCS status code of responses on all endpoints should be "103"
 
@@ -32,15 +32,15 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send PUT request to OCS endpoints as admin with wrong password
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                         |
-      | /ocs/v1.php/cloud/users/%username%/disable       |
-      | /ocs/v1.php/cloud/users/%username%/enable        |
+      | endpoint                                   |
+      | /ocs/v1.php/cloud/users/%username%/disable |
+      | /ocs/v1.php/cloud/users/%username%/enable  |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "998"
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                         |
-      | /ocs/v2.php/cloud/users/%username%/disable       |
-      | /ocs/v2.php/cloud/users/%username%/enable        |
+      | endpoint                                   |
+      | /ocs/v2.php/cloud/users/%username%/disable |
+      | /ocs/v2.php/cloud/users/%username%/enable  |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"
 
