@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/iancoleman/strcase"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
@@ -106,7 +107,7 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.IndicesByField[field] {
+		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			idxVal := val
 			res, err := idx.Lookup(idxVal)
 			if err != nil {
@@ -155,7 +156,7 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	typeName := getTypeFQN(t)
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
-		for _, idx := range fields.IndicesByField[field] {
+		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			res, err := idx.Search(pattern)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
