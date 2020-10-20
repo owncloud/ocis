@@ -70,6 +70,9 @@ func (idx *NonUnique) Init() error {
 
 // Lookup exact lookup by value.
 func (idx *NonUnique) Lookup(v string) ([]string, error) {
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	fi, err := ioutil.ReadDir(searchPath)
 	if os.IsNotExist(err) {
@@ -97,6 +100,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v, id)
 
@@ -117,6 +123,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 func (idx *NonUnique) Remove(id string, v string) error {
 	if v == "" {
 		return nil
+	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
 	}
 	res, err := filepath.Glob(path.Join(idx.indexRootDir, "/*/", id))
 	if err != nil {
@@ -147,6 +156,10 @@ func (idx *NonUnique) Remove(id string, v string) error {
 
 // Update index from <oldV> to <newV>.
 func (idx *NonUnique) Update(id, oldV, newV string) (err error) {
+	if idx.caseInsensitive {
+		oldV = strings.ToLower(oldV)
+		newV = strings.ToLower(newV)
+	}
 	oldDir := path.Join(idx.indexRootDir, oldV)
 	oldPath := path.Join(oldDir, id)
 	newDir := path.Join(idx.indexRootDir, newV)
@@ -186,6 +199,9 @@ func (idx *NonUnique) Update(id, oldV, newV string) (err error) {
 
 // Search allows for glob search on the index.
 func (idx *NonUnique) Search(pattern string) ([]string, error) {
+	if idx.caseInsensitive {
+		pattern = strings.ToLower(pattern)
+	}
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern, "*"))
 	if err != nil {
 		return nil, err

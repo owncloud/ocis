@@ -83,6 +83,9 @@ func (idx *Unique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	oldName := path.Join(idx.filesDir, id)
 	newName := path.Join(idx.indexRootDir, v)
 	err := os.Symlink(oldName, newName)
@@ -98,18 +101,23 @@ func (idx *Unique) Remove(id string, v string) (err error) {
 	if v == "" {
 		return nil
 	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	return os.Remove(searchPath)
 }
 
 // Lookup exact lookup by value.
 func (idx *Unique) Lookup(v string) (resultPath []string, err error) {
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	if err = isValidSymlink(searchPath); err != nil {
 		if os.IsNotExist(err) {
 			err = &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 		}
-
 		return
 	}
 
@@ -123,6 +131,10 @@ func (idx *Unique) Lookup(v string) (resultPath []string, err error) {
 
 // Update index from <oldV> to <newV>.
 func (idx *Unique) Update(id, oldV, newV string) (err error) {
+	if idx.caseInsensitive {
+		oldV = strings.ToLower(oldV)
+		newV = strings.ToLower(newV)
+	}
 	oldPath := path.Join(idx.indexRootDir, oldV)
 	if err = isValidSymlink(oldPath); err != nil {
 		if os.IsNotExist(err) {
@@ -146,6 +158,9 @@ func (idx *Unique) Update(id, oldV, newV string) (err error) {
 
 // Search allows for glob search on the index.
 func (idx *Unique) Search(pattern string) ([]string, error) {
+	if idx.caseInsensitive {
+		pattern = strings.ToLower(pattern)
+	}
 	paths, err := filepath.Glob(path.Join(idx.indexRootDir, pattern))
 	if err != nil {
 		return nil, err

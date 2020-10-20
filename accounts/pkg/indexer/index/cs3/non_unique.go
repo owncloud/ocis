@@ -120,6 +120,9 @@ func (idx *NonUnique) Init() error {
 
 // Lookup exact lookup by value.
 func (idx *NonUnique) Lookup(v string) ([]string, error) {
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	var matches = make([]string, 0)
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
@@ -148,6 +151,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return "", err
@@ -173,6 +179,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 func (idx *NonUnique) Remove(id string, v string) error {
 	if v == "" {
 		return nil
+	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
 	}
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
@@ -221,6 +230,11 @@ func (idx *NonUnique) Remove(id string, v string) error {
 
 // Update index from <oldV> to <newV>.
 func (idx *NonUnique) Update(id, oldV, newV string) error {
+	if idx.caseInsensitive {
+		oldV = strings.ToLower(oldV)
+		newV = strings.ToLower(newV)
+	}
+
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
 	}
@@ -234,6 +248,10 @@ func (idx *NonUnique) Update(id, oldV, newV string) error {
 
 // Search allows for glob search on the index.
 func (idx *NonUnique) Search(pattern string) ([]string, error) {
+	if idx.caseInsensitive {
+		pattern = strings.ToLower(pattern)
+	}
+
 	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return nil, err

@@ -4,7 +4,6 @@ package indexer
 import (
 	"fmt"
 	"path"
-	"strings"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
@@ -87,9 +86,6 @@ func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
-				if idx.CaseInsensitive() {
-					idxByVal = strings.ToLower(idxByVal)
-				}
 				value, err := idx.Add(pkVal, idxByVal)
 				if err != nil {
 					return []IdxAddResult{}, err
@@ -112,9 +108,6 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[field] {
 			idxVal := val
-			if idx.CaseInsensitive() {
-				idxVal = strings.ToLower(idxVal)
-			}
 			res, err := idx.Lookup(idxVal)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
@@ -147,9 +140,6 @@ func (i Indexer) Delete(t interface{}) error {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
 				idxByVal := valueOf(t, idx.IndexBy())
-				if idx.CaseInsensitive() {
-					idxByVal = strings.ToLower(idxByVal)
-				}
 				if err := idx.Remove(pkVal, idxByVal); err != nil {
 					return err
 				}
@@ -166,12 +156,7 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	resultPaths := make([]string, 0)
 	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[field] {
-			idxPattern := pattern
-			// TODO: CaseInsensitive is leaking implementation. Should be moved to the implementation instead.
-			if idx.CaseInsensitive() {
-				idxPattern = strings.ToLower(idxPattern)
-			}
-			res, err := idx.Search(idxPattern)
+			res, err := idx.Search(pattern)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
 					continue
@@ -212,10 +197,6 @@ func (i Indexer) Update(from, to interface{}) error {
 			for _, idx := range indices {
 				if oldV == newV {
 					continue
-				}
-				if idx.CaseInsensitive() {
-					oldV = strings.ToLower(oldV)
-					newV = strings.ToLower(newV)
 				}
 				if oldV == "" {
 					if _, err := idx.Add(pkVal, newV); err != nil {

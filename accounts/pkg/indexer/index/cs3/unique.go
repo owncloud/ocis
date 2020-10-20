@@ -125,6 +125,9 @@ func (idx *Unique) Init() error {
 
 // Lookup exact lookup by value.
 func (idx *Unique) Lookup(v string) ([]string, error) {
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	oldname, err := idx.resolveSymlink(searchPath)
 	if err != nil {
@@ -143,6 +146,9 @@ func (idx *Unique) Add(id, v string) (string, error) {
 	if v == "" {
 		return "", nil
 	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
+	}
 	newName := path.Join(idx.indexRootDir, v)
 	if err := idx.createSymlink(id, newName); err != nil {
 		if os.IsExist(err) {
@@ -159,6 +165,9 @@ func (idx *Unique) Add(id, v string) (string, error) {
 func (idx *Unique) Remove(id string, v string) error {
 	if v == "" {
 		return nil
+	}
+	if idx.caseInsensitive {
+		v = strings.ToLower(v)
 	}
 	searchPath := path.Join(idx.indexRootDir, v)
 	_, err := idx.resolveSymlink(searchPath)
@@ -198,6 +207,11 @@ func (idx *Unique) Remove(id string, v string) error {
 
 // Update index from <oldV> to <newV>.
 func (idx *Unique) Update(id, oldV, newV string) error {
+	if idx.caseInsensitive {
+		oldV = strings.ToLower(oldV)
+		newV = strings.ToLower(newV)
+	}
+
 	if err := idx.Remove(id, oldV); err != nil {
 		return err
 	}
@@ -211,6 +225,10 @@ func (idx *Unique) Update(id, oldV, newV string) error {
 
 // Search allows for glob search on the index.
 func (idx *Unique) Search(pattern string) ([]string, error) {
+	if idx.caseInsensitive {
+		pattern = strings.ToLower(pattern)
+	}
+
 	ctx := context.Background()
 	t, err := idx.authenticate(ctx)
 	if err != nil {
