@@ -167,10 +167,11 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[field] {
 			idxPattern := pattern
+			// TODO: CaseInsensitive is leaking implementation. Should be moved to the implementation instead.
 			if idx.CaseInsensitive() {
 				idxPattern = strings.ToLower(idxPattern)
 			}
-			res, err := idx.Search(pattern)
+			res, err := idx.Search(idxPattern)
 			if err != nil {
 				if errors.IsNotFoundErr(err) {
 					continue
