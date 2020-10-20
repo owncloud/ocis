@@ -190,7 +190,7 @@ If you prefer to configure the service with commandline flags you can see the av
 : Version, defaults to `0.1.0`
 
 --web-config-app
-: Provide multiple apps, defaults to `""`. Usage: `phoenix --web-config-app files --web-config-app pdf-viewer`
+: Provide multiple apps, defaults to `""`. Usage: `phoenix --web-config-app files --web-config-app media-viewer`
 
 --oidc-metadata-url
 : OpenID Connect metadata URL, defaults to `http://localhost:9130/.well-known/openid-configuration`
