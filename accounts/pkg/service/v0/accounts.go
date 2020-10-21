@@ -306,7 +306,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	var id string
 
 	if in.Account == nil {
-		return merrors.InternalServerError(s.id, "invalid account: empty", nil)
+		return merrors.InternalServerError(s.id, "invalid account: empty")
 	}
 	*out = *in.Account
 

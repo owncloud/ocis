@@ -111,7 +111,7 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 // CreateGroup implements the GroupsServiceHandler interface
 func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
 	if in.Group == nil {
-		return merrors.InternalServerError(s.id, "invalid group: empty", nil)
+		return merrors.InternalServerError(s.id, "invalid group: empty")
 	}
 	*out = *in.Group
 
