@@ -1,0 +1,309 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-05-09T14:09:27.715Z\n"
+"PO-Revision-Date: 2019-09-02 15:40+0000\n"
+"Last-Translator: Tryggvi Björgvinsson <ME@TRICKVI.IS>\n"
+"Language-Team: Icelandic <http://translate.kopano.io/projects/kopano/konnect/is/>\n"
+"Language: is\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2.4\n"
+
+#. [konnect.chooseaccount.useOther.persona.label]
+#. defaultMessage is:
+#. ?
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.useOther.persona.label"
+msgid "?"
+msgstr "?"
+
+#. [konnect.scopeDescription.aliasBasic]
+#. defaultMessage is:
+#. Access your basic account information
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.aliasBasic"
+msgid "Access your basic account information"
+msgstr "Komast í grunnupplýsingar um þig"
+
+#. [konnect.consent.allowButton.label]
+#. defaultMessage is:
+#. Allow
+#: i18n/src/messages.json
+msgctxt "konnect.consent.allowButton.label"
+msgid "Allow"
+msgstr "Leyfa"
+
+#. [konnect.consent.question]
+#. defaultMessage is:
+#. Allow {clientDisplayName} to do this?
+#: i18n/src/messages.json
+msgctxt "konnect.consent.question"
+msgid "Allow {clientDisplayName} to do this?"
+msgstr "Leyfa {clientDisplayName} að gera þetta?"
+
+#. [konnect.consent.consequence]
+#. defaultMessage is:
+#. By clicking Allow, you allow this app to use your information.
+#: i18n/src/messages.json
+msgctxt "konnect.consent.consequence"
+msgid "By clicking Allow, you allow this app to use your information."
+msgstr "Með því að smella á \"Leyfa\", leyfir þú þessu forriti að nota upplýsingarnar um þig."
+
+#. [konnect.consent.cancelButton.label]
+#. defaultMessage is:
+#. Cancel
+#: i18n/src/messages.json
+msgctxt "konnect.consent.cancelButton.label"
+msgid "Cancel"
+msgstr "Hætta við"
+
+#. [konnect.chooseaccount.headline]
+#. defaultMessage is:
+#. Choose an account
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.headline"
+msgid "Choose an account"
+msgstr "Veldu aðgang"
+
+#. [konnect.consent.tooltip.client]
+#. defaultMessage is:
+#. Clicking "Allow" will redirect you to: {redirectURI}
+#: i18n/src/messages.json
+msgctxt "konnect.consent.tooltip.client"
+msgid "Clicking \"Allow\" will redirect you to: {redirectURI}"
+msgstr "Þegar þú smellir á \"Leyfa\" áframsendist þú á: {redirectURI}"
+
+#. [konnect.error.login.validate.missingPassword]
+#. defaultMessage is:
+#. Enter a password
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.validate.missingPassword"
+msgid "Enter a password"
+msgstr "Sláðu inn lykilorð"
+
+#. [konnect.error.login.validate.missingUsername]
+#. defaultMessage is:
+#. Enter an username
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.validate.missingUsername"
+msgid "Enter an username"
+msgstr "Sláðu inn notandanafn"
+
+#. [konnect.loading.error.headline]
+#. defaultMessage is:
+#. Failed to connect to server
+#: i18n/src/messages.json
+msgctxt "konnect.loading.error.headline"
+msgid "Failed to connect to server"
+msgstr "Mistókst að tengjast netþjóni"
+
+#. [konnect.goodbye.headline]
+#. defaultMessage is:
+#. Goodbye
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.headline"
+msgid "Goodbye"
+msgstr "Bless"
+
+#. [konnect.goodbye.confirm.headline]
+#. defaultMessage is:
+#. Hello {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.confirm.headline"
+msgid "Hello {displayName}"
+msgstr "Halló {displayName}"
+
+#. [konnect.consent.headline]
+#. defaultMessage is:
+#. Hi {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.consent.headline"
+msgid "Hi {displayName}"
+msgstr "Hæ {displayName}"
+
+#. [konnect.scopeDescription.offlineAccess]
+#. defaultMessage is:
+#. Keep the allowed access persistently and forever
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.offlineAccess"
+msgid "Keep the allowed access persistently and forever"
+msgstr "Viðhalda heimildunum alltaf og að eilífu (mundu mig)"
+
+#. [konnect.error.login.failed]
+#. defaultMessage is:
+#. Logon failed. Please verify your credentials and try again.
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.failed"
+msgid "Logon failed. Please verify your credentials and try again."
+msgstr "Innskráning mistókst. Vinsamlegast staðfestu notandaupplýsingarnar og reyndu aftur."
+
+#. [konnet.error.http.networkError]
+#. defaultMessage is:
+#. Network error. Please check your connection and try again.
+#: i18n/src/messages.json
+msgctxt "konnet.error.http.networkError"
+msgid "Network error. Please check your connection and try again."
+msgstr "Netvilla. Vinsamlegast athugaðu tenginguna þína og reyndu aftur."
+
+#. [konnect.login.nextButton.label]
+#. defaultMessage is:
+#. Next
+#: i18n/src/messages.json
+msgctxt "konnect.login.nextButton.label"
+msgid "Next"
+msgstr "Næsta"
+
+#. [konnect.login.passwordField.label]
+#. defaultMessage is:
+#. Password
+#: i18n/src/messages.json
+msgctxt "konnect.login.passwordField.label"
+msgid "Password"
+msgstr "Lykilorð"
+
+#. [konnect.goodbye.message.confirm]
+#. defaultMessage is:
+#. Press the button below, to sign out from your Kopano account now.
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.message.confirm"
+msgid "Press the button below, to sign out from your Kopano account now."
+msgstr "Smelltu á takkann fyrir neðan til að skrá þig út af Kopano aðganginum núna."
+
+#. [konnect.login.retryButton.label]
+#. defaultMessage is:
+#. Retry
+#: i18n/src/messages.json
+msgctxt "konnect.login.retryButton.label"
+msgid "Retry"
+msgstr "Reyna aftur"
+
+#. [konnect.scopeDescription.scope]
+#. defaultMessage is:
+#. Scope: {scope}
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.scope"
+msgid "Scope: {scope}"
+msgstr "Gildissvið: {scope}"
+
+#. [konnect.login.headline]
+#. defaultMessage is:
+#. Sign in
+#: i18n/src/messages.json
+msgctxt "konnect.login.headline"
+msgid "Sign in"
+msgstr "Innskrá"
+
+#. [konnect.goodbye.signoutButton.label]
+#. defaultMessage is:
+#. Sign out
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.signoutButton.label"
+msgid "Sign out"
+msgstr "Útskrá"
+
+#. [konnect.welcome.signoutButton.label]
+#. defaultMessage is:
+#. Sign out
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.signoutButton.label"
+msgid "Sign out"
+msgstr "Útskrá"
+
+#. [konnect.error.http.unexpectedResponseStatus]
+#. defaultMessage is:
+#. Unexpected HTTP response: {status}. Please check your connection and try again.
+#: i18n/src/messages.json
+msgctxt "konnect.error.http.unexpectedResponseStatus"
+msgid "Unexpected HTTP response: {status}. Please check your connection and try again."
+msgstr "Ófyrirsjáanlegt HTTP svar: {status}. Vinsamlegast athugaðu tenginguna þína og reyndu aftur."
+
+#. [konnect.error.http.unexpectedResponseState]
+#. defaultMessage is:
+#. Unexpected response state: {state}
+#: i18n/src/messages.json
+msgctxt "konnect.error.http.unexpectedResponseState"
+msgid "Unexpected response state: {state}"
+msgstr "Ófyrirsjáanleg svarstaða: {state}"
+
+#. [konnect.chooseaccount.useOther.label]
+#. defaultMessage is:
+#. Use another account
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.useOther.label"
+msgid "Use another account"
+msgstr "Nota annan aðgang"
+
+#. [konnect.login.usernameField.label]
+#. defaultMessage is:
+#. Username
+#: i18n/src/messages.json
+msgctxt "konnect.login.usernameField.label"
+msgid "Username"
+msgstr "Notandanafn"
+
+#. [konnect.welcome.headline]
+#. defaultMessage is:
+#. Welcome {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.headline"
+msgid "Welcome {displayName}"
+msgstr "Halló {displayName}"
+
+#. [konnect.welcome.message]
+#. defaultMessage is:
+#. You are signed in - awesome!
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.message"
+msgid "You are signed in - awesome!"
+msgstr "Innskráningin tókst - frábært!"
+
+#. [konnect.goodbye.message.close]
+#. defaultMessage is:
+#. You can close this window now.
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.message.close"
+msgid "You can close this window now."
+msgstr "Þú getur lokað þessum glugga núna."
+
+#. [konnect.goodbye.confirm.subHeader]
+#. defaultMessage is:
+#. please confirm sign out
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.confirm.subHeader"
+msgid "please confirm sign out"
+msgstr "vinsamlegast staðfestu útskráningu"
+
+#. [konnect.chooseaccount.subHeader]
+#. defaultMessage is:
+#. to sign in to Kopano
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.subHeader"
+msgid "to sign in to Kopano"
+msgstr "til að skrá þig inn í Kopano"
+
+#. [konnect.login.subHeader]
+#. defaultMessage is:
+#. with your Kopano account
+#: i18n/src/messages.json
+msgctxt "konnect.login.subHeader"
+msgid "with your Kopano account"
+msgstr "með Kopano-aðganginum þínum"
+
+#. [konnect.goodbye.subHeader]
+#. defaultMessage is:
+#. you have been signed out from your Kopano account
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.subHeader"
+msgid "you have been signed out from your Kopano account"
+msgstr "útskráning Kopano-aðgangsins þíns tókst"
+
+#. [konnect.consent.message]
+#. defaultMessage is:
+#. {clientDisplayName} wants to
+#: i18n/src/messages.json
+msgctxt "konnect.consent.message"
+msgid "{clientDisplayName} wants to"
+msgstr "{clientDisplayName} vill"

@@ -1,2 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[2],[function(n,o,i){n.exports=i(6)},function(n,o,i){},function(n,o,i){},function(n,o,i){},function(n,o,i){},function(n,o,i){},function(n,o,i){"use strict";i.r(o);i(1),i(2),i(3),i(4),i(5);console.info("Kopano Identifier build version: ".concat("0.28.1-3-gabe57b2-dirty")),console.info("Kopano Kpop build version: ".concat("0.24.5")),Promise.all([i.e(4),i.e(0)]).then(i.bind(null,552))}],[[0,3]]]);
-//# sourceMappingURL=main.c5511071.chunk.js.map
