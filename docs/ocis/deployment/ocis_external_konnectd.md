@@ -24,25 +24,71 @@ ocis and konnectd running on linux nodes behind traefik as reverse proxy
 
 ## Nodes
 
-### Requirements for both nodes
-* Server running Ubuntu 20.04 is public availible with an static ip address
-* An A-record for domain is pointing on the servers ip address
-* Create user `$sudo adduser username`
-* Add user to sudo group `$sudo usermod -aG sudo username`
+### Requirements
+* Server running Ubuntu 20.04 is public availible with a static ip address
+* Two A-records for both domains are pointing on the servers ip address
+* Create user
+  `$ sudo adduser username`
+* Add user to sudo group
+  `$ sudo usermod -aG sudo username`
 * Add users pub key to `~/.ssh/authorized_keys`
-* Setup sshd to forbid root access and permit authorisation only by ssh key
-* Install docker `$sudo apt install docker.io`
-* Add user to docker group `$sudo usermod -aG docker username`
-* Install docker-compose via `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
-* Make docker-compose executable `$ sudo chmod +x /usr/local/bin/docker-compose`
+* Setup ssh to permit authorisation only by ssh key
+* Install docker
+  `$ sudo apt install docker.io`
+* Add user to docker group
+  `$ sudo usermod -aG docker username`
+* Install docker-compose via
+  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
+* Make docker-compose executable
+  `$ sudo chmod +x /usr/local/bin/docker-compose`
 * Environment variables for OCIS Stack are provided by .env file
-* Change in both `.env` files
 
-```
-  OCIS_DOMAIN=ocis.domain.com
-  IDP_DOMAIN=idp.domain.com
-```
+### Setup on ocis server
 
+- Clone ocis repository
+
+  ```git clone https://github.com/owncloud/ocis.git```
+
+- Copy example sub folder for ocisnode to /opt
+  ```cp deployment/examples/ocis_external_konnectd/ocisnode /opt/```
+
+- Overwrite OCIS_DOMAIN and IDP_DOMAIN in .env with your-ocis.domain.com and your-idp.domain.com
+  ```
+  sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/ocisnode/.env
+  sed -i 's/idp.domain.com/your-idp.domain.com/g' /opt/ocisnode/.env
+  ```
+
+- Change into deployment folder
+  ```cd /opt/ocisnode```
+
+- Start application stack
+  ```docker-compose up -d```
+
+### Setup on idp server
+
+- Clone ocis repository
+
+  ```git clone https://github.com/owncloud/ocis.git```
+
+- Copy example sub folder for idpnode to /opt
+  ```cp deployment/examples/ocis_external_konnectd/idpnode /opt/```
+
+- Overwrite OCIS_DOMAIN and IDP_DOMAIN in .env with your-ocis.domain.com and your-idp.domain.com
+  ```
+  sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/idpnode/.env
+  sed -i 's/idp.domain.com/your-idp.domain.com/g' /opt/idpnode/.env
+  ```
+
+- Overwrite redirect uri with your-ocis.domain.com in identifier-registration.yml
+  ```
+  sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/idpnode/config/identifier-registration.yml
+  ```
+
+- Change into deployment folder
+  ```cd /opt/idpnode```
+
+- Start application stack
+  ```docker-compose up -d```
 
 ### Stack
 On both nodes, a traefik dokcer container is terminating ssl and forwards the http requests to the services. The nodes are named according to their services.
