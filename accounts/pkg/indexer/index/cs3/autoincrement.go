@@ -3,7 +3,6 @@ package cs3
 import (
 	"context"
 	"fmt"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -28,11 +29,11 @@ import (
 
 // Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
-	indexBy         string
-	typeName        string
-	filesDir        string
-	indexBaseDir    string
-	indexRootDir    string
+	indexBy      string
+	typeName     string
+	filesDir     string
+	indexBaseDir string
+	indexRootDir string
 
 	tokenManager    token.Manager
 	storageProvider provider.ProviderAPIClient
@@ -53,18 +54,18 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	}
 
 	u := &Autoincrement{
-		indexBy:         opts.IndexBy,
-		typeName:        opts.TypeName,
-		filesDir:        opts.FilesDir,
-		indexBaseDir:    path.Join(opts.DataDir, "index.cs3"),
-		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr:    opts.ProviderAddr,
 			DataURL:         opts.DataURL,
 			DataPrefix:      opts.DataPrefix,
 			JWTSecret:       opts.JWTSecret,
-			ServiceUserName: "",
-			ServiceUserUUID: "",
+			ServiceUserName: opts.ServiceUserName,
+			ServiceUserUUID: opts.ServiceUserUUID,
 		},
 		dataProvider: dataProviderClient{
 			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
@@ -343,11 +344,8 @@ func (idx *Autoincrement) makeDirIfNotExists(ctx context.Context, folder string)
 
 func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err error) {
 	u := &user.User{
-		Id:     &user.UserId{},
+		Id:     &user.UserId{OpaqueId: idx.cs3conf.ServiceUserUUID},
 		Groups: []string{},
-	}
-	if idx.cs3conf.ServiceUserName != "" {
-		u.Id.OpaqueId = idx.cs3conf.ServiceUserUUID
 	}
 	return idx.tokenManager.MintToken(ctx, u)
 }

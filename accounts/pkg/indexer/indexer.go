@@ -65,12 +65,12 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 			option.WithBounds(bound),
 			option.WithTypeName(getTypeFQN(t)),
 			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.config.Repo.Disk.Path),
 			option.WithDataURL(i.config.Repo.CS3.DataURL),
 			option.WithDataPrefix(i.config.Repo.CS3.DataPrefix),
 			option.WithJWTSecret(i.config.Repo.CS3.JWTSecret),
 			option.WithProviderAddr(i.config.Repo.CS3.ProviderAddr),
+			option.WithServiceUserUUID(i.config.ServiceUser.UUID),
+			option.WithServiceUserName(i.config.ServiceUser.Username),
 		)
 	}
 
