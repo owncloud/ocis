@@ -1501,31 +1501,10 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:152
 apiWebdavEtagPropagation1/deleteFileFolder.feature:182
 apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
-# https://github.com/owncloud/product/issues/238 renaming a files does not change etag of containing folder
-#
-apiWebdavEtagPropagation1/moveFileFolder.feature:20
-apiWebdavEtagPropagation1/moveFileFolder.feature:21
-apiWebdavEtagPropagation1/moveFileFolder.feature:58
-apiWebdavEtagPropagation1/moveFileFolder.feature:59
-apiWebdavEtagPropagation1/moveFileFolder.feature:74
-apiWebdavEtagPropagation1/moveFileFolder.feature:75
-apiWebdavEtagPropagation1/moveFileFolder.feature:93
-apiWebdavEtagPropagation1/moveFileFolder.feature:94
-apiWebdavEtagPropagation1/moveFileFolder.feature:112
-apiWebdavEtagPropagation1/moveFileFolder.feature:113
-apiWebdavEtagPropagation1/moveFileFolder.feature:306
-apiWebdavEtagPropagation1/moveFileFolder.feature:321
-#
 # https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
 #
-apiWebdavEtagPropagation1/moveFileFolder.feature:39
-apiWebdavEtagPropagation1/moveFileFolder.feature:40
-apiWebdavEtagPropagation1/moveFileFolder.feature:201
-apiWebdavEtagPropagation1/moveFileFolder.feature:202
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236
-apiWebdavEtagPropagation1/moveFileFolder.feature:269
-apiWebdavEtagPropagation1/moveFileFolder.feature:270
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
 #
