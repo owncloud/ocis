@@ -21,16 +21,22 @@ ocis running on a hcloud node behind traefik as reverse proxy
 ## Node
 
 ### Requirements
-* Server running Ubuntu 20.04 is public availible with an static ip address
-* An A-record for domain is pointing on the servers ip address
-* Create user `$sudo adduser username`
-* Add user to sudo group `$sudo usermod -aG sudo username`
+* Server running Ubuntu 20.04 is public availible with a static ip address
+* Two A-records for both domains are pointing on the servers ip address
+* Create user
+  `$ sudo adduser username`
+* Add user to sudo group
+  `$ sudo usermod -aG sudo username`
 * Add users pub key to `~/.ssh/authorized_keys`
-* Setup sshd to forbid root access and permit authorisation only by ssh key
-* Install docker `$sudo apt install docker.io`
-* Add user to docker group `$sudo usermod -aG docker username`
-* Install docker-compose via `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
-* Make docker-compose executable `$ sudo chmod +x /usr/local/bin/docker-compose`
+* Setup ssh to permit authorisation only by ssh key
+* Install docker
+  `$ sudo apt install docker.io`
+* Add user to docker group
+  `$ sudo usermod -aG docker username`
+* Install docker-compose via
+  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
+* Make docker-compose executable
+  `$ sudo chmod +x /usr/local/bin/docker-compose`
 * Environment variables for OCIS Stack are provided by .env file
 
 ### Setup on server
