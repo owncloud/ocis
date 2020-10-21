@@ -105,10 +105,6 @@ apiAuthWebDav/webDavPROPFINDAuth.feature:37
 #
 apiAuthWebDav/webDavPROPPATCHAuth.feature:38
 #
-# https://github.com/owncloud/ocis-reva/issues/9 users can access each-others data using the new webdav API
-#
-apiAuthWebDav/webDavPUTAuth.feature:38
-#
 # https://github.com/owncloud/ocis-reva/issues/175 Default capabilities for normal user not same as in oC-core
 # https://github.com/owncloud/ocis-reva/issues/176 Difference in response content of status.php and default capabilities
 #
@@ -165,7 +161,6 @@ apiProvisioning-v2/enableUser.feature:31
 apiProvisioning-v2/enableUser.feature:32
 apiProvisioning-v2/getUser.feature:34
 apiProvisioning-v2/getUser.feature:35
-apiProvisioning-v1/addUser.feature:118
 #
 # https://github.com/owncloud/ocis-accounts/issues/80
 # Creating an already existing user works
@@ -181,25 +176,16 @@ apiProvisioning-v2/addUser.feature:39
 apiProvisioning-v1/addUser.feature:69
 apiProvisioning-v2/addUser.feature:69
 #
+# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
+#
+apiSharePublicLink1/createPublicLinkShare.feature:793
+apiSharePublicLink1/createPublicLinkShare.feature:804
+#
 # https://github.com/owncloud/ocis-accounts/issues/128
 # Username is case sensitive
 #
-apiProvisioning-v1/addUser.feature:96
-apiProvisioning-v1/addUser.feature:97
-apiProvisioning-v1/addUser.feature:98
-apiProvisioning-v1/addUser.feature:99
-apiProvisioning-v1/addUser.feature:100
 apiProvisioning-v1/addUser.feature:102
-apiProvisioning-v1/getUser.feature:37
-apiProvisioning-v2/addUser.feature:96
-apiProvisioning-v2/addUser.feature:97
-apiProvisioning-v2/addUser.feature:98
-apiProvisioning-v2/addUser.feature:99
-apiProvisioning-v2/addUser.feature:100
 apiProvisioning-v2/addUser.feature:102
-apiProvisioning-v2/getUser.feature:37
-apiProvisioning-v1/deleteUser.feature:32
-apiProvisioning-v2/deleteUser.feature:32
 #
 # https://github.com/owncloud/ocis/issues/197
 # Client token generation not implemented
@@ -1510,6 +1496,7 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:20
 apiWebdavEtagPropagation1/moveFileFolder.feature:21
+apiWebdavEtagPropagation1/moveFileFolder.feature:58
 apiWebdavEtagPropagation1/moveFileFolder.feature:59
 apiWebdavEtagPropagation1/moveFileFolder.feature:74
 apiWebdavEtagPropagation1/moveFileFolder.feature:75
@@ -1517,7 +1504,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:93
 apiWebdavEtagPropagation1/moveFileFolder.feature:94
 apiWebdavEtagPropagation1/moveFileFolder.feature:112
 apiWebdavEtagPropagation1/moveFileFolder.feature:113
-apiWebdavEtagPropagation1/moveFileFolder.feature:306
 apiWebdavEtagPropagation1/moveFileFolder.feature:321
 #
 # https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
