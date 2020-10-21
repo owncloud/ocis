@@ -66,7 +66,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		enabled = "false"
 	}
 
-	render.Render(w, r, response.DataRender(&data.User{
+	d := &data.User{
 		UserID:            account.PreferredName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
@@ -83,7 +83,8 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Relative:   0.18,
 			Definition: "default",
 		},
-	}))
+	}
+	render.Render(w, r, response.DataRender(d))
 }
 
 // AddUser creates a new user account
@@ -118,15 +119,11 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	// fallbacks
 	/* TODO decide if we want to make these fallbacks. Keep in mind:
-	  - ocis requires a username and email
-	  - the username should really be different from the userid
-	if username == "" {
-		username = userid
-	}
-	if displayname == "" {
-		displayname = username
-	}
+	- ocis requires a preferred_name and email
 	*/
+	if displayname == "" {
+		displayname = userid
+	}
 
 	newAccount := &accounts.Account{
 		Id:                       userid,
