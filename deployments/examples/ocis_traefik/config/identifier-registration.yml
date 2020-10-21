@@ -7,12 +7,12 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - http://your.domain.com/oidc-callback.html
-      - http://your.domain.com/
-      - https://your.domain.com/
-      - https://your.domain.com/oidc-callback.html
-      - http://your.domain.com/oidc-silent-redirect.html
-      - https://your.domain.com/oidc-silent-redirect.html
+      - http://ocis.domain.com/
+      - https://ocis.domain.com/
+      - http://ocis.domain.com/oidc-callback.html
+      - https://ocis.domain.com/oidc-callback.html
+      - http://ocis.domain.com/oidc-silent-redirect.html
+      - https://ocis.domain.com/oidc-silent-redirect.html
     origins:
-      - http://your.domain.com
-      - https://your.domain.com
+      - http://ocis.domain.com
+      - https://ocis.domain.com
