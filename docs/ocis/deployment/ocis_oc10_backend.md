@@ -9,21 +9,21 @@ geekdocFilePath: ocis_frontend_oc10_backend.md
 
 {{< toc >}}
 
-
-# ocis frontend with oc10 backend deployment scenario
-
 This deployment scenario shows how to use ocis as frontend for a existing owncloud 10 installation.
 ocis will allow owncloud 10 users to log in and work with their files.
 
 ## Overview
+
 ### Node Setup
-ocis and oc10 running as docker containers behind traefik as reverse proxy
+
+* ocis and oc10 running as docker containers behind traefik as reverse proxy
 * Cloudflare DNS is resolving one domain for ocis and one for oc10
 * Letsencrypt is providing valid ssl certificate for both domains
 
 ## Node Deployment
 
 ### Requirements
+
 * Server running Ubuntu 20.04 is public availible with a static ip address
 * Two A-records for both domains are pointing on the servers ip address
 * Create user
@@ -57,35 +57,35 @@ ocis and oc10 running as docker containers behind traefik as reverse proxy
 
 ### Setup on server
 
-- Clone ocis repository
+* Clone ocis repository
 
   `git clone https://github.com/owncloud/ocis.git`
 
-- Copy example folder to /opt
+* Copy example folder to /opt
   `cp deployment/examples/ocis_oc10_backend /opt/`
 
-- Overwrite OCIS_DOMAIN and OC10_DOMAIN in .env with your-ocis.domain.com and your-oc10.domain.com
+* Overwrite OCIS_DOMAIN and OC10_DOMAIN in .env with your-ocis.domain.com and your-oc10.domain.com
 
   `sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/ocis_oc10_backend/.env`
 
   `sed -i 's/oc10.domain.com/your-oc10.domain.com/g' /opt/ocis_oc10_backend/.env`
 
-- Overwrite redirect uris with your-ocis.domain.com and your-oc10.domain.com in identifier-registration.yml
+* Overwrite redirect uris with your-ocis.domain.com and your-oc10.domain.com in identifier-registration.yml
 
   `sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/ocis_oc10_backend/ocis/identifier-registration.yml`
 
   `sed -i 's/oc10.domain.com/your-oc10.domain.com/g' /opt/ocis_oc10_backend/ocis/identifier-registration.yml`
 
-- Change into deployment folder
+* Change into deployment folder
 
   `cd /opt/ocis_oc10_backend`
 
-- Start application stack
+* Start application stack
 
   `docker-compose up -d`
 
-
 ### Stack
+
 The application stack is separated in docker containers. One is a traefik proxy which is terminating ssl and forwards the https requests to the internal docker network. Additional, traefik is creating two certificates that are stored in the file `letsencrypt/acme.json` of the users home directory. In a local setup, this traefik is not included.
 The next container is the ocis server which is exposing the webservice on port 9200 to traefic and provides the oidc provider konnectd to owncloud.
 oc10 is running as a three container setup out of owncloud-server, a db container and a redis container as memcache storage.
@@ -94,7 +94,7 @@ oc10 is running as a three container setup out of owncloud-server, a db containe
 
 #### Repository structure
 
-```
+```bash
 ocis_oc10_backend  # rootfolder
 │   .env
 │   docker-compose.yml
@@ -114,8 +114,7 @@ ocis_oc10_backend  # rootfolder
 
 In this deployment scenario, traefik requests letsencrypt to issue 2 ssl certificates, so two certificate resolver are needed. These are named according to the services, ocis for the ocis container and oc10 for the oc10 container.
 
-
-```
+```yaml
 ...
   traefik:
     image: "traefik:v2.2"
@@ -134,8 +133,10 @@ In this deployment scenario, traefik requests letsencrypt to issue 2 ssl certifi
       - "--certificatesresolvers.oc10.acme.storage=/letsencrypt/acme-oc10.json"
 ...
 ```
+
 Both container's traefik labels have to match with the correct resolvers and domains
-```
+
+```yaml
   ocis:
     ...
     labels:
@@ -143,7 +144,8 @@ Both container's traefik labels have to match with the correct resolvers and dom
       - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
       ...
 ```
-```
+
+```yaml
   oc10:
     ...
     labels:
@@ -162,7 +164,7 @@ Since ssl shall be terminated from traefik and inside of the docker network the 
 
 For ocis 2 config files are provided.
 
-```
+```bash
 │
 └───ocis #ocis related config files
 │   │   identifier-registration.yml
@@ -172,7 +174,7 @@ For ocis 2 config files are provided.
 Changes need to be done in identifier-registration.yml to match the domains
 Phoenix client needs the redirects uri's set to the ocis domain while oc10 client needs them to point on the owncloud domain
 
-```
+```yaml
 ---
 # OpenID Connect client registry.
 clients:
@@ -208,7 +210,7 @@ clients:
 
 The second file is proxy-config.json which configures the ocis internal service proxy routes. The policy_selector selector needs to be changed to forward to the related backend. ocis proxy makes the decision in this scenario to which backend the request needs to be forwarded based on the user storage.
 
-```
+```yaml
 {
   "HTTP": {
     "Namespace": "works.owncloud"
@@ -233,7 +235,7 @@ The second file is proxy-config.json which configures the ocis internal service 
 
 Glauth needs to be configured to utilize oc10 as primary user backend.
 
-```
+```yaml
 GLAUTH_BACKEND_DATASTORE: owncloud
 GLAUTH_BACKEND_SERVERS: https://${OC10_DOMAIN}/apps/graphapi/v1.0
 GLAUTH_BACKEND_BASEDN: dc=example,dc=org
@@ -244,7 +246,7 @@ ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts # Accounts fails to start whe
 
 To allow konnectd to glauth, ldap needs to be configured have to be set.
 
-```
+```yaml
 # Konnectd ldap setup
 LDAP_URI: ldap://localhost:9125
 LDAP_BINDDN: "cn=admin,dc=example,dc=org"
@@ -263,7 +265,7 @@ LDAP_FILTER: "(objectClass=posixaccount)"
 
 Owncloud 10 needs the graph api extensions to work in this setup. This extension is needed for Glauth to get oc10 users. It's necessary to add a image build step which extends owncloud/server:latest docker image with the app. The app is provided as tarball in the folder oc10/apps
 
-```
+```bash
 └───oc10
 │   │   Dockerfile
 │   │
@@ -273,7 +275,8 @@ Owncloud 10 needs the graph api extensions to work in this setup. This extension
 
 The docker files is pretty simple
 
-```
+```Dockerfile
+
 # Take the latest owncloud/server image as base
 FROM owncloud/server:latest
 
@@ -283,5 +286,4 @@ ADD apps/graphapi-0.1.0.tar.gz /var/www/owncloud/apps/
 
 The build is triggered by the terminal command `docker-compose build` from the root folder.
 
-
-Constraints: In this setup it's mandatory that the user has an email adress set in oc10
+Constraints: In this setup it's mandatory that the user has an email adress set in oc10.

@@ -9,11 +9,9 @@ geekdocFilePath: ocis_traefik.md
 
 {{< toc >}}
 
-
-# ocis traefik deployment scenario
-
 ## Overview
-ocis running on a hcloud node behind traefik as reverse proxy
+
+* ocis running on a hcloud node behind traefik as reverse proxy
 * Cloudflare DNS is resolving the domain
 * Letsencrypt provides a ssl certificate for the domain
 * Traefik docker container terminates ssl and forwards http requests to ocis
@@ -21,6 +19,7 @@ ocis running on a hcloud node behind traefik as reverse proxy
 ## Node
 
 ### Requirements
+
 * Server running Ubuntu 20.04 is public availible with a static ip address
 * Two A-records for both domains are pointing on the servers ip address
 * Create user
@@ -54,38 +53,40 @@ ocis running on a hcloud node behind traefik as reverse proxy
 
 ### Setup on server
 
-- Clone ocis repository
+* Clone ocis repository
 
   `git clone https://github.com/owncloud/ocis.git`
 
-- Copy example folder to /opt
+* Copy example folder to /opt
 
   `cp deployment/examples/ocis_traefik /opt/`
 
-- Overwrite OCIS_DOMAIN in .env with your.domain.com
+* Overwrite OCIS_DOMAIN in .env with your.domain.com
 
   `sed -i 's/ocis.domain.com/your.domain.com/g' /opt/ocis_traefik/.env`
 
-- Overwrite redirect uri with your.domain.com in identifier-registration.yml
+* Overwrite redirect uri with your.domain.com in identifier-registration.yml
 
   `sed -i 's/ocis.domain.com/your.domain.com/g' /opt/ocis_traefik/config/identifier-registration.yml`
 
-- Change into deployment folder
+* Change into deployment folder
 
   `cd /opt/ocis_traefik`
 
-- Start application stack
+* Start application stack
 
   `docker-compose up -d`
 
-
 ### Stack
+
 The application stack contains two containers. The first one is a traefik proxy which is terminating ssl and forwards the requests to the internal docker network. Additional, traefik is creating a certificate that is stored in `acme.json` in the folder `letsencrypt` inside the users home directory.
 The second one is th ocis server which is exposing the webservice on port 9200 to traefic.
 
 ### Config
+
 Edit docker-compose.yml file to fit your domain setup
-```
+
+```yaml
 ...
   traefik:
     image: "traefik:v2.2"
@@ -97,7 +98,7 @@ Edit docker-compose.yml file to fit your domain setup
 ...
 ```
 
-```
+```yaml
   ocis:
     container_name: ocis
     ...
@@ -113,7 +114,7 @@ In this example, ssl is terminated from traefik while inside of the docker netwo
 For ocis to work properly it's neccesary to provide one config file.
 Change identifier-registration.yml to match your domain.
 
-```
+```yaml
 ---
 # OpenID Connect client registry.
 clients:
@@ -136,7 +137,7 @@ clients:
 
 To make it availible for ocis inside of the container, `config` hast to be mounted as volume.
 
-```
+```yaml
     ...
     volumes:
       - ./config:/etc/ocis
