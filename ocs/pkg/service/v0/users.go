@@ -403,5 +403,5 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 	if res != nil && len(res.Accounts) == 1 {
 		return res.Accounts[0], nil
 	}
-	return nil, fmt.Errorf("cannot find account by username '%v'", name)
+	return nil, merrors.NotFound("", "The requested user could not be found")
 }

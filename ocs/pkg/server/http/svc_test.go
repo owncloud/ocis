@@ -120,7 +120,6 @@ type Quota struct {
 type User struct {
 	Enabled     string `json:"enabled" xml:"enabled"`
 	ID          string `json:"id" xml:"id"`
-	Username    string `json:"username" xml:"username"`
 	Email       string `json:"email" xml:"email"`
 	Password    string `json:"-" xml:"-"`
 	Quota       Quota  `json:"quota" xml:"quota"`
@@ -138,10 +137,6 @@ func (u *User) getUserRequestString() string {
 
 	if u.ID != "" {
 		res.Add("userid", u.ID)
-	}
-
-	if u.Username != "" {
-		res.Add("username", u.Username)
 	}
 
 	if u.Email != "" {
@@ -297,33 +292,31 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 			actual.ID, "the userid is not a valid uuid",
 		)
 	} else {
-		assert.Equal(t, expected.ID, actual.ID, "UserId doesn't match for user %v", expected.Username)
+		assert.Equal(t, expected.ID, actual.ID, "UserId doesn't match for user %v", expected.ID)
 	}
-	assert.Equal(t, expected.Username, actual.Username, "Username doesn't match for user %v", expected.Username)
-	assert.Equal(t, expected.Email, actual.Email, "email doesn't match for user %v", expected.Username)
-	assert.Equal(t, expected.Enabled, actual.Enabled, "enabled doesn't match for user %v", expected.Username)
-	assert.Equal(t, expected.Displayname, actual.Displayname, "displayname doesn't match for user %v", expected.Username)
+	assert.Equal(t, expected.Email, actual.Email, "email doesn't match for user %v", expected.ID)
+	assert.Equal(t, expected.Enabled, actual.Enabled, "enabled doesn't match for user %v", expected.ID)
+	assert.Equal(t, expected.Displayname, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
 	if quotaAvailable {
 		assert.NotZero(t, actual.Quota.Free)
 		assert.NotZero(t, actual.Quota.Used)
 		assert.NotZero(t, actual.Quota.Total)
 		assert.Equal(t, "default", actual.Quota.Definition)
 	} else {
-		assert.Equal(t, expected.Quota, actual.Quota, "Quota match for user %v", expected.Username)
+		assert.Equal(t, expected.Quota, actual.Quota, "Quota match for user %v", expected.ID)
 	}
 
 	if expected.UIDNumber != 0 {
-		assert.Equal(t, expected.UIDNumber, actual.UIDNumber, "UidNumber doesn't match for user %s", expected.Username)
+		assert.Equal(t, expected.UIDNumber, actual.UIDNumber, "UidNumber doesn't match for user %s", expected.ID)
 	}
 	if expected.GIDNumber != 0 {
-		assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %s", expected.Username)
+		assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %s", expected.ID)
 	}
 
 }
 
 func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
-	client := service.Client()
-	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", client)
+	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
 	req := &accountsProto.DeleteAccountRequest{Id: id}
 	res, err := cl.DeleteAccount(context.Background(), req)
@@ -331,8 +324,7 @@ func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
 }
 
 func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
-	client := service.Client()
-	cl := accountsProto.NewGroupsService("com.owncloud.api.accounts", client)
+	cl := accountsProto.NewGroupsService("com.owncloud.api.accounts", service.Client())
 
 	req := &accountsProto.DeleteGroupRequest{Id: id}
 	res, err := cl.DeleteGroup(context.Background(), req)
@@ -481,12 +473,10 @@ func getService() svc.Service {
 
 	var logger ocisLog.Logger
 
-	svc := svc.NewService(
+	return svc.NewService(
 		svc.Logger(logger),
 		svc.Config(c),
 	)
-
-	return svc
 }
 
 func createUser(u User) error {
@@ -518,15 +508,15 @@ func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
 }
 
 func TestCreateUser(t *testing.T) {
-	testData := []struct {
+	scenarios := []struct {
+		name string
 		user User
 		err  *Meta
 	}{
-		// A simple user
 		{
+			"A simple user",
 			User{
 				Enabled:     "true",
-				Username:    "rutherford",
 				ID:          "rutherford",
 				Email:       "rutherford@example.com",
 				Displayname: "ErnestRutherFord",
@@ -534,12 +524,10 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-
-		// User with Uid and Gid defined
 		{
+			"User with Uid and Gid defined",
 			User{
 				Enabled:     "true",
-				Username:    "thomson",
 				ID:          "thomson",
 				Email:       "thomson@example.com",
 				Displayname: "J. J. Thomson",
@@ -549,36 +537,22 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-		// User with different username and Id
+		// https://github.com/owncloud/ocis-ocs/issues/50
 		{
+			"User without password",
 			User{
 				Enabled:     "true",
-				Username:    "niels",
-				ID:          "bohr",
-				Email:       "bohr@example.com",
-				Displayname: "Niels Bohr",
-				Password:    "newPassword",
-			},
-			nil,
-		},
-		// User without password
-		// https://github.com/owncloud/ocis/ocs/issues/50
-		{
-			User{
-				Enabled:     "true",
-				Username:    "john",
 				ID:          "john",
 				Email:       "john@example.com",
 				Displayname: "John Dalton",
 			},
 			nil,
 		},
-		// User with special character in username
-		// https://github.com/owncloud/ocis/ocs/issues/49
+		// https://github.com/owncloud/ocis-ocs/issues/49
 		{
+			"User with special character in userid",
 			User{
 				Enabled:     "true",
-				Username:    "schrödinger",
 				ID:          "schrödinger",
 				Email:       "schrödinger@example.com",
 				Displayname: "Erwin Schrödinger",
@@ -590,11 +564,10 @@ func TestCreateUser(t *testing.T) {
 				Message:    "preferred_name 'schrödinger' must be at least the local part of an email",
 			},
 		},
-		// User with different userid and email
 		{
+			"User with different userid and email",
 			User{
 				Enabled:     "true",
-				Username:    "planck",
 				ID:          "planck",
 				Email:       "max@example.com",
 				Displayname: "Max Planck",
@@ -602,34 +575,20 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-		// User with different userid and email and username
 		{
-			User{
-				Enabled:     "true",
-				Username:    "hisenberg",
-				ID:          "hberg",
-				Email:       "werner@example.com",
-				Displayname: "Werner Hisenberg",
-				Password:    "newPassword",
-			},
-			nil,
-		},
-		// User without displayname
-		{
+			"User without displayname",
 			User{
 				Enabled:  "true",
-				Username: "oppenheimer",
 				ID:       "oppenheimer",
 				Email:    "robert@example.com",
 				Password: "newPassword",
 			},
 			nil,
 		},
-		// User wit invalid email
 		{
+			"User wit invalid email",
 			User{
 				Enabled:  "true",
-				Username: "chadwick",
 				ID:       "chadwick",
 				Email:    "not_a_email",
 				Password: "newPassword",
@@ -640,11 +599,10 @@ func TestCreateUser(t *testing.T) {
 				Message:    "mail 'not_a_email' must be a valid email",
 			},
 		},
-		// User without email
 		{
+			"User without email",
 			User{
 				Enabled:  "true",
-				Username: "chadwick",
 				ID:       "chadwick",
 				Password: "newPassword",
 			},
@@ -654,11 +612,10 @@ func TestCreateUser(t *testing.T) {
 				Message:    "mail '' must be a valid email",
 			},
 		},
-		// User without username
 		{
+			"User without userid",
 			User{
 				Enabled:  "true",
-				ID:       "chadwick",
 				Email:    "james@example.com",
 				Password: "newPassword",
 			},
@@ -668,86 +625,68 @@ func TestCreateUser(t *testing.T) {
 				Message:    "preferred_name '' must be at least the local part of an email",
 			},
 		},
-		// User without userid
-		{
-			User{
-				Enabled:  "true",
-				Username: "chadwick",
-				Email:    "james@example.com",
-				Password: "newPassword",
-			},
-			nil,
-		},
 	}
 
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {
-			for _, data := range testData {
-				formatpart := getFormatString(format)
-				res, err := sendRequest(
-					"POST",
-					fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
-					data.user.getUserRequestString(),
-					adminBasicAuth,
-				)
+			for _, scenario := range scenarios {
+				t.Run(fmt.Sprintf("%s (ocs=%s, format=%s)", scenario.name, ocsVersion, format), func(t *testing.T) {
+					formatpart := getFormatString(format)
+					res, err := sendRequest(
+						"POST",
+						fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
+						scenario.user.getUserRequestString(),
+						adminBasicAuth,
+					)
+					assert.NoError(t, err)
 
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				var response SingleUserResponse
-
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
+					var response SingleUserResponse
+					if format == "json" {
+						err = json.Unmarshal(res.Body.Bytes(), &response)
+						assert.NoError(t, err)
+					} else {
+						err = xml.Unmarshal(res.Body.Bytes(), &response.Ocs)
+						assert.NoError(t, err)
 					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
+
+					if scenario.err == nil {
+						assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
+						assertStatusCode(t, 200, res, ocsVersion)
+						assertUserSame(t, scenario.user, response.Ocs.Data, false)
+					} else {
+						assertStatusCode(t, 400, res, ocsVersion)
+						assertResponseMeta(t, *scenario.err, response.Ocs.Meta)
 					}
-				}
 
-				if data.err == nil {
-					assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-					assertStatusCode(t, 200, res, ocsVersion)
-					assertUserSame(t, data.user, response.Ocs.Data, false)
-				} else {
-					assertStatusCode(t, 400, res, ocsVersion)
-					assertResponseMeta(t, *data.err, response.Ocs.Meta)
-				}
+					var id string
+					if scenario.user.ID != "" {
+						id = scenario.user.ID
+					} else {
+						id = response.Ocs.Data.ID
+					}
 
-				var id string
-				if data.user.ID != "" {
-					id = data.user.ID
-				} else {
-					id = response.Ocs.Data.ID
-				}
+					res, err = sendRequest(
+						"GET",
+						userProvisioningEndPoint,
+						"",
+						adminBasicAuth,
+					)
+					assert.NoError(t, err)
 
-				res, err = sendRequest(
-					"GET",
-					userProvisioningEndPoint,
-					"",
-					adminBasicAuth,
-				)
+					var usersResponse GetUsersResponse
+					err = json.Unmarshal(res.Body.Bytes(), &usersResponse)
+					assert.NoError(t, err)
 
-				if err != nil {
-					t.Fatal(err)
-				}
+					assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
 
-				var usersResponse GetUsersResponse
-				if err := json.Unmarshal(res.Body.Bytes(), &usersResponse); err != nil {
-					t.Fatal(err)
-				}
-
-				assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
-
-				if data.err == nil {
-					assert.Contains(t, usersResponse.Ocs.Data.Users, id)
-				} else {
-					assert.NotContains(t, usersResponse.Ocs.Data.Users, data.user.ID)
-				}
+					if scenario.err == nil {
+						assert.Contains(t, usersResponse.Ocs.Data.Users, id)
+					} else {
+						assert.NotContains(t, usersResponse.Ocs.Data.Users, scenario.user.ID)
+					}
+					cleanUp(t)
+				})
 			}
-			cleanUp(t)
 		}
 	}
 }
@@ -756,14 +695,12 @@ func TestGetUsers(t *testing.T) {
 	users := []User{
 		{
 			Enabled:     "true",
-			Username:    "rutherford",
 			ID:          "rutherford",
 			Email:       "rutherford@example.com",
 			Displayname: "Ernest RutherFord",
 		},
 		{
 			Enabled:     "true",
-			Username:    "thomson",
 			ID:          "thomson",
 			Email:       "thomson@example.com",
 			Displayname: "J. J. Thomson",
@@ -806,7 +743,7 @@ func TestGetUsers(t *testing.T) {
 			assertStatusCode(t, 200, res, ocsVersion)
 			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 			for _, user := range users {
-				assert.Contains(t, response.Ocs.Data.Users, user.Username)
+				assert.Contains(t, response.Ocs.Data.Users, user.ID)
 			}
 			cleanUp(t)
 		}
@@ -854,14 +791,12 @@ func TestGetUser(t *testing.T) {
 	users := []User{
 		{
 			Enabled:     "true",
-			Username:    "rutherford",
 			ID:          "rutherford",
 			Email:       "rutherford@example.com",
 			Displayname: "Ernest RutherFord",
 		},
 		{
 			Enabled:     "true",
-			Username:    "thomson",
 			ID:          "thomson",
 			Email:       "thomson@example.com",
 			Displayname: "J. J. Thomson",
@@ -960,14 +895,12 @@ func TestDeleteUser(t *testing.T) {
 	users := []User{
 		{
 			Enabled:     "true",
-			Username:    "rutherford",
 			ID:          "rutherford",
 			Email:       "rutherford@example.com",
 			Displayname: "Ernest RutherFord",
 		},
 		{
 			Enabled:     "true",
-			Username:    "thomson",
 			ID:          "thomson",
 			Email:       "thomson@example.com",
 			Displayname: "J. J. Thomson",
@@ -1048,38 +981,35 @@ func TestDeleteUserInvalidId(t *testing.T) {
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {
 			for _, user := range invalidUsers {
-				formatpart := getFormatString(format)
-				res, err := sendRequest(
-					"DELETE",
-					fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user, formatpart),
-					"",
-					adminBasicAuth,
-				)
+				t.Run(fmt.Sprintf("%s (ocs=%s, format=%s)", user, ocsVersion, format), func(t *testing.T) {
+					formatpart := getFormatString(format)
+					res, err := sendRequest(
+						"DELETE",
+						fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user, formatpart),
+						"",
+						adminBasicAuth,
+					)
+					assert.NoError(t, err)
 
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				var response EmptyResponse
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
+					var response EmptyResponse
+					if format == "json" {
+						err = json.Unmarshal(res.Body.Bytes(), &response)
+						assert.NoError(t, err)
+					} else {
+						err = xml.Unmarshal(res.Body.Bytes(), &response.Ocs)
+						assert.NoError(t, err)
 					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
 
-				assertStatusCode(t, 404, res, ocsVersion)
-				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was not expected to be successful but was")
-				assert.Empty(t, response.Ocs.Data)
+					assertStatusCode(t, 404, res, ocsVersion)
+					assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was not expected to be successful but was")
+					assert.Empty(t, response.Ocs.Data)
 
-				assertResponseMeta(t, Meta{
-					Status:     "error",
-					StatusCode: 998,
-					Message:    "The requested user could not be found",
-				}, response.Ocs.Meta)
+					assertResponseMeta(t, Meta{
+						Status:     "error",
+						StatusCode: 998,
+						Message:    "The requested user could not be found",
+					}, response.Ocs.Meta)
+				})
 			}
 		}
 	}
@@ -1088,7 +1018,6 @@ func TestDeleteUserInvalidId(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
-		Username:    "rutherford",
 		ID:          "rutherford",
 		Email:       "rutherford@example.com",
 		Displayname: "Ernest RutherFord",
@@ -1129,23 +1058,9 @@ func TestUpdateUser(t *testing.T) {
 			nil,
 		},
 		{
-			"username",
-			"e_rutherford",
-			nil,
-		},
-		{
 			"email",
 			"",
 			nil,
-		},
-		{
-			"username",
-			"",
-			&Meta{
-				Status:     "error",
-				StatusCode: 400,
-				Message:    "preferred_name '' must be at least the local part of an email",
-			},
 		},
 		{
 			"password",
@@ -1214,8 +1129,6 @@ func TestUpdateUser(t *testing.T) {
 
 				updatedUser := user
 				switch data.UpdateKey {
-				case "username":
-					updatedUser.Username = data.UpdateValue
 				case "email":
 					updatedUser.Email = data.UpdateValue
 				case "displayname":
@@ -1286,7 +1199,6 @@ func TestUpdateUser(t *testing.T) {
 func TestGetSingleUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
-		Username:    "rutherford",
 		ID:          "rutherford",
 		Email:       "rutherford@example.com",
 		Displayname: "Ernest RutherFord",
@@ -1305,7 +1217,7 @@ func TestGetSingleUser(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
 				"",
-				fmt.Sprintf("%v:%v", user.Username, user.Password),
+				fmt.Sprintf("%v:%v", user.ID, user.Password),
 			)
 
 			if err != nil {
@@ -1344,7 +1256,6 @@ func TestGetSingleUser(t *testing.T) {
 func TestGetUserSigningKey(t *testing.T) {
 	user := User{
 		Enabled:     "true",
-		Username:    "rutherford",
 		ID:          "rutherford",
 		Email:       "rutherford@example.com",
 		Displayname: "Ernest RutherFord",
@@ -1363,7 +1274,7 @@ func TestGetUserSigningKey(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/user/signing-key%v", ocsVersion, formatpart),
 				"",
-				fmt.Sprintf("%v:%v", user.Username, user.Password),
+				fmt.Sprintf("%v:%v", user.ID, user.Password),
 			)
 
 			if err != nil {
@@ -1416,14 +1327,12 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 	users := []User{
 		{
 			Enabled:     "true",
-			Username:    "rutherford",
 			ID:          "rutherford",
 			Email:       "rutherford@example.com",
 			Displayname: "Ernest RutherFord",
 		},
 		{
 			Enabled:     "true",
-			Username:    "thomson",
 			ID:          "thomson",
 			Email:       "thomson@example.com",
 			Displayname: "J. J. Thomson",
@@ -1591,14 +1500,12 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 	users := []User{
 		{
 			Enabled:     "true",
-			Username:    "rutherford",
 			ID:          "rutherford",
 			Email:       "rutherford@example.com",
 			Displayname: "Ernest RutherFord",
 		},
 		{
 			Enabled:     "true",
-			Username:    "thomson",
 			ID:          "thomson",
 			Email:       "thomson@example.com",
 			Displayname: "J. J. Thomson",
@@ -1669,7 +1576,6 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",
-		Username:    "rutherford",
 		ID:          "rutherford",
 		Email:       "rutherford@example.com",
 		Displayname: "Ernest RutherFord",
@@ -1732,7 +1638,6 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 func TestRemoveUserFromGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",
-		Username:    "rutherford",
 		ID:          "rutherford",
 		Email:       "rutherford@example.com",
 		Displayname: "Ernest RutherFord",
