@@ -296,7 +296,11 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	}
 	assert.Equal(t, expected.Email, actual.Email, "email doesn't match for user %v", expected.ID)
 	assert.Equal(t, expected.Enabled, actual.Enabled, "enabled doesn't match for user %v", expected.ID)
-	assert.Equal(t, expected.Displayname, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
+	if expected.Displayname == "" {
+		assert.Equal(t, expected.ID, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
+	} else {
+		assert.Equal(t, expected.Displayname, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
+	}
 	if quotaAvailable {
 		assert.NotZero(t, actual.Quota.Free)
 		assert.NotZero(t, actual.Quota.Used)
