@@ -744,8 +744,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:84
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
-apiShareReshareToShares3/reShareUpdate.feature:25
-apiShareReshareToShares3/reShareUpdate.feature:26
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
 #

@@ -837,8 +837,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:84
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
-apiShareReshareToShares3/reShareUpdate.feature:42
-apiShareReshareToShares3/reShareUpdate.feature:43
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
 #
@@ -852,15 +850,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:127
 apiShareReshareToShares2/reShareSubfolder.feature:128
 apiShareReshareToShares2/reShareSubfolder.feature:149
 apiShareReshareToShares2/reShareSubfolder.feature:150
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiShareReshareToShares3/reShareUpdate.feature:76
-apiShareReshareToShares3/reShareUpdate.feature:77
-apiShareReshareToShares3/reShareUpdate.feature:93
-apiShareReshareToShares3/reShareUpdate.feature:94
-apiShareReshareToShares3/reShareUpdate.feature:25
-apiShareReshareToShares3/reShareUpdate.feature:26
 #
 # Share receiver cannot get share by id
 # https://github.com/owncloud/product/issues/253
