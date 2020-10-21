@@ -62,10 +62,6 @@ Edit docker-compose.yml file to fit your domain setup
       ...
 ```
 
-A folder for letsencypt to store the certificate needs to be created
-`$ mkdir ~/letsencrypt`
-This folder is bind to the docker container and the certificate is persistently stored into it.
-
 In this example, ssl is terminated from traefik while inside of the docker network the services are comunicating via http. For this `PROXY_TLS: "false"` as environment parameter for ocis has to be set.
 
 For ocis to work properly it's neccesary to provide one config file.
@@ -81,13 +77,15 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - http://your.domain.com
-      - http://your.domain.com/oidc-callback.html
-      - https://your.domain.com/
-      - https://your.domain.com/oidc-callback.html
+      - http://ocis.domain.com/
+      - https://ocis.domain.com/
+      - http://ocis.domain.com/oidc-callback.html
+      - https://ocis.domain.com/oidc-callback.html
+      - http://ocis.domain.com/oidc-silent-redirect.html
+      - https://ocis.domain.com/oidc-silent-redirect.html
     origins:
-      - http://your.domain.com
-      - https://your.domain.com
+      - http://ocis.domain.com
+      - https://ocis.domain.com
 ```
 
 To make it availible for ocis inside of the container, `config` hast to be mounted as volume.

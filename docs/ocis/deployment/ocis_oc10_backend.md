@@ -54,10 +54,8 @@ oc10 is running as a three container setup out of owncloud-server, a db containe
 
 ```
 ocis_oc10_backend  # rootfolder
-│   README.md
 │   .env
 │   docker-compose.yml
-│   docker-compose-local.yml
 │
 └───ocis #ocis related config files
 │   │   identifier-registration.yml
@@ -142,10 +140,12 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - http://ocis.domain.com
-      - http://ocis.domain.com/oidc-callback.html
+      - http://ocis.domain.com/
       - https://ocis.domain.com/
+      - http://ocis.domain.com/oidc-callback.html
       - https://ocis.domain.com/oidc-callback.html
+      - http://ocis.domain.com/oidc-silent-redirect.html
+      - https://ocis.domain.com/oidc-silent-redirect.html
     origins:
       - http://ocis.domain.com
       - https://ocis.domain.com
