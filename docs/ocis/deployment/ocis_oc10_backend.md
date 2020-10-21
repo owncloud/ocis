@@ -26,21 +26,48 @@ ocis and oc10 running as docker containers behind traefik as reverse proxy
 ### Requirements
 * Server running Ubuntu 20.04 is public availible with a static ip address
 * Two A-records for both domains are pointing on the servers ip address
-* Create user `$sudo adduser username`
-* Add user to sudo group `$sudo usermod -aG sudo username`
+* Create user
+  `$ sudo adduser username`
+* Add user to sudo group
+  `$ sudo usermod -aG sudo username`
 * Add users pub key to `~/.ssh/authorized_keys`
 * Setup ssh to permit authorisation only by ssh key
-* Install docker `$sudo apt install docker.io`
-* Add user to docker group `$sudo usermod -aG docker username`
-* Install docker-compose via `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
-* Make docker-compose executable `$ sudo chmod +x /usr/local/bin/docker-compose`
+* Install docker
+  `$ sudo apt install docker.io`
+* Add user to docker group
+  `$ sudo usermod -aG docker username`
+* Install docker-compose via
+  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` (docker compose version 1.27.4 as of today)
+* Make docker-compose executable
+  `$ sudo chmod +x /usr/local/bin/docker-compose`
 * Environment variables for OCIS Stack are provided by .env file
-* Change in `.env`
 
-```
-  OCIS_DOMAIN=ocis.domain.org
-  OC10_DOMAIN=oc10.domain.org
-```
+### Setup on server
+
+- Clone ocis repository
+
+  ```git clone https://github.com/owncloud/ocis.git```
+
+- Copy example folder to /opt
+  ```cp deployment/examples/ocis_oc10_backend /opt/```
+
+- Overwrite OCIS_DOMAIN and OC10_DOMAIN in .env with your-ocis.domain.com and your-oc10.domain.com
+  ```
+  sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/ocis_oc10_backend/.env
+  sed -i 's/oc10.domain.com/your-oc10.domain.com/g' /opt/ocis_oc10_backend/.env
+  ```
+
+- Overwrite redirect uris with your-ocis.domain.com and your-oc10.domain.com in identifier-registration.yml
+  ```
+  sed -i 's/ocis.domain.com/your-ocis.domain.com/g' /opt/ocis_oc10_backend/ocis/identifier-registration.yml
+  sed -i 's/oc10.domain.com/your-oc10.domain.com/g' /opt/ocis_oc10_backend/ocis/identifier-registration.yml
+  ```
+
+- Change into deployment folder
+  ```cd /opt/ocis_oc10_backend```
+
+- Start application stack
+  ```docker-compose up -d```
 
 
 ### Stack
