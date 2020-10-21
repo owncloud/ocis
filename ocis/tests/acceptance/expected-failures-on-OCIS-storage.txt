@@ -1504,6 +1504,7 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:93
 apiWebdavEtagPropagation1/moveFileFolder.feature:94
 apiWebdavEtagPropagation1/moveFileFolder.feature:112
 apiWebdavEtagPropagation1/moveFileFolder.feature:113
+apiWebdavEtagPropagation1/moveFileFolder.feature:306
 apiWebdavEtagPropagation1/moveFileFolder.feature:321
 #
 # https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
