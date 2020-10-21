@@ -11,6 +11,8 @@ clients:
       - http://ocis.domain.com/
       - https://ocis.domain.com/
       - https://ocis.domain.com/oidc-callback.html
+      - http://ocis.domain.com/oidc-silent-redirect.html
+      - https://ocis.domain.com/oidc-silent-redirect.html
     origins:
       - http://ocis.domain.com
       - https://ocis.domain.com

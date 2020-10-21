@@ -11,6 +11,8 @@ clients:
       - http://your.domain.com/
       - https://your.domain.com/
       - https://your.domain.com/oidc-callback.html
+      - http://your.domain.com/oidc-silent-redirect.html
+      - https://your.domain.com/oidc-silent-redirect.html
     origins:
       - http://your.domain.com
       - https://your.domain.com
