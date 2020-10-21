@@ -150,7 +150,7 @@ def testing(ctx, module):
   steps = generate(module) + [
     {
       'name': 'vet',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -165,7 +165,7 @@ def testing(ctx, module):
     },
     {
       'name': 'staticcheck',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -180,7 +180,7 @@ def testing(ctx, module):
     },
     {
       'name': 'lint',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -195,7 +195,7 @@ def testing(ctx, module):
     },
     {
         'name': 'test',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd %s' % (module),
@@ -526,7 +526,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
     'steps': [
       {
         'name': 'build-ocis',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -543,7 +543,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
       },
       {
         'name': 'ocis-server',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'detach': True,
         'environment' : {
@@ -869,7 +869,7 @@ def binary(ctx, name):
       generate('ocis') + [
       {
         'name': 'build',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -884,7 +884,7 @@ def binary(ctx, name):
       },
       {
         'name': 'finish',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -1075,7 +1075,7 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -1239,7 +1239,7 @@ def docs(ctx):
       },
       {
         'name': 'generate-config-docs',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'commands': generateConfigDocs,
         'volumes': [
           {
@@ -1327,7 +1327,7 @@ def generate(module):
   return [
     {
       'name': 'generate',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -1402,7 +1402,7 @@ def ocisServer(storage):
   return [
     {
       'name': 'ocis-server',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'detach': True,
       'environment' : {
@@ -1493,7 +1493,7 @@ def build():
   return [
     {
       'name': 'build',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd ocis',
