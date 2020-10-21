@@ -667,7 +667,7 @@ func TestListAccountsWithFilterQuery(t *testing.T) {
 		},
 		{
 			name:        "ListAccounts with exact match on mail",
-			query:       "mail eq 'user1@example.org'",
+			query:       "mail eq 'user1@example.com'",
 			expectedIDs: []string{user1.Id},
 		},
 		//{
@@ -682,32 +682,32 @@ func TestListAccountsWithFilterQuery(t *testing.T) {
 		//},
 		//{
 		//	name:        "ListAccounts with exact match on preferred_name AND mail",
-		//	query:       "preferred_name eq 'user1' and mail eq 'user1@example.org'",
+		//	query:       "preferred_name eq 'user1' and mail eq 'user1@example.com'",
 		//	expectedIDs: []string{user1.Id},
 		//},
 		//{
 		//	name:        "ListAccounts without match on preferred_name AND mail",
-		//	query:       "preferred_name eq 'user1' and mail eq 'wololo@example.org'",
+		//	query:       "preferred_name eq 'user1' and mail eq 'wololo@example.com'",
 		//	expectedIDs: []string{},
 		//},
 		//{
 		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail exists",
-		//	query:       "preferred_name eq 'user1' or mail eq 'user1@example.org'",
+		//	query:       "preferred_name eq 'user1' or mail eq 'user1@example.com'",
 		//	expectedIDs: []string{user1.Id},
 		//},
 		//{
 		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail does not exist",
-		//	query:       "preferred_name eq 'user1' or mail eq 'wololo@example.org'",
+		//	query:       "preferred_name eq 'user1' or mail eq 'wololo@example.com'",
 		//	expectedIDs: []string{user1.Id},
 		//},
 		//{
 		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name does not exists, mail exists",
-		//	query:       "preferred_name eq 'wololo' or mail eq 'user1@example.org'",
+		//	query:       "preferred_name eq 'wololo' or mail eq 'user1@example.com'",
 		//	expectedIDs: []string{user1.Id},
 		//},
 		//{
 		//	name:        "ListAccounts without match on preferred_name OR mail, preferred_name and mail do not exist",
-		//	query:       "preferred_name eq 'wololo' or mail eq 'wololo@example.org'",
+		//	query:       "preferred_name eq 'wololo' or mail eq 'wololo@example.com'",
 		//	expectedIDs: []string{},
 		//},
 		//{

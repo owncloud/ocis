@@ -110,31 +110,29 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 
 // CreateGroup implements the GroupsServiceHandler interface
 func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
-	var _ string
 	if in.Group == nil {
-		return merrors.BadRequest(s.id, "account missing")
+		return merrors.InternalServerError(s.id, "invalid group: empty", nil)
 	}
-	if in.Group.Id == "" {
-		in.Group.Id = uuid.Must(uuid.NewV4()).String()
+	*out = *in.Group
+
+	if out.Id == "" {
+		out.Id = uuid.Must(uuid.NewV4()).String()
 	}
 
-	_ = in.Group.Id
-
-	if _, err = cleanupID(in.Group.Id); err != nil {
+	if _, err = cleanupID(out.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	// extract member id
-	s.deflateMembers(in.Group)
+	s.deflateMembers(out)
 
-	if err = s.repo.WriteGroup(c, in.Group); err != nil {
-		s.log.Error().Err(err).Interface("group", in.Group).Msg("could not persist new group")
+	if err = s.repo.WriteGroup(c, out); err != nil {
+		s.log.Error().Err(err).Interface("group", out).Msg("could not persist new group")
 		return merrors.InternalServerError(s.id, "could not persist new group: %v", err.Error())
 	}
 
-	indexResults, err := s.index.Add(in.Group)
+	indexResults, err := s.index.Add(out)
 	if err != nil {
-		s.rollbackCreateGroup(c, in.Group)
+		s.rollbackCreateGroup(c, out)
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
 	}
 
@@ -142,15 +140,13 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 		if r.Field == "GidNumber" {
 			gid, err := strconv.Atoi(path.Base(r.Value))
 			if err != nil {
-				s.rollbackCreateGroup(c, in.Group)
+				s.rollbackCreateGroup(c, out)
 				return err
 			}
-			in.Group.GidNumber = int64(gid)
-			return s.repo.WriteGroup(context.Background(), in.Group)
+			out.GidNumber = int64(gid)
+			return s.repo.WriteGroup(context.Background(), out)
 		}
 	}
-
-	*out = *in.Group
 
 	return
 }

@@ -304,22 +304,24 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
-	var acc = in.Account
-	if acc == nil {
-		return merrors.BadRequest(s.id, "account missing")
+
+	if in.Account == nil {
+		return merrors.InternalServerError(s.id, "invalid account: empty", nil)
 	}
-	if acc.Id == "" {
-		acc.Id = uuid.Must(uuid.NewV4()).String()
+	*out = *in.Account
+
+	if out.Id == "" {
+		out.Id = uuid.Must(uuid.NewV4()).String()
 	}
-	if err = validateAccount(s.id, acc); err != nil {
+	if err = validateAccount(s.id, out); err != nil {
 		return err
 	}
 
-	if id, err = cleanupID(acc.Id); err != nil {
+	if id, err = cleanupID(out.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	exists, err := s.accountExists(ctx, acc.PreferredName, acc.Mail, acc.Id)
+	exists, err := s.accountExists(ctx, out.PreferredName, out.Mail, out.Id)
 	if err != nil {
 		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
 	}
@@ -327,17 +329,17 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return merrors.BadRequest(s.id, "account already exists")
 	}
 
-	if acc.PasswordProfile != nil {
-		if acc.PasswordProfile.Password != "" {
+	if out.PasswordProfile != nil {
+		if out.PasswordProfile.Password != "" {
 			// encrypt password
 			c := crypt.New(crypt.SHA512)
-			if acc.PasswordProfile.Password, err = c.Generate([]byte(acc.PasswordProfile.Password), nil); err != nil {
+			if out.PasswordProfile.Password, err = c.Generate([]byte(out.PasswordProfile.Password), nil); err != nil {
 				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
 				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
 			}
 		}
 
-		if err := passwordPoliciesValid(acc.PasswordProfile.PasswordPolicies); err != nil {
+		if err := passwordPoliciesValid(out.PasswordProfile.PasswordPolicies); err != nil {
 			return merrors.BadRequest(s.id, "%s", err)
 		}
 	}
@@ -346,33 +348,33 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	// TODO groups should be ignored during create, use groups.AddMember? return error?
 
 	// write and index account - note: don't do anything else in between!
-	if err = s.repo.WriteAccount(ctx, acc); err != nil {
+	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
-		s.debugLogAccount(acc).Msg("could not persist new account")
+		s.debugLogAccount(out).Msg("could not persist new account")
 		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
-	indexResults, err := s.index.Add(acc)
+	indexResults, err := s.index.Add(out)
 	if err != nil {
-		s.rollbackCreateAccount(ctx, acc)
+		s.rollbackCreateAccount(ctx, out)
 		return merrors.BadRequest(s.id, "Account already exists %v", err.Error())
 
 	}
-	s.log.Debug().Interface("account", acc).Msg("account after indexing")
+	s.log.Debug().Interface("account", out).Msg("account after indexing")
 
 	for _, r := range indexResults {
 		if r.Field == "UidNumber" {
 			id, err := strconv.Atoi(path.Base(r.Value))
 			if err != nil {
-				s.rollbackCreateAccount(ctx, acc)
+				s.rollbackCreateAccount(ctx, out)
 				return err
 			}
-			acc.UidNumber = int64(id)
+			out.UidNumber = int64(id)
 			break
 		}
 	}
 
-	if in.Account.GidNumber == 0 {
-		in.Account.GidNumber = userDefaultGID
+	if out.GidNumber == 0 {
+		out.GidNumber = userDefaultGID
 	}
 
 	r := proto.ListGroupsResponse{}
@@ -383,27 +385,25 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	}
 
 	for _, group := range r.Groups {
-		if group.GidNumber == in.Account.GidNumber {
-			in.Account.MemberOf = append(in.Account.MemberOf, group)
+		if group.GidNumber == out.GidNumber {
+			out.MemberOf = append(out.MemberOf, group)
 		}
 	}
 	//acc.MemberOf = append(acc.MemberOf, &group)
-	if err := s.repo.WriteAccount(context.Background(), acc); err != nil {
+	if err := s.repo.WriteAccount(context.Background(), out); err != nil {
 		return err
 	}
 
-	if acc.PasswordProfile != nil {
-		acc.PasswordProfile.Password = ""
+	if out.PasswordProfile != nil {
+		out.PasswordProfile.Password = ""
 	}
-
-	*out = *acc
 
 	// TODO: assign user role to all new users for now, as create Account request does not have any role field
 	if s.RoleService == nil {
 		return merrors.InternalServerError(s.id, "could not assign role to account: roleService not configured")
 	}
 	if _, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
-		AccountUuid: acc.Id,
+		AccountUuid: out.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	}); err != nil {
 		return merrors.InternalServerError(s.id, "could not assign role to account: %v", err.Error())
@@ -468,18 +468,18 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	}
 
 	if _, exists := validMask.Filter("PreferredName"); exists {
-		if err = validateAccountPreferredName(s.id, *in.Account); err != nil {
+		if err = validateAccountPreferredName(s.id, in.Account); err != nil {
 			return err
 		}
 	}
 	if _, exists := validMask.Filter("OnPremisesSamAccountName"); exists {
-		if err = validateAccountOnPremisesSamAccountName(s.id, *in.Account); err != nil {
+		if err = validateAccountOnPremisesSamAccountName(s.id, in.Account); err != nil {
 			return err
 		}
 	}
 	if _, exists := validMask.Filter("Mail"); exists {
 		if in.Account.Mail != "" {
-			if err = validateAccountEmail(s.id, *in.Account); err != nil {
+			if err = validateAccountEmail(s.id, in.Account); err != nil {
 				return err
 			}
 		}
@@ -620,33 +620,33 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 }
 
 func validateAccount(serviceID string, a *proto.Account) error {
-	if err := validateAccountPreferredName(serviceID, *a); err != nil {
+	if err := validateAccountPreferredName(serviceID, a); err != nil {
 		return err
 	}
-	if err := validateAccountOnPremisesSamAccountName(serviceID, *a); err != nil {
+	if err := validateAccountOnPremisesSamAccountName(serviceID, a); err != nil {
 		return err
 	}
-	if err := validateAccountEmail(serviceID, *a); err != nil {
+	if err := validateAccountEmail(serviceID, a); err != nil {
 		return err
 	}
 	return nil
 }
 
-func validateAccountPreferredName(serviceID string, a proto.Account) error {
+func validateAccountPreferredName(serviceID string, a *proto.Account) error {
 	if !isValidUsername(a.PreferredName) {
 		return merrors.BadRequest(serviceID, "preferred_name '%s' must be at least the local part of an email", a.PreferredName)
 	}
 	return nil
 }
 
-func validateAccountOnPremisesSamAccountName(serviceID string, a proto.Account) error {
+func validateAccountOnPremisesSamAccountName(serviceID string, a *proto.Account) error {
 	if !isValidUsername(a.OnPremisesSamAccountName) {
 		return merrors.BadRequest(serviceID, "on_premises_sam_account_name '%s' must be at least the local part of an email", a.OnPremisesSamAccountName)
 	}
 	return nil
 }
 
-func validateAccountEmail(serviceID string, a proto.Account) error {
+func validateAccountEmail(serviceID string, a *proto.Account) error {
 	if !isValidEmail(a.Mail) {
 		return merrors.BadRequest(serviceID, "mail '%s' must be a valid email", a.Mail)
 	}
