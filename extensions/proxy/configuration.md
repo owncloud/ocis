@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-21T15:41:02+0000"
+date: "2020-10-21T20:36:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -68,6 +68,15 @@ Usage: `ocis-proxy version [command options] [arguments...]`
 
 --service-name | $PROXY_SERVICE_NAME  
 : Service name. Default: `proxy`.
+
+### ocis-proxy health
+
+Check health status
+
+Usage: `ocis-proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
 ### ocis-proxy server
 
@@ -140,13 +149,4 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 
 --autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
-
-### ocis-proxy health
-
-Check health status
-
-Usage: `ocis-proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
