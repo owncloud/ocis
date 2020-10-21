@@ -1414,7 +1414,7 @@ def ocisServer(storage):
         #'STORAGE_HOME_EXPOSE_DATA_SERVER': 'true',
         'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
         'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
-        #'STORAGE_USERS_EXPOSE_DATA_SERVER': 'true',
+        'STORAGE_USERS_EXPOSE_DATA_SERVER': 'true',
         'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
         'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
         'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
