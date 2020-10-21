@@ -20,55 +20,48 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 
 		// Services
 
-		// Users
+		// Userprovider
 
 		&cli.StringFlag{
 			Name:        "network",
 			Value:       "tcp",
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
-			EnvVars:     []string{"STORAGE_USERS_NETWORK"},
-			Destination: &cfg.Reva.Users.Network,
-		},
-		&cli.StringFlag{
-			Name:        "protocol",
-			Value:       "grpc",
-			Usage:       "protocol for storage service, can be 'http' or 'grpc'",
-			EnvVars:     []string{"STORAGE_USERS_PROTOCOL"},
-			Destination: &cfg.Reva.Users.Protocol,
+			EnvVars:     []string{"STORAGE_USERPROVIDER_NETWORK"},
+			Destination: &cfg.Reva.Users.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "addr",
 			Value:       "0.0.0.0:9144",
 			Usage:       "Address to bind storage service",
-			EnvVars:     []string{"STORAGE_USERS_ADDR"},
-			Destination: &cfg.Reva.Users.Addr,
+			EnvVars:     []string{"STORAGE_USERPROVIDER_ADDR"},
+			Destination: &cfg.Reva.Users.GRPCAddr,
 		},
 		&cli.StringFlag{
-			Name:        "url",
+			Name:        "endpoint",
 			Value:       "localhost:9144",
 			Usage:       "URL to use for the storage service",
-			EnvVars:     []string{"STORAGE_USERS_URL"},
-			Destination: &cfg.Reva.Users.URL,
+			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.Users.Endpoint,
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
 			Value:   cli.NewStringSlice("userprovider"), // TODO preferences
 			Usage:   "--service userprovider [--service otherservice]",
-			EnvVars: []string{"STORAGE_USERS_SERVICES"},
+			EnvVars: []string{"STORAGE_USERPROVIDER_SERVICES"},
 		},
 
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "ldap",
 			Usage:       "user driver: 'demo', 'json', 'ldap', or 'rest'",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
+			EnvVars:     []string{"STORAGE_USERPROVIDER_DRIVER"},
 			Destination: &cfg.Reva.Users.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "json-config",
 			Value:       "",
 			Usage:       "Path to users.json file",
-			EnvVars:     []string{"STORAGE_USERS_JSON"},
+			EnvVars:     []string{"STORAGE_USERPROVIDER_JSON"},
 			Destination: &cfg.Reva.Users.JSON,
 		},
 

@@ -348,10 +348,6 @@ apiShareManagementToShares/acceptShares.feature:398
 apiShareManagementToShares/acceptShares.feature:417
 apiShareManagementToShares/acceptShares.feature:439
 #
-# https://github.com/owncloud/product/issues/208 After accepting a share data in the received file cannot be downloaded
-#
-apiShareManagementToShares/acceptSharesToSharesFolder.feature:17
-#
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
@@ -433,10 +429,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:343
 #
 apiShareManagementBasicToShares/deleteShareFromShares.feature:58
 apiShareManagementBasicToShares/deleteShareFromShares.feature:72
-#
-# https://github.com/owncloud/product/issues/270 share permissions are not enforced
-#
-apiShareManagementBasicToShares/deleteShareFromShares.feature:107
 #
 # cannot share a folder with create permission
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
@@ -752,8 +744,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:84
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
-apiShareReshareToShares3/reShareUpdate.feature:25
-apiShareReshareToShares3/reShareUpdate.feature:26
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
 #

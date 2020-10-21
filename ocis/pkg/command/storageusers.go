@@ -4,25 +4,25 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
-// StorageUsersCommand is the entrypoint for the reva-users command.
+// StorageUsersCommand is the entrypoint for the storage-users command.
 func StorageUsersCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-users",
-		Usage:    "Start storage users service",
+		Usage:    "Start storage and data provider for /users mount",
 		Category: "Extensions",
-		Flags:    flagset.UsersWithConfig(cfg.Storage),
+		Flags:    flagset.StorageUsersWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
 			scfg := configureStorageUsers(cfg)
 
 			return cli.HandleAction(
-				command.Users(scfg).Action,
+				command.StorageUsers(scfg).Action,
 				c,
 			)
 		},

@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -103,15 +102,15 @@ func Frontend(cfg *config.Config) *cli.Command {
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "frontend",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint, // Todo or address?
 					},
 					"http": map[string]interface{}{
-						"network": cfg.Reva.Frontend.Network,
-						"address": cfg.Reva.Frontend.Addr,
+						"network": cfg.Reva.Frontend.HTTPNetwork,
+						"address": cfg.Reva.Frontend.HTTPAddr,
 						"middlewares": map[string]interface{}{
 							"cors": map[string]interface{}{
 								"allow_credentials": true,
@@ -139,7 +138,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"config": map[string]interface{}{
 									"version": "1.8",
 									"website": "reva",
-									"host":    urlWithScheme(cfg.Reva.Frontend.URL),
+									"host":    cfg.Reva.Frontend.PublicURL,
 									"contact": "admin@localhost",
 									"ssl":     "false",
 								},
@@ -297,14 +296,4 @@ func Frontend(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
-}
-
-// urlWithScheme checks if the given string is prefixed with "http". If it is not, "http://" will be added as prefix.
-// As we can't tell if http or https should be the preferred scheme, the correct approach would be to fail on urls
-// without scheme. As long as we have default urls in our flagsets which don't have a scheme, this is a feasible workaround.
-func urlWithScheme(str string) string {
-	if !strings.HasPrefix(str, "http") {
-		str = "http://" + str
-	}
-	return str
 }

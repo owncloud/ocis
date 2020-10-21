@@ -105,10 +105,6 @@ apiAuthWebDav/webDavPROPFINDAuth.feature:37
 #
 apiAuthWebDav/webDavPROPPATCHAuth.feature:38
 #
-# https://github.com/owncloud/ocis-reva/issues/9 users can access each-others data using the new webdav API
-#
-apiAuthWebDav/webDavPUTAuth.feature:38
-#
 # https://github.com/owncloud/ocis-reva/issues/175 Default capabilities for normal user not same as in oC-core
 # https://github.com/owncloud/ocis-reva/issues/176 Difference in response content of status.php and default capabilities
 #
@@ -348,10 +344,6 @@ apiShareManagementToShares/acceptShares.feature:398
 apiShareManagementToShares/acceptShares.feature:417
 apiShareManagementToShares/acceptShares.feature:439
 #
-# https://github.com/owncloud/product/issues/208 After accepting a share data in the received file cannot be downloaded
-#
-apiShareManagementToShares/acceptSharesToSharesFolder.feature:17
-#
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
@@ -441,10 +433,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:343
 apiShareManagementBasicToShares/deleteShareFromShares.feature:58
 apiShareManagementBasicToShares/deleteShareFromShares.feature:72
 #
-# https://github.com/owncloud/product/issues/270 share permissions are not enforced
-#
-apiShareManagementBasicToShares/deleteShareFromShares.feature:107
-#
 # cannot share a folder with create permission
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
 #
@@ -498,22 +486,8 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 apiShareOperationsToShares/gettingShares.feature:167
 apiShareOperationsToShares/gettingShares.feature:168
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiSharePublicLink1/changingPublicLinkShare.feature:74
-apiSharePublicLink1/changingPublicLinkShare.feature:139
-apiSharePublicLink1/changingPublicLinkShare.feature:185
-apiSharePublicLink1/changingPublicLinkShare.feature:209
-apiSharePublicLink1/changingPublicLinkShare.feature:255
 apiSharePublicLink1/createPublicLinkShare.feature:793
 apiSharePublicLink1/createPublicLinkShare.feature:804
-apiSharePublicLink1/deletePublicLinkShare.feature:20
-apiSharePublicLink1/deletePublicLinkShare.feature:21
-apiSharePublicLink1/deletePublicLinkShare.feature:53
-apiSharePublicLink1/deletePublicLinkShare.feature:54
-apiSharePublicLink1/deletePublicLinkShare.feature:70
-apiSharePublicLink1/deletePublicLinkShare.feature:71
 #
 # https://github.com/owncloud/product/issues/271 Cannot set mtime on upload
 #
@@ -624,33 +598,6 @@ apiSharePublicLink1/createPublicLinkShare.feature:730
 #
 apiSharePublicLink1/createPublicLinkShare.feature:733
 apiSharePublicLink1/createPublicLinkShare.feature:742
-#
-# https://github.com/owncloud/ocis-reva/issues/311 Deleting a public link after renaming a file
-#
-apiSharePublicLink1/deletePublicLinkShare.feature:37
-apiSharePublicLink1/deletePublicLinkShare.feature:38
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiSharePublicLink2/copyFromPublicLink.feature:9
-apiSharePublicLink2/copyFromPublicLink.feature:21
-apiSharePublicLink2/copyFromPublicLink.feature:34
-apiSharePublicLink2/copyFromPublicLink.feature:47
-apiSharePublicLink2/copyFromPublicLink.feature:86
-apiSharePublicLink2/copyFromPublicLink.feature:113
-apiSharePublicLink2/copyFromPublicLink.feature:114
-apiSharePublicLink2/copyFromPublicLink.feature:115
-apiSharePublicLink2/copyFromPublicLink.feature:116
-apiSharePublicLink2/copyFromPublicLink.feature:131
-apiSharePublicLink2/copyFromPublicLink.feature:132
-apiSharePublicLink2/copyFromPublicLink.feature:133
-apiSharePublicLink2/copyFromPublicLink.feature:134
-apiSharePublicLink2/copyFromPublicLink.feature:150
-apiSharePublicLink2/copyFromPublicLink.feature:151
-apiSharePublicLink2/copyFromPublicLink.feature:152
-apiSharePublicLink2/copyFromPublicLink.feature:153
-apiSharePublicLink2/multilinkSharing.feature:108
-apiSharePublicLink2/uploadToPublicLinkShare.feature:92
 #
 # https://github.com/owncloud/ocis-reva/issues/373 copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file
 #
@@ -890,8 +837,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:84
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
-apiShareReshareToShares3/reShareUpdate.feature:42
-apiShareReshareToShares3/reShareUpdate.feature:43
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
 #
@@ -905,15 +850,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:127
 apiShareReshareToShares2/reShareSubfolder.feature:128
 apiShareReshareToShares2/reShareSubfolder.feature:149
 apiShareReshareToShares2/reShareSubfolder.feature:150
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiShareReshareToShares3/reShareUpdate.feature:76
-apiShareReshareToShares3/reShareUpdate.feature:77
-apiShareReshareToShares3/reShareUpdate.feature:93
-apiShareReshareToShares3/reShareUpdate.feature:94
-apiShareReshareToShares3/reShareUpdate.feature:25
-apiShareReshareToShares3/reShareUpdate.feature:26
 #
 # Share receiver cannot get share by id
 # https://github.com/owncloud/product/issues/253
@@ -1128,25 +1064,6 @@ apiWebdavMove1/moveFolderToExcludedDirectory.feature:35
 apiWebdavMove1/moveFolderToExcludedDirectory.feature:70
 apiWebdavMove1/moveFolderToExcludedDirectory.feature:71
 #
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiWebdavMove2/moveFile.feature:21
-apiWebdavMove2/moveFile.feature:22
-apiWebdavMove2/moveFile.feature:34
-apiWebdavMove2/moveFile.feature:35
-apiWebdavMove2/moveFile.feature:303
-apiWebdavMove2/moveFile.feature:304
-apiWebdavMove2/moveFile.feature:305
-apiWebdavMove2/moveFile.feature:306
-apiWebdavMove2/moveFile.feature:307
-apiWebdavMove2/moveFile.feature:308
-apiWebdavMove2/moveFile.feature:309
-apiWebdavMove2/moveFile.feature:310
-apiWebdavMove2/moveFile.feature:311
-apiWebdavMove2/moveFile.feature:312
-apiWebdavMove2/moveFile.feature:313
-apiWebdavMove2/moveFile.feature:314
-#
 # https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
 apiWebdavMove2/moveFile.feature:89
@@ -1189,15 +1106,6 @@ apiWebdavMove2/moveFileToExcludedDirectory.feature:28
 apiWebdavMove2/moveFileToExcludedDirectory.feature:29
 apiWebdavMove2/moveFileToExcludedDirectory.feature:63
 apiWebdavMove2/moveFileToExcludedDirectory.feature:64
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiWebdavOperations/deleteFile.feature:33
-apiWebdavOperations/deleteFile.feature:34
-apiWebdavOperations/deleteFolder.feature:32
-apiWebdavOperations/deleteFolder.feature:33
-apiWebdavOperations/deleteFolder.feature:47
-apiWebdavOperations/deleteFolder.feature:48
 #
 # https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
@@ -1246,26 +1154,6 @@ apiWebdavOperations/search.feature:210
 apiWebdavOperations/search.feature:211
 apiWebdavOperations/search.feature:213
 apiWebdavOperations/search.feature:229
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiWebdavProperties1/copyFile.feature:183
-apiWebdavProperties1/copyFile.feature:184
-apiWebdavProperties1/createFolder.feature:18
-apiWebdavProperties1/createFolder.feature:19
-apiWebdavProperties1/createFolder.feature:20
-apiWebdavProperties1/createFolder.feature:21
-apiWebdavProperties1/createFolder.feature:22
-apiWebdavProperties1/createFolder.feature:23
-apiWebdavProperties1/createFolder.feature:24
-apiWebdavProperties1/createFolder.feature:25
-apiWebdavProperties1/createFolder.feature:26
-apiWebdavProperties1/createFolder.feature:27
-apiWebdavProperties1/createFolder.feature:28
-apiWebdavProperties1/createFolder.feature:29
-apiWebdavProperties1/createFolder.feature:30
-apiWebdavProperties1/createFolder.feature:31
-apiWebdavProperties1/createFolder.feature:32
 #
 # https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
@@ -1333,33 +1221,6 @@ apiWebdavProperties1/getQuota.feature:78
 #
 apiWebdavProperties1/setFileProperties.feature:63
 apiWebdavProperties1/setFileProperties.feature:64
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiWebdavProperties2/getFileProperties.feature:19
-apiWebdavProperties2/getFileProperties.feature:20
-apiWebdavProperties2/getFileProperties.feature:21
-apiWebdavProperties2/getFileProperties.feature:22
-apiWebdavProperties2/getFileProperties.feature:23
-apiWebdavProperties2/getFileProperties.feature:24
-apiWebdavProperties2/getFileProperties.feature:25
-apiWebdavProperties2/getFileProperties.feature:26
-apiWebdavProperties2/getFileProperties.feature:38
-apiWebdavProperties2/getFileProperties.feature:42
-apiWebdavProperties2/getFileProperties.feature:81
-apiWebdavProperties2/getFileProperties.feature:82
-apiWebdavProperties2/getFileProperties.feature:83
-apiWebdavProperties2/getFileProperties.feature:84
-apiWebdavProperties2/getFileProperties.feature:85
-apiWebdavProperties2/getFileProperties.feature:86
-apiWebdavProperties2/getFileProperties.feature:87
-apiWebdavProperties2/getFileProperties.feature:88
-apiWebdavProperties2/getFileProperties.feature:89
-apiWebdavProperties2/getFileProperties.feature:90
-apiWebdavProperties2/getFileProperties.feature:102
-apiWebdavProperties2/getFileProperties.feature:103
-apiWebdavProperties2/getFileProperties.feature:339
-apiWebdavProperties2/getFileProperties.feature:340
 #
 # https://github.com/owncloud/ocis-reva/issues/214 XML properties in webdav response not properly encoded
 #
@@ -1432,28 +1293,6 @@ apiWebdavProperties2/getFileProperties.feature:441
 apiWebdavProperties2/getFileProperties.feature:442
 apiWebdavProperties2/getFileProperties.feature:454
 apiWebdavProperties2/getFileProperties.feature:455
-#
-# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
-#
-apiWebdavUpload1/uploadFile.feature:20
-apiWebdavUpload1/uploadFile.feature:21
-apiWebdavUpload1/uploadFile.feature:22
-apiWebdavUpload1/uploadFile.feature:23
-apiWebdavUpload1/uploadFile.feature:24
-apiWebdavUpload1/uploadFile.feature:25
-apiWebdavUpload1/uploadFile.feature:26
-apiWebdavUpload1/uploadFile.feature:27
-apiWebdavUpload1/uploadFile.feature:123
-apiWebdavUpload1/uploadFile.feature:124
-apiWebdavUpload1/uploadFile.feature:125
-apiWebdavUpload1/uploadFile.feature:126
-apiWebdavUpload1/uploadFile.feature:127
-apiWebdavUpload1/uploadFile.feature:128
-apiWebdavUpload1/uploadFile.feature:129
-apiWebdavUpload1/uploadFile.feature:130
-apiWebdavUpload1/uploadFile.feature:131
-apiWebdavUpload1/uploadFile.feature:132
-apiWebdavUpload1/uploadFile.feature:133
 apiWebdavUpload1/uploadFile.feature:144
 apiWebdavUpload1/uploadFile.feature:145
 apiWebdavUpload1/uploadFile.feature:157
@@ -1681,13 +1520,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:321
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:39
 apiWebdavEtagPropagation1/moveFileFolder.feature:40
-#
-# https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
-#
-apiWebdavEtagPropagation1/moveFileFolder.feature:139
-apiWebdavEtagPropagation1/moveFileFolder.feature:140
-apiWebdavEtagPropagation1/moveFileFolder.feature:166
-apiWebdavEtagPropagation1/moveFileFolder.feature:167
 apiWebdavEtagPropagation1/moveFileFolder.feature:201
 apiWebdavEtagPropagation1/moveFileFolder.feature:202
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
@@ -1696,18 +1528,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:269
 apiWebdavEtagPropagation1/moveFileFolder.feature:270
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
-apiWebdavEtagPropagation2/createFolder.feature:63
-apiWebdavEtagPropagation2/createFolder.feature:64
-apiWebdavEtagPropagation2/createFolder.feature:87
-apiWebdavEtagPropagation2/createFolder.feature:88
-apiWebdavEtagPropagation2/upload.feature:63
-apiWebdavEtagPropagation2/upload.feature:64
-apiWebdavEtagPropagation2/upload.feature:86
-apiWebdavEtagPropagation2/upload.feature:87
-apiWebdavEtagPropagation2/upload.feature:110
-apiWebdavEtagPropagation2/upload.feature:111
-apiWebdavEtagPropagation2/upload.feature:134
-apiWebdavEtagPropagation2/upload.feature:135
 #
 # https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
 #
