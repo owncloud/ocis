@@ -13,7 +13,7 @@ type Bound struct {
 // Options defines the available options for this package.
 type Options struct {
 	CaseInsensitive bool
-	Bound         *Bound
+	Bound           *Bound
 
 	// Disk Options
 	TypeName      string
@@ -25,10 +25,12 @@ type Options struct {
 	Entity        interface{}
 
 	// CS3 options
-	DataURL      string
-	DataPrefix   string
-	JWTSecret    string
-	ProviderAddr string
+	DataURL         string
+	DataPrefix      string
+	JWTSecret       string
+	ProviderAddr    string
+	ServiceUserUUID string
+	ServiceUserName string
 }
 
 // CaseInsensitive sets the CaseInsensitive field.
@@ -94,23 +96,37 @@ func WithTypeName(val string) Option {
 	}
 }
 
-// WithIndexBy sets the option IndexBy
+// WithIndexBy sets the option IndexBy.
 func WithIndexBy(val string) Option {
 	return func(o *Options) {
 		o.IndexBy = val
 	}
 }
 
-// WithFilesDir sets the option FilesDir
+// WithFilesDir sets the option FilesDir.
 func WithFilesDir(val string) Option {
 	return func(o *Options) {
 		o.FilesDir = val
 	}
 }
 
-// WithProviderAddr sets the option ProviderAddr
+// WithProviderAddr sets the option ProviderAddr.
 func WithProviderAddr(val string) Option {
 	return func(o *Options) {
 		o.ProviderAddr = val
+	}
+}
+
+// WithServiceUserUUID sets the option ServiceUserUUID.
+func WithServiceUserUUID(val string) Option {
+	return func(o *Options) {
+		o.ServiceUserUUID = val
+	}
+}
+
+// WithServiceUserName sets the option ServiceUserName.
+func WithServiceUserName(val string) Option {
+	return func(o *Options) {
+		o.ServiceUserName = val
 	}
 }

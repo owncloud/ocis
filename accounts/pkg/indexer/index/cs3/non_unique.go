@@ -3,6 +3,13 @@ package cs3
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -14,12 +21,6 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
 	"google.golang.org/grpc/metadata"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
 )
 
 func init() {
@@ -69,8 +70,8 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 			DataURL:         opts.DataURL,
 			DataPrefix:      opts.DataPrefix,
 			JWTSecret:       opts.JWTSecret,
-			ServiceUserName: "",
-			ServiceUserUUID: "",
+			ServiceUserName: opts.ServiceUserName,
+			ServiceUserUUID: opts.ServiceUserUUID,
 		},
 		dataProvider: dataProviderClient{
 			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
@@ -316,11 +317,8 @@ func (idx *NonUnique) FilesDir() string {
 
 func (idx *NonUnique) authenticate(ctx context.Context) (token string, err error) {
 	u := &user.User{
-		Id:     &user.UserId{},
+		Id:     &user.UserId{OpaqueId: idx.cs3conf.ServiceUserUUID},
 		Groups: []string{},
-	}
-	if idx.cs3conf.ServiceUserName != "" {
-		u.Id.OpaqueId = idx.cs3conf.ServiceUserUUID
 	}
 	return idx.tokenManager.MintToken(ctx, u)
 }
