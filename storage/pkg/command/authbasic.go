@@ -73,18 +73,18 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Users.MaxCPUs,
+						"max_cpus":             cfg.Reva.AuthBasic.MaxCPUs,
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "auth-basic",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.AuthBasic.Network,
-						"address": cfg.Reva.AuthBasic.Addr,
+						"network": cfg.Reva.AuthBasic.GRPCNetwork,
+						"address": cfg.Reva.AuthBasic.GRPCAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"authprovider": map[string]interface{}{

@@ -89,38 +89,39 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":             "100",
-						"tracing_enabled":      false,
+						"max_cpus":             cfg.Reva.StorageMetadata.MaxCPUs,
+						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "storage-metadata",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.StorageMetadata.Network,
-						"address": cfg.Reva.StorageMetadata.Addr,
+						"network": cfg.Reva.StorageMetadata.GRPCNetwork,
+						"address": cfg.Reva.StorageMetadata.GRPCAddr,
 						"interceptors": map[string]interface{}{
 							"log": map[string]interface{}{},
 						},
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
 								"mount_path":      "/meta",
-								"data_server_url": cfg.Reva.StorageMetadataData.URL,
 								"driver":          cfg.Reva.StorageMetadata.Driver,
 								"drivers":         drivers(cfg),
+								"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
 							},
 						},
 					},
 					"http": map[string]interface{}{
-						"network": cfg.Reva.StorageMetadataData.Network,
-						"address": cfg.Reva.StorageMetadataData.Addr,
+						"network": cfg.Reva.StorageMetadata.HTTPNetwork,
+						"address": cfg.Reva.StorageMetadata.HTTPAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"dataprovider": map[string]interface{}{
 								"prefix":      "data",
-								"driver":      cfg.Reva.StorageMetadataData.Driver,
+								"driver":      cfg.Reva.StorageMetadata.Driver,
 								"drivers":     drivers(cfg),
 								"timeout":     86400,
 								"insecure":    true,

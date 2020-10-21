@@ -76,14 +76,14 @@ func Users(cfg *config.Config) *cli.Command {
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "users",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.Users.Network,
-						"address": cfg.Reva.Users.Addr,
+						"network": cfg.Reva.Users.GRPCNetwork,
+						"address": cfg.Reva.Users.GRPCAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"userprovider": map[string]interface{}{

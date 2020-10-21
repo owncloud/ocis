@@ -476,6 +476,11 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 apiShareOperationsToShares/gettingShares.feature:167
 apiShareOperationsToShares/gettingShares.feature:168
+<<<<<<< HEAD
+=======
+apiSharePublicLink1/createPublicLinkShare.feature:793
+apiSharePublicLink1/createPublicLinkShare.feature:804
+>>>>>>> master
 #
 # https://github.com/owncloud/product/issues/271 Cannot set mtime on upload
 #
@@ -1281,9 +1286,12 @@ apiWebdavProperties2/getFileProperties.feature:441
 apiWebdavProperties2/getFileProperties.feature:442
 apiWebdavProperties2/getFileProperties.feature:454
 apiWebdavProperties2/getFileProperties.feature:455
+<<<<<<< HEAD
 #
 # https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
 #
+=======
+>>>>>>> master
 apiWebdavUpload1/uploadFile.feature:144
 apiWebdavUpload1/uploadFile.feature:145
 apiWebdavUpload1/uploadFile.feature:157
@@ -1492,6 +1500,7 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:152
 apiWebdavEtagPropagation1/deleteFileFolder.feature:182
 apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
+<<<<<<< HEAD
 # https://github.com/owncloud/product/issues/238 renaming a files does not change etag of containing folder
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:20
@@ -1515,10 +1524,12 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:40
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:201
 apiWebdavEtagPropagation1/moveFileFolder.feature:202
+=======
+# https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
+#
+>>>>>>> master
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236
-apiWebdavEtagPropagation1/moveFileFolder.feature:269
-apiWebdavEtagPropagation1/moveFileFolder.feature:270
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
 #

@@ -43,6 +43,7 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
 
@@ -1279,3 +1280,10 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
+
+  * fixes etag propagation in the ocis driver
+
+   https://github.com/owncloud/ocis/pull/725
+   https://github.com/cs3org/reva/pull/1264

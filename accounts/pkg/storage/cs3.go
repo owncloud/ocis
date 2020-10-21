@@ -218,11 +218,10 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
 	u := &user.User{
-		Id:     &user.UserId{},
+		Id: &user.UserId{
+			OpaqueId: r.cfg.ServiceUser.UUID,
+		},
 		Groups: []string{},
-	}
-	if r.cfg.ServiceUser.Username != "" {
-		u.Id.OpaqueId = r.cfg.ServiceUser.UUID
 	}
 	return r.tm.MintToken(ctx, u)
 }
