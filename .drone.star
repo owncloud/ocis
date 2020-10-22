@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '693fa6d275243fc860b4b82e5146d25f62d927fb',
+    'phoenixCommit': '2fabcb8bf376dbbdff9bb7e787dbee5c334b4a7b',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -51,6 +51,8 @@ config = {
         'webUISharingFilePermissionsGroups',
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
+        ],
+       'phoenixWebUI5': [
         'webUIResharing',
         'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
@@ -462,7 +464,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
