@@ -38,12 +38,12 @@ config = {
         'webUIRenameFiles',
         'webUIRenameFolders',
       ],
-       'phoenixWebUI4': [
+      'phoenixWebUI4': [
         'webUITrashbin',
         'webUIUpload',
-        # All tests in the following suites are skipped currently
-        # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
+        ],
+      'phoenixWebUI5': [
         'webUISharingAutocompletion',
         'webUISharingInternalGroups',
         'webUISharingInternalUsers',
@@ -52,15 +52,17 @@ config = {
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
         ],
-       'phoenixWebUI5': [
+      'phoenixWebUI6': [
         'webUIResharing',
         'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
         'webUISharingAcceptShares',
+        'webUISharingNotifications',
+      ],
+      'phoenixWebUI7': [
         'webUISharingFilePermissionMultipleUsers',
         'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers',
-        'webUISharingNotifications',
       ],
     }
   }
