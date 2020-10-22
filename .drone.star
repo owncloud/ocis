@@ -539,7 +539,6 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage = 'owncloud'):
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
-          'TEST_PATHS': paths,
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
