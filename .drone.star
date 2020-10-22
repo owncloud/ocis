@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '693fa6d275243fc860b4b82e5146d25f62d927fb',
+    'phoenixCommit': '2fabcb8bf376dbbdff9bb7e787dbee5c334b4a7b',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -38,12 +38,12 @@ config = {
         'webUIRenameFiles',
         'webUIRenameFolders',
       ],
-       'phoenixWebUI4': [
+      'phoenixWebUI4': [
         'webUITrashbin',
         'webUIUpload',
-        # All tests in the following suites are skipped currently
-        # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
+        ],
+      'phoenixWebUI5': [
         'webUISharingAutocompletion',
         'webUISharingInternalGroups',
         'webUISharingInternalUsers',
@@ -51,14 +51,18 @@ config = {
         'webUISharingFilePermissionsGroups',
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
+        ],
+      'phoenixWebUI6': [
         'webUIResharing',
         'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
         'webUISharingAcceptShares',
+        'webUISharingNotifications',
+      ],
+      'phoenixWebUI7': [
         'webUISharingFilePermissionMultipleUsers',
         'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers',
-        'webUISharingNotifications',
       ],
     }
   }
@@ -462,7 +466,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
