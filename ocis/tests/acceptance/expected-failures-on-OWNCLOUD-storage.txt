@@ -179,6 +179,11 @@ apiProvisioning-v2/addUser.feature:39
 apiProvisioning-v1/addUser.feature:69
 apiProvisioning-v2/addUser.feature:69
 #
+# https://github.com/owncloud/ocis-accounts/issues/128
+# Username is case sensitive
+#
+apiProvisioning-v1/addUser.feature:102
+#
 # https://github.com/owncloud/ocis/issues/197
 # Client token generation not implemented
 #
