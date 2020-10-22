@@ -464,7 +464,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
