@@ -191,6 +191,8 @@ apiProvisioning-v1/addUser.feature:99
 apiProvisioning-v1/addUser.feature:100
 apiProvisioning-v1/addUser.feature:102
 apiProvisioning-v1/getUser.feature:37
+apiProvisioning-v1/getUser.feature:113
+apiProvisioning-v1/getUser.feature:124
 apiProvisioning-v2/addUser.feature:96
 apiProvisioning-v2/addUser.feature:97
 apiProvisioning-v2/addUser.feature:98
@@ -198,6 +200,8 @@ apiProvisioning-v2/addUser.feature:99
 apiProvisioning-v2/addUser.feature:100
 apiProvisioning-v2/addUser.feature:102
 apiProvisioning-v2/getUser.feature:37
+apiProvisioning-v2/getUser.feature:114
+apiProvisioning-v2/getUser.feature:125
 apiProvisioning-v1/deleteUser.feature:32
 apiProvisioning-v2/deleteUser.feature:32
 #
@@ -1371,31 +1375,31 @@ apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
 # https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
 #
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:38
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:42
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:40
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:21
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:37
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:41
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:26
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:35
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:25
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:34
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:43
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:75
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:77
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:96
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
