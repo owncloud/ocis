@@ -539,6 +539,8 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
+          'PHOENIX_PATH': '/srv/app/phoenix',
+          'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
