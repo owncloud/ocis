@@ -232,7 +232,7 @@ def testing(ctx, module):
   ]
 
   if module == 'accounts':
-    steps = ocisMetadataStorage() + steps
+    steps = build() + ocisMetadataStorage() + steps
 
   if config['modules'][module] == 'frontend':
     steps = frontend(module) + steps
