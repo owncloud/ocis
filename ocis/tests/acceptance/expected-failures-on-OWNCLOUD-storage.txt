@@ -165,13 +165,11 @@ apiProvisioning-v2/enableUser.feature:31
 apiProvisioning-v2/enableUser.feature:32
 apiProvisioning-v2/getUser.feature:34
 apiProvisioning-v2/getUser.feature:35
-apiProvisioning-v1/addUser.feature:118
 #
 # https://github.com/owncloud/ocis-accounts/issues/80
 # Creating an already existing user works
 #
 apiProvisioning-v1/addUser.feature:32
-apiProvisioning-v2/addUser.feature:32
 apiProvisioning-v1/addUser.feature:39
 apiProvisioning-v2/addUser.feature:39
 #
@@ -184,26 +182,7 @@ apiProvisioning-v2/addUser.feature:69
 # https://github.com/owncloud/ocis-accounts/issues/128
 # Username is case sensitive
 #
-apiProvisioning-v1/addUser.feature:96
-apiProvisioning-v1/addUser.feature:97
-apiProvisioning-v1/addUser.feature:98
-apiProvisioning-v1/addUser.feature:99
-apiProvisioning-v1/addUser.feature:100
 apiProvisioning-v1/addUser.feature:102
-apiProvisioning-v1/getUser.feature:37
-apiProvisioning-v1/getUser.feature:113
-apiProvisioning-v1/getUser.feature:124
-apiProvisioning-v2/addUser.feature:96
-apiProvisioning-v2/addUser.feature:97
-apiProvisioning-v2/addUser.feature:98
-apiProvisioning-v2/addUser.feature:99
-apiProvisioning-v2/addUser.feature:100
-apiProvisioning-v2/addUser.feature:102
-apiProvisioning-v2/getUser.feature:37
-apiProvisioning-v2/getUser.feature:114
-apiProvisioning-v2/getUser.feature:125
-apiProvisioning-v1/deleteUser.feature:32
-apiProvisioning-v2/deleteUser.feature:32
 #
 # https://github.com/owncloud/ocis/issues/197
 # Client token generation not implemented

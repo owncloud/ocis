@@ -3,19 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"path/filepath"
+	"path"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
-	"github.com/CiscoM31/godata"
-	"github.com/blevesearch/bleve"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/provider"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
@@ -34,22 +34,6 @@ import (
 
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
-
-func (s Service) indexAccount(id string) error {
-	a := &proto.BleveAccount{
-		BleveType: "account",
-	}
-	if err := s.repo.LoadAccount(context.Background(), id, &a.Account); err != nil {
-		s.log.Error().Err(err).Str("account", id).Msg("could not load account")
-		return err
-	}
-	s.log.Debug().Interface("account", a).Msg("found account")
-	if err := s.index.Index(a.Id, a); err != nil {
-		s.log.Error().Err(err).Interface("account", a).Msg("could not index account")
-		return err
-	}
-	return nil
-}
 
 // an auth request is currently hardcoded and has to match this regex
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
@@ -74,17 +58,6 @@ func (s Service) expandMemberOf(a *proto.Account) {
 	a.MemberOf = expanded
 }
 
-func (s Service) passwordIsValid(hash string, pwd string) (ok bool) {
-	defer func() {
-		if r := recover(); r != nil {
-			s.log.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
-		}
-	}()
-
-	c := crypt.NewFromHash(hash)
-	return c.Verify(hash, []byte(pwd)) == nil
-}
-
 func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	// get roles from context
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
@@ -104,15 +77,12 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 // serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
 func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
 	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
-		err := s.index.Index(s.Config.ServiceUser.UUID, &proto.BleveAccount{
-			BleveType: "account",
-			Account:   s.getInMemoryServiceUser(),
-		})
+		_, err := s.index.Add(s.getInMemoryServiceUser())
 		if err != nil {
 			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
 		} else {
 			return func() {
-				_ = s.index.Delete(s.Config.ServiceUser.UUID)
+				_ = s.index.Delete(s.getInMemoryServiceUser())
 			}
 		}
 	}
@@ -140,83 +110,56 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	accLock.Lock()
 	defer accLock.Unlock()
-	var password string
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
 
-	// check if this looks like an auth request
-	match := authQuery.FindStringSubmatch(in.Query)
-	if len(match) == 3 {
-		in.Query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", match[1]) // todo fetch email? make query configurable
-		password = match[2]
-		if password == "" {
-			return merrors.Unauthorized(s.id, "password must not be empty")
-		}
-	}
-
-	// only search for accounts
-	tq := bleve.NewTermQuery("account")
-	tq.SetField("bleve_type")
-
-	query := bleve.NewConjunctionQuery(tq)
-
-	if in.Query != "" {
-		// parse the query like an odata filter
-		var q *godata.GoDataFilterQuery
-		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			s.log.Error().Err(err).Msg("could not parse query")
-			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
+	match, authRequest := getAuthQueryMatch(in.Query)
+	if authRequest {
+		password := match[2]
+		if len(password) == 0 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
 
-		// convert to bleve query
-		bq, err := provider.BuildBleveQuery(q)
-		if err != nil {
-			s.log.Error().Err(err).Msg("could not build bleve query")
-			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
+		ids, err := s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+		if err != nil || len(ids) > 1 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
-		query.AddQuery(bq)
-	}
+		if len(ids) == 0 {
+			ids, err = s.index.FindBy(&proto.Account{}, "Mail", match[1])
+			if err != nil || len(ids) != 1 {
+				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+			}
+		}
 
-	s.log.Debug().Interface("query", query).Msg("using query")
-
-	searchRequest := bleve.NewSearchRequest(query)
-	var searchResult *bleve.SearchResult
-	searchResult, err = s.index.Search(searchRequest)
-	if err != nil {
-		s.log.Error().Err(err).Msg("could not execute bleve search")
-		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
-	}
-
-	s.log.Debug().Interface("result", searchResult).Msg("result")
-
-	out.Accounts = make([]*proto.Account, 0)
-
-	for _, hit := range searchResult.Hits {
 		a := &proto.Account{}
-		if hit.ID == s.Config.ServiceUser.UUID {
+		err = s.repo.LoadAccount(ctx, ids[0], a)
+		if err != nil || a.PasswordProfile == nil || len(a.PasswordProfile.Password) == 0 {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+		}
+		if !isPasswordValid(s.log, a.PasswordProfile.Password, password) {
+			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+		}
+		a.PasswordProfile.Password = ""
+		out.Accounts = []*proto.Account{a}
+		return nil
+	}
+
+	searchResults, err := s.findAccountsByQuery(ctx, in.Query)
+	out.Accounts = make([]*proto.Account, 0, len(searchResults))
+
+	for _, hit := range searchResults {
+		a := &proto.Account{}
+		if hit == s.Config.ServiceUser.UUID {
 			acc := s.getInMemoryServiceUser()
 			a = &acc
-		} else if err = s.repo.LoadAccount(ctx, hit.ID, a); err != nil {
-			s.log.Error().Err(err).Str("account", hit.ID).Msg("could not load account, skipping")
+		} else if err = s.repo.LoadAccount(ctx, hit, a); err != nil {
+			s.log.Error().Err(err).Str("account", hit).Msg("could not load account, skipping")
 			continue
-		}
-		var currentHash string
-		if a.PasswordProfile != nil {
-			currentHash = a.PasswordProfile.Password
 		}
 
 		s.debugLogAccount(a).Msg("found account")
 
-		if password != "" {
-			if a.PasswordProfile == nil {
-				s.debugLogAccount(a).Msg("no password profile")
-				return merrors.Unauthorized(s.id, "invalid password")
-			}
-			if !s.passwordIsValid(currentHash, password) {
-				return merrors.Unauthorized(s.id, "invalid password")
-			}
-		}
 		// TODO add groups if requested
 		// if in.FieldMask ...
 		s.expandMemberOf(a)
@@ -230,6 +173,90 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	}
 
 	return
+}
+
+func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
+	var searchResults []string
+	var err error
+
+	if query == "" {
+		return s.index.FindByPartial(&proto.Account{}, "Mail", "*")
+	}
+
+	// TODO: more explicit queries have to be on top
+	var onPremOrMailQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)' or mail eq '(.*)'$`)
+	match := onPremOrMailQuery.FindStringSubmatch(query)
+	if len(match) == 3 {
+		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[2]+"*")
+		if err != nil {
+			return nil, err
+		}
+
+		searchResults = append(resSam, resMail...)
+		return unique(searchResults), nil
+	}
+
+	// startswith(on_premises_sam_account_name,'mar') or startswith(display_name,'mar') or startswith(mail,'mar')
+	var searchQuery = regexp.MustCompile(`^startswith\(on_premises_sam_account_name,'(.*)'\) or startswith\(display_name,'(.*)'\) or startswith\(mail,'(.*)'\)$`)
+	match = searchQuery.FindStringSubmatch(query)
+	if len(match) == 4 {
+		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resDisp, err := s.index.FindByPartial(&proto.Account{}, "DisplayName", match[2]+"*")
+		if err != nil {
+			return nil, err
+		}
+		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[3]+"*")
+		if err != nil {
+			return nil, err
+		}
+
+		searchResults = append(resSam, append(resDisp, resMail...)...)
+		return unique(searchResults), nil
+	}
+
+	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
+	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
+	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
+	match = idOrQuery.FindStringSubmatch(query)
+	if len(match) == 3 {
+		qID, qSam := match[1], match[2]
+		tmp := &proto.Account{}
+		err = s.repo.LoadAccount(ctx, qID, tmp)
+		if err != nil {
+			return nil, err
+		}
+		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
+		if err != nil {
+			return nil, err
+		}
+
+		if tmp.Id != "" {
+			searchResults = append(searchResults, tmp.Id)
+		}
+
+		return unique(searchResults), nil
+	}
+
+	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
+	match = onPremQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+	}
+
+	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
+	match = mailQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return s.index.FindBy(&proto.Account{}, "Mail", match[1])
+	}
+
+	return nil, merrors.BadRequest(s.id, "unsupported query %s", query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface
@@ -277,35 +304,43 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
-	var acc = in.Account
-	if acc == nil {
-		return merrors.BadRequest(s.id, "account missing")
-	}
-	if acc.Id == "" {
-		acc.Id = uuid.Must(uuid.NewV4()).String()
-	}
-	if !s.isValidUsername(acc.PreferredName) {
-		return merrors.BadRequest(s.id, "preferred_name '%s' must be at least the local part of an email", acc.PreferredName)
-	}
-	if !s.isValidEmail(acc.Mail) {
-		return merrors.BadRequest(s.id, "mail '%s' must be a valid email", acc.Mail)
+
+	if in.Account == nil {
+		return merrors.InternalServerError(s.id, "invalid account: empty")
 	}
 
-	if id, err = cleanupID(acc.Id); err != nil {
+	out.XXX_Merge(in.Account)
+
+	if out.Id == "" {
+		out.Id = uuid.Must(uuid.NewV4()).String()
+	}
+	if err = validateAccount(s.id, out); err != nil {
+		return err
+	}
+
+	if id, err = cleanupID(out.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	if acc.PasswordProfile != nil {
-		if acc.PasswordProfile.Password != "" {
+	exists, err := s.accountExists(ctx, out.PreferredName, out.Mail, out.Id)
+	if err != nil {
+		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
+	}
+	if exists {
+		return merrors.BadRequest(s.id, "account already exists")
+	}
+
+	if out.PasswordProfile != nil {
+		if out.PasswordProfile.Password != "" {
 			// encrypt password
 			c := crypt.New(crypt.SHA512)
-			if acc.PasswordProfile.Password, err = c.Generate([]byte(acc.PasswordProfile.Password), nil); err != nil {
+			if out.PasswordProfile.Password, err = c.Generate([]byte(out.PasswordProfile.Password), nil); err != nil {
 				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
 				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
 			}
 		}
 
-		if err := passwordPoliciesValid(acc.PasswordProfile.PasswordPolicies); err != nil {
+		if err := passwordPoliciesValid(out.PasswordProfile.PasswordPolicies); err != nil {
 			return merrors.BadRequest(s.id, "%s", err)
 		}
 	}
@@ -314,27 +349,54 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	// TODO groups should be ignored during create, use groups.AddMember? return error?
 
 	// write and index account - note: don't do anything else in between!
-	if err = s.repo.WriteAccount(ctx, acc); err != nil {
+	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", id).Msg("could not persist new account")
-		s.debugLogAccount(acc).Msg("could not persist new account")
+		s.debugLogAccount(out).Msg("could not persist new account")
 		return merrors.InternalServerError(s.id, "could not persist new account: %v", err.Error())
 	}
-	if err = s.indexAccount(acc.Id); err != nil {
-		return merrors.InternalServerError(s.id, "could not index new account: %v", err.Error())
-	}
-	s.log.Debug().Interface("account", acc).Msg("account after indexing")
+	indexResults, err := s.index.Add(out)
+	if err != nil {
+		s.rollbackCreateAccount(ctx, out)
+		return merrors.BadRequest(s.id, "Account already exists %v", err.Error())
 
-	if acc.PasswordProfile != nil {
-		acc.PasswordProfile.Password = ""
+	}
+	s.log.Debug().Interface("account", out).Msg("account after indexing")
+
+	for _, r := range indexResults {
+		if r.Field == "UidNumber" {
+			id, err := strconv.Atoi(path.Base(r.Value))
+			if err != nil {
+				s.rollbackCreateAccount(ctx, out)
+				return err
+			}
+			out.UidNumber = int64(id)
+			break
+		}
 	}
 
-	{
-		out.Id = acc.Id
-		out.Mail = acc.Mail
-		out.PreferredName = acc.PreferredName
-		out.AccountEnabled = acc.AccountEnabled
-		out.DisplayName = acc.DisplayName
-		out.OnPremisesSamAccountName = acc.OnPremisesSamAccountName
+	if out.GidNumber == 0 {
+		out.GidNumber = userDefaultGID
+	}
+
+	r := proto.ListGroupsResponse{}
+	err = s.ListGroups(ctx, &proto.ListGroupsRequest{}, &r)
+	if err != nil {
+		// rollback account creation
+		return err
+	}
+
+	for _, group := range r.Groups {
+		if group.GidNumber == out.GidNumber {
+			out.MemberOf = append(out.MemberOf, group)
+		}
+	}
+	//acc.MemberOf = append(acc.MemberOf, &group)
+	if err := s.repo.WriteAccount(context.Background(), out); err != nil {
+		return err
+	}
+
+	if out.PasswordProfile != nil {
+		out.PasswordProfile.Password = ""
 	}
 
 	// TODO: assign user role to all new users for now, as create Account request does not have any role field
@@ -342,13 +404,25 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return merrors.InternalServerError(s.id, "could not assign role to account: roleService not configured")
 	}
 	if _, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
-		AccountUuid: acc.Id,
+		AccountUuid: out.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	}); err != nil {
 		return merrors.InternalServerError(s.id, "could not assign role to account: %v", err.Error())
 	}
 
 	return
+}
+
+// rollbackCreateAccount tries to rollback changes made by `CreateAccount` if parts of it failed.
+func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) {
+	err := s.index.Delete(acc)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback account from indices")
+	}
+	err = s.repo.DeleteAccount(ctx, acc.Id)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback account from repo")
+	}
 }
 
 // UpdateAccount implements the AccountsServiceHandler interface
@@ -373,8 +447,6 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "accounts", id)
-
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "account not found: %v", err.Error())
@@ -394,6 +466,24 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	validMask, err := validateUpdate(in.UpdateMask, updatableAccountPaths)
 	if err != nil {
 		return merrors.BadRequest(s.id, "%s", err)
+	}
+
+	if _, exists := validMask.Filter("PreferredName"); exists {
+		if err = validateAccountPreferredName(s.id, in.Account); err != nil {
+			return err
+		}
+	}
+	if _, exists := validMask.Filter("OnPremisesSamAccountName"); exists {
+		if err = validateAccountOnPremisesSamAccountName(s.id, in.Account); err != nil {
+			return err
+		}
+	}
+	if _, exists := validMask.Filter("Mail"); exists {
+		if in.Account.Mail != "" {
+			if err = validateAccountEmail(s.id, in.Account); err != nil {
+				return err
+			}
+		}
 	}
 
 	if err := fieldmask_utils.StructToStruct(validMask, in.Account, out); err != nil {
@@ -434,13 +524,20 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		out.ExternalUserStateChangeDateTime = tsnow
 	}
 
+	// We need to reload the old account state to be able to compute the update
+	old := &proto.Account{}
+	if err = s.repo.LoadAccount(ctx, id, old); err != nil {
+		s.log.Error().Err(err).Str("id", out.Id).Msg("could not load old account representation during update, maybe the account got deleted meanwhile?")
+		return merrors.InternalServerError(s.id, "could not load current account for update: %v", err.Error())
+	}
+
 	if err = s.repo.WriteAccount(ctx, out); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not persist updated account")
 		return merrors.InternalServerError(s.id, "could not persist updated account: %v", err.Error())
 	}
 
-	if err = s.indexAccount(id); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not index new account")
+	if err = s.index.Update(old, out); err != nil {
+		s.log.Error().Err(err).Str("id", id).Msg("could not index new account")
 		return merrors.InternalServerError(s.id, "could not index updated account: %v", err.Error())
 	}
 
@@ -514,7 +611,7 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		return merrors.InternalServerError(s.id, "could not remove account: %v", err.Error())
 	}
 
-	if err = s.index.Delete(id); err != nil {
+	if err = s.index.Delete(a); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("accountId", id).Msg("could not remove account from index")
 		return merrors.InternalServerError(s.id, "could not remove account from index: %v", err.Error())
 	}
@@ -523,12 +620,46 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	return
 }
 
+func validateAccount(serviceID string, a *proto.Account) error {
+	if err := validateAccountPreferredName(serviceID, a); err != nil {
+		return err
+	}
+	if err := validateAccountOnPremisesSamAccountName(serviceID, a); err != nil {
+		return err
+	}
+	if err := validateAccountEmail(serviceID, a); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateAccountPreferredName(serviceID string, a *proto.Account) error {
+	if !isValidUsername(a.PreferredName) {
+		return merrors.BadRequest(serviceID, "preferred_name '%s' must be at least the local part of an email", a.PreferredName)
+	}
+	return nil
+}
+
+func validateAccountOnPremisesSamAccountName(serviceID string, a *proto.Account) error {
+	if !isValidUsername(a.OnPremisesSamAccountName) {
+		return merrors.BadRequest(serviceID, "on_premises_sam_account_name '%s' must be at least the local part of an email", a.OnPremisesSamAccountName)
+	}
+	return nil
+}
+
+func validateAccountEmail(serviceID string, a *proto.Account) error {
+	if !isValidEmail(a.Mail) {
+		return merrors.BadRequest(serviceID, "mail '%s' must be a valid email", a.Mail)
+	}
+	return nil
+}
+
 // We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow intergration with our glauth LDAP service
 // so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
 // names should not start with numbers
 var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
 
-func (s Service) isValidUsername(e string) bool {
+func isValidUsername(e string) bool {
 	if len(e) < 1 && len(e) > 254 {
 		return false
 	}
@@ -538,7 +669,7 @@ func (s Service) isValidUsername(e string) bool {
 // regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-func (s Service) isValidEmail(e string) bool {
+func isValidEmail(e string) bool {
 	if len(e) < 3 && len(e) > 254 {
 		return false
 	}
@@ -612,4 +743,69 @@ func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
 		"CreatedDateTime":              a.CreatedDateTime,
 		"DeletedDateTime":              a.DeletedDateTime,
 	})
+}
+
+func unique(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func (s Service) accountExists(ctx context.Context, username, mail, id string) (exists bool, err error) {
+	var ids []string
+	ids, err = s.index.FindBy(&proto.Account{}, "preferred_name", username)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	ids, err = s.index.FindBy(&proto.Account{}, "on_premises_sam_account_name", username)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	ids, err = s.index.FindBy(&proto.Account{}, "mail", mail)
+	if err != nil {
+		return false, err
+	}
+	if len(ids) > 0 {
+		return true, nil
+	}
+
+	a := &proto.Account{}
+	err = s.repo.LoadAccount(ctx, id, a)
+	if err == nil {
+		return true, nil
+	}
+	if !storage.IsNotFoundErr(err) {
+		return true, err
+	}
+	return false, nil
+}
+
+func getAuthQueryMatch(query string) (match []string, authRequest bool) {
+	match = authQuery.FindStringSubmatch(query)
+	return match, len(match) == 3
+}
+
+func isPasswordValid(logger log.Logger, hash string, pwd string) (ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error().Err(fmt.Errorf("%s", r)).Str("hash", hash).Msg("password lib panicked")
+		}
+	}()
+
+	c := crypt.NewFromHash(hash)
+	return c.Verify(hash, []byte(pwd)) == nil
 }

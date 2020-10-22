@@ -24,7 +24,7 @@ require (
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/proxy v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
-	github.com/owncloud/ocis/storage v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df
 	github.com/owncloud/ocis/store v0.0.0-20200918125107-fcca9faa81c8
 	github.com/owncloud/ocis/thumbnails v0.1.6
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000

@@ -127,7 +127,7 @@ func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 		}
 	}
 
-	return nil
+	return
 
 	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
 	//return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())

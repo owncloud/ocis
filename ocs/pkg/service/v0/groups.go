@@ -3,6 +3,7 @@ package svc
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -16,18 +17,26 @@ import (
 // ListUserGroups lists a users groups
 func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	var account *accounts.Account
+	var err error
 
-	account, err := o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{Id: userid})
-
-	if err != nil {
-		merr := merrors.FromError(err)
-		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
-		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	if isValidUUID(userid) {
+		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+			Id: userid,
+		})
+	} else {
+		// despite the confusion, if we make it here we got ourselves a username
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+		if err != nil {
+			merr := merrors.FromError(err)
+			if merr.Code == http.StatusNotFound {
+				render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			}
+			o.logger.Error().Err(err).Str("userid", userid).Msg("could not get list of user groups")
+			return
 		}
-		o.logger.Error().Err(err).Str("userid", userid).Msg("could not get list of user groups")
-		return
 	}
 
 	groups := []string{}
@@ -49,16 +58,26 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty group assignment: unspecified group"))
 		return
 	}
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		return
+	}
 
-	_, err := o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
-		AccountId: userid,
+	_, err = o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
+		AccountId: account.Id,
 		GroupId:   groupid,
 	})
 
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -75,15 +94,37 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 	groupid := r.URL.Query().Get("groupid")
 
-	_, err := o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
-		AccountId: userid,
+	var account *accounts.Account
+	var err error
+
+	if isValidUUID(userid) {
+		account, _ = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+			Id: userid,
+		})
+	} else {
+		// despite the confusion, if we make it here we got ourselves a username
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+		if err != nil {
+			merr := merrors.FromError(err)
+			if merr.Code == http.StatusNotFound {
+				render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "The requested user could not be found"))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			}
+			o.logger.Error().Err(err).Str("userid", userid).Msg("could not get list of user groups")
+			return
+		}
+	}
+
+	_, err = o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
+		AccountId: account.Id,
 		GroupId:   groupid,
 	})
 
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -174,4 +215,9 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 
 	o.logger.Error().Err(err).Int("count", len(members)).Str("groupid", groupid).Msg("listing group members")
 	render.Render(w, r, response.DataRender(&data.Users{Users: members}))
+}
+
+func isValidUUID(uuid string) bool {
+	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
+	return r.MatchString(uuid)
 }

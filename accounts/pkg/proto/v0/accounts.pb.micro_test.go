@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,51 +26,88 @@ import (
 
 var service = grpc.Service{}
 
-const dataPath = "./accounts-store"
+var dataPath = createTmpDir()
 
 var newCreatedAccounts = []string{}
 var newCreatedGroups = []string{}
 
 var mockedRoleAssignment = map[string]string{}
 
+var (
+	user1 = proto.Account{
+		Id:                       "f9149a32-2b8e-4f04-9e8d-937d81712b9a",
+		AccountEnabled:           true,
+		IsResourceAccount:        true,
+		CreationType:             "",
+		DisplayName:              "User One",
+		PreferredName:            "user1",
+		OnPremisesSamAccountName: "user1",
+		UidNumber:                20009,
+		GidNumber:                30000,
+		Mail:                     "user1@example.com",
+		Identities:               []*proto.Identities{nil},
+		PasswordProfile:          &proto.PasswordProfile{Password: "heysdjfsdlk"},
+		MemberOf: []*proto.Group{
+			{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+		},
+	}
+	user2 = proto.Account{
+		Id:                       "e9149a32-2b8e-4f04-9e8d-937d81712b9a",
+		AccountEnabled:           true,
+		IsResourceAccount:        true,
+		CreationType:             "",
+		DisplayName:              "User Two",
+		PreferredName:            "user2",
+		OnPremisesSamAccountName: "user2",
+		UidNumber:                20010,
+		GidNumber:                30000,
+		Mail:                     "user2@example.com",
+		Identities:               []*proto.Identities{nil},
+		PasswordProfile:          &proto.PasswordProfile{Password: "hello123"},
+		MemberOf: []*proto.Group{
+			{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+		},
+	}
+)
+
+func init() {
+	service = grpc.NewService(
+		grpc.Namespace("com.owncloud.api"),
+		grpc.Name("accounts"),
+		grpc.Address("localhost:9180"),
+	)
+
+	cfg := config.New()
+	cfg.Server.AccountsDataPath = dataPath
+	cfg.Repo.Disk.Path = dataPath
+	var hdlr *svc.Service
+	var err error
+
+	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+		log.Fatalf("Could not create new service")
+	}
+
+	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
+	if err != nil {
+		log.Fatal("could not register the Accounts handler")
+	}
+	err = proto.RegisterGroupsServiceHandler(service.Server(), hdlr)
+	if err != nil {
+		log.Fatal("could not register the Groups handler")
+	}
+
+	err = service.Server().Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func getAccount(user string) *proto.Account {
 	switch user {
 	case "user1":
-		return &proto.Account{
-			Id:                       "f9149a32-2b8e-4f04-9e8d-937d81712b9a",
-			AccountEnabled:           true,
-			IsResourceAccount:        true,
-			CreationType:             "",
-			DisplayName:              "User One",
-			PreferredName:            "user1",
-			OnPremisesSamAccountName: "user1",
-			UidNumber:                20009,
-			GidNumber:                30000,
-			Mail:                     "user1@example.com",
-			Identities:               []*proto.Identities{nil},
-			PasswordProfile:          &proto.PasswordProfile{Password: "heysdjfsdlk"},
-			MemberOf: []*proto.Group{
-				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
-			},
-		}
+		return &user1
 	case "user2":
-		return &proto.Account{
-			Id:                       "e9149a32-2b8e-4f04-9e8d-937d81712b9a",
-			AccountEnabled:           true,
-			IsResourceAccount:        true,
-			CreationType:             "",
-			DisplayName:              "User Two",
-			PreferredName:            "user2",
-			OnPremisesSamAccountName: "user2",
-			UidNumber:                20009,
-			GidNumber:                30000,
-			Mail:                     "user2@example.com",
-			Identities:               []*proto.Identities{nil},
-			PasswordProfile:          &proto.PasswordProfile{Password: "hello123"},
-			MemberOf: []*proto.Group{
-				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
-			},
-		}
+		return &user2
 	default:
 		return &proto.Account{
 			Id:                fmt.Sprintf("new-id-%s", user),
@@ -154,38 +192,6 @@ func getTestGroups(group string) *proto.Group {
 	return nil
 }
 
-func init() {
-	service = grpc.NewService(
-		grpc.Namespace("com.owncloud.api"),
-		grpc.Name("accounts"),
-		grpc.Address("localhost:9180"),
-	)
-
-	cfg := config.New()
-	cfg.Server.AccountsDataPath = dataPath
-	cfg.Repo.Disk.Path = dataPath
-	var hdlr *svc.Service
-	var err error
-
-	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
-		log.Fatalf("Could not create new service")
-	}
-
-	err = proto.RegisterAccountsServiceHandler(service.Server(), hdlr)
-	if err != nil {
-		log.Fatal("could not register the Accounts handler")
-	}
-	err = proto.RegisterGroupsServiceHandler(service.Server(), hdlr)
-	if err != nil {
-		log.Fatal("could not register the Groups handler")
-	}
-
-	err = service.Server().Start()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func buildRoleServiceMock() settings.RoleService {
 	return settings.MockRoleService{
 		AssignRoleToUserFunc: func(ctx context.Context, req *settings.AssignRoleToUserRequest, opts ...client.CallOption) (res *settings.AssignRoleToUserResponse, err error) {
@@ -208,8 +214,7 @@ func cleanUp(t *testing.T) {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			continue
 		}
-		_, err := deleteAccount(t, id)
-		checkError(t, err)
+		_, _ = deleteAccount(t, id)
 	}
 
 	datastore = filepath.Join(dataPath, "groups")
@@ -219,8 +224,7 @@ func cleanUp(t *testing.T) {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			continue
 		}
-		_, err := deleteGroup(t, id)
-		checkError(t, err)
+		_, _ = deleteGroup(t, id)
 	}
 
 	newCreatedAccounts = []string{}
@@ -309,12 +313,6 @@ func assertGroupHasMember(t *testing.T, grp *proto.Group, memberId string) {
 	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberId, grp.DisplayName)
 }
 
-func checkError(t *testing.T, err error) {
-	if err != nil {
-		t.Fatalf("Expected Error to be nil but got %s", err)
-	}
-}
-
 func createAccount(t *testing.T, user string) (*proto.Account, error) {
 	client := service.Client()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
@@ -368,7 +366,7 @@ func listGroups(t *testing.T) *proto.ListGroupsResponse {
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	response, err := cl.ListGroups(context.Background(), request)
-	checkError(t, err)
+	assert.NoError(t, err)
 	return response
 }
 
@@ -390,18 +388,27 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 	return res, err
 }
 
+// createTmpDir creates a temporary dir for tests data.
+func createTmpDir() string {
+	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-")
+	if err != nil {
+		panic(err)
+	}
+
+	return name
+}
+
 // https://github.com/owncloud/ocis/accounts/issues/61
 func TestCreateAccount(t *testing.T) {
-
 	resp, err := createAccount(t, "user1")
-	checkError(t, err)
+	assert.NoError(t, err)
 	assertUserExists(t, getAccount("user1"))
 	assert.IsType(t, &proto.Account{}, resp)
 	// Account is not returned in response
 	// assertAccountsSame(t, getAccount("user1"), resp)
 
 	resp, err = createAccount(t, "user2")
-	checkError(t, err)
+	assert.NoError(t, err)
 	assertUserExists(t, getAccount("user2"))
 	assert.IsType(t, &proto.Account{}, resp)
 	// Account is not returned in response
@@ -410,24 +417,25 @@ func TestCreateAccount(t *testing.T) {
 	cleanUp(t)
 }
 
-// https://github.com/owncloud/ocis/accounts/issues/62
+// https://github.com/owncloud/ocis-accounts/issues/62
 func TestCreateExistingUser(t *testing.T) {
-	createAccount(t, "user1")
-	_, err := createAccount(t, "user1")
+	var err error
+	_, err = createAccount(t, "user1")
+	assert.NoError(t, err)
 
-	// Should give error but it does not
-	checkError(t, err)
+	_, err = createAccount(t, "user1")
+	assert.Error(t, err)
 	assertUserExists(t, getAccount("user1"))
 
 	cleanUp(t)
 }
 
 // All tests fail after running this
-// https://github.com/owncloud/ocis/accounts/issues/62
+// https://github.com/owncloud/ocis/accounts-issues/62
 func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	resp, err := listAccounts(t)
-	checkError(t, err)
+	assert.NoError(t, err)
 	numAccounts := len(resp.GetAccounts())
 
 	testData := []string{
@@ -448,7 +456,7 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 
 	// resp should have the same number of accounts
 	resp, err = listAccounts(t)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, numAccounts, len(resp.GetAccounts()))
 
@@ -456,57 +464,58 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 }
 
 func TestUpdateAccount(t *testing.T) {
-	_, _ = createAccount(t, "user1")
-
 	tests := []struct {
-		name        string
-		userAccount *proto.Account
+		name                string
+		userAccount         *proto.Account
+		expectedErrOnUpdate error
 	}{
 		{
 			"Update user (demonstration of updatable fields)",
 			&proto.Account{
-				DisplayName:                 "Alice Hansen",
-				PreferredName:               "Wonderful Alice",
-				OnPremisesDistinguishedName: "Alice",
-				UidNumber:                   20010,
-				GidNumber:                   30001,
-				Mail:                        "alice@example.com",
+				DisplayName:              "Alice Hansen",
+				PreferredName:            "Wonderful-Alice",
+				OnPremisesSamAccountName: "Alice",
+				UidNumber:                20010,
+				GidNumber:                30001,
+				Mail:                     "alice@example.com",
 			},
+			nil,
 		},
 		{
 			"Update user with unicode data",
 			&proto.Account{
-				DisplayName:                 "एलिस हेन्सेन",
-				PreferredName:               "अद्भुत एलिस",
-				OnPremisesDistinguishedName: "एलिस",
-				UidNumber:                   20010,
-				GidNumber:                   30001,
-				Mail:                        "एलिस@उदाहरण.com",
+				DisplayName:              "एलिस हेन्सेन",
+				PreferredName:            "अद्भुत-एलिस",
+				OnPremisesSamAccountName: "एलिस",
+				UidNumber:                20010,
+				GidNumber:                30001,
+				Mail:                     "एलिस@उदाहरण.com",
 			},
+			merrors.BadRequest(".", "preferred_name 'अद्भुत-एलिस' must be at least the local part of an email"),
 		},
 		{
 			"Update user with empty data values",
 			&proto.Account{
-				DisplayName:                 "",
-				PreferredName:               "",
-				OnPremisesDistinguishedName: "",
-				UidNumber:                   0,
-				GidNumber:                   0,
-				Mail:                        "",
+				DisplayName:              "",
+				PreferredName:            "",
+				OnPremisesSamAccountName: "",
+				UidNumber:                0,
+				GidNumber:                0,
+				Mail:                     "",
 			},
+			merrors.BadRequest(".", "preferred_name '' must be at least the local part of an email"),
 		},
 		{
 			"Update user with strange data",
 			&proto.Account{
-				DisplayName:                 "12345",
-				PreferredName:               "12345",
-				OnPremisesDistinguishedName: "54321",
-				UidNumber:                   1000,
-				GidNumber:                   1000,
-				// No email validation
-				// https://github.com/owncloud/ocis/accounts/issues/77
-				Mail: "1.2@3.c_@",
+				DisplayName:              "12345",
+				PreferredName:            "a12345",
+				OnPremisesSamAccountName: "a54321",
+				UidNumber:                1000,
+				GidNumber:                1000,
+				Mail:                     "1.2@3.c_@",
 			},
+			merrors.BadRequest(".", "mail '1.2@3.c_@' must be a valid email"),
 		},
 	}
 
@@ -524,20 +533,25 @@ func TestUpdateAccount(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
-			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
+			acc, err := createAccount(t, "user1")
+			assert.NoError(t, err)
+
+			tt.userAccount.Id = acc.Id
 			tt.userAccount.AccountEnabled = false
 			tt.userAccount.IsResourceAccount = false
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
-
-			checkError(t, err)
-
-			assert.IsType(t, &proto.Account{}, resp)
-			assertAccountsSame(t, tt.userAccount, resp)
-			assertUserExists(t, tt.userAccount)
+			if tt.expectedErrOnUpdate != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErrOnUpdate, err)
+			} else {
+				assert.NoError(t, err)
+				assert.IsType(t, &proto.Account{}, resp)
+				assertAccountsSame(t, tt.userAccount, resp)
+				assertUserExists(t, tt.userAccount)
+			}
+			cleanUp(t)
 		})
 	}
-
-	cleanUp(t)
 }
 
 func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
@@ -554,6 +568,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"CreationType",
 			},
 			&proto.Account{
+				Id:           user1.Id,
 				CreationType: "Type Test",
 			},
 		},
@@ -563,6 +578,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"PasswordProfile",
 			},
 			&proto.Account{
+				Id:              user1.Id,
 				PasswordProfile: &proto.PasswordProfile{Password: "new password"},
 			},
 		},
@@ -572,6 +588,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				"MemberOf",
 			},
 			&proto.Account{
+				Id: user1.Id,
 				MemberOf: []*proto.Group{
 					{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"},
 				},
@@ -580,7 +597,6 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.userAccount.Id = "f9149a32-2b8e-4f04-9e8d-937d81712b9a"
 			res, err := updateAccount(t, tt.userAccount, tt.updateMask)
 			if err == nil {
 				t.Fatalf("Expected error while updating non updatable field, but found none.")
@@ -602,6 +618,8 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 			}
 		})
 	}
+
+	cleanUp(t)
 }
 
 func TestListAccounts(t *testing.T) {
@@ -609,7 +627,7 @@ func TestListAccounts(t *testing.T) {
 	createAccount(t, "user2")
 
 	resp, err := listAccounts(t)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.IsType(t, &proto.ListAccountsResponse{}, resp)
 	assert.Equal(t, 8, len(resp.Accounts))
@@ -622,12 +640,108 @@ func TestListAccounts(t *testing.T) {
 
 func TestListWithoutUserCreation(t *testing.T) {
 	resp, err := listAccounts(t)
-
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	// Only 5 default users
 	assert.Equal(t, 6, len(resp.Accounts))
 	cleanUp(t)
+}
+
+func TestListAccountsWithFilterQuery(t *testing.T) {
+	scenarios := []struct {
+		name        string
+		query       string
+		expectedIDs []string
+	}{
+		// FIXME: disabled test scenarios need to be supported when implementing OData support
+		// OData implementation tracked in https://github.com/owncloud/ocis/issues/716
+		//{
+		//	name:        "ListAccounts with exact match on preferred_name",
+		//	query:       "preferred_name eq 'user1'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		{
+			name:        "ListAccounts with exact match on on_premises_sam_account_name",
+			query:       "on_premises_sam_account_name eq 'user1'",
+			expectedIDs: []string{user1.Id},
+		},
+		{
+			name:        "ListAccounts with exact match on mail",
+			query:       "mail eq 'user1@example.com'",
+			expectedIDs: []string{user1.Id},
+		},
+		//{
+		//	name:        "ListAccounts with exact match on id",
+		//	query:       "id eq 'f9149a32-2b8e-4f04-9e8d-937d81712b9a'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		//{
+		//	name:        "ListAccounts without match on preferred_name",
+		//	query:       "preferred_name eq 'wololo'",
+		//	expectedIDs: []string{},
+		//},
+		//{
+		//	name:        "ListAccounts with exact match on preferred_name AND mail",
+		//	query:       "preferred_name eq 'user1' and mail eq 'user1@example.com'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		//{
+		//	name:        "ListAccounts without match on preferred_name AND mail",
+		//	query:       "preferred_name eq 'user1' and mail eq 'wololo@example.com'",
+		//	expectedIDs: []string{},
+		//},
+		//{
+		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail exists",
+		//	query:       "preferred_name eq 'user1' or mail eq 'user1@example.com'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		//{
+		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name exists, mail does not exist",
+		//	query:       "preferred_name eq 'user1' or mail eq 'wololo@example.com'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		//{
+		//	name:        "ListAccounts with exact match on preferred_name OR mail, preferred_name does not exists, mail exists",
+		//	query:       "preferred_name eq 'wololo' or mail eq 'user1@example.com'",
+		//	expectedIDs: []string{user1.Id},
+		//},
+		//{
+		//	name:        "ListAccounts without match on preferred_name OR mail, preferred_name and mail do not exist",
+		//	query:       "preferred_name eq 'wololo' or mail eq 'wololo@example.com'",
+		//	expectedIDs: []string{},
+		//},
+		//{
+		//	name:        "ListAccounts with multiple matches on preferred_name",
+		//	query:       "startswith(preferred_name,'user*')",
+		//	expectedIDs: []string{user1.Id, user2.Id},
+		//},
+		//{
+		//	name:        "ListAccounts with multiple matches on on_premises_sam_account_name",
+		//	query:       "startswith(on_premises_sam_account_name,'user*')",
+		//	expectedIDs: []string{user1.Id, user2.Id},
+		//},
+	}
+
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", service.Client())
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			_, err := createAccount(t, "user1")
+			assert.NoError(t, err)
+			_, err = createAccount(t, "user2")
+			assert.NoError(t, err)
+
+			req := &proto.ListAccountsRequest{Query: scenario.query}
+			res, err := cl.ListAccounts(context.Background(), req)
+			assert.NoError(t, err)
+			ids := make([]string, 0)
+			for _, acc := range res.Accounts {
+				ids = append(ids, acc.Id)
+			}
+			assert.Equal(t, scenario.expectedIDs, ids)
+			cleanUp(t)
+		})
+	}
 }
 
 func TestGetAccount(t *testing.T) {
@@ -635,17 +749,18 @@ func TestGetAccount(t *testing.T) {
 
 	req := &proto.GetAccountRequest{Id: getAccount("user1").Id}
 
-	client := service.Client()
-	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
+	cl := proto.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
 	resp, err := cl.GetAccount(context.Background(), req)
 
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.IsType(t, &proto.Account{}, resp)
 	assertAccountsSame(t, getAccount("user1"), resp)
 
 	cleanUp(t)
 }
+
+//TODO: This segfaults! WIP
 
 func TestDeleteAccount(t *testing.T) {
 	createAccount(t, "user1")
@@ -657,7 +772,7 @@ func TestDeleteAccount(t *testing.T) {
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.DeleteAccount(context.Background(), req)
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.IsType(t, resp, &empty.Empty{})
 
 	// Check the account doesn't exists anymore
@@ -675,9 +790,9 @@ func TestListGroups(t *testing.T) {
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.ListGroups(context.Background(), req)
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.IsType(t, &proto.ListGroupsResponse{}, resp)
-	assert.Equal(t, len(resp.Groups), 9)
+	assert.Equal(t, 9, len(resp.Groups))
 
 	groups := []string{
 		"sysusers",
@@ -718,7 +833,7 @@ func TestGetGroups(t *testing.T) {
 		req := &proto.GetGroupRequest{Id: group.Id}
 		resp, err := cl.GetGroup(context.Background(), req)
 
-		checkError(t, err)
+		assert.NoError(t, err)
 		assert.IsType(t, &proto.Group{}, resp)
 		assertGroupsSame(t, group, resp)
 	}
@@ -733,7 +848,7 @@ func TestCreateGroup(t *testing.T) {
 	}}
 
 	res, err := createGroup(t, group)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 
@@ -772,12 +887,12 @@ func TestDeleteGroup(t *testing.T) {
 	req := &proto.DeleteGroupRequest{Id: grp1.Id}
 	res, err := cl.DeleteGroup(context.Background(), req)
 	assert.IsType(t, res, &empty.Empty{})
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	req = &proto.DeleteGroupRequest{Id: grp2.Id}
 	res, err = cl.DeleteGroup(context.Background(), req)
 	assert.IsType(t, res, &empty.Empty{})
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	groupsResponse := listGroups(t)
 	assertResponseNotContainsGroup(t, groupsResponse, grp1)
@@ -870,7 +985,7 @@ func TestAddMember(t *testing.T) {
 	req := &proto.AddMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
 
 	res, err := cl.AddMember(context.Background(), req)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 
@@ -904,7 +1019,7 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 	res, err := cl.AddMember(context.Background(), req)
 
 	// Should Give Error
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 	//assert.Equal(t, proto.Group{}, *res)
 	//assertGroupsSame(t, updatedGroup, res)
@@ -975,7 +1090,7 @@ func TestRemoveMember(t *testing.T) {
 	req := &proto.RemoveMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
 
 	res, err := cl.RemoveMember(context.Background(), req)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.IsType(t, &proto.Group{}, res)
 	//assert.Equal(t, proto.Group{}, *res)
@@ -1034,7 +1149,7 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 	res, err := cl.RemoveMember(context.Background(), req)
 
 	// Should give an error
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 
 	//assert.Error(t, err)
@@ -1071,7 +1186,7 @@ func TestListMembers(t *testing.T) {
 		req := &proto.ListMembersRequest{Id: expectedGroup.Id}
 
 		res, err := cl.ListMembers(context.Background(), req)
-		checkError(t, err)
+		assert.NoError(t, err)
 
 		assert.Equal(t, len(res.Members), len(expectedGroup.Members))
 
@@ -1104,7 +1219,7 @@ func TestListMembersEmptyGroup(t *testing.T) {
 
 	res, err := cl.ListMembers(context.Background(), req)
 
-	checkError(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, res.Members)
 
 	cleanUp(t)
@@ -1120,12 +1235,12 @@ func TestAccountUpdateMask(t *testing.T) {
 		Account: &proto.Account{
 			Id:            user1.Id,
 			DisplayName:   "ShouldBeUpdated",
-			PreferredName: "ShouldStaySame",
+			PreferredName: "ShouldStaySame And Is Invalid Anyway",
 		}}
 
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 	res, err := cl.UpdateAccount(context.Background(), req)
-	checkError(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "ShouldBeUpdated", res.DisplayName)
 	assert.Equal(t, user1.PreferredName, res.PreferredName)

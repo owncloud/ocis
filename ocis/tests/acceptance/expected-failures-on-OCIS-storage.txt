@@ -161,7 +161,6 @@ apiProvisioning-v2/enableUser.feature:31
 apiProvisioning-v2/enableUser.feature:32
 apiProvisioning-v2/getUser.feature:34
 apiProvisioning-v2/getUser.feature:35
-apiProvisioning-v1/addUser.feature:118
 #
 # https://github.com/owncloud/ocis-accounts/issues/80
 # Creating an already existing user works
@@ -177,29 +176,16 @@ apiProvisioning-v2/addUser.feature:39
 apiProvisioning-v1/addUser.feature:69
 apiProvisioning-v2/addUser.feature:69
 #
+# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
+#
+apiSharePublicLink1/createPublicLinkShare.feature:793
+apiSharePublicLink1/createPublicLinkShare.feature:804
+#
 # https://github.com/owncloud/ocis-accounts/issues/128
 # Username is case sensitive
 #
-apiProvisioning-v1/addUser.feature:96
-apiProvisioning-v1/addUser.feature:97
-apiProvisioning-v1/addUser.feature:98
-apiProvisioning-v1/addUser.feature:99
-apiProvisioning-v1/addUser.feature:100
 apiProvisioning-v1/addUser.feature:102
-apiProvisioning-v1/getUser.feature:37
-apiProvisioning-v1/getUser.feature:113
-apiProvisioning-v1/getUser.feature:124
-apiProvisioning-v2/addUser.feature:96
-apiProvisioning-v2/addUser.feature:97
-apiProvisioning-v2/addUser.feature:98
-apiProvisioning-v2/addUser.feature:99
-apiProvisioning-v2/addUser.feature:100
 apiProvisioning-v2/addUser.feature:102
-apiProvisioning-v2/getUser.feature:37
-apiProvisioning-v2/getUser.feature:114
-apiProvisioning-v2/getUser.feature:125
-apiProvisioning-v1/deleteUser.feature:32
-apiProvisioning-v2/deleteUser.feature:32
 #
 # https://github.com/owncloud/ocis/issues/197
 # Client token generation not implemented
@@ -494,6 +480,7 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 apiShareOperationsToShares/gettingShares.feature:167
 apiShareOperationsToShares/gettingShares.feature:168
+#
 apiSharePublicLink1/createPublicLinkShare.feature:793
 apiSharePublicLink1/createPublicLinkShare.feature:804
 #
@@ -1301,6 +1288,9 @@ apiWebdavProperties2/getFileProperties.feature:441
 apiWebdavProperties2/getFileProperties.feature:442
 apiWebdavProperties2/getFileProperties.feature:454
 apiWebdavProperties2/getFileProperties.feature:455
+#
+# https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
+#
 apiWebdavUpload1/uploadFile.feature:144
 apiWebdavUpload1/uploadFile.feature:145
 apiWebdavUpload1/uploadFile.feature:157
@@ -1509,7 +1499,7 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:152
 apiWebdavEtagPropagation1/deleteFileFolder.feature:182
 apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
-# https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
+# https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236

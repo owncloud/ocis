@@ -128,6 +128,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Repo.CS3.DataPrefix,
 		},
 		&cli.StringFlag{
+			Name:        "storage-cs3-jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_JWT_SECRET"},
+			Destination: &cfg.Repo.CS3.JWTSecret,
+		},
+		&cli.StringFlag{
 			Name:        "service-user-uuid",
 			Value:       "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 			Usage:       "uuid of the internal service user (required on EOS)",
@@ -154,6 +161,34 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "gid of the internal service user (required on EOS)",
 			EnvVars:     []string{"ACCOUNTS_SERVICE_USER_GID"},
 			Destination: &cfg.ServiceUser.GID,
+		},
+		&cli.Int64Flag{
+			Name:        "uid-index-lower-bound",
+			Value:       0,
+			Usage:       "define a starting point for the account UID",
+			EnvVars:     []string{"ACCOUNTS_UID_INDEX_LOWER_BOUND"},
+			Destination: &cfg.Index.UID.Lower,
+		},
+		&cli.Int64Flag{
+			Name:        "gid-index-lower-bound",
+			Value:       1000,
+			Usage:       "define a starting point for the account GID",
+			EnvVars:     []string{"ACCOUNTS_GID_INDEX_LOWER_BOUND"},
+			Destination: &cfg.Index.GID.Lower,
+		},
+		&cli.Int64Flag{
+			Name:        "uid-index-upper-bound",
+			Value:       0,
+			Usage:       "define an ending point for the account UID",
+			EnvVars:     []string{"ACCOUNTS_UID_INDEX_UPPER_BOUND"},
+			Destination: &cfg.Index.UID.Upper,
+		},
+		&cli.Int64Flag{
+			Name:        "gid-index-upper-bound",
+			Value:       1000,
+			Usage:       "define an ending point for the account GID",
+			EnvVars:     []string{"ACCOUNTS_GID_INDEX_UPPER_BOUND"},
+			Destination: &cfg.Index.GID.Upper,
 		},
 	}
 }
