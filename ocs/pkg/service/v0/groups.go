@@ -64,7 +64,12 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
 		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not add user to group")
 		return
 	}
@@ -95,7 +100,12 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
 		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not remove user from group")
 		return
 	}

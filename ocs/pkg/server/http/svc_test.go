@@ -1576,7 +1576,6 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 	}
 }
 
-// Issue: https://github.com/owncloud/ocis/ocs/issues/55 Incorrect message when adding user to non existing group
 func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1629,7 +1628,7 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 				assertResponseMeta(t, Meta{
 					"error",
 					998,
-					"The requested user could not be found",
+					"The requested group could not be found",
 				}, response.Ocs.Meta)
 				assert.Empty(t, response.Ocs.Data)
 			}
