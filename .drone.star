@@ -512,7 +512,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     },
   }
 
-def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage = 'owncloud'):
+def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
