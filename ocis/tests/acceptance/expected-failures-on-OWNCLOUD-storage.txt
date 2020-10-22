@@ -400,8 +400,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:498
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:501
 apiShareManagementBasicToShares/deleteShareFromShares.feature:28
 apiShareManagementBasicToShares/deleteShareFromShares.feature:29
-apiShareManagementBasicToShares/deleteShareFromShares.feature:43
-apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 apiShareManagementBasicToShares/deleteShareFromShares.feature:89
 apiShareManagementBasicToShares/deleteShareFromShares.feature:163
 apiShareManagementBasicToShares/deleteShareFromShares.feature:164
@@ -419,6 +417,12 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:154
+#
+# https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
+# https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
+#
+apiShareManagementBasicToShares/deleteShareFromShares.feature:43
+apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
