@@ -308,7 +308,8 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if in.Account == nil {
 		return merrors.InternalServerError(s.id, "invalid account: empty")
 	}
-	*out = *in.Account
+
+	out.XXX_Merge(in.Account)
 
 	if out.Id == "" {
 		out.Id = uuid.Must(uuid.NewV4()).String()

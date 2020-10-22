@@ -113,7 +113,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 	if in.Group == nil {
 		return merrors.InternalServerError(s.id, "invalid group: empty")
 	}
-	*out = *in.Group
+	out.XXX_Merge(in.Group)
 
 	if out.Id == "" {
 		out.Id = uuid.Must(uuid.NewV4()).String()
