@@ -16,9 +16,7 @@ import (
 // ListUserGroups lists a users groups
 func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-
 	account, err := o.fetchAccountByUsername(r.Context(), userid)
-
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -49,12 +47,7 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty group assignment: unspecified group"))
 		return
 	}
-
-	_, err := o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
-		AccountId: userid,
-		GroupId:   groupid,
-	})
-
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -62,6 +55,16 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
+		return
+	}
+
+	_, err = o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
+		AccountId: account.Id,
+		GroupId:   groupid,
+	})
+
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not add user to group")
 		return
 	}
@@ -75,11 +78,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 	groupid := r.URL.Query().Get("groupid")
 
-	_, err := o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
-		AccountId: userid,
-		GroupId:   groupid,
-	})
-
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -87,6 +86,16 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
+		return
+	}
+
+	_, err = o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
+		AccountId: account.Id,
+		GroupId:   groupid,
+	})
+
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not remove user from group")
 		return
 	}
