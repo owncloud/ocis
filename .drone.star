@@ -552,6 +552,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
         ] if phoenixCommit != '' else []) + [
           'yarn install-all',
           'cd /drone/src/accounts',
+          'yarn install --all',
           'make test-acceptance-webui'
         ],
         'volumes': [{
@@ -1356,7 +1357,6 @@ def ocisServer(storage):
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
-        'ACCOUNTS_DATA_PATH': '/srv/app/tmp/ocis-accounts/',
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
