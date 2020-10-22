@@ -17,7 +17,7 @@ import (
 func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 
-	account, err := o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{Id: userid})
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
 
 	if err != nil {
 		merr := merrors.FromError(err)
