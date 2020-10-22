@@ -84,6 +84,7 @@ TEST_SERVER_URL=https://localhost:9200 \
 TEST_EXTERNAL_USER_BACKENDS=true \
 TEST_OCIS=true \
 OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
+DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@preview-extension-required' \
 SKELETON_DIR=apps/testing/data/apiSkeleton
 ```
@@ -129,6 +130,7 @@ If you want to work on a specific issue
     TEST_EXTERNAL_USER_BACKENDS=true \
     TEST_OCIS=true \
     OCIS_REVA_DATA_ROOT=/var/tmp/ocis/owncloud/ \
+    DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
@@ -143,6 +145,3 @@ If you want to work on a specific issue
     If the changes also affect the `ocis` repository make sure the changes get ported over there.
     That will need the fixed code in `storage` to be applied to `ocis` along with the test-related changes.
 
-### Notes
-- in a normal case the test-code cleans up users after the test-run, but if a test-run is interrupted (e.g. by CTRL+C) users might have been left on the LDAP server. In that case rerunning the tests requires wiping the users in the ldap server, otherwise the tests will fail when trying to populate the users. This can be done by simply running `docker stop docker-slapd && docker rm docker-slapd` and [restarting the LDAP server container](#run-a-ldap-server-in-a-docker-container)
-- the tests usually create users in the OU `TestUsers` with usernames specified in the feature file. If not defined in the feature file, most users have the password `123456`, defined by `regularUserPassword` in `behat.yml`, but other passwords are also used, see [`\FeatureContext::getPasswordForUser()`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L386) for mapping and [`\FeatureContext::__construct`](https://github.com/owncloud/core/blob/master/tests/acceptance/features/bootstrap/FeatureContext.php#L1668) for the password definitions.
