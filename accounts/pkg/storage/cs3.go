@@ -8,11 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -95,7 +97,7 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return err
 	}
 
-	if resp.StatusCode == http.StatusNotFound {
+	if resp.StatusCode != http.StatusOK {
 		return &notFoundErr{"account", id}
 	}
 
@@ -222,6 +224,18 @@ func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
 			OpaqueId: r.cfg.ServiceUser.UUID,
 		},
 		Groups: []string{},
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(r.cfg.ServiceUser.UID, 10)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(r.cfg.ServiceUser.GID, 10)),
+				},
+			},
+		},
 	}
 	return r.tm.MintToken(ctx, u)
 }
