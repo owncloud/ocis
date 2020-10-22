@@ -1499,15 +1499,8 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:152
 apiWebdavEtagPropagation1/deleteFileFolder.feature:182
 apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
-# https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
-#
-apiWebdavEtagPropagation1/moveFileFolder.feature:39
-apiWebdavEtagPropagation1/moveFileFolder.feature:40
-#
 # https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
 #
-apiWebdavEtagPropagation1/moveFileFolder.feature:201
-apiWebdavEtagPropagation1/moveFileFolder.feature:202
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
