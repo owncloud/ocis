@@ -12,57 +12,72 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			Name:        "debug-addr",
 			Value:       "0.0.0.0:9217",
 			Usage:       "Address to bind debug server",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_DEBUG_ADDR"},
+			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.DebugAddr,
 		},
 		&cli.StringFlag{
-			Name:        "network",
+			Name:        "grpc-network",
 			Value:       "tcp",
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_NETWORK"},
-			Destination: &cfg.Reva.StorageMetadata.Network,
+			EnvVars:     []string{"STORAGE_METADATA_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageMetadata.GRPCNetwork,
 		},
 		&cli.StringFlag{
-			Name:        "provider-addr",
+			Name:        "grpc-addr",
 			Value:       "0.0.0.0:9215",
 			Usage:       "Address to bind storage service",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_PROVIDER_ADDR"},
-			Destination: &cfg.Reva.StorageMetadata.Addr,
+			EnvVars:     []string{"STORAGE_METADATA_GRPC_PROVIDER_ADDR"},
+			Destination: &cfg.Reva.StorageMetadata.GRPCAddr,
 		},
 		&cli.StringFlag{
 			Name:        "data-server-url",
 			Value:       "http://localhost:9216",
-			Usage:       "URL of the data-server the storage-provider uses",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_DATA_SERVER_URL"},
+			Usage:       "URL of the data-provider the storage-provider uses",
+			EnvVars:     []string{"STORAGE_METADATA_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageMetadata.DataServerURL,
 		},
 		&cli.StringFlag{
-			Name:        "data-server-addr",
-			Value:       "0.0.0.0:9216",
-			Usage:       "Address to bind the metadata data-server to",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_DATA_SERVER_ADDR"},
-			Destination: &cfg.Reva.StorageMetadataData.Addr,
+			Name:        "http-network",
+			Value:       "tcp",
+			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
+			EnvVars:     []string{"STORAGE_METADATA_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageMetadata.HTTPNetwork,
 		},
 		&cli.StringFlag{
-			Name:        "storage-provider-driver",
-			Value:       "local",
+			Name:        "http-addr",
+			Value:       "0.0.0.0:9216",
+			Usage:       "Address to bind storage service",
+			EnvVars:     []string{"STORAGE_METADATA_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageMetadata.HTTPAddr,
+		},
+		&cli.StringFlag{
+			Name:        "driver",
+			Value:       "ocis",
 			Usage:       "storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_PROVIDER_DRIVER"},
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER"},
 			Destination: &cfg.Reva.StorageMetadata.Driver,
 		},
+
+		// some drivers need to look up users at the gateway
+
+		// Gateway
+
 		&cli.StringFlag{
-			Name:        "data-provider-driver",
-			Value:       "local",
-			Usage:       "storage driver for data-provider mount: eg. local, eos, owncloud, ocis or s3",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_DATA_PROVIDER_DRIVER"},
-			Destination: &cfg.Reva.StorageMetadataData.Driver,
+			Name:        "gateway-endpoint",
+			Value:       "localhost:9142",
+			Usage:       "endpoint to use for the gateway service",
+			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
+
+		// User provider
+
 		&cli.StringFlag{
-			Name:        "storage-root",
-			Value:       "/var/tmp/ocis/metadata",
-			Usage:       "the path to the metadata storage root",
-			EnvVars:     []string{"STORAGE_STORAGE_METADATA_ROOT"},
-			Destination: &cfg.Reva.Storages.Common.Root,
+			Name:        "userprovider-endpoint",
+			Value:       "localhost:9144",
+			Usage:       "endpoint to use for the userprovider service",
+			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.Users.Endpoint,
 		},
 	}
 
@@ -73,7 +88,15 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DriverLocalWithConfig(cfg)...)
 	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
 	flags = append(flags, DriverOCISWithConfig(cfg)...)
-
+	flags = append(flags,
+		&cli.StringFlag{
+			Name:        "storage-root",
+			Value:       "/var/tmp/ocis/metadata",
+			Usage:       "the path to the metadata storage root",
+			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
+			Destination: &cfg.Reva.Storages.Common.Root,
+		},
+	)
 	return flags
 
 }

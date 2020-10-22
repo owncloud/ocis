@@ -30,7 +30,7 @@ require (
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
 	github.com/restic/calens v0.2.0
-	go.opencensus.io v0.22.4
+	go.opencensus.io v0.22.5
 )
 
 replace (

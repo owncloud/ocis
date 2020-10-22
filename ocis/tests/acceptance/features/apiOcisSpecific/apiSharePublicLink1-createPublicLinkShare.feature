@@ -23,7 +23,7 @@ Feature: create a public link share
     Given user "Alice" has created folder "testFolder"
     When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "testFolder/file.txt" using the WebDAV API
     And user "Alice" has created a public link share with settings
-      | path        | /testFolder |
+      | path        | /testFolder               |
       | permissions | read,update,create,delete |
     And the public uploads file "file.txt" to the last shared folder with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the new public WebDAV API
     Then as "Alice" file "/testFolder/file.txt" should exist

@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -18,8 +19,10 @@
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -40,6 +43,7 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
 
@@ -70,6 +74,15 @@
    accordingly.
 
    https://github.com/owncloud/ocis/pull/625
+
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+
+   Tags: glauth
+
+   We found a file descriptor leak in the glauth connections to the accounts service. Fixed it by
+   using the micro default client.
+
+   https://github.com/owncloud/ocis/pull/718
 
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 
@@ -210,6 +223,15 @@
    https://github.com/owncloud/phoenix/releases/tag/v0.18.0
    https://github.com/owncloud/owncloud-design-system/releases/tag/v1.12.1
 
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
+
+   Tags: web
+
+   We changed the default apps for ownCloud Web to be only files and media-viewer.
+   Markdown-editor and draw-io have been removed as defaults.
+
+   https://github.com/owncloud/ocis/pull/688
+
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 
    Tags: settings
@@ -228,6 +250,14 @@
 
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
+
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
+
+   Tags: konnectd
+
+   We've styled our konnectd login page to reflect ownCloud theme.
+
+   https://github.com/owncloud/ocis/pull/698
 
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 
@@ -1250,3 +1280,10 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
+
+  * fixes etag propagation in the ocis driver
+
+   https://github.com/owncloud/ocis/pull/725
+   https://github.com/cs3org/reva/pull/1264

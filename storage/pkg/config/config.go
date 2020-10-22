@@ -46,14 +46,19 @@ type Port struct {
 	// MaxCPUs can be a number or a percentage
 	MaxCPUs  string
 	LogLevel string
-	// Network can be tcp, udp or unix
-	Network string
-	// Addr to listen on, hostname:port (0.0.0.0:9999 for all interfaces) or socket (/var/run/reva/sock)
-	Addr string
+	// GRPCNetwork can be tcp, udp or unix
+	GRPCNetwork string
+	// GRPCAddr to listen on, hostname:port (0.0.0.0:9999 for all interfaces) or socket (/var/run/reva/sock)
+	GRPCAddr string
+	// Protocol can be grpc or http
+	// HTTPNetwork can be tcp, udp or unix
+	HTTPNetwork string
+	// HTTPAddr to listen on, hostname:port (0.0.0.0:9100 for all interfaces) or socket (/var/run/reva/sock)
+	HTTPAddr string
 	// Protocol can be grpc or http
 	Protocol string
-	// URL is used by the gateway and registries (eg http://localhost:9100 or https://cloud.example.com)
-	URL string
+	// Endpoint is used by the gateway and registries (eg localhost:9100 or cloud.example.com)
+	Endpoint string
 	// DebugAddr for the debug endpoint to bind to
 	DebugAddr string
 	// Services can be used to give a list of services that should be started on this port
@@ -77,6 +82,13 @@ type FrontendPort struct {
 	DatagatewayPrefix string
 	OCDavPrefix       string
 	OCSPrefix         string
+	PublicURL         string
+}
+
+// DataGatewayPort has a public url
+type DataGatewayPort struct {
+	Port
+	PublicURL string
 }
 
 // StoragePort defines the available storage configuration.
@@ -86,10 +98,11 @@ type StoragePort struct {
 	MountPath        string
 	MountID          string
 	ExposeDataServer bool
-	DataServerURL    string
+	// url the data gateway will use to route requests
+	DataServerURL string
 
 	// for HTTP ports with only one http service
-	Prefix     string
+	HTTPPrefix string
 	TempFolder string
 }
 
@@ -273,32 +286,19 @@ type Reva struct {
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
-	Frontend            FrontendPort
-	DataGateway         Port
-	Gateway             Gateway
-	StorageRegistry     StorageRegistry
-	Users               Users
-	AuthProvider        Users
-	AuthBasic           Port
-	AuthBearer          Port
-	Sharing             Sharing
-	StorageRoot         StoragePort
-	StorageRootData     StoragePort
-	StorageHome         StoragePort
-	StorageHomeData     StoragePort
-	StorageEOS          StoragePort
-	StorageEOSData      StoragePort
-	StorageOC           StoragePort
-	StorageOCData       StoragePort
-	StorageS3           StoragePort
-	StorageS3Data       StoragePort
-	StorageWND          StoragePort
-	StorageWNDData      StoragePort
-	StorageCustom       StoragePort
-	StorageCustomData   StoragePort
-	StoragePublicLink   PublicStorage
-	StorageMetadata     StoragePort
-	StorageMetadataData StoragePort
+	Frontend          FrontendPort
+	DataGateway       DataGatewayPort
+	Gateway           Gateway
+	StorageRegistry   StorageRegistry
+	Users             Users
+	AuthProvider      Users
+	AuthBasic         Port
+	AuthBearer        Port
+	Sharing           Sharing
+	StorageHome       StoragePort
+	StorageUsers      StoragePort
+	StoragePublicLink PublicStorage
+	StorageMetadata   StoragePort
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}
