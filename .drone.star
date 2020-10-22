@@ -143,7 +143,7 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
-  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'], 'owncloud'))
+  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
   return pipelines
 
 def testing(ctx, module):
@@ -512,7 +512,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     },
   }
 
-def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
+def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage = 'owncloud'):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -521,110 +521,46 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommitId, storage):
       'os': 'linux',
       'arch': 'amd64',
     },
-    'steps': [
-      {
-        'name': 'build-ocis',
-        'image': 'webhippie/golang:1.14',
-        'pull': 'always',
-        'commands': [
-          'cd ocis',
-          'make build',
-          'mkdir -p /srv/app/ocis/bin',
-          'cp bin/ocis /srv/app/ocis/bin',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app'
-          },
-        ]
-      },
-      {
-        'name': 'ocis-server',
-        'image': 'webhippie/golang:1.14',
-        'pull': 'always',
-        'detach': True,
-        'environment' : {
-          #'OCIS_LOG_LEVEL': 'debug',
-          'STORAGE_HOME_DRIVER': '%s' % (storage),
-          'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
-          'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/reva/root',
-          'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
-          'STORAGE_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-          'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
-          'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
-          'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
-          'STORAGE_HOME_EXPOSE_DATA_SERVER': 'true',
-          'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
-          'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
-          'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
-          'PHOENIX_WEB_CONFIG': '/drone/src/accounts/ui/tests/config/drone/ocis-config.json',
-          'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/accounts/ui/tests/config/drone/identifier-registration.yml',
-          'KONNECTD_ISS': 'https://ocis-server:9200',
-          'ACCOUNTS_STORAGE_DISK_PATH': '/srv/app/tmp/ocis-accounts', # Temporary workaround, don't use metadata storage
-        },
-        'commands': [
-          'mkdir -p /srv/app/tmp/reva',
-          # First run settings service because accounts need it to register the settings bundles
-          '/srv/app/ocis/bin/ocis settings &',
-
-          # Wait for the settings service to start
-          "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9190)\" != \"404\" ]]; do sleep 2; done",
-
-          # Now start the accounts service
-          '/srv/app/ocis/bin/ocis accounts &',
-
-          # Wait for the accounts service to start
-          "while [[ \"$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9181)\" != \"404\" ]]; do sleep 2; done",
-
-          # Now run all the ocis services except the accounts and settings because they are already running
-          '/srv/app/ocis/bin/ocis server',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app'
-          },
-        ]
-      },
+    'steps':
+      generate('ocis') +
+      build() +
+      ocisServer(storage) + [
       {
         'name': 'WebUIAcceptanceTests',
-        'image': 'owncloudci/nodejs:10',
+        'image': 'owncloudci/nodejs:11',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
-          'PHOENIX_CONFIG': '/drone/src/accounts/ui/tests/config/drone/ocis-config.json',
+          'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
-          'PHOENIX_PATH': '/srv/app/phoenix',
-          'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
-          'NODE_TLS_REJECT_UNAUTHORIZED': '0'
+          'NODE_TLS_REJECT_UNAUTHORIZED': 0,
+          'TEST_PATHS': paths,
         },
         'commands': [
-          'git clone --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
-          'git clone -b %s --single-branch https://github.com/owncloud/phoenix /srv/app/phoenix' % (phoenixBranch),
-          'cd /srv/app/phoenix',
-          'git checkout %s' % (phoenixCommitId),
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/phoenix.git /srv/app/phoenix' % (phoenixBranch),
           'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/phoenix',
+        ] + ([
+          'git checkout %s' % (phoenixCommit)
+        ] if phoenixCommit != '' else []) + [
           'yarn install-all',
           'cd /drone/src/accounts',
-          'yarn install --all',
           'make test-acceptance-webui'
         ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-          {
-            'name': 'uploads',
-            'path': '/uploads'
-          }
-        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+        {
+          'name': 'uploads',
+          'path': '/uploads'
+        }],
       },
     ],
     'services': [
