@@ -119,6 +119,8 @@ apiCapabilities/capabilitiesWithNormalUser.feature:11
 #
 apiFavorites/favorites.feature:91
 apiFavorites/favorites.feature:92
+apiFavorites/favorites.feature:100
+apiFavorites/favorites.feature:101
 apiFavorites/favorites.feature:112
 apiFavorites/favorites.feature:113
 apiFavorites/favorites.feature:128
