@@ -1,35 +1,34 @@
-// +build !simple
-
 package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
-// StorageStorageEOSDataCommand is the entrypoint for the reva-storage-eos-data command.
-func StorageStorageEOSDataCommand(cfg *config.Config) *cli.Command {
+// StorageMetadataCommand is the entrypoint for the storage-metadata command.
+func StorageMetadataCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-storage-eos-data",
-		Usage:    "Start storage storage data provider for eos mount",
+		Name:     "storage-metadata",
+		Usage:    "Start storage and data service for metadata",
 		Category: "Extensions",
-		Flags:    flagset.StorageEOSDataWithConfig(cfg.Storage),
+		Flags:    flagset.StorageMetadata(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageStorageEOSData(cfg)
+			revaStorageMetadataCommand := command.StorageMetadata(configureStorageMetadata(cfg))
 
-			return cli.HandleAction(
-				command.StorageEOSData(scfg).Action,
-				c,
-			)
+			if err := revaStorageMetadataCommand.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(revaStorageMetadataCommand.Action, c)
 		},
 	}
 }
 
-func configureStorageStorageEOSData(cfg *config.Config) *svcconfig.Config {
+func configureStorageMetadata(cfg *config.Config) *svcconfig.Config {
 	cfg.Storage.Log.Level = cfg.Log.Level
 	cfg.Storage.Log.Pretty = cfg.Log.Pretty
 	cfg.Storage.Log.Color = cfg.Log.Color
@@ -46,5 +45,5 @@ func configureStorageStorageEOSData(cfg *config.Config) *svcconfig.Config {
 }
 
 func init() {
-	register.AddCommand(StorageStorageEOSDataCommand)
+	register.AddCommand(StorageMetadataCommand)
 }

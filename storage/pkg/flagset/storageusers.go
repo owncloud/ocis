@@ -5,17 +5,17 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
-// StorageHomeWithConfig applies cfg to the root flagset
-func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
+// StorageUsersWithConfig applies cfg to the root flagset
+func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 	flags := []cli.Flag{
 
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9156",
+			Value:       "0.0.0.0:9159",
 			Usage:       "Address to bind debug server",
-			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
-			Destination: &cfg.Reva.StorageHome.DebugAddr,
+			EnvVars:     []string{"STORAGE_USERS_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.DebugAddr,
 		},
 
 		// Services
@@ -25,98 +25,88 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "grpc-network",
 			Value:       "tcp",
-			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
-			EnvVars:     []string{"STORAGE_HOME_GRPC_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.GRPCNetwork,
+			Usage:       "Network to use for the users storage, can be 'tcp', 'udp' or 'unix'",
+			EnvVars:     []string{"STORAGE_USERS_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageUsers.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       "0.0.0.0:9154",
-			Usage:       "Address to bind storage service",
-			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
-			Destination: &cfg.Reva.StorageHome.GRPCAddr,
+			Value:       "0.0.0.0:9157",
+			Usage:       "GRPC Address to bind users storage",
+			EnvVars:     []string{"STORAGE_USERS_GRPC_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.GRPCAddr,
 		},
 		&cli.StringFlag{
 			Name:        "http-network",
 			Value:       "tcp",
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
-			EnvVars:     []string{"STORAGE_HOME_HTTP_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.HTTPNetwork,
+			EnvVars:     []string{"STORAGE_USERS_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageUsers.HTTPNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9155",
-			Usage:       "Address to bind storage service",
-			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
-			Destination: &cfg.Reva.StorageHome.HTTPAddr,
+			Value:       "0.0.0.0:9158",
+			Usage:       "HTTP Address to bind users storage",
+			EnvVars:     []string{"STORAGE_USERS_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.HTTPAddr,
 		},
-
 		// TODO allow disabling grpc / http services
 		/*
 			&cli.StringSliceFlag{
 				Name:    "grpc-service",
 				Value:   cli.NewStringSlice("storageprovider"),
 				Usage:   "--service storageprovider [--service otherservice]",
-				EnvVars: []string{"STORAGE_HOME_GRPC_SERVICES"},
+				EnvVars: []string{"STORAGE_USERS_GRPC_SERVICES"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "http-service",
 				Value:   cli.NewStringSlice("dataprovider"),
 				Usage:   "--service dataprovider [--service otherservice]",
-				EnvVars: []string{"STORAGE_HOME_HTTP_SERVICES"},
+				EnvVars: []string{"STORAGE_USERS_HTTP_SERVICES"},
 			},
 		*/
 
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "ocis",
-			Usage:       "storage driver for home mount: eg. local, eos, owncloud, ocis or s3",
-			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
-			Destination: &cfg.Reva.StorageHome.Driver,
+			Usage:       "storage driver for users mount: eg. local, eos, owncloud, ocis or s3",
+			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
+			Destination: &cfg.Reva.StorageUsers.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "mount-path",
-			Value:       "/home",
+			Value:       "/users",
 			Usage:       "mount path",
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_PATH"},
-			Destination: &cfg.Reva.StorageHome.MountPath,
+			EnvVars:     []string{"STORAGE_USERS_MOUNT_PATH"},
+			Destination: &cfg.Reva.StorageUsers.MountPath,
 		},
 		&cli.StringFlag{
-			Name: "mount-id",
-			// This is the mount id of the storage provider using the same storage driver
-			// as /home but withoud home enabled.
+			Name:        "mount-id",
 			Value:       "1284d238-aa92-42ce-bdc4-0b0000009157", // /users
 			Usage:       "mount id",
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_ID"},
-			Destination: &cfg.Reva.StorageHome.MountID,
+			EnvVars:     []string{"STORAGE_USERS_MOUNT_ID"},
+			Destination: &cfg.Reva.StorageUsers.MountID,
 		},
 		&cli.BoolFlag{
 			Name:        "expose-data-server",
 			Value:       false,
 			Usage:       "exposes a dedicated data server",
-			EnvVars:     []string{"STORAGE_HOME_EXPOSE_DATA_SERVER"},
-			Destination: &cfg.Reva.StorageHome.ExposeDataServer,
+			EnvVars:     []string{"STORAGE_USERS_EXPOSE_DATA_SERVER"},
+			Destination: &cfg.Reva.StorageUsers.ExposeDataServer,
 		},
 		&cli.StringFlag{
 			Name:        "data-server-url",
-			Value:       "http://localhost:9155/data",
+			Value:       "http://localhost:9158/data",
 			Usage:       "data server url",
-			EnvVars:     []string{"STORAGE_HOME_DATA_SERVER_URL"},
-			Destination: &cfg.Reva.StorageHome.DataServerURL,
+			EnvVars:     []string{"STORAGE_USERS_DATA_SERVER_URL"},
+			Destination: &cfg.Reva.StorageUsers.DataServerURL,
 		},
 		&cli.StringFlag{
 			Name:        "http-prefix",
 			Value:       "data",
 			Usage:       "prefix for the http endpoint, without leading slash",
-			EnvVars:     []string{"STORAGE_HOME_HTTP_PREFIX"},
-			Destination: &cfg.Reva.StorageHome.HTTPPrefix,
-		},
-		&cli.BoolFlag{
-			Name:        "enable-home",
-			Value:       true,
-			Usage:       "enable the creation of home directories",
-			EnvVars:     []string{"STORAGE_HOME_ENABLE_HOME"},
-			Destination: &cfg.Reva.Storages.Home.EnableHome,
+			EnvVars:     []string{"STORAGE_USERS_HTTP_PREFIX"},
+			Destination: &cfg.Reva.StorageUsers.HTTPPrefix,
 		},
 
 		// some drivers need to look up users at the gateway

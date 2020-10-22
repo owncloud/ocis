@@ -386,8 +386,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:498
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:501
 apiShareManagementBasicToShares/deleteShareFromShares.feature:28
 apiShareManagementBasicToShares/deleteShareFromShares.feature:29
-apiShareManagementBasicToShares/deleteShareFromShares.feature:43
-apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 apiShareManagementBasicToShares/deleteShareFromShares.feature:89
 apiShareManagementBasicToShares/deleteShareFromShares.feature:163
 apiShareManagementBasicToShares/deleteShareFromShares.feature:164
@@ -405,6 +403,12 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:154
+#
+# https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
+# https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
+#
+apiShareManagementBasicToShares/deleteShareFromShares.feature:43
+apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 #
@@ -476,6 +480,9 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 apiShareOperationsToShares/gettingShares.feature:167
 apiShareOperationsToShares/gettingShares.feature:168
+#
+apiSharePublicLink1/createPublicLinkShare.feature:793
+apiSharePublicLink1/createPublicLinkShare.feature:804
 #
 # https://github.com/owncloud/product/issues/271 Cannot set mtime on upload
 #
@@ -1363,11 +1370,11 @@ apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:50
 # https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
 #
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:38
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:42
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:40
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1381,11 +1388,11 @@ apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:52
 # https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
 #
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:21
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:37
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:41
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1407,16 +1414,16 @@ apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:26
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:35
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:25
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:34
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:43
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:75
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:77
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:96
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
@@ -1492,21 +1499,6 @@ apiWebdavEtagPropagation1/deleteFileFolder.feature:152
 apiWebdavEtagPropagation1/deleteFileFolder.feature:182
 apiWebdavEtagPropagation1/deleteFileFolder.feature:183
 #
-# https://github.com/owncloud/product/issues/238 renaming a files does not change etag of containing folder
-#
-apiWebdavEtagPropagation1/moveFileFolder.feature:20
-apiWebdavEtagPropagation1/moveFileFolder.feature:21
-apiWebdavEtagPropagation1/moveFileFolder.feature:58
-apiWebdavEtagPropagation1/moveFileFolder.feature:59
-apiWebdavEtagPropagation1/moveFileFolder.feature:74
-apiWebdavEtagPropagation1/moveFileFolder.feature:75
-apiWebdavEtagPropagation1/moveFileFolder.feature:93
-apiWebdavEtagPropagation1/moveFileFolder.feature:94
-apiWebdavEtagPropagation1/moveFileFolder.feature:112
-apiWebdavEtagPropagation1/moveFileFolder.feature:113
-apiWebdavEtagPropagation1/moveFileFolder.feature:306
-apiWebdavEtagPropagation1/moveFileFolder.feature:321
-#
 # https://github.com/owncloud/product/issues/239 moving a file from one folder to an other does not change the etag of the source folder
 #
 apiWebdavEtagPropagation1/moveFileFolder.feature:39
@@ -1518,8 +1510,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:201
 apiWebdavEtagPropagation1/moveFileFolder.feature:202
 apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236
-apiWebdavEtagPropagation1/moveFileFolder.feature:269
-apiWebdavEtagPropagation1/moveFileFolder.feature:270
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
 #

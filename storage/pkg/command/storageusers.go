@@ -16,14 +16,14 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
-// StorageHomeData is the entrypoint for the storage-home-data command.
-func StorageHomeData(cfg *config.Config) *cli.Command {
+// StorageUsers is the entrypoint for the storage-users command.
+func StorageUsers(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "storage-home-data",
-		Usage: "Start storage-home-data service",
-		Flags: flagset.StorageHomeDataWithConfig(cfg),
+		Name:  "storage-users",
+		Usage: "Start storage-users service",
+		Flags: flagset.StorageUsersWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.StorageHomeData.Services = c.StringSlice("service")
+			cfg.Reva.StorageHome.Services = c.StringSlice("service")
 
 			return nil
 		},
@@ -80,24 +80,39 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 				}
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Users.MaxCPUs,
+						"max_cpus":             cfg.Reva.StorageUsers.MaxCPUs,
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "storage-home-data",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+					},
+					"grpc": map[string]interface{}{
+						"network": cfg.Reva.StorageUsers.GRPCNetwork,
+						"address": cfg.Reva.StorageUsers.GRPCAddr,
+						// TODO build services dynamically
+						"services": map[string]interface{}{
+							"storageprovider": map[string]interface{}{
+								"driver":             cfg.Reva.StorageUsers.Driver,
+								"drivers":            drivers(cfg),
+								"mount_path":         cfg.Reva.StorageUsers.MountPath,
+								"mount_id":           cfg.Reva.StorageUsers.MountID,
+								"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
+								"data_server_url":    cfg.Reva.StorageUsers.DataServerURL,
+							},
+						},
 					},
 					"http": map[string]interface{}{
-						"network": cfg.Reva.StorageHomeData.Network,
-						"address": cfg.Reva.StorageHomeData.Addr,
+						"network": cfg.Reva.StorageUsers.HTTPNetwork,
+						"address": cfg.Reva.StorageUsers.HTTPAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"dataprovider": map[string]interface{}{
-								"prefix":      cfg.Reva.StorageHomeData.Prefix,
-								"driver":      cfg.Reva.StorageHomeData.Driver,
+								"prefix":      cfg.Reva.StorageUsers.HTTPPrefix,
+								"driver":      cfg.Reva.StorageUsers.Driver,
 								"drivers":     drivers(cfg),
 								"timeout":     86400,
 								"insecure":    true,
@@ -126,7 +141,7 @@ func StorageHomeData(cfg *config.Config) *cli.Command {
 			{
 				server, err := debug.Server(
 					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.StorageHomeData.DebugAddr),
+					debug.Addr(cfg.Reva.StorageUsers.DebugAddr),
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),

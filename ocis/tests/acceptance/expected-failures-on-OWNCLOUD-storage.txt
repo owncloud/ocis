@@ -383,8 +383,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:498
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:501
 apiShareManagementBasicToShares/deleteShareFromShares.feature:28
 apiShareManagementBasicToShares/deleteShareFromShares.feature:29
-apiShareManagementBasicToShares/deleteShareFromShares.feature:43
-apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 apiShareManagementBasicToShares/deleteShareFromShares.feature:89
 apiShareManagementBasicToShares/deleteShareFromShares.feature:163
 apiShareManagementBasicToShares/deleteShareFromShares.feature:164
@@ -402,6 +400,12 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:154
+#
+# https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
+# https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
+#
+apiShareManagementBasicToShares/deleteShareFromShares.feature:43
+apiShareManagementBasicToShares/deleteShareFromShares.feature:44
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
@@ -1350,31 +1354,31 @@ apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
 # https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
 #
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:38
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:42
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:40
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:21
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:37
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:41
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:26
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:35
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:25
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:34
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:43
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:75
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:77
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:96
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
 #
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
