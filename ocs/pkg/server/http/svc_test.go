@@ -32,32 +32,39 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
-const ocsV1 string = "v1.php"
-const ocsV2 string = "v2.php"
-
-const adminBasicAuth string = "admin:admin"
-
-const userProvisioningEndPoint string = "/v1.php/cloud/users?format=json"
-const groupProvisioningEndPoint string = "/v1.php/cloud/groups?format=json"
+const (
+	ocsV1          string = "v1.php"
+	ocsV2          string = "v2.php"
+	adminBasicAuth string = "admin:admin"
+)
 
 const unsuccessfulResponseText string = "The response was expected to be successful but was not"
 
-const userIDEinstein string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
-const userIDMarie string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
-const userIDFeynman string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
-const userIDKonnectd string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
-const userIDReva string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
-const userIDMoss string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
+const (
+	userProvisioningEndPoint  string = "/v1.php/cloud/users?format=json"
+	groupProvisioningEndPoint string = "/v1.php/cloud/groups?format=json"
+)
 
-const groupPhilosophyHaters = "167cbee2-0518-455a-bfb2-031fe0621e5d"
-const groupPhysicsLovers = "262982c1-2362-4afa-bfdf-8cbfef64a06e"
-const groupPoloniumLovers = "cedc21aa-4072-4614-8676-fa9165f598ff"
-const groupQuantumLovers = "a1726108-01f8-4c30-88df-2b1a9d1cba1a"
-const groupRadiumLovers = "7b87fd49-286e-4a5f-bafd-c535d5dd997a"
-const groupSailingLovers = "6040aa17-9c64-4fef-9bd0-77234d71bad0"
-const groupViolinHaters = "dd58e5ec-842e-498b-8800-61f2ec6f911f"
-const groupUsers = "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
-const groupSysUsers = "34f38767-c937-4eb6-b847-1c175829a2a0"
+const (
+	userIDEinstein string = "einstein"
+	userIDMarie    string = "marie"
+	userIDFeynman  string = "richard"
+	userIDKonnectd string = "konnectd"
+	userIDReva     string = "reva"
+	userIDMoss     string = "moss"
+)
+
+const (
+	groupPhilosophyHaters = "167cbee2-0518-455a-bfb2-031fe0621e5d"
+	groupPhysicsLovers    = "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+	groupPoloniumLovers   = "cedc21aa-4072-4614-8676-fa9165f598ff"
+	groupQuantumLovers    = "a1726108-01f8-4c30-88df-2b1a9d1cba1a"
+	groupRadiumLovers     = "7b87fd49-286e-4a5f-bafd-c535d5dd997a"
+	groupSailingLovers    = "6040aa17-9c64-4fef-9bd0-77234d71bad0"
+	groupViolinHaters     = "dd58e5ec-842e-498b-8800-61f2ec6f911f"
+	groupUsers            = "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+	groupSysUsers         = "34f38767-c937-4eb6-b847-1c175829a2a0"
+)
 
 var service = grpc.Service{}
 
