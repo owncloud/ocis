@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'a8eb4b1a8410a0c944d153be8703a09d54acb98d',
+    'phoenixCommit': '2fabcb8bf376dbbdff9bb7e787dbee5c334b4a7b',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -38,12 +38,12 @@ config = {
         'webUIRenameFiles',
         'webUIRenameFolders',
       ],
-       'phoenixWebUI4': [
+      'phoenixWebUI4': [
         'webUITrashbin',
         'webUIUpload',
-        # All tests in the following suites are skipped currently
-        # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
+        ],
+      'phoenixWebUI5': [
         'webUISharingAutocompletion',
         'webUISharingInternalGroups',
         'webUISharingInternalUsers',
@@ -51,14 +51,18 @@ config = {
         'webUISharingFilePermissionsGroups',
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
+        ],
+      'phoenixWebUI6': [
         'webUIResharing',
         'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
         'webUISharingAcceptShares',
+        'webUISharingNotifications',
+      ],
+      'phoenixWebUI7': [
         'webUISharingFilePermissionMultipleUsers',
         'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers',
-        'webUISharingNotifications',
       ],
     }
   }
