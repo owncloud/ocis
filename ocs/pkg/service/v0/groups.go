@@ -98,7 +98,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if isValidUUID(userid) {
-		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		account, _ = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
 			Id: userid,
 		})
 	} else {
