@@ -46,12 +46,12 @@ const (
 )
 
 const (
-	userIDEinstein string = "einstein"
-	userIDMarie    string = "marie"
-	userIDFeynman  string = "richard"
-	userIDKonnectd string = "konnectd"
-	userIDReva     string = "reva"
-	userIDMoss     string = "moss"
+	userIDEinstein string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
+	userIDMarie    string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
+	userIDFeynman  string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
+	userIDKonnectd string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
+	userIDReva     string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
+	userIDMoss     string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
 )
 
 const (
