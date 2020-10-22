@@ -231,6 +231,9 @@ def testing(ctx, module):
       }
   ]
 
+  if module == 'accounts':
+    steps = ocisMetadataStorage() + steps
+
   if config['modules'][module] == 'frontend':
     steps = frontend(module) + steps
 
@@ -252,6 +255,27 @@ def testing(ctx, module):
       ],
     },
   }
+
+def ocisMetadataStorage():
+  return [
+    {
+      'name': 'ocis-metadata-storage',
+      'image': 'webhippie/golang:1.14',
+      'pull': 'always',
+      'detach': True,
+      'commands': [
+        'mkdir -p /srv/app/tmp/ocis/owncloud/data/',
+        'mkdir -p /srv/app/tmp/ocis/storage/users/',
+        'ocis/bin/ocis storage-metadata'
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app'
+        },
+      ]
+    },
+  ]
 
 def uploadCoverage(ctx):
   return {
