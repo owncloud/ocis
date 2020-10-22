@@ -6,9 +6,11 @@
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+* Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
+* Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -17,6 +19,7 @@
 * Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
+* Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
 * Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
@@ -84,6 +87,15 @@
 
    https://github.com/owncloud/ocis/pull/718
 
+* Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: accounts
+
+   We don't allow anymore to create a new account if the provided id/mail/username is already
+   taken.
+
+   https://github.com/owncloud/ocis/pull/709
+
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 
    Tags: proxy
@@ -109,6 +121,24 @@
    progress bar before.
 
    https://github.com/owncloud/ocis/pull/656
+
+* Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: accounts, storage
+
+   We replaced `bleve` with a new filesystem based index implementation. There is an `indexer`
+   which is capable of orchestrating different index types to build indices on documents by
+   field. You can choose from the index types `unique`, `non-unique` or `autoincrement`.
+   Indices can be utilized to run search queries (full matches or globbing) on document fields.
+   The accounts service is using this index internally to run the search queries coming in via
+   `ListAccounts` and `ListGroups` and to generate UIDs for new accounts as well as GIDs for new
+   groups.
+
+   The accounts service can be configured to store the index on the local FS / a NFS (`disk`
+   implementation of the index) or to use an arbitrary storage ( `cs3` implementation of the
+   index). `cs3` is the new default, which is configured to use the `metadata` storage.
+
+   https://github.com/owncloud/ocis/pull/709
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -184,6 +214,17 @@
    list`, `ocis kill` and `ocis run` available for service runtime management.
 
    https://github.com/owncloud/ocis/pull/287
+
+* Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: ocs
+
+   We use the incoming userid as both the `id` and the `on_premises_sam_account_name` for new
+   accounts in the accounts service. The userid in OCS requests is in fact the username, not our
+   internal account id. We need to enforce the userid as our internal account id though, because
+   the account id is part of various `path` formats.
+
+   https://github.com/owncloud/ocis/pull/709
 
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 
