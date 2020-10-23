@@ -10,8 +10,10 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
-	github.com/gorilla/mux v1.7.4
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
+	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
@@ -20,14 +22,19 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/flaex v0.2.0
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-00010101000000-000000000000
+	github.com/pquerna/cachecontrol v0.0.0-20200921180117-858c6e7e6b7e // indirect
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.19.0
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/viper v1.6.3
 	go.opencensus.io v0.22.4
-	golang.org/x/net v0.0.0-20200625001655-4c5254603344
-	stash.kopano.io/kc/konnect v0.30.0
+	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
+	golang.org/x/net v0.0.0-20201022231255-08b38378de70
+	golang.org/x/sys v0.0.0-20201022201747-fb209a7c41cd // indirect
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+	stash.kopano.io/kc/konnect v0.33.8
 	stash.kopano.io/kgol/rndm v1.1.0
 )
 
