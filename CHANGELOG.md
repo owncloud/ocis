@@ -4,6 +4,7 @@
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
@@ -50,6 +51,7 @@
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
@@ -71,6 +73,14 @@
    removed, as it was blocking a new set of default external apps in ocis-phoenix.
 
    https://github.com/owncloud/ocis/pull/473
+
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
+
+   Tags: accounts
+
+   Lower bound working on the cs3 index implementation
+
+   https://github.com/owncloud/ocis/pull/741
 
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 
@@ -1375,6 +1385,13 @@
    ca-certificates version
 
    https://github.com/owncloud/ocis/pull/744
+
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
+
+  * let the gateway filter invalid references
+
+   https://github.com/owncloud/ocis/pull/748
+   https://github.com/cs3org/reva/pull/1274
 
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
