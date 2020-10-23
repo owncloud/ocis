@@ -47,7 +47,10 @@ func (i Indexer) Reset() error {
 	for j := range i.indices {
 		for _, indices := range i.indices[j].IndicesByField {
 			for _, idx := range indices {
-				_ = idx.Delete()
+				err := idx.Delete()
+				if err != nil {
+					return err
+				}
 			}
 		}
 		delete(i.indices, j)

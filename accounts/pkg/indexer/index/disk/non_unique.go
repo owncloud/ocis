@@ -236,5 +236,5 @@ func (idx *NonUnique) FilesDir() string {
 
 // Delete deletes the index folder from its storage.
 func (idx *NonUnique) Delete() error {
-	return os.Remove(idx.indexRootDir)
+	return os.RemoveAll(idx.indexRootDir)
 }

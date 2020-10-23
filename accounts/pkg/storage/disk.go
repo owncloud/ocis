@@ -75,8 +75,8 @@ func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err er
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		acc := &proto.Account{}
-		if err = r.LoadAccount(ctx, filepath.Base(path), acc); err != nil {
-			r.log.Err(err).Msg("could not load account")
+		if e := r.LoadAccount(ctx, filepath.Base(path), acc); e != nil {
+			r.log.Err(e).Msg("could not load account")
 			return nil
 		}
 		*a = append(*a, acc)
@@ -137,8 +137,8 @@ func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error)
 	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		grp := &proto.Group{}
-		if err = r.LoadGroup(ctx, filepath.Base(path), grp); err != nil {
-			r.log.Err(err).Msg("could not load group")
+		if e := r.LoadGroup(ctx, filepath.Base(path), grp); e != nil {
+			r.log.Err(e).Msg("could not load group")
 			return nil
 		}
 		*g = append(*g, grp)
