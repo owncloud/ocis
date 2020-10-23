@@ -61,6 +61,8 @@ config = {
       ],
       'phoenixWebUI7': [
         'webUISharingFilePermissionMultipleUsers',
+      ],
+      'phoenixWebUI8': [
         'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers',
       ],
