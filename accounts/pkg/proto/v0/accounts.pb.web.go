@@ -372,6 +372,120 @@ func RegisterGroupsServiceWeb(r chi.Router, i GroupsServiceHandler, middlewares 
 	r.MethodFunc("POST", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
 }
 
+type webIndexServiceHandler struct {
+	r chi.Router
+	h IndexServiceHandler
+}
+
+func (h *webIndexServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.r.ServeHTTP(w, r)
+}
+
+func (h *webIndexServiceHandler) RebuildIndex(w http.ResponseWriter, r *http.Request) {
+
+	req := &RebuildIndexRequest{}
+
+	resp := &RebuildIndexResponse{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	if err := h.h.RebuildIndex(
+		r.Context(),
+		req,
+		resp,
+	); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, resp)
+}
+
+func RegisterIndexServiceWeb(r chi.Router, i IndexServiceHandler, middlewares ...func(http.Handler) http.Handler) {
+	handler := &webIndexServiceHandler{
+		r: r,
+		h: i,
+	}
+
+	r.MethodFunc("POST", "/api/v0/index/rebuild", handler.RebuildIndex)
+}
+
+// RebuildIndexRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of RebuildIndexRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var RebuildIndexRequestJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *RebuildIndexRequest) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := RebuildIndexRequestJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*RebuildIndexRequest)(nil)
+
+// RebuildIndexRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of RebuildIndexRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var RebuildIndexRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *RebuildIndexRequest) UnmarshalJSON(b []byte) error {
+	return RebuildIndexRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*RebuildIndexRequest)(nil)
+
+// RebuildIndexResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of RebuildIndexResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var RebuildIndexResponseJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *RebuildIndexResponse) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := RebuildIndexResponseJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*RebuildIndexResponse)(nil)
+
+// RebuildIndexResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of RebuildIndexResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var RebuildIndexResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *RebuildIndexResponse) UnmarshalJSON(b []byte) error {
+	return RebuildIndexResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*RebuildIndexResponse)(nil)
+
 // ListAccountsRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of ListAccountsRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.

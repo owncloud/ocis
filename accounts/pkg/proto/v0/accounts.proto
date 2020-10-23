@@ -137,7 +137,14 @@ service GroupsService {
 }
 
 service IndexService {
-    rpc RebuildIndex(RebuildIndexRequest) returns (RebuildIndexResponse);
+    rpc RebuildIndex(RebuildIndexRequest) returns (RebuildIndexResponse) {
+        //  All request parameters go into body.
+        option (google.api.http) = {
+            // URLs are broken
+            post: "/api/v0/index/rebuild"
+            body: "*"
+        };
+    }
 }
 
 message RebuildIndexRequest {

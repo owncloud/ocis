@@ -42,6 +42,16 @@ func getRegistryStrategy(cfg *config.Config) string {
 	return "cs3"
 }
 
+func (i Indexer) Reset() error {
+	for k := range i.indices {
+		delete(i.indices, k)
+	}
+
+	// TODO: delete indexes from storage (cs3 / disk)
+
+	return nil
+}
+
 // AddIndex adds a new index to the indexer receiver.
 func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
 	strategy := getRegistryStrategy(i.config)
