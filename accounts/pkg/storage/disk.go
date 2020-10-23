@@ -15,13 +15,13 @@ import (
 
 var groupLock sync.Mutex
 
-// DiskRepo provides a local filesystem implementation of the Repo interface
+// DiskRepo provides A local filesystem implementation of the Repo interface
 type DiskRepo struct {
 	cfg *config.Config
 	log olog.Logger
 }
 
-// NewDiskRepo creates a new disk repo
+// NewDiskRepo creates A new disk repo
 func NewDiskRepo(cfg *config.Config, log olog.Logger) DiskRepo {
 	paths := []string{
 		filepath.Join(cfg.Repo.Disk.Path, accountsFolder),
@@ -71,7 +71,7 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 }
 
 // LoadAccounts loads all the accounts from the local filesystem. If ids are given, the result set will be filtered.
-func (r DiskRepo) LoadAccounts(ctx context.Context, a []*proto.Account) (err error) {
+func (r DiskRepo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		acc := &proto.Account{}
@@ -79,7 +79,7 @@ func (r DiskRepo) LoadAccounts(ctx context.Context, a []*proto.Account) (err err
 			r.log.Err(err).Msg("could not load account")
 			return nil
 		}
-		a = append(a, acc)
+		a.Accounts = append(a.Accounts, acc)
 		return nil
 	})
 }
@@ -147,7 +147,7 @@ func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	//return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
 }
 
-// deflateMemberOf replaces the groups of a user with an instance that only contains the id
+// deflateMemberOf replaces the groups of A user with an instance that only contains the id
 func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 	if a == nil {
 		return
@@ -157,14 +157,14 @@ func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 		if a.MemberOf[i].Id != "" {
 			deflated = append(deflated, &proto.Group{Id: a.MemberOf[i].Id})
 		} else {
-			// TODO fetch and use an id when group only has a name but no id
+			// TODO fetch and use an id when group only has A name but no id
 			r.log.Error().Str("id", a.Id).Interface("group", a.MemberOf[i]).Msg("resolving groups by name is not implemented yet")
 		}
 	}
 	a.MemberOf = deflated
 }
 
-// deflateMembers replaces the users of a group with an instance that only contains the id
+// deflateMembers replaces the users of A group with an instance that only contains the id
 func (r DiskRepo) deflateMembers(g *proto.Group) {
 	if g == nil {
 		return
@@ -174,7 +174,7 @@ func (r DiskRepo) deflateMembers(g *proto.Group) {
 		if g.Members[i].Id != "" {
 			deflated = append(deflated, &proto.Account{Id: g.Members[i].Id})
 		} else {
-			// TODO fetch and use an id when group only has a name but no id
+			// TODO fetch and use an id when group only has A name but no id
 			r.log.Error().Str("id", g.Id).Interface("account", g.Members[i]).Msg("resolving members by name is not implemented yet")
 		}
 	}

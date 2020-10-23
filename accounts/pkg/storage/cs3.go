@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// CS3Repo provides a cs3 implementation of the Repo interface
+// CS3Repo provides A cs3 implementation of the Repo interface
 type CS3Repo struct {
 	cfg             *config.Config
 	tm              token.Manager
@@ -31,7 +31,7 @@ type CS3Repo struct {
 	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
 }
 
-// NewCS3Repo creates a new cs3 repo
+// NewCS3Repo creates A new cs3 repo
 func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
@@ -58,7 +58,7 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	}, nil
 }
 
-// WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
+// WriteAccount writes an account via cs3 and modifies the provided account (e.G. with A generated id).
 func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -116,7 +116,7 @@ func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
 }
 
 // LoadAccounts loads all the accounts from the cs3 api. If ids are given, the result set will be filtered.
-func (r CS3Repo) LoadAccounts(ctx context.Context, a []*proto.Account) (err error) {
+func (r CS3Repo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a []*proto.Account) (err erro
 			log.Err(err).Msg("could not load account")
 			continue
 		}
-		a = append(a, acc)
+		a.Accounts = append(a.Accounts, acc)
 	}
 	return nil
 }
@@ -172,7 +172,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 	return nil
 }
 
-// WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
+// WriteGroup writes A group via cs3 and modifies the provided group (e.G. with A generated id).
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -199,7 +199,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	return nil
 }
 
-// LoadGroup loads a group via cs3 by id and writes it to the provided group
+// LoadGroup loads A group via cs3 by id and writes it to the provided group
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -225,7 +225,7 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 	return json.Unmarshal(b, &g)
 }
 
-// DeleteGroup deletes a group via cs3 by id
+// DeleteGroup deletes A group via cs3 by id
 func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -296,7 +296,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 	return nil
 }
 
-// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
+// TODO: this is copied from proxy. Find A better solution or move it to ocis-pkg
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
@@ -19,12 +21,14 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 		return err
 	}
 
-	accounts := make([]*proto.Account, 0)
-	if err := s.repo.LoadAccounts(ctx, accounts); err != nil {
+	resp := &storage.Accounts{
+		Accounts: make([]*proto.Account, 0),
+	}
+	if err := s.repo.LoadAccounts(ctx, resp); err != nil {
 		return err
 	}
-	for i := range accounts {
-		_, err := s.index.Add(accounts[i])
+	for i := range resp.Accounts {
+		_, err := s.index.Add(resp.Accounts[i])
 		if err != nil {
 			return err
 		}
