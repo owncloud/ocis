@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/owncloud/ocis/accounts/pkg/storage"
-
 	"github.com/gofrs/uuid"
+	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 )
 
 func (s Service) expandMembers(g *proto.Group) {
@@ -113,7 +113,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 	if in.Group == nil {
 		return merrors.InternalServerError(s.id, "invalid group: empty")
 	}
-	out.XXX_Merge(in.Group)
+	p.Merge(out, in.Group)
 
 	if out.Id == "" {
 		out.Id = uuid.Must(uuid.NewV4()).String()

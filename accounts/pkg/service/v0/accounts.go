@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
 	"github.com/gofrs/uuid"
+	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
@@ -309,7 +310,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return merrors.InternalServerError(s.id, "invalid account: empty")
 	}
 
-	out.XXX_Merge(in.Account)
+	p.Merge(out, in.Account)
 
 	if out.Id == "" {
 		out.Id = uuid.Must(uuid.NewV4()).String()
