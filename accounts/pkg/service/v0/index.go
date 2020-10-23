@@ -10,6 +10,6 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 	if err := s.index.Reset(); err != nil {
 		return err
 	}
-
+	response.Indices = []string{"foo", "bar"}
 	return nil
 }
