@@ -1208,19 +1208,23 @@ func TestListMembers(t *testing.T) {
 }
 
 func TestListMembersEmptyGroup(t *testing.T) {
-	group := &proto.Group{Id: "5d58e5ec-842e-498b-8800-61f2ec6f911c", GidNumber: 30002, OnPremisesSamAccountName: "quantum-group", DisplayName: "Quantum Group", Members: []*proto.Account{}}
-
-	createGroup(t, group)
+	group := &proto.Group{Id: "5d58e5ec-842e-498b-8800-61f2ec6f911c", GidNumber: 60000, OnPremisesSamAccountName: "quantum-group", DisplayName: "Quantum Group", Members: []*proto.Account{}}
 
 	client := service.Client()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
+	request := &proto.CreateGroupRequest{Group: group}
+	_, err := cl.CreateGroup(context.Background(), request)
+	if err == nil {
+		newCreatedGroups = append(newCreatedGroups, group.Id)
+	}
+
 	req := &proto.ListMembersRequest{Id: group.Id}
 
-	res, err := cl.ListMembers(context.Background(), req)
+	listRes, err := cl.ListMembers(context.Background(), req)
 
 	assert.NoError(t, err)
-	assert.Empty(t, res.Members)
+	assert.Empty(t, listRes.Members)
 
 	cleanUp(t)
 }
