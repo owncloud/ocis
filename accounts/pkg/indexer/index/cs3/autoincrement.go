@@ -15,7 +15,6 @@ import (
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -403,17 +402,5 @@ func (idx *Autoincrement) Delete() error {
 		return err
 	}
 
-	res, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
-		},
-	})
-	if err != nil {
-		return err
-	}
-	if res.Status.Code != rpc.Code_CODE_OK {
-		return fmt.Errorf("error deleting index root dir: %v", idx.indexRootDir)
-	}
-
-	return nil
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
 }
