@@ -230,7 +230,7 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		qID, qSam := match[1], match[2]
 		tmp := &proto.Account{}
 		err = s.repo.LoadAccount(ctx, qID, tmp)
-		if err != nil {
+		if err != nil && !storage.IsNotFoundErr(err) {
 			return nil, err
 		}
 		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
