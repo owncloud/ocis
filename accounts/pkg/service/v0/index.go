@@ -14,9 +14,8 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 	if err := s.index.Reset(); err != nil {
 		return err
 	}
-	response.Indices = []string{"foo", "bar"}
 
-	if err := createIndices(s.index, s.Config); err != nil {
+	if err := recreateContainers(s.index, s.Config); err != nil {
 		return err
 	}
 
@@ -25,8 +24,8 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 	return nil
 }
 
-// createIndices adds all indices to the indexer that we have for this service.
-func createIndices(idx *indexer.Indexer, cfg *config.Config) error {
+// recreateContainers adds all indices to the indexer that we have for this service.
+func recreateContainers(idx *indexer.Indexer, cfg *config.Config) error {
 	// Accounts
 	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique", nil, true); err != nil {
 		return err

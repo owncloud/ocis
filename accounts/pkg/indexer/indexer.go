@@ -43,11 +43,17 @@ func getRegistryStrategy(cfg *config.Config) string {
 }
 
 func (i Indexer) Reset() error {
-	for k := range i.indices {
-		delete(i.indices, k)
-	}
+	// TODO: is the root "index.cs3" folder somewhere?
+	// basically every implementation should take care of deleting its root folder.
 
-	// TODO: delete indexes from storage (cs3 / disk)
+	for j := range i.indices {
+		for _, indices := range i.indices[j].IndicesByField {
+			for _, idx := range indices {
+				_ = idx.Delete()
+			}
+		}
+		delete(i.indices, j)
+	}
 
 	return nil
 }

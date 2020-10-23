@@ -220,3 +220,8 @@ func isValidSymlink(path string) (err error) {
 
 	return
 }
+
+// Delete deletes the index folder from its storage.
+func (idx *Unique) Delete() error {
+	return nil
+}

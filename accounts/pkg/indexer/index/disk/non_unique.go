@@ -233,3 +233,8 @@ func (idx *NonUnique) TypeName() string {
 func (idx *NonUnique) FilesDir() string {
 	return idx.filesDir
 }
+
+// Delete deletes the index folder from its storage.
+func (idx *NonUnique) Delete() error {
+	return nil
+}

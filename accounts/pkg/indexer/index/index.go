@@ -13,4 +13,5 @@ type Index interface {
 	IndexBy() string
 	TypeName() string
 	FilesDir() string
+	Delete() error // Delete deletes the index folder from its storage.
 }

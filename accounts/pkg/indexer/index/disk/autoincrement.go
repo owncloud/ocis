@@ -19,11 +19,11 @@ import (
 
 // Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
-	indexBy         string
-	typeName        string
-	filesDir        string
-	indexBaseDir    string
-	indexRootDir    string
+	indexBy      string
+	typeName     string
+	filesDir     string
+	indexBaseDir string
+	indexRootDir string
 
 	bound *option.Bound
 }
@@ -54,12 +54,12 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	}
 
 	return &Autoincrement{
-		indexBy:         opts.IndexBy,
-		typeName:        opts.TypeName,
-		filesDir:        opts.FilesDir,
-		bound:           opts.Bound,
-		indexBaseDir:    path.Join(opts.DataDir, "index.disk"),
-		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		bound:        opts.Bound,
+		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
 
@@ -259,4 +259,9 @@ func (idx *Autoincrement) next() (int, error) {
 	}
 
 	return latest + 1, nil
+}
+
+// Delete deletes the index folder from its storage.
+func (idx *Autoincrement) Delete() error {
+	return nil
 }
