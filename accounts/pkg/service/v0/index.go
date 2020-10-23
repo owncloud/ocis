@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 
@@ -14,14 +15,18 @@ import (
 // RebuildIndex deletes all indices (in memory and on storage) and rebuilds them from scratch.
 func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRequest, response *proto.RebuildIndexResponse) error {
 	if err := s.index.Reset(); err != nil {
-		return err
+		return fmt.Errorf("failed to delete index containers: %w", err)
 	}
 
 	if err := recreateContainers(s.index, s.Config); err != nil {
-		return err
+		return fmt.Errorf("failed to recreate index containers: %w", err)
 	}
 
-	return reindexDocuments(ctx, s.repo, s.index)
+	if err := reindexDocuments(ctx, s.repo, s.index); err != nil {
+		return fmt.Errorf("failed to reindex documents: %w", err)
+	}
+
+	return nil
 }
 
 // recreateContainers adds all indices to the indexer that we have for this service.
