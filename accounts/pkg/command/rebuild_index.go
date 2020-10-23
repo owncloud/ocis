@@ -6,6 +6,7 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2/client/grpc"
+	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	index "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 )
@@ -22,10 +23,11 @@ func DeleteIndex(cdf *config.Config) *cli.Command {
 
 			_, err := idxSvc.RebuildIndex(context.Background(), &index.RebuildIndexRequest{})
 			if err != nil {
+				fmt.Println(merrors.FromError(err).Detail)
 				return err
 			}
 
-			fmt.Print("index rebuilt successfully")
+			fmt.Println("index rebuilt successfully")
 			return nil
 		},
 	}
