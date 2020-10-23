@@ -21,20 +21,31 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 		return err
 	}
 
-	resp := &storage.Accounts{
+	accounts := &storage.Accounts{
 		Accounts: make([]*proto.Account, 0),
 	}
-	if err := s.repo.LoadAccounts(ctx, resp); err != nil {
+	if err := s.repo.LoadAccounts(ctx, accounts); err != nil {
 		return err
 	}
-	for i := range resp.Accounts {
-		_, err := s.index.Add(resp.Accounts[i])
+	for i := range accounts.Accounts {
+		_, err := s.index.Add(accounts.Accounts[i])
 		if err != nil {
 			return err
 		}
 	}
 
-	// TODO: read all the documents and add them to the indexer.
+	groups := &storage.Groups{
+		Groups: make([]*proto.Group, 0),
+	}
+	if err := s.repo.LoadGroups(ctx, groups); err != nil {
+		return err
+	}
+	for i := range groups.Groups {
+		_, err := s.index.Add(groups.Groups[i])
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

@@ -70,7 +70,7 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 	return json.Unmarshal(data, a)
 }
 
-// LoadAccounts loads all the accounts from the local filesystem. If ids are given, the result set will be filtered.
+// LoadAccounts loads all the accounts from the local filesystem
 func (r DiskRepo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -132,6 +132,20 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 	return json.Unmarshal(data, g)
 }
 
+// LoadGroups loads all the groups from the local filesystem
+func (r DiskRepo) LoadGroups(ctx context.Context, g *Groups) (err error) {
+	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
+	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		grp := &proto.Group{}
+		if err = r.LoadGroup(ctx, filepath.Base(path), grp); err != nil {
+			r.log.Err(err).Msg("could not load group")
+			return nil
+		}
+		g.Groups = append(g.Groups, grp)
+		return nil
+	})
+}
+
 // DeleteGroup from the local filesystem
 func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
@@ -142,9 +156,6 @@ func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	}
 
 	return
-
-	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-	//return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
 }
 
 // deflateMemberOf replaces the groups of A user with an instance that only contains the id

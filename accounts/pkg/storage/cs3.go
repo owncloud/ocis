@@ -95,27 +95,7 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 	return r.loadAccount(id, t, a)
 }
 
-func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
-	resp, err := r.dataProvider.get(r.accountURL(id), t)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode == http.StatusNotFound {
-		return &notFoundErr{"account", id}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return json.Unmarshal(b, &a)
-}
-
-// LoadAccounts loads all the accounts from the cs3 api. If ids are given, the result set will be filtered.
+// LoadAccounts loads all the accounts from the cs3 api
 func (r CS3Repo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -143,6 +123,26 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 		a.Accounts = append(a.Accounts, acc)
 	}
 	return nil
+}
+
+func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
+	resp, err := r.dataProvider.get(r.accountURL(id), t)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return &notFoundErr{"account", id}
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &a)
 }
 
 // DeleteAccount deletes an account via cs3 by id
@@ -206,6 +206,40 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return err
 	}
 
+	return r.loadGroup(id, t, g)
+}
+
+// LoadGroups loads all the groups from the cs3 api
+func (r CS3Repo) LoadGroups(ctx context.Context, g *Groups) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder)},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
+	for i := range res.Infos {
+		grp := &proto.Group{}
+		err := r.loadGroup(filepath.Base(res.Infos[i].Path), t, grp)
+		if err != nil {
+			log.Err(err).Msg("could not load account")
+			continue
+		}
+		g.Groups = append(g.Groups, grp)
+	}
+	return nil
+}
+
+func (r CS3Repo) loadGroup(id string, t string, g *proto.Group) error {
 	resp, err := r.dataProvider.get(r.groupURL(id), t)
 	if err != nil {
 		return err
