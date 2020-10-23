@@ -71,7 +71,7 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 }
 
 // LoadAccounts loads all the accounts from the local filesystem
-func (r DiskRepo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
+func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		acc := &proto.Account{}
@@ -79,7 +79,7 @@ func (r DiskRepo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 			r.log.Err(err).Msg("could not load account")
 			return nil
 		}
-		a.Accounts = append(a.Accounts, acc)
+		*a = append(*a, acc)
 		return nil
 	})
 }
@@ -133,7 +133,7 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 }
 
 // LoadGroups loads all the groups from the local filesystem
-func (r DiskRepo) LoadGroups(ctx context.Context, g *Groups) (err error) {
+func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		grp := &proto.Group{}
@@ -141,7 +141,7 @@ func (r DiskRepo) LoadGroups(ctx context.Context, g *Groups) (err error) {
 			r.log.Err(err).Msg("could not load group")
 			return nil
 		}
-		g.Groups = append(g.Groups, grp)
+		*g = append(*g, grp)
 		return nil
 	})
 }

@@ -20,12 +20,12 @@ func DeleteIndex(cdf *config.Config) *cli.Command {
 			idxSvcID := "com.owncloud.api.accounts"
 			idxSvc := index.NewIndexService(idxSvcID, grpc.NewClient())
 
-			rsp, err := idxSvc.RebuildIndex(context.Background(), &index.RebuildIndexRequest{})
+			_, err := idxSvc.RebuildIndex(context.Background(), &index.RebuildIndexRequest{})
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("deleted: %+v", rsp.Indices)
+			fmt.Print("index rebuilt successfully")
 			return nil
 		},
 	}

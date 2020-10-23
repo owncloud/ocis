@@ -96,7 +96,7 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 }
 
 // LoadAccounts loads all the accounts from the cs3 api
-func (r CS3Repo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
+func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
 		return err
@@ -120,7 +120,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *Accounts) (err error) {
 			log.Err(err).Msg("could not load account")
 			continue
 		}
-		a.Accounts = append(a.Accounts, acc)
+		*a = append(*a, acc)
 	}
 	return nil
 }
@@ -210,7 +210,7 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 }
 
 // LoadGroups loads all the groups from the cs3 api
-func (r CS3Repo) LoadGroups(ctx context.Context, g *Groups) (err error) {
+func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
 		return err
@@ -234,7 +234,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *Groups) (err error) {
 			log.Err(err).Msg("could not load account")
 			continue
 		}
-		g.Groups = append(g.Groups, grp)
+		*g = append(*g, grp)
 	}
 	return nil
 }
