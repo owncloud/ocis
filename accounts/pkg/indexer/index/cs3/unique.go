@@ -10,7 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+
+	"github.com/owncloud/ocis/accounts/pkg/config"
+
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -41,12 +44,11 @@ type Unique struct {
 
 // Config represents cs3conf. Should be deprecated in favor of config.Config.
 type Config struct {
-	ProviderAddr    string
-	DataURL         string
-	DataPrefix      string
-	JWTSecret       string
-	ServiceUserName string
-	ServiceUserUUID string
+	ProviderAddr string
+	DataURL      string
+	DataPrefix   string
+	JWTSecret    string
+	ServiceUser  config.ServiceUser
 }
 
 func init() {
@@ -69,12 +71,11 @@ func NewUniqueIndexWithOptions(o ...option.Option) index.Index {
 		indexBaseDir:    path.Join(opts.DataDir, "index.cs3"),
 		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"unique", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
-			ProviderAddr:    opts.ProviderAddr,
-			DataURL:         opts.DataURL,
-			DataPrefix:      opts.DataPrefix,
-			JWTSecret:       opts.JWTSecret,
-			ServiceUserName: opts.ServiceUserName,
-			ServiceUserUUID: opts.ServiceUserUUID,
+			ProviderAddr: opts.ProviderAddr,
+			DataURL:      opts.DataURL,
+			DataPrefix:   opts.DataPrefix,
+			JWTSecret:    opts.JWTSecret,
+			ServiceUser:  opts.ServiceUser,
 		},
 		dataProvider: dataProviderClient{
 			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
@@ -305,7 +306,6 @@ func (idx *Unique) createSymlink(oldname, newname string) error {
 	}
 
 	return nil
-
 }
 
 func (idx *Unique) resolveSymlink(name string) (string, error) {
@@ -338,35 +338,9 @@ func (idx *Unique) resolveSymlink(name string) (string, error) {
 }
 
 func (idx *Unique) makeDirIfNotExists(ctx context.Context, folder string) error {
-	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%v", folder)},
-	}
-
-	resp, err := idx.storageProvider.Stat(ctx, &provider.StatRequest{
-		Ref: rootPathRef,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
-		_, err := idx.storageProvider.CreateContainer(ctx, &provider.CreateContainerRequest{
-			Ref: rootPathRef,
-		})
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
 }
 
 func (idx *Unique) authenticate(ctx context.Context) (token string, err error) {
-	u := &user.User{
-		Id:     &user.UserId{OpaqueId: idx.cs3conf.ServiceUserUUID},
-		Groups: []string{},
-	}
-	return idx.tokenManager.MintToken(ctx, u)
+	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 }

@@ -69,8 +69,7 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 			option.WithDataPrefix(i.config.Repo.CS3.DataPrefix),
 			option.WithJWTSecret(i.config.Repo.CS3.JWTSecret),
 			option.WithProviderAddr(i.config.Repo.CS3.ProviderAddr),
-			option.WithServiceUserUUID(i.config.ServiceUser.UUID),
-			option.WithServiceUserName(i.config.ServiceUser.Username),
+			option.WithServiceUser(i.config.ServiceUser),
 		)
 	}
 
