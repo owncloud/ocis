@@ -75,7 +75,7 @@ func New(opts ...Option) (s *Service, err error) {
 func (s Service) buildIndex() (*indexer.Indexer, error) {
 	idx := indexer.CreateIndexer(s.Config)
 
-	if err := createIndices(idx, s.Config); err != nil {
+	if err := recreateContainers(idx, s.Config); err != nil {
 		return nil, err
 	}
 	return idx, nil

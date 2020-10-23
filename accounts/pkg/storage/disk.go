@@ -17,8 +17,8 @@ var groupLock sync.Mutex
 
 // DiskRepo provides a local filesystem implementation of the Repo interface
 type DiskRepo struct {
-	cfg       *config.Config
-	log       olog.Logger
+	cfg *config.Config
+	log olog.Logger
 }
 
 // NewDiskRepo creates a new disk repo
@@ -37,8 +37,8 @@ func NewDiskRepo(cfg *config.Config, log olog.Logger) DiskRepo {
 		}
 	}
 	return DiskRepo{
-		cfg:       cfg,
-		log:       log,
+		cfg: cfg,
+		log: log,
 	}
 }
 
@@ -68,6 +68,20 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 	}
 
 	return json.Unmarshal(data, a)
+}
+
+// LoadAccounts loads all the accounts from the local filesystem. If ids are given, the result set will be filtered.
+func (r DiskRepo) LoadAccounts(ctx context.Context, a []*proto.Account) (err error) {
+	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
+	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		acc := &proto.Account{}
+		if err = r.LoadAccount(ctx, filepath.Base(path), acc); err != nil {
+			r.log.Err(err).Msg("could not load account")
+			return nil
+		}
+		a = append(a, acc)
+		return nil
+	})
 }
 
 // DeleteAccount from the local filesystem

@@ -19,6 +19,17 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 		return err
 	}
 
+	accounts := make([]*proto.Account, 0)
+	if err := s.repo.LoadAccounts(ctx, accounts); err != nil {
+		return err
+	}
+	for i := range accounts {
+		_, err := s.index.Add(accounts[i])
+		if err != nil {
+			return err
+		}
+	}
+
 	// TODO: read all the documents and add them to the indexer.
 
 	return nil

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -18,6 +19,7 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -90,6 +92,10 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return err
 	}
 
+	return r.loadAccount(id, t, a)
+}
+
+func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
 	resp, err := r.dataProvider.get(r.accountURL(id), t)
 	if err != nil {
 		return err
@@ -107,6 +113,36 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return err
 	}
 	return json.Unmarshal(b, &a)
+}
+
+// LoadAccounts loads all the accounts from the cs3 api. If ids are given, the result set will be filtered.
+func (r CS3Repo) LoadAccounts(ctx context.Context, a []*proto.Account) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder)},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
+	for i := range res.Infos {
+		acc := &proto.Account{}
+		err := r.loadAccount(filepath.Base(res.Infos[i].Path), t, acc)
+		if err != nil {
+			log.Err(err).Msg("could not load account")
+			continue
+		}
+		a = append(a, acc)
+	}
+	return nil
 }
 
 // DeleteAccount deletes an account via cs3 by id
