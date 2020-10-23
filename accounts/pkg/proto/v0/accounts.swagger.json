@@ -1045,15 +1045,7 @@
       "type": "object"
     },
     "settingsRebuildIndexResponse": {
-      "type": "object",
-      "properties": {
-        "Indices": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
+      "type": "object"
     },
     "settingsRemoveMemberRequest": {
       "type": "object",

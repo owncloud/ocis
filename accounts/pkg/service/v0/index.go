@@ -21,33 +21,7 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 		return err
 	}
 
-	accounts := &storage.Accounts{
-		Accounts: make([]*proto.Account, 0),
-	}
-	if err := s.repo.LoadAccounts(ctx, accounts); err != nil {
-		return err
-	}
-	for i := range accounts.Accounts {
-		_, err := s.index.Add(accounts.Accounts[i])
-		if err != nil {
-			return err
-		}
-	}
-
-	groups := &storage.Groups{
-		Groups: make([]*proto.Group, 0),
-	}
-	if err := s.repo.LoadGroups(ctx, groups); err != nil {
-		return err
-	}
-	for i := range groups.Groups {
-		_, err := s.index.Add(groups.Groups[i])
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return reindexDocuments(ctx, s.repo, s.index)
 }
 
 // recreateContainers adds all indices to the indexer that we have for this service.
@@ -91,5 +65,35 @@ func recreateContainers(idx *indexer.Indexer, cfg *config.Config) error {
 		return err
 	}
 
+	return nil
+}
+
+// reindexDocuments loads all existing documents and adds them to the index.
+func reindexDocuments(ctx context.Context, repo storage.Repo, index *indexer.Indexer) error {
+	accounts := &storage.Accounts{
+		Accounts: make([]*proto.Account, 0),
+	}
+	if err := repo.LoadAccounts(ctx, accounts); err != nil {
+		return err
+	}
+	for i := range accounts.Accounts {
+		_, err := index.Add(accounts.Accounts[i])
+		if err != nil {
+			return err
+		}
+	}
+
+	groups := &storage.Groups{
+		Groups: make([]*proto.Group, 0),
+	}
+	if err := repo.LoadGroups(ctx, groups); err != nil {
+		return err
+	}
+	for i := range groups.Groups {
+		_, err := index.Add(groups.Groups[i])
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

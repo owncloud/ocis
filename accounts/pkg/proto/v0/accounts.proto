@@ -148,11 +148,9 @@ service IndexService {
 }
 
 message RebuildIndexRequest {
-
 }
 
 message RebuildIndexResponse {
-    repeated string Indices = 1;
 }
 
 message ListAccountsRequest {
