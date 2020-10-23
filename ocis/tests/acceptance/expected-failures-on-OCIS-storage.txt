@@ -123,12 +123,16 @@ apiFavorites/favorites.feature:148
 apiFavorites/favorites.feature:149
 apiFavorites/favorites.feature:176
 apiFavorites/favorites.feature:177
-apiFavorites/favorites.feature:190
-apiFavorites/favorites.feature:191
-apiFavorites/favorites.feature:204
-apiFavorites/favorites.feature:205
 apiFavorites/favorites.feature:217
 apiFavorites/favorites.feature:218
+apiFavorites/favoritesSharingToShares.feature:22
+apiFavorites/favoritesSharingToShares.feature:23
+apiFavorites/favoritesSharingToShares.feature:36
+apiFavorites/favoritesSharingToShares.feature:37
+apiFavorites/favoritesSharingToShares.feature:49
+apiFavorites/favoritesSharingToShares.feature:50
+apiFavorites/favoritesSharingToShares.feature:63
+apiFavorites/favoritesSharingToShares.feature:64
 #
 # https://github.com/owncloud/product/issues/187
 # Cannot create user with different username and emails

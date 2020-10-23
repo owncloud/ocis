@@ -4,8 +4,11 @@
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
+* Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+* Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
@@ -27,6 +30,7 @@
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
+* Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -46,6 +50,8 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
@@ -68,6 +74,14 @@
 
    https://github.com/owncloud/ocis/pull/473
 
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
+
+   Tags: accounts
+
+   Lower bound working on the cs3 index implementation
+
+   https://github.com/owncloud/ocis/pull/741
+
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 
    Tags: accounts
@@ -78,6 +92,15 @@
 
    https://github.com/owncloud/ocis/pull/625
 
+* Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
+
+   Tags: accounts
+
+   The code was stopping execution when encountering an error while loading an account by id. But
+   for or queries we can continue execution.
+
+   https://github.com/owncloud/ocis/pull/745
+
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 
    Tags: glauth
@@ -86,6 +109,15 @@
    using the micro default client.
 
    https://github.com/owncloud/ocis/pull/718
+
+* Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
+
+   Tags: accounts
+
+   The eos driver expects the uid and gid from the opaque map of a user. While the proxy does mint
+   tokens correctly, the accounts service wasn't.
+
+   https://github.com/owncloud/ocis/pull/737
 
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 
@@ -309,6 +341,16 @@
 
    https://github.com/owncloud/ocis/pull/674
    https://github.com/owncloud/phoenix/releases/tag/v0.20.0
+
+* Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
+
+   Tags: web
+
+   We updated phoenix to v0.21.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/728
+   https://github.com/owncloud/phoenix/releases/tag/v0.21.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
@@ -1321,6 +1363,35 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+
+   This update adds options which allow the configuration of oidc-token expiration parameters:
+   KONNECTD_ACCESS_TOKEN_EXPIRATION, KONNECTD_ID_TOKEN_EXPIRATION and
+   KONNECTD_REFRESH_TOKEN_EXPIRATION.
+
+   Other changes from upstream:
+
+   - Generate random endsession state for external authority - Update dependencies in
+   Dockerfile - Set prompt=None to avoid loops with external authority - Update Jenkins
+   reporting plugin from checkstyle to recordIssues - Remove extra kty key from JWKS top level
+   document - Fix regression which encodes URL fragments twice - Avoid generating fragmet/query
+   URLs with wrong order - Return state for oidc endsession response redirects - Use server
+   provided username to avoid case mismatch - Use signed-out-uri if set as fallback for goodbye
+   redirect on saml slo - Add checks to ensure post_logout_redirect_uri is not empty - Fix SAML2
+   logout request parsing - Cure panic when no state is found in saml esr - Use SAML IdP Issuer value
+   from meta data entityID - Allow configuration of expiration of oidc access, id and refresh
+   tokens - Implement trampolin for external OIDC authority end session - Update
+   ca-certificates version
+
+   https://github.com/owncloud/ocis/pull/744
+
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
+
+  * let the gateway filter invalid references
+
+   https://github.com/owncloud/ocis/pull/748
+   https://github.com/cs3org/reva/pull/1274
 
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 

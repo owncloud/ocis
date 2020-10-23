@@ -15,7 +15,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '914992f5f6d4bb562534fa52273e5bd0bc11b208',
+    'coreCommit': '6806e327048fa107678536f9eded5166eb781ba3',
     'numberOfParts': 6
   },
   'uiTests': {
@@ -61,6 +61,8 @@ config = {
       ],
       'phoenixWebUI7': [
         'webUISharingFilePermissionMultipleUsers',
+      ],
+      'phoenixWebUI8': [
         'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers',
       ],

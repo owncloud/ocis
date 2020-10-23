@@ -12,9 +12,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+
 	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -40,6 +41,7 @@ type Autoincrement struct {
 	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
 
 	cs3conf *Config
+	bound   *option.Bound
 }
 
 func init() {
@@ -57,15 +59,15 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
+		bound:        opts.Bound,
 		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
-			ProviderAddr:    opts.ProviderAddr,
-			DataURL:         opts.DataURL,
-			DataPrefix:      opts.DataPrefix,
-			JWTSecret:       opts.JWTSecret,
-			ServiceUserName: opts.ServiceUserName,
-			ServiceUserUUID: opts.ServiceUserUUID,
+			ProviderAddr: opts.ProviderAddr,
+			DataURL:      opts.DataURL,
+			DataPrefix:   opts.DataPrefix,
+			JWTSecret:    opts.JWTSecret,
+			ServiceUser:  opts.ServiceUser,
 		},
 		dataProvider: dataProviderClient{
 			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
@@ -284,7 +286,6 @@ func (idx *Autoincrement) createSymlink(oldname, newname string) error {
 	}
 
 	return nil
-
 }
 
 func (idx *Autoincrement) resolveSymlink(name string) (string, error) {
@@ -317,37 +318,11 @@ func (idx *Autoincrement) resolveSymlink(name string) (string, error) {
 }
 
 func (idx *Autoincrement) makeDirIfNotExists(ctx context.Context, folder string) error {
-	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: fmt.Sprintf("/meta/%v", folder)},
-	}
-
-	resp, err := idx.storageProvider.Stat(ctx, &provider.StatRequest{
-		Ref: rootPathRef,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
-		_, err := idx.storageProvider.CreateContainer(ctx, &provider.CreateContainerRequest{
-			Ref: rootPathRef,
-		})
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
 }
 
 func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err error) {
-	u := &user.User{
-		Id:     &user.UserId{OpaqueId: idx.cs3conf.ServiceUserUUID},
-		Groups: []string{},
-	}
-	return idx.tokenManager.MintToken(ctx, u)
+	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 }
 
 func (idx *Autoincrement) next() (int, error) {
@@ -383,6 +358,11 @@ func (idx *Autoincrement) next() (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
+	if int64(latest) < idx.bound.Lower {
+		return int(idx.bound.Lower), nil
+	}
+
 	return latest + 1, nil
 }
 
