@@ -223,5 +223,5 @@ func isValidSymlink(path string) (err error) {
 
 // Delete deletes the index folder from its storage.
 func (idx *Unique) Delete() error {
-	return nil
+	return os.Remove(idx.indexRootDir)
 }

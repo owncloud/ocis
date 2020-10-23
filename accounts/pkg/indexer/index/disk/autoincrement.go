@@ -263,5 +263,5 @@ func (idx *Autoincrement) next() (int, error) {
 
 // Delete deletes the index folder from its storage.
 func (idx *Autoincrement) Delete() error {
-	return nil
+	return os.Remove(idx.indexRootDir)
 }
