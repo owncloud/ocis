@@ -41,6 +41,7 @@ type Autoincrement struct {
 	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
 
 	cs3conf *Config
+	bound   *option.Bound
 }
 
 func init() {
@@ -58,6 +59,7 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		indexBy:      opts.IndexBy,
 		typeName:     opts.TypeName,
 		filesDir:     opts.FilesDir,
+		bound:        opts.Bound,
 		indexBaseDir: path.Join(opts.DataDir, "index.cs3"),
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
@@ -356,5 +358,10 @@ func (idx *Autoincrement) next() (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
+	if int64(latest) < idx.bound.Lower {
+		return int(idx.bound.Lower), nil
+	}
+
 	return latest + 1, nil
 }
