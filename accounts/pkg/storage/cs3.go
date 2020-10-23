@@ -219,25 +219,30 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 }
 
 func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
+	return AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+}
+
+// AuthenticateCS3 mints an auth token for communicating with cs3 storage based on a service user from config
+func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manager) (token string, err error) {
 	u := &user.User{
 		Id: &user.UserId{
-			OpaqueId: r.cfg.ServiceUser.UUID,
+			OpaqueId: su.UUID,
 		},
 		Groups: []string{},
 		Opaque: &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
 				"uid": {
 					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(r.cfg.ServiceUser.UID, 10)),
+					Value:   []byte(strconv.FormatInt(su.UID, 10)),
 				},
 				"gid": {
 					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(r.cfg.ServiceUser.GID, 10)),
+					Value:   []byte(strconv.FormatInt(su.GID, 10)),
 				},
 			},
 		},
 	}
-	return r.tm.MintToken(ctx, u)
+	return tm.MintToken(ctx, u)
 }
 
 func (r CS3Repo) accountURL(id string) string {
@@ -249,11 +254,16 @@ func (r CS3Repo) groupURL(id string) string {
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
+	return MakeDirIfNotExist(ctx, r.storageProvider, folder)
+}
+
+// MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
+func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
 		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
 	}
 
-	resp, err := r.storageProvider.Stat(ctx, &provider.StatRequest{
+	resp, err := sp.Stat(ctx, &provider.StatRequest{
 		Ref: rootPathRef,
 	})
 
@@ -262,7 +272,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 	}
 
 	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
-		_, err := r.storageProvider.CreateContainer(ctx, &provider.CreateContainerRequest{
+		_, err := sp.CreateContainer(ctx, &provider.CreateContainerRequest{
 			Ref: rootPathRef,
 		})
 

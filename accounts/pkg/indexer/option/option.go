@@ -1,5 +1,7 @@
 package option
 
+import "github.com/owncloud/ocis/accounts/pkg/config"
+
 // Option defines a single option function.
 type Option func(o *Options)
 
@@ -25,12 +27,11 @@ type Options struct {
 	Entity        interface{}
 
 	// CS3 options
-	DataURL         string
-	DataPrefix      string
-	JWTSecret       string
-	ProviderAddr    string
-	ServiceUserUUID string
-	ServiceUserName string
+	DataURL      string
+	DataPrefix   string
+	JWTSecret    string
+	ProviderAddr string
+	ServiceUser  config.ServiceUser
 }
 
 // CaseInsensitive sets the CaseInsensitive field.
@@ -117,16 +118,9 @@ func WithProviderAddr(val string) Option {
 	}
 }
 
-// WithServiceUserUUID sets the option ServiceUserUUID.
-func WithServiceUserUUID(val string) Option {
+// WithServiceUser sets the option ServiceUser.
+func WithServiceUser(val config.ServiceUser) Option {
 	return func(o *Options) {
-		o.ServiceUserUUID = val
-	}
-}
-
-// WithServiceUserName sets the option ServiceUserName.
-func WithServiceUserName(val string) Option {
-	return func(o *Options) {
-		o.ServiceUserName = val
+		o.ServiceUser = val
 	}
 }
