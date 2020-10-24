@@ -14,6 +14,7 @@
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
+* Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -32,6 +33,7 @@
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
+* Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -171,6 +173,17 @@
    index). `cs3` is the new default, which is configured to use the `metadata` storage.
 
    https://github.com/owncloud/ocis/pull/709
+
+* Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
+
+   Tags: accounts
+
+   The index for the accounts service can now be rebuilt by running the cli command `./bin/ocis
+   accounts rebuild`. It deletes all configured indices and rebuilds them from the documents
+   found on storage. For this we also introduced a `LoadAccounts` and `LoadGroups` function on
+   storage for loading all existing documents.
+
+   https://github.com/owncloud/ocis/pull/748
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -361,6 +374,16 @@
    https://github.com/owncloud/ocis/pull/337
    https://github.com/owncloud/ocis/pull/338
    https://github.com/owncloud/ocis-reva/pull/891
+
+* Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
+
+   After renaming ocsi-reva to storage and combining the storage and data providers some env vars
+   were confusingly named `STORAGE_STORAGE_...`. We are changing the prefix for driver related
+   env vars to `STORAGE_DRIVER_...`. This makes changing the storage driver using eg.:
+   `STORAGE_HOME_DRIVER=eos` and setting driver options using
+   `STORAGE_DRIVER_EOS_LAYOUT=...` less confusing.
+
+   https://github.com/owncloud/ocis/pull/729
 
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
