@@ -200,7 +200,7 @@ func (idx *Autoincrement) next() (int, error) {
 		return int(idx.bound.Lower), nil
 	}
 
-	latest := lastValueFromTree(err, files)
+	latest, err := lastValueFromTree(files)
 	if err != nil {
 		return -1, err
 	}
@@ -217,7 +217,10 @@ func (idx *Autoincrement) Delete() error {
 	return os.RemoveAll(idx.indexRootDir)
 }
 
-func lastValueFromTree(err error, files []os.FileInfo) int {
+func lastValueFromTree(files []os.FileInfo) (int, error) {
 	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name()))
-	return latest
+	if err != nil {
+		return -1, err
+	}
+	return latest, nil
 }
