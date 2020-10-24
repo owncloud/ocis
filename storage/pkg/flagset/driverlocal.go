@@ -12,7 +12,7 @@ func DriverLocalWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "storage-local-root",
 			Value:       "/var/tmp/ocis/local",
 			Usage:       "the path to the local storage root",
-			EnvVars:     []string{"STORAGE_STORAGE_LOCAL_ROOT"},
+			EnvVars:     []string{"STORAGE_DRIVER_LOCAL_ROOT"},
 			Destination: &cfg.Reva.Storages.Local.Root,
 		},
 	}
