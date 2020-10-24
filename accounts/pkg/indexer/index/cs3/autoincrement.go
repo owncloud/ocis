@@ -99,12 +99,10 @@ func (idx *Autoincrement) Init() error {
 
 	idx.storageProvider = client
 
-	ctx := context.Background()
-	tk, err := idx.authenticate(ctx)
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, tk)
 
 	if err := idx.makeDirIfNotExists(ctx, idx.indexBaseDir); err != nil {
 		return err
@@ -170,14 +168,12 @@ func (idx *Autoincrement) Remove(id string, v string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	t, err := idx.authenticate(ctx)
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return err
 	}
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{Path: deletePath},
@@ -211,13 +207,11 @@ func (idx *Autoincrement) Update(id, oldV, newV string) error {
 
 // Search allows for glob search on the index.
 func (idx *Autoincrement) Search(pattern string) ([]string, error) {
-	ctx := context.Background()
-	t, err := idx.authenticate(ctx)
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
@@ -326,13 +320,11 @@ func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err e
 }
 
 func (idx *Autoincrement) next() (int, error) {
-	ctx := context.Background()
-	t, err := idx.authenticate(ctx)
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return -1, err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
