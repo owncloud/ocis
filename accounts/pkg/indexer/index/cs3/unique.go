@@ -344,3 +344,22 @@ func (idx *Unique) makeDirIfNotExists(ctx context.Context, folder string) error 
 func (idx *Unique) authenticate(ctx context.Context) (token string, err error) {
 	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 }
+
+func (idx *Unique) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
+	t, err := idx.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	return ctx, nil
+}
+
+// Delete deletes the index folder from its storage.
+func (idx *Unique) Delete() error {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
+}

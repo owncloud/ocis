@@ -146,6 +146,26 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		return nil
 	}
 
+	if in.Query == "" {
+		err = s.repo.LoadAccounts(ctx, &out.Accounts)
+		if err != nil {
+			s.log.Err(err).Msg("failed to load all accounts from storage")
+			return merrors.InternalServerError(s.id, "failed to load all accounts")
+		}
+		for i := range out.Accounts {
+			a := out.Accounts[i]
+
+			// TODO add groups only if requested
+			// if in.FieldMask ...
+			s.expandMemberOf(a)
+
+			if a.PasswordProfile != nil {
+				a.PasswordProfile.Password = ""
+			}
+		}
+		return nil
+	}
+
 	searchResults, err := s.findAccountsByQuery(ctx, in.Query)
 	out.Accounts = make([]*proto.Account, 0, len(searchResults))
 
@@ -179,10 +199,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
 	var searchResults []string
 	var err error
-
-	if query == "" {
-		return s.index.FindByPartial(&proto.Account{}, "Mail", "*")
-	}
 
 	// TODO: more explicit queries have to be on top
 	var onPremOrMailQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)' or mail eq '(.*)'$`)

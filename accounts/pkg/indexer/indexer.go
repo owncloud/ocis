@@ -42,6 +42,23 @@ func getRegistryStrategy(cfg *config.Config) string {
 	return "cs3"
 }
 
+// Reset takes care of deleting all indices from storage and from the internal map of indices
+func (i Indexer) Reset() error {
+	for j := range i.indices {
+		for _, indices := range i.indices[j].IndicesByField {
+			for _, idx := range indices {
+				err := idx.Delete()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		delete(i.indices, j)
+	}
+
+	return nil
+}
+
 // AddIndex adds a new index to the indexer receiver.
 func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
 	strategy := getRegistryStrategy(i.config)

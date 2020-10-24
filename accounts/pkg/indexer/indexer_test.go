@@ -14,37 +14,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
-
-func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
-	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
-	assert.NoError(t, err)
-	indexer := createCs3Indexer()
-
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
-	assert.NoError(t, err)
-
-	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	_, err = indexer.Add(u)
-	assert.NoError(t, err)
-
-	_ = os.RemoveAll(dataDir)
-}
-
-func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
-	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
-	assert.NoError(t, err)
-	indexer := createCs3Indexer()
-
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil, false)
-	assert.NoError(t, err)
-
-	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	_, err = indexer.Add(u)
-	assert.NoError(t, err)
-
-	_ = os.RemoveAll(dataDir)
-}
+//const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+//
+//func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
+//	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+//	assert.NoError(t, err)
+//	indexer := createCs3Indexer()
+//
+//	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
+//	assert.NoError(t, err)
+//
+//	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+//	_, err = indexer.Add(u)
+//	assert.NoError(t, err)
+//
+//	_ = os.RemoveAll(dataDir)
+//}
+//
+//func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
+//	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+//	assert.NoError(t, err)
+//	indexer := createCs3Indexer()
+//
+//	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil, false)
+//	assert.NoError(t, err)
+//
+//	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+//	_, err = indexer.Add(u)
+//	assert.NoError(t, err)
+//
+//	_ = os.RemoveAll(dataDir)
+//}
 
 func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
@@ -251,18 +251,18 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func createCs3Indexer() *Indexer {
-	return CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	})
-}
+//func createCs3Indexer() *Indexer {
+//	return CreateIndexer(&config.Config{
+//		Repo: config.Repo{
+//			CS3: config.CS3{
+//				ProviderAddr: "0.0.0.0:9215",
+//				DataURL:      "http://localhost:9216",
+//				DataPrefix:   "data",
+//				JWTSecret:    "Pive-Fumkiu4",
+//			},
+//		},
+//	})
+//}
 
 func createDiskIndexer(dataDir string) *Indexer {
 	return CreateIndexer(&config.Config{

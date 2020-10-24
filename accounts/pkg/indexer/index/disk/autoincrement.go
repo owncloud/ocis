@@ -5,8 +5,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -19,31 +17,26 @@ import (
 
 // Autoincrement are fields for an index of type autoincrement.
 type Autoincrement struct {
-	indexBy         string
-	typeName        string
-	filesDir        string
-	indexBaseDir    string
-	indexRootDir    string
+	indexBy      string
+	typeName     string
+	filesDir     string
+	indexBaseDir string
+	indexRootDir string
 
 	bound *option.Bound
 }
-
-// - Creating an autoincrement index has to be thread safe.
-// - Validation: autoincrement indexes should only work on integers.
 
 func init() {
 	registry.IndexConstructorRegistry["disk"]["autoincrement"] = NewAutoincrementIndex
 }
 
-// NewAutoincrementIndex instantiates a new AutoincrementIndex instance. Init() should be
-// called afterward to ensure correct on-disk structure.
+// NewAutoincrementIndex instantiates a new AutoincrementIndex instance. Init() MUST be called upon instantiation.
 func NewAutoincrementIndex(o ...option.Option) index.Index {
 	opts := &option.Options{}
 	for _, opt := range o {
 		opt(opts)
 	}
 
-	// validate the field
 	if opts.Entity == nil {
 		panic("invalid autoincrement index: configured without entity")
 	}
@@ -54,24 +47,14 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 	}
 
 	return &Autoincrement{
-		indexBy:         opts.IndexBy,
-		typeName:        opts.TypeName,
-		filesDir:        opts.FilesDir,
-		bound:           opts.Bound,
-		indexBaseDir:    path.Join(opts.DataDir, "index.disk"),
-		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
+		indexBy:      opts.IndexBy,
+		typeName:     opts.TypeName,
+		filesDir:     opts.FilesDir,
+		bound:        opts.Bound,
+		indexBaseDir: path.Join(opts.DataDir, "index.disk"),
+		indexRootDir: path.Join(path.Join(opts.DataDir, "index.disk"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 	}
 }
-
-var (
-	validKinds = []reflect.Kind{
-		reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-	}
-)
 
 // Init initializes an autoincrement index.
 func (idx *Autoincrement) Init() error {
@@ -207,38 +190,6 @@ func (idx *Autoincrement) FilesDir() string {
 	return idx.filesDir
 }
 
-func isValidKind(k reflect.Kind) bool {
-	for _, v := range validKinds {
-		if k == v {
-			return true
-		}
-	}
-	return false
-}
-
-func getKind(i interface{}, field string) (reflect.Kind, error) {
-	r := reflect.ValueOf(i)
-	return reflect.Indirect(r).FieldByName(field).Kind(), nil
-}
-
-func readDir(dirname string) ([]os.FileInfo, error) {
-	f, err := os.Open(dirname)
-	if err != nil {
-		return nil, err
-	}
-	list, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		return nil, err
-	}
-	sort.Slice(list, func(i, j int) bool {
-		a, _ := strconv.Atoi(list[i].Name())
-		b, _ := strconv.Atoi(list[j].Name())
-		return a < b
-	})
-	return list, nil
-}
-
 func (idx *Autoincrement) next() (int, error) {
 	files, err := readDir(idx.indexRootDir)
 	if err != nil {
@@ -249,7 +200,7 @@ func (idx *Autoincrement) next() (int, error) {
 		return int(idx.bound.Lower), nil
 	}
 
-	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name()))
+	latest, err := lastValueFromTree(files)
 	if err != nil {
 		return -1, err
 	}
@@ -259,4 +210,17 @@ func (idx *Autoincrement) next() (int, error) {
 	}
 
 	return latest + 1, nil
+}
+
+// Delete deletes the index root folder from the configured storage.
+func (idx *Autoincrement) Delete() error {
+	return os.RemoveAll(idx.indexRootDir)
+}
+
+func lastValueFromTree(files []os.FileInfo) (int, error) {
+	latest, err := strconv.Atoi(path.Base(files[len(files)-1].Name()))
+	if err != nil {
+		return -1, err
+	}
+	return latest, nil
 }

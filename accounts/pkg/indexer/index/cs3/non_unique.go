@@ -378,6 +378,16 @@ func (idx *NonUnique) getAuthenticatedContext(ctx context.Context) (context.Cont
 	return ctx, nil
 }
 
+// Delete deletes the index folder from its storage.
+func (idx *NonUnique) Delete() error {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
+}
+
 func (idx *NonUnique) authenticate(ctx context.Context) (token string, err error) {
 	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 }

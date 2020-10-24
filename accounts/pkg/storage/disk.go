@@ -17,8 +17,8 @@ var groupLock sync.Mutex
 
 // DiskRepo provides a local filesystem implementation of the Repo interface
 type DiskRepo struct {
-	cfg       *config.Config
-	log       olog.Logger
+	cfg *config.Config
+	log olog.Logger
 }
 
 // NewDiskRepo creates a new disk repo
@@ -37,8 +37,8 @@ func NewDiskRepo(cfg *config.Config, log olog.Logger) DiskRepo {
 		}
 	}
 	return DiskRepo{
-		cfg:       cfg,
-		log:       log,
+		cfg: cfg,
+		log: log,
 	}
 }
 
@@ -68,6 +68,20 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 	}
 
 	return json.Unmarshal(data, a)
+}
+
+// LoadAccounts loads all the accounts from the local filesystem
+func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
+	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
+	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		acc := &proto.Account{}
+		if e := r.LoadAccount(ctx, filepath.Base(path), acc); e != nil {
+			r.log.Err(e).Msg("could not load account")
+			return nil
+		}
+		*a = append(*a, acc)
+		return nil
+	})
 }
 
 // DeleteAccount from the local filesystem
@@ -118,6 +132,20 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 	return json.Unmarshal(data, g)
 }
 
+// LoadGroups loads all the groups from the local filesystem
+func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
+	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
+	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		grp := &proto.Group{}
+		if e := r.LoadGroup(ctx, filepath.Base(path), grp); e != nil {
+			r.log.Err(e).Msg("could not load group")
+			return nil
+		}
+		*g = append(*g, grp)
+		return nil
+	})
+}
+
 // DeleteGroup from the local filesystem
 func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
@@ -128,9 +156,6 @@ func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 	}
 
 	return
-
-	//r.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group")
-	//return merrors.InternalServerError(r.serviceID, "could not remove group: %v", err.Error())
 }
 
 // deflateMemberOf replaces the groups of a user with an instance that only contains the id

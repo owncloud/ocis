@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-
 	"github.com/owncloud/ocis/accounts/pkg/indexer"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 
@@ -77,45 +75,9 @@ func New(opts ...Option) (s *Service, err error) {
 func (s Service) buildIndex() (*indexer.Indexer, error) {
 	idx := indexer.CreateIndexer(s.Config)
 
-	// Accounts
-	if err := idx.AddIndex(&proto.Account{}, "DisplayName", "Id", "accounts", "non_unique", nil, true); err != nil {
+	if err := recreateContainers(idx, s.Config); err != nil {
 		return nil, err
 	}
-	if err := idx.AddIndex(&proto.Account{}, "Mail", "Id", "accounts", "unique", nil, true); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Account{}, "OnPremisesSamAccountName", "Id", "accounts", "unique", nil, true); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Account{}, "PreferredName", "Id", "accounts", "unique", nil, true); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Account{}, "UidNumber", "Id", "accounts", "autoincrement", &option.Bound{
-		Lower: s.Config.Index.UID.Lower,
-		Upper: s.Config.Index.UID.Upper,
-	}, false); err != nil {
-		return nil, err
-	}
-
-	// Groups
-	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil, true); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil, true); err != nil {
-		return nil, err
-	}
-
-	if err := idx.AddIndex(&proto.Group{}, "GidNumber", "Id", "groups", "autoincrement", &option.Bound{
-		Lower: s.Config.Index.GID.Lower,
-		Upper: s.Config.Index.GID.Upper,
-	}, false); err != nil {
-		return nil, err
-	}
-
 	return idx, nil
 
 }

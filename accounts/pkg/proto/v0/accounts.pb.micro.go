@@ -551,3 +551,77 @@ func (h *groupsServiceHandler) RemoveMember(ctx context.Context, in *RemoveMembe
 func (h *groupsServiceHandler) ListMembers(ctx context.Context, in *ListMembersRequest, out *ListMembersResponse) error {
 	return h.GroupsServiceHandler.ListMembers(ctx, in, out)
 }
+
+// Api Endpoints for IndexService service
+
+func NewIndexServiceEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{
+		&api.Endpoint{
+			Name:    "IndexService.RebuildIndex",
+			Path:    []string{"/api/v0/index/rebuild"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
+	}
+}
+
+// Client API for IndexService service
+
+type IndexService interface {
+	RebuildIndex(ctx context.Context, in *RebuildIndexRequest, opts ...client.CallOption) (*RebuildIndexResponse, error)
+}
+
+type indexService struct {
+	c    client.Client
+	name string
+}
+
+func NewIndexService(name string, c client.Client) IndexService {
+	return &indexService{
+		c:    c,
+		name: name,
+	}
+}
+
+func (c *indexService) RebuildIndex(ctx context.Context, in *RebuildIndexRequest, opts ...client.CallOption) (*RebuildIndexResponse, error) {
+	req := c.c.NewRequest(c.name, "IndexService.RebuildIndex", in)
+	out := new(RebuildIndexResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for IndexService service
+
+type IndexServiceHandler interface {
+	RebuildIndex(context.Context, *RebuildIndexRequest, *RebuildIndexResponse) error
+}
+
+func RegisterIndexServiceHandler(s server.Server, hdlr IndexServiceHandler, opts ...server.HandlerOption) error {
+	type indexService interface {
+		RebuildIndex(ctx context.Context, in *RebuildIndexRequest, out *RebuildIndexResponse) error
+	}
+	type IndexService struct {
+		indexService
+	}
+	h := &indexServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "IndexService.RebuildIndex",
+		Path:    []string{"/api/v0/index/rebuild"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	return s.Handle(s.NewHandler(&IndexService{h}, opts...))
+}
+
+type indexServiceHandler struct {
+	IndexServiceHandler
+}
+
+func (h *indexServiceHandler) RebuildIndex(ctx context.Context, in *RebuildIndexRequest, out *RebuildIndexResponse) error {
+	return h.IndexServiceHandler.RebuildIndex(ctx, in, out)
+}
