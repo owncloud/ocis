@@ -49,33 +49,58 @@ uid=20000(einstein) gid=30000(users) groups=30000(users),30001(sailing-lovers),3
 If the user is not found at first you might need to wait a few more minutes in case the ocis container is still compiling.
 {{< /hint >}}
 
-We also need to restart the storage-users service, so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
+We also need to restart the storage-userprovider service, so it picks up the changed environment. Without a restart it is not able to resolve users from LDAP.
 ```
-docker-compose exec ocis ./bin/ocis kill storage-users
-docker-compose exec ocis ./bin/ocis run storage-users
+docker-compose exec ocis ./bin/ocis kill storage-userprovider
+docker-compose exec ocis ./bin/ocis run storage-userprovider
 ```
 
 ### 3. Home storage
 
-Kill the home storage. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
+Kill the home storage. By default it uses the `ocis` storage driver. We need to switch it to the `eoshome` driver:
 
 ```
-docker-compose exec ocis ./bin/ocis kill storage-storage-home
-docker-compose exec -e STORAGE_STORAGE_HOME_DRIVER=eoshome -e STORAGE_STORAGE_HOME_MOUNT_ID=1284d238-aa92-42ce-bdc4-0b0000009158 ocis ./bin/ocis run storage-storage-home
+docker-compose exec ocis ./bin/ocis kill storage-home
+docker-compose exec -e STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run storage-home
 ```
 
-### 4. Home data provider
+### 4. Users storage
 
-Kill the home data provider. By default it uses the `owncloud` storage driver. We need to switch it to the `eoshome` driver and make it use the storage id of the eos storage provider:
+Kill the users storage. By default it uses the `ocis` storage driver. We need to switch it to the `eos` driver:
 
 ```
-docker-compose exec ocis ./bin/ocis kill storage-storage-home-data
-docker-compose exec -e STORAGE_STORAGE_HOME_DATA_DRIVER=eoshome ocis ./bin/ocis run storage-storage-home-data
+docker-compose exec ocis ./bin/ocis kill storage-users
+docker-compose exec -e STORAGE_USERS_DRIVER=eos ocis ./bin/ocis run storage-users
+```
+
+### 5. Metadata storage
+
+First we need to create the metadata root in eos and set an owner:
+```
+docker-compose exec ocis eos mkdir -p /eos/dockertest/ocis/metadata
+docker-compose exec ocis eos chown 2:2 /eos/dockertest/ocis/metadata
 ```
 
 {{< hint info >}}
-The difference between the *home storage* and the *home data provider* are that the former is responsible for metadata changes while the latter is responsible for actual data transfer. The *home storage* uses the cs3 api to manage a folder hierarchy, while the *home data provider* is responsible for moving bytes to and from the storage.
+The uid and gid `2` are referencing the user `daemon` inside the ocis container. That user is also configured when restarting the accounts service later. For production systems you should create a dedicated user for the metadata storage.
 {{< /hint >}}
+
+Kill the metadata storage. By default it uses the `ocis` storage driver. We need to switch it to the `eos` driver:
+
+```
+docker-compose exec ocis ./bin/ocis kill storage-metadata
+docker-compose exec -e STORAGE_METADATA_DRIVER=eos -e STORAGE_METADATA_ROOT=/eos/dockertest/ocis/metadata ocis ./bin/ocis run storage-metadata
+```
+
+
+### 6. Accounts service
+
+Kill the accounts service. By default it uses the `ocis` storage driver. We need to switch it to the `eos` driver:
+
+```
+docker-compose exec ocis ./bin/ocis kill accounts
+docker-compose exec -e ACCOUNTS_SERVICE_USER_USERNAME=daemon -e ACCOUNTS_SERVICE_USER_UID=2 -e ACCOUNTS_SERVICE_USER_GID=2 ocis ./bin/ocis run accounts
+```
 
 ## Verification
 
@@ -199,7 +224,7 @@ The ocis logs can be accessed using `docker-compose logs ocis`. Add `-f` for fol
 1. `docker-compose exec ocis make clean build` to update the binary
 2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
 3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
-  `docker-compose exec -e STORAGE_STORAGE_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}" -e STORAGE_STORAGE_HOME_DRIVER=eoshome ocis ./bin/ocis run storage-storage-home`
+  `docker-compose exec -e STORAGE_HOME_DRIVER=eoshome -e STORAGE_DRIVER_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"  ocis ./bin/ocis run storage-home`
 
 ### Creation and upload of files does not work
 
