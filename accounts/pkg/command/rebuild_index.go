@@ -11,11 +11,11 @@ import (
 	index "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 )
 
-// DeleteIndex rebuilds the entire configured index.
-func DeleteIndex(cdf *config.Config) *cli.Command {
+// RebuildIndex rebuilds the entire configured index.
+func RebuildIndex(cdf *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:    "rebuildIndex",
-		Usage:   "Rebuilds the service's index",
+		Usage:   "Rebuilds the service's index, i.e. deleting and then re-adding all existing documents",
 		Aliases: []string{"rebuild", "ri"},
 		Action: func(ctx *cli.Context) error {
 			idxSvcID := "com.owncloud.api.accounts"

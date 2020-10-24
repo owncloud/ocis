@@ -49,7 +49,7 @@ func Execute() error {
 			InspectAccount(cfg),
 			RemoveAccount(cfg),
 			PrintVersion(cfg),
-			DeleteIndex(cfg),
+			RebuildIndex(cfg),
 		},
 	}
 
