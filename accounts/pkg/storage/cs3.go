@@ -25,7 +25,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// CS3Repo provides A cs3 implementation of the Repo interface
+// CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
 	cfg             *config.Config
 	tm              token.Manager
@@ -33,7 +33,7 @@ type CS3Repo struct {
 	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
 }
 
-// NewCS3Repo creates A new cs3 repo
+// NewCS3Repo creates a new cs3 repo
 func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
@@ -60,7 +60,7 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	}, nil
 }
 
-// WriteAccount writes an account via cs3 and modifies the provided account (e.G. with A generated id).
+// WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
 func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -174,7 +174,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 	return nil
 }
 
-// WriteGroup writes A group via cs3 and modifies the provided group (e.G. with A generated id).
+// WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -201,7 +201,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 	return nil
 }
 
-// LoadGroup loads A group via cs3 by id and writes it to the provided group
+// LoadGroup loads a group via cs3 by id and writes it to the provided group
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -261,7 +261,7 @@ func (r CS3Repo) loadGroup(id string, t string, g *proto.Group) error {
 	return json.Unmarshal(b, &g)
 }
 
-// DeleteGroup deletes A group via cs3 by id
+// DeleteGroup deletes a group via cs3 by id
 func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	t, err := r.authenticate(ctx)
 	if err != nil {
@@ -354,7 +354,7 @@ func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folde
 	return nil
 }
 
-// TODO: this is copied from proxy. Find A better solution or move it to ocis-pkg
+// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")
