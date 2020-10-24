@@ -218,6 +218,22 @@ func (s Service) createDefaultAccounts() (err error) {
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 			},
 		},
+		{
+			Id:                       "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
+			PreferredName:            "admin",
+			OnPremisesSamAccountName: "admin",
+			Mail:                     "admin@example.org",
+			DisplayName:              "Admin",
+			UidNumber:                20004,
+			GidNumber:                30000,
+			PasswordProfile: &proto.PasswordProfile{
+				Password: "$6$rounds=95551$/bdqsmiGleA20kAS$rCAvHV7wjaHVF5nEVAnpW7mugRqcnPmdU4UPqhSroE74gXFxNGZflCF.ZyHwocDwgAw3uLkqsCzB1h5bXBjYB0",
+			},
+			AccountEnabled: true,
+			MemberOf: []*proto.Group{
+				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+			},
+		},
 		// technical users for kopano and reva
 		{
 			Id:                       "820ba2a1-3f54-4538-80a4-2d73007e30bf",
@@ -293,6 +309,7 @@ func (s Service) createDefaultAccounts() (err error) {
 	assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
 	for _, accountID := range []string{
 		"058bff95-6708-4fe5-91e4-9ea3d377588b", //moss
+		"ddc2004c-0977-11eb-9d3f-a793888cd0f8", //admin
 	} {
 		assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
 	}

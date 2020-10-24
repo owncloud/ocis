@@ -91,9 +91,10 @@ marie:radioactivity
 richard:superfluidity
 ```
 
-There is an admin demo account:
+There are admin demo accounts:
 ```console
 moss:vista
+admin:admin
 ```
 
 ## Runtime
