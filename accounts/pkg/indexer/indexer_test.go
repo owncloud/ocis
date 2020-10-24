@@ -14,37 +14,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
-
-func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
-	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
-	assert.NoError(t, err)
-	indexer := createCs3Indexer()
-
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
-	assert.NoError(t, err)
-
-	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	_, err = indexer.Add(u)
-	assert.NoError(t, err)
-
-	_ = os.RemoveAll(dataDir)
-}
-
-func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
-	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
-	assert.NoError(t, err)
-	indexer := createCs3Indexer()
-
-	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil, false)
-	assert.NoError(t, err)
-
-	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
-	_, err = indexer.Add(u)
-	assert.NoError(t, err)
-
-	_ = os.RemoveAll(dataDir)
-}
+//const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+//
+//func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
+//	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+//	assert.NoError(t, err)
+//	indexer := createCs3Indexer()
+//
+//	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "unique", nil, false)
+//	assert.NoError(t, err)
+//
+//	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+//	_, err = indexer.Add(u)
+//	assert.NoError(t, err)
+//
+//	_ = os.RemoveAll(dataDir)
+//}
+//
+//func TestIndexer_CS3_AddWithNonUniqueIndex(t *testing.T) {
+//	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
+//	assert.NoError(t, err)
+//	indexer := createCs3Indexer()
+//
+//	err = indexer.AddIndex(&User{}, "UserName", "ID", "users", "non_unique", nil, false)
+//	assert.NoError(t, err)
+//
+//	u := &User{ID: "abcdefg-123", UserName: "mikey", Email: "mikey@example.com"}
+//	_, err = indexer.Add(u)
+//	assert.NoError(t, err)
+//
+//	_ = os.RemoveAll(dataDir)
+//}
 
 func TestIndexer_Disk_FindByWithUniqueIndex(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
