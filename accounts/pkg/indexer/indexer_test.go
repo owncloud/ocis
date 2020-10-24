@@ -251,18 +251,18 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-func createCs3Indexer() *Indexer {
-	return CreateIndexer(&config.Config{
-		Repo: config.Repo{
-			CS3: config.CS3{
-				ProviderAddr: "0.0.0.0:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-	})
-}
+//func createCs3Indexer() *Indexer {
+//	return CreateIndexer(&config.Config{
+//		Repo: config.Repo{
+//			CS3: config.CS3{
+//				ProviderAddr: "0.0.0.0:9215",
+//				DataURL:      "http://localhost:9216",
+//				DataPrefix:   "data",
+//				JWTSecret:    "Pive-Fumkiu4",
+//			},
+//		},
+//	})
+//}
 
 func createDiskIndexer(dataDir string) *Indexer {
 	return CreateIndexer(&config.Config{
