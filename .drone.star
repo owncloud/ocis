@@ -363,8 +363,6 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner',
-          'ADMIN_USERNAME': 'moss',
-          'ADMIN_PASSWORD': 'vista',
         },
         'commands': [
           'cd ocis',
@@ -422,8 +420,6 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
-          'ADMIN_USERNAME': 'moss',
-          'ADMIN_PASSWORD': 'vista',
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -489,8 +485,6 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
           'TEST_PATHS': paths,
-          'ADMIN_USERNAME': 'moss',
-          'ADMIN_PASSWORD': 'vista',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
