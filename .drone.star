@@ -1350,8 +1350,13 @@ def notify(ctx):
             'from_secret': config['rocketchat']['from_secret']
           },
           'channel': config['rocketchat']['channel']
-        }
-      }
+        },
+        'when': {
+          'status': [
+            'failure',
+          ],
+        },
+      },
     ],
     'depends_on': [],
     'trigger': {
@@ -1360,9 +1365,6 @@ def notify(ctx):
         'refs/heads/release*',
         'refs/tags/**',
       ],
-      'status': [
-        'failure',
-      ]
     }
   }
 
