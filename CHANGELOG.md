@@ -4,10 +4,17 @@
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
+* Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+* Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
+* Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
+* Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
+* Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -16,12 +23,17 @@
 * Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
+* Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
+* Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
+* Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -40,6 +52,9 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
 
@@ -61,6 +76,14 @@
 
    https://github.com/owncloud/ocis/pull/473
 
+* Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
+
+   Tags: accounts
+
+   Lower bound working on the cs3 index implementation
+
+   https://github.com/owncloud/ocis/pull/741
+
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 
    Tags: accounts
@@ -70,6 +93,42 @@
    accordingly.
 
    https://github.com/owncloud/ocis/pull/625
+
+* Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
+
+   Tags: accounts
+
+   The code was stopping execution when encountering an error while loading an account by id. But
+   for or queries we can continue execution.
+
+   https://github.com/owncloud/ocis/pull/745
+
+* Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+
+   Tags: glauth
+
+   We found a file descriptor leak in the glauth connections to the accounts service. Fixed it by
+   using the micro default client.
+
+   https://github.com/owncloud/ocis/pull/718
+
+* Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
+
+   Tags: accounts
+
+   The eos driver expects the uid and gid from the opaque map of a user. While the proxy does mint
+   tokens correctly, the accounts service wasn't.
+
+   https://github.com/owncloud/ocis/pull/737
+
+* Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: accounts
+
+   We don't allow anymore to create a new account if the provided id/mail/username is already
+   taken.
+
+   https://github.com/owncloud/ocis/pull/709
 
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 
@@ -96,6 +155,35 @@
    progress bar before.
 
    https://github.com/owncloud/ocis/pull/656
+
+* Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: accounts, storage
+
+   We replaced `bleve` with a new filesystem based index implementation. There is an `indexer`
+   which is capable of orchestrating different index types to build indices on documents by
+   field. You can choose from the index types `unique`, `non-unique` or `autoincrement`.
+   Indices can be utilized to run search queries (full matches or globbing) on document fields.
+   The accounts service is using this index internally to run the search queries coming in via
+   `ListAccounts` and `ListGroups` and to generate UIDs for new accounts as well as GIDs for new
+   groups.
+
+   The accounts service can be configured to store the index on the local FS / a NFS (`disk`
+   implementation of the index) or to use an arbitrary storage ( `cs3` implementation of the
+   index). `cs3` is the new default, which is configured to use the `metadata` storage.
+
+   https://github.com/owncloud/ocis/pull/709
+
+* Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
+
+   Tags: accounts
+
+   The index for the accounts service can now be rebuilt by running the cli command `./bin/ocis
+   accounts rebuild`. It deletes all configured indices and rebuilds them from the documents
+   found on storage. For this we also introduced a `LoadAccounts` and `LoadGroups` function on
+   storage for loading all existing documents.
+
+   https://github.com/owncloud/ocis/pull/748
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -172,6 +260,17 @@
 
    https://github.com/owncloud/ocis/pull/287
 
+* Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
+
+   Tags: ocs
+
+   We use the incoming userid as both the `id` and the `on_premises_sam_account_name` for new
+   accounts in the accounts service. The userid in OCS requests is in fact the username, not our
+   internal account id. We need to enforce the userid as our internal account id though, because
+   the account id is part of various `path` formats.
+
+   https://github.com/owncloud/ocis/pull/709
+
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 
    Tags: accounts, settings
@@ -210,6 +309,15 @@
    https://github.com/owncloud/phoenix/releases/tag/v0.18.0
    https://github.com/owncloud/owncloud-design-system/releases/tag/v1.12.1
 
+* Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
+
+   Tags: web
+
+   We changed the default apps for ownCloud Web to be only files and media-viewer.
+   Markdown-editor and draw-io have been removed as defaults.
+
+   https://github.com/owncloud/ocis/pull/688
+
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 
    Tags: settings
@@ -229,6 +337,14 @@
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
 
+* Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
+
+   Tags: konnectd
+
+   We've styled our konnectd login page to reflect ownCloud theme.
+
+   https://github.com/owncloud/ocis/pull/698
+
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 
    Tags: web
@@ -239,6 +355,16 @@
    https://github.com/owncloud/ocis/pull/674
    https://github.com/owncloud/phoenix/releases/tag/v0.20.0
 
+* Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
+
+   Tags: web
+
+   We updated phoenix to v0.21.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/728
+   https://github.com/owncloud/phoenix/releases/tag/v0.21.0
+
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
   * EOS homes are not configured with an enable-flag anymore, but with a dedicated storage driver.
@@ -248,6 +374,16 @@
    https://github.com/owncloud/ocis/pull/337
    https://github.com/owncloud/ocis/pull/338
    https://github.com/owncloud/ocis-reva/pull/891
+
+* Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
+
+   After renaming ocsi-reva to storage and combining the storage and data providers some env vars
+   were confusingly named `STORAGE_STORAGE_...`. We are changing the prefix for driver related
+   env vars to `STORAGE_DRIVER_...`. This makes changing the storage driver using eg.:
+   `STORAGE_HOME_DRIVER=eos` and setting driver options using
+   `STORAGE_DRIVER_EOS_LAYOUT=...` less confusing.
+
+   https://github.com/owncloud/ocis/pull/729
 
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
@@ -1250,3 +1386,39 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+
+   This update adds options which allow the configuration of oidc-token expiration parameters:
+   KONNECTD_ACCESS_TOKEN_EXPIRATION, KONNECTD_ID_TOKEN_EXPIRATION and
+   KONNECTD_REFRESH_TOKEN_EXPIRATION.
+
+   Other changes from upstream:
+
+   - Generate random endsession state for external authority - Update dependencies in
+   Dockerfile - Set prompt=None to avoid loops with external authority - Update Jenkins
+   reporting plugin from checkstyle to recordIssues - Remove extra kty key from JWKS top level
+   document - Fix regression which encodes URL fragments twice - Avoid generating fragmet/query
+   URLs with wrong order - Return state for oidc endsession response redirects - Use server
+   provided username to avoid case mismatch - Use signed-out-uri if set as fallback for goodbye
+   redirect on saml slo - Add checks to ensure post_logout_redirect_uri is not empty - Fix SAML2
+   logout request parsing - Cure panic when no state is found in saml esr - Use SAML IdP Issuer value
+   from meta data entityID - Allow configuration of expiration of oidc access, id and refresh
+   tokens - Implement trampolin for external OIDC authority end session - Update
+   ca-certificates version
+
+   https://github.com/owncloud/ocis/pull/744
+
+* Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
+
+  * let the gateway filter invalid references
+
+   https://github.com/owncloud/ocis/pull/748
+   https://github.com/cs3org/reva/pull/1274
+
+* Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
+
+  * fixes etag propagation in the ocis driver
+
+   https://github.com/owncloud/ocis/pull/725
+   https://github.com/cs3org/reva/pull/1264

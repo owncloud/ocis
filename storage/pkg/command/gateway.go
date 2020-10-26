@@ -80,35 +80,35 @@ func Gateway(cfg *config.Config) *cli.Command {
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "gateway",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.URL, // Todo or address?
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.Gateway.Network,
-						"address": cfg.Reva.Gateway.Addr,
+						"network": cfg.Reva.Gateway.GRPCNetwork,
+						"address": cfg.Reva.Gateway.GRPCAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"gateway": map[string]interface{}{
 								// registries is located on the gateway
-								"authregistrysvc":    cfg.Reva.Gateway.URL,
-								"storageregistrysvc": cfg.Reva.Gateway.URL,
-								"appregistrysvc":     cfg.Reva.Gateway.URL,
+								"authregistrysvc":    cfg.Reva.Gateway.Endpoint,
+								"storageregistrysvc": cfg.Reva.Gateway.Endpoint,
+								"appregistrysvc":     cfg.Reva.Gateway.Endpoint,
 								// user metadata is located on the users services
-								"preferencessvc":  cfg.Reva.Users.URL,
-								"userprovidersvc": cfg.Reva.Users.URL,
+								"preferencessvc":  cfg.Reva.Users.Endpoint,
+								"userprovidersvc": cfg.Reva.Users.Endpoint,
 								// sharing is located on the sharing service
-								"usershareprovidersvc":          cfg.Reva.Sharing.URL,
-								"publicshareprovidersvc":        cfg.Reva.Sharing.URL,
-								"ocmshareprovidersvc":           cfg.Reva.Sharing.URL,
+								"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
+								"publicshareprovidersvc":        cfg.Reva.Sharing.Endpoint,
+								"ocmshareprovidersvc":           cfg.Reva.Sharing.Endpoint,
 								"commit_share_to_storage_grant": cfg.Reva.Gateway.CommitShareToStorageGrant,
 								"commit_share_to_storage_ref":   cfg.Reva.Gateway.CommitShareToStorageRef,
 								"share_folder":                  cfg.Reva.Gateway.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 								// other
 								"disable_home_creation_on_login": cfg.Reva.Gateway.DisableHomeCreationOnLogin,
-								"datagateway":                    urlWithScheme(cfg.Reva.DataGateway.URL),
+								"datagateway":                    cfg.Reva.DataGateway.PublicURL,
 								"transfer_shared_secret":         cfg.Reva.TransferSecret,
 								"transfer_expires":               cfg.Reva.TransferExpires,
 							},
@@ -117,9 +117,9 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"drivers": map[string]interface{}{
 									"static": map[string]interface{}{
 										"rules": map[string]interface{}{
-											"basic":        cfg.Reva.AuthBasic.URL,
-											"bearer":       cfg.Reva.AuthBearer.URL,
-											"publicshares": cfg.Reva.StoragePublicLink.URL,
+											"basic":        cfg.Reva.AuthBasic.Endpoint,
+											"bearer":       cfg.Reva.AuthBearer.Endpoint,
+											"publicshares": cfg.Reva.StoragePublicLink.Endpoint,
 										},
 									},
 								},
@@ -142,7 +142,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 						ctx,
 						"com.owncloud.storage",
 						uuid.String(),
-						cfg.Reva.Gateway.Addr,
+						cfg.Reva.Gateway.GRPCAddr,
 						logger,
 					)
 
@@ -239,21 +239,12 @@ func rules(cfg *config.Config) map[string]interface{} {
 
 	// generate rules based on default config
 	return map[string]interface{}{
-		cfg.Reva.StorageRoot.MountPath:       cfg.Reva.StorageRoot.URL,
-		cfg.Reva.StorageRoot.MountID:         cfg.Reva.StorageRoot.URL,
-		cfg.Reva.StorageHome.MountPath:       cfg.Reva.StorageHome.URL,
-		cfg.Reva.StorageHome.MountID:         cfg.Reva.StorageHome.URL,
-		cfg.Reva.StorageEOS.MountPath:        cfg.Reva.StorageEOS.URL,
-		cfg.Reva.StorageEOS.MountID:          cfg.Reva.StorageEOS.URL,
-		cfg.Reva.StorageOC.MountPath:         cfg.Reva.StorageOC.URL,
-		cfg.Reva.StorageOC.MountID:           cfg.Reva.StorageOC.URL,
-		cfg.Reva.StorageS3.MountPath:         cfg.Reva.StorageS3.URL,
-		cfg.Reva.StorageS3.MountID:           cfg.Reva.StorageS3.URL,
-		cfg.Reva.StorageWND.MountPath:        cfg.Reva.StorageWND.URL,
-		cfg.Reva.StorageWND.MountID:          cfg.Reva.StorageWND.URL,
-		cfg.Reva.StorageCustom.MountPath:     cfg.Reva.StorageCustom.URL,
-		cfg.Reva.StorageCustom.MountID:       cfg.Reva.StorageCustom.URL,
-		cfg.Reva.StoragePublicLink.MountPath: cfg.Reva.StoragePublicLink.URL,
+		cfg.Reva.StorageHome.MountPath:       cfg.Reva.StorageHome.Endpoint,
+		cfg.Reva.StorageHome.MountID:         cfg.Reva.StorageHome.Endpoint,
+		cfg.Reva.StorageUsers.MountPath:      cfg.Reva.StorageUsers.Endpoint,
+		cfg.Reva.StorageUsers.MountID:        cfg.Reva.StorageUsers.Endpoint,
+		cfg.Reva.StoragePublicLink.MountPath: cfg.Reva.StoragePublicLink.Endpoint,
 		// public link storage returns the mount id of the actual storage
+		// medatada storage not part of the global namespace
 	}
 }

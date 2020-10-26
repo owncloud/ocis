@@ -47,13 +47,13 @@ services:
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-localhost}:9200
       # TODO make id the default in ocis-storage
-      STORAGE_STORAGE_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
+      STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
       STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN:-localhost}:9200
       STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN:-localhost}:9200/data
       # common eos settings used for both drivers: eos and eoshome
-      STORAGE_STORAGE_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      STORAGE_STORAGE_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
-      STORAGE_STORAGE_EOS_NAMESPACE: "/eos/dockertest/reva/users"
+      STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
+      STORAGE_DRIVER_EOS_NAMESPACE: "/eos/dockertest/reva/users"
       # the eos end xrdcopy binaries use this env var to find the eos mgm
       EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
 

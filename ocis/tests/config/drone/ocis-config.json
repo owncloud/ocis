@@ -12,8 +12,17 @@
     "apps": [
         "files",
         "draw-io",
-        "pdf-viewer",
         "markdown-editor",
         "media-viewer"
+    ],
+    "external_apps": [
+        {
+            "id": "settings",
+            "path": "https://ocis-server:9200/settings.js"
+        },
+        {
+            "id": "accounts",
+            "path": "https://ocis-server:9200/accounts.js"
+        }
     ]
 }

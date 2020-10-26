@@ -8,16 +8,20 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -73,8 +77,14 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	_, err = r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
-	return err
+	resp, err := r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // LoadAccount loads an account via cs3 by id and writes it to the provided account
@@ -84,12 +94,46 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 		return err
 	}
 
+	return r.loadAccount(id, t, a)
+}
+
+// LoadAccounts loads all the accounts from the cs3 api
+func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder)},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
+	for i := range res.Infos {
+		acc := &proto.Account{}
+		err := r.loadAccount(filepath.Base(res.Infos[i].Path), t, acc)
+		if err != nil {
+			log.Err(err).Msg("could not load account")
+			continue
+		}
+		*a = append(*a, acc)
+	}
+	return nil
+}
+
+func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
 	resp, err := r.dataProvider.get(r.accountURL(id), t)
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode == http.StatusNotFound {
+	if resp.StatusCode != http.StatusOK {
 		return &notFoundErr{"account", id}
 	}
 
@@ -147,8 +191,14 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	_, err = r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
-	return err
+	resp, err := r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // LoadGroup loads a group via cs3 by id and writes it to the provided group
@@ -158,6 +208,40 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 		return err
 	}
 
+	return r.loadGroup(id, t, g)
+}
+
+// LoadGroups loads all the groups from the cs3 api
+func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
+	t, err := r.authenticate(ctx)
+	if err != nil {
+		return err
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder)},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
+	for i := range res.Infos {
+		grp := &proto.Group{}
+		err := r.loadGroup(filepath.Base(res.Infos[i].Path), t, grp)
+		if err != nil {
+			log.Err(err).Msg("could not load account")
+			continue
+		}
+		*g = append(*g, grp)
+	}
+	return nil
+}
+
+func (r CS3Repo) loadGroup(id string, t string, g *proto.Group) error {
 	resp, err := r.dataProvider.get(r.groupURL(id), t)
 	if err != nil {
 		return err
@@ -205,14 +289,30 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 }
 
 func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
+	return AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+}
+
+// AuthenticateCS3 mints an auth token for communicating with cs3 storage based on a service user from config
+func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manager) (token string, err error) {
 	u := &user.User{
-		Id:     &user.UserId{},
+		Id: &user.UserId{
+			OpaqueId: su.UUID,
+		},
 		Groups: []string{},
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(su.UID, 10)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(su.GID, 10)),
+				},
+			},
+		},
 	}
-	if r.cfg.ServiceUser.Username != "" {
-		u.Id.OpaqueId = r.cfg.ServiceUser.UUID
-	}
-	return r.tm.MintToken(ctx, u)
+	return tm.MintToken(ctx, u)
 }
 
 func (r CS3Repo) accountURL(id string) string {
@@ -224,11 +324,16 @@ func (r CS3Repo) groupURL(id string) string {
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
+	return MakeDirIfNotExist(ctx, r.storageProvider, folder)
+}
+
+// MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
+func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
 		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
 	}
 
-	resp, err := r.storageProvider.Stat(ctx, &provider.StatRequest{
+	resp, err := sp.Stat(ctx, &provider.StatRequest{
 		Ref: rootPathRef,
 	})
 
@@ -237,7 +342,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 	}
 
 	if resp.Status.Code == v1beta11.Code_CODE_NOT_FOUND {
-		_, err := r.storageProvider.CreateContainer(ctx, &provider.CreateContainerRequest{
+		_, err := sp.CreateContainer(ctx, &provider.CreateContainerRequest{
 			Ref: rootPathRef,
 		})
 

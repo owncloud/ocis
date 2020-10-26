@@ -1,0 +1,187 @@
+[
+  {
+    "id": "konnect.loading.error.headline",
+    "defaultMessage": "Failed to connect to server",
+    "filepath": "./src/components/Loading.js"
+  },
+  {
+    "id": "konnect.login.retryButton.label",
+    "defaultMessage": "Retry",
+    "filepath": "./src/components/Loading.js"
+  },
+  {
+    "id": "konnect.scopeDescription.aliasBasic",
+    "defaultMessage": "Access your basic account information",
+    "filepath": "./src/components/ScopesList.js"
+  },
+  {
+    "id": "konnect.scopeDescription.offlineAccess",
+    "defaultMessage": "Keep the allowed access persistently and forever",
+    "filepath": "./src/components/ScopesList.js"
+  },
+  {
+    "id": "konnect.scopeDescription.scope",
+    "defaultMessage": "Scope: {scope}",
+    "filepath": "./src/components/ScopesList.js"
+  },
+  {
+    "id": "konnect.goodbye.headline",
+    "defaultMessage": "Goodbye",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.subHeader",
+    "defaultMessage": "you have been signed out from your Kopano account",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.message.close",
+    "defaultMessage": "You can close this window now.",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.confirm.headline",
+    "defaultMessage": "Hello {displayName}",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.confirm.subHeader",
+    "defaultMessage": "please confirm sign out",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.message.confirm",
+    "defaultMessage": "Press the button below, to sign out from your Kopano account now.",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.goodbye.signoutButton.label",
+    "defaultMessage": "Sign out",
+    "filepath": "./src/containers/Goodbye/Goodbyescreen.js"
+  },
+  {
+    "id": "konnect.chooseaccount.headline",
+    "defaultMessage": "Choose an account",
+    "filepath": "./src/containers/Login/Chooseaccount.js"
+  },
+  {
+    "id": "konnect.chooseaccount.subHeader",
+    "defaultMessage": "to sign in to Kopano",
+    "filepath": "./src/containers/Login/Chooseaccount.js"
+  },
+  {
+    "id": "konnect.chooseaccount.useOther.persona.label",
+    "defaultMessage": "?",
+    "filepath": "./src/containers/Login/Chooseaccount.js"
+  },
+  {
+    "id": "konnect.chooseaccount.useOther.label",
+    "defaultMessage": "Use another account",
+    "filepath": "./src/containers/Login/Chooseaccount.js"
+  },
+  {
+    "id": "konnect.consent.headline",
+    "defaultMessage": "Hi {displayName}",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.message",
+    "defaultMessage": "{clientDisplayName} wants to",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.tooltip.client",
+    "defaultMessage": "Clicking \"Allow\" will redirect you to: {redirectURI}",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.question",
+    "defaultMessage": "Allow {clientDisplayName} to do this?",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.consequence",
+    "defaultMessage": "By clicking Allow, you allow this app to use your information.",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.cancelButton.label",
+    "defaultMessage": "Cancel",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.consent.allowButton.label",
+    "defaultMessage": "Allow",
+    "filepath": "./src/containers/Login/Consent.js"
+  },
+  {
+    "id": "konnect.login.headline",
+    "defaultMessage": "Sign in",
+    "filepath": "./src/containers/Login/Login.js"
+  },
+  {
+    "id": "konnect.login.subHeader",
+    "defaultMessage": "with your Kopano account",
+    "filepath": "./src/containers/Login/Login.js"
+  },
+  {
+    "id": "konnect.login.usernameField.label",
+    "defaultMessage": "Username",
+    "filepath": "./src/containers/Login/Login.js"
+  },
+  {
+    "id": "konnect.login.passwordField.label",
+    "defaultMessage": "Password",
+    "filepath": "./src/containers/Login/Login.js"
+  },
+  {
+    "id": "konnect.login.nextButton.label",
+    "defaultMessage": "Next",
+    "filepath": "./src/containers/Login/Login.js"
+  },
+  {
+    "id": "konnect.welcome.headline",
+    "defaultMessage": "Welcome {displayName}",
+    "filepath": "./src/containers/Welcome/Welcomescreen.js"
+  },
+  {
+    "id": "konnect.welcome.message",
+    "defaultMessage": "You are signed in - awesome!",
+    "filepath": "./src/containers/Welcome/Welcomescreen.js"
+  },
+  {
+    "id": "konnect.welcome.signoutButton.label",
+    "defaultMessage": "Sign out",
+    "filepath": "./src/containers/Welcome/Welcomescreen.js"
+  },
+  {
+    "id": "konnect.error.login.validate.missingUsername",
+    "defaultMessage": "Enter an username",
+    "filepath": "./src/errors/index.js"
+  },
+  {
+    "id": "konnect.error.login.validate.missingPassword",
+    "defaultMessage": "Enter a password",
+    "filepath": "./src/errors/index.js"
+  },
+  {
+    "id": "konnect.error.login.failed",
+    "defaultMessage": "Logon failed. Please verify your credentials and try again.",
+    "filepath": "./src/errors/index.js"
+  },
+  {
+    "id": "konnet.error.http.networkError",
+    "defaultMessage": "Network error. Please check your connection and try again.",
+    "filepath": "./src/errors/index.js"
+  },
+  {
+    "id": "konnect.error.http.unexpectedResponseStatus",
+    "defaultMessage": "Unexpected HTTP response: {status}. Please check your connection and try again.",
+    "filepath": "./src/errors/index.js"
+  },
+  {
+    "id": "konnect.error.http.unexpectedResponseState",
+    "defaultMessage": "Unexpected response state: {state}",
+    "filepath": "./src/errors/index.js"
+  }
+]

@@ -83,7 +83,7 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"redis":           cfg.Reva.Storages.OwnCloud.Redis,
 			"enable_home":     cfg.Reva.Storages.OwnCloud.EnableHome,
 			"scan":            cfg.Reva.Storages.OwnCloud.Scan,
-			"userprovidersvc": cfg.Reva.Users.URL,
+			"userprovidersvc": cfg.Reva.Users.Endpoint,
 		},
 		"ocis": map[string]interface{}{
 			"root":                cfg.Reva.Storages.Common.Root,
@@ -91,6 +91,7 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":         cfg.Reva.Storages.Common.UserLayout,
 			"treetime_accounting": true,
 			"treesize_accounting": true,
+			"owner":               "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad", // the accounts service system account uuid
 		},
 		"s3": map[string]interface{}{
 			"region":     cfg.Reva.Storages.S3.Region,

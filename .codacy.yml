@@ -7,8 +7,11 @@ exclude_paths:
   - 'docs/**'
   - '**/docs/**'
   - '**/pkg/proto/**'
-  - 'konnectd/assets/identifier/**'
+  - 'konnectd/ui_config/**'
+  - 'konnectd/scripts/**'
   - 'settings/rollup.config.js'
   - 'accounts/rollup.config.js'
+  - 'ocis/docker/eos-ocis/Dockerfile'
+  - 'ocis/docker/eos-ocis-dev/Dockerfile'
 
 ...

@@ -312,6 +312,27 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:       true,
 			Destination: &cfg.Konnectd.IdentifierClientDisabled,
 		},
+		&cli.Uint64Flag{
+			Name:        "access-token-expiration",
+			Usage:       "Expiration time of access tokens in seconds since generated",
+			EnvVars:     []string{"KONNECTD_ACCESS_TOKEN_EXPIRATION"},
+			Destination: &cfg.Konnectd.AccessTokenDurationSeconds,
+			Value:       60 * 10, // 10 Minutes.
+		},
+		&cli.Uint64Flag{
+			Name:        "id-token-expiration",
+			Usage:       "Expiration time of id tokens in seconds since generated",
+			EnvVars:     []string{"KONNECTD_ID_TOKEN_EXPIRATION"},
+			Destination: &cfg.Konnectd.IDTokenDurationSeconds,
+			Value:       60 * 60, // 1 Hour
+		},
+		&cli.Uint64Flag{
+			Name:        "refresh-token-expiration",
+			Usage:       "Expiration time of refresh tokens in seconds since generated",
+			EnvVars:     []string{"KONNECTD_REFRESH_TOKEN_EXPIRATION"},
+			Destination: &cfg.Konnectd.RefreshTokenDurationSeconds,
+			Value:       60 * 60 * 24 * 365 * 3, // 1 year
+		},
 	}
 }
 

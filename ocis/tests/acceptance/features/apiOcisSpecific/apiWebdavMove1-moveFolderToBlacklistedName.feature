@@ -8,7 +8,7 @@ Feature: users cannot move (rename) a folder to a blacklisted name
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-ocis-reva-211 @skipOnOcis-EOS-Storage @skipOnOcis-OCIS-Storage @issue-ocis-reva-269
+  @issue-ocis-reva-211 @skipOnOcis-EOS-Storage @issue-ocis-reva-269 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Renaming a folder to a name that is banned by default is allowed
     Given using <dav_version> DAV path
