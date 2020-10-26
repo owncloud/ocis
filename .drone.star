@@ -67,7 +67,11 @@ config = {
         'webUISharingFolderAdvancedPermissionMultipleUsers',
       ],
     }
-  }
+  },
+  'rocketchat': {
+    'channel': 'ocis-internal',
+    'from_secret': 'private_rocketchat',
+  },
 }
 def getTestSuiteNames():
   keys = config['modules'].keys()
@@ -119,12 +123,14 @@ def main(ctx):
     readme(ctx),
     badges(ctx),
     docs(ctx),
-    updateDeployment(ctx)
+    updateDeployment(ctx),
+    notify(),
   ]
 
   if '[docs-only]' in (ctx.build.title + ctx.build.message):
     pipelines = docs(ctx)
     pipelines['depends_on'] = []
+    pipelines = [ pipelines, notify()]
   else:
     pipelines = before + stages + after
 
@@ -1319,6 +1325,41 @@ def updateDeployment(ctx):
       'ref': [
         'refs/heads/master',
       ],
+    }
+  }
+
+def notify():
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'chat-notifications',
+    'clone': {
+      'disable': True
+    },
+    'steps': [
+      {
+        'name': 'notify-rocketchat',
+        'image': 'plugins/slack:1',
+        'pull': 'always',
+        'settings': {
+          'webhook': {
+            'from_secret': config['rocketchat']['from_secret']
+          },
+          'channel': config['rocketchat']['channel']
+        }
+      }
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/heads/release*',
+        'refs/tags/**',
+      ],
+      'status': [
+        'failure',
+        'success',
+      ]
     }
   }
 
