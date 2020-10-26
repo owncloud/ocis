@@ -2,18 +2,24 @@ package svc
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/micro/go-micro/v2/client/grpc"
 
+	mclient "github.com/micro/go-micro/v2/client"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/account"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 var defaultClient = grpc.NewClient()
@@ -31,19 +37,45 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
-	svc := Ocs{
-		config: options.Config,
-		mux:    m,
-		logger: options.Logger,
+	roleService := options.RoleService
+	if roleService == nil {
+		// https://github.com/owncloud/ocis-proxy/issues/38
+		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
+		roleService = settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	}
+	roleManager := options.RoleManager
+	if roleManager == nil {
+		m := roles.NewManager(
+			roles.CacheSize(1024),
+			roles.CacheTTL(time.Hour*24*7),
+			roles.Logger(options.Logger),
+			roles.RoleService(roleService),
+		)
+		roleManager = &m
 	}
 
+	svc := Ocs{
+		config:      options.Config,
+		mux:         m,
+		RoleManager: roleManager,
+		logger:      options.Logger,
+	}
+
+	requireAdmin := ocsm.RequireAdmin(
+		ocsm.RoleManager(roleManager),
+	)
+
+	requireSelfOrAdmin := ocsm.RequireSelfOrAdmin(
+		ocsm.RoleManager(roleManager),
+		ocsm.Logger(options.Logger),
+	)
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.NotFound(svc.NotFound)
 		r.Use(middleware.StripSlashes)
-		r.Use(ocsm.AccessToken(
-			ocsm.Logger(options.Logger),
-			ocsm.TokenManagerConfig(options.Config.TokenManager),
-		))
+		r.Use(opkgm.ExtractAccountUUID(
+			account.Logger(options.Logger),
+			account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+		)
 		r.Use(ocsm.OCSFormatCtx) // updates request Accept header according to format=(json|xml) query parameter
 		r.Route("/v{version:(1|2)}.php", func(r chi.Router) {
 			r.Use(response.VersionCtx) // stores version in context
@@ -51,28 +83,31 @@ func NewService(opts ...Option) Service {
 			r.Route("/apps/notifications/api/v1", func(r chi.Router) {})
 			r.Route("/cloud", func(r chi.Router) {
 				r.Route("/capabilities", func(r chi.Router) {})
+				// TODO /apps
 				r.Route("/user", func(r chi.Router) {
-					r.Get("/", svc.GetUser)
+					r.With(requireSelfOrAdmin).Get("/", svc.GetSelf)
 					r.Get("/signing-key", svc.GetSigningKey)
 				})
 				r.Route("/users", func(r chi.Router) {
-					r.Get("/", svc.ListUsers)
-					r.Post("/", svc.AddUser)
-					r.Get("/{userid}", svc.GetUser)
-					r.Put("/{userid}", svc.EditUser)
-					r.Delete("/{userid}", svc.DeleteUser)
+					r.With(requireAdmin).Get("/", svc.ListUsers)
+					r.With(requireAdmin).Post("/", svc.AddUser)
+					r.Route("/{userid}", func(r chi.Router) {
+						r.With(requireSelfOrAdmin).Get("/", svc.GetUser)
+						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
+						r.With(requireAdmin).Delete("/", svc.DeleteUser)
+					})
 
 					r.Route("/{userid}/groups", func(r chi.Router) {
-						r.Get("/", svc.ListUserGroups)
-						r.Post("/", svc.AddToGroup)
-						r.Delete("/", svc.RemoveFromGroup)
+						r.With(requireSelfOrAdmin).Get("/", svc.ListUserGroups)
+						r.With(requireAdmin).Post("/", svc.AddToGroup)
+						r.With(requireAdmin).Delete("/", svc.RemoveFromGroup)
 					})
 				})
 				r.Route("/groups", func(r chi.Router) {
-					r.Get("/", svc.ListGroups)
-					r.Post("/", svc.AddGroup)
-					r.Delete("/{groupid}", svc.DeleteGroup)
-					r.Get("/{groupid}", svc.GetGroupMembers)
+					r.With(requireAdmin).Get("/", svc.ListGroups)
+					r.With(requireAdmin).Post("/", svc.AddGroup)
+					r.With(requireAdmin).Delete("/{groupid}", svc.DeleteGroup)
+					r.With(requireSelfOrAdmin).Get("/{groupid}", svc.GetGroupMembers)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
@@ -86,9 +121,11 @@ func NewService(opts ...Option) Service {
 
 // Ocs defines implements the business logic for Service.
 type Ocs struct {
-	config *config.Config
-	logger log.Logger
-	mux    *chi.Mux
+	config      *config.Config
+	logger      log.Logger
+	RoleService settings.RoleService
+	RoleManager *roles.Manager
+	mux         *chi.Mux
 }
 
 // ServeHTTP implements the Service interface.

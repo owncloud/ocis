@@ -16,8 +16,10 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
@@ -75,6 +77,22 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	return s.RoleManager.FindPermissionByID(ctx, roleIDs, AccountManagementPermissionID) != nil
 }
 
+func (s Service) hasSelfManagementPermissions(ctx context.Context) bool {
+	// get roles from context
+	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
+	if !ok {
+		/**
+		 * FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
+		 * metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
+		 * for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
+		 */
+		return true
+	}
+
+	// check if permission is present in roles of the authenticated account
+	return s.RoleManager.FindPermissionByID(ctx, roleIDs, SelfManagementPermissionID) != nil
+}
+
 // serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
 func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
 	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
@@ -105,9 +123,12 @@ func (s Service) getInMemoryServiceUser() proto.Account {
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for ListAccounts")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
@@ -144,6 +165,15 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		a.PasswordProfile.Password = ""
 		out.Accounts = []*proto.Account{a}
 		return nil
+	}
+
+	if onlySelf {
+		// limit list to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			in.Query = "id eq '" + aid + "'"
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
 	}
 
 	if in.Query == "" {
@@ -238,6 +268,13 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		return unique(searchResults), nil
 	}
 
+	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
+	var idQuery = regexp.MustCompile(`^id eq '(.*)'$`)
+	match = idQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return append(searchResults, match[1]), nil
+	}
+
 	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
 	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
 	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
@@ -278,15 +315,29 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for GetAccount")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
+	}
+
+	if onlySelf {
+		// limit get to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			if id != aid {
+				return merrors.Forbidden(s.id, "no permission for GetAccount of another user")
+			}
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
 	}
 
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
