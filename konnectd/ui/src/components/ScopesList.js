@@ -78,8 +78,9 @@ const ScopesList = ({scopes, meta, classes, ...rest}) => {
           checked
           disableRipple
           disabled
+          className="oc-checkbox-dark"
         />
-        <ListItemText primary={label} />
+        <ListItemText primary={label} className="oc-light" />
       </ListItem>
     );
   }
