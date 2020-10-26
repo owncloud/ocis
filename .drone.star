@@ -1353,7 +1353,7 @@ def notify(ctx):
         }
       }
     ],
-    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'depends_on': [],
     'trigger': {
       'ref': [
         'refs/heads/master',
