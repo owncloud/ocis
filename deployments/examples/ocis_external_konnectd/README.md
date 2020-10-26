@@ -2,7 +2,7 @@
 
 ## Setup on ocis server
 
-* Clone ocis repository
+*   Clone ocis repository
 
   `git clone https://github.com/owncloud/ocis.git`
 
