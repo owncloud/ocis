@@ -10,7 +10,7 @@ Feature: auth
       | /ocs/v1.php/apps/files_sharing/api/v1/shares/123 |
       | /ocs/v2.php/apps/files_sharing/api/v1/shares/123 |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "notset"
+    And the OCS status code of responses on all endpoints should be "997"
 
   @issue-ocis-reva-30
   @issue-ocis-ocs-26
@@ -20,12 +20,12 @@ Feature: auth
       | endpoint                           |
       | /ocs/v1.php/cloud/users/%username% |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "998"
+    And the OCS status code of responses on all endpoints should be "997"
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                           |
       | /ocs/v2.php/cloud/users/%username% |
-    Then the HTTP status code of responses on all endpoints should be "404"
-    And the OCS status code of responses on all endpoints should be "998"
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "997"
 
   @issue-ocis-reva-30
   @issue-ocis-ocs-28
@@ -36,11 +36,11 @@ Feature: auth
       | /ocs/v1.php/cloud/users/%username%/disable |
       | /ocs/v1.php/cloud/users/%username%/enable  |
     Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "998"
+    And the OCS status code of responses on all endpoints should be "997"
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                                   |
       | /ocs/v2.php/cloud/users/%username%/disable |
       | /ocs/v2.php/cloud/users/%username%/enable  |
-    Then the HTTP status code of responses on all endpoints should be "404"
-    And the OCS status code of responses on all endpoints should be "998"
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "997"
 
