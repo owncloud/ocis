@@ -1,0 +1,108 @@
+{
+  "HTTP": {
+    "Namespace": "com.owncloud"
+  },
+  "policy_selector": {
+    "migration": {
+      "acc_found_policy" : "reva",
+      "acc_not_found_policy": "oc10",
+      "unauthenticated_policy": "oc10"
+  }
+},
+  "policies": [
+    {
+      "name": "reva",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://konnectd:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://konnectd:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://konnectd:9130"
+        },
+        {
+          "endpoint": "/ocs/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/remote.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/webdav/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "http://localhost:9140"
+        }
+      ]
+    },
+    {
+      "name": "oc10",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/ocs/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/remote.php/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/webdav/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "http://owncloud:8080"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "http://owncloud:8080"
+        }
+      ]
+    }
+  ]
+}
