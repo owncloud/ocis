@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '2fabcb8bf376dbbdff9bb7e787dbee5c334b4a7b',
+    'phoenixCommit': 'f427a438e12a23e7a32f7864763787e756287461',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
