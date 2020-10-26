@@ -1,6 +1,8 @@
 package svc
 
 import (
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/pkg/token"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -9,11 +11,11 @@ import (
 	"github.com/micro/go-micro/v2/client/grpc"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 var defaultClient = grpc.NewClient()
@@ -35,6 +37,8 @@ func NewService(opts ...Option) Service {
 		config: options.Config,
 		mux:    m,
 		logger: options.Logger,
+		tokenManager: options.TokenManager,
+		revaClient: options.RevaClient,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -89,6 +93,8 @@ type Ocs struct {
 	config *config.Config
 	logger log.Logger
 	mux    *chi.Mux
+	tokenManager token.Manager
+	revaClient gatewayv1beta1.GatewayAPIClient
 }
 
 // ServeHTTP implements the Service interface.

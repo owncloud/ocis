@@ -23,6 +23,8 @@ func Server(opts ...Option) (http.Service, error) {
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
+		svc.TokenManager(options.TokenManager),
+		svc.RevaClient(options.RevaClient),
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,

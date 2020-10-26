@@ -1,6 +1,8 @@
 package svc
 
 import (
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/pkg/token"
 	"net/http"
 
 	"github.com/owncloud/ocis/ocs/pkg/config"
@@ -15,6 +17,8 @@ type Options struct {
 	Logger     log.Logger
 	Config     *config.Config
 	Middleware []func(http.Handler) http.Handler
+	TokenManager token.Manager
+	RevaClient gatewayv1beta1.GatewayAPIClient
 }
 
 // newOptions initializes the available default options.
@@ -46,5 +50,19 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// TokenManager provides a function to set the TokenManager option.
+func TokenManager(tm token.Manager) Option {
+	return func(o *Options) {
+		o.TokenManager = tm
+	}
+}
+
+// RevaClient provides a function to set the RevaClient option.
+func RevaClient(c gatewayv1beta1.GatewayAPIClient) Option {
+	return func(o *Options) {
+		o.RevaClient = c
 	}
 }
