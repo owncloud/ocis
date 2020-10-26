@@ -90,13 +90,11 @@ def getCoreApiTestPipelineNames():
   return names
 
 def getDependsOnAllTestPipelines(ctx):
-  dependencies = getTestSuiteNames() + [ 'upload-coverage' ]
-  if ctx.build.ref != "refs/heads/master":
-    dependencies = getTestSuiteNames() + [
-      'upload-coverage',
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
+  dependencies = getTestSuiteNames() + [
+    'upload-coverage',
+    'localApiTests-owncloud-storage',
+    'localApiTests-ocis-storage',
+  ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
 
@@ -376,6 +374,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -432,6 +431,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -512,6 +512,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -604,6 +605,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
