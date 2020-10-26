@@ -5,11 +5,17 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/user"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc/metadata"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -267,6 +273,46 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	t, err := o.mintTokenForUser(r.Context(), account)
+	if err != nil {
+		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
+		return
+	}
+
+	ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+
+	homeResp, err := o.revaClient.GetHome(ctx, &provider.GetHomeRequest{} )
+	if err != nil {
+		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
+		return
+	}
+
+	statResp, err := o.revaClient.Stat(ctx, &provider.StatRequest{
+		Ref: &provider.Reference {
+			Spec: &provider.Reference_Path{
+				Path: homeResp.Path,
+			},
+		},
+	})
+	if err != nil {
+		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
+		return
+	}
+
+	delReq := &provider.DeleteRequest{
+		Ref: &provider.Reference {
+			Spec: &provider.Reference_Id{
+				Id: statResp.Info.Id,
+			},
+		},
+	}
+
+	_, err = o.revaClient.Delete(ctx, delReq)
+	if err != nil {
+		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
+		return
+	}
+
 	req := accounts.DeleteAccountRequest{
 		Id: account.Id,
 	}
@@ -382,6 +428,28 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, response.DataRender(&data.Users{Users: users}))
+}
+
+func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
+	u := &revauser.User{
+		Id: &revauser.UserId{
+			OpaqueId: account.Id,
+		},
+		Groups: []string{},
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
+				},
+			},
+		},
+	}
+	return o.tokenManager.MintToken(ctx, u)
 }
 
 // escapeValue escapes all special characters in the value
