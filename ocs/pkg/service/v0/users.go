@@ -22,22 +22,58 @@ import (
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 )
 
-// GetUser returns the currently logged in user
+// GetSelf returns the currently logged in user
+func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
+	var account *accounts.Account
+	var err error
+	u, ok := user.ContextGetUser(r.Context())
+	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+		return
+	}
+
+	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		Id: u.Id.OpaqueId,
+	})
+
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			// if the user was authenticated why wes he not found?!? log error?
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
+		return
+	}
+
+	// remove password from log if it is set
+	if account.PasswordProfile != nil {
+		account.PasswordProfile.Password = ""
+	}
+	o.logger.Debug().Interface("account", account).Msg("got user")
+
+	d := &data.User{
+		UserID:            account.PreferredName,
+		DisplayName:       account.DisplayName,
+		LegacyDisplayName: account.DisplayName,
+		Email:             account.Mail,
+		UIDNumber:         account.UidNumber,
+		GIDNumber:         account.GidNumber,
+		// TODO hide enabled flag or it might get rendered as false
+	}
+	render.Render(w, r, response.DataRender(d))
+}
+
+// GetUser returns the user with the given userid
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication using the roles and permissions
 	userid := chi.URLParam(r, "userid")
 	var account *accounts.Account
 	var err error
 
 	if userid == "" {
-		u, ok := user.ContextGetUser(r.Context())
-		if !ok || u.Id == nil || u.Id.OpaqueId == "" {
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
-			return
-		}
-		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-			Id: u.Id.OpaqueId,
-		})
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
 	} else {
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	}
@@ -48,7 +84,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("userid", userid).Msg("could not get user")
+		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
 	}
 
@@ -73,8 +109,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		Email:             account.Mail,
 		UIDNumber:         account.UidNumber,
 		GIDNumber:         account.GidNumber,
-		Enabled:           enabled,
-		// FIXME onlyfor users/{userid} endpoint (not /user)
+		Enabled:           enabled, // TODO include in response only when admin?
 		// TODO query storage registry for free space? of home storage, maybe...
 		Quota: &data.Quota{
 			Free:       2840756224000,
@@ -89,7 +124,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // AddUser creates a new user account
 func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication using the roles and permissions
 	userid := r.PostFormValue("userid")
 	password := r.PostFormValue("password")
 	displayname := r.PostFormValue("displayname")
@@ -186,7 +220,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication
 	userid := chi.URLParam(r, "userid")
 	account, err := o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
