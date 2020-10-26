@@ -42,6 +42,11 @@ type TokenManager struct {
 	JWTSecret string
 }
 
+// RevaGateway is the config for using the reva token manager
+type RevaGateway struct {
+	Address string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File         string
@@ -51,6 +56,7 @@ type Config struct {
 	Tracing      Tracing
 	TokenManager TokenManager
 	Service      Service
+	RevaGateway RevaGateway
 }
 
 // New initializes a new configuration with or without defaults.

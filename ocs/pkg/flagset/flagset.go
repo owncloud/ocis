@@ -152,6 +152,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       "127.0.0.1:9142",
+			Usage:       "REVA Gateway Endpoint",
+			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
+			Destination: &cfg.RevaGateway.Address,
+		},
 	}
 }
 

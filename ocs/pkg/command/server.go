@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"os"
 	"os/signal"
 	"strings"
@@ -138,10 +140,31 @@ func Server(cfg *config.Config) *cli.Command {
 			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			{
+				tm, err := jwt.New(map[string]interface{}{
+					"secret":  cfg.TokenManager.JWTSecret,
+					"expires": int64(60),
+				})
+				if err != nil {
+					logger.Error().
+						Err(err).
+						Msg("could not create token manager")
+					return err
+				}
+
+				gwc, err := pool.GetGatewayServiceClient(cfg.RevaGateway.Address)
+				if err != nil {
+					logger.Error().
+						Err(err).
+						Msg("could not create reva gateway client")
+					return err
+				}
+
 				server, err := http.Server(
 					http.Logger(logger),
 					http.Context(ctx),
 					http.Config(cfg),
+					http.TokenManager(tm),
+					http.RevaClient(gwc),
 					http.Metrics(metrics),
 					http.Flags(flagset.RootWithConfig(config.New())),
 					http.Flags(flagset.ServerWithConfig(config.New())),
