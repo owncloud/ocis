@@ -6,6 +6,10 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ggrpc "google.golang.org/grpc"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -467,6 +471,29 @@ func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorde
 
 	return rr, nil
 }
+type mockRevaClient struct {
+	gatewayv1beta1.GatewayAPIClient
+}
+
+func(c mockRevaClient) GetHome(ctx context.Context, req *providerv1beta1.GetHomeRequest, options ...ggrpc.CallOption) (*providerv1beta1.GetHomeResponse, error){
+	return &providerv1beta1.GetHomeResponse{
+		Path: "/home",
+	}, nil
+}
+
+func(c mockRevaClient) Stat(ctx context.Context, req *providerv1beta1.StatRequest, options ...ggrpc.CallOption) (*providerv1beta1.StatResponse, error){
+	return &providerv1beta1.StatResponse{
+		Info: &providerv1beta1.ResourceInfo{Id: &providerv1beta1.ResourceId{
+			OpaqueId: "",
+			StorageId: "",
+			},
+		},
+	}, nil
+}
+
+func (c mockRevaClient) Delete(ctx context.Context, req * providerv1beta1.DeleteRequest, options ...ggrpc.CallOption) (*providerv1beta1.DeleteResponse, error) {
+	return nil, nil
+}
 
 func getService() svc.Service {
 	c := &config.Config{
@@ -484,9 +511,19 @@ func getService() svc.Service {
 
 	var logger ocisLog.Logger
 
+	tm, _ := jwt.New(map[string]interface{}{
+		"secret":  c.TokenManager.JWTSecret,
+		"expires": int64(60),
+	})
+
+
+
+
 	return svc.NewService(
 		svc.Logger(logger),
 		svc.Config(c),
+		svc.TokenManager(tm),
+		svc.RevaClient(mockRevaClient{}),
 	)
 }
 

@@ -2,11 +2,13 @@ package http
 
 import (
 	"context"
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/pkg/token"
 
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis/ocs/pkg/metrics"
-	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // Option defines a single option function.
@@ -20,6 +22,8 @@ type Options struct {
 	Config    *config.Config
 	Metrics   *metrics.Metrics
 	Flags     []cli.Flag
+	TokenManager token.Manager
+	RevaClient gatewayv1beta1.GatewayAPIClient
 }
 
 // newOptions initializes the available default options.
@@ -72,5 +76,19 @@ func Flags(val []cli.Flag) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// TokenManager provides a function to set the TokenManager option.
+func TokenManager(tm token.Manager) Option {
+	return func(o *Options) {
+		o.TokenManager = tm
+	}
+}
+
+// RevaClient provides a function to set the RevaClient option.
+func RevaClient(c gatewayv1beta1.GatewayAPIClient) Option {
+	return func(o *Options) {
+		o.RevaClient = c
 	}
 }
