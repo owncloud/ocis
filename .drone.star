@@ -124,13 +124,17 @@ def main(ctx):
     badges(ctx),
     docs(ctx),
     updateDeployment(ctx),
-    notify(),
+    notify(ctx),
   ]
 
   if '[docs-only]' in (ctx.build.title + ctx.build.message):
-    pipelines = docs(ctx)
-    pipelines['depends_on'] = []
-    pipelines = [ pipelines, notify()]
+    doc_pipelines = docs(ctx)
+    doc_pipelines['depends_on'] = []
+
+    notify_pipelines = notify(ctx)
+    notify_pipelines['depends_on'] = ['docs']
+
+    pipelines = [ doc_pipelines, notify_pipelines ]
   else:
     pipelines = before + stages + after
 
@@ -1328,7 +1332,7 @@ def updateDeployment(ctx):
     }
   }
 
-def notify():
+def notify(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1349,7 +1353,7 @@ def notify():
         }
       }
     ],
-    'depends_on': [],
+    'depends_on': getDependsOnAllTestPipelines(ctx),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1358,7 +1362,6 @@ def notify():
       ],
       'status': [
         'failure',
-        'success',
       ]
     }
   }
