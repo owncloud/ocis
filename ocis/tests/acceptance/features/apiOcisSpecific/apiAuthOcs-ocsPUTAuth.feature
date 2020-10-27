@@ -10,7 +10,7 @@ Feature: auth
       | /ocs/v1.php/apps/files_sharing/api/v1/shares/123 |
       | /ocs/v2.php/apps/files_sharing/api/v1/shares/123 |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   @issue-ocis-reva-30
   @issue-ocis-ocs-26

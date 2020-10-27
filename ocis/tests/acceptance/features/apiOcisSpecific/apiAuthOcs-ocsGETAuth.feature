@@ -81,7 +81,7 @@ Feature: auth
       | endpoint                |
       | /ocs/v1.php/cloud/users |
       | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint           |
