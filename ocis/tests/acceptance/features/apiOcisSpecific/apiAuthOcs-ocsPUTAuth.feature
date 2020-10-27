@@ -19,10 +19,6 @@ Feature: auth
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                           |
       | /ocs/v1.php/cloud/users/%username% |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "997"
-    When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                           |
       | /ocs/v2.php/cloud/users/%username% |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
@@ -34,12 +30,8 @@ Feature: auth
     When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                                   |
       | /ocs/v1.php/cloud/users/%username%/disable |
-      | /ocs/v1.php/cloud/users/%username%/enable  |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "997"
-    When the administrator requests these endpoints with "PUT" with body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                   |
       | /ocs/v2.php/cloud/users/%username%/disable |
+      | /ocs/v1.php/cloud/users/%username%/enable  |
       | /ocs/v2.php/cloud/users/%username%/enable  |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
