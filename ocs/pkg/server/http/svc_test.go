@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ggrpc "google.golang.org/grpc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -484,9 +485,12 @@ func(c mockRevaClient) GetHome(ctx context.Context, req *providerv1beta1.GetHome
 func(c mockRevaClient) Stat(ctx context.Context, req *providerv1beta1.StatRequest, options ...ggrpc.CallOption) (*providerv1beta1.StatResponse, error){
 	return &providerv1beta1.StatResponse{
 		Info: &providerv1beta1.ResourceInfo{Id: &providerv1beta1.ResourceId{
-			OpaqueId: "",
+			OpaqueId:  "",
 			StorageId: "",
 			},
+		},
+		Status: &rpcv1beta1.Status{
+			Code: rpcv1beta1.Code_CODE_OK,
 		},
 	}, nil
 }
