@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/token"
@@ -299,18 +300,25 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	delReq := &provider.DeleteRequest{
-		Ref: &provider.Reference {
-			Spec: &provider.Reference_Id{
-				Id: statResp.Info.Id,
+	if statResp.Status.Code == rpcv1beta1.Code_CODE_OK {
+		delReq := &provider.DeleteRequest{
+			Ref: &provider.Reference {
+				Spec: &provider.Reference_Id{
+					Id: statResp.Info.Id,
+				},
 			},
-		},
-	}
+		}
 
-	_, err = o.revaClient.Delete(ctx, delReq)
-	if err != nil {
-		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
-		return
+		_, err = o.revaClient.Delete(ctx, delReq)
+		if err != nil {
+			render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
+			return
+		}
+	} else {
+		o.logger.Debug().
+			Str("stat_status_code", statResp.Status.Code.String()).
+			Str("stat_message", statResp.Status.Message).
+			Msg("DeleteUser: stat failed")
 	}
 
 	req := accounts.DeleteAccountRequest{
