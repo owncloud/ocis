@@ -88,6 +88,8 @@ func NewService(opts ...Option) Service {
 					r.With(requireSelfOrAdmin).Get("/", svc.GetSelf)
 					r.Get("/signing-key", svc.GetSigningKey)
 				})
+
+				// for /users endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L44-L56
 				r.Route("/users", func(r chi.Router) {
 					r.With(requireAdmin).Get("/", svc.ListUsers)
 					r.With(requireAdmin).Post("/", svc.AddUser)
@@ -95,6 +97,8 @@ func NewService(opts ...Option) Service {
 						r.With(requireSelfOrAdmin).Get("/", svc.GetUser)
 						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
 						r.With(requireAdmin).Delete("/", svc.DeleteUser)
+						r.With(requireAdmin).Put("/enable", svc.NotImplementedStub)
+						r.With(requireAdmin).Put("/disable", svc.NotImplementedStub)
 					})
 
 					r.Route("/{userid}/groups", func(r chi.Router) {
@@ -102,12 +106,21 @@ func NewService(opts ...Option) Service {
 						r.With(requireAdmin).Post("/", svc.AddToGroup)
 						r.With(requireAdmin).Delete("/", svc.RemoveFromGroup)
 					})
+
+					r.Route("/{userid}/subadmins", func(r chi.Router) {
+						r.With(requireAdmin).Post("/", svc.NotImplementedStub)
+						r.With(requireSelfOrAdmin).Get("/", svc.NotImplementedStub)
+						r.With(requireAdmin).Delete("/", svc.NotImplementedStub)
+					})
 				})
+
+				// for /groups endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L65-L69
 				r.Route("/groups", func(r chi.Router) {
 					r.With(requireAdmin).Get("/", svc.ListGroups)
 					r.With(requireAdmin).Post("/", svc.AddGroup)
-					r.With(requireAdmin).Delete("/{groupid}", svc.DeleteGroup)
 					r.With(requireSelfOrAdmin).Get("/{groupid}", svc.GetGroupMembers)
+					r.With(requireAdmin).Delete("/{groupid}", svc.DeleteGroup)
+					r.With(requireAdmin).Get("/{groupid}/subadmins", svc.NotImplementedStub)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
@@ -144,4 +157,9 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 
 func (o Ocs) getGroupsService() accounts.GroupsService {
 	return accounts.NewGroupsService("com.owncloud.api.accounts", defaultClient)
+}
+
+// NotImplementedStub returns a not implemented error
+func (o Ocs) NotImplementedStub(w http.ResponseWriter, r *http.Request) {
+	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented"))
 }

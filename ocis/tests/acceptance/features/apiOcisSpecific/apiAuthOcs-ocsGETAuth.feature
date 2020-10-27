@@ -27,7 +27,7 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   @issue-ocis-ocs-26
   # after fixing all issues delete this Scenario and use the one from oC10 core
@@ -35,10 +35,6 @@ Feature: auth
     When a user requests these endpoints with "GET" and no authentication
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "997"
-    When a user requests these endpoints with "GET" and no authentication
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
@@ -84,10 +80,6 @@ Feature: auth
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "997"
-    When the user "Alice" requests these endpoints with "GET" with basic auth
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "997"
@@ -121,7 +113,7 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   @issue-ocis-reva-29
   @issue-ocis-reva-30
@@ -133,10 +125,6 @@ Feature: auth
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "997"
-    When user "Alice" requests these endpoints with "GET" using password "invalid"
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
@@ -169,7 +157,7 @@ Feature: auth
       | /ocs/v1.php/privatedata/getattribute                        |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   @skipOnOcV10
   @issue-ocis-reva-29
@@ -183,10 +171,6 @@ Feature: auth
     When user "brian" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
-    When user "brian" requests these endpoints with "GET" using password "invalid"
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "997"

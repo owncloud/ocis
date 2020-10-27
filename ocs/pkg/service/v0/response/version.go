@@ -32,6 +32,9 @@ func APIVersion(ctx context.Context) string {
 
 // OcsV1StatusCodes returns the http status codes for the OCS API v1.
 func OcsV1StatusCodes(meta data.Meta) int {
+	if meta.StatusCode == data.MetaUnauthorized.StatusCode {
+		return http.StatusUnauthorized
+	}
 	return http.StatusOK
 }
 
