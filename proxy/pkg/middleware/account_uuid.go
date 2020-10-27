@@ -99,11 +99,8 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 							Iss: opt.OIDCIss,
 						}
 					} else {
-						// we are still forwarding the request, the service is responsible for rendering the error
-						// TODO or render a full blown ocs xml / json error response
-						next.ServeHTTP(w, r)
 						// tell client to reauthenticate
-						//w.WriteHeader(http.StatusUnauthorized)
+						w.WriteHeader(http.StatusUnauthorized)
 						return
 					}
 				} else {

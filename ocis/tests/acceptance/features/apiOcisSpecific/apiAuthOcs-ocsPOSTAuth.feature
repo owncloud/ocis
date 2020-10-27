@@ -26,7 +26,7 @@ Feature: auth
       | /ocs/v1.php/privatedata/setattribute/testing/test               |
       | /ocs/v2.php/privatedata/setattribute/testing/test               |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: send POST requests to OCS endpoints as normal user with wrong password
