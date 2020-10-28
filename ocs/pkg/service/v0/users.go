@@ -262,6 +262,9 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+
+	// TODO(corby): move the deletion of the user home to the accounts service.
+	// https://github.com/owncloud/ocis/pull/755#issuecomment-717322218
 	account, err := o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
 		merr := merrors.FromError(err)
@@ -318,7 +321,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		o.logger.Debug().
 			Str("stat_status_code", statResp.Status.Code.String()).
 			Str("stat_message", statResp.Status.Message).
-			Msg("DeleteUser: stat failed")
+			Msg("DeleteUser: could not delete user home: stat failed")
 	}
 
 	req := accounts.DeleteAccountRequest{
