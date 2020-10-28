@@ -870,7 +870,6 @@ def binary(ctx, name):
         'image': 'toolhippie/calens:latest',
         'pull': 'always',
         'commands': [
-          'cd ocis',
           'calens --version %s -o dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
