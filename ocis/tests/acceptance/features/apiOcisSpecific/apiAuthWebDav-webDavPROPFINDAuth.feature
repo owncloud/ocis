@@ -17,4 +17,4 @@ Feature: get file info using PROPFIND
       | /remote.php/dav/files/%username%/textfile0.txt     |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "404"
+    Then the HTTP status code of responses on all endpoints should be "207"
