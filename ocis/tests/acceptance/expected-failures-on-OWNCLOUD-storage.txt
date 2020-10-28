@@ -1461,3 +1461,50 @@ apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:109
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:110
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:111
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:112
+#
+# https://github.com/owncloud/ocis/issues/762 path and other information are not shown if a share does not have "read" permission
+#
+apiShareOperationsToShares/uploadToShare.feature:64
+apiShareOperationsToShares/uploadToShare.feature:65
+#
+# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+#
+apiShareOperationsToShares/uploadToShare.feature:39
+apiShareOperationsToShares/uploadToShare.feature:40
+apiShareOperationsToShares/uploadToShare.feature:91
+apiShareOperationsToShares/uploadToShare.feature:92
+apiShareOperationsToShares/uploadToShare.feature:139
+apiShareOperationsToShares/uploadToShare.feature:140
+#
+# https://github.com/owncloud/product/issues/247 changing user quota gives ocs status 103 / Cannot set quota
+#
+apiShareOperationsToShares/uploadToShare.feature:162
+apiShareOperationsToShares/uploadToShare.feature:163
+apiShareOperationsToShares/uploadToShare.feature:181
+apiShareOperationsToShares/uploadToShare.feature:182
+apiShareOperationsToShares/uploadToShare.feature:202
+apiShareOperationsToShares/uploadToShare.feature:203
+apiShareOperationsToShares/uploadToShare.feature:221
+apiShareOperationsToShares/uploadToShare.feature:222
+apiShareOperationsToShares/uploadToShare.feature:242
+apiShareOperationsToShares/uploadToShare.feature:243
+#
+# https://github.com/owncloud/ocis-reva/issues/56  remote.php/dav/uploads endpoint does not exist
+#
+apiShareOperationsToShares/uploadToShare.feature:246
+#
+# not possible to move file into a received folder https://github.com/owncloud/ocis/issues/764
+#
+apiShareOperationsToShares/changingFilesShare.feature:23
+apiShareOperationsToShares/changingFilesShare.feature:24
+apiShareOperationsToShares/changingFilesShare.feature:63
+apiShareOperationsToShares/changingFilesShare.feature:79
+apiShareOperationsToShares/changingFilesShare.feature:95
+#
+# https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
+#
+apiShareOperationsToShares/changingFilesShare.feature:40
+apiShareOperationsToShares/changingFilesShare.feature:41
+apiShareOperationsToShares/changingFilesShare.feature:59
+apiShareOperationsToShares/changingFilesShare.feature:60
