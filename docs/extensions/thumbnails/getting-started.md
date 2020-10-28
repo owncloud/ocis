@@ -189,6 +189,13 @@ The health command is used to execute a health check, if the exit code equals ze
 {{ Name }} health --help
 {{< / highlight >}}
 
+### Version
+The version command lists the versions of all running instances. For further help please execute:
+
+{{< highlight txt >}}
+{{ Name }} version --help
+{{< /highlight >}}
+
 ## Metrics
 
 This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `THUMBNAILS_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:9114/metrics`.

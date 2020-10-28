@@ -42,7 +42,7 @@ The program provides a few sub-commands on execution. The available configuratio
 The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general webservice while the debug server is used for health check, readiness check and to server the metrics mentioned below. For further help please execute:
 
 {{< highlight txt >}}
-ocis-ocs server --help
+ocs server --help
 {{< / highlight >}}
 
 ### Health
@@ -50,8 +50,15 @@ ocis-ocs server --help
 The health command is used to execute a health check, if the exit code equals zero the service should be up and running, if the exist code is greater than zero the service is not in a healthy state. Generally this command is used within our Docker containers, it could also be used within Kubernetes.
 
 {{< highlight txt >}}
-ocis-ocs health --help
+ocs health --help
 {{< / highlight >}}
+
+### Version
+The version command lists the versions of all running instances. For further help please execute:
+
+{{< highlight txt >}}
+ocs version --help
+{{< /highlight >}}
 
 ## Metrics
 
