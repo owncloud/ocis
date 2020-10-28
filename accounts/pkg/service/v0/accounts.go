@@ -268,13 +268,6 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		return unique(searchResults), nil
 	}
 
-	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
-	var idQuery = regexp.MustCompile(`^id eq '(.*)'$`)
-	match = idQuery.FindStringSubmatch(query)
-	if len(match) == 2 {
-		return append(searchResults, match[1]), nil
-	}
-
 	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
 	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
 	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
@@ -296,6 +289,13 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 		}
 
 		return unique(searchResults), nil
+	}
+
+	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
+	var idQuery = regexp.MustCompile(`^id eq '(.*)'$`)
+	match = idQuery.FindStringSubmatch(query)
+	if len(match) == 2 {
+		return append(searchResults, match[1]), nil
 	}
 
 	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
