@@ -39,7 +39,7 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			// if the user was authenticated why wes he not found?!? log error?
+			// if the user was authenticated why was he not found?!? log error?
 			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
