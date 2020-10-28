@@ -4,7 +4,9 @@ package indexer
 import (
 	"fmt"
 	"path"
+	"strings"
 
+	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
@@ -234,5 +236,153 @@ func (i Indexer) Update(from, to interface{}) error {
 		}
 	}
 
+	return nil
+}
+
+// Query parses an OData query into something our indexer.Index understands and resolves it.
+func (i Indexer) Query(t interface{}, q string) ([]string, error) {
+	query, err := godata.ParseFilterString(q)
+	if err != nil {
+		return nil, err
+	}
+
+	tree := newQueryTree()
+	if err := buildTreeFromOdataQuery(query.Tree, &tree); err != nil {
+		return nil, err
+	}
+
+	results := make([]string, 0)
+	if err := i.resolveTree(t, &tree, &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+// t is used to infer the indexed field names. When building an index search query, field names have to respect Golang
+// conventions and be in PascalCase. For a better overview on this contemplate reading the reflection package under the
+// indexer directory. Traversal of the tree happens in a pre-order fashion.
+// TODO implement logic for `and` operators.
+func (i Indexer) resolveTree(t interface{}, tree *queryTree, partials *[]string) error {
+	if partials == nil {
+		return fmt.Errorf("return value cannot be nil: partials")
+	}
+
+	if tree.left != nil {
+		_ = i.resolveTree(t, tree.left, partials)
+	}
+
+	if tree.right != nil {
+		_ = i.resolveTree(t, tree.right, partials)
+	}
+
+	// by the time we're here we reached a leaf node.
+	if tree.token != nil {
+		switch tree.token.filterType {
+		case "FindBy":
+			operand, err := sanitizeInput(tree.token.operands)
+			if err != nil {
+				return err
+			}
+
+			r, err := i.FindBy(t, operand.field, operand.value)
+			if err != nil {
+				return err
+			}
+
+			*partials = append(*partials, r...)
+		case "FindByPartial":
+			operand, err := sanitizeInput(tree.token.operands)
+			if err != nil {
+				return err
+			}
+
+			r, err := i.FindByPartial(t, operand.field, fmt.Sprintf("%v*", operand.value))
+			if err != nil {
+				return err
+			}
+
+			*partials = append(*partials, r...)
+		default:
+			return fmt.Errorf("unsupported filter: %v", tree.token.filterType)
+		}
+	}
+
+	*partials = dedup(*partials)
+	return nil
+}
+
+type indexerTuple struct {
+	field, value string
+}
+
+// sanitizeInput returns a tuple of fieldName + value to be applied on indexer.Index filters.
+func sanitizeInput(operands []string) (*indexerTuple, error) {
+	if len(operands) != 2 {
+		return nil, fmt.Errorf("invalid number of operands for filter function: got %v expected 2", len(operands))
+	}
+
+	// field names are Go public types and by design they are in PascalCase, therefore we need to adhere to this rules.
+	// for further information on this have a look at the reflection package.
+	f := strcase.ToCamel(operands[0])
+
+	// remove single quotes from value.
+	v := strings.ReplaceAll(operands[1], "'", "")
+	return &indexerTuple{
+		field: f,
+		value: v,
+	}, nil
+}
+
+// buildTreeFromOdataQuery builds an indexer.queryTree out of a GOData ParseNode. The purpose of this intermediate tree
+// is to transform godata operators and functions into supported operations on our index. At the time of this writing
+// we only support `FindBy` and `FindByPartial` queries as these are the only implemented filters on indexer.Index(es).
+func buildTreeFromOdataQuery(root *godata.ParseNode, tree *queryTree) error {
+	if root.Token.Type == godata.FilterTokenFunc { // i.e "startswith", "contains"
+		switch root.Token.Value {
+		case "startswith":
+			token := token{
+				operator:   root.Token.Value,
+				filterType: "FindByPartial",
+				// TODO sanitize the number of operands it the expected one.
+				operands: []string{
+					root.Children[0].Token.Value, // field name, i.e: Name
+					root.Children[1].Token.Value, // field value, i.e: Jac
+				},
+			}
+
+			tree.insert(&token)
+		default:
+			return fmt.Errorf("operation not supported")
+		}
+	}
+
+	if root.Token.Type == godata.FilterTokenLogical {
+		switch root.Token.Value {
+		case "or":
+			tree.insert(&token{operator: root.Token.Value})
+			for _, child := range root.Children {
+				if err := buildTreeFromOdataQuery(child, tree.left); err != nil {
+					return err
+				}
+			}
+		case "eq":
+			tree.insert(&token{
+				operator:   root.Token.Value,
+				filterType: "FindBy",
+				operands: []string{
+					root.Children[0].Token.Value,
+					root.Children[1].Token.Value,
+				},
+			})
+			for _, child := range root.Children {
+				if err := buildTreeFromOdataQuery(child, tree.left); err != nil {
+					return err
+				}
+			}
+		default:
+			return fmt.Errorf("operator not supported")
+		}
+	}
 	return nil
 }

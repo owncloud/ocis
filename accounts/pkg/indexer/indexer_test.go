@@ -251,18 +251,51 @@ func TestIndexer_Disk_UpdateWithNonUniqueIndex(t *testing.T) {
 	_ = os.RemoveAll(dataDir)
 }
 
-//func createCs3Indexer() *Indexer {
-//	return CreateIndexer(&config.Config{
-//		Repo: config.Repo{
-//			CS3: config.CS3{
-//				ProviderAddr: "0.0.0.0:9215",
-//				DataURL:      "http://localhost:9216",
-//				DataPrefix:   "data",
-//				JWTSecret:    "Pive-Fumkiu4",
-//			},
-//		},
-//	})
-//}
+func TestQueryDiskImpl(t *testing.T) {
+	dataDir, err := WriteIndexTestData(Data, "ID", "")
+	assert.NoError(t, err)
+	indexer := createDiskIndexer(dataDir)
+
+	err = indexer.AddIndex(&Account{}, "OnPremisesSamAccountName", "ID", "accounts", "non_unique", nil, false)
+	assert.NoError(t, err)
+
+	err = indexer.AddIndex(&Account{}, "Mail", "ID", "accounts", "non_unique", nil, false)
+	assert.NoError(t, err)
+
+	err = indexer.AddIndex(&Account{}, "ID", "ID", "accounts", "non_unique", nil, false)
+	assert.NoError(t, err)
+
+	acc := Account{
+		ID:                       "ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2",
+		Mail:                     "spooky@skeletons.org",
+		OnPremisesSamAccountName: "MrDootDoot",
+	}
+
+	_, err = indexer.Add(acc)
+	assert.NoError(t, err)
+
+	r, err := indexer.Query(&Account{}, "on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
+
+	r, err = indexer.Query(&Account{}, "mail eq 'spooky@skeletons.org'") // this query will match both pets.
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
+
+	r, err = indexer.Query(&Account{}, "on_premises_sam_account_name eq 'MrDootDoot' or mail eq 'spooky@skeletons.org'") // this query will match both pets.
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
+
+	r, err = indexer.Query(&Account{}, "startswith(on_premises_sam_account_name,'MrDoo')") // this query will match both pets.
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
+
+	r, err = indexer.Query(&Account{}, "id eq 'ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2' or on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
+
+	_ = os.RemoveAll(dataDir)
+}
 
 func createDiskIndexer(dataDir string) *Indexer {
 	return CreateIndexer(&config.Config{
