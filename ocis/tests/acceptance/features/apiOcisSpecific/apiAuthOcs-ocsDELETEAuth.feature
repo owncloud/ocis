@@ -32,4 +32,4 @@ Feature: auth
       | /ocs/v1.php/cloud/users/%username%/groups    |
       | /ocs/v2.php/cloud/users/%username%/groups    |
     Then the HTTP status code of responses on all endpoints should be "401"
-    And the OCS status code of responses on all endpoints should be "997"
+    And the OCS status code of responses on all endpoints should be "notset"
