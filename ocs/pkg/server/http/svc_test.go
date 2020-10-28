@@ -52,6 +52,7 @@ const (
 	userIDKonnectd string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
 	userIDReva     string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
 	userIDMoss     string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
+	userIDAdmin    string = "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
 )
 
 const (
@@ -83,6 +84,7 @@ var DefaultUsers = []string{
 	userIDReva,
 	userIDMarie,
 	userIDMoss,
+	userIDAdmin,
 }
 
 var DefaultGroups = []string{
@@ -457,6 +459,7 @@ func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorde
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	if auth != "" {
+		// TODO this needs to use the x-access-token ...
 		req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(auth)))
 	}
 
@@ -1418,6 +1421,9 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
 			groupPhysicsLovers,
 		},
 		userIDMoss: {
+			groupUsers,
+		},
+		userIDAdmin: {
 			groupUsers,
 		},
 	}
