@@ -465,6 +465,37 @@ apiShareOperationsToShares/gettingShares.feature:181
 apiShareOperationsToShares/gettingShares.feature:219
 apiShareOperationsToShares/gettingShares.feature:220
 #
+# https://github.com/owncloud/ocis/issues/774 Allow getting the share list filtered by share type via API
+#
+apiShareOperationsToShares/gettingSharesPendingFiltered.feature:44
+apiShareOperationsToShares/gettingSharesPendingFiltered.feature:45
+apiShareOperationsToShares/gettingSharesPendingFiltered.feature:56
+apiShareOperationsToShares/gettingSharesPendingFiltered.feature:57
+apiShareOperationsToShares/gettingSharesReceivedFiltered.feature:47
+apiShareOperationsToShares/gettingSharesReceivedFiltered.feature:48
+apiShareOperationsToShares/gettingSharesReceivedFiltered.feature:60
+apiShareOperationsToShares/gettingSharesReceivedFiltered.feature:61
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:41
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:42
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:62
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:63
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:90
+apiShareOperationsToShares/gettingSharesReceivedFilteredEmpty.feature:91
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:47
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:48
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:60
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:61
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:73
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:74
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:88
+apiShareOperationsToShares/gettingSharesSharedFiltered.feature:89
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:39
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:40
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:60
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:61
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:79
+apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:80
+#
 # https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
 #
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:23
@@ -593,6 +624,27 @@ apiSharePublicLink2/updatePublicLinkShare.feature:93
 apiSharePublicLink2/updatePublicLinkShare.feature:94
 apiSharePublicLink2/updatePublicLinkShare.feature:284
 apiSharePublicLink2/updatePublicLinkShare.feature:285
+#
+# https://github.com/owncloud/ocis/issues/776 investigate ocis issues in apiSharePublicLink2/reShareAsPublicLinkToShares
+#
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:25
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:26
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:47
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:48
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:63
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:64
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:78
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:79
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:100
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:101
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:123
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:124
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:140
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:141
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:161
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:162
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:184
+apiSharePublicLink2/reShareAsPublicLinkToShares.feature:185
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 #
@@ -1114,6 +1166,10 @@ apiWebdavOperations/refuseAccess.feature:22
 apiWebdavOperations/refuseAccess.feature:33
 apiWebdavOperations/refuseAccess.feature:34
 #
+# https://github.com/owncloud/core/pull/38035 PROPFIND to https://localhost:9200/remote.php/dav/files gets an error 500 response
+#
+apiWebdavOperations/propfind.feature:5
+#
 # https://github.com/owncloud/ocis-reva/issues/39  REPORT request not implemented
 #
 apiWebdavOperations/search.feature:42
@@ -1436,3 +1492,50 @@ apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:109
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:110
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:111
 apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:112
+#
+# https://github.com/owncloud/ocis/issues/762 path and other information are not shown if a share does not have "read" permission
+#
+apiShareOperationsToShares/uploadToShare.feature:64
+apiShareOperationsToShares/uploadToShare.feature:65
+#
+# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+#
+apiShareOperationsToShares/uploadToShare.feature:39
+apiShareOperationsToShares/uploadToShare.feature:40
+apiShareOperationsToShares/uploadToShare.feature:91
+apiShareOperationsToShares/uploadToShare.feature:92
+apiShareOperationsToShares/uploadToShare.feature:139
+apiShareOperationsToShares/uploadToShare.feature:140
+#
+# https://github.com/owncloud/product/issues/247 changing user quota gives ocs status 103 / Cannot set quota
+#
+apiShareOperationsToShares/uploadToShare.feature:162
+apiShareOperationsToShares/uploadToShare.feature:163
+apiShareOperationsToShares/uploadToShare.feature:181
+apiShareOperationsToShares/uploadToShare.feature:182
+apiShareOperationsToShares/uploadToShare.feature:202
+apiShareOperationsToShares/uploadToShare.feature:203
+apiShareOperationsToShares/uploadToShare.feature:221
+apiShareOperationsToShares/uploadToShare.feature:222
+apiShareOperationsToShares/uploadToShare.feature:242
+apiShareOperationsToShares/uploadToShare.feature:243
+#
+# https://github.com/owncloud/ocis-reva/issues/56  remote.php/dav/uploads endpoint does not exist
+#
+apiShareOperationsToShares/uploadToShare.feature:246
+#
+# not possible to move file into a received folder https://github.com/owncloud/ocis/issues/764
+#
+apiShareOperationsToShares/changingFilesShare.feature:23
+apiShareOperationsToShares/changingFilesShare.feature:24
+apiShareOperationsToShares/changingFilesShare.feature:63
+apiShareOperationsToShares/changingFilesShare.feature:79
+apiShareOperationsToShares/changingFilesShare.feature:95
+#
+# https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
+#
+apiShareOperationsToShares/changingFilesShare.feature:40
+apiShareOperationsToShares/changingFilesShare.feature:41
+apiShareOperationsToShares/changingFilesShare.feature:59
+apiShareOperationsToShares/changingFilesShare.feature:60
