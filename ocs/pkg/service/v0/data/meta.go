@@ -18,6 +18,9 @@ var MetaFailure = Meta{Status: "", StatusCode: 101, Message: "Failure"}
 // MetaInvalidInput is an error response with code 102
 var MetaInvalidInput = Meta{Status: "", StatusCode: 102, Message: "Invalid Input"}
 
+// MetaForbidden is an error response with code 104
+var MetaForbidden = Meta{Status: "", StatusCode: 104, Message: "Forbidden"}
+
 // MetaBadRequest is used for unknown errors
 var MetaBadRequest = Meta{Status: "error", StatusCode: 400, Message: "Bad Request"}
 
