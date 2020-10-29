@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-10-27T06:46:53+0000"
+date: "2020-10-29T08:47:57+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -56,18 +56,6 @@ Usage: `ocis-proxy [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
-
-### ocis-proxy version
-
-Print the versions of the running instances
-
-Usage: `ocis-proxy version [command options] [arguments...]`
-
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
 
 ### ocis-proxy server
 
@@ -140,6 +128,18 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 
 --autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
+
+### ocis-proxy version
+
+Print the versions of the running instances
+
+Usage: `ocis-proxy version [command options] [arguments...]`
+
+--service-namespace | $PROXY_SERVICE_NAMESPACE  
+: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
+
+--service-name | $PROXY_SERVICE_NAME  
+: Service name. Default: `proxy`.
 
 ### ocis-proxy health
 
