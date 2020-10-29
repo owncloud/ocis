@@ -61,6 +61,8 @@ func NewService(opts ...Option) Service {
 		logger:      options.Logger,
 	}
 
+	requireUser := ocsm.RequireUser()
+
 	requireAdmin := ocsm.RequireAdmin(
 		ocsm.RoleManager(roleManager),
 	)
@@ -94,7 +96,7 @@ func NewService(opts ...Option) Service {
 					r.With(requireAdmin).Get("/", svc.ListUsers)
 					r.With(requireAdmin).Post("/", svc.AddUser)
 					r.Route("/{userid}", func(r chi.Router) {
-						r.With(requireSelfOrAdmin).Get("/", svc.GetUser)
+						r.With(requireUser).Get("/", svc.GetUser)
 						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
 						r.With(requireAdmin).Delete("/", svc.DeleteUser)
 						r.With(requireAdmin).Put("/enable", svc.EnableUser)
@@ -124,7 +126,7 @@ func NewService(opts ...Option) Service {
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
-				r.Get("/", svc.GetConfig)
+				r.With(requireUser).Get("/", svc.GetConfig)
 			})
 		})
 	})
