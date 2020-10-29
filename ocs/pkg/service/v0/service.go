@@ -97,8 +97,8 @@ func NewService(opts ...Option) Service {
 						r.With(requireSelfOrAdmin).Get("/", svc.GetUser)
 						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
 						r.With(requireAdmin).Delete("/", svc.DeleteUser)
-						r.With(requireAdmin).Put("/enable", svc.NotImplementedStub)
-						r.With(requireAdmin).Put("/disable", svc.NotImplementedStub)
+						r.With(requireAdmin).Put("/enable", svc.EnableUser)
+						r.With(requireAdmin).Put("/disable", svc.DisableUser)
 					})
 
 					r.Route("/{userid}/groups", func(r chi.Router) {
