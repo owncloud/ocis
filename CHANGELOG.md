@@ -22,6 +22,7 @@
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
 * Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
+* Change - Properly style konnectd consent page: [#754](https://github.com/owncloud/ocis/pull/754)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
@@ -32,6 +33,7 @@
 * Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
+* Change - Update phoenix to v0.22.0: [#757](https://github.com/owncloud/ocis/pull/757)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -251,6 +253,15 @@
    https://github.com/owncloud/product/issues/25
    https://github.com/owncloud/ocis/pull/239/files
 
+* Change - Properly style konnectd consent page: [#754](https://github.com/owncloud/ocis/pull/754)
+
+   Tags: konnectd
+
+   After bringing our theme into konnectd, we've had to adjust the styles of the consent page so the
+   text is visible and button reflects our theme.
+
+   https://github.com/owncloud/ocis/pull/754
+
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 
    We moved away from using the go-micro runtime and are now using [our own
@@ -364,6 +375,16 @@
 
    https://github.com/owncloud/ocis/pull/728
    https://github.com/owncloud/phoenix/releases/tag/v0.21.0
+
+* Change - Update phoenix to v0.22.0: [#757](https://github.com/owncloud/ocis/pull/757)
+
+   Tags: web
+
+   We updated phoenix to v0.22.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/757
+   https://github.com/owncloud/phoenix/releases/tag/v0.22.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 

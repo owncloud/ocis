@@ -20,10 +20,6 @@ import ClientDisplayName from '../../components/ClientDisplayName';
 import ScopesList from '../../components/ScopesList';
 
 const styles = theme => ({
-  button: {
-    margin: theme.spacing(1),
-    minWidth: 100
-  },
   buttonProgress: {
     color: green[500],
     position: 'absolute',
@@ -31,9 +27,6 @@ const styles = theme => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
-  },
-  subHeader: {
-    marginBottom: theme.spacing(2)
   },
   scopesList: {
     marginBottom: theme.spacing(2)
@@ -87,18 +80,18 @@ class Consent extends React.PureComponent {
 
     return (
       <div>
-        <Typography variant="h5" component="h3">
+        <Typography variant="h5" component="h3" className="oc-light">
           <FormattedMessage
             id="konnect.consent.headline"
             defaultMessage="Hi {displayName}"
-            values={{displayName: hello.displayName}}>
-          </FormattedMessage>
+            values={{displayName: hello.displayName}}
+          />
         </Typography>
-        <Typography variant="subtitle1" className={classes.subHeader}>
+        <Typography variant="subtitle1" className="oc-light oc-mb-m">
           {hello.username}
         </Typography>
 
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1" gutterBottom className="oc-light">
           <FormattedMessage
             id="konnect.consent.message"
             defaultMessage="{clientDisplayName} wants to"
@@ -120,16 +113,7 @@ class Consent extends React.PureComponent {
         </Typography>
         <ScopesList dense disablePadding className={classes.scopesList} scopes={scopes} meta={meta.scopes}></ScopesList>
 
-        <Typography variant="subtitle1" gutterBottom>
-          <FormattedMessage
-            id="konnect.consent.question"
-            defaultMessage="Allow {clientDisplayName} to do this?"
-            values={{
-              clientDisplayName: <em><ClientDisplayName client={client}/></em>
-            }}
-          ></FormattedMessage>
-        </Typography>
-        <Typography color="secondary">
+        <Typography className="oc-light">
           <FormattedMessage
             id="konnect.consent.consequence"
             defaultMessage="By clicking Allow, you allow this app to use your information.">
@@ -155,7 +139,7 @@ class Consent extends React.PureComponent {
                 type="submit"
                 color="primary"
                 variant="contained"
-                className={classes.button}
+                className="oc-button-primary"
                 disabled={!!loading}
                 onClick={this.action(true, scopes)}
               >

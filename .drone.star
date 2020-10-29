@@ -15,12 +15,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '6806e327048fa107678536f9eded5166eb781ba3',
+    'coreCommit': '47365d22af95d90fcbd7705572f715a7b93d31b6',
     'numberOfParts': 6
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '2fabcb8bf376dbbdff9bb7e787dbee5c334b4a7b',
+    'phoenixCommit': 'f427a438e12a23e7a32f7864763787e756287461',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -67,7 +67,11 @@ config = {
         'webUISharingFolderAdvancedPermissionMultipleUsers',
       ],
     }
-  }
+  },
+  'rocketchat': {
+    'channel': 'ocis-internal',
+    'from_secret': 'private_rocketchat',
+  },
 }
 def getTestSuiteNames():
   keys = config['modules'].keys()
@@ -90,13 +94,11 @@ def getCoreApiTestPipelineNames():
   return names
 
 def getDependsOnAllTestPipelines(ctx):
-  dependencies = getTestSuiteNames() + [ 'upload-coverage' ]
-  if ctx.build.ref != "refs/heads/master":
-    dependencies = getTestSuiteNames() + [
-      'upload-coverage',
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
+  dependencies = getTestSuiteNames() + [
+    'upload-coverage',
+    'localApiTests-owncloud-storage',
+    'localApiTests-ocis-storage',
+  ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
 
@@ -121,12 +123,18 @@ def main(ctx):
     readme(ctx),
     badges(ctx),
     docs(ctx),
-    updateDeployment(ctx)
+    updateDeployment(ctx),
+    notify(ctx),
   ]
 
   if '[docs-only]' in (ctx.build.title + ctx.build.message):
-    pipelines = docs(ctx)
-    pipelines['depends_on'] = []
+    doc_pipelines = docs(ctx)
+    doc_pipelines['depends_on'] = []
+
+    notify_pipelines = notify(ctx)
+    notify_pipelines['depends_on'] = ['docs']
+
+    pipelines = [ doc_pipelines, notify_pipelines ]
   else:
     pipelines = before + stages + after
 
@@ -376,6 +384,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -432,6 +441,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -512,6 +522,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -604,6 +615,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -858,8 +870,7 @@ def binary(ctx, name):
         'image': 'toolhippie/calens:latest',
         'pull': 'always',
         'commands': [
-          'cd ocis',
-          'calens --version %s -o dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+          'calens --version %s -o ocis/dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
           'ref': [
@@ -1316,6 +1327,42 @@ def updateDeployment(ctx):
     'trigger': {
       'ref': [
         'refs/heads/master',
+      ],
+    }
+  }
+
+def notify(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'chat-notifications',
+    'clone': {
+      'disable': True
+    },
+    'steps': [
+      {
+        'name': 'notify-rocketchat',
+        'image': 'plugins/slack:1',
+        'pull': 'always',
+        'settings': {
+          'webhook': {
+            'from_secret': config['rocketchat']['from_secret']
+          },
+          'channel': config['rocketchat']['channel']
+        },
+        'when': {
+          'status': [
+            'failure',
+          ],
+        },
+      },
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/heads/release*',
+        'refs/tags/**',
       ],
     }
   }

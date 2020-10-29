@@ -81,6 +81,11 @@ strong {
   background-color: #306db5 !important;
 }
 
+.oc-checkbox-dark svg {
+  /* Needs to be important to overwrite material-ui */
+  fill: white !important;
+}
+
 .oc-footer-message {
   color: white;
   padding: 10px;
@@ -97,6 +102,10 @@ strong {
 /* Helpers */
 .oc-mt-l {
   margin-top: 30px !important;
+}
+
+.oc-mb-m {
+  margin-bottom: 20px !important;
 }
 
 .oc-light {
