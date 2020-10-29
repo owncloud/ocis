@@ -1539,3 +1539,39 @@ apiShareOperationsToShares/changingFilesShare.feature:40
 apiShareOperationsToShares/changingFilesShare.feature:41
 apiShareOperationsToShares/changingFilesShare.feature:59
 apiShareOperationsToShares/changingFilesShare.feature:60
+#
+# restoring an older version of a shared file deletes the share https://github.com/owncloud/ocis/issues/765
+#
+apiVersions/fileVersionsSharingToShares.feature:44
+#
+# https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
+#
+apiVersions/fileVersionsSharingToShares.feature:134
+apiVersions/fileVersionsSharingToShares.feature:149
+apiVersions/fileVersionsSharingToShares.feature:163
+apiVersions/fileVersionsSharingToShares.feature:250
+apiVersions/fileVersionsSharingToShares.feature:251
+#
+# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+#
+apiVersions/fileVersionsSharingToShares.feature:179
+#
+# not possible to move file into a received folder https://github.com/owncloud/ocis/issues/764
+#
+apiVersions/fileVersionsSharingToShares.feature:222
+apiVersions/fileVersionsSharingToShares.feature:223
+apiVersions/fileVersionsSharingToShares.feature:224
+apiVersions/fileVersionsSharingToShares.feature:225
+# getting the metadata without permission results in a 403 error https://github.com/owncloud/ocis/issues/773
+#
+apiVersions/fileVersionsSharingToShares.feature:256
+#
+# The version number of a file is incorrect because of the incorrect number of <d:getetag> and <d:getlastmodified> element https://github.com/owncloud/ocis-reva/issues/376
+#
+apiVersions/fileVersionsSharingToShares.feature:267
+#
+# [OC-Storage] moving a file out of folder removes the versions  https://github.com/owncloud/ocis/issues/777
+#
+apiVersions/fileVersionsSharingToShares.feature:252
+apiVersions/fileVersionsSharingToShares.feature:253
