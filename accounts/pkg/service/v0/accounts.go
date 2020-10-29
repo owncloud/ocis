@@ -395,7 +395,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
 	}
 	if exists {
-		return merrors.BadRequest(s.id, "account already exists")
+		return merrors.Conflict(s.id, "account already exists")
 	}
 
 	if out.PasswordProfile != nil {
@@ -425,7 +425,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	indexResults, err := s.index.Add(out)
 	if err != nil {
 		s.rollbackCreateAccount(ctx, out)
-		return merrors.BadRequest(s.id, "Account already exists %v", err.Error())
+		return merrors.Conflict(s.id, "Account already exists %v", err.Error())
 
 	}
 	s.log.Debug().Interface("account", out).Msg("account after indexing")

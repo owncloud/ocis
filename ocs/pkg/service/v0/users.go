@@ -184,9 +184,12 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		merr := merrors.FromError(err)
-		if merr.Code == http.StatusBadRequest {
+		switch merr.Code {
+		case http.StatusBadRequest:
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
-		} else {
+		case http.StatusConflict:
+			render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+		default:
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not add user")
