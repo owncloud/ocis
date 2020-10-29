@@ -414,9 +414,12 @@ func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) 
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
 func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for UpdateAccount")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
@@ -432,6 +435,17 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
+	if onlySelf {
+		// limit update to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			if id != aid {
+				return merrors.Forbidden(s.id, "no permission to UpdateAccount of another user")
+			}
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
+	}
+
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "account not found: %v", err.Error())
@@ -439,7 +453,6 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
 		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
-
 	}
 
 	t := time.Now()
@@ -448,9 +461,15 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		Nanos:   int32(t.Nanosecond()),
 	}
 
-	validMask, err := validateUpdate(in.UpdateMask, updatableAccountPaths)
-	if err != nil {
-		return merrors.BadRequest(s.id, "%s", err)
+	var validMask fieldmask_utils.FieldFilterContainer
+	if onlySelf {
+		if validMask, err = validateUpdate(in.UpdateMask, selfUpdatableAccountPaths); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
+		}
+	} else {
+		if validMask, err = validateUpdate(in.UpdateMask, updatableAccountPaths); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
+		}
 	}
 
 	if _, exists := validMask.Filter("PreferredName"); exists {
@@ -532,6 +551,14 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	}
 
 	return
+}
+
+// whitelist of all paths/fields which can be updated by users themself
+var selfUpdatableAccountPaths = map[string]struct{}{
+	"DisplayName":              {},
+	"Description":              {},
+	"Mail":                     {}, // read only?,
+	"PasswordProfile.Password": {},
 }
 
 // whitelist of all paths/fields which can be updated by clients
