@@ -189,7 +189,13 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		case http.StatusBadRequest:
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
 		case http.StatusConflict:
-			render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+			if response.APIVersion(r.Context()) == "2" {
+				// it seems the application framework sets the ocs status code to the httpstatus code, which affects the provisioning api
+				// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
+				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+			}
 		default:
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
