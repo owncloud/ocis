@@ -32,7 +32,7 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 // recreateContainers adds all indices to the indexer that we have for this service.
 func recreateContainers(idx *indexer.Indexer, cfg *config.Config) error {
 	// Accounts
-	if err := idx.AddIndex(&proto.Account{}, "Id", "Id", "accounts", "unique", nil, true); err != nil {
+	if err := idx.AddIndex(&proto.Account{}, "Id", "Id", "accounts", "non_unique", nil, true); err != nil {
 		return err
 	}
 
