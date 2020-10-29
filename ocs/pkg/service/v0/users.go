@@ -12,6 +12,7 @@ import (
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/micro/go-micro/v2/client/grpc"
@@ -320,6 +321,86 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
+	render.Render(w, r, response.DataRender(struct{}{}))
+}
+
+// EnableUser enables a user
+func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not enable user")
+		return
+	}
+
+	account.AccountEnabled = true
+
+	req := accounts.UpdateAccountRequest{
+		Account: account,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"AccountEnabled"},
+		},
+	}
+
+	_, err = o.getAccountService().UpdateAccount(r.Context(), &req)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not enable account")
+		return
+	}
+
+	o.logger.Debug().Str("account_id", account.Id).Msg("enabled user")
+	render.Render(w, r, response.DataRender(struct{}{}))
+}
+
+// DisableUser disables a user
+func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not disable user")
+		return
+	}
+
+	account.AccountEnabled = false
+
+	req := accounts.UpdateAccountRequest{
+		Account: account,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"AccountEnabled"},
+		},
+	}
+
+	_, err = o.getAccountService().UpdateAccount(r.Context(), &req)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not disable account")
+		return
+	}
+
+	o.logger.Debug().Str("account_id", account.Id).Msg("disabled user")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
