@@ -42,5 +42,12 @@ The program provides a few sub-commands on execution. The available configuratio
 The server command is used to start the http server. For further help please execute:
 
 {{< highlight txt >}}
-ocis-proxy server --help
+proxy server --help
 {{< / highlight >}}
+
+### Version
+The version command lists the versions of all running instances. For further help please execute:
+
+{{< highlight txt >}}
+proxy version --help
+{{< /highlight >}}
