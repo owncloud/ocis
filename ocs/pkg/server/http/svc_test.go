@@ -245,12 +245,12 @@ func assertEmptyResponse(t *testing.T, format string, res *httptest.ResponseReco
 	var response EmptyResponse
 	if format == "json" {
 		if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-			t.Log(string(res.Body.Bytes()))
+			t.Log(res.Body.String())
 			t.Fatal(err)
 		}
 	} else {
 		if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-			t.Log(string(res.Body.Bytes()))
+			t.Log(res.Body.String())
 			t.Fatal(err)
 		}
 	}
@@ -453,6 +453,9 @@ func init() {
 	tokenManager, err = jwt.New(map[string]interface{}{
 		"secret": jwtSecret,
 	})
+	if err != nil {
+		log.Fatalf("could not create token manager: %v", err)
+	}
 }
 
 func cleanUp(t *testing.T) {
