@@ -5,8 +5,8 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"net/http"
 
-	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocs/pkg/config"
 )
 
 // Option defines a single option function.
@@ -14,11 +14,11 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger     log.Logger
-	Config     *config.Config
-	Middleware []func(http.Handler) http.Handler
+	Logger       log.Logger
+	Config       *config.Config
+	Middleware   []func(http.Handler) http.Handler
 	TokenManager token.Manager
-	RevaClient gatewayv1beta1.GatewayAPIClient
+	RevaClient   gatewayv1beta1.GatewayAPIClient
 }
 
 // newOptions initializes the available default options.

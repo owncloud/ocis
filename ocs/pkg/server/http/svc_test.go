@@ -9,8 +9,8 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ggrpc "google.golang.org/grpc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	ggrpc "google.golang.org/grpc"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -472,22 +472,23 @@ func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorde
 
 	return rr, nil
 }
+
 type mockRevaClient struct {
 	gatewayv1beta1.GatewayAPIClient
 }
 
-func(c mockRevaClient) GetHome(ctx context.Context, req *providerv1beta1.GetHomeRequest, options ...ggrpc.CallOption) (*providerv1beta1.GetHomeResponse, error){
+func (c mockRevaClient) GetHome(ctx context.Context, req *providerv1beta1.GetHomeRequest, options ...ggrpc.CallOption) (*providerv1beta1.GetHomeResponse, error) {
 	return &providerv1beta1.GetHomeResponse{
 		Path: "/home",
 	}, nil
 }
 
-func(c mockRevaClient) Stat(ctx context.Context, req *providerv1beta1.StatRequest, options ...ggrpc.CallOption) (*providerv1beta1.StatResponse, error){
+func (c mockRevaClient) Stat(ctx context.Context, req *providerv1beta1.StatRequest, options ...ggrpc.CallOption) (*providerv1beta1.StatResponse, error) {
 	return &providerv1beta1.StatResponse{
 		Info: &providerv1beta1.ResourceInfo{Id: &providerv1beta1.ResourceId{
 			OpaqueId:  "",
 			StorageId: "",
-			},
+		},
 		},
 		Status: &rpcv1beta1.Status{
 			Code: rpcv1beta1.Code_CODE_OK,
@@ -495,8 +496,12 @@ func(c mockRevaClient) Stat(ctx context.Context, req *providerv1beta1.StatReques
 	}, nil
 }
 
-func (c mockRevaClient) Delete(ctx context.Context, req * providerv1beta1.DeleteRequest, options ...ggrpc.CallOption) (*providerv1beta1.DeleteResponse, error) {
-	return nil, nil
+func (c mockRevaClient) Delete(ctx context.Context, req *providerv1beta1.DeleteRequest, options ...ggrpc.CallOption) (*providerv1beta1.DeleteResponse, error) {
+	return &providerv1beta1.DeleteResponse{
+		Status: &rpcv1beta1.Status{
+			Code: rpcv1beta1.Code_CODE_OK,
+		},
+	}, nil
 }
 
 func getService() svc.Service {
@@ -519,9 +524,6 @@ func getService() svc.Service {
 		"secret":  c.TokenManager.JWTSecret,
 		"expires": int64(60),
 	})
-
-
-
 
 	return svc.NewService(
 		svc.Logger(logger),

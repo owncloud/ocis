@@ -279,49 +279,58 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	t, err := o.mintTokenForUser(r.Context(), account)
 	if err != nil {
-		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
 		return
 	}
 
 	ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
 
-	homeResp, err := o.revaClient.GetHome(ctx, &provider.GetHomeRequest{} )
+	homeResp, err := o.revaClient.GetHome(ctx, &provider.GetHomeRequest{})
 	if err != nil {
-		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
 		return
 	}
 
 	statResp, err := o.revaClient.Stat(ctx, &provider.StatRequest{
-		Ref: &provider.Reference {
+		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{
 				Path: homeResp.Path,
 			},
 		},
 	})
 	if err != nil {
-		render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
 		return
 	}
 
-	if statResp.Status.Code == rpcv1beta1.Code_CODE_OK {
-		delReq := &provider.DeleteRequest{
-			Ref: &provider.Reference {
-				Spec: &provider.Reference_Id{
-					Id: statResp.Info.Id,
-				},
-			},
-		}
-
-		_, err = o.revaClient.Delete(ctx, delReq)
-		if err != nil {
-			render.Render(w,r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
-			return
-		}
-	} else {
-		o.logger.Debug().
+	if statResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Error().
 			Str("stat_status_code", statResp.Status.Code.String()).
 			Str("stat_message", statResp.Status.Message).
 			Msg("DeleteUser: could not delete user home: stat failed")
+		return
+	}
+
+	delReq := &provider.DeleteRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Id{
+				Id: statResp.Info.Id,
+			},
+		},
+	}
+
+	delResp, err := o.revaClient.Delete(ctx, delReq)
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
+		return
+	}
+
+	if delResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Error().
+			Str("stat_status_code", statResp.Status.Code.String()).
+			Str("stat_message", statResp.Status.Message).
+			Msg("DeleteUser: could not delete user home: delete failed")
+		return
 	}
 
 	req := accounts.DeleteAccountRequest{
@@ -441,6 +450,7 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, response.DataRender(&data.Users{Users: users}))
 }
 
+// TODO move this to ocis-pkg ... we are minting tokens all over the place ... or use a service? ... like reva?
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	u := &revauser.User{
 		Id: &revauser.UserId{
