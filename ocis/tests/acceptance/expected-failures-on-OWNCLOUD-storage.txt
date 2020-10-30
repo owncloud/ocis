@@ -625,26 +625,38 @@ apiSharePublicLink2/updatePublicLinkShare.feature:94
 apiSharePublicLink2/updatePublicLinkShare.feature:284
 apiSharePublicLink2/updatePublicLinkShare.feature:285
 #
-# https://github.com/owncloud/ocis/issues/776 investigate ocis issues in apiSharePublicLink2/reShareAsPublicLinkToShares
+# https://github.com/owncloud/ocis/issues/270 [OCIS] share permissions not enforced
 #
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:25
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:26
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:47
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:48
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:63
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:64
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:78
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:79
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:100
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:101
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:123
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:124
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:140
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:141
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:161
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:162
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:184
-apiSharePublicLink2/reShareAsPublicLinkToShares.feature:185
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:25
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:26
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:62
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:63
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:77
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:78
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:136
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:137
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:157
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:158
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:179
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:180
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+#
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:97
+apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:98
+#
+# https://github.com/owncloud/product/issues/272 [OCIS] old public webdav api doesnt works
+#
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:30
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:31
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:50
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:51
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:71
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:72
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:92
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:93
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:114
+apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:115
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 #
