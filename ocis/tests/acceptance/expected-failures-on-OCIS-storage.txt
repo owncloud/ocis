@@ -202,18 +202,12 @@ apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
 # https://github.com/owncloud/ocis-ocs/issues/28
 # disable users /cloud/users/disable|enable not available
 #
-apiProvisioning-v1/disableUser.feature:11
-apiProvisioning-v1/disableUser.feature:79
 apiProvisioning-v1/disableUser.feature:99
-apiProvisioning-v1/disableUser.feature:107
 apiProvisioning-v1/disableUser.feature:129
-apiProvisioning-v1/enableUser.feature:11
-apiProvisioning-v2/disableUser.feature:11
 apiProvisioning-v2/disableUser.feature:79
 apiProvisioning-v2/disableUser.feature:99
 apiProvisioning-v2/disableUser.feature:108
 apiProvisioning-v2/disableUser.feature:130
-apiProvisioning-v2/enableUser.feature:11
 #
 # https://github.com/owncloud/ocis-ocs/issues/51
 # displayname of user can be changed to empty
@@ -226,9 +220,6 @@ apiProvisioning-v2/editUser.feature:47
 #
 apiProvisioning-v1/editUser.feature:56
 apiProvisioning-v1/editUser.feature:122
-apiProvisioning-v1/enableUser.feature:34
-apiProvisioning-v1/enableUser.feature:56
-apiProvisioning-v1/enableUser.feature:63
 apiProvisioning-v2/editUser.feature:56
 apiProvisioning-v2/editUser.feature:122
 apiProvisioning-v2/enableUser.feature:34
@@ -238,14 +229,10 @@ apiProvisioning-v2/enableUser.feature:64
 # https://github.com/owncloud/product/issues/248
 # user can get info of other users/ cloud/users endpoints not authenticated
 #
-apiProvisioning-v1/deleteUser.feature:53
 apiProvisioning-v2/deleteUser.feature:54
 apiProvisioning-v1/getUser.feature:81
-apiProvisioning-v1/getUsers.feature:43
-apiProvisioning-v1/resetUserPassword.feature:56
 apiProvisioning-v2/getUser.feature:82
 apiProvisioning-v2/getUsers.feature:44
-apiProvisioning-v2/resetUserPassword.feature:56
 #
 # https://github.com/owncloud/product/issues/250
 # incorrect ocs(v2) status value when getting info of user that does not exist should be 404, gives 998
@@ -451,11 +438,6 @@ apiShareOperationsToShares/accessToShare.feature:56
 apiShareOperationsToShares/gettingShares.feature:24
 apiShareOperationsToShares/gettingShares.feature:25
 #
-# https://github.com/owncloud/ocis-reva/issues/65 There is no such thing like a "super-user"
-#
-apiShareOperationsToShares/gettingShares.feature:38
-apiShareOperationsToShares/gettingShares.feature:39
-#
 # https://github.com/owncloud/ocis-reva/issues/357 Delete shares from user when user is deleted
 # https://github.com/owncloud/ocis-reva/issues/301 no displayname_owner shown when creating a share
 # https://github.com/owncloud/ocis-reva/issues/302 when sharing a file mime-type field is set to application/octet-stream
@@ -549,11 +531,8 @@ apiSharePublicLink1/changingPublicLinkShare.feature:96
 #
 apiSharePublicLink1/changingPublicLinkShare.feature:63
 apiSharePublicLink1/changingPublicLinkShare.feature:107
-apiSharePublicLink1/changingPublicLinkShare.feature:128
 apiSharePublicLink1/changingPublicLinkShare.feature:151
-apiSharePublicLink1/changingPublicLinkShare.feature:174
 apiSharePublicLink1/changingPublicLinkShare.feature:197
-apiSharePublicLink1/changingPublicLinkShare.feature:221
 apiSharePublicLink1/changingPublicLinkShare.feature:244
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
@@ -1211,8 +1190,6 @@ apiWebdavOperations/downloadFile.feature:84
 apiWebdavOperations/downloadFile.feature:85
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
-apiWebdavOperations/refuseAccess.feature:33
-apiWebdavOperations/refuseAccess.feature:34
 #
 # https://github.com/owncloud/core/pull/38035 PROPFIND to https://localhost:9200/remote.php/dav/files gets an error 500 response
 #
