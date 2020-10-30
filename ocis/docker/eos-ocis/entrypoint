@@ -19,23 +19,4 @@ mkdir -p /var/tmp/reva
 
 echo "----- [ocis] Starting oCIS -----"
 # todo start ocis as daemon not as root
-ocis reva-storage-home &
-ocis reva-storage-home-data &
-ocis reva-storage-eos & 
-ocis reva-storage-eos-data &
-ocis reva-storage-public-link &
-ocis micro &
-ocis glauth &
-ocis graph-explorer &
-ocis graph &
-ocis konnectd &
-ocis phoenix &
-ocis thumbnails &
-ocis webdav &
-ocis reva-auth-basic &
-ocis reva-auth-bearer &
-ocis reva-frontend &
-ocis reva-gateway &
-ocis reva-sharing &
-ocis reva-users &
-exec ocis proxy
+exec ocis server
