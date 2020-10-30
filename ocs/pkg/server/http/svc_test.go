@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -12,24 +11,27 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/golang/protobuf/ptypes/empty"
-	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocs/pkg/config"
-	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-
+	"github.com/micro/go-micro/v2/client"
 	accountsCmd "github.com/owncloud/ocis/accounts/pkg/command"
 	accountsCfg "github.com/owncloud/ocis/accounts/pkg/config"
 	accountsProto "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	accountsSvc "github.com/owncloud/ocis/accounts/pkg/service/v0"
-
-	"github.com/micro/go-micro/v2/client"
+	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocs/pkg/config"
+	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -67,7 +69,10 @@ const (
 	groupSysUsers         = "34f38767-c937-4eb6-b847-1c175829a2a0"
 )
 
+const jwtSecret = "HELLO-secret"
+
 var service = grpc.Service{}
+var tokenManager token.Manager
 
 var mockedRoleAssignment = map[string]string{}
 
@@ -236,6 +241,22 @@ type EmptyResponse struct {
 	} `json:"ocs" xml:"ocs"`
 }
 
+func assertEmptyResponse(t *testing.T, format string, res *httptest.ResponseRecorder) *EmptyResponse {
+	var response EmptyResponse
+	if format == "json" {
+		if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
+			t.Log(string(res.Body.Bytes()))
+			t.Fatal(err)
+		}
+	} else {
+		if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
+			t.Log(string(res.Body.Bytes()))
+			t.Fatal(err)
+		}
+	}
+	return &response
+}
+
 type GetUsersGroupsResponse struct {
 	Ocs struct {
 		Meta Meta `json:"meta" xml:"meta"`
@@ -355,6 +376,28 @@ func buildRoleServiceMock() settings.RoleService {
 				},
 			}, nil
 		},
+		ListRolesFunc: func(ctx context.Context, req *settings.ListBundlesRequest, opts ...client.CallOption) (*settings.ListBundlesResponse, error) {
+			return &settings.ListBundlesResponse{
+				Bundles: []*settings.Bundle{
+					{
+						Id: ssvc.BundleUUIDRoleAdmin,
+						Settings: []*settings.Setting{
+							{
+								Id: accountsSvc.AccountManagementPermissionID,
+							},
+						},
+					},
+					{
+						Id: ssvc.BundleUUIDRoleUser,
+						Settings: []*settings.Setting{
+							{
+								Id: accountsSvc.SelfManagementPermissionID,
+							},
+						},
+					},
+				},
+			}, nil
+		},
 	}
 }
 
@@ -387,7 +430,8 @@ func init() {
 	if hdlr, err = accountsSvc.New(
 		accountsSvc.Logger(accountsCmd.NewLogger(c)),
 		accountsSvc.Config(c),
-		accountsSvc.RoleService(buildRoleServiceMock())); err != nil {
+		accountsSvc.RoleService(buildRoleServiceMock()),
+	); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 
@@ -404,6 +448,11 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)
 	}
+
+	// a token manager to mint tokens
+	tokenManager, err = jwt.New(map[string]interface{}{
+		"secret": jwtSecret,
+	})
 }
 
 func cleanUp(t *testing.T) {
@@ -450,7 +499,37 @@ func cleanUp(t *testing.T) {
 	}
 }
 
-func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorder, error) {
+func mintToken(ctx context.Context, su *User, roleIds []string) (token string, err error) {
+	roleIDsJSON, err := json.Marshal(roleIds)
+	if err != nil {
+		return "", err
+	}
+	u := &user.User{
+		Id: &user.UserId{
+			OpaqueId: su.ID,
+		},
+		Groups: []string{},
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.Itoa(su.UIDNumber)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.Itoa(su.GIDNumber)),
+				},
+				"roles": {
+					Decoder: "json",
+					Value:   roleIDsJSON,
+				},
+			},
+		},
+	}
+	return tokenManager.MintToken(ctx, u)
+}
+
+func sendRequest(method, endpoint, body string, u *User, roleIds []string) (*httptest.ResponseRecorder, error) {
 	var reader = strings.NewReader(body)
 	req, err := http.NewRequest(method, endpoint, reader)
 	if err != nil {
@@ -458,9 +537,12 @@ func sendRequest(method, endpoint, body, auth string) (*httptest.ResponseRecorde
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	if auth != "" {
-		// TODO this needs to use the x-access-token ...
-		req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(auth)))
+	if u != nil {
+		token, err := mintToken(context.Background(), u, roleIds)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("x-access-token", token)
 	}
 
 	rr := httptest.NewRecorder()
@@ -478,7 +560,7 @@ func getService() svc.Service {
 			Addr: "localhost:9110",
 		},
 		TokenManager: config.TokenManager{
-			JWTSecret: "HELLO-secret",
+			JWTSecret: jwtSecret,
 		},
 		Log: config.Log{
 			Level: "debug",
@@ -490,6 +572,7 @@ func getService() svc.Service {
 	return svc.NewService(
 		svc.Logger(logger),
 		svc.Config(c),
+		svc.RoleService(buildRoleServiceMock()),
 	)
 }
 
@@ -498,7 +581,8 @@ func createUser(u User) error {
 		"POST",
 		userProvisioningEndPoint,
 		u.getUserRequestString(),
-		adminBasicAuth,
+		&User{ID: userIDAdmin},
+		[]string{accountsSvc.AccountManagementPermissionID},
 	)
 
 	if err != nil {
@@ -512,7 +596,8 @@ func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
 		"POST",
 		groupProvisioningEndPoint,
 		g.getGroupRequestString(),
-		adminBasicAuth,
+		&User{ID: userIDAdmin},
+		[]string{accountsSvc.AccountManagementPermissionID},
 	)
 
 	if err != nil {
@@ -650,7 +735,8 @@ func TestCreateUser(t *testing.T) {
 						"POST",
 						fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 						scenario.user.getUserRequestString(),
-						adminBasicAuth,
+						&User{ID: userIDAdmin},
+						[]string{accountsSvc.AccountManagementPermissionID},
 					)
 					assert.NoError(t, err)
 
@@ -683,7 +769,8 @@ func TestCreateUser(t *testing.T) {
 						"GET",
 						userProvisioningEndPoint,
 						"",
-						adminBasicAuth,
+						&User{ID: userIDAdmin},
+						[]string{accountsSvc.AccountManagementPermissionID},
 					)
 					assert.NoError(t, err)
 
@@ -735,7 +822,8 @@ func TestGetUsers(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
@@ -772,7 +860,8 @@ func TestGetUsersDefaultUsers(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
@@ -832,7 +921,8 @@ func TestGetUser(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user.ID, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -875,7 +965,8 @@ func TestGetUserInvalidId(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/user/%s%s", ocsVersion, user, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -935,23 +1026,15 @@ func TestDeleteUser(t *testing.T) {
 				"DELETE",
 				fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			var response EmptyResponse
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
+			response := assertEmptyResponse(t, format, res)
 
 			assertStatusCode(t, 200, res, ocsVersion)
 			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
@@ -962,7 +1045,8 @@ func TestDeleteUser(t *testing.T) {
 				"GET",
 				userProvisioningEndPoint,
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
@@ -1001,18 +1085,12 @@ func TestDeleteUserInvalidId(t *testing.T) {
 						"DELETE",
 						fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user, formatpart),
 						"",
-						adminBasicAuth,
+						&User{ID: userIDAdmin},
+						[]string{accountsSvc.AccountManagementPermissionID},
 					)
 					assert.NoError(t, err)
 
-					var response EmptyResponse
-					if format == "json" {
-						err = json.Unmarshal(res.Body.Bytes(), &response)
-						assert.NoError(t, err)
-					} else {
-						err = xml.Unmarshal(res.Body.Bytes(), &response.Ocs)
-						assert.NoError(t, err)
-					}
+					response := assertEmptyResponse(t, format, res)
 
 					assertStatusCode(t, 404, res, ocsVersion)
 					assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was not expected to be successful but was")
@@ -1138,7 +1216,8 @@ func TestUpdateUser(t *testing.T) {
 					"PUT",
 					fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
 					params.Encode(),
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				updatedUser := user
@@ -1184,7 +1263,8 @@ func TestUpdateUser(t *testing.T) {
 					"GET",
 					"/v1.php/cloud/users/rutherford?format=json",
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -1231,25 +1311,15 @@ func TestGetSingleUser(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
 				"",
-				fmt.Sprintf("%v:%v", user.ID, user.Password),
+				&User{ID: user.ID},
+				[]string{accountsSvc.SelfManagementPermissionID},
 			)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			var response EmptyResponse
-
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-					log.Println(err)
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
+			response := assertEmptyResponse(t, format, res)
 
 			assertStatusCode(t, 400, res, ocsVersion)
 			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
@@ -1288,25 +1358,15 @@ func TestGetUserSigningKey(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%v/cloud/user/signing-key%v", ocsVersion, formatpart),
 				"",
-				fmt.Sprintf("%v:%v", user.ID, user.Password),
+				&User{ID: user.ID},
+				[]string{accountsSvc.SelfManagementPermissionID},
 			)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			var response EmptyResponse
-
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-					log.Println(err)
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
+			response := assertEmptyResponse(t, format, res)
 
 			assertStatusCode(t, 400, res, ocsVersion)
 			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
@@ -1326,7 +1386,8 @@ func AddUserToGroup(userid, groupid string) error {
 		"POST",
 		fmt.Sprintf("/v2.php/cloud/users/%s/groups", userid),
 		fmt.Sprintf("groupid=%v", groupid),
-		adminBasicAuth,
+		&User{ID: userIDAdmin},
+		[]string{accountsSvc.AccountManagementPermissionID},
 	)
 	if err != nil {
 		return err
@@ -1366,7 +1427,8 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -1436,7 +1498,8 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -1481,23 +1544,15 @@ func TestGetGroupForUserInvalidUserId(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				assertStatusCode(t, 404, res, ocsVersion)
 				assert.False(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
@@ -1545,23 +1600,15 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 					"POST",
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 					"groupid="+groupid,
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
@@ -1572,7 +1619,8 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1618,23 +1666,15 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 					"POST",
 					fmt.Sprintf("/%s/cloud/users/rutherford/groups%s", ocsVersion, formatpart),
 					"groupid="+groupid,
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				assertStatusCode(t, 404, res, ocsVersion)
 				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be fail but was successful")
@@ -1686,23 +1726,15 @@ func TestRemoveUserFromGroup(t *testing.T) {
 				"DELETE",
 				fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 				"groupid="+groups[0],
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			var response EmptyResponse
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
+			response := assertEmptyResponse(t, format, res)
 
 			assertStatusCode(t, 500, res, ocsVersion)
 			assertResponseMeta(t, Meta{
@@ -1717,7 +1749,8 @@ func TestRemoveUserFromGroup(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -1746,23 +1779,15 @@ func TestCapabilities(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/cloud/capabilities%s", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			var response EmptyResponse
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
+			response := assertEmptyResponse(t, format, res)
 
 			assertStatusCode(t, 404, res, ocsVersion)
 			assertResponseMeta(t, Meta{
@@ -1783,7 +1808,8 @@ func TestGetConfig(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/config%s", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
@@ -1818,7 +1844,8 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
 				"GET",
 				fmt.Sprintf("/%s/cloud/groups%s", ocsVersion, formatpart),
 				"",
-				adminBasicAuth,
+				&User{ID: userIDAdmin},
+				[]string{accountsSvc.AccountManagementPermissionID},
 			)
 
 			if err != nil {
@@ -1870,24 +1897,15 @@ func TestCreateGroup(t *testing.T) {
 					"POST",
 					fmt.Sprintf("/%v/cloud/groups%v", ocsVersion, formatpart),
 					data.group.getGroupRequestString(),
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				if data.err == nil {
 					assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
@@ -1900,7 +1918,8 @@ func TestCreateGroup(t *testing.T) {
 					"GET",
 					"/v2.php/cloud/groups?format=json",
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1941,22 +1960,14 @@ func TestDeleteGroup(t *testing.T) {
 					"DELETE",
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data.ID, formatpart),
 					"groupid="+data.ID,
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 
 				// Check the group does not exists
@@ -1964,7 +1975,8 @@ func TestDeleteGroup(t *testing.T) {
 					"GET",
 					"/v2.php/cloud/groups?format=json",
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1997,24 +2009,15 @@ func TestDeleteGroupInvalidGroups(t *testing.T) {
 					"DELETE",
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data, formatpart),
 					"groupid="+data,
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				assertStatusCode(t, 404, res, ocsVersion)
 				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to fail but was successful")
@@ -2069,7 +2072,8 @@ func TestGetGroupMembersDefaultGroups(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
@@ -2114,24 +2118,15 @@ func TestListMembersInvalidGroups(t *testing.T) {
 					"GET",
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
 					"",
-					adminBasicAuth,
+					&User{ID: userIDAdmin},
+					[]string{accountsSvc.AccountManagementPermissionID},
 				)
 
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				var response EmptyResponse
-
-				if format == "json" {
-					if err := json.Unmarshal(res.Body.Bytes(), &response); err != nil {
-						t.Fatal(err)
-					}
-				} else {
-					if err := xml.Unmarshal(res.Body.Bytes(), &response.Ocs); err != nil {
-						t.Fatal(err)
-					}
-				}
+				response := assertEmptyResponse(t, format, res)
 
 				assertStatusCode(t, 404, res, ocsVersion)
 				assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to fail but was successful")
