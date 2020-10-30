@@ -383,7 +383,7 @@ func buildRoleServiceMock() settings.RoleService {
 						Id: ssvc.BundleUUIDRoleAdmin,
 						Settings: []*settings.Setting{
 							{
-								Id: accountsSvc.AccountManagementPermissionID,
+								Id: ssvc.BundleUUIDRoleAdmin,
 							},
 						},
 					},
@@ -391,7 +391,7 @@ func buildRoleServiceMock() settings.RoleService {
 						Id: ssvc.BundleUUIDRoleUser,
 						Settings: []*settings.Setting{
 							{
-								Id: accountsSvc.SelfManagementPermissionID,
+								Id: ssvc.BundleUUIDRoleUser,
 							},
 						},
 					},
@@ -585,7 +585,7 @@ func createUser(u User) error {
 		userProvisioningEndPoint,
 		u.getUserRequestString(),
 		&User{ID: userIDAdmin},
-		[]string{accountsSvc.AccountManagementPermissionID},
+		[]string{ssvc.BundleUUIDRoleAdmin},
 	)
 
 	if err != nil {
@@ -600,7 +600,7 @@ func createGroup(g Group) error { //lint:file-ignore U1000 not implemented
 		groupProvisioningEndPoint,
 		g.getGroupRequestString(),
 		&User{ID: userIDAdmin},
-		[]string{accountsSvc.AccountManagementPermissionID},
+		[]string{ssvc.BundleUUIDRoleAdmin},
 	)
 
 	if err != nil {
@@ -739,7 +739,7 @@ func TestCreateUser(t *testing.T) {
 						fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 						scenario.user.getUserRequestString(),
 						&User{ID: userIDAdmin},
-						[]string{accountsSvc.AccountManagementPermissionID},
+						[]string{ssvc.BundleUUIDRoleAdmin},
 					)
 					assert.NoError(t, err)
 
@@ -773,7 +773,7 @@ func TestCreateUser(t *testing.T) {
 						userProvisioningEndPoint,
 						"",
 						&User{ID: userIDAdmin},
-						[]string{accountsSvc.AccountManagementPermissionID},
+						[]string{ssvc.BundleUUIDRoleAdmin},
 					)
 					assert.NoError(t, err)
 
@@ -826,7 +826,7 @@ func TestGetUsers(t *testing.T) {
 				fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -864,7 +864,7 @@ func TestGetUsersDefaultUsers(t *testing.T) {
 				fmt.Sprintf("/%v/cloud/users%v", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -925,7 +925,7 @@ func TestGetUser(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user.ID, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -969,7 +969,7 @@ func TestGetUserInvalidId(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/user/%s%s", ocsVersion, user, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1030,7 +1030,7 @@ func TestDeleteUser(t *testing.T) {
 				fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1049,7 +1049,7 @@ func TestDeleteUser(t *testing.T) {
 				userProvisioningEndPoint,
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1089,7 +1089,7 @@ func TestDeleteUserInvalidId(t *testing.T) {
 						fmt.Sprintf("/%s/cloud/users/%s%s", ocsVersion, user, formatpart),
 						"",
 						&User{ID: userIDAdmin},
-						[]string{accountsSvc.AccountManagementPermissionID},
+						[]string{ssvc.BundleUUIDRoleAdmin},
 					)
 					assert.NoError(t, err)
 
@@ -1220,7 +1220,7 @@ func TestUpdateUser(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/rutherford%s", ocsVersion, formatpart),
 					params.Encode(),
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				updatedUser := user
@@ -1267,7 +1267,7 @@ func TestUpdateUser(t *testing.T) {
 					"/v1.php/cloud/users/rutherford?format=json",
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1315,7 +1315,7 @@ func TestGetSingleUser(t *testing.T) {
 				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
 				"",
 				&User{ID: user.ID},
-				[]string{accountsSvc.SelfManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleUser},
 			)
 
 			if err != nil {
@@ -1362,7 +1362,7 @@ func TestGetUserSigningKey(t *testing.T) {
 				fmt.Sprintf("/%v/cloud/user/signing-key%v", ocsVersion, formatpart),
 				"",
 				&User{ID: user.ID},
-				[]string{accountsSvc.SelfManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleUser},
 			)
 
 			if err != nil {
@@ -1390,7 +1390,7 @@ func AddUserToGroup(userid, groupid string) error {
 		fmt.Sprintf("/v2.php/cloud/users/%s/groups", userid),
 		fmt.Sprintf("groupid=%v", groupid),
 		&User{ID: userIDAdmin},
-		[]string{accountsSvc.AccountManagementPermissionID},
+		[]string{ssvc.BundleUUIDRoleAdmin},
 	)
 	if err != nil {
 		return err
@@ -1431,7 +1431,7 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1502,7 +1502,7 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1548,7 +1548,7 @@ func TestGetGroupForUserInvalidUserId(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1604,7 +1604,7 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 					"groupid="+groupid,
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1623,7 +1623,7 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1670,7 +1670,7 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 					fmt.Sprintf("/%s/cloud/users/rutherford/groups%s", ocsVersion, formatpart),
 					"groupid="+groupid,
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1730,7 +1730,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 				fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
 				"groupid="+groups[0],
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1753,7 +1753,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 				fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 			if err != nil {
 				t.Fatal(err)
@@ -1783,7 +1783,7 @@ func TestCapabilities(t *testing.T) {
 				fmt.Sprintf("/%s/cloud/capabilities%s", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1812,7 +1812,7 @@ func TestGetConfig(t *testing.T) {
 				fmt.Sprintf("/%s/config%s", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1848,7 +1848,7 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
 				fmt.Sprintf("/%s/cloud/groups%s", ocsVersion, formatpart),
 				"",
 				&User{ID: userIDAdmin},
-				[]string{accountsSvc.AccountManagementPermissionID},
+				[]string{ssvc.BundleUUIDRoleAdmin},
 			)
 
 			if err != nil {
@@ -1901,7 +1901,7 @@ func TestCreateGroup(t *testing.T) {
 					fmt.Sprintf("/%v/cloud/groups%v", ocsVersion, formatpart),
 					data.group.getGroupRequestString(),
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -1922,7 +1922,7 @@ func TestCreateGroup(t *testing.T) {
 					"/v2.php/cloud/groups?format=json",
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1964,7 +1964,7 @@ func TestDeleteGroup(t *testing.T) {
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data.ID, formatpart),
 					"groupid="+data.ID,
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -1979,7 +1979,7 @@ func TestDeleteGroup(t *testing.T) {
 					"/v2.php/cloud/groups?format=json",
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 				if err != nil {
 					t.Fatal(err)
@@ -2013,7 +2013,7 @@ func TestDeleteGroupInvalidGroups(t *testing.T) {
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data, formatpart),
 					"groupid="+data,
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -2076,7 +2076,7 @@ func TestGetGroupMembersDefaultGroups(t *testing.T) {
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {
@@ -2122,7 +2122,7 @@ func TestListMembersInvalidGroups(t *testing.T) {
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, group, formatpart),
 					"",
 					&User{ID: userIDAdmin},
-					[]string{accountsSvc.AccountManagementPermissionID},
+					[]string{ssvc.BundleUUIDRoleAdmin},
 				)
 
 				if err != nil {

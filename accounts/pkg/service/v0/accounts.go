@@ -76,12 +76,7 @@ func (s Service) hasSelfManagementPermissions(ctx context.Context) bool {
 	// get roles from context
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
-		/**
-		 * FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
-		 * metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
-		 * for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
-		 */
-		return true
+		return false
 	}
 
 	// check if permission is present in roles of the authenticated account
