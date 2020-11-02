@@ -65,7 +65,16 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	// get roles from context
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
-		return false
+		/**
+		* FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
+		* metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
+		* for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
+		 */
+		// TODO add system role for internal requests.
+		// - at least the proxy needs to look up account info
+		// - glauth needs to make bind requests
+		// tracked as OCIS-454
+		return true
 	}
 
 	// check if permission is present in roles of the authenticated account
