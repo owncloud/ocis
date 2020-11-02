@@ -34,6 +34,7 @@
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
 * Change - Update phoenix to v0.22.0: [#757](https://github.com/owncloud/ocis/pull/757)
+* Change - Update phoenix to v0.23.0: [#785](https://github.com/owncloud/ocis/pull/785)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -54,6 +55,7 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
@@ -385,6 +387,16 @@
 
    https://github.com/owncloud/ocis/pull/757
    https://github.com/owncloud/phoenix/releases/tag/v0.22.0
+
+* Change - Update phoenix to v0.23.0: [#785](https://github.com/owncloud/ocis/pull/785)
+
+   Tags: web
+
+   We updated phoenix to v0.23.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/785
+   https://github.com/owncloud/phoenix/releases/tag/v0.23.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
@@ -1407,6 +1419,12 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
+
+   Includes a bugfix, don't mix graph and provisioning api.
+
+   https://github.com/owncloud/ocis/pull/786
 
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
 

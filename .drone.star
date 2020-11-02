@@ -15,12 +15,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '47365d22af95d90fcbd7705572f715a7b93d31b6',
+    'coreCommit': '8fee3047cadfaae5a4cee330a102af8d1ada8160',
     'numberOfParts': 6
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'f427a438e12a23e7a32f7864763787e756287461',
+    'phoenixCommit': '492e6a663efad67f770ba4ac405c4d9983d00cd3',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -352,7 +352,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'localApiTests-%s-storage' % (storage),
-        'image': 'owncloudci/php:7.2',
+        'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
@@ -407,7 +407,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
-        'image': 'owncloudci/php:7.2',
+        'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
@@ -1430,7 +1430,7 @@ def cloneCoreRepos(coreBranch, coreCommit):
   return [
     {
       'name': 'clone-core-repos',
-      'image': 'owncloudci/php:7.2',
+      'image': 'owncloudci/php:7.4',
       'pull': 'always',
       'commands': [
         'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
