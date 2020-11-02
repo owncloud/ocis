@@ -197,83 +197,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 }
 
 func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
-	var searchResults []string
-	var err error
-
-	// TODO: more explicit queries have to be on top
-	var onPremOrMailQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)' or mail eq '(.*)'$`)
-	match := onPremOrMailQuery.FindStringSubmatch(query)
-	if len(match) == 3 {
-		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
-		if err != nil {
-			return nil, err
-		}
-		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[2]+"*")
-		if err != nil {
-			return nil, err
-		}
-
-		searchResults = append(resSam, resMail...)
-		return unique(searchResults), nil
-	}
-
-	// startswith(on_premises_sam_account_name,'mar') or startswith(display_name,'mar') or startswith(mail,'mar')
-	var searchQuery = regexp.MustCompile(`^startswith\(on_premises_sam_account_name,'(.*)'\) or startswith\(display_name,'(.*)'\) or startswith\(mail,'(.*)'\)$`)
-	match = searchQuery.FindStringSubmatch(query)
-	if len(match) == 4 {
-		resSam, err := s.index.FindByPartial(&proto.Account{}, "OnPremisesSamAccountName", match[1]+"*")
-		if err != nil {
-			return nil, err
-		}
-		resDisp, err := s.index.FindByPartial(&proto.Account{}, "DisplayName", match[2]+"*")
-		if err != nil {
-			return nil, err
-		}
-		resMail, err := s.index.FindByPartial(&proto.Account{}, "Mail", match[3]+"*")
-		if err != nil {
-			return nil, err
-		}
-
-		searchResults = append(resSam, append(resDisp, resMail...)...)
-		return unique(searchResults), nil
-	}
-
-	// id eq 'marie' or on_premises_sam_account_name eq 'marie'
-	// id eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c' or on_premises_sam_account_name eq 'f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c'
-	var idOrQuery = regexp.MustCompile(`^id eq '(.*)' or on_premises_sam_account_name eq '(.*)'$`)
-	match = idOrQuery.FindStringSubmatch(query)
-	if len(match) == 3 {
-		qID, qSam := match[1], match[2]
-		tmp := &proto.Account{}
-		err = s.repo.LoadAccount(ctx, qID, tmp)
-		if err != nil && !storage.IsNotFoundErr(err) {
-			return nil, err
-		}
-		searchResults, err = s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", qSam)
-		if err != nil {
-			return nil, err
-		}
-
-		if tmp.Id != "" {
-			searchResults = append(searchResults, tmp.Id)
-		}
-
-		return unique(searchResults), nil
-	}
-
-	var onPremQuery = regexp.MustCompile(`^on_premises_sam_account_name eq '(.*)'$`) // TODO how is ' escaped in the password?
-	match = onPremQuery.FindStringSubmatch(query)
-	if len(match) == 2 {
-		return s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
-	}
-
-	var mailQuery = regexp.MustCompile(`^mail eq '(.*)'$`)
-	match = mailQuery.FindStringSubmatch(query)
-	if len(match) == 2 {
-		return s.index.FindBy(&proto.Account{}, "Mail", match[1])
-	}
-
-	return nil, merrors.BadRequest(s.id, "unsupported query %s", query)
+	return s.index.Query(&proto.Account{}, query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface
@@ -760,18 +684,6 @@ func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
 		"CreatedDateTime":              a.CreatedDateTime,
 		"DeletedDateTime":              a.DeletedDateTime,
 	})
-}
-
-func unique(strSlice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range strSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
 }
 
 func (s Service) accountExists(ctx context.Context, username, mail, id string) (exists bool, err error) {

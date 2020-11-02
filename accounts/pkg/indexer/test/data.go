@@ -19,6 +19,13 @@ type Pet struct {
 	UID                   int
 }
 
+// Account mocks an ocis account.
+type Account struct {
+	ID                       string
+	OnPremisesSamAccountName string
+	Mail                     string
+}
+
 // Data mock data.
 var Data = map[string][]interface{}{
 	"users": {
@@ -32,6 +39,9 @@ var Data = map[string][]interface{}{
 		Pet{ID: "wefwe-456", Kind: "Cat", Color: "White", Name: "Snowy"},
 		Pet{ID: "goefe-789", Kind: "Hog", Color: "Green", Name: "Dicky"},
 		Pet{ID: "xadaf-189", Kind: "Hog", Color: "Green", Name: "Ricky"},
+	},
+	"accounts": {
+		Account{ID: "ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2", Mail: "spooky@skeletons.org", OnPremisesSamAccountName: "MrDootDoot"},
 	},
 }
 

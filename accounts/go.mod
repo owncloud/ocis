@@ -3,6 +3,7 @@ module github.com/owncloud/ocis/accounts
 go 1.13
 
 require (
+	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666
 	github.com/cs3org/reva v1.2.2-0.20200924071957-e6676516e61e
 	github.com/go-chi/chi v4.1.2+incompatible
