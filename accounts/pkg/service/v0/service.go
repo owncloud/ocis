@@ -310,6 +310,8 @@ func (s Service) createDefaultAccounts() (err error) {
 	for _, accountID := range []string{
 		"058bff95-6708-4fe5-91e4-9ea3d377588b", //moss
 		"ddc2004c-0977-11eb-9d3f-a793888cd0f8", //admin
+		"820ba2a1-3f54-4538-80a4-2d73007e30bf", //konnectd
+		"bc596f3c-c955-4328-80a0-60d018b4ad57", //reva
 	} {
 		assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
 	}
