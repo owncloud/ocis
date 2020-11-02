@@ -282,7 +282,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not edit user")
+		o.logger.Error().Err(err).Str("account_id", req.Account.Id).Str("user_id", userid).Msg("could not edit user")
 		return
 	}
 
