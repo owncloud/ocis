@@ -44,7 +44,7 @@ class Login extends React.PureComponent {
   componentDidMount() {
     const { hello, query, dispatch, history } = this.props;
     if (hello && hello.state && history.action !== 'PUSH') {
-      if (query.prompt !== 'select_account') {
+      if (!query.prompt || query.prompt.indexOf('select_account') == -1) {
         dispatch(advanceLogonFlow(true, history));
         return;
       }
