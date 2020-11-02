@@ -2,6 +2,7 @@ package glauth
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"strconv"
@@ -9,10 +10,12 @@ import (
 
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
+	"github.com/micro/go-micro/v2/metadata"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
 )
 
 type queryType string
@@ -29,6 +32,7 @@ type ocisHandler struct {
 	basedn      string
 	nameFormat  string
 	groupFormat string
+	rbid        string
 }
 
 func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAPResultCode, error) {
@@ -66,8 +70,22 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	}
 	userName := strings.TrimPrefix(parts[0], "cn=")
 
+	// TODO make glauth context aware
+	ctx := context.Background()
+
+	// use a session with the bound user?
+	roleIDs, err := json.Marshal([]string{h.rbid})
+	if err != nil {
+		h.log.Error().
+			Err(err).
+			Str("handler", "ocis").
+			Msg("could not marshal roleid json")
+		return ldap.LDAPResultOperationsError, nil
+	}
+	ctx = metadata.Set(ctx, middleware.RoleIDs, string(roleIDs))
+
 	// check password
-	res, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
+	res, err := h.as.ListAccounts(ctx, &accounts.ListAccountsRequest{
 		//Query: fmt.Sprintf("username eq '%s'", username),
 		// TODO this allows lookung up users when you know the username using basic auth
 		// adding the password to the query is an option but sending the sover the wira a la scim seems ugly
@@ -76,6 +94,7 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	})
 	if err != nil || len(res.Accounts) == 0 {
 		h.log.Error().
+			Err(err).
 			Str("handler", "ocis").
 			Str("username", userName).
 			Str("binddn", bindDN).
@@ -162,6 +181,22 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		}
 	}
 
+	// TODO make glauth context aware
+	ctx := context.Background()
+
+	// use a session with the bound user?
+	roleIDs, err := json.Marshal([]string{h.rbid})
+	if err != nil {
+		h.log.Error().
+			Err(err).
+			Str("handler", "ocis").
+			Msg("could not marshal roleid json")
+		return ldap.ServerSearchResult{
+			ResultCode: ldap.LDAPResultOperationsError,
+		}, nil
+	}
+	ctx = metadata.Set(ctx, middleware.RoleIDs, string(roleIDs))
+
 	entries := []*ldap.Entry{}
 	h.log.Debug().
 		Str("handler", "ocis").
@@ -173,7 +208,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		Msg("parsed query")
 	switch qtype {
 	case usersQuery:
-		accounts, err := h.as.ListAccounts(context.TODO(), &accounts.ListAccountsRequest{
+		accounts, err := h.as.ListAccounts(ctx, &accounts.ListAccountsRequest{
 			Query: query,
 		})
 		if err != nil {
@@ -193,7 +228,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		}
 		entries = append(entries, h.mapAccounts(accounts.Accounts)...)
 	case groupsQuery:
-		groups, err := h.gs.ListGroups(context.TODO(), &accounts.ListGroupsRequest{
+		groups, err := h.gs.ListGroups(ctx, &accounts.ListGroupsRequest{
 			Query: query,
 		})
 		if err != nil {
@@ -501,6 +536,7 @@ func NewOCISHandler(opts ...Option) handler.Handler {
 		basedn:      options.BaseDN,
 		nameFormat:  options.NameFormat,
 		groupFormat: options.GroupFormat,
+		rbid:        options.RoleBundleUUID,
 	}
 	return handler
 }

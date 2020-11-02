@@ -22,6 +22,7 @@ type Options struct {
 	BaseDN          string
 	NameFormat      string
 	GroupFormat     string
+	RoleBundleUUID  string
 	AccountsService accounts.AccountsService
 	GroupsService   accounts.GroupsService
 }
@@ -111,5 +112,12 @@ func AccountsService(val accounts.AccountsService) Option {
 func GroupsService(val accounts.GroupsService) Option {
 	return func(o *Options) {
 		o.GroupsService = val
+	}
+}
+
+// RoleBundleUUID provides a role bundle UUID to make internal grpc requests.
+func RoleBundleUUID(val string) Option {
+	return func(o *Options) {
+		o.RoleBundleUUID = val
 	}
 }

@@ -200,6 +200,7 @@ func Server(cfg *config.Config) *cli.Command {
 					glauth.LDAPS(&lscfg),
 					glauth.Backend(&bcfg),
 					glauth.Fallback(&fcfg),
+					glauth.RoleBundleUUID(cfg.RoleBundleUUID),
 				)
 
 				if err != nil {

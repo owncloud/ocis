@@ -115,6 +115,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_DEBUG_ZPAGES"},
 			Destination: &cfg.Debug.Zpages,
 		},
+		&cli.StringFlag{
+			Name:        "role-bundle-id",
+			Value:       "71881883-1768-46bd-a24d-a356a2afdf7f", // BundleUUIDRoleAdmin
+			Usage:       "roleid used to make internal grpc requests",
+			EnvVars:     []string{"GLAUTH_ROLE_BUNDLE_ID"},
+			Destination: &cfg.RoleBundleUUID,
+		},
 
 		&cli.StringFlag{
 			Name:        "ldap-addr",
