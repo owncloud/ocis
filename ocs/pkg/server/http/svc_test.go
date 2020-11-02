@@ -383,7 +383,7 @@ func buildRoleServiceMock() settings.RoleService {
 						Id: ssvc.BundleUUIDRoleAdmin,
 						Settings: []*settings.Setting{
 							{
-								Id: ssvc.BundleUUIDRoleAdmin,
+								Id: accountsSvc.AccountManagementPermissionID,
 							},
 						},
 					},
@@ -391,7 +391,7 @@ func buildRoleServiceMock() settings.RoleService {
 						Id: ssvc.BundleUUIDRoleUser,
 						Settings: []*settings.Setting{
 							{
-								Id: ssvc.BundleUUIDRoleUser,
+								Id: accountsSvc.SelfManagementPermissionID,
 							},
 						},
 					},
