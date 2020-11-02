@@ -8,6 +8,7 @@
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
+* Bugfix - Allow consent-prompt with switch-account: [#788](https://github.com/owncloud/ocis/pull/788)
 * Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
@@ -115,6 +116,15 @@
    using the micro default client.
 
    https://github.com/owncloud/ocis/pull/718
+
+* Bugfix - Allow consent-prompt with switch-account: [#788](https://github.com/owncloud/ocis/pull/788)
+
+   Multiple prompt values are allowed and this change fixes the check for select_account if it was
+   used together with other prompt values. Where select_account previously was ignored, it is
+   now processed as required, fixing the use case when a RP wants to trigger select_account first
+   while at the same time wants also to request interactive consent.
+
+   https://github.com/owncloud/ocis/pull/788
 
 * Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
 
