@@ -6,8 +6,8 @@ package cs3
 //	"testing"
 //
 //	"github.com/owncloud/ocis/accounts/pkg/config"
-//	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-//	. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
+//	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+//	. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
 //	"github.com/stretchr/testify/assert"
 //)
 //

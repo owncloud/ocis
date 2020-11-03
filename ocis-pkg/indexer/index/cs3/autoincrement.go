@@ -14,7 +14,7 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -23,9 +23,9 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
 )
 
 // Autoincrement are fields for an index of type autoincrement.

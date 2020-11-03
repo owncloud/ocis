@@ -8,13 +8,13 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
-	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/cs3"  // to populate index
-	_ "github.com/owncloud/ocis/accounts/pkg/indexer/index/disk" // to populate index
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
+	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/cs3"  // to populate index
+	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/disk" // to populate index
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
 )
 
 // Indexer is a facade to configure and query over multiple indices.

@@ -9,12 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/accounts/pkg/indexer"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"github.com/owncloud/ocis/ocis-pkg/indexer"
+	idxcfg "github.com/owncloud/ocis/ocis-pkg/indexer/config"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -73,13 +74,56 @@ func New(opts ...Option) (s *Service, err error) {
 }
 
 func (s Service) buildIndex() (*indexer.Indexer, error) {
-	idx := indexer.CreateIndexer(s.Config)
+	var indexcfg *idxcfg.Config
 
-	if err := recreateContainers(idx, s.Config); err != nil {
+	indexcfg, err := configFromSvc(s.Config)
+	if err != nil {
+		return nil, err
+	}
+	idx := indexer.CreateIndexer(indexcfg)
+
+	if err := recreateContainers(idx, indexcfg); err != nil {
 		return nil, err
 	}
 	return idx, nil
+}
 
+// configFromSvc creates an index config out of a service configuration. This intermediate step exists
+// because the index config was mapped after the service config.
+func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
+	c := idxcfg.New()
+
+	if &cfg.Repo.Disk != nil {
+		c.Repo = idxcfg.Repo{
+			Disk: idxcfg.Disk{
+				Path: cfg.Repo.Disk.Path,
+			},
+		}
+	}
+
+	if &cfg.Repo.CS3 != nil {
+		c.Repo = idxcfg.Repo{
+			CS3: idxcfg.CS3{
+				ProviderAddr: cfg.Repo.CS3.ProviderAddr,
+				DataURL:      cfg.Repo.CS3.DataURL,
+				DataPrefix:   cfg.Repo.CS3.DataPrefix,
+				JWTSecret:    cfg.Repo.CS3.JWTSecret,
+			},
+		}
+	}
+
+	if &cfg.Index != nil {
+		c.Index = idxcfg.Index{
+			UID: idxcfg.Bound{
+				Lower: cfg.Index.UID.Lower,
+			},
+			GID: idxcfg.Bound{
+				Lower: cfg.Index.GID.Lower,
+			},
+		}
+	}
+
+	return c, nil
 }
 
 func (s Service) createDefaultAccounts() (err error) {

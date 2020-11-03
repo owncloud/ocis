@@ -745,6 +745,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0j
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/mennanov/fieldmask-utils v0.3.2 h1:AkHXYBEOoyvocl8YhzoStATRnto5OH1PY4Rj78I5Cuc=
 github.com/mennanov/fieldmask-utils v0.3.2/go.mod h1:JpaanSp6Ql5A8dGktEFxTmA9uBXmz3F+2LAXDZwiimU=
+github.com/mennanov/fieldmask-utils v0.3.3 h1:/cAjLk3ja74dQJ0BBxEsK4xyzvECcOYLLB1lo6HuLog=
+github.com/mennanov/fieldmask-utils v0.3.3/go.mod h1:OcOWam4DG685inAjtNuFONKpkitiCCK1W5yKljvWwCY=
 github.com/micro/cli/v2 v2.1.2 h1:43J1lChg/rZCC1rvdqZNFSQDrGT7qfMrtp6/ztpIkEM=
 github.com/micro/cli/v2 v2.1.2/go.mod h1:EguNh6DAoWKm9nmk+k/Rg0H3lQnDxqzu5x5srOtGtYg=
 github.com/micro/go-micro/v2 v2.9.1 h1:+S9koIrNWARjpP6k2TZ7kt0uC9zUJtNXzIdZTZRms7Q=
@@ -870,6 +872,10 @@ github.com/ory/viper v1.7.5/go.mod h1:ypOuyJmEUb3oENywQZRgeAMwqgOyDqwboO1tj3DjTa
 github.com/ory/x v0.0.85/go.mod h1:s44V8t3xyjWZREcU+mWlp4h302rTuM4aLXcW+y5FbQ8=
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203/go.mod h1:jip86t4OVURJTf8CM/0e2qcji/Y4NG3l2lR8kex4JWw=
+github.com/owncloud/ocis v1.0.0-rc3 h1:ZFQxg7OhvO08l5Hvqa4gQS0HT6ul7s1j3w3qvHPh8gc=
+github.com/owncloud/ocis v1.0.0-rc3.0.20201103111659-46bf133a3c63 h1:IkzoExiUk2zOWSTt5dlZmbmzs/wFz8zo/tHgz4QOFKY=
+github.com/owncloud/ocis v1.0.0-rc3.0.20201103111659-46bf133a3c63/go.mod h1:kHoustfrV4pGvkKcNFXIr8GRT9MY25mzOKGij4uAC60=
+github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b/go.mod h1:IX7T4MJ1U8Y4z9dfDW1J2jq1nv/SHCM7n2zt1fmBHI8=
 github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df h1:PhRLD+WTGIfQ1T4MqBabp6/1Q8H/iwxjlygh6xzao0A=
 github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df/go.mod h1:s9kJvxtBlHEi5qc1TuPAdz2bprk9yGFe+FSOeC76Pbs=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=

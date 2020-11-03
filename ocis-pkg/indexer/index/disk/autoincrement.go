@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
 )
 
 // Autoincrement are fields for an index of type autoincrement.

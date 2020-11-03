@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	//. "github.com/owncloud/ocis/accounts/pkg/indexer/test"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	//. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 )
