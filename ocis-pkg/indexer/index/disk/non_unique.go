@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
 )
 
 // NonUnique is able to index an document by a key which might contain non-unique values

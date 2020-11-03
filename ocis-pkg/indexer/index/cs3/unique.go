@@ -12,17 +12,17 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 
-	"github.com/owncloud/ocis/accounts/pkg/config"
+	acccfg "github.com/owncloud/ocis/accounts/pkg/config"
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	idxerrs "github.com/owncloud/ocis/accounts/pkg/indexer/errors"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/index"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/registry"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -48,7 +48,7 @@ type Config struct {
 	DataURL      string
 	DataPrefix   string
 	JWTSecret    string
-	ServiceUser  config.ServiceUser
+	ServiceUser  acccfg.ServiceUser
 }
 
 func init() {

@@ -15,8 +15,8 @@ func Test_getTypeFQN(t *testing.T) {
 		args args
 		want string
 	}{
-		{name: "ByValue", args: args{&someT{}}, want: "github.com.owncloud.ocis.accounts.pkg.indexer.someT"},
-		{name: "ByRef", args: args{someT{}}, want: "github.com.owncloud.ocis.accounts.pkg.indexer.someT"},
+		{name: "ByValue", args: args{&someT{}}, want: "github.com.owncloud.ocis.ocis-pkg.indexer.someT"},
+		{name: "ByRef", args: args{someT{}}, want: "github.com.owncloud.ocis.ocis-pkg.indexer.someT"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

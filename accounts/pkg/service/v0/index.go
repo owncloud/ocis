@@ -6,10 +6,10 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 
-	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/indexer"
-	"github.com/owncloud/ocis/accounts/pkg/indexer/option"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/indexer"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
+	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 )
 
 // RebuildIndex deletes all indices (in memory and on storage) and rebuilds them from scratch.
@@ -18,7 +18,11 @@ func (s Service) RebuildIndex(ctx context.Context, request *proto.RebuildIndexRe
 		return fmt.Errorf("failed to delete index containers: %w", err)
 	}
 
-	if err := recreateContainers(s.index, s.Config); err != nil {
+	c, err := configFromSvc(s.Config)
+	if err != nil {
+		return err
+	}
+	if err := recreateContainers(s.index, c); err != nil {
 		return fmt.Errorf("failed to recreate index containers: %w", err)
 	}
 
