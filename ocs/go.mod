@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/cs3org/reva v1.3.1-0.20201021065855-dc400f81ecbc
+	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.3
@@ -16,8 +16,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis/accounts v0.0.0-20200918125107-fcca9faa81c8
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
+	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20201103111659-46bf133a3c63
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/owncloud/ocis/store v0.0.0-20200918125107-fcca9faa81c8
 	github.com/prometheus/client_golang v1.7.1

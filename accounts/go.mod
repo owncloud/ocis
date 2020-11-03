@@ -4,12 +4,12 @@ go 1.13
 
 require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06 // indirect
-	github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666
-	github.com/cs3org/reva v1.2.2-0.20200924071957-e6676516e61e
+	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
+	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/iancoleman/strcase v0.1.2 // indirect
 	github.com/mennanov/fieldmask-utils v0.3.3
@@ -29,7 +29,7 @@ require (
 	github.com/tredoe/osutil v1.0.5
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
-	google.golang.org/grpc v1.32.0
+	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0
 )
 
