@@ -93,6 +93,16 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 	c := idxcfg.New()
 
+	defer func(cfg *config.Config) {
+		l := log.NewLogger(log.Color(cfg.Log.Color), log.Pretty(cfg.Log.Pretty), log.Level(cfg.Log.Level))
+		if r := recover(); r != nil {
+			l.Error().
+				Str("panic", "recovered from panic while parsing index config from service configuration").
+				Interface("svc_config", cfg).
+				Msg("recovered from panic")
+		}
+	}(cfg)
+
 	if &cfg.Repo.Disk != nil {
 		c.Repo = idxcfg.Repo{
 			Disk: idxcfg.Disk{
@@ -121,6 +131,10 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 				Lower: cfg.Index.GID.Lower,
 			},
 		}
+	}
+
+	if &cfg.ServiceUser != nil {
+		c.ServiceUser = cfg.ServiceUser
 	}
 
 	return c, nil
