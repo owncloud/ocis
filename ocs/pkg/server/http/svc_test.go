@@ -2050,7 +2050,9 @@ func TestDeleteGroup(t *testing.T) {
 			formatpart := getFormatString(format)
 			for _, data := range testData {
 				err := createGroup(data)
-
+				if err != nil {
+					t.Fatal(err)
+				}
 				res, err := sendRequest(
 					"DELETE",
 					fmt.Sprintf("/%v/cloud/groups/%v%v", ocsVersion, data.ID, formatpart),
