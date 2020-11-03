@@ -91,7 +91,7 @@ services:
       - 9200:9200
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN}
-      PROXY_CONFIG_FILE: "/etc/ocis/proxy.json"
+      PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_TLS: "false"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
       PROXY_OIDC_INSECURE: "true"
@@ -104,18 +104,15 @@ services:
       PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN}
       PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN}/.well-known/openid-configuration
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN}
+      PHOENIX_WEB_CONFIG: "/config/web/config.json"
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
       STORAGE_TRANSFER_EXPIRES: 86400
       STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
       STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
-      STORAGE_STORAGE_METADATA_PROVIDER_DRIVER: owncloud # Storage fails start up if backend owncloud is selected and this env vars isn't set
-      STORAGE_STORAGE_METADATA_DATA_PROVIDER_DRIVER: owncloud # Storage fails start up if backend owncloud is selected and this env vars isn't set
       GLAUTH_BACKEND_DATASTORE: owncloud
       GLAUTH_BACKEND_SERVERS: https://${OC10_DOMAIN}/apps/graphapi/v1.0
       GLAUTH_BACKEND_BASEDN: dc=example,dc=org
-      ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts # Accounts fails to start when cs3 backend is used atm
-      # Konnectd ldap setup
       LDAP_URI: ldap://localhost:9125
       LDAP_BINDDN: "cn=admin,dc=example,dc=org"
       LDAP_BINDPW: "admin"
