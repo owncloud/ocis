@@ -1,6 +1,6 @@
 {
   "HTTP": {
-    "Namespace": "com.owncloud"
+    "Namespace": "works.owncloud"
   },
   "policy_selector": {
     "migration": {
@@ -19,21 +19,26 @@
         },
         {
           "endpoint": "/.well-known/",
-          "backend": "http://konnectd:9130"
+          "backend": "http://localhost:9130"
         },
         {
           "endpoint": "/konnect/",
-          "backend": "http://konnectd:9130"
+          "backend": "http://localhost:9130"
         },
         {
           "endpoint": "/signin/",
-          "backend": "http://konnectd:9130"
+          "backend": "http://localhost:9130"
         },
         {
           "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
         },
         {
+          "type": "regex",
+          "endpoint": "/ocs/v[12].php/cloud/user",
+          "backend": "http://localhost:9110"
+        },
+	{
           "endpoint": "/remote.php/",
           "backend": "http://localhost:9140"
         },
@@ -52,6 +57,26 @@
         {
           "endpoint": "/index.php/",
           "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/data",
+          "backend": "http://localhost:9140"
+        },
+        {
+	  "endpoint": "/api/v0/accounts",
+	  "backend":  "http://localhost:9181"
+	},
+	{
+          "endpoint": "/accounts.js",
+	  "backend":  "http://localhost:9181"
+	},
+        {
+          "endpoint": "/api/v0/settings",
+          "backend":  "http://localhost:9190"
+        },
+        {
+          "endpoint": "/settings.js",
+          "backend":  "http://localhost:9190"
         }
       ]
     },
