@@ -11,6 +11,8 @@ volumes:
     driver: local
   tmp:
     driver: local
+  letsencrypt:
+    driver: local
 
 services:
   traefik:
