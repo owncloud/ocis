@@ -8,15 +8,16 @@ services:
     networks:
       - idpnet
     command:
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.idp.acme.tlschallenge=true"
       - "--certificatesresolvers.idp.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.idp.acme.email=postmaster@${IDP_DOMAIN}"
       - "--certificatesresolvers.idp.acme.storage=/letsencrypt/acme.json"
     ports:
+      - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
@@ -51,9 +52,16 @@ services:
       LDAP_FILTER: (objectClass=posixaccount)
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.idp.rule=Host(`${IDP_DOMAIN}`)"
-      - "traefik.http.routers.idp.entrypoints=websecure"
-      - "traefik.http.routers.idp.tls.certresolver=idp"
+      - "traefik.http.services.idp.loadbalancer.server.port=9200"
       - "traefik.docker.network=idpnet"
       - "traefik.port=9130"
       - "traefik.protocol=https"
+      # ssl config
+      - "traefik.http.routers.idp.rule=Host(`${IDP_DOMAIN}`)"
+      - "traefik.http.routers.idp.entrypoints=websecure"
+      - "traefik.http.routers.idp.tls.certresolver=idp"
+      # http -> https forwarding
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.idp-redirs.rule=Host(`${IDP_DOMAIN}`)"
+      - "traefik.http.routers.idp-redirs.entrypoints=web"
+      - "traefik.http.routers.idp-redirs.middlewares=redirect-to-https"
