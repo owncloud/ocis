@@ -17,10 +17,11 @@ services:
     image: "traefik:v2.2"
     container_name: "traefik"
     command:
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--serverstransport.insecureskipverify=true"
       # Ocis certificate resolver
       - "--certificatesresolvers.ocis.acme.tlschallenge=true"
       - "--certificatesresolvers.ocis.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
@@ -71,12 +72,18 @@ services:
       - tmp:/tmp/shared
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.oc10.rule=Host(`${OC10_DOMAIN}`)"
-      - "traefik.http.routers.oc10.entrypoints=websecure"
-      - "traefik.http.routers.oc10.tls.certresolver=oc10"
       - "traefik.http.services.oc10.loadbalancer.server.port=8080"
       - "traefik.docker.network=ocisnet"
       - "traefik.protocol=https"
+      # ssl config
+      - "traefik.http.routers.oc10.rule=Host(`${OC10_DOMAIN}`)"
+      - "traefik.http.routers.oc10.entrypoints=websecure"
+      - "traefik.http.routers.oc10.tls.certresolver=oc10"
+      # http -> https forwarding
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.oc10-redirs.rule=Host(`${OC10_DOMAIN}`)"
+      - "traefik.http.routers.oc10-redirs.entrypoints=web"
+      - "traefik.http.routers.oc10-redirs.middlewares=redirect-to-https"
 
   ocis:
     image: owncloud/ocis:latest
@@ -125,12 +132,18 @@ services:
       - ./ocis/proxy-config.json:/etc/ocis/proxy.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
-      - "traefik.http.routers.ocis.entrypoints=websecure"
-      - "traefik.http.routers.ocis.tls.certresolver=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.docker.network=ocisnet"
       - "traefik.protocol=https"
+      # ssl config
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
+      - "traefik.http.routers.ocis.entrypoints=websecure"
+      - "traefik.http.routers.ocis.tls.certresolver=ocis"
+      # http -> https forwarding
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.ocis-redirs.rule=Host(`${OCIS_DOMAIN}`)"
+      - "traefik.http.routers.ocis-redirs.entrypoints=web"
+      - "traefik.http.routers.ocis-redirs.middlewares=redirect-to-https"
 
   db:
     image: webhippie/mariadb:latest
