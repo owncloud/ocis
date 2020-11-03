@@ -24,6 +24,7 @@
 * Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Properly style konnectd consent page: [#754](https://github.com/owncloud/ocis/pull/754)
+* Change - Move the indexer package from ocis/accounts to ocis/ocis-pkg: [#794](https://github.com/owncloud/ocis/pull/794)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
@@ -273,6 +274,13 @@
    text is visible and button reflects our theme.
 
    https://github.com/owncloud/ocis/pull/754
+
+* Change - Move the indexer package from ocis/accounts to ocis/ocis-pkg: [#794](https://github.com/owncloud/ocis/pull/794)
+
+   We are making that change for semantic reasons. So consumers of any index don't necessarily
+   need to know of the accounts service.
+
+   https://github.com/owncloud/ocis/pull/794
 
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 
