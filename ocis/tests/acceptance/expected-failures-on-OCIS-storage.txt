@@ -1573,6 +1573,8 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:235
 apiWebdavEtagPropagation1/moveFileFolder.feature:236
 apiWebdavEtagPropagation1/moveFileFolder.feature:303
 apiWebdavEtagPropagation1/moveFileFolder.feature:304
+apiWebdavEtagPropagation2/copyFileFolder.feature:152
+apiWebdavEtagPropagation2/copyFileFolder.feature:153
 #
 # https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
 #
