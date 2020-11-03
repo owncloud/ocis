@@ -103,38 +103,40 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 		}
 	}(cfg)
 
-	if &cfg.Repo.Disk != nil {
-		c.Repo = idxcfg.Repo{
-			Disk: idxcfg.Disk{
-				Path: cfg.Repo.Disk.Path,
-			},
+	if (config.Repo{}) != cfg.Repo {
+		if (config.Disk{}) != cfg.Repo.Disk {
+			c.Repo = idxcfg.Repo{
+				Disk: idxcfg.Disk{
+					Path: cfg.Repo.Disk.Path,
+				},
+			}
 		}
-	}
 
-	if &cfg.Repo.CS3 != nil {
-		c.Repo = idxcfg.Repo{
-			CS3: idxcfg.CS3{
-				ProviderAddr: cfg.Repo.CS3.ProviderAddr,
-				DataURL:      cfg.Repo.CS3.DataURL,
-				DataPrefix:   cfg.Repo.CS3.DataPrefix,
-				JWTSecret:    cfg.Repo.CS3.JWTSecret,
-			},
+		if (config.CS3{}) != cfg.Repo.CS3 {
+			c.Repo = idxcfg.Repo{
+				CS3: idxcfg.CS3{
+					ProviderAddr: cfg.Repo.CS3.ProviderAddr,
+					DataURL:      cfg.Repo.CS3.DataURL,
+					DataPrefix:   cfg.Repo.CS3.DataPrefix,
+					JWTSecret:    cfg.Repo.CS3.JWTSecret,
+				},
+			}
 		}
-	}
 
-	if &cfg.Index != nil {
-		c.Index = idxcfg.Index{
-			UID: idxcfg.Bound{
-				Lower: cfg.Index.UID.Lower,
-			},
-			GID: idxcfg.Bound{
-				Lower: cfg.Index.GID.Lower,
-			},
+		if (config.Index{}) != cfg.Index {
+			c.Index = idxcfg.Index{
+				UID: idxcfg.Bound{
+					Lower: cfg.Index.UID.Lower,
+				},
+				GID: idxcfg.Bound{
+					Lower: cfg.Index.GID.Lower,
+				},
+			}
 		}
-	}
 
-	if &cfg.ServiceUser != nil {
-		c.ServiceUser = cfg.ServiceUser
+		if (config.ServiceUser{}) != cfg.ServiceUser {
+			c.ServiceUser = cfg.ServiceUser
+		}
 	}
 
 	return c, nil
