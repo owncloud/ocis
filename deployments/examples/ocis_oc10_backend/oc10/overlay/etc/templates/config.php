@@ -32,20 +32,12 @@ function getConfigFromEnv() {
       0 => $domain
     ],
     'openid-connect' => [
-        'provider-url' => 'https://ocis-bridge.owncloud.works',
+        'provider-url' => 'https://${OCIS_DOMAIN}',
         'client-id' => 'oc10',
         'client-secret' => 'super',
         'loginButtonName' => 'OpenId Connect',
         'search-attribute' => 'preferred_username',
         'mode' => 'userid',
-        #'provider-params' => [
-        #  "authorization_endpoint" => "https://ocis-bridge.owncloud.works//signin/v1/identifier/_/authorize",
-        #  "token_endpoint" => "https://ocis-bridge.owncloud.works//konnect/v1/token",
-        #  "userinfo_endpoint"=> "https://ocis-bridge.owncloud.works//konnect/v1/userinfo",
-        #  "end_session_endpoint" => "https://ocis-bridge.owncloud.works//signin/v1/identifier/_/endsession",
-        #  "check_session_iframe" => "https://ocis-bridge.owncloud.works//konnect/v1/session/check-session.html",
-        #  "jwks_uri" => "https://ocis-bridge.owncloud.works//konnect/v1/jwks.json"
-        #]
       ],
     'datadirectory' => getenv('OWNCLOUD_VOLUME_FILES'),
     'dbtype' => getenv('OWNCLOUD_DB_TYPE'),
@@ -55,8 +47,8 @@ function getConfigFromEnv() {
     'dbpassword' => getenv('OWNCLOUD_DB_PASSWORD'),
     'dbtableprefix' => getenv('OWNCLOUD_DB_PREFIX'),
 
-    'phoenix.baseUrl' => 'https://ocis-bridge.owncloud.works',
-    'cors.allowed-domains' => ['htttps://ocis-bridge.owncloud.works'],
+    'phoenix.baseUrl' => 'https://${OCIS_DOMAIN}',
+    'cors.allowed-domains' => ['https://${OCIS_DOMAIN}'],
 
     'log_type' => 'owncloud',
 
