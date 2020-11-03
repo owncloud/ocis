@@ -48,6 +48,93 @@ const (
 )
 
 const (
+	userEinstein string = "einstein"
+	userMarie    string = "marie"
+	userRichard  string = "richard"
+	userKonnectd string = "konnectd"
+	userReva     string = "reva"
+	userMoss     string = "moss"
+	userAdmin    string = "admin"
+)
+const (
+	groupPhilosophyHaters string = "philosophy-haters"
+	groupPhysicsLovers    string = "physics-lovers"
+	groupPoloniumLovers   string = "polonium-lovers"
+	groupQuantumLovers    string = "quantum-lovers"
+	groupRadiumLovers     string = "radium-lovers"
+	groupSailingLovers    string = "sailing-lovers"
+	groupViolinHaters     string = "violin-haters"
+	groupUsers            string = "users"
+	groupSysUsers         string = "sysusers"
+)
+
+var defaultMemberOf = map[string][]string{
+	userEinstein: {
+		groupUsers,
+		groupSailingLovers,
+		groupViolinHaters,
+		groupPhysicsLovers,
+	},
+	userKonnectd: {
+		groupSysUsers,
+	},
+	userRichard: {
+		groupUsers,
+		groupQuantumLovers,
+		groupPhilosophyHaters,
+		groupPhysicsLovers,
+	},
+	userReva: {
+		groupSysUsers,
+	},
+	userMarie: {
+		groupUsers,
+		groupRadiumLovers,
+		groupPoloniumLovers,
+		groupPhysicsLovers,
+	},
+	userMoss: {
+		groupUsers,
+	},
+	userAdmin: {
+		groupUsers,
+	},
+}
+
+var defaultMembers = map[string][]string{
+	groupSysUsers: {
+		userKonnectd,
+		userReva,
+	},
+	groupUsers: {
+		userEinstein,
+		userMarie,
+		userRichard,
+	},
+	groupSailingLovers: {
+		userEinstein,
+	},
+	groupViolinHaters: {
+		userEinstein,
+	},
+	groupPoloniumLovers: {
+		userMarie,
+	},
+	groupQuantumLovers: {
+		userRichard,
+	},
+	groupPhilosophyHaters: {
+		userRichard,
+	},
+	groupPhysicsLovers: {
+		userEinstein,
+		userMarie,
+		userRichard,
+	},
+}
+
+// These account ids are only needed for cleanup
+const (
 	userIDEinstein string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
 	userIDMarie    string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
 	userIDFeynman  string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
@@ -57,16 +144,17 @@ const (
 	userIDAdmin    string = "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
 )
 
+// These group ids are only needed for cleanup
 const (
-	groupPhilosophyHaters = "167cbee2-0518-455a-bfb2-031fe0621e5d"
-	groupPhysicsLovers    = "262982c1-2362-4afa-bfdf-8cbfef64a06e"
-	groupPoloniumLovers   = "cedc21aa-4072-4614-8676-fa9165f598ff"
-	groupQuantumLovers    = "a1726108-01f8-4c30-88df-2b1a9d1cba1a"
-	groupRadiumLovers     = "7b87fd49-286e-4a5f-bafd-c535d5dd997a"
-	groupSailingLovers    = "6040aa17-9c64-4fef-9bd0-77234d71bad0"
-	groupViolinHaters     = "dd58e5ec-842e-498b-8800-61f2ec6f911f"
-	groupUsers            = "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
-	groupSysUsers         = "34f38767-c937-4eb6-b847-1c175829a2a0"
+	groupIDPhilosophyHaters = "167cbee2-0518-455a-bfb2-031fe0621e5d"
+	groupIDPhysicsLovers    = "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+	groupIDPoloniumLovers   = "cedc21aa-4072-4614-8676-fa9165f598ff"
+	groupIDQuantumLovers    = "a1726108-01f8-4c30-88df-2b1a9d1cba1a"
+	groupIDRadiumLovers     = "7b87fd49-286e-4a5f-bafd-c535d5dd997a"
+	groupIDSailingLovers    = "6040aa17-9c64-4fef-9bd0-77234d71bad0"
+	groupIDViolinHaters     = "dd58e5ec-842e-498b-8800-61f2ec6f911f"
+	groupIDUsers            = "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+	groupIDSysUsers         = "34f38767-c937-4eb6-b847-1c175829a2a0"
 )
 
 const jwtSecret = "HELLO-secret"
@@ -82,7 +170,16 @@ var formats = []string{"json", "xml"}
 
 var dataPath = createTmpDir()
 
-var DefaultUsers = []string{
+var defaultUsers = []string{
+	userEinstein,
+	userKonnectd,
+	userRichard,
+	userReva,
+	userMarie,
+	userMoss,
+	userAdmin,
+}
+var defaultUserIDs = []string{
 	userIDEinstein,
 	userIDKonnectd,
 	userIDFeynman,
@@ -92,7 +189,7 @@ var DefaultUsers = []string{
 	userIDAdmin,
 }
 
-var DefaultGroups = []string{
+var defaultGroups = []string{
 	groupPhilosophyHaters,
 	groupPhysicsLovers,
 	groupSysUsers,
@@ -102,6 +199,17 @@ var DefaultGroups = []string{
 	groupQuantumLovers,
 	groupPoloniumLovers,
 	groupViolinHaters,
+}
+var defaultGroupIDs = []string{
+	groupIDPhilosophyHaters,
+	groupIDPhysicsLovers,
+	groupIDSysUsers,
+	groupIDUsers,
+	groupIDSailingLovers,
+	groupIDRadiumLovers,
+	groupIDQuantumLovers,
+	groupIDPoloniumLovers,
+	groupIDViolinHaters,
 }
 
 func getFormatString(format string) string {
@@ -313,7 +421,30 @@ func assertResponseMeta(t *testing.T, expected, actual Meta) {
 	assert.Equal(t, expected.Message, actual.Message, "The Message of response doesn't match")
 }
 
-func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
+// compares users at tha /user endpoint
+func assertUserSame(t *testing.T, expected, actual User) {
+	if expected.ID == "" {
+		// Check the auto generated userId
+		assert.Regexp(
+			t,
+			"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+			actual.ID, "the userid is not a valid uuid",
+		)
+	} else {
+		assert.Equal(t, expected.ID, actual.ID, "UserId doesn't match for user %v", expected.ID)
+	}
+	assert.Equal(t, expected.Email, actual.Email, "email doesn't match for user %v", expected.ID)
+	// /user has no enabled flag
+	if expected.Displayname == "" {
+		assert.Equal(t, expected.ID, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
+	} else {
+		assert.Equal(t, expected.Displayname, actual.Displayname, "displayname doesn't match for user %v", expected.ID)
+	}
+	// /user has no quota, uid or gid
+}
+
+// compares users at the /users/<userid> endpoint
+func assertUsersSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	if expected.ID == "" {
 		// Check the auto generated userId
 		assert.Regexp(
@@ -346,7 +477,6 @@ func assertUserSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	if expected.GIDNumber != 0 {
 		assert.Equal(t, expected.GIDNumber, actual.GIDNumber, "GidNumber doesn't match for user %s", expected.ID)
 	}
-
 }
 
 func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
@@ -468,7 +598,7 @@ func cleanUp(t *testing.T) {
 
 	for _, f := range files {
 		found := false
-		for _, defUser := range DefaultUsers {
+		for _, defUser := range defaultUserIDs {
 			if f.Name() == defUser {
 				found = true
 				break
@@ -489,7 +619,7 @@ func cleanUp(t *testing.T) {
 
 	for _, f := range files {
 		found := false
-		for _, defGrp := range DefaultGroups {
+		for _, defGrp := range defaultGroupIDs {
 			if f.Name() == defGrp {
 				found = true
 				break
@@ -755,7 +885,7 @@ func TestCreateUser(t *testing.T) {
 					if scenario.err == nil {
 						assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 						assertStatusCode(t, 200, res, ocsVersion)
-						assertUserSame(t, scenario.user, response.Ocs.Data, false)
+						assertUsersSame(t, scenario.user, response.Ocs.Data, false)
 					} else {
 						assertStatusCode(t, 400, res, ocsVersion)
 						assertResponseMeta(t, *scenario.err, response.Ocs.Meta)
@@ -885,7 +1015,7 @@ func TestGetUsersDefaultUsers(t *testing.T) {
 
 			assertStatusCode(t, 200, res, ocsVersion)
 			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-			for _, user := range DefaultUsers {
+			for _, user := range defaultUsers {
 				assert.Contains(t, response.Ocs.Data.Users, user)
 			}
 			cleanUp(t)
@@ -945,7 +1075,7 @@ func TestGetUser(t *testing.T) {
 
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
-				assertUserSame(t, user, response.Ocs.Data, true)
+				assertUsersSame(t, user, response.Ocs.Data, true)
 			}
 			cleanUp(t)
 		}
@@ -1281,9 +1411,9 @@ func TestUpdateUser(t *testing.T) {
 
 				assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
 				if data.Error == nil {
-					assertUserSame(t, updatedUser, usersResponse.Ocs.Data, true)
+					assertUsersSame(t, updatedUser, usersResponse.Ocs.Data, true)
 				} else {
-					assertUserSame(t, user, usersResponse.Ocs.Data, true)
+					assertUsersSame(t, user, usersResponse.Ocs.Data, true)
 				}
 				cleanUp(t)
 			}
@@ -1291,8 +1421,8 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
-// This is a bug demonstration test for endpoint '/cloud/user'
-// Link to the issue: https://github.com/owncloud/ocis/ocs/issues/52
+// This is a bug verification test for endpoint '/cloud/user'
+// Link to the fixed issue: https://github.com/owncloud/ocis-ocs/issues/52
 func TestGetSingleUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1322,16 +1452,21 @@ func TestGetSingleUser(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			response := assertEmptyResponse(t, format, res)
+			var userResponse SingleUserResponse
+			if format == "json" {
+				if err := json.Unmarshal(res.Body.Bytes(), &userResponse); err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err := xml.Unmarshal(res.Body.Bytes(), &userResponse.Ocs); err != nil {
+					t.Fatal(err)
+				}
+			}
 
-			assertStatusCode(t, 400, res, ocsVersion)
-			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
-			assertResponseMeta(t, Meta{
-				Status:     "error",
-				StatusCode: 400,
-				Message:    "missing user in context",
-			}, response.Ocs.Meta)
-			assert.Empty(t, response.Ocs.Data)
+			assertStatusCode(t, 200, res, ocsVersion)
+			assert.True(t, userResponse.Ocs.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
+			assertUserSame(t, user, userResponse.Ocs.Data)
+
 			cleanUp(t)
 		}
 	}
@@ -1339,7 +1474,6 @@ func TestGetSingleUser(t *testing.T) {
 
 // This is a bug demonstration test for endpoint '/cloud/user'
 // Link to the issue: https://github.com/owncloud/ocis/ocs/issues/53
-
 func TestGetUserSigningKey(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1371,12 +1505,12 @@ func TestGetUserSigningKey(t *testing.T) {
 
 			response := assertEmptyResponse(t, format, res)
 
-			assertStatusCode(t, 400, res, ocsVersion)
+			assertStatusCode(t, 500, res, ocsVersion)
 			assert.False(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to be a failure but was not")
 			assertResponseMeta(t, Meta{
 				Status:     "error",
-				StatusCode: 400,
-				Message:    "missing user in context",
+				StatusCode: 996,
+				Message:    "error reading from store", // because the store service is not started
 			}, response.Ocs.Meta)
 			assert.Empty(t, response.Ocs.Data)
 			cleanUp(t)
@@ -1451,6 +1585,7 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
+				// TODO why should new users be in the users group?
 				assert.Equal(t, []string{groupUsers}, response.Ocs.Data.Groups)
 
 				cleanUp(t)
@@ -1460,43 +1595,11 @@ func TestListUsersGroupNewUsers(t *testing.T) {
 }
 
 func TestListUsersGroupDefaultUsers(t *testing.T) {
-	DefaultGroups := map[string][]string{
-		userIDEinstein: {
-			groupUsers,
-			groupSailingLovers,
-			groupViolinHaters,
-			groupPhysicsLovers,
-		},
-		userIDKonnectd: {
-			groupSysUsers,
-		},
-		userIDFeynman: {
-			groupUsers,
-			groupQuantumLovers,
-			groupPhilosophyHaters,
-			groupPhysicsLovers,
-		},
-		userIDReva: {
-			groupSysUsers,
-		},
-		userIDMarie: {
-			groupUsers,
-			groupRadiumLovers,
-			groupPoloniumLovers,
-			groupPhysicsLovers,
-		},
-		userIDMoss: {
-			groupUsers,
-		},
-		userIDAdmin: {
-			groupUsers,
-		},
-	}
 
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {
 			formatpart := getFormatString(format)
-			for _, user := range DefaultUsers {
+			for _, user := range defaultUsers {
 				res, err := sendRequest(
 					"GET",
 					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
@@ -1523,7 +1626,7 @@ func TestListUsersGroupDefaultUsers(t *testing.T) {
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 
-				assert.Equal(t, DefaultGroups[user], response.Ocs.Data.Groups)
+				assert.Equal(t, defaultMemberOf[user], response.Ocs.Data.Groups)
 			}
 		}
 	}
@@ -1543,29 +1646,31 @@ func TestGetGroupForUserInvalidUserId(t *testing.T) {
 		for _, format := range formats {
 			formatpart := getFormatString(format)
 			for _, user := range invalidUsers {
-				res, err := sendRequest(
-					"GET",
-					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
-					"",
-					&User{ID: userIDAdmin},
-					[]string{ssvc.BundleUUIDRoleAdmin},
-				)
+				t.Run(fmt.Sprintf("%s (ocs=%s, format=%s)", user, ocsVersion, format), func(t *testing.T) {
+					res, err := sendRequest(
+						"GET",
+						fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user, formatpart),
+						"",
+						&User{ID: userIDAdmin},
+						[]string{ssvc.BundleUUIDRoleAdmin},
+					)
 
-				if err != nil {
-					t.Fatal(err)
-				}
+					if err != nil {
+						t.Fatal(err)
+					}
 
-				response := assertEmptyResponse(t, format, res)
+					response := assertEmptyResponse(t, format, res)
 
-				assertStatusCode(t, 404, res, ocsVersion)
-				assert.False(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-				assertResponseMeta(t, Meta{
-					Status:     "error",
-					StatusCode: 998,
-					Message:    "The requested user could not be found",
-				}, response.Ocs.Meta)
+					assertStatusCode(t, 404, res, ocsVersion)
+					assert.False(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
+					assertResponseMeta(t, Meta{
+						Status:     "error",
+						StatusCode: 998,
+						Message:    "The requested user could not be found",
+					}, response.Ocs.Meta)
 
-				assert.Empty(t, response.Ocs.Data)
+					assert.Empty(t, response.Ocs.Data)
+				})
 			}
 		}
 	}
@@ -1591,50 +1696,52 @@ func TestAddUsersToGroupsNewUsers(t *testing.T) {
 		for _, format := range formats {
 			formatpart := getFormatString(format)
 			for _, user := range users {
-				err := createUser(user)
-				if err != nil {
-					t.Fatal(err)
-				}
+				t.Run(fmt.Sprintf("%s (ocs=%s, format=%s)", user.ID, ocsVersion, format), func(t *testing.T) {
+					err := createUser(user)
+					if err != nil {
+						t.Fatal(err)
+					}
 
-				// group id for Physics lover
-				groupid := groupPhysicsLovers
+					// group id for Physics lover
+					groupid := groupPhysicsLovers
 
-				res, err := sendRequest(
-					"POST",
-					fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
-					"groupid="+groupid,
-					&User{ID: userIDAdmin},
-					[]string{ssvc.BundleUUIDRoleAdmin},
-				)
+					res, err := sendRequest(
+						"POST",
+						fmt.Sprintf("/%s/cloud/users/%s/groups%s", ocsVersion, user.ID, formatpart),
+						"groupid="+groupid,
+						&User{ID: userIDAdmin},
+						[]string{ssvc.BundleUUIDRoleAdmin},
+					)
 
-				if err != nil {
-					t.Fatal(err)
-				}
+					if err != nil {
+						t.Fatal(err)
+					}
 
-				response := assertEmptyResponse(t, format, res)
+					response := assertEmptyResponse(t, format, res)
 
-				assertStatusCode(t, 200, res, ocsVersion)
-				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-				assert.Empty(t, response.Ocs.Data)
+					assertStatusCode(t, 200, res, ocsVersion)
+					assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
+					assert.Empty(t, response.Ocs.Data)
 
-				// Check the user is in the group
-				res, err = sendRequest(
-					"GET",
-					fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
-					"",
-					&User{ID: userIDAdmin},
-					[]string{ssvc.BundleUUIDRoleAdmin},
-				)
-				if err != nil {
-					t.Fatal(err)
-				}
-				var grpResponse GetUsersGroupsResponse
-				if err := json.Unmarshal(res.Body.Bytes(), &grpResponse); err != nil {
-					t.Fatal(err)
-				}
-				assert.Contains(t, grpResponse.Ocs.Data.Groups, groupid)
+					// Check the user is in the group
+					res, err = sendRequest(
+						"GET",
+						fmt.Sprintf("/%s/cloud/users/%s/groups?format=json", ocsVersion, user.ID),
+						"",
+						&User{ID: userIDAdmin},
+						[]string{ssvc.BundleUUIDRoleAdmin},
+					)
+					if err != nil {
+						t.Fatal(err)
+					}
+					var grpResponse GetUsersGroupsResponse
+					if err := json.Unmarshal(res.Body.Bytes(), &grpResponse); err != nil {
+						t.Fatal(err)
+					}
+					assert.Contains(t, grpResponse.Ocs.Data.Groups, groupid)
 
-				cleanUp(t)
+					cleanUp(t)
+				})
 			}
 		}
 	}
@@ -1738,13 +1845,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 			}
 
 			response := assertEmptyResponse(t, format, res)
-
-			assertStatusCode(t, 500, res, ocsVersion)
-			assertResponseMeta(t, Meta{
-				"error",
-				996,
-				"{\"id\":\".\",\"code\":500,\"detail\":\"could not clean up group id: invalid id .\",\"status\":\"Internal Server Error\"}",
-			}, response.Ocs.Meta)
+			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
 			assert.Empty(t, response.Ocs.Data)
 
 			// Check the users are correctly added to group
@@ -1763,9 +1864,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// Change this line once the issue is fixed
-			// assert.NotContains(t, grpResponse.Ocs.Data.Groups, groups[0])
-			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[0])
+			assert.NotContains(t, grpResponse.Ocs.Data.Groups, groups[0])
 			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[1])
 			assert.Contains(t, grpResponse.Ocs.Data.Groups, groups[2])
 			cleanUp(t)
@@ -1868,7 +1967,7 @@ func TestGetGroupsDefaultGroups(t *testing.T) {
 
 			assertStatusCode(t, 200, res, ocsVersion)
 			assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
-			assert.Subset(t, DefaultGroups, response.Ocs.Data.Groups)
+			assert.Subset(t, defaultGroups, response.Ocs.Data.Groups)
 		}
 	}
 }
@@ -2036,40 +2135,9 @@ func TestDeleteGroupInvalidGroups(t *testing.T) {
 }
 
 func TestGetGroupMembersDefaultGroups(t *testing.T) {
-	defaultGroups := map[string][]string{
-		groupSysUsers: {
-			userIDKonnectd,
-			userIDReva,
-		},
-		groupUsers: {
-			userIDEinstein,
-			userIDMarie,
-			userIDFeynman,
-		},
-		groupSailingLovers: {
-			userIDEinstein,
-		},
-		groupViolinHaters: {
-			userIDEinstein,
-		},
-		groupPoloniumLovers: {
-			userIDMarie,
-		},
-		groupQuantumLovers: {
-			userIDFeynman,
-		},
-		groupPhilosophyHaters: {
-			userIDFeynman,
-		},
-		groupPhysicsLovers: {
-			userIDEinstein,
-			userIDMarie,
-			userIDFeynman,
-		},
-	}
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {
-			for group, members := range defaultGroups {
+			for group, members := range defaultMembers {
 				formatpart := getFormatString(format)
 				res, err := sendRequest(
 					"GET",
@@ -2096,7 +2164,7 @@ func TestGetGroupMembersDefaultGroups(t *testing.T) {
 				}
 
 				assertStatusCode(t, 200, res, ocsVersion)
-				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText)
+				assert.True(t, response.Ocs.Meta.Success(ocsVersion), unsuccessfulResponseText+" for group "+group)
 				assert.Equal(t, members, response.Ocs.Data.Users)
 
 				cleanUp(t)

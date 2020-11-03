@@ -73,15 +73,19 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 // LoadAccounts loads all the accounts from the local filesystem
 func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	infos, err := ioutil.ReadDir(root)
+	if err != nil {
+		return err
+	}
+	for i := range infos {
 		acc := &proto.Account{}
-		if e := r.LoadAccount(ctx, filepath.Base(path), acc); e != nil {
+		if e := r.LoadAccount(ctx, infos[i].Name(), acc); e != nil {
 			r.log.Err(e).Msg("could not load account")
-			return nil
+			continue
 		}
 		*a = append(*a, acc)
-		return nil
-	})
+	}
+	return nil
 }
 
 // DeleteAccount from the local filesystem
@@ -135,15 +139,19 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 // LoadGroups loads all the groups from the local filesystem
 func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	infos, err := ioutil.ReadDir(root)
+	if err != nil {
+		return err
+	}
+	for i := range infos {
 		grp := &proto.Group{}
-		if e := r.LoadGroup(ctx, filepath.Base(path), grp); e != nil {
+		if e := r.LoadGroup(ctx, infos[i].Name(), grp); e != nil {
 			r.log.Err(e).Msg("could not load group")
-			return nil
+			continue
 		}
 		*g = append(*g, grp)
-		return nil
-	})
+	}
+	return nil
 }
 
 // DeleteGroup from the local filesystem

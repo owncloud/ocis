@@ -501,7 +501,7 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 
 	users := []string{}
 	for i := range res.Accounts {
-		users = append(users, res.Accounts[i].Id)
+		users = append(users, res.Accounts[i].OnPremisesSamAccountName)
 	}
 
 	render.Render(w, r, response.DataRender(&data.Users{Users: users}))
