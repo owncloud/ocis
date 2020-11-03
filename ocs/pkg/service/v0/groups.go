@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -230,7 +231,58 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 
 // AddGroup adds a group
 func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "not implemented"))
+	groupid := r.PostFormValue("groupid")
+	displayname := r.PostFormValue("displayname")
+	gid := r.PostFormValue("gidnumber")
+
+	var gidNumber int64
+	var err error
+
+	if gid != "" {
+		gidNumber, err = strconv.ParseInt(gid, 10, 64)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidnumber provided"))
+			o.logger.Error().Err(err).Str("gid", gid).Str("groupid", groupid).Msg("Cannot use the gidnumber provided")
+			return
+		}
+	}
+
+	if displayname == "" {
+		displayname = groupid
+	}
+
+	newGroup := &accounts.Group{
+		Id:                       groupid,
+		DisplayName:              displayname,
+		OnPremisesSamAccountName: groupid,
+		GidNumber:                gidNumber,
+	}
+	group, err := o.getGroupsService().CreateGroup(r.Context(), &accounts.CreateGroupRequest{
+		Group: newGroup,
+	})
+	if err != nil {
+		merr := merrors.FromError(err)
+		switch merr.Code {
+		case http.StatusBadRequest:
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+		case http.StatusConflict:
+			if response.APIVersion(r.Context()) == "2" {
+				// it seems the application framework sets the ocs status code to the httpstatus code, which affects the provisioning api
+				// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
+				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+			}
+		default:
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("groupid", groupid).Msg("could not add group")
+		// TODO check error if group already existed
+		return
+	}
+	o.logger.Debug().Interface("group", group).Msg("added group")
+
+	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
 // DeleteGroup deletes a group

@@ -1984,11 +1984,7 @@ func TestCreateGroup(t *testing.T) {
 				GIDNumber:   32222,
 				Displayname: "Group Name",
 			},
-			&Meta{
-				Status:     "error",
-				StatusCode: 999,
-				Message:    "not implemented",
-			},
+			nil,
 		},
 	}
 	for _, ocsVersion := range ocsVersions {
@@ -2041,10 +2037,7 @@ func TestCreateGroup(t *testing.T) {
 	}
 }
 
-// Add group not implemented
-// Unskip this test after adding group is implemented.
 func TestDeleteGroup(t *testing.T) {
-	t.Skip()
 	testData := []Group{
 		{
 			ID:          "grp1",
