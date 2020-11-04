@@ -1478,15 +1478,6 @@ apiWebdavPreviews/previews.feature:166
 apiWebdavPreviews/previews.feature:178
 apiWebdavPreviews/previews.feature:179
 #
-# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
-#
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:93
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:94
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:114
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:115
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:116
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:117
-#
 # https://github.com/owncloud/ocis/issues/762 path and other information are not shown if a share does not have "read" permission
 #
 apiShareOperationsToShares/uploadToShare.feature:64
