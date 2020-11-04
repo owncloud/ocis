@@ -14,8 +14,8 @@ config = {
     'webdav':'',
   },
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': 'f8f9de42f8a3af795fbfe658ca270b83fb435f84',
+    'coreBranch': 'acceptance-tests-ocis-cleanup',
+    'coreCommit': '784879e05ef10a609bb1a026c3744ef83173210b',
     'numberOfParts': 6
   },
   'uiTests': {
