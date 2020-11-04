@@ -196,6 +196,9 @@ func (k Konnectd) Index() http.HandlerFunc {
 	if err != nil {
 		k.logger.Fatal().Err(err).Msg("Could not read index template")
 	}
+	if err = f.Close(); err != nil {
+		k.logger.Fatal().Err(err).Msg("Could not close body")
+	}
 
 	// TODO add environment variable to make the path prefix configurable
 	pp := "/signin/v1"

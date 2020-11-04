@@ -137,6 +137,10 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, err.Error()))
 		return
 	}
+	if err = r.Body.Close(); err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		return
+	}
 
 	values, err := url.ParseQuery(string(body))
 	if err != nil {
