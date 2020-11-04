@@ -72,6 +72,8 @@ func createAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsSer
 func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 	opt := newOptions(opts...)
 
+	publicFilesEndpoint := "/remote.php/dav/public-files/"
+
 	return func(next http.Handler) http.Handler {
 		// TODO: handle error
 		tokenManager, err := jwt.New(map[string]interface{}{
@@ -90,6 +92,12 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 			switch {
 			case claims == nil:
 				login, password, ok := r.BasicAuth()
+				// check if we are dealing with a public link
+				if ok && login == "public" && strings.HasPrefix(r.URL.Path, publicFilesEndpoint) {
+					// forward to reva frontend
+					next.ServeHTTP(w, r)
+					return
+				}
 				if opt.EnableBasicAuth && ok {
 					l.Warn().Msg("basic auth enabled, use only for testing or development")
 					account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("login eq '%s' and password eq '%s'", strings.ReplaceAll(login, "'", "''"), strings.ReplaceAll(password, "'", "''")))
