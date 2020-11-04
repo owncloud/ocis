@@ -26,6 +26,9 @@ func Server(opts ...Option) grpc.Service {
 	if err := proto.RegisterGroupsServiceHandler(service.Server(), handler); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register groups handler")
 	}
+	if err := proto.RegisterIndexServiceHandler(service.Server(), handler); err != nil {
+		options.Logger.Fatal().Err(err).Msg("could not register index handler")
+	}
 
 	service.Init()
 	return service

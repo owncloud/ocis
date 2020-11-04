@@ -16,7 +16,7 @@ require (
 	github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7
 	github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853
-	github.com/owncloud/ocis/accounts v0.5.2
+	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-phoenix v0.0.0-00010101000000-000000000000
@@ -24,13 +24,13 @@ require (
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/proxy v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
-	github.com/owncloud/ocis/storage v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df
 	github.com/owncloud/ocis/store v0.0.0-20200918125107-fcca9faa81c8
 	github.com/owncloud/ocis/thumbnails v0.1.6
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
 	github.com/restic/calens v0.2.0
-	go.opencensus.io v0.22.4
+	go.opencensus.io v0.22.5
 )
 
 replace (

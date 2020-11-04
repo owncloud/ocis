@@ -72,27 +72,28 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "storage-public-link",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.StoragePublicLink.Network,
-						"address": cfg.Reva.StoragePublicLink.Addr,
+						"network": cfg.Reva.StoragePublicLink.GRPCNetwork,
+						"address": cfg.Reva.StoragePublicLink.GRPCAddr,
 						"interceptors": map[string]interface{}{
 							"log": map[string]interface{}{},
 						},
 						"services": map[string]interface{}{
 							"publicstorageprovider": map[string]interface{}{
 								"mount_path":   cfg.Reva.StoragePublicLink.MountPath,
-								"gateway_addr": cfg.Reva.Gateway.URL,
+								"gateway_addr": cfg.Reva.Gateway.Endpoint,
 							},
 							"authprovider": map[string]interface{}{
 								"auth_manager": "publicshares",
 								"auth_managers": map[string]interface{}{
 									"publicshares": map[string]interface{}{
-										"gateway_addr": cfg.Reva.Gateway.URL,
+										"gateway_addr": cfg.Reva.Gateway.Endpoint,
 									},
 								},
 							},

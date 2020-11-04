@@ -3,19 +3,17 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
-	"os"
+	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/blevesearch/bleve"
-	"github.com/blevesearch/bleve/analysis/analyzer/custom"
-	"github.com/blevesearch/bleve/analysis/analyzer/keyword"
-	"github.com/blevesearch/bleve/analysis/analyzer/simple"
-	"github.com/blevesearch/bleve/analysis/analyzer/standard"
-	"github.com/blevesearch/bleve/analysis/token/lowercase"
-	"github.com/blevesearch/bleve/analysis/tokenizer/unicode"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"github.com/owncloud/ocis/ocis-pkg/indexer"
+	idxcfg "github.com/owncloud/ocis/ocis-pkg/indexer/config"
+	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -24,6 +22,9 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
+
+// userDefaultGID is the default integer representing the "users" group.
+const userDefaultGID = 30000
 
 // New returns a new instance of Service
 func New(opts ...Option) (s *Service, err error) {
@@ -72,92 +73,73 @@ func New(opts ...Option) (s *Service, err error) {
 	return
 }
 
-func (s Service) buildIndex() (index bleve.Index, err error) {
-	indexDir := filepath.Join(s.Config.Server.AccountsDataPath, "index.bleve")
-	if index, err = bleve.Open(indexDir); err != nil {
-		if err != bleve.ErrorIndexPathDoesNotExist {
-			s.log.Error().Err(err).Msg("failed to read index")
-			return
+func (s Service) buildIndex() (*indexer.Indexer, error) {
+	var indexcfg *idxcfg.Config
+
+	indexcfg, err := configFromSvc(s.Config)
+	if err != nil {
+		return nil, err
+	}
+	idx := indexer.CreateIndexer(indexcfg)
+
+	if err := recreateContainers(idx, indexcfg); err != nil {
+		return nil, err
+	}
+	return idx, nil
+}
+
+// configFromSvc creates an index config out of a service configuration. This intermediate step exists
+// because the index config was mapped after the service config.
+func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
+	c := idxcfg.New()
+
+	defer func(cfg *config.Config) {
+		l := log.NewLogger(log.Color(cfg.Log.Color), log.Pretty(cfg.Log.Pretty), log.Level(cfg.Log.Level))
+		if r := recover(); r != nil {
+			l.Error().
+				Str("panic", "recovered from panic while parsing index config from service configuration").
+				Interface("svc_config", cfg).
+				Msg("recovered from panic")
 		}
+	}(cfg)
 
-		indexMapping := bleve.NewIndexMapping()
-		// keep all symbols in terms to allow exact maching, eg. emails
-		indexMapping.DefaultAnalyzer = keyword.Name
-		// TODO don't bother to store fields as we will load the account from disk
-
-		// Reusable mapping for text
-		standardTextFieldMapping := bleve.NewTextFieldMapping()
-		standardTextFieldMapping.Analyzer = standard.Name
-		standardTextFieldMapping.Store = false
-
-		// Reusable mapping for text, uses english stop word removal
-		simpleTextFieldMapping := bleve.NewTextFieldMapping()
-		simpleTextFieldMapping.Analyzer = simple.Name
-		simpleTextFieldMapping.Store = false
-
-		// Reusable mapping for keyword text
-		keywordFieldMapping := bleve.NewTextFieldMapping()
-		keywordFieldMapping.Analyzer = keyword.Name
-		keywordFieldMapping.Store = false
-
-		// Reusable mapping for lowercase text
-		err = indexMapping.AddCustomAnalyzer("lowercase",
-			map[string]interface{}{
-				"type":      custom.Name,
-				"tokenizer": unicode.Name,
-				"token_filters": []string{
-					lowercase.Name,
+	if (config.Repo{}) != cfg.Repo {
+		if (config.Disk{}) != cfg.Repo.Disk {
+			c.Repo = idxcfg.Repo{
+				Disk: idxcfg.Disk{
+					Path: cfg.Repo.Disk.Path,
 				},
-			})
-		if err != nil {
-			return
+			}
 		}
-		lowercaseTextFieldMapping := bleve.NewTextFieldMapping()
-		lowercaseTextFieldMapping.Analyzer = "lowercase"
-		lowercaseTextFieldMapping.Store = true
 
-		// accounts
-		accountMapping := bleve.NewDocumentMapping()
-		indexMapping.AddDocumentMapping("account", accountMapping)
-
-		// Text
-		accountMapping.AddFieldMappingsAt("display_name", standardTextFieldMapping)
-		accountMapping.AddFieldMappingsAt("description", standardTextFieldMapping)
-
-		// Lowercase
-		accountMapping.AddFieldMappingsAt("on_premises_sam_account_name", lowercaseTextFieldMapping)
-		accountMapping.AddFieldMappingsAt("preferred_name", lowercaseTextFieldMapping)
-
-		// Keywords
-		accountMapping.AddFieldMappingsAt("mail", keywordFieldMapping)
-
-		// groups
-		groupMapping := bleve.NewDocumentMapping()
-		indexMapping.AddDocumentMapping("group", groupMapping)
-
-		// Text
-		groupMapping.AddFieldMappingsAt("display_name", standardTextFieldMapping)
-		groupMapping.AddFieldMappingsAt("description", standardTextFieldMapping)
-
-		// Lowercase
-		groupMapping.AddFieldMappingsAt("on_premises_sam_account_name", lowercaseTextFieldMapping)
-
-		// Tell blevesearch how to determine the type of the structs that are indexed.
-		// The referenced field needs to match the struct field exactly and it must be public.
-		// See pkg/proto/v0/bleve.go how we wrap the generated Account and Group to add a
-		// BleveType property which is indexed as `bleve_type` so we can also distinguish the
-		// documents in the index by querying for that property.
-		indexMapping.TypeField = "BleveType"
-
-		// for now recreate index on every start
-		if err = os.RemoveAll(indexDir); err != nil {
-			return
+		if (config.CS3{}) != cfg.Repo.CS3 {
+			c.Repo = idxcfg.Repo{
+				CS3: idxcfg.CS3{
+					ProviderAddr: cfg.Repo.CS3.ProviderAddr,
+					DataURL:      cfg.Repo.CS3.DataURL,
+					DataPrefix:   cfg.Repo.CS3.DataPrefix,
+					JWTSecret:    cfg.Repo.CS3.JWTSecret,
+				},
+			}
 		}
-		if index, err = bleve.New(indexDir, indexMapping); err != nil {
-			return nil, err
+
+		if (config.Index{}) != cfg.Index {
+			c.Index = idxcfg.Index{
+				UID: idxcfg.Bound{
+					Lower: cfg.Index.UID.Lower,
+				},
+				GID: idxcfg.Bound{
+					Lower: cfg.Index.GID.Lower,
+				},
+			}
+		}
+
+		if (config.ServiceUser{}) != cfg.ServiceUser {
+			c.ServiceUser = cfg.ServiceUser
 		}
 	}
-	return
+
+	return c, nil
 }
 
 func (s Service) createDefaultAccounts() (err error) {
@@ -275,8 +257,35 @@ func (s Service) createDefaultAccounts() (err error) {
 			return err
 		}
 
-		if err := s.indexAccount(accounts[i].Id); err != nil {
-			return err
+		results, err := s.index.Add(&accounts[i])
+		if err != nil {
+			if idxerrs.IsAlreadyExistsErr(err) {
+				continue
+			} else {
+				return err
+			}
+		}
+
+		// TODO: can be removed again as soon as we respect the predefined UIDs and GIDs from the account. Then no autoincrement is happening, therefore we don't need to update accounts.
+		changed := false
+		for _, r := range results {
+			if r.Field == "UidNumber" || r.Field == "GidNumber" {
+				id, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+				if err != nil {
+					return err
+				}
+				if r.Field == "UidNumber" {
+					accounts[i].UidNumber = id
+				} else {
+					accounts[i].GidNumber = id
+				}
+				changed = true
+			}
+		}
+		if changed {
+			if err := s.repo.WriteAccount(context.Background(), &accounts[i]); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -337,8 +346,28 @@ func (s Service) createDefaultGroups() (err error) {
 			return err
 		}
 
-		if err := s.indexGroup(groups[i].Id); err != nil {
-			return err
+		results, err := s.index.Add(&groups[i])
+		if err != nil {
+			if idxerrs.IsAlreadyExistsErr(err) {
+				continue
+			} else {
+				return err
+			}
+		}
+
+		// TODO: can be removed again as soon as we respect the predefined GIDs from the group. Then no autoincrement is happening, therefore we don't need to update groups.
+		for _, r := range results {
+			if r.Field == "GidNumber" {
+				gid, err := strconv.ParseInt(path.Base(r.Value), 10, 0)
+				if err != nil {
+					return err
+				}
+				groups[i].GidNumber = gid
+				if err := s.repo.WriteGroup(context.Background(), &groups[i]); err != nil {
+					return err
+				}
+				break
+			}
 		}
 	}
 	return nil
@@ -374,7 +403,7 @@ type Service struct {
 	id          string
 	log         log.Logger
 	Config      *config.Config
-	index       bleve.Index
+	index       *indexer.Indexer
 	RoleService settings.RoleService
 	RoleManager *roles.Manager
 	repo        storage.Repo

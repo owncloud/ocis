@@ -17,7 +17,7 @@
     "watch": "rollup -c -w",
     "test": "echo 'Not implemented'",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/accounts.swagger.json --moduleName accounts --destination ui/client/accounts/index.js",
-    "acceptance-tests": "cucumber-js --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
+    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
@@ -53,7 +53,7 @@
     "ldap": "^0.7.1",
     "nightwatch": "^1.3.6",
     "nightwatch-api": "^3.0.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "qs": "^6.9.1",
     "rimraf": "^3.0.0",
     "rollup": "^1.28.0",

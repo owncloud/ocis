@@ -2,33 +2,17 @@ package service
 
 import (
 	"context"
-	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"path"
 	"path/filepath"
+	"strconv"
 
-	"github.com/CiscoM31/godata"
-	"github.com/blevesearch/bleve"
 	"github.com/gofrs/uuid"
+	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/provider"
+	"github.com/owncloud/ocis/accounts/pkg/storage"
 )
-
-func (s Service) indexGroup(id string) error {
-	g := &proto.BleveGroup{
-		BleveType: "group",
-	}
-	if err := s.repo.LoadGroup(context.Background(), id, &g.Group); err != nil {
-		s.log.Error().Err(err).Str("group", id).Msg("could not load group")
-		return err
-	}
-	s.log.Debug().Interface("group", g).Msg("found group")
-	if err := s.index.Index(g.Id, g); err != nil {
-		s.log.Error().Err(err).Interface("group", g).Msg("could not index group")
-		return err
-	}
-	return nil
-}
 
 func (s Service) expandMembers(g *proto.Group) {
 	if g == nil {
@@ -41,7 +25,7 @@ func (s Service) expandMembers(g *proto.Group) {
 		if err := s.repo.LoadAccount(context.Background(), g.Members[i].Id, a); err == nil {
 			expanded = append(expanded, a)
 		} else {
-			// log errors but continue execution for now
+			// log errors but con/var/tmp/ocis-accounts-store-408341811tinue execution for now
 			s.log.Error().Err(err).Str("id", g.Members[i].Id).Msg("could not load account")
 		}
 	}
@@ -67,49 +51,25 @@ func (s Service) deflateMembers(g *proto.Group) {
 
 // ListGroups implements the GroupsServiceHandler interface
 func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
-
-	// only search for groups
-	tq := bleve.NewTermQuery("group")
-	tq.SetField("bleve_type")
-
-	query := bleve.NewConjunctionQuery(tq)
-
-	if in.Query != "" {
-		// parse the query like an odata filter
-		var q *godata.GoDataFilterQuery
-		if q, err = godata.ParseFilterString(in.Query); err != nil {
-			s.log.Error().Err(err).Msg("could not parse query")
-			return merrors.InternalServerError(s.id, "could not parse query: %v", err.Error())
-		}
-
-		// convert to bleve query
-		bq, err := provider.BuildBleveQuery(q)
-		if err != nil {
-			s.log.Error().Err(err).Msg("could not build bleve query")
-			return merrors.InternalServerError(s.id, "could not build bleve query: %v", err.Error())
-		}
-		query.AddQuery(bq)
-	}
-
-	s.log.Debug().Interface("query", query).Msg("using query")
-
-	searchRequest := bleve.NewSearchRequest(query)
-	var searchResult *bleve.SearchResult
-	searchResult, err = s.index.Search(searchRequest)
-	if err != nil {
-		s.log.Error().Err(err).Msg("could not execute bleve search")
-		return merrors.InternalServerError(s.id, "could not execute bleve search: %v", err.Error())
-	}
-
-	s.log.Debug().Interface("result", searchResult).Msg("result")
+	var searchResults []string
 
 	out.Groups = make([]*proto.Group, 0)
+	if in.Query == "" {
+		searchResults, _ = s.index.FindByPartial(&proto.Group{}, "DisplayName", "*")
+	}
 
-	for _, hit := range searchResult.Hits {
+	/*
+		var startsWithIDQuery = regexp.MustCompile(`^startswith\(id,'(.*)'\)$`)
+		match := startsWithIDQuery.FindStringSubmatch(in.Query)
+		if len(match) == 2 {
+			searchResults = []string{match[1]}
+		}
+	*/
 
+	for _, hit := range searchResults {
 		g := &proto.Group{}
-		if err = s.repo.LoadGroup(c, hit.ID, g); err != nil {
-			s.log.Error().Err(err).Str("group", hit.ID).Msg("could not load group, skipping")
+		if err = s.repo.LoadGroup(c, hit, g); err != nil {
+			s.log.Error().Err(err).Str("group", hit).Msg("could not load group, skipping")
 			continue
 		}
 		s.log.Debug().Interface("group", g).Msg("found group")
@@ -150,31 +110,57 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 
 // CreateGroup implements the GroupsServiceHandler interface
 func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
-	var id string
 	if in.Group == nil {
-		return merrors.BadRequest(s.id, "account missing")
+		return merrors.InternalServerError(s.id, "invalid group: empty")
 	}
-	if in.Group.Id == "" {
-		in.Group.Id = uuid.Must(uuid.NewV4()).String()
+	p.Merge(out, in.Group)
+
+	if out.Id == "" {
+		out.Id = uuid.Must(uuid.NewV4()).String()
 	}
 
-	if id, err = cleanupID(in.Group.Id); err != nil {
+	if _, err = cleanupID(out.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	// extract member id
-	s.deflateMembers(in.Group)
+	s.deflateMembers(out)
 
-	if err = s.repo.WriteGroup(c, in.Group); err != nil {
-		s.log.Error().Err(err).Interface("group", in.Group).Msg("could not persist new group")
+	if err = s.repo.WriteGroup(c, out); err != nil {
+		s.log.Error().Err(err).Interface("group", out).Msg("could not persist new group")
 		return merrors.InternalServerError(s.id, "could not persist new group: %v", err.Error())
 	}
 
-	if err = s.indexGroup(id); err != nil {
+	indexResults, err := s.index.Add(out)
+	if err != nil {
+		s.rollbackCreateGroup(c, out)
 		return merrors.InternalServerError(s.id, "could not index new group: %v", err.Error())
 	}
 
+	for _, r := range indexResults {
+		if r.Field == "GidNumber" {
+			gid, err := strconv.Atoi(path.Base(r.Value))
+			if err != nil {
+				s.rollbackCreateGroup(c, out)
+				return err
+			}
+			out.GidNumber = int64(gid)
+			return s.repo.WriteGroup(context.Background(), out)
+		}
+	}
+
 	return
+}
+
+// rollbackCreateGroup tries to rollback changes made by `CreateGroup` if parts of it failed.
+func (s Service) rollbackCreateGroup(ctx context.Context, group *proto.Group) {
+	err := s.index.Delete(group)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback group from indices")
+	}
+	err = s.repo.DeleteGroup(ctx, group.Id)
+	if err != nil {
+		s.log.Err(err).Msg("failed to rollback group from repo")
+	}
 }
 
 // UpdateGroup implements the GroupsServiceHandler interface
@@ -217,7 +203,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
-	if err = s.index.Delete(id); err != nil {
+	if err = s.index.Delete(g); err != nil {
 		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group from index")
 		return merrors.InternalServerError(s.id, "could not remove group from index: %v", err.Error())
 	}

@@ -15,12 +15,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '35c53c096f40dd15ae15940c589965379e921857',
-    'numberOfParts': 4
+    'coreCommit': '6e5e252dcd18448709006cb2de6fe86cb6d0ecec',
+    'numberOfParts': 6
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '42c2a372aceb31eb17e13ebae08e2e25e2447dfe',
+    'phoenixCommit': '492e6a663efad67f770ba4ac405c4d9983d00cd3',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -38,12 +38,12 @@ config = {
         'webUIRenameFiles',
         'webUIRenameFolders',
       ],
-       'phoenixWebUI4': [
+      'phoenixWebUI4': [
         'webUITrashbin',
         'webUIUpload',
-        # All tests in the following suites are skipped currently
-        # so they won't run now but when they are enabled they will run
         'webUIRestrictSharing',
+        ],
+      'phoenixWebUI5': [
         'webUISharingAutocompletion',
         'webUISharingInternalGroups',
         'webUISharingInternalUsers',
@@ -51,17 +51,27 @@ config = {
         'webUISharingFilePermissionsGroups',
         'webUISharingFolderPermissionsGroups',
         'webUISharingFolderAdvancedPermissionsGroups',
+        ],
+      'phoenixWebUI6': [
         'webUIResharing',
         'webUISharingPublic',
         'webUISharingPublicDifferentRoles',
         'webUISharingAcceptShares',
-        'webUISharingFilePermissionMultipleUsers',
-        'webUISharingFolderPermissionMultipleUsers',
-        'webUISharingFolderAdvancedPermissionMultipleUsers',
         'webUISharingNotifications',
       ],
+      'phoenixWebUI7': [
+        'webUISharingFilePermissionMultipleUsers',
+      ],
+      'phoenixWebUI8': [
+        'webUISharingFolderPermissionMultipleUsers',
+        'webUISharingFolderAdvancedPermissionMultipleUsers',
+      ],
     }
-  }
+  },
+  'rocketchat': {
+    'channel': 'ocis-internal',
+    'from_secret': 'private_rocketchat',
+  },
 }
 def getTestSuiteNames():
   keys = config['modules'].keys()
@@ -84,13 +94,11 @@ def getCoreApiTestPipelineNames():
   return names
 
 def getDependsOnAllTestPipelines(ctx):
-  dependencies = getTestSuiteNames() + [ 'upload-coverage' ]
-  if ctx.build.ref != "refs/heads/master":
-    dependencies = getTestSuiteNames() + [
-      'upload-coverage',
-      'localApiTests-owncloud-storage',
-      'localApiTests-ocis-storage',
-    ] + getCoreApiTestPipelineNames() + getUITestSuiteNames()
+  dependencies = getTestSuiteNames() + [
+    'upload-coverage',
+    'localApiTests-owncloud-storage',
+    'localApiTests-ocis-storage',
+  ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
 
@@ -102,6 +110,7 @@ def main(ctx):
     docker(ctx, 'amd64'),
     docker(ctx, 'arm64'),
     docker(ctx, 'arm'),
+    dockerEos(ctx),
     binary(ctx, 'linux'),
     binary(ctx, 'darwin'),
     binary(ctx, 'windows'),
@@ -114,12 +123,18 @@ def main(ctx):
     readme(ctx),
     badges(ctx),
     docs(ctx),
-    updateDeployment(ctx)
+    updateDeployment(ctx),
+    notify(ctx),
   ]
 
-  if '[docs-only]' in ctx.build.title:
-    pipelines = docs(ctx)
-    pipelines['depends_on'] = []
+  if '[docs-only]' in (ctx.build.title + ctx.build.message):
+    doc_pipelines = docs(ctx)
+    doc_pipelines['depends_on'] = []
+
+    notify_pipelines = notify(ctx)
+    notify_pipelines['depends_on'] = ['docs']
+
+    pipelines = [ doc_pipelines, notify_pipelines ]
   else:
     pipelines = before + stages + after
 
@@ -142,13 +157,14 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
+  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
   return pipelines
 
 def testing(ctx, module):
   steps = generate(module) + [
     {
       'name': 'vet',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -163,7 +179,7 @@ def testing(ctx, module):
     },
     {
       'name': 'staticcheck',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -178,7 +194,7 @@ def testing(ctx, module):
     },
     {
       'name': 'lint',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -193,7 +209,7 @@ def testing(ctx, module):
     },
     {
         'name': 'test',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd %s' % (module),
@@ -292,9 +308,9 @@ def uploadCoverage(ctx):
           'SONAR_TOKEN': {
             'from_secret': 'sonar_token',
           },
-          'SONAR_PULL_REQUEST_BASE': 'master' if ctx.build.event == 'pull_request' else None,
-          'SONAR_PULL_REQUEST_BRANCH': ctx.build.source if ctx.build.event == 'pull_request' else None,
-          'SONAR_PULL_REQUEST_KEY': ctx.build.ref.replace("refs/pull/", "").split("/")[0] if ctx.build.event == 'pull_request' else None,
+          'SONAR_PULL_REQUEST_BASE': '%s' % ('master' if ctx.build.event == 'pull_request' else None),
+          'SONAR_PULL_REQUEST_BRANCH': '%s' % (ctx.build.source if ctx.build.event == 'pull_request' else None),
+          'SONAR_PULL_REQUEST_KEY': '%s' % (ctx.build.ref.replace("refs/pull/", "").split("/")[0] if ctx.build.event == 'pull_request' else None),
         },
       },
       {
@@ -336,13 +352,14 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'localApiTests-%s-storage' % (storage),
-        'image': 'owncloudci/php:7.2',
+        'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/data/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner'
@@ -367,6 +384,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -389,13 +407,14 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
-        'image': 'owncloudci/php:7.2',
+        'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('rm -rf /srv/app/tmp/ocis/owncloud/*' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/*'),
+          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
+          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
+          'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
@@ -422,6 +441,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -458,7 +478,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
           'SERVER_HOST': 'https://ocis-server:9200',
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
-          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
@@ -502,6 +522,100 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     ],
     'trigger': {
       'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'accountsUITests',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate('ocis') +
+      build() +
+      ocisServer(storage) + [
+      {
+        'name': 'WebUIAcceptanceTests',
+        'image': 'owncloudci/nodejs:11',
+        'pull': 'always',
+        'environment': {
+          'SERVER_HOST': 'https://ocis-server:9200',
+          'BACKEND_HOST': 'https://ocis-server:9200',
+          'RUN_ON_OCIS': 'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
+          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
+          'PHOENIX_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
+          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
+          'LOCAL_UPLOAD_DIR': '/uploads',
+          'NODE_TLS_REJECT_UNAUTHORIZED': 0,
+          'PHOENIX_PATH': '/srv/app/phoenix',
+          'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
+        },
+        'commands': [
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/phoenix.git /srv/app/phoenix' % (phoenixBranch),
+          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/phoenix',
+        ] + ([
+          'git checkout %s' % (phoenixCommit)
+        ] if phoenixCommit != '' else []) + [
+          'yarn install-all',
+          'cd /drone/src/accounts',
+          'yarn install --all',
+          'make test-acceptance-webui'
+        ],
+        'volumes': [{
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+        {
+          'name': 'uploads',
+          'path': '/uploads'
+        }],
+      },
+    ],
+    'services': [
+      {
+        'name': 'redis',
+        'image': 'webhippie/redis',
+        'pull': 'always',
+        'environment': {
+          'REDIS_DATABASES': 1
+        },
+      },
+      {
+        'name': 'selenium',
+        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+        'pull': 'always',
+        'volumes': [
+          {
+            'name': 'uploads',
+            'path': '/uploads'
+          }
+        ],
+      },
+    ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+      {
+        'name': 'uploads',
+        'temp': {}
+      }
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
         'refs/tags/v*',
         'refs/pull/**',
       ],
@@ -581,6 +695,78 @@ def docker(ctx, arch):
     },
   }
 
+def dockerEos(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'docker-eos-ocis',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      generate('ocis') +
+      build() + [
+        {
+          'name': 'dryrun-eos-ocis',
+          'image': 'plugins/docker:18.09',
+          'pull': 'always',
+          'settings': {
+            'dry_run': True,
+            'context': 'ocis/docker/eos-ocis',
+            'tags': 'linux-eos-ocis',
+            'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
+            'repo': 'owncloud/eos-ocis',
+          },
+          'when': {
+            'ref': {
+              'include': [
+                'refs/pull/**',
+              ],
+            },
+          },
+        },
+        {
+          'name': 'docker-eos-ocis',
+          'image': 'plugins/docker:18.09',
+          'pull': 'always',
+          'settings': {
+            'username': {
+              'from_secret': 'docker_username',
+            },
+            'password': {
+              'from_secret': 'docker_password',
+            },
+            'auto_tag': True,
+            'context': 'ocis/docker/eos-ocis',
+            'dockerfile': 'ocis/docker/eos-ocis/Dockerfile',
+            'repo': 'owncloud/eos-ocis',
+          },
+          'when': {
+            'ref': {
+              'exclude': [
+                'refs/pull/**',
+              ],
+            },
+          },
+        },
+      ],
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
 def binary(ctx, name):
   if ctx.build.event == "tag":
     settings = {
@@ -633,7 +819,7 @@ def binary(ctx, name):
       generate('ocis') + [
       {
         'name': 'build',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -648,7 +834,7 @@ def binary(ctx, name):
       },
       {
         'name': 'finish',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -684,8 +870,7 @@ def binary(ctx, name):
         'image': 'toolhippie/calens:latest',
         'pull': 'always',
         'commands': [
-          'cd ocis',
-          'calens --version %s -o dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+          'calens --version %s -o ocis/dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
           'ref': [
@@ -814,6 +999,7 @@ def manifest(ctx):
       'docker-amd64',
       'docker-arm64',
       'docker-arm',
+      'docker-eos-ocis',
       'binaries-linux',
       'binaries-darwin',
       'binaries-windows',
@@ -838,7 +1024,7 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
           'cd ocis',
@@ -968,6 +1154,7 @@ def badges(ctx):
       'docker-amd64',
       'docker-arm64',
       'docker-arm',
+      'docker-eos-ocis',
     ],
     'trigger': {
       'ref': [
@@ -1001,7 +1188,7 @@ def docs(ctx):
       },
       {
         'name': 'generate-config-docs',
-        'image': 'webhippie/golang:1.13',
+        'image': 'webhippie/golang:1.14',
         'commands': generateConfigDocs,
         'volumes': [
           {
@@ -1089,7 +1276,7 @@ def generate(module):
   return [
     {
       'name': 'generate',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd %s' % (module),
@@ -1144,6 +1331,42 @@ def updateDeployment(ctx):
     }
   }
 
+def notify(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'chat-notifications',
+    'clone': {
+      'disable': True
+    },
+    'steps': [
+      {
+        'name': 'notify-rocketchat',
+        'image': 'plugins/slack:1',
+        'pull': 'always',
+        'settings': {
+          'webhook': {
+            'from_secret': config['rocketchat']['from_secret']
+          },
+          'channel': config['rocketchat']['channel']
+        },
+        'when': {
+          'status': [
+            'failure',
+          ],
+        },
+      },
+    ],
+    'depends_on': [],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/heads/release*',
+        'refs/tags/**',
+      ],
+    }
+  }
+
 def frontend(module):
   return [
     {
@@ -1164,32 +1387,29 @@ def ocisServer(storage):
   return [
     {
       'name': 'ocis-server',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'detach': True,
       'environment' : {
         #'OCIS_LOG_LEVEL': 'debug',
-        'STORAGE_STORAGE_HOME_DRIVER': '%s' % (storage),
-        'STORAGE_STORAGE_HOME_DATA_DRIVER': '%s' % (storage),
-        'STORAGE_STORAGE_OC_DRIVER': '%s' % (storage),
-        'STORAGE_STORAGE_OC_DATA_DRIVER': '%s' % (storage),
-        'STORAGE_STORAGE_HOME_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-        'STORAGE_STORAGE_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
-        'STORAGE_STORAGE_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
-        'STORAGE_STORAGE_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
-        'STORAGE_STORAGE_OC_DATA_TEMP_FOLDER': '/srv/app/tmp/',
-        'STORAGE_STORAGE_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+        'STORAGE_HOME_DRIVER': '%s' % (storage),
+        'STORAGE_USERS_DRIVER': '%s' % (storage),
+        'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
+        'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
+        'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
+        'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
+        'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
         'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
         'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
         'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
-        'STORAGE_STORAGE_OC_DATA_SERVER_URL': 'http://ocis-server:9164/data',
-        'STORAGE_DATAGATEWAY_URL': 'https://ocis-server:9200/data',
-        'STORAGE_FRONTEND_URL': 'https://ocis-server:9200',
+        'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
+        'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
+        'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
+        'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
         'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
-        'ACCOUNTS_DATA_PATH': '/srv/app/tmp/ocis-accounts/',
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
@@ -1210,7 +1430,7 @@ def cloneCoreRepos(coreBranch, coreCommit):
   return [
     {
       'name': 'clone-core-repos',
-      'image': 'owncloudci/php:7.2',
+      'image': 'owncloudci/php:7.4',
       'pull': 'always',
       'commands': [
         'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
@@ -1255,7 +1475,7 @@ def build():
   return [
     {
       'name': 'build',
-      'image': 'webhippie/golang:1.13',
+      'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
         'cd ocis',

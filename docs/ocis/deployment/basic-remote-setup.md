@@ -3,7 +3,7 @@ title: "Basic Remote Setup"
 date: 2020-02-27T20:35:00+01:00
 weight: 16
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: basic-remote-setup.md
 ---
 

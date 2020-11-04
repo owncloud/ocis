@@ -12,7 +12,7 @@ type Options struct {
 	Context  *cli.Context
 }
 
-// Option undocummented
+// Option undocumented
 type Option func(o *Options)
 
 // Services option

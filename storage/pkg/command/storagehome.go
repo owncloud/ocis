@@ -80,18 +80,19 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				}
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Users.MaxCPUs,
+						"max_cpus":             cfg.Reva.StorageHome.MaxCPUs,
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": "storage-home",
+						"tracing_service_name": c.Command.Name,
 					},
 					"shared": map[string]interface{}{
 						"jwt_secret": cfg.Reva.JWTSecret,
+						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.StorageHome.Network,
-						"address": cfg.Reva.StorageHome.Addr,
+						"network": cfg.Reva.StorageHome.GRPCNetwork,
+						"address": cfg.Reva.StorageHome.GRPCAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"storageprovider": map[string]interface{}{
@@ -100,8 +101,22 @@ func StorageHome(cfg *config.Config) *cli.Command {
 								"mount_path":         cfg.Reva.StorageHome.MountPath,
 								"mount_id":           cfg.Reva.StorageHome.MountID,
 								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
-								// TODO use cfg.Reva.StorageHomeData.URL, ?
-								"data_server_url": cfg.Reva.StorageHome.DataServerURL,
+								"data_server_url":    cfg.Reva.StorageHome.DataServerURL,
+							},
+						},
+					},
+					"http": map[string]interface{}{
+						"network": cfg.Reva.StorageHome.HTTPNetwork,
+						"address": cfg.Reva.StorageHome.HTTPAddr,
+						// TODO build services dynamically
+						"services": map[string]interface{}{
+							"dataprovider": map[string]interface{}{
+								"prefix":      cfg.Reva.StorageHome.HTTPPrefix,
+								"driver":      cfg.Reva.StorageHome.Driver,
+								"drivers":     drivers(cfg),
+								"timeout":     86400,
+								"insecure":    true,
+								"disable_tus": false,
 							},
 						},
 					},

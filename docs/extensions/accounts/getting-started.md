@@ -57,5 +57,12 @@ The program provides a few sub-commands on execution. The available configuratio
 The server command is used to start the grpc server. For further help please execute:
 
 {{< highlight txt >}}
-ocis-accounts server --help
+accounts server --help
 {{< / highlight >}}
+
+### Version
+The version command lists the versions of all running instances. For further help please execute:
+
+{{< highlight txt >}}
+accounts version --help
+{{< /highlight >}}

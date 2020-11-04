@@ -156,8 +156,8 @@ $(GOPATH)/bin/protoc-gen-micro:
 $(GOPATH)/bin/protoc-gen-microweb:
 	GO111MODULE=off go get -v github.com/owncloud/protoc-gen-microweb
 
-$(GOPATH)/bin/protoc-gen-swagger:
-	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+$(GOPATH)/bin/protoc-gen-openapiv2:
+	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-openapiv2
 
 $(PROTO_SRC)/accounts.pb.go: $(PROTO_SRC)/accounts.proto
 	protoc \
@@ -186,5 +186,5 @@ $(PROTO_SRC)/accounts.swagger.json: $(PROTO_SRC)/accounts.proto
 		--swagger_out=$(PROTO_SRC) accounts.proto
 
 .PHONY: protobuf
-protobuf: $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger \
+protobuf: $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-openapiv2 \
 		  $(PROTO_SRC)/accounts.pb.go $(PROTO_SRC)/accounts.pb.micro.go $(PROTO_SRC)/accounts.pb.web.go $(PROTO_SRC)/accounts.swagger.json

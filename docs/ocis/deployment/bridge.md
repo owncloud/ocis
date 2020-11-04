@@ -3,7 +3,7 @@ title: "Bridge"
 date: 2020-02-27T20:35:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: bridge.md
 ---
 
@@ -64,7 +64,7 @@ Enter host password for user 'admin':
 
 ### Start ocis-glauth
 
-We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy. 
+We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy.
 
 #### Grab it!
 
@@ -250,5 +250,5 @@ In the above configuration replace
 ## Next steps
 
 Aside from the above todos these are the next stepo
-- tie it all together behind `ocis-proxy` 
+- tie it all together behind `ocis-proxy`
 - create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `phoenix` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
