@@ -7,8 +7,8 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/cs3org/go-cs3apis v0.0.0-20200929101248-821df597ec8d
-	github.com/cs3org/reva v1.3.1-0.20201021065855-dc400f81ecbc
+	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
+	github.com/cs3org/reva v1.3.1-0.20201104092030-4a28e84e33e4
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.3
@@ -28,7 +28,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
-	google.golang.org/grpc v1.32.0
+	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0
 )
 
