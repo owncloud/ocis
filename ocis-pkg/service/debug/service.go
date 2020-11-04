@@ -17,7 +17,7 @@ func NewService(opts ...Option) *http.Server {
 	dopts.Logger.Info().
 		Str("transport", "debug").
 		Str("addr", dopts.Address).
-		Msg("Starting server")
+		Msg("starting server")
 
 	mux := http.NewServeMux()
 

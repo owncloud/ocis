@@ -19,7 +19,7 @@ func NewService(opts ...Option) Service {
 	sopts.Logger.Info().
 		Str("transport", transport(sopts.TLSConfig)).
 		Str("addr", sopts.Address).
-		Msg("Starting server")
+		Msg("starting server")
 
 	wopts := []web.Option{
 		web.Name(

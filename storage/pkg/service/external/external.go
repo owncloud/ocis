@@ -33,7 +33,7 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 
 	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
 
-	logger.Info().Msgf("Registering external service %v@%v", node.Id, node.Address)
+	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
 	if err := registry.Register(service, rOpts...); err != nil {
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", serviceID)

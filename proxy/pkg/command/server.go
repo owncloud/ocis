@@ -281,7 +281,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	)
 
 	if cfg.OIDC.Issuer != "" {
-		l.Info().Msg("Loading OIDC-Middleware")
+		l.Info().Msg("loading OIDC middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
 
 		var oidcHTTPClient = &http.Client{
