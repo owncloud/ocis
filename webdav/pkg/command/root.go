@@ -33,7 +33,7 @@ func Execute() error {
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
-			return ParseConfig(c, cfg)
+			return nil
 		},
 
 		Commands: []*cli.Command{
