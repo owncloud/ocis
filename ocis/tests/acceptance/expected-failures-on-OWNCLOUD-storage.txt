@@ -289,7 +289,6 @@ apiSharees/sharees.feature:538
 # https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
 #
 apiShareManagementToShares/acceptShares.feature:22
-apiShareManagementToShares/acceptShares.feature:52
 apiShareManagementToShares/acceptShares.feature:71
 apiShareManagementToShares/acceptShares.feature:156
 apiShareManagementToShares/acceptShares.feature:157
@@ -305,12 +304,9 @@ apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptShares.feature:270
 apiShareManagementToShares/acceptShares.feature:279
 apiShareManagementToShares/acceptShares.feature:298
-apiShareManagementToShares/acceptShares.feature:320
 apiShareManagementToShares/acceptShares.feature:342
 apiShareManagementToShares/acceptShares.feature:378
-apiShareManagementToShares/acceptShares.feature:398
 apiShareManagementToShares/acceptShares.feature:417
-apiShareManagementToShares/acceptShares.feature:439
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
@@ -375,12 +371,8 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:70
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:97
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:98
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:115
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:116
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:135
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:154
 #
 # https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
 # https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
