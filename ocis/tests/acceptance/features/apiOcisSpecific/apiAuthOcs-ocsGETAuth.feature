@@ -55,7 +55,6 @@ Feature: auth
       | /ocs/v1.php/apps/files_sharing/api/v1/remote_shares         |
       | /ocs/v1.php/apps/files_sharing/api/v1/remote_shares/pending |
       | /ocs/v1.php/privatedata/getattribute                        |
-      | /ocs/v1.php/cloud/groups                                    |
       | /ocs/v1.php/cloud/apps                                      |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "998"
@@ -73,14 +72,15 @@ Feature: auth
      # | /ocs/v2.php/apps/files_sharing/api/v1/shares                | 100      | 200       |
 
       | /ocs/v2.php/cloud/apps                                      |
-      | /ocs/v2.php/cloud/groups                                    |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"
     When the user "Alice" requests these endpoints with "GET" with basic auth
-      | endpoint                |
-      | /ocs/v1.php/cloud/users |
-      | /ocs/v2.php/cloud/users |
+      | endpoint                 |
+      | /ocs/v1.php/cloud/users  |
+      | /ocs/v2.php/cloud/users  |
+      | /ocs/v1.php/cloud/groups |
+      | /ocs/v2.php/cloud/groups |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
     When the user "Alice" requests these endpoints with "GET" with basic auth
