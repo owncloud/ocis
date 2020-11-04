@@ -1,0 +1,49 @@
+{
+  "server": "https://${OCIS_DOMAIN}",
+  "theme": "owncloud",
+  "version": "0.1.0",
+  "openIdConnect": {
+      "metadata_url": "https://${OCIS_DOMAIN}/.well-known/openid-configuration",
+      "authority": "https://${OCIS_DOMAIN}",
+      "client_id": "phoenix",
+      "response_type": "code",
+      "scope": "openid profile email"
+  },
+  "applications": [
+        {
+                "title": {
+                        "en": "Classic Design",
+                        "de": "Klassisches ownCloud"
+                },
+                "icon": "switch_ui",
+                "url": "https://${OC10_DOMAIN}",
+                "target": "_self"
+        },
+        {
+              "title": {"en": "Classic Settings"},
+              "icon": "application",
+              "url": "https://${OC10_DOMAIN}/index.php/settings/personal",
+              "target": "_self",
+              "menu": "user"
+        }
+  ],
+  "apps": [
+      "files",
+      "draw-io",
+      "markdown-editor",
+      "media-viewer"
+  ],
+  "options": {
+      "hideSearchBar": false
+  },
+  "external_apps": [
+  {
+    "id": "accounts",
+    "path": "/accounts.js"
+  },
+  {
+    "id": "settings",
+    "path": "/settings.js"
+  }
+]
+}

@@ -17,10 +17,11 @@ services:
     image: "traefik:v2.2"
     container_name: "traefik"
     command:
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--serverstransport.insecureskipverify=true"
       # Ocis certificate resolver
       - "--certificatesresolvers.ocis.acme.tlschallenge=true"
       - "--certificatesresolvers.ocis.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
@@ -71,12 +72,18 @@ services:
       - tmp:/tmp/shared
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.oc10.rule=Host(`${OC10_DOMAIN}`)"
-      - "traefik.http.routers.oc10.entrypoints=websecure"
-      - "traefik.http.routers.oc10.tls.certresolver=oc10"
       - "traefik.http.services.oc10.loadbalancer.server.port=8080"
       - "traefik.docker.network=ocisnet"
       - "traefik.protocol=https"
+      # ssl config
+      - "traefik.http.routers.oc10.rule=Host(`${OC10_DOMAIN}`)"
+      - "traefik.http.routers.oc10.entrypoints=websecure"
+      - "traefik.http.routers.oc10.tls.certresolver=oc10"
+      # http -> https forwarding
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.oc10-redirs.rule=Host(`${OC10_DOMAIN}`)"
+      - "traefik.http.routers.oc10-redirs.entrypoints=web"
+      - "traefik.http.routers.oc10-redirs.middlewares=redirect-to-https"
 
   ocis:
     image: owncloud/ocis:latest
@@ -84,7 +91,7 @@ services:
       - 9200:9200
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN}
-      PROXY_CONFIG_FILE: "/etc/ocis/proxy.json"
+      PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_TLS: "false"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
       PROXY_OIDC_INSECURE: "true"
@@ -97,18 +104,15 @@ services:
       PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN}
       PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN}/.well-known/openid-configuration
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN}
+      PHOENIX_WEB_CONFIG: "/config/web/config.json"
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
       STORAGE_TRANSFER_EXPIRES: 86400
       STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
       STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
-      STORAGE_STORAGE_METADATA_PROVIDER_DRIVER: owncloud # Storage fails start up if backend owncloud is selected and this env vars isn't set
-      STORAGE_STORAGE_METADATA_DATA_PROVIDER_DRIVER: owncloud # Storage fails start up if backend owncloud is selected and this env vars isn't set
       GLAUTH_BACKEND_DATASTORE: owncloud
       GLAUTH_BACKEND_SERVERS: https://${OC10_DOMAIN}/apps/graphapi/v1.0
       GLAUTH_BACKEND_BASEDN: dc=example,dc=org
-      ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts # Accounts fails to start when cs3 backend is used atm
-      # Konnectd ldap setup
       LDAP_URI: ldap://localhost:9125
       LDAP_BINDDN: "cn=admin,dc=example,dc=org"
       LDAP_BINDPW: "admin"
@@ -125,12 +129,18 @@ services:
       - ./ocis/proxy-config.json:/etc/ocis/proxy.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
-      - "traefik.http.routers.ocis.entrypoints=websecure"
-      - "traefik.http.routers.ocis.tls.certresolver=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.docker.network=ocisnet"
       - "traefik.protocol=https"
+      # ssl config
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
+      - "traefik.http.routers.ocis.entrypoints=websecure"
+      - "traefik.http.routers.ocis.tls.certresolver=ocis"
+      # http -> https forwarding
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.ocis-redirs.rule=Host(`${OCIS_DOMAIN}`)"
+      - "traefik.http.routers.ocis-redirs.entrypoints=web"
+      - "traefik.http.routers.ocis-redirs.middlewares=redirect-to-https"
 
   db:
     image: webhippie/mariadb:latest
