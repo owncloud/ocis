@@ -9,13 +9,6 @@ import (
 func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:        "config-file",
-			Value:       "",
-			Usage:       "Path to config file",
-			EnvVars:     []string{"KONNECTD_CONFIG_FILE"},
-			Destination: &cfg.File,
-		},
-		&cli.StringFlag{
 			Name:        "log-level",
 			Value:       "info",
 			Usage:       "Set logging level",
@@ -55,6 +48,13 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "config-file",
+			Value:       "",
+			Usage:       "Path to config file",
+			EnvVars:     []string{"KONNECTD_CONFIG_FILE"},
+			Destination: &cfg.File,
+		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",

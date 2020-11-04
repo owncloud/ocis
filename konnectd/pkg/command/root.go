@@ -33,7 +33,7 @@ func Execute() error {
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
-			return ParseConfig(c, cfg)
+			return nil
 		},
 
 		Commands: []*cli.Command{
@@ -88,22 +88,22 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
 			logger.Info().
-				Msg("Continue without config")
+				Msg("no config found on preconfigured location")
 		case viper.UnsupportedConfigError:
 			logger.Fatal().
 				Err(err).
-				Msg("Unsupported config type")
+				Msg("unsupported config type")
 		default:
 			logger.Fatal().
 				Err(err).
-				Msg("Failed to read config")
+				Msg("failed to read config")
 		}
 	}
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		logger.Fatal().
 			Err(err).
-			Msg("Failed to parse config")
+			Msg("failed to parse config")
 	}
 
 	return nil
