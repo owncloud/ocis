@@ -20,8 +20,6 @@ Feature: auth
       | /ocs/v2.php/apps/files_sharing/api/v1/shares                |
       | /ocs/v1.php/cloud/apps                                      |
       | /ocs/v2.php/cloud/apps                                      |
-      | /ocs/v1.php/cloud/groups                                    |
-      | /ocs/v2.php/cloud/groups                                    |
       | /ocs/v1.php/config                                          |
       | /ocs/v2.php/config                                          |
       | /ocs/v1.php/privatedata/getattribute                        |
@@ -33,9 +31,11 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS anonymously
     When a user requests these endpoints with "GET" and no authentication
-      | endpoint                |
-      | /ocs/v1.php/cloud/users |
-      | /ocs/v2.php/cloud/users |
+      | endpoint                 |
+      | /ocs/v1.php/cloud/users  |
+      | /ocs/v2.php/cloud/users  |
+      | /ocs/v1.php/cloud/groups |
+      | /ocs/v2.php/cloud/groups |
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "997"
 
