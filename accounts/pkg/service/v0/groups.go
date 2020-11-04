@@ -257,8 +257,11 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			alreadyRelated = true
 		}
 	}
+	aref := &proto.Account{
+		Id: a.Id,
+	}
 	if !alreadyRelated {
-		g.Members = append(g.Members, a)
+		g.Members = append(g.Members, aref)
 	}
 
 	// check if we need to add the group to the account
@@ -269,8 +272,12 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			break
 		}
 	}
+	// only store the reference to prevent recurision when marshaling json
+	gref := &proto.Group{
+		Id: g.Id,
+	}
 	if !alreadyRelated {
-		a.MemberOf = append(a.MemberOf, g)
+		a.MemberOf = append(a.MemberOf, gref)
 	}
 
 	if err = s.repo.WriteAccount(c, a); err != nil {
