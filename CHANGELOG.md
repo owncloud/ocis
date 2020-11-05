@@ -33,6 +33,7 @@
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
+* Change - Unify Configuration Parsing: [#675](https://github.com/owncloud/ocis/pull/675)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 * Change - Update phoenix to v0.21.0: [#728](https://github.com/owncloud/ocis/pull/728)
 * Change - Update phoenix to v0.22.0: [#757](https://github.com/owncloud/ocis/pull/757)
@@ -375,6 +376,17 @@
    We've styled our konnectd login page to reflect ownCloud theme.
 
    https://github.com/owncloud/ocis/pull/698
+
+* Change - Unify Configuration Parsing: [#675](https://github.com/owncloud/ocis/pull/675)
+
+   Tags: ocis
+
+   - responsibility for config parsing should be on the subcommand - if there is a config file in the
+   environment location, env var should take precedence - general rule of thumb: the more
+   explicit the config file is that would be picked up. Order from less to more explicit: - config
+   location (/etc/ocis) - environment variable - cli flag
+
+   https://github.com/owncloud/ocis/pull/675
 
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
 
