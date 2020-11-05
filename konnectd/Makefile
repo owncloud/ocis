@@ -63,6 +63,8 @@ sync:
 clean:
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST)
+	rm -rf node_modules
+	rm -rf assets/identifier
 
 .PHONY: fmt
 fmt:
@@ -84,11 +86,20 @@ lint:
 generate: assets
 	go generate $(GENERATE)
 
-.PHONY: assets
-assets:
+# TODO find a docker container with go and yarn so we can properly build assets in ci
+#assets: assets/identifier/static assets/identifier/index.html
+assets: assets/identifier/static
+
+assets/identifier/static:
 	mkdir -p assets/identifier/static
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
+
+assets/identifier/index.html: node_modules
+	yarn build
+
+node_modules:
+	yarn install
 
 .PHONY: changelog
 changelog:

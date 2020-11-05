@@ -6,6 +6,7 @@ clients:
     name: ownCloud web app
     application_type: web
     insecure: yes
+    trusted: yes
     redirect_uris:
       - https://localhost:9200/
       - https://localhost:9200/oidc-callback.html
