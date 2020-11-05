@@ -86,7 +86,12 @@ lint:
 generate: assets
 	go generate $(GENERATE)
 
-assets: assets/identifier/index.html
+# TODO find a docker container with go and yarn so we can properly build assets in ci
+#assets: assets/identifier/static assets/identifier/index.html
+assets: assets/identifier/static
+
+assets/identifier/static:
+	mkdir -p assets/identifier/static
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
