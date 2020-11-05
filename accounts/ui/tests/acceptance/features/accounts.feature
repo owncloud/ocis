@@ -18,11 +18,13 @@ Feature: Accounts
 		When the user reloads the current page of the webUI
 		Then the displayed role of user "einstein" should be "Admin" on the WebUI
 
+	@skip @issue-product-167
 	Scenario: regular user should not be able to see accounts list
 		Given user "Marie" has logged in using the webUI
 		When the user browses to the accounts page
 		Then the user should not be able to see the accounts list on the WebUI
 
+	@skip @issue-product-167
 	Scenario: guest user should not be able to see accounts list
 		Given user "Moss" has logged in using the webUI
 		When the user browses to the accounts page
