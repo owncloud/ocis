@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-05T13:50:47+0000"
+date: "2020-11-05T13:54:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/webdav
@@ -43,9 +43,6 @@ Serve WebDAV API for oCIS
 
 Usage: `webdav [global options] command [command options] [arguments...]`
 
---config-file | $WEBDAV_CONFIG_FILE  
-: Path to config file.
-
 --log-level | $WEBDAV_LOG_LEVEL  
 : Set logging level. Default: `info`.
 
@@ -62,6 +59,9 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 Start integrated server
 
 Usage: `webdav server [command options] [arguments...]`
+
+--config-file | $WEBDAV_CONFIG_FILE  
+: Path to config file.
 
 --tracing-enabled | $WEBDAV_TRACING_ENABLED  
 : Enable sending traces.

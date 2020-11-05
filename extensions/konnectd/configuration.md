@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-05T13:50:42+0000"
+date: "2020-11-05T13:54:54+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-konnectd
 geekdocEditPath: edit/master/docs
@@ -43,9 +43,6 @@ Serve Konnectd API for oCIS
 
 Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 
---config-file | $KONNECTD_CONFIG_FILE  
-: Path to config file.
-
 --log-level | $KONNECTD_LOG_LEVEL  
 : Set logging level. Default: `info`.
 
@@ -62,6 +59,9 @@ Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 Start integrated server
 
 Usage: `ocis-konnectd server [command options] [arguments...]`
+
+--config-file | $KONNECTD_CONFIG_FILE  
+: Path to config file.
 
 --tracing-enabled | $KONNECTD_TRACING_ENABLED  
 : Enable sending traces.
