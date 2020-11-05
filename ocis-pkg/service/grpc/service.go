@@ -21,7 +21,7 @@ func NewService(opts ...Option) Service {
 	sopts.Logger.Info().
 		Str("transport", "grpc").
 		Str("addr", sopts.Address).
-		Msg("Starting server")
+		Msg("starting server")
 
 	mopts := []micro.Option{
 		micro.Name(

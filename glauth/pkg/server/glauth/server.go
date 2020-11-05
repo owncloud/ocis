@@ -133,13 +133,13 @@ func Server(opts ...Option) (*LdapSvc, error) {
 
 // ListenAndServe listens on the TCP network address s.c.LDAP.Listen
 func (s *LdapSvc) ListenAndServe() error {
-	s.log.V(3).Info("LDAP server listening", "address", s.ldap.Listen)
+	s.log.V(3).Info("ldap server listening", "address", s.ldap.Listen)
 	return s.l.ListenAndServe(s.ldap.Listen)
 }
 
 // ListenAndServeTLS listens on the TCP network address s.c.LDAPS.Listen
 func (s *LdapSvc) ListenAndServeTLS() error {
-	s.log.V(3).Info("LDAPS server listening", "address", s.ldaps.Listen)
+	s.log.V(3).Info("ldaps server listening", "address", s.ldaps.Listen)
 	return s.l.ListenAndServeTLS(
 		s.ldaps.Listen,
 		s.ldaps.Cert,

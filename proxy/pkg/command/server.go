@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,8 +44,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			l := NewLogger(cfg)
-			l.Debug().Str("tracing", strconv.FormatBool(cfg.Tracing.Enabled)).Msg("init: before")
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -284,7 +281,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	)
 
 	if cfg.OIDC.Issuer != "" {
-		l.Info().Msg("Loading OIDC-Middleware")
+		l.Info().Msg("loading OIDC middleware")
 		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
 
 		var oidcHTTPClient = &http.Client{
