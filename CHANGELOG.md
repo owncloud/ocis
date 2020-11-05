@@ -7,6 +7,7 @@
 * Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
+* Bugfix - Fix konnectd build: [#809](https://github.com/owncloud/ocis/pull/809)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 * Bugfix - Allow consent-prompt with switch-account: [#788](https://github.com/owncloud/ocis/pull/788)
 * Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
@@ -42,6 +43,7 @@
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
+* Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Add the glauth service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add the konnectd service: [#244](https://github.com/owncloud/product/issues/244)
@@ -109,6 +111,15 @@
    for or queries we can continue execution.
 
    https://github.com/owncloud/ocis/pull/745
+
+* Bugfix - Fix konnectd build: [#809](https://github.com/owncloud/ocis/pull/809)
+
+   Tags: konnectd
+
+   We fixed the default config for konnectd and updated the Makefile to include the `yarn
+   install`and `yarn build` steps if the static assets are missing.
+
+   https://github.com/owncloud/ocis/pull/809
 
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 
@@ -497,6 +508,16 @@
   * Enhancement - Configuration: [#15](https://github.com/owncloud/ocis-accounts/pull/15)
 
    https://github.com/owncloud/product/issues/244
+
+* Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
+
+   We added a new `enable-basic-auth` option and `PROXY_ENABLE_BASIC_AUTH` environment
+   variable that can be set to `true` to make the proxy verify the basic auth header with the
+   accounts service. This should only be used for testing and development and is disabled by
+   default.
+
+   https://github.com/owncloud/product/issues/198
+   https://github.com/owncloud/ocis/pull/627
 
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 
