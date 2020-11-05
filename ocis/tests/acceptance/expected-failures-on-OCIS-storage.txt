@@ -202,18 +202,12 @@ apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
 # https://github.com/owncloud/ocis-ocs/issues/28
 # disable users /cloud/users/disable|enable not available
 #
-apiProvisioning-v1/disableUser.feature:11
-apiProvisioning-v1/disableUser.feature:79
 apiProvisioning-v1/disableUser.feature:99
-apiProvisioning-v1/disableUser.feature:107
 apiProvisioning-v1/disableUser.feature:129
-apiProvisioning-v1/enableUser.feature:11
-apiProvisioning-v2/disableUser.feature:11
 apiProvisioning-v2/disableUser.feature:79
 apiProvisioning-v2/disableUser.feature:99
 apiProvisioning-v2/disableUser.feature:108
 apiProvisioning-v2/disableUser.feature:130
-apiProvisioning-v2/enableUser.feature:11
 #
 # https://github.com/owncloud/ocis-ocs/issues/51
 # displayname of user can be changed to empty
@@ -226,9 +220,6 @@ apiProvisioning-v2/editUser.feature:47
 #
 apiProvisioning-v1/editUser.feature:56
 apiProvisioning-v1/editUser.feature:122
-apiProvisioning-v1/enableUser.feature:34
-apiProvisioning-v1/enableUser.feature:56
-apiProvisioning-v1/enableUser.feature:63
 apiProvisioning-v2/editUser.feature:56
 apiProvisioning-v2/editUser.feature:122
 apiProvisioning-v2/enableUser.feature:34
@@ -238,14 +229,10 @@ apiProvisioning-v2/enableUser.feature:64
 # https://github.com/owncloud/product/issues/248
 # user can get info of other users/ cloud/users endpoints not authenticated
 #
-apiProvisioning-v1/deleteUser.feature:53
 apiProvisioning-v2/deleteUser.feature:54
 apiProvisioning-v1/getUser.feature:81
-apiProvisioning-v1/getUsers.feature:43
-apiProvisioning-v1/resetUserPassword.feature:56
 apiProvisioning-v2/getUser.feature:82
 apiProvisioning-v2/getUsers.feature:44
-apiProvisioning-v2/resetUserPassword.feature:56
 #
 # https://github.com/owncloud/product/issues/250
 # incorrect ocs(v2) status value when getting info of user that does not exist should be 404, gives 998
@@ -315,7 +302,6 @@ apiSharees/sharees.feature:538
 # https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
 #
 apiShareManagementToShares/acceptShares.feature:22
-apiShareManagementToShares/acceptShares.feature:52
 apiShareManagementToShares/acceptShares.feature:71
 apiShareManagementToShares/acceptShares.feature:156
 apiShareManagementToShares/acceptShares.feature:157
@@ -331,12 +317,9 @@ apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptShares.feature:270
 apiShareManagementToShares/acceptShares.feature:279
 apiShareManagementToShares/acceptShares.feature:298
-apiShareManagementToShares/acceptShares.feature:320
 apiShareManagementToShares/acceptShares.feature:342
 apiShareManagementToShares/acceptShares.feature:378
-apiShareManagementToShares/acceptShares.feature:398
 apiShareManagementToShares/acceptShares.feature:417
-apiShareManagementToShares/acceptShares.feature:439
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
@@ -401,12 +384,8 @@ apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.fe
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:70
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:97
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:98
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:115
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:116
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:135
 apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:153
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:154
 #
 # https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
 # https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
@@ -450,11 +429,6 @@ apiShareOperationsToShares/accessToShare.feature:56
 #
 apiShareOperationsToShares/gettingShares.feature:24
 apiShareOperationsToShares/gettingShares.feature:25
-#
-# https://github.com/owncloud/ocis-reva/issues/65 There is no such thing like a "super-user"
-#
-apiShareOperationsToShares/gettingShares.feature:38
-apiShareOperationsToShares/gettingShares.feature:39
 #
 # https://github.com/owncloud/ocis-reva/issues/357 Delete shares from user when user is deleted
 # https://github.com/owncloud/ocis-reva/issues/301 no displayname_owner shown when creating a share
@@ -549,11 +523,8 @@ apiSharePublicLink1/changingPublicLinkShare.feature:96
 #
 apiSharePublicLink1/changingPublicLinkShare.feature:63
 apiSharePublicLink1/changingPublicLinkShare.feature:107
-apiSharePublicLink1/changingPublicLinkShare.feature:128
 apiSharePublicLink1/changingPublicLinkShare.feature:151
-apiSharePublicLink1/changingPublicLinkShare.feature:174
 apiSharePublicLink1/changingPublicLinkShare.feature:197
-apiSharePublicLink1/changingPublicLinkShare.feature:221
 apiSharePublicLink1/changingPublicLinkShare.feature:244
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
@@ -707,6 +678,11 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:83
 apiSharePublicLink2/uploadToPublicLinkShare.feature:103
 apiSharePublicLink2/uploadToPublicLinkShare.feature:121
 apiSharePublicLink2/uploadToPublicLinkShare.feature:139
+#
+# https://github.com/owncloud/ocis/issues/801 deleting a folder should delete share links to it as well
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:48
+apiSharePublicLink2/uploadToPublicLinkShare.feature:49
 #
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 #
@@ -1190,8 +1166,6 @@ apiWebdavOperations/downloadFile.feature:84
 apiWebdavOperations/downloadFile.feature:85
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
-apiWebdavOperations/refuseAccess.feature:33
-apiWebdavOperations/refuseAccess.feature:34
 #
 # https://github.com/owncloud/core/pull/38035 PROPFIND to https://localhost:9200/remote.php/dav/files gets an error 500 response
 #
@@ -1534,15 +1508,6 @@ apiWebdavPreviews/previews.feature:165
 apiWebdavPreviews/previews.feature:166
 apiWebdavPreviews/previews.feature:178
 apiWebdavPreviews/previews.feature:179
-#
-# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
-#
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:93
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:94
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:114
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:115
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:116
-apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:117
 #
 # https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
 #

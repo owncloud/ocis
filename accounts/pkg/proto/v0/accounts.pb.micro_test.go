@@ -630,7 +630,7 @@ func TestListAccounts(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.IsType(t, &proto.ListAccountsResponse{}, resp)
-	assert.Equal(t, 8, len(resp.Accounts))
+	assert.Equal(t, 9, len(resp.Accounts))
 
 	assertResponseContainsUser(t, resp, getAccount("user1"))
 	assertResponseContainsUser(t, resp, getAccount("user2"))
@@ -642,8 +642,8 @@ func TestListWithoutUserCreation(t *testing.T) {
 	resp, err := listAccounts(t)
 	assert.NoError(t, err)
 
-	// Only 5 default users
-	assert.Equal(t, 6, len(resp.Accounts))
+	// Only 7 default users
+	assert.Equal(t, 7, len(resp.Accounts))
 	cleanUp(t)
 }
 

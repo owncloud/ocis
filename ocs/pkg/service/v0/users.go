@@ -12,6 +12,7 @@ import (
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/micro/go-micro/v2/client/grpc"
@@ -22,22 +23,58 @@ import (
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 )
 
-// GetUser returns the currently logged in user
+// GetSelf returns the currently logged in user
+func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
+	var account *accounts.Account
+	var err error
+	u, ok := user.ContextGetUser(r.Context())
+	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+		return
+	}
+
+	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		Id: u.Id.OpaqueId,
+	})
+
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			// if the user was authenticated why was he not found?!? log error?
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
+		return
+	}
+
+	// remove password from log if it is set
+	if account.PasswordProfile != nil {
+		account.PasswordProfile.Password = ""
+	}
+	o.logger.Debug().Interface("account", account).Msg("got user")
+
+	d := &data.User{
+		UserID:            account.Id,
+		DisplayName:       account.DisplayName,
+		LegacyDisplayName: account.DisplayName,
+		Email:             account.Mail,
+		UIDNumber:         account.UidNumber,
+		GIDNumber:         account.GidNumber,
+		// TODO hide enabled flag or it might get rendered as false
+	}
+	render.Render(w, r, response.DataRender(d))
+}
+
+// GetUser returns the user with the given userid
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication using the roles and permissions
 	userid := chi.URLParam(r, "userid")
 	var account *accounts.Account
 	var err error
 
 	if userid == "" {
-		u, ok := user.ContextGetUser(r.Context())
-		if !ok || u.Id == nil || u.Id.OpaqueId == "" {
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
-			return
-		}
-		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-			Id: u.Id.OpaqueId,
-		})
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
 	} else {
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	}
@@ -48,7 +85,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("userid", userid).Msg("could not get user")
+		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
 	}
 
@@ -67,14 +104,13 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := &data.User{
-		UserID:            account.PreferredName,
+		UserID:            account.Id,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
 		UIDNumber:         account.UidNumber,
 		GIDNumber:         account.GidNumber,
-		Enabled:           enabled,
-		// FIXME onlyfor users/{userid} endpoint (not /user)
+		Enabled:           enabled, // TODO include in response only when admin?
 		// TODO query storage registry for free space? of home storage, maybe...
 		Quota: &data.Quota{
 			Free:       2840756224000,
@@ -89,7 +125,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // AddUser creates a new user account
 func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication using the roles and permissions
 	userid := r.PostFormValue("userid")
 	password := r.PostFormValue("password")
 	displayname := r.PostFormValue("displayname")
@@ -150,9 +185,18 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		merr := merrors.FromError(err)
-		if merr.Code == http.StatusBadRequest {
+		switch merr.Code {
+		case http.StatusBadRequest:
 			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
-		} else {
+		case http.StatusConflict:
+			if response.APIVersion(r.Context()) == "2" {
+				// it seems the application framework sets the ocs status code to the httpstatus code, which affects the provisioning api
+				// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
+				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+			}
+		default:
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not add user")
@@ -186,7 +230,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
-	// TODO this endpoint needs authentication
 	userid := chi.URLParam(r, "userid")
 	account, err := o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
@@ -239,7 +282,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("userid", req.Account.Id).Msg("could not edit user")
+		o.logger.Error().Err(err).Str("account_id", req.Account.Id).Str("user_id", userid).Msg("could not edit user")
 		return
 	}
 
@@ -284,6 +327,86 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
+	render.Render(w, r, response.DataRender(struct{}{}))
+}
+
+// EnableUser enables a user
+func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not enable user")
+		return
+	}
+
+	account.AccountEnabled = true
+
+	req := accounts.UpdateAccountRequest{
+		Account: account,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"AccountEnabled"},
+		},
+	}
+
+	_, err = o.getAccountService().UpdateAccount(r.Context(), &req)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not enable account")
+		return
+	}
+
+	o.logger.Debug().Str("account_id", account.Id).Msg("enabled user")
+	render.Render(w, r, response.DataRender(struct{}{}))
+}
+
+// DisableUser disables a user
+func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
+	userid := chi.URLParam(r, "userid")
+	account, err := o.fetchAccountByUsername(r.Context(), userid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("userid", userid).Msg("could not disable user")
+		return
+	}
+
+	account.AccountEnabled = false
+
+	req := accounts.UpdateAccountRequest{
+		Account: account,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"AccountEnabled"},
+		},
+	}
+
+	_, err = o.getAccountService().UpdateAccount(r.Context(), &req)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not disable account")
+		return
+	}
+
+	o.logger.Debug().Str("account_id", account.Id).Msg("disabled user")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
@@ -378,7 +501,7 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 
 	users := []string{}
 	for i := range res.Accounts {
-		users = append(users, res.Accounts[i].Id)
+		users = append(users, res.Accounts[i].OnPremisesSamAccountName)
 	}
 
 	render.Render(w, r, response.DataRender(&data.Users{Users: users}))

@@ -72,6 +72,8 @@ func createAccount(l log.Logger, claims *oidc.StandardClaims, ac acc.AccountsSer
 func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 	opt := newOptions(opts...)
 
+	publicFilesEndpoint := "/remote.php/dav/public-files/"
+
 	return func(next http.Handler) http.Handler {
 		// TODO: handle error
 		tokenManager, err := jwt.New(map[string]interface{}{
@@ -85,22 +87,43 @@ func AccountUUID(opts ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			l := opt.Logger
 			claims := oidc.FromContext(r.Context())
-			if claims == nil {
-				next.ServeHTTP(w, r)
-				return
-			}
-
 			var account *acc.Account
 			var status int
-			if claims.Email != "" {
+			switch {
+			case claims == nil:
+				login, password, ok := r.BasicAuth()
+				// check if we are dealing with a public link
+				if ok && login == "public" && strings.HasPrefix(r.URL.Path, publicFilesEndpoint) {
+					// forward to reva frontend
+					next.ServeHTTP(w, r)
+					return
+				}
+				if opt.EnableBasicAuth && ok {
+					l.Warn().Msg("basic auth enabled, use only for testing or development")
+					account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("login eq '%s' and password eq '%s'", strings.ReplaceAll(login, "'", "''"), strings.ReplaceAll(password, "'", "''")))
+					if status == 0 {
+						// fake claims for the subsequent code flow
+						claims = &oidc.StandardClaims{
+							Iss: opt.OIDCIss,
+						}
+					} else {
+						// tell client to reauthenticate
+						w.WriteHeader(http.StatusUnauthorized)
+						return
+					}
+				} else {
+					next.ServeHTTP(w, r)
+					return
+				}
+			case claims.Email != "":
 				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")))
-			} else if claims.PreferredUsername != "" {
+			case claims.PreferredUsername != "":
 				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(claims.PreferredUsername, "'", "''")))
-			} else if claims.OcisID != "" {
+			case claims.OcisID != "":
 				account, status = getAccount(l, opt.AccountsClient, fmt.Sprintf("id eq '%s'", strings.ReplaceAll(claims.OcisID, "'", "''")))
-			} else {
+			default:
 				// TODO allow lookup by custom claim, eg an id ... or sub
-				l.Error().Err(err).Msgf("Could not lookup account, no mail or preferred_username claim set")
+				l.Error().Err(err).Msg("Could not lookup account, no mail or preferred_username claim set")
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 			if status != 0 || account == nil {

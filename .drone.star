@@ -362,7 +362,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
-          'PATH_TO_CORE': '/srv/app/testrunner'
+          'PATH_TO_CORE': '/srv/app/testrunner',
         },
         'commands': [
           'cd ocis',
@@ -419,7 +419,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper())
+          'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -1406,6 +1406,7 @@ def ocisServer(storage):
         'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
         'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
         'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
+        'PROXY_ENABLE_BASIC_AUTH': True,
         'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',

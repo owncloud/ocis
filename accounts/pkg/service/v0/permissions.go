@@ -11,13 +11,17 @@ import (
 
 const (
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
-	AccountManagementPermissionID   string = "8e587774-d929-4215-910b-a317b1e80f73"
+	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
 	// AccountManagementPermissionName is the hardcoded setting name for the account management permission
 	AccountManagementPermissionName string = "account-management"
 	// GroupManagementPermissionID is the hardcoded setting UUID for the group management permission
-	GroupManagementPermissionID     string = "522adfbe-5908-45b4-b135-41979de73245"
+	GroupManagementPermissionID string = "522adfbe-5908-45b4-b135-41979de73245"
 	// GroupManagementPermissionName is the hardcoded setting name for the group management permission
-	GroupManagementPermissionName   string = "group-management"
+	GroupManagementPermissionName string = "group-management"
+	// SelfManagementPermissionID is the hardcoded setting UUID for the self management permission
+	SelfManagementPermissionID string = "e03070e9-4362-4cc6-a872-1c7cb2eb2b8e"
+	// SelfManagementPermissionName is the hardcoded setting name for the self management permission
+	SelfManagementPermissionName string = "self-management"
 )
 
 // RegisterPermissions registers permissions for account management and group management with the settings service.
@@ -74,6 +78,25 @@ func generateAccountManagementPermissionsRequests() []settings.AddSettingToBundl
 					PermissionValue: &settings.Permission{
 						Operation:  settings.Permission_OPERATION_READWRITE,
 						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: ssvc.BundleUUIDRoleUser,
+			Setting: &settings.Setting{
+				Id:          SelfManagementPermissionID,
+				Name:        SelfManagementPermissionName,
+				DisplayName: "Self Management",
+				Description: "This permission gives access to self management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+					Id:   "me",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},

@@ -1,9 +1,13 @@
 package svc
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -41,10 +45,28 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 
 	groups := []string{}
 	for i := range account.MemberOf {
-		groups = append(groups, account.MemberOf[i].Id)
+		if account.MemberOf[i].OnPremisesSamAccountName == "" {
+			o.logger.Warn().Str("groupid", account.MemberOf[i].Id).Msg("group on_premises_sam_account_name is empty, trying to lookup by id")
+			// we can try to look up the name
+			group, err := o.getGroupsService().GetGroup(r.Context(), &accounts.GetGroupRequest{
+				Id: account.MemberOf[i].Id,
+			})
+
+			if err != nil {
+				o.logger.Error().Err(err).Str("groupid", account.MemberOf[i].Id).Msg("could not get group")
+				continue
+			}
+			if group.OnPremisesSamAccountName == "" {
+				o.logger.Error().Err(err).Str("groupid", account.MemberOf[i].Id).Msg("group on_premises_sam_account_name is empty")
+				continue
+			}
+			groups = append(groups, group.OnPremisesSamAccountName)
+		} else {
+			groups = append(groups, account.MemberOf[i].OnPremisesSamAccountName)
+		}
 	}
 
-	o.logger.Error().Err(err).Int("count", len(groups)).Str("userid", userid).Msg("listing groups for user")
+	o.logger.Error().Err(err).Int("count", len(groups)).Str("userid", account.Id).Msg("listing groups for user")
 	render.Render(w, r, response.DataRender(&data.Groups{Groups: groups}))
 }
 
@@ -69,9 +91,21 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ocs only knows about names so we have to look up the internal id
+	group, err := o.fetchGroupByName(r.Context(), groupid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		return
+	}
+
 	_, err = o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
 		AccountId: account.Id,
-		GroupId:   groupid,
+		GroupId:   group.Id,
 	})
 
 	if err != nil {
@@ -81,21 +115,46 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not add user to group")
+		o.logger.Error().Err(err).Str("userid", account.Id).Str("groupid", group.Id).Msg("could not add user to group")
 		return
 	}
 
-	o.logger.Debug().Str("userid", userid).Str("groupid", groupid).Msg("added user to group")
+	o.logger.Debug().Str("userid", account.Id).Str("groupid", group.Id).Msg("added user to group")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
 // RemoveFromGroup removes a user from a group
 func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	groupid := r.URL.Query().Get("groupid")
+
+	var err error
+
+	// Really? a DELETE with form encoded body?!?
+	// but it is not encoded as mime, so we cannot just call r.ParseForm()
+	// read it manually
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, err.Error()))
+		return
+	}
+	if err = r.Body.Close(); err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		return
+	}
+
+	values, err := url.ParseQuery(string(body))
+	if err != nil {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, err.Error()))
+		return
+	}
+
+	groupid := values.Get("groupid")
+	if groupid == "" {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, err.Error()))
+		return
+	}
 
 	var account *accounts.Account
-	var err error
 
 	if isValidUUID(userid) {
 		account, _ = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
@@ -116,9 +175,21 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// ocs only knows about names so we have to look up the internal id
+	group, err := o.fetchGroupByName(r.Context(), groupid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		return
+	}
+
 	_, err = o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
 		AccountId: account.Id,
-		GroupId:   groupid,
+		GroupId:   group.Id,
 	})
 
 	if err != nil {
@@ -128,11 +199,11 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("userid", userid).Str("groupid", groupid).Msg("could not remove user from group")
+		o.logger.Error().Err(err).Str("userid", account.Id).Str("groupid", group.Id).Msg("could not remove user from group")
 		return
 	}
 
-	o.logger.Debug().Str("userid", userid).Str("groupid", groupid).Msg("removed user from group")
+	o.logger.Debug().Str("userid", account.Id).Str("groupid", group.Id).Msg("removed user from group")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
@@ -156,7 +227,7 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 
 	groups := []string{}
 	for i := range res.Groups {
-		groups = append(groups, res.Groups[i].Id)
+		groups = append(groups, res.Groups[i].OnPremisesSamAccountName)
 	}
 
 	render.Render(w, r, response.DataRender(&data.Groups{Groups: groups}))
@@ -164,15 +235,78 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 
 // AddGroup adds a group
 func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "not implemented"))
+	groupid := r.PostFormValue("groupid")
+	displayname := r.PostFormValue("displayname")
+	gid := r.PostFormValue("gidnumber")
+
+	var gidNumber int64
+	var err error
+
+	if gid != "" {
+		gidNumber, err = strconv.ParseInt(gid, 10, 64)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidnumber provided"))
+			o.logger.Error().Err(err).Str("gid", gid).Str("groupid", groupid).Msg("Cannot use the gidnumber provided")
+			return
+		}
+	}
+
+	if displayname == "" {
+		displayname = groupid
+	}
+
+	newGroup := &accounts.Group{
+		Id:                       groupid,
+		DisplayName:              displayname,
+		OnPremisesSamAccountName: groupid,
+		GidNumber:                gidNumber,
+	}
+	group, err := o.getGroupsService().CreateGroup(r.Context(), &accounts.CreateGroupRequest{
+		Group: newGroup,
+	})
+	if err != nil {
+		merr := merrors.FromError(err)
+		switch merr.Code {
+		case http.StatusBadRequest:
+			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+		case http.StatusConflict:
+			if response.APIVersion(r.Context()) == "2" {
+				// it seems the application framework sets the ocs status code to the httpstatus code, which affects the provisioning api
+				// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
+				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			} else {
+				render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+			}
+		default:
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		o.logger.Error().Err(err).Str("groupid", groupid).Msg("could not add group")
+		// TODO check error if group already existed
+		return
+	}
+	o.logger.Debug().Interface("group", group).Msg("added group")
+
+	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
 // DeleteGroup deletes a group
 func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	groupid := chi.URLParam(r, "groupid")
 
-	_, err := o.getGroupsService().DeleteGroup(r.Context(), &accounts.DeleteGroupRequest{
-		Id: groupid,
+	// ocs only knows about names so we have to look up the internal id
+	group, err := o.fetchGroupByName(r.Context(), groupid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		return
+	}
+
+	_, err = o.getGroupsService().DeleteGroup(r.Context(), &accounts.DeleteGroupRequest{
+		Id: group.Id,
 	})
 
 	if err != nil {
@@ -182,11 +316,11 @@ func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("groupid", groupid).Msg("could not remove group")
+		o.logger.Error().Err(err).Str("groupid", group.Id).Msg("could not remove group")
 		return
 	}
 
-	o.logger.Debug().Str("groupid", groupid).Msg("removed group")
+	o.logger.Debug().Str("groupid", group.Id).Msg("removed group")
 	render.Render(w, r, response.DataRender(struct{}{}))
 }
 
@@ -195,7 +329,19 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 
 	groupid := chi.URLParam(r, "groupid")
 
-	res, err := o.getGroupsService().ListMembers(r.Context(), &accounts.ListMembersRequest{Id: groupid})
+	// ocs only knows about names so we have to look up the internal id
+	group, err := o.fetchGroupByName(r.Context(), groupid)
+	if err != nil {
+		merr := merrors.FromError(err)
+		if merr.Code == http.StatusNotFound {
+			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+		} else {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+		}
+		return
+	}
+
+	res, err := o.getGroupsService().ListMembers(r.Context(), &accounts.ListMembersRequest{Id: group.Id})
 
 	if err != nil {
 		merr := merrors.FromError(err)
@@ -204,13 +350,13 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(err).Str("groupid", groupid).Msg("could not get list of members")
+		o.logger.Error().Err(err).Str("groupid", group.Id).Msg("could not get list of members")
 		return
 	}
 
 	members := []string{}
 	for i := range res.Members {
-		members = append(members, res.Members[i].Id)
+		members = append(members, res.Members[i].OnPremisesSamAccountName)
 	}
 
 	o.logger.Error().Err(err).Int("count", len(members)).Str("groupid", groupid).Msg("listing group members")
@@ -220,4 +366,18 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 func isValidUUID(uuid string) bool {
 	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
 	return r.MatchString(uuid)
+}
+
+func (o Ocs) fetchGroupByName(ctx context.Context, name string) (*accounts.Group, error) {
+	var res *accounts.ListGroupsResponse
+	res, err := o.getGroupsService().ListGroups(ctx, &accounts.ListGroupsRequest{
+		Query: fmt.Sprintf("on_premises_sam_account_name eq '%v'", escapeValue(name)),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if res != nil && len(res.Groups) == 1 {
+		return res.Groups[0], nil
+	}
+	return nil, merrors.NotFound("", "The requested group could not be found")
 }

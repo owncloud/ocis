@@ -16,8 +16,10 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
@@ -64,15 +66,30 @@ func (s Service) hasAccountManagementPermissions(ctx context.Context) bool {
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
 		/**
-		 * FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
-		 * metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
-		 * for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
+		* FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
+		* metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
+		* for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
 		 */
+		// TODO add system role for internal requests.
+		// - at least the proxy needs to look up account info
+		// - glauth needs to make bind requests
+		// tracked as OCIS-454
 		return true
 	}
 
 	// check if permission is present in roles of the authenticated account
 	return s.RoleManager.FindPermissionByID(ctx, roleIDs, AccountManagementPermissionID) != nil
+}
+
+func (s Service) hasSelfManagementPermissions(ctx context.Context) bool {
+	// get roles from context
+	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
+	if !ok {
+		return false
+	}
+
+	// check if permission is present in roles of the authenticated account
+	return s.RoleManager.FindPermissionByID(ctx, roleIDs, SelfManagementPermissionID) != nil
 }
 
 // serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
@@ -105,9 +122,12 @@ func (s Service) getInMemoryServiceUser() proto.Account {
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for ListAccounts")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
@@ -144,6 +164,15 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		a.PasswordProfile.Password = ""
 		out.Accounts = []*proto.Account{a}
 		return nil
+	}
+
+	if onlySelf {
+		// limit list to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			in.Query = "id eq '" + aid + "'"
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
 	}
 
 	if in.Query == "" {
@@ -202,15 +231,29 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for GetAccount")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
+	}
+
+	if onlySelf {
+		// limit get to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			if id != aid {
+				return merrors.Forbidden(s.id, "no permission for GetAccount of another user")
+			}
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
 	}
 
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
@@ -268,7 +311,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		return merrors.InternalServerError(s.id, "could not check if account exists: %v", err.Error())
 	}
 	if exists {
-		return merrors.BadRequest(s.id, "account already exists")
+		return merrors.Conflict(s.id, "account already exists")
 	}
 
 	if out.PasswordProfile != nil {
@@ -298,7 +341,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	indexResults, err := s.index.Add(out)
 	if err != nil {
 		s.rollbackCreateAccount(ctx, out)
-		return merrors.BadRequest(s.id, "Account already exists %v", err.Error())
+		return merrors.Conflict(s.id, "Account already exists %v", err.Error())
 
 	}
 	s.log.Debug().Interface("account", out).Msg("account after indexing")
@@ -370,9 +413,12 @@ func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) 
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
 func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
-	if !s.hasAccountManagementPermissions(ctx) {
+	hasSelf := s.hasSelfManagementPermissions(ctx)
+	hasManagement := s.hasAccountManagementPermissions(ctx)
+	if !hasSelf && !hasManagement {
 		return merrors.Forbidden(s.id, "no permission for UpdateAccount")
 	}
+	onlySelf := hasSelf && !hasManagement
 
 	accLock.Lock()
 	defer accLock.Unlock()
@@ -388,6 +434,17 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
+	if onlySelf {
+		// limit update to own account id
+		if aid, ok := metadata.Get(ctx, middleware.AccountID); ok {
+			if id != aid {
+				return merrors.Forbidden(s.id, "no permission to UpdateAccount of another user")
+			}
+		} else {
+			return merrors.InternalServerError(s.id, "account id not in context")
+		}
+	}
+
 	if err = s.repo.LoadAccount(ctx, id, out); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "account not found: %v", err.Error())
@@ -395,7 +452,6 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 
 		s.log.Error().Err(err).Str("id", id).Msg("could not load account")
 		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
-
 	}
 
 	t := time.Now()
@@ -404,9 +460,15 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		Nanos:   int32(t.Nanosecond()),
 	}
 
-	validMask, err := validateUpdate(in.UpdateMask, updatableAccountPaths)
-	if err != nil {
-		return merrors.BadRequest(s.id, "%s", err)
+	var validMask fieldmask_utils.FieldFilterContainer
+	if onlySelf {
+		if validMask, err = validateUpdate(in.UpdateMask, selfUpdatableAccountPaths); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
+		}
+	} else {
+		if validMask, err = validateUpdate(in.UpdateMask, updatableAccountPaths); err != nil {
+			return merrors.BadRequest(s.id, "%s", err)
+		}
 	}
 
 	if _, exists := validMask.Filter("PreferredName"); exists {
@@ -488,6 +550,14 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	}
 
 	return
+}
+
+// whitelist of all paths/fields which can be updated by users themself
+var selfUpdatableAccountPaths = map[string]struct{}{
+	"DisplayName":              {},
+	"Description":              {},
+	"Mail":                     {}, // read only?,
+	"PasswordProfile.Password": {},
 }
 
 // whitelist of all paths/fields which can be updated by clients

@@ -50,25 +50,30 @@ func (s Service) deflateMembers(g *proto.Group) {
 }
 
 // ListGroups implements the GroupsServiceHandler interface
-func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
-	var searchResults []string
-
-	out.Groups = make([]*proto.Group, 0)
+func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
 	if in.Query == "" {
-		searchResults, _ = s.index.FindByPartial(&proto.Group{}, "DisplayName", "*")
+		err = s.repo.LoadGroups(ctx, &out.Groups)
+		if err != nil {
+			s.log.Err(err).Msg("failed to load all groups from storage")
+			return merrors.InternalServerError(s.id, "failed to load all groups")
+		}
+		for i := range out.Groups {
+			a := out.Groups[i]
+
+			// TODO add accounts only if requested
+			// if in.FieldMask ...
+			s.expandMembers(a)
+
+		}
+		return nil
 	}
 
-	/*
-		var startsWithIDQuery = regexp.MustCompile(`^startswith\(id,'(.*)'\)$`)
-		match := startsWithIDQuery.FindStringSubmatch(in.Query)
-		if len(match) == 2 {
-			searchResults = []string{match[1]}
-		}
-	*/
+	searchResults, err := s.findGroupsByQuery(ctx, in.Query)
+	out.Groups = make([]*proto.Group, 0, len(searchResults))
 
 	for _, hit := range searchResults {
 		g := &proto.Group{}
-		if err = s.repo.LoadGroup(c, hit, g); err != nil {
+		if err = s.repo.LoadGroup(ctx, hit, g); err != nil {
 			s.log.Error().Err(err).Str("group", hit).Msg("could not load group, skipping")
 			continue
 		}
@@ -82,6 +87,9 @@ func (s Service) ListGroups(c context.Context, in *proto.ListGroupsRequest, out 
 	}
 
 	return
+}
+func (s Service) findGroupsByQuery(ctx context.Context, query string) ([]string, error) {
+	return s.index.Query(&proto.Group{}, query)
 }
 
 // GetGroup implements the GroupsServiceHandler interface
@@ -249,8 +257,11 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			alreadyRelated = true
 		}
 	}
+	aref := &proto.Account{
+		Id: a.Id,
+	}
 	if !alreadyRelated {
-		g.Members = append(g.Members, a)
+		g.Members = append(g.Members, aref)
 	}
 
 	// check if we need to add the group to the account
@@ -261,8 +272,12 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			break
 		}
 	}
+	// only store the reference to prevent recurision when marshaling json
+	gref := &proto.Group{
+		Id: g.Id,
+	}
 	if !alreadyRelated {
-		a.MemberOf = append(a.MemberOf, g)
+		a.MemberOf = append(a.MemberOf, gref)
 	}
 
 	if err = s.repo.WriteAccount(c, a); err != nil {

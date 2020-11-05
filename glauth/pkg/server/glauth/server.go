@@ -78,6 +78,7 @@ func Server(opts ...Option) (*LdapSvc, error) {
 			BaseDN(s.backend.Backend.BaseDN),
 			NameFormat(s.backend.Backend.NameFormat),
 			GroupFormat(s.backend.Backend.GroupFormat),
+			RoleBundleUUID(options.RoleBundleUUID),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported backend %s - must be 'ldap', 'owncloud' or 'accounts'", s.backend.Backend.Datastore)
@@ -115,6 +116,7 @@ func Server(opts ...Option) (*LdapSvc, error) {
 				BaseDN(s.fallback.Backend.BaseDN),
 				NameFormat(s.fallback.Backend.NameFormat),
 				GroupFormat(s.fallback.Backend.GroupFormat),
+				RoleBundleUUID(options.RoleBundleUUID),
 			)
 		default:
 			return nil, fmt.Errorf("unsupported fallback %s - must be 'ldap', 'owncloud' or 'accounts'", s.fallback.Backend.Datastore)

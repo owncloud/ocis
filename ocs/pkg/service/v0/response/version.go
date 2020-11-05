@@ -32,10 +32,17 @@ func APIVersion(ctx context.Context) string {
 
 // OcsV1StatusCodes returns the http status codes for the OCS API v1.
 func OcsV1StatusCodes(meta data.Meta) int {
+	if meta.StatusCode == data.MetaUnauthorized.StatusCode {
+		return http.StatusUnauthorized
+	}
 	return http.StatusOK
 }
 
 // OcsV2StatusCodes maps the OCS codes to http status codes for the ocs API v2.
+// see https://github.com/owncloud/core/blob/c08baf580927ecb8ec179028dda255fdd85b4568/lib/private/legacy/api.php#L528
+// also HTTP status codes for apps are the same as OCS codes
+// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
+// I think this is a bug in the ocs v2 api, but since we are going to mimic bugs in ocis ... here goes
 func OcsV2StatusCodes(meta data.Meta) int {
 	sc := meta.StatusCode
 	switch sc {
@@ -47,7 +54,8 @@ func OcsV2StatusCodes(meta data.Meta) int {
 		return http.StatusInternalServerError
 	case data.MetaUnauthorized.StatusCode:
 		return http.StatusUnauthorized
-	case 100:
+	case data.MetaOK.StatusCode:
+		// TODO mustn't data.Meta be a pointer so this assignment has an effect
 		meta.StatusCode = http.StatusOK
 		return http.StatusOK
 	}
@@ -61,7 +69,7 @@ func OcsV2StatusCodes(meta data.Meta) int {
 		return http.StatusBadRequest
 	}
 
-	// TODO change this status code?
+	// TODO change this status code? yes, align with oc10 core mapStatusCodes
 	return http.StatusOK
 }
 

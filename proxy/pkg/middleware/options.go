@@ -39,6 +39,8 @@ type Options struct {
 	PreSignedURLConfig config.PreSignedURL
 	// AutoprovisionAccounts when an account does not exist.
 	AutoprovisionAccounts bool
+	// EnableBasicAuth to allow basic auth
+	EnableBasicAuth bool
 }
 
 // newOptions initializes the available default options.
@@ -126,5 +128,12 @@ func PreSignedURLConfig(cfg config.PreSignedURL) Option {
 func AutoprovisionAccounts(val bool) Option {
 	return func(o *Options) {
 		o.AutoprovisionAccounts = val
+	}
+}
+
+// EnableBasicAuth provides a function to set the EnableBasicAuth config
+func EnableBasicAuth(enableBasicAuth bool) Option {
+	return func(o *Options) {
+		o.EnableBasicAuth = enableBasicAuth
 	}
 }

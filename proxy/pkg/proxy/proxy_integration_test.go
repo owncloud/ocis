@@ -145,6 +145,9 @@ func TestProxyIntegration(t *testing.T) {
 			if err != nil {
 				t.Fatal("Error reading result body")
 			}
+			if err = rr.Result().Body.Close(); err != nil {
+				t.Fatal("Error closing result body")
+			}
 
 			bodyString := string(resultBody)
 			if bodyString != `OK` {

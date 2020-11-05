@@ -20,8 +20,6 @@ Feature: auth
       | /ocs/v2.php/apps/files_sharing/api/v1/shares                |
       | /ocs/v1.php/cloud/apps                                      |
       | /ocs/v2.php/cloud/apps                                      |
-      | /ocs/v1.php/cloud/groups                                    |
-      | /ocs/v2.php/cloud/groups                                    |
       | /ocs/v1.php/config                                          |
       | /ocs/v2.php/config                                          |
       | /ocs/v1.php/privatedata/getattribute                        |
@@ -33,15 +31,13 @@ Feature: auth
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario: using OCS anonymously
     When a user requests these endpoints with "GET" and no authentication
-      | endpoint                |
-      | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
-    When a user requests these endpoints with "GET" and no authentication
-      | endpoint                |
-      | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+      | endpoint                 |
+      | /ocs/v1.php/cloud/users  |
+      | /ocs/v2.php/cloud/users  |
+      | /ocs/v1.php/cloud/groups |
+      | /ocs/v2.php/cloud/groups |
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "997"
 
 
   @issue-ocis-reva-11
@@ -59,7 +55,6 @@ Feature: auth
       | /ocs/v1.php/apps/files_sharing/api/v1/remote_shares         |
       | /ocs/v1.php/apps/files_sharing/api/v1/remote_shares/pending |
       | /ocs/v1.php/privatedata/getattribute                        |
-      | /ocs/v1.php/cloud/groups                                    |
       | /ocs/v1.php/cloud/apps                                      |
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "998"
@@ -77,20 +72,17 @@ Feature: auth
      # | /ocs/v2.php/apps/files_sharing/api/v1/shares                | 100      | 200       |
 
       | /ocs/v2.php/cloud/apps                                      |
-      | /ocs/v2.php/cloud/groups                                    |
       | /ocs/v2.php/privatedata/getattribute                        |
     Then the HTTP status code of responses on all endpoints should be "404"
     And the OCS status code of responses on all endpoints should be "998"
     When the user "Alice" requests these endpoints with "GET" with basic auth
-      | endpoint                |
-      | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
-    When the user "Alice" requests these endpoints with "GET" with basic auth
-      | endpoint                |
-      | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+      | endpoint                 |
+      | /ocs/v1.php/cloud/users  |
+      | /ocs/v2.php/cloud/users  |
+      | /ocs/v1.php/cloud/groups |
+      | /ocs/v2.php/cloud/groups |
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "997"
     When the user "Alice" requests these endpoints with "GET" with basic auth
       | endpoint           |
       | /ocs/v2.php/config |
@@ -133,13 +125,9 @@ Feature: auth
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
-    When user "Alice" requests these endpoints with "GET" using password "invalid"
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "notset"
 
   @skipOnOcV10
   @issue-ocis-reva-29
@@ -183,10 +171,6 @@ Feature: auth
     When user "brian" requests these endpoints with "GET" using password "invalid"
       | endpoint                |
       | /ocs/v1.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "100"
-    When user "brian" requests these endpoints with "GET" using password "invalid"
-      | endpoint                |
       | /ocs/v2.php/cloud/users |
-    Then the HTTP status code of responses on all endpoints should be "200"
-    And the OCS status code of responses on all endpoints should be "200"
+    Then the HTTP status code of responses on all endpoints should be "401"
+    And the OCS status code of responses on all endpoints should be "notset"

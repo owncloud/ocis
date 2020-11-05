@@ -29,8 +29,10 @@ File versions need a redis server. Start one with docker by using:
 
 To start ocis:
 ```
-bin/ocis server
+PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 ```
+
+`PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
 ### Run the acceptance tests
 First we will need to clone the testing app in owncloud which contains the skeleton files required for running the tests.
