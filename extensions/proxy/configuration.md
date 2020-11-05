@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-05T13:54:57+0000"
+date: "2020-11-05T23:08:00+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis-proxy
 geekdocEditPath: edit/master/docs
@@ -137,6 +137,9 @@ Usage: `ocis-proxy server [command options] [arguments...]`
 
 --autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
+
+--enable-basic-auth | $PROXY_ENABLE_BASIC_AUTH  
+: enable basic authentication. Default: `false`.
 
 ### ocis-proxy version
 
