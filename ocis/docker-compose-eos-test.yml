@@ -11,6 +11,8 @@ services:
     #image: owncloud/eos-ocis:1.0.0-rc2
     build:
       context: ./docker/eos-ocis
+      args:
+        BRANCH: v1.0.0-rc3
     tty: true
     privileged: true
     stdin_open: true
