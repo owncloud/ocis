@@ -313,6 +313,7 @@
    the account id is part of various `path` formats.
 
    https://github.com/owncloud/ocis/pull/709
+   https://github.com/owncloud/ocis/pull/816
 
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 
