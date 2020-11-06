@@ -56,7 +56,7 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	o.logger.Debug().Interface("account", account).Msg("got user")
 
 	d := &data.User{
-		UserID:            account.Id,
+		UserID:            account.OnPremisesSamAccountName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
@@ -104,7 +104,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := &data.User{
-		UserID:            account.Id,
+		UserID:            account.OnPremisesSamAccountName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
@@ -218,7 +218,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		enabled = "false"
 	}
 	render.Render(w, r, response.DataRender(&data.User{
-		UserID:            account.Id,
+		UserID:            account.OnPremisesSamAccountName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
 		Email:             account.Mail,
