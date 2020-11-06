@@ -619,6 +619,7 @@ apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:115
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 #
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:367
 apiSharePublicLink2/updatePublicLinkShare.feature:303
 apiSharePublicLink2/updatePublicLinkShare.feature:304
 apiSharePublicLink2/updatePublicLinkShare.feature:322
@@ -1412,6 +1413,23 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 #
+# https://github.com/owncloud/ocis-reva/issues/243  Sharing does not work
+#
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:529
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:547
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:565
+#
+# https://github.com/owncloud/ocis-reva/issues/357  Delete shares from user when user is deleted
+# https://github.com/owncloud/ocis-reva/issues/302  when sharing a file mime-type field is set to `application/octet-stream
+# https://github.com/owncloud/ocis-reva/issues/301  no displayname_owner shown when creating a share
+#
+apiShareOperationsToShares/gettingShares.feature:167
+apiShareOperationsToShares/gettingShares.feature:168
+#
+# https://github.com/owncloud/ocis-reva/issues/335  Moving resource loses associated shares
+#
+apiSharePublicLink2/multilinkSharing.feature:181
+#
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
 apiWebdavPreviews/previews.feature:15
@@ -1536,3 +1554,40 @@ apiVersions/fileVersionsSharingToShares.feature:267
 #
 apiVersions/fileVersionsSharingToShares.feature:252
 apiVersions/fileVersionsSharingToShares.feature:253
+
+#
+# https://github.com/owncloud/product/issues/279 etags are not updated on file operations
+#
+# renaming file/folder doesn't changes the etag of parent
+# moving a file/folder from one folder to another doesn't changes etag of destination folder
+# renaming a file/folder inside another folder doesn't changes etag of parent folder
+# restoring a file doesn't changes the etags of the parents
+#
+apiWebdavEtagPropagation1/moveFileFolder.feature:21
+apiWebdavEtagPropagation1/moveFileFolder.feature:22
+apiWebdavEtagPropagation1/moveFileFolder.feature:41
+apiWebdavEtagPropagation1/moveFileFolder.feature:42
+apiWebdavEtagPropagation1/moveFileFolder.feature:61
+apiWebdavEtagPropagation1/moveFileFolder.feature:62
+apiWebdavEtagPropagation1/moveFileFolder.feature:78
+apiWebdavEtagPropagation1/moveFileFolder.feature:79
+apiWebdavEtagPropagation1/moveFileFolder.feature:98
+apiWebdavEtagPropagation1/moveFileFolder.feature:99
+apiWebdavEtagPropagation1/moveFileFolder.feature:146
+apiWebdavEtagPropagation1/moveFileFolder.feature:147
+apiWebdavEtagPropagation1/moveFileFolder.feature:174
+apiWebdavEtagPropagation1/moveFileFolder.feature:175
+apiWebdavEtagPropagation1/moveFileFolder.feature:244
+apiWebdavEtagPropagation1/moveFileFolder.feature:245
+apiWebdavEtagPropagation1/moveFileFolder.feature:314
+apiWebdavEtagPropagation1/moveFileFolder.feature:315
+apiWebdavEtagPropagation1/moveFileFolder.feature:318
+apiWebdavEtagPropagation1/moveFileFolder.feature:334
+apiWebdavEtagPropagation2/restoreFromTrash.feature:26
+apiWebdavEtagPropagation2/restoreFromTrash.feature:27
+apiWebdavEtagPropagation2/restoreFromTrash.feature:48
+apiWebdavEtagPropagation2/restoreFromTrash.feature:49
+apiWebdavEtagPropagation2/restoreFromTrash.feature:68
+apiWebdavEtagPropagation2/restoreFromTrash.feature:69
+apiWebdavEtagPropagation2/restoreFromTrash.feature:90
+apiWebdavEtagPropagation2/restoreFromTrash.feature:91
