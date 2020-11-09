@@ -137,6 +137,8 @@ apiFavorites/favoritesSharingToShares.feature:49
 apiFavorites/favoritesSharingToShares.feature:50
 apiFavorites/favoritesSharingToShares.feature:63
 apiFavorites/favoritesSharingToShares.feature:64
+apiFavorites/favoritesSharingToShares.feature:77
+apiFavorites/favoritesSharingToShares.feature:78
 #
 # https://github.com/owncloud/product/issues/187
 # Cannot create user with different username and emails
@@ -1430,7 +1432,6 @@ apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:40
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1448,7 +1449,6 @@ apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:20
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:37
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1469,12 +1469,7 @@ apiWebdavUpload2/uploadFileUsingNewChunking.feature:169
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:25
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:34
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:43
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:75
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:96
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98

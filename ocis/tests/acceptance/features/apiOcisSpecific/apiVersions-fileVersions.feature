@@ -13,7 +13,7 @@ Feature: dav-versions
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
     Then the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "0" elements
     Then the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "0" elements
-    And as "Alice" file "/davtest.txt-olddav-oldchunking" should not exist
+    Then the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "0" elements
     And as "Alice" file "/davtest.txt-newdav-newchunking" should not exist
 
   @issue-ocis-reva-17 @issue-ocis-reva-56
@@ -23,7 +23,7 @@ Feature: dav-versions
     And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
     Then the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "1" element
     And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "1" element
-    And as "Alice" file "/davtest.txt-olddav-oldchunking" should not exist
+    Then the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "1" element
     And as "Alice" file "/davtest.txt-newdav-newchunking" should not exist
 
   @files_sharing-app-required
