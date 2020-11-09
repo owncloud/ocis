@@ -107,24 +107,9 @@ def main(ctx):
   before = testPipelines(ctx)
 
   stages = [
-    docker(ctx, 'amd64'),
-    docker(ctx, 'arm64'),
-    docker(ctx, 'arm'),
-    dockerEos(ctx),
-    binary(ctx, 'linux'),
-    binary(ctx, 'darwin'),
-    binary(ctx, 'windows'),
-    releaseSubmodule(ctx),
   ]
 
   after = [
-    manifest(ctx),
-    changelog(ctx),
-    readme(ctx),
-    badges(ctx),
-    docs(ctx),
-    updateDeployment(ctx),
-    notify(ctx),
   ]
 
   if '[docs-only]' in (ctx.build.title + ctx.build.message):
@@ -156,8 +141,8 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
-  pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
-  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
+  # pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
+  # pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
   return pipelines
 
 def testing(ctx, module):
@@ -417,9 +402,8 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
-          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
-          'RUN_PART': part_number,
           'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
+          'BEHAT_FEATURE': 'tests/acceptance/features/apiWebdavUpload1/uploadFile.feature:12'
         },
         'commands': [
           'cd /srv/app/testrunner',
@@ -1411,6 +1395,7 @@ def ocisServer(storage):
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
+        'OCIS_LOG_LEVEL': 'debug',
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types
