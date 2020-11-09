@@ -9,11 +9,6 @@ mkdir -p /var/log/ocis
 
 (/wait-for-mgm; /setup > /var/log/ocis/setup.log; cat /var/log/ocis/setup.log ) &
 
-echo "----- [ocis] DOMAIN setup -----"
-echo "Domain / IP: $OCIS_DOMAIN"
-mkdir -p /etc/ocis
-sed -e "s|@IPADDR@|${OCIS_DOMAIN}|g" /config/identifier-registration.yml.tmpl > /etc/ocis/identifier-registration.yml
-
 # TODO do we still need to precreate this folder?
 mkdir -p /var/tmp/reva
 
