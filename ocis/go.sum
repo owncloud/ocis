@@ -351,6 +351,7 @@ github.com/glauth/glauth v1.1.3-0.20201005201919-4d42af8aacbf h1:3ejnL7OvxCJ6XiE
 github.com/glauth/glauth v1.1.3-0.20201005201919-4d42af8aacbf/go.mod h1:ygO1z1pcp79iBrjbA6vqrsUxIonStjBncosl2a9/Dx8=
 github.com/glauth/glauth v1.1.3-0.20201030130813-4f029234b230 h1:2oT6sD4SUhZ94BXf0NmOaKCwbkzsweBTYRPnyTDP7xY=
 github.com/glauth/glauth v1.1.3-0.20201030130813-4f029234b230/go.mod h1:ygO1z1pcp79iBrjbA6vqrsUxIonStjBncosl2a9/Dx8=
+github.com/glauth/glauth v1.1.3-0.20201110124627-fd3ac7e4bbdc/go.mod h1:ygO1z1pcp79iBrjbA6vqrsUxIonStjBncosl2a9/Dx8=
 github.com/gliderlabs/ssh v0.2.2 h1:6zsha5zo/TWhRhwqCD3+EarCAgZ2yN28ipRnGPnwkI0=
 github.com/gliderlabs/ssh v0.2.2/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
 github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2 h1:Ujru1hufTHVb++eG6OuNDKMxZnGIvF6o/u8q/8h2+I4=

@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
+* Bugfix - Make settings service start without go coroutines: [#835](https://github.com/owncloud/ocis/pull/835)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Fix konnectd build: [#809](https://github.com/owncloud/ocis/pull/809)
@@ -61,6 +62,7 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
+* Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
@@ -93,6 +95,13 @@
    Lower bound working on the cs3 index implementation
 
    https://github.com/owncloud/ocis/pull/741
+
+* Bugfix - Make settings service start without go coroutines: [#835](https://github.com/owncloud/ocis/pull/835)
+
+   The go routines cause a race condition that sometimes causes the tests to fail. The ListRoles
+   request would not return all permissions.
+
+   https://github.com/owncloud/ocis/pull/835
 
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 
@@ -1482,6 +1491,13 @@
    https://github.com/owncloud/product/issues/92
    https://github.com/owncloud/ocis/pull/329
    https://github.com/owncloud/ocis/pull/409
+
+* Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
+
+   We updated glauth to dev commit fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2, which allows to
+   skip certificate checks for the owncloud backend.
+
+   https://github.com/owncloud/ocis/pull/834
 
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 
