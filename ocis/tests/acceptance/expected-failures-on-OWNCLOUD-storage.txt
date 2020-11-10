@@ -573,10 +573,11 @@ apiSharePublicLink1/deletePublicLinkShare.feature:38
 # https://github.com/owncloud/ocis-reva/issues/373 copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file
 #
 apiSharePublicLink2/copyFromPublicLink.feature:60
+apiSharePublicLink2/copyFromPublicLink.feature:85
+apiSharePublicLink2/copyFromPublicLink.feature:166
 apiSharePublicLink2/copyFromPublicLink.feature:167
-apiSharePublicLink2/copyFromPublicLink.feature:168
+apiSharePublicLink2/copyFromPublicLink.feature:182
 apiSharePublicLink2/copyFromPublicLink.feature:183
-apiSharePublicLink2/copyFromPublicLink.feature:184
 apiSharePublicLink2/updatePublicLinkShare.feature:44
 apiSharePublicLink2/updatePublicLinkShare.feature:45
 apiSharePublicLink2/updatePublicLinkShare.feature:93
@@ -619,6 +620,7 @@ apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:115
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 #
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:367
 apiSharePublicLink2/updatePublicLinkShare.feature:303
 apiSharePublicLink2/updatePublicLinkShare.feature:304
 apiSharePublicLink2/updatePublicLinkShare.feature:322
@@ -1304,10 +1306,15 @@ apiWebdavProperties2/getFileProperties.feature:442
 apiWebdavProperties2/getFileProperties.feature:454
 apiWebdavProperties2/getFileProperties.feature:455
 #
-# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+# https://github.com/owncloud/ocis/issues/824 PUT request with missing parent must return status code 409
 #
 apiWebdavUpload1/uploadFile.feature:112
 apiWebdavUpload1/uploadFile.feature:113
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+#
+apiWebdavUpload1/uploadFile.feature:127
+apiWebdavUpload1/uploadFile.feature:128
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 # also requires test helper to read and clear the log file.
@@ -1368,20 +1375,20 @@ apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:47
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:48
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:49
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:52
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:12
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:29
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:43
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:57
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:79
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:13
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:31
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:46
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:61
 apiWebdavUpload2/uploadFileUsingNewChunking.feature:85
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:94
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:98
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:106
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:135
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:136
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:137
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:157
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:92
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:102
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:107
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:116
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:145
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:146
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:147
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:168
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:169
 #
 # https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
 #
@@ -1411,6 +1418,23 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
+#
+# https://github.com/owncloud/ocis-reva/issues/243  Sharing does not work
+#
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:529
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:547
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:565
+#
+# https://github.com/owncloud/ocis-reva/issues/357  Delete shares from user when user is deleted
+# https://github.com/owncloud/ocis-reva/issues/302  when sharing a file mime-type field is set to `application/octet-stream
+# https://github.com/owncloud/ocis-reva/issues/301  no displayname_owner shown when creating a share
+#
+apiShareOperationsToShares/gettingShares.feature:167
+apiShareOperationsToShares/gettingShares.feature:168
+#
+# https://github.com/owncloud/ocis-reva/issues/335  Moving resource loses associated shares
+#
+apiSharePublicLink2/multilinkSharing.feature:181
 #
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
@@ -1536,3 +1560,40 @@ apiVersions/fileVersionsSharingToShares.feature:267
 #
 apiVersions/fileVersionsSharingToShares.feature:252
 apiVersions/fileVersionsSharingToShares.feature:253
+
+#
+# https://github.com/owncloud/product/issues/279 etags are not updated on file operations
+#
+# renaming file/folder doesn't changes the etag of parent
+# moving a file/folder from one folder to another doesn't changes etag of destination folder
+# renaming a file/folder inside another folder doesn't changes etag of parent folder
+# restoring a file doesn't changes the etags of the parents
+#
+apiWebdavEtagPropagation1/moveFileFolder.feature:21
+apiWebdavEtagPropagation1/moveFileFolder.feature:22
+apiWebdavEtagPropagation1/moveFileFolder.feature:41
+apiWebdavEtagPropagation1/moveFileFolder.feature:42
+apiWebdavEtagPropagation1/moveFileFolder.feature:61
+apiWebdavEtagPropagation1/moveFileFolder.feature:62
+apiWebdavEtagPropagation1/moveFileFolder.feature:78
+apiWebdavEtagPropagation1/moveFileFolder.feature:79
+apiWebdavEtagPropagation1/moveFileFolder.feature:98
+apiWebdavEtagPropagation1/moveFileFolder.feature:99
+apiWebdavEtagPropagation1/moveFileFolder.feature:146
+apiWebdavEtagPropagation1/moveFileFolder.feature:147
+apiWebdavEtagPropagation1/moveFileFolder.feature:174
+apiWebdavEtagPropagation1/moveFileFolder.feature:175
+apiWebdavEtagPropagation1/moveFileFolder.feature:244
+apiWebdavEtagPropagation1/moveFileFolder.feature:245
+apiWebdavEtagPropagation1/moveFileFolder.feature:314
+apiWebdavEtagPropagation1/moveFileFolder.feature:315
+apiWebdavEtagPropagation1/moveFileFolder.feature:318
+apiWebdavEtagPropagation1/moveFileFolder.feature:334
+apiWebdavEtagPropagation2/restoreFromTrash.feature:26
+apiWebdavEtagPropagation2/restoreFromTrash.feature:27
+apiWebdavEtagPropagation2/restoreFromTrash.feature:48
+apiWebdavEtagPropagation2/restoreFromTrash.feature:49
+apiWebdavEtagPropagation2/restoreFromTrash.feature:68
+apiWebdavEtagPropagation2/restoreFromTrash.feature:69
+apiWebdavEtagPropagation2/restoreFromTrash.feature:90
+apiWebdavEtagPropagation2/restoreFromTrash.feature:91

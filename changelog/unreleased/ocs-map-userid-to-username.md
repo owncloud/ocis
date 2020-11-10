@@ -7,3 +7,4 @@ service. The userid in OCS requests is in fact the username, not our internal ac
 as our internal account id though, because the account id is part of various `path` formats.
 
 https://github.com/owncloud/ocis/pull/709
+https://github.com/owncloud/ocis/pull/816

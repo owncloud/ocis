@@ -105,6 +105,10 @@ apiAuthWebDav/webDavPROPFINDAuth.feature:37
 #
 apiAuthWebDav/webDavPROPPATCHAuth.feature:38
 #
+# https://github.com/owncloud/ocis/issues/824 PUT request with missing parent must return status code 409
+#
+apiAuthWebDav/webDavPUTAuth.feature:38
+#
 # https://github.com/owncloud/ocis-reva/issues/175 Default capabilities for normal user not same as in oC-core
 # https://github.com/owncloud/ocis-reva/issues/176 Difference in response content of status.php and default capabilities
 #
@@ -603,10 +607,11 @@ apiSharePublicLink1/createPublicLinkShare.feature:742
 # https://github.com/owncloud/ocis-reva/issues/373 copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file
 #
 apiSharePublicLink2/copyFromPublicLink.feature:60
+apiSharePublicLink2/copyFromPublicLink.feature:85
+apiSharePublicLink2/copyFromPublicLink.feature:166
 apiSharePublicLink2/copyFromPublicLink.feature:167
-apiSharePublicLink2/copyFromPublicLink.feature:168
+apiSharePublicLink2/copyFromPublicLink.feature:182
 apiSharePublicLink2/copyFromPublicLink.feature:183
-apiSharePublicLink2/copyFromPublicLink.feature:184
 apiSharePublicLink2/updatePublicLinkShare.feature:44
 apiSharePublicLink2/updatePublicLinkShare.feature:45
 apiSharePublicLink2/updatePublicLinkShare.feature:93
@@ -1333,19 +1338,24 @@ apiWebdavProperties2/getFileProperties.feature:455
 #
 # https://github.com/owncloud/product/issues/237 etags are not quoted in PROPFIND
 #
-apiWebdavUpload1/uploadFile.feature:144
-apiWebdavUpload1/uploadFile.feature:145
-apiWebdavUpload1/uploadFile.feature:157
-apiWebdavUpload1/uploadFile.feature:158
-apiWebdavUpload1/uploadFile.feature:171
-apiWebdavUpload1/uploadFile.feature:172
-apiWebdavUpload1/uploadFile.feature:184
-apiWebdavUpload1/uploadFile.feature:185
+apiWebdavUpload1/uploadFile.feature:160
+apiWebdavUpload1/uploadFile.feature:161
+apiWebdavUpload1/uploadFile.feature:173
+apiWebdavUpload1/uploadFile.feature:174
+apiWebdavUpload1/uploadFile.feature:187
+apiWebdavUpload1/uploadFile.feature:188
+apiWebdavUpload1/uploadFile.feature:200
+apiWebdavUpload1/uploadFile.feature:201
 #
-# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+# https://github.com/owncloud/ocis/issues/824 PUT request with missing parent must return status code 409
 #
 apiWebdavUpload1/uploadFile.feature:112
 apiWebdavUpload1/uploadFile.feature:113
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+#
+apiWebdavUpload1/uploadFile.feature:127
+apiWebdavUpload1/uploadFile.feature:128
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1438,20 +1448,20 @@ apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:12
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:29
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:43
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:57
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:79
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:13
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:31
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:46
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:61
 apiWebdavUpload2/uploadFileUsingNewChunking.feature:85
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:94
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:98
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:106
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:135
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:136
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:137
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:157
-apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:92
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:102
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:107
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:116
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:145
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:146
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:147
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:168
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:169
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
@@ -1511,46 +1521,46 @@ apiWebdavPreviews/previews.feature:179
 #
 # https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
 #
-apiWebdavEtagPropagation1/deleteFileFolder.feature:25
 apiWebdavEtagPropagation1/deleteFileFolder.feature:26
-apiWebdavEtagPropagation1/deleteFileFolder.feature:43
-apiWebdavEtagPropagation1/deleteFileFolder.feature:44
-apiWebdavEtagPropagation1/deleteFileFolder.feature:62
-apiWebdavEtagPropagation1/deleteFileFolder.feature:63
-apiWebdavEtagPropagation1/deleteFileFolder.feature:185
-apiWebdavEtagPropagation1/deleteFileFolder.feature:199
+apiWebdavEtagPropagation1/deleteFileFolder.feature:27
+apiWebdavEtagPropagation1/deleteFileFolder.feature:45
+apiWebdavEtagPropagation1/deleteFileFolder.feature:46
+apiWebdavEtagPropagation1/deleteFileFolder.feature:65
+apiWebdavEtagPropagation1/deleteFileFolder.feature:66
+apiWebdavEtagPropagation1/deleteFileFolder.feature:193
+apiWebdavEtagPropagation1/deleteFileFolder.feature:208
 #
 # https://github.com/owncloud/product/issues/241 deleting an item updates etags of grandparent but not on parent
 # https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
 #
-apiWebdavEtagPropagation1/deleteFileFolder.feature:91
-apiWebdavEtagPropagation1/deleteFileFolder.feature:92
-apiWebdavEtagPropagation1/deleteFileFolder.feature:120
-apiWebdavEtagPropagation1/deleteFileFolder.feature:121
-apiWebdavEtagPropagation1/deleteFileFolder.feature:151
-apiWebdavEtagPropagation1/deleteFileFolder.feature:152
-apiWebdavEtagPropagation1/deleteFileFolder.feature:182
-apiWebdavEtagPropagation1/deleteFileFolder.feature:183
+apiWebdavEtagPropagation1/deleteFileFolder.feature:95
+apiWebdavEtagPropagation1/deleteFileFolder.feature:96
+apiWebdavEtagPropagation1/deleteFileFolder.feature:125
+apiWebdavEtagPropagation1/deleteFileFolder.feature:126
+apiWebdavEtagPropagation1/deleteFileFolder.feature:157
+apiWebdavEtagPropagation1/deleteFileFolder.feature:158
+apiWebdavEtagPropagation1/deleteFileFolder.feature:189
+apiWebdavEtagPropagation1/deleteFileFolder.feature:190
 #
 # https://github.com/owncloud/product/issues/243 etags don't change for a share receiver
 #
-apiWebdavEtagPropagation1/moveFileFolder.feature:235
-apiWebdavEtagPropagation1/moveFileFolder.feature:236
-apiWebdavEtagPropagation1/moveFileFolder.feature:303
-apiWebdavEtagPropagation1/moveFileFolder.feature:304
-apiWebdavEtagPropagation2/copyFileFolder.feature:152
-apiWebdavEtagPropagation2/copyFileFolder.feature:153
+apiWebdavEtagPropagation1/moveFileFolder.feature:244
+apiWebdavEtagPropagation1/moveFileFolder.feature:245
+apiWebdavEtagPropagation1/moveFileFolder.feature:314
+apiWebdavEtagPropagation1/moveFileFolder.feature:315
+apiWebdavEtagPropagation2/copyFileFolder.feature:158
+apiWebdavEtagPropagation2/copyFileFolder.feature:159
 #
 # https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
 #
-apiWebdavEtagPropagation2/restoreFromTrash.feature:25
 apiWebdavEtagPropagation2/restoreFromTrash.feature:26
-apiWebdavEtagPropagation2/restoreFromTrash.feature:46
-apiWebdavEtagPropagation2/restoreFromTrash.feature:47
-apiWebdavEtagPropagation2/restoreFromTrash.feature:65
-apiWebdavEtagPropagation2/restoreFromTrash.feature:66
-apiWebdavEtagPropagation2/restoreFromTrash.feature:86
-apiWebdavEtagPropagation2/restoreFromTrash.feature:87
+apiWebdavEtagPropagation2/restoreFromTrash.feature:27
+apiWebdavEtagPropagation2/restoreFromTrash.feature:48
+apiWebdavEtagPropagation2/restoreFromTrash.feature:49
+apiWebdavEtagPropagation2/restoreFromTrash.feature:68
+apiWebdavEtagPropagation2/restoreFromTrash.feature:69
+apiWebdavEtagPropagation2/restoreFromTrash.feature:90
+apiWebdavEtagPropagation2/restoreFromTrash.feature:91
 #
 # https://github.com/owncloud/product/issues/210 Implement Versions Feature for ocis storage
 #
