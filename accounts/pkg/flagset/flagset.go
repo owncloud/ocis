@@ -85,6 +85,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_DATA_PATH"},
 			Destination: &cfg.Server.AccountsDataPath,
 		},
+		&cli.IntFlag{
+			Name:        "accounts-hash-difficulty",
+			Value:       11,
+			Usage:       "accounts password hash difficulty",
+			EnvVars:     []string{"ACCOUNTS_HASH_DIFFICULTY"},
+			Destination: &cfg.Server.HashDifficulty,
+		},
 		&cli.StringFlag{
 			Name:        "asset-path",
 			Value:       "",

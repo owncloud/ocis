@@ -1411,6 +1411,8 @@ def ocisServer(storage):
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
+        # 4 is the lowest possible value. ONLY FOR TESTS
+        'ACCOUNTS_HASH_DIFFICULTY': 4,
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types

@@ -29,10 +29,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const (
-	_hashDifficulty = 11
-)
-
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
 
@@ -315,7 +311,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if out.PasswordProfile != nil {
 		if out.PasswordProfile.Password != "" {
 			// encrypt password
-			hashed, err := bcrypt.GenerateFromPassword([]byte(in.Account.PasswordProfile.Password), _hashDifficulty)
+			hashed, err := bcrypt.GenerateFromPassword([]byte(in.Account.PasswordProfile.Password), s.Config.Server.HashDifficulty)
 			if err != nil {
 				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
 				return merrors.InternalServerError(s.id, "could not hash password: %v", err.Error())
@@ -499,7 +495,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 		}
 		if in.Account.PasswordProfile.Password != "" {
 			// encrypt password
-			hashed, err := bcrypt.GenerateFromPassword([]byte(in.Account.PasswordProfile.Password), _hashDifficulty)
+			hashed, err := bcrypt.GenerateFromPassword([]byte(in.Account.PasswordProfile.Password), s.Config.Server.HashDifficulty)
 			if err != nil {
 				in.Account.PasswordProfile.Password = ""
 				s.log.Error().Err(err).Str("id", id).Msg("could not hash password")
