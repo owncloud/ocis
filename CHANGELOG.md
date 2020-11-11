@@ -5,6 +5,7 @@
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
+* Bugfix - Accounts config sometimes being overwritten: [#808](https://github.com/owncloud/ocis/pull/808)
 * Bugfix - Make settings service start without go coroutines: [#835](https://github.com/owncloud/ocis/pull/835)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
@@ -95,6 +96,15 @@
    Lower bound working on the cs3 index implementation
 
    https://github.com/owncloud/ocis/pull/741
+
+* Bugfix - Accounts config sometimes being overwritten: [#808](https://github.com/owncloud/ocis/pull/808)
+
+   Tags: accounts
+
+   Sometimes when running the accounts extensions flags were not being taken into
+   consideration.
+
+   https://github.com/owncloud/ocis/pull/808
 
 * Bugfix - Make settings service start without go coroutines: [#835](https://github.com/owncloud/ocis/pull/835)
 
