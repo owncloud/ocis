@@ -7,6 +7,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/micro/go-micro/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+
 	cli "github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
@@ -63,11 +66,15 @@ var (
 )
 
 // Runtime represents an oCIS runtime environment.
-type Runtime struct{}
+type Runtime struct {
+	c *config.Config
+}
 
 // New creates a new ocis + micro runtime
-func New() Runtime {
-	return Runtime{}
+func New(cfg *config.Config) Runtime {
+	return Runtime{
+		c: cfg,
+	}
 }
 
 // Start rpc runtime
@@ -129,12 +136,12 @@ func RunService(client *rpc.Client, service string) int {
 }
 
 // AddMicroPlatform adds the micro subcommands to the cli app
-func AddMicroPlatform(app *cli.App) {
+func AddMicroPlatform(app *cli.App, opts micro.Options) {
 	setDefaults()
 
-	app.Commands = append(app.Commands, api.Commands()...)
-	app.Commands = append(app.Commands, web.Commands()...)
-	app.Commands = append(app.Commands, registry.Commands()...)
+	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
+	app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
+	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
 }
 
 // provide a config.Config with default values?

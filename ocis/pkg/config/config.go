@@ -55,12 +55,13 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	GRPC    GRPC
-	Tracing Tracing
+	File     string
+	Registry string
+	Log      Log
+	Debug    Debug
+	HTTP     HTTP
+	GRPC     GRPC
+	Tracing  Tracing
 
 	Accounts      *accounts.Config
 	Graph         *graph.Config

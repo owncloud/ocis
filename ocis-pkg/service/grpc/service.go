@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -10,6 +10,9 @@ import (
 	"github.com/micro/go-micro/v2/client/grpc"
 
 	etcdr "github.com/micro/go-micro/v2/registry/etcd"
+	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
+
+	"github.com/micro/go-micro/v2/registry"
 
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
@@ -18,9 +21,17 @@ import (
 var DefaultClient = newGrpcClient()
 
 func newGrpcClient() mclient.Client {
+	var r registry.Registry
+	switch os.Getenv("MICRO_REGISTRY") {
+	case "etcd":
+		r = etcdr.NewRegistry()
+	default:
+		r = mdnsr.NewRegistry()
+	}
+
 	c := grpc.NewClient(
 		mclient.RequestTimeout(10*time.Second),
-		mclient.Registry(etcdr.NewRegistry()), // this is a workaround and will force clients to ONLY use etcd as the registry. This needs to be configurable
+		mclient.Registry(r), // this is a workaround and will force clients to ONLY use etcd as the registry. This needs to be configurable
 	)
 	return c
 }
@@ -33,7 +44,6 @@ type Service struct {
 // NewService initializes a new grpc service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
-	fmt.Printf("\n\n%v\n\n", sopts.Name)
 
 	sopts.Logger.Info().
 		Str("transport", "grpc").

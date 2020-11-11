@@ -55,6 +55,12 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "registry",
+			Usage:       "Enable sending traces",
+			EnvVars:     []string{"OCIS_REGISTRY"},
+			Destination: &cfg.Registry,
+		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
