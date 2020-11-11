@@ -4,12 +4,12 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/store/pkg/command"
 	svcconfig "github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
 // StoreCommand is the entrypoint for the ocs command.
@@ -45,7 +45,6 @@ func configureStore(cfg *config.Config) *svcconfig.Config {
 		cfg.Store.Tracing.Type = cfg.Tracing.Type
 		cfg.Store.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Store.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Store.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg.Store

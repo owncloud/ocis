@@ -45,7 +45,6 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 		cfg.OCS.Tracing.Type = cfg.Tracing.Type
 		cfg.OCS.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.OCS.Tracing.Collector = cfg.Tracing.Collector
-		cfg.OCS.Tracing.Service = cfg.Tracing.Service
 	}
 
 	if cfg.TokenManager.JWTSecret != "" {
