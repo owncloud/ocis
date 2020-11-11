@@ -3,7 +3,8 @@ package service
 import (
 	"context"
 
-	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
@@ -28,7 +29,7 @@ const (
 func RegisterPermissions(l *olog.Logger) {
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis-proxy/issues/38
-	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)
+	service := settings.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	permissionRequests := generateAccountManagementPermissionsRequests()
 	for i := range permissionRequests {

@@ -1,13 +1,25 @@
 package grpc
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/micro/go-micro/v2"
+	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
+
+var DefaultClient = newGrpcClient()
+
+func newGrpcClient() mclient.Client {
+	c := grpc.NewClient(
+		mclient.RequestTimeout(10 * time.Second),
+	)
+	return c
+}
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {
@@ -17,6 +29,7 @@ type Service struct {
 // NewService initializes a new grpc service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
+	fmt.Printf("\n\n%v\n\n", sopts.Name)
 
 	sopts.Logger.Info().
 		Str("transport", "grpc").
@@ -33,6 +46,7 @@ func NewService(opts ...Option) Service {
 				".",
 			),
 		),
+		micro.Client(DefaultClient),
 		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),

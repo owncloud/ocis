@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	mclient "github.com/micro/go-micro/v2/client"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
@@ -17,7 +17,7 @@ const (
 func RegisterSettingsBundles(l *olog.Logger) {
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis-proxy/issues/38
-	service := settings.NewBundleService("com.owncloud.api.settings", mclient.DefaultClient)
+	service := settings.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	bundleRequests := []settings.SaveBundleRequest{
 		generateBundleProfileRequest(),

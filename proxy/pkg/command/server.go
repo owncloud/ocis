@@ -15,13 +15,13 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
-	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	ogrpc "github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
@@ -254,8 +254,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 	// https://github.com/owncloud/ocis/proxy/issues/38
-	accounts := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
-	roles := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	accounts := acc.NewAccountsService("com.owncloud.api.accounts", ogrpc.DefaultClient)
+	roles := settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
 
 	uuidMW := middleware.AccountUUID(
 		middleware.Logger(l),

@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/micro/go-micro/v2/client/grpc"
+	ogrpc "github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
-	mclient "github.com/micro/go-micro/v2/client"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -41,7 +41,7 @@ func NewService(opts ...Option) Service {
 	if roleService == nil {
 		// https://github.com/owncloud/ocis-proxy/issues/38
 		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		roleService = settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+		roleService = settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {
