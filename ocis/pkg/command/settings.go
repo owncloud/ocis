@@ -48,8 +48,8 @@ func configureSettings(cfg *config.Config) *svcconfig.Config {
 		cfg.Settings.Tracing.Service = cfg.Tracing.Service
 	}
 
-	if cfg.Storage.Reva.JWTSecret != "" {
-		cfg.Settings.TokenManager.JWTSecret = cfg.Storage.Reva.JWTSecret
+	if cfg.TokenManager.JWTSecret != "" {
+		cfg.Settings.TokenManager.JWTSecret = cfg.TokenManager.JWTSecret
 	}
 
 	return cfg.Settings

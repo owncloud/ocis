@@ -36,31 +36,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-	}
-}
-
-// HealthWithConfig applies cfg to the root flagset
-func HealthWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:        "debug-addr",
-			Value:       "0.0.0.0:9010",
-			Usage:       "Address to debug endpoint",
-			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
-			Destination: &cfg.Debug.Addr,
-		},
-	}
-}
-
-// ServerWithConfig applies cfg to the root flagset
-func ServerWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:        "registry",
-			Usage:       "Enable sending traces",
-			EnvVars:     []string{"OCIS_REGISTRY"},
-			Destination: &cfg.Registry,
-		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
@@ -95,6 +70,32 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCIS_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to dismantle the access token, should equal reva's jwt-secret",
+			EnvVars:     []string{"OCIS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
+	}
+}
+
+// HealthWithConfig applies cfg to the root flagset
+func HealthWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "debug-addr",
+			Value:       "0.0.0.0:9010",
+			Usage:       "Address to debug endpoint",
+			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
+		},
+	}
+}
+
+// ServerWithConfig applies cfg to the root flagset
+func ServerWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
 			Value:       "0.0.0.0:9010",
