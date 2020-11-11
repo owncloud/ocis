@@ -1383,37 +1383,44 @@ def frontend(module):
     }
   ]
 
-def ocisServer(storage):
+def ocisServer(storage, accounts_hash_difficulty = 4):
+  environment = {
+    #'OCIS_LOG_LEVEL': 'debug',
+    'STORAGE_HOME_DRIVER': '%s' % (storage),
+    'STORAGE_USERS_DRIVER': '%s' % (storage),
+    'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
+    'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
+    'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
+    'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
+    'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+    'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
+    'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
+    'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
+    'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
+    'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
+    'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
+    'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
+    'PROXY_ENABLE_BASIC_AUTH': True,
+    'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
+    'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
+    'KONNECTD_ISS': 'https://ocis-server:9200',
+    'KONNECTD_TLS': 'true',
+  }
+
+  # Pass in "default" accounts_hash_difficulty to not set this environment variable.
+  # That will allow OCIS to use whatever its built-in default is.
+  # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
+  # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
+  if (accounts_hash_difficulty != 'default'):
+    environment['ACCOUNTS_HASH_DIFFICULTY'] = accounts_hash_difficulty
+
   return [
     {
       'name': 'ocis-server',
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'detach': True,
-      'environment' : {
-        #'OCIS_LOG_LEVEL': 'debug',
-        'STORAGE_HOME_DRIVER': '%s' % (storage),
-        'STORAGE_USERS_DRIVER': '%s' % (storage),
-        'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
-        'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
-        'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
-        'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
-        'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-        'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
-        'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
-        'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
-        'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
-        'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
-        'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
-        'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
-        'PROXY_ENABLE_BASIC_AUTH': True,
-        'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
-        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
-        'KONNECTD_ISS': 'https://ocis-server:9200',
-        'KONNECTD_TLS': 'true',
-        # 4 is the lowest possible value. ONLY FOR TESTS
-        'ACCOUNTS_HASH_DIFFICULTY': 4,
-      },
+      'environment' : environment,
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/ocis/owncloud/data/',
