@@ -53,14 +53,20 @@ type Tracing struct {
 	Service   string
 }
 
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	GRPC    GRPC
-	Tracing Tracing
+	File         string
+	Log          Log
+	Debug        Debug
+	HTTP         HTTP
+	GRPC         GRPC
+	Tracing      Tracing
+	TokenManager TokenManager
 
 	Accounts      *accounts.Config
 	Graph         *graph.Config

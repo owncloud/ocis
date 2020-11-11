@@ -4,12 +4,12 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/ocs/pkg/command"
 	svcconfig "github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis/ocs/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
 // OCSCommand is the entrypoint for the ocs command.
@@ -48,10 +48,13 @@ func configureOCS(cfg *config.Config) *svcconfig.Config {
 		cfg.OCS.Tracing.Service = cfg.Tracing.Service
 	}
 
+	if cfg.TokenManager.JWTSecret != "" {
+		cfg.OCS.TokenManager.JWTSecret = cfg.TokenManager.JWTSecret
+	}
+
 	return cfg.OCS
 }
 
 func init() {
 	register.AddCommand(OCSCommand)
 }
-
