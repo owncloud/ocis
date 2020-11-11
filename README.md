@@ -10,7 +10,7 @@
 
 **This project is under heavy development, it's not in a working state yet!**
 
-Trigger CI (5)
+Trigger CI (6)
 
 ## Install
 
