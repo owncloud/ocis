@@ -8,6 +8,9 @@ import (
 	"github.com/micro/go-micro/v2"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
+
+	etcdr "github.com/micro/go-micro/v2/registry/etcd"
+
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
@@ -16,7 +19,8 @@ var DefaultClient = newGrpcClient()
 
 func newGrpcClient() mclient.Client {
 	c := grpc.NewClient(
-		mclient.RequestTimeout(10 * time.Second),
+		mclient.RequestTimeout(10*time.Second),
+		mclient.Registry(etcdr.NewRegistry()), // this is a workaround and will force clients to ONLY use etcd as the registry. This needs to be configurable
 	)
 	return c
 }
