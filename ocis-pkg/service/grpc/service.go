@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
 
+// DefaultClient is a custom ocis grpc configured client.
 var DefaultClient = newGrpcClient()
 
 func newGrpcClient() mclient.Client {
