@@ -15,12 +15,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': 'a6cae1e241bfa259b176878e4e1e3596b6eda9b8',
-    'numberOfParts': 6
+    'coreCommit': '4f7fb95e5926f9bce6a89b1d4c62ee0368b7b866',
+    'numberOfParts': 10
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'f6d2f9bd869758b645debaadb29c60e0154e20c3',
+    'phoenixCommit': '645d91f0dadde314b3173afafe30eb3cff12bf59',
     'suites': {
       'phoenixWebUI1': [
         'webUICreateFilesFolders',
@@ -1411,6 +1411,8 @@ def ocisServer(storage):
         'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
         'KONNECTD_ISS': 'https://ocis-server:9200',
         'KONNECTD_TLS': 'true',
+        # 4 is the lowest possible value. ONLY FOR TESTS
+        'ACCOUNTS_HASH_DIFFICULTY': 4,
       },
       'commands': [
         'apk add mailcap', # install /etc/mime.types

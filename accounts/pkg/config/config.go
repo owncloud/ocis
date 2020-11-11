@@ -42,6 +42,7 @@ type Server struct {
 	Version          string
 	Name             string
 	AccountsDataPath string
+	HashDifficulty   int
 }
 
 // Asset defines the available asset configuration.

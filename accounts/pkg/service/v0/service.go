@@ -155,7 +155,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                20000,
 			GidNumber:                30000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=35210$sa1u5Pmfo4cr23Vw$RJNGElaDB1D3xorWkfTEGm2Ko.o2QL3E0cimKx23MNxVWVFSkUUeRoC7FqC4RzYDNQBD6cKzovTEaDD.8TDkD.",
+				Password: "$2a$11$4WNffzgU/WrIRiDnwu8OnOwgOIIUqR/2Ptvp7WJAQCTSgSrylyuvC",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -174,7 +174,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                20001,
 			GidNumber:                30000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=81434$sa1u5Pmfo4cr23Vw$W78cyL884GmuvDpxYPvSRBVzEj02T5QhTTcI8Dv4IKvMooDFGv4bwaWMkH9HfJ0wgpEBW7Lp.4Cad0xE/MYSg1",
+				Password: "$2a$11$Wu2XcDnE6G2No8C88FVWluNHyXuQQi0cHzSe82Vni8AdwIO12fphC",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -193,7 +193,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                20002,
 			GidNumber:                30000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=5524$sa1u5Pmfo4cr23Vw$58bQVL/JeUlwM0RY21YKAFMvKvwKLLysGllYXox.vwKT5dHMwdzJjCxwTDMnB2o2pwexC8o/iOXyP2zrhALS40",
+				Password: "$2a$11$6Lak4zh1xUkpObg2rrOotOTdQYGj2Uu/sowcVLhub.8qYIr.CxzEW",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -213,7 +213,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                20003,
 			GidNumber:                30000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=47068$lhw6odzXW0LTk/ao$GgxS.pIgP8jawLJBAiyNor2FrWzrULF95PwspRkli2W3VF.4HEwTYlQfRXbNQBMjNCEcEYlgZo3a.kRz2k2N0/",
+				Password: "$2a$11$jvI6PHuvrimpcCHzL2Q2WOqfm1FGdYAuSYZBDahr/B48fpiFxyDy2",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -229,7 +229,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                20004,
 			GidNumber:                30000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=95551$/bdqsmiGleA20kAS$rCAvHV7wjaHVF5nEVAnpW7mugRqcnPmdU4UPqhSroE74gXFxNGZflCF.ZyHwocDwgAw3uLkqsCzB1h5bXBjYB0",
+				Password: "$2a$11$En9VIUtqOdDyUl.LuUq2KeuBb5A2n8zE0lkJ2v6IDRSaOamhNq6Uu",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -246,7 +246,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                10000,
 			GidNumber:                15000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=9746$sa1u5Pmfo4cr23Vw$2hnwpkTvUkWX0v6mh8Aw1pbzEXa9EUJzmrey4g2W/8arwWCwhteqU//3aWnA3S0d5T21fOKYteoqlsN1IbTcN.",
+				Password: "$2a$11$ntoTP2W/kyQIuoYpH5mRBuNzaEERYWSwn/zCsY5rtffen4d41y9.6",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -262,7 +262,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			UidNumber:                10001,
 			GidNumber:                15000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$6$rounds=91087$sa1u5Pmfo4cr23Vw$wPC3BbMTbP/ytlo0p.f99zJifyO70AUCdKIK9hkhwutBKGCirLmZs/MsWAG6xHjVvmnmHN5NoON7FUGv5pPaN.",
+				Password: "$2a$11$40xzy3rO8Tq4j2VkFbKz8Ow19BRaqaixEjAR0IbvQXxtOvMtkjwzy",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
