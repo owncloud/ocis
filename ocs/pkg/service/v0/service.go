@@ -39,8 +39,6 @@ func NewService(opts ...Option) Service {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		// https://github.com/owncloud/ocis-proxy/issues/38
-		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
 		roleService = settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
 	}
 	roleManager := options.RoleManager

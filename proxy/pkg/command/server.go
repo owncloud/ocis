@@ -252,8 +252,6 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		middleware.PreSignedURLConfig(cfg.PreSignedURL),
 	)
 
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis/proxy/issues/38
 	accounts := acc.NewAccountsService("com.owncloud.api.accounts", ogrpc.DefaultClient)
 	roles := settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
 

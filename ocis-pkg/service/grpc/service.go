@@ -31,7 +31,7 @@ func newGrpcClient() mclient.Client {
 
 	c := grpc.NewClient(
 		mclient.RequestTimeout(10*time.Second),
-		mclient.Registry(r), // this is a workaround and will force clients to ONLY use etcd as the registry. This needs to be configurable
+		mclient.Registry(r),
 	)
 	return c
 }

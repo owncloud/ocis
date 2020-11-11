@@ -15,8 +15,6 @@ const (
 
 // RegisterSettingsBundles pushes the settings bundle definitions for this extension to the ocis-settings service.
 func RegisterSettingsBundles(l *olog.Logger) {
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
 	service := settings.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	bundleRequests := []settings.SaveBundleRequest{

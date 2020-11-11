@@ -27,8 +27,6 @@ const (
 
 // RegisterPermissions registers permissions for account management and group management with the settings service.
 func RegisterPermissions(l *olog.Logger) {
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis-proxy/issues/38
 	service := settings.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	permissionRequests := generateAccountManagementPermissionsRequests()
