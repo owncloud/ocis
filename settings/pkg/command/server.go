@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
-	"github.com/owncloud/ocis/settings/pkg/metrics"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/settings/pkg/metrics"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -143,8 +144,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(mtrcs),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Flags(flagset.RootWithConfig(config.New())),
+					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				gr.Add(server.Run, func(_ error) {
