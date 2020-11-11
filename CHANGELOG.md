@@ -20,6 +20,7 @@
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
+* Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Improve reva service descriptions: [#536](https://github.com/owncloud/ocis/pull/536)
@@ -239,6 +240,14 @@
    Added the thumbnails command so that the thumbnails service can get started via ocis.
 
    https://github.com/owncloud/ocis/issues/156
+
+* Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
+
+   Change the hashing algorithm from SHA-512 to bcrypt since the latter is better suitable for
+   password hashing. This is a breaking change. Existing deployments need to regenerate the
+   accounts folder.
+
+   https://github.com/owncloud/ocis/issues/510
 
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 
