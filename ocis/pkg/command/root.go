@@ -50,10 +50,12 @@ func Execute() error {
 		)
 	}
 
+	addresses := strings.Split(os.Getenv("MICRO_REGISTRY_ADDRESS"), ",")
+
 	var r registry.Registry
 	switch os.Getenv("MICRO_REGISTRY") {
 	case "etcd":
-		r = etcdr.NewRegistry()
+		r = etcdr.NewRegistry(registry.Addrs(addresses...))
 	default:
 		r = mdnsr.NewRegistry()
 	}
