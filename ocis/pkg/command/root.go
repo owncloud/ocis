@@ -4,11 +4,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/registry"
+
 	"github.com/micro/go-micro/v2"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	oregistry "github.com/owncloud/ocis/ocis-pkg/registry"
+
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -47,7 +49,7 @@ func Execute() error {
 		)
 	}
 
-	r := *oregistry.GetRegistry()
+	r := *registry.GetRegistry()
 
 	opts := micro.Options{
 		Registry: r,
