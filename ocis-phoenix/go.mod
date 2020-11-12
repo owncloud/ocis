@@ -9,7 +9,6 @@ require (
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro v1.18.0 // indirect
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee

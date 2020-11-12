@@ -3,30 +3,25 @@ module github.com/owncloud/ocis/accounts
 go 1.13
 
 require (
-	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06 // indirect
 	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
 	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang/protobuf v1.4.3
-	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
-	github.com/iancoleman/strcase v0.1.2 // indirect
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/owncloud/ocis v1.0.0-rc3.0.20201103111659-46bf133a3c63 // indirect
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20201103111659-46bf133a3c63
 	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
-	github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df // indirect
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
-	github.com/tredoe/osutil v1.0.5
+	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
 	google.golang.org/grpc v1.33.1
