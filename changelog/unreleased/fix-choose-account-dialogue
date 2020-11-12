@@ -1,0 +1,8 @@
+Bugfix: Fix choose account dialogue
+
+Tags: konnectd
+
+We've fixed the choose account dialogue in konnectd bug that the user hasn't been logged in after selecting account.
+
+https://github.com/owncloud/ocis/pull/846
+

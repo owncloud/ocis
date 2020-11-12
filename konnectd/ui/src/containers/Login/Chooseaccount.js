@@ -32,9 +32,7 @@ const styles = theme => ({
   }
 });
 
-function Chooseaccount(props) {
-  const { loading, errors, classes, hello, history } = props;
-
+function Chooseaccount({ loading, errors, classes, hello, history, dispatch }) {
   useEffect(() => {
     if ((!hello || !hello.state) && history.action !== 'PUSH') {
       history.replace(`/identifier${history.location.search}${history.location.hash}`);
