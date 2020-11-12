@@ -96,8 +96,10 @@ def getCoreApiTestPipelineNames():
 def getDependsOnAllTestPipelines(ctx):
   dependencies = getTestSuiteNames() + [
     'upload-coverage',
-    'localApiTests-owncloud-storage',
-    'localApiTests-ocis-storage',
+    'localApiTests-apiOcisSpecific-owncloud',
+    'localApiTests-apiOcisSpecific-ocis',
+    'localApiTests-apiBasic-owncloud',
+    'localApiTests-apiBasic-ocis',
   ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
@@ -148,8 +150,10 @@ def testPipelines(ctx):
 
   pipelines += [
     uploadCoverage(ctx),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiOcisSpecific'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiOcisSpecific'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiBasic', 'default'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiBasic', 'default')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
@@ -336,11 +340,11 @@ def uploadCoverage(ctx):
     'depends_on': getTestSuiteNames(),
   }
 
-def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'localApiTests-%s-storage' % (storage),
+    'name': 'localApiTests-%s-%s' % (suite, storage),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -348,10 +352,10 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) +
+      ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'localApiTests-%s-storage' % (storage),
+        'name': 'localApiTests-%s-%s' % (suite, storage),
         'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
@@ -361,6 +365,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
+          'BEHAT_SUITE': suite,
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner',
         },
@@ -391,7 +396,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud'):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -403,7 +408,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) +
+      ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
@@ -452,7 +457,7 @@ def uiTests(ctx, phoenixBranch, phoenixCommit):
   suiteNames = getUITestSuiteNames()
   return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
 
-def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud'):
+def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = getUITestSuites()
   paths = ""
   for path in suites[suiteName]:
@@ -469,7 +474,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) + [
+      ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'webUITests',
         'image': 'owncloudci/nodejs:11',
@@ -529,7 +534,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     },
   }
 
-def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
+def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -541,7 +546,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) + [
+      ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'WebUIAcceptanceTests',
         'image': 'owncloudci/nodejs:11',

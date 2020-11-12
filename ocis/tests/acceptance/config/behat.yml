@@ -3,9 +3,9 @@ default:
     '': '%paths.base%/../features/bootstrap'
 
   suites:
-    apiOcisSpecific:
+    apiBasic:
       paths:
-        - '%paths.base%/../features/apiOcisSpecific'
+        - '%paths.base%/../features/apiBasic'
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -21,6 +21,22 @@ default:
             adminPassword: admin
             regularUserPassword: 123456
             ocPath: apps/testing/api/v1/occ
+        - CapabilitiesContext:
+        - ChecksumContext:
+        - FavoritesContext:
+        - FilesVersionsContext:
+        - PublicWebDavContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
+
+    apiOcisSpecific:
+      paths:
+        - '%paths.base%/../features/apiOcisSpecific'
+      context: *common_ldap_suite_context
+      contexts:
+        - RevaContext:
+        - OccContext:
+        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
         - FavoritesContext:
