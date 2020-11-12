@@ -45,7 +45,6 @@ func configureSettings(cfg *config.Config) *svcconfig.Config {
 		cfg.Settings.Tracing.Type = cfg.Tracing.Type
 		cfg.Settings.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Settings.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Settings.Tracing.Service = cfg.Tracing.Service
 	}
 
 	if cfg.TokenManager.JWTSecret != "" {

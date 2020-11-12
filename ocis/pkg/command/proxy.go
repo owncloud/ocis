@@ -45,7 +45,6 @@ func configureProxy(cfg *config.Config) *svcconfig.Config {
 		cfg.Proxy.Tracing.Type = cfg.Tracing.Type
 		cfg.Proxy.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Proxy.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Proxy.Tracing.Service = cfg.Tracing.Service
 	}
 
 	if cfg.TokenManager.JWTSecret != "" {

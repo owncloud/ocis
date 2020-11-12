@@ -4,11 +4,11 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
 // StorageSharingCommand is the entrypoint for the reva-sharing command.
@@ -39,7 +39,6 @@ func configureStorageSharing(cfg *config.Config) *svcconfig.Config {
 		cfg.Storage.Tracing.Type = cfg.Tracing.Type
 		cfg.Storage.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Storage.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Storage.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg.Storage
