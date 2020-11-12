@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/registry"
+
 	"github.com/micro/cli/v2"
-	"github.com/micro/go-micro/v2/registry/mdns"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
@@ -18,7 +19,7 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 		Usage: "Print the versions of the running instances",
 		Flags: flagset.ListAccountsWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			reg := mdns.NewRegistry()
+			reg := *registry.GetRegistry()
 			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Server.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get accounts services from the registry: %v", err))
