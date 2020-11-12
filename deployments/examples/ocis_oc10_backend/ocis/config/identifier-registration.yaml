@@ -7,15 +7,11 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - http://ocis.domain.com/oidc-callback.html
-      - http://ocis.domain.com/
-      - https://ocis.domain.com/
-      - https://ocis.domain.com/oidc-callback.html
-      - http://ocis.domain.com/oidc-silent-redirect.html
-      - https://ocis.domain.com/oidc-silent-redirect.html
+      - https://ocis.example.org/
+      - https://ocis.example.org/oidc-callback.html
+      - https://ocis.example.org/oidc-silent-redirect.html
     origins:
-      - http://ocis.domain.com
-      - https://ocis.domain.com
+      - https://ocis.example.org
 
   - id: oc10
     name: OC10
@@ -24,11 +20,9 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
-      - https://oc10.domain.com/apps/openidconnect/redirect/
-      - https://oc10.domain.com/apps/openidconnect/redirect
+      - https://oc10.example.org/apps/openidconnect/redirect
     origins:
-      - http://oc10.domain.com
-      - https://oc10.domain.com
+      - https://oc10.example.org
 
   - id: ocis-explorer.js
     name: OCIS Graph Explorer

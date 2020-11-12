@@ -1,0 +1,61 @@
+{
+  "HTTP": {
+    "Namespace": "works.owncloud"
+  },
+  "policy_selector": {
+    "static": {
+      "policy": "oc10"
+    }
+  },
+  "policies": [
+    {
+      "name": "oc10",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/ocs/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/remote.php/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/webdav/",
+          "backend": "http://owncloud:8080",
+          "apache-vhost": true
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "http://owncloud:8080"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "http://owncloud:8080"
+        }
+      ]
+    }
+  ]
+}

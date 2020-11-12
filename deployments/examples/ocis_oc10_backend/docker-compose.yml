@@ -41,6 +41,11 @@ services:
     volumes:
       - "letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      default:
+        aliases:
+          - ${OC10_DOMAIN}
+          - ${OCIS_DOMAIN}
 
   owncloud:
     build:
@@ -52,6 +57,8 @@ services:
       - db
       - redis
     environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN}
+      PROXY_LOG_LEVEL: debug
       OWNCLOUD_DOMAIN: ${OC10_DOMAIN}
       OWNCLOUD_DB_TYPE: mysql
       OWNCLOUD_DB_NAME: owncloud
@@ -88,33 +95,28 @@ services:
       - "traefik.http.routers.oc10-redirs.middlewares=redirect-to-https"
 
   ocis:
-    image: owncloud/ocis:latest
+    build:
+      context: ./ocis
+      dockerfile: Dockerfile
+      args:
+        OCIS_DOMAIN: ${OCIS_DOMAIN}
+        OC10_DOMAIN: ${OC10_DOMAIN}
     ports:
       - 9200:9200
     environment:
-      OCIS_DOMAIN: ${OCIS_DOMAIN}
+      OCIS_LOG_LEVEL: debug
+      # proxy
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_TLS: "false"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
-      PROXY_OIDC_INSECURE: "true"
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      PROXY_OIDC_INSECURE: "${INSECURE}"
+      # konnectd - binddn must exist as oc10 admin user
       KONNECTD_ISS: https://${OCIS_DOMAIN}
-      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yml"
+      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
       KONNECTD_TLS: 0
       KONNECTD_SIGNING_KID: super
-      GRAPH_OIDC_ENDPOINT: https://${OC10_DOMAIN}/apps/graphapi/v1.0
-      PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN}
-      PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN}/.well-known/openid-configuration
-      PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN}
-      PHOENIX_WEB_CONFIG: "/config/web/config.json"
-      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
-      STORAGE_TRANSFER_EXPIRES: 86400
-      STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
-      STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
-      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
-      GLAUTH_BACKEND_DATASTORE: owncloud
-      GLAUTH_BACKEND_SERVERS: https://${OC10_DOMAIN}/apps/graphapi/v1.0
-      GLAUTH_BACKEND_BASEDN: dc=example,dc=org
+      KONNECTD_INSECURE: "${INSECURE}"
       LDAP_URI: ldap://localhost:9125
       LDAP_BINDDN: "cn=admin,dc=example,dc=org"
       LDAP_BINDPW: "admin"
@@ -126,9 +128,23 @@ services:
       LDAP_UUID_ATTRIBUTE: uid
       LDAP_UUID_ATTRIBUTE_TYPE: text
       LDAP_FILTER: "(objectClass=posixaccount)"
+      # glauth
+      GLAUTH_BACKEND_DATASTORE: owncloud
+      GLAUTH_BACKEND_SERVERS: https://${OC10_DOMAIN}/apps/graphapi/v1.0
+      GLAUTH_BACKEND_INSECURE: "${INSECURE}"
+      # graph
+      GRAPH_OIDC_ENDPOINT: https://${OC10_DOMAIN}/apps/graphapi/v1.0
+      # web ui
+      PHOENIX_WEB_CONFIG: "/config/web/config.json"
+      # storage - although not used, yet
+      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
+      STORAGE_OIDC_INSECURE: "${INSECURE}"
+      STORAGE_TRANSFER_EXPIRES: 86400
+      STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
+      STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
+      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
     volumes:
-      - ./ocis:/config
-      - ./ocis/proxy-config.json:/etc/ocis/proxy.json
+      - ./ocis/config/proxy-config.json:/etc/ocis/proxy.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
@@ -143,7 +159,6 @@ services:
       - "traefik.http.routers.ocis-redirs.rule=Host(`${OCIS_DOMAIN}`)"
       - "traefik.http.routers.ocis-redirs.entrypoints=web"
       - "traefik.http.routers.ocis-redirs.middlewares=redirect-to-https"
-
   db:
     image: webhippie/mariadb:latest
     restart: always
