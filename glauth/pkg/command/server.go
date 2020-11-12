@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 
 	"github.com/owncloud/ocis/glauth/pkg/crypto"
@@ -17,7 +19,6 @@ import (
 	glauthcfg "github.com/glauth/glauth/pkg/config"
 
 	"github.com/micro/cli/v2"
-	"github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -76,7 +77,9 @@ func Server(cfg *config.Config) *cli.Command {
 						jaeger.Options{
 							AgentEndpoint:     cfg.Tracing.Endpoint,
 							CollectorEndpoint: cfg.Tracing.Collector,
-							ServiceName:       cfg.Tracing.Service,
+							Process: jaeger.Process{
+								ServiceName: cfg.Tracing.Service,
+							},
 						},
 					)
 
@@ -309,6 +312,6 @@ func Server(cfg *config.Config) *cli.Command {
 
 // getAccountsServices returns an ocis-accounts service
 func getAccountsServices() (accounts.AccountsService, accounts.GroupsService) {
-	return accounts.NewAccountsService("com.owncloud.api.accounts", client.DefaultClient),
-		accounts.NewGroupsService("com.owncloud.api.accounts", client.DefaultClient)
+	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
+		accounts.NewGroupsService("com.owncloud.api.accounts", grpc.DefaultClient)
 }

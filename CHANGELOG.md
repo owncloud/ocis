@@ -30,6 +30,7 @@
 * Change - Properly style konnectd consent page: [#754](https://github.com/owncloud/ocis/pull/754)
 * Change - Move the indexer package from ocis/accounts to ocis/ocis-pkg: [#794](https://github.com/owncloud/ocis/pull/794)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
+* Change - Move ocis default config to root level: [#842](https://github.com/owncloud/ocis/pull/842)
 * Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
@@ -61,6 +62,7 @@
 * Enhancement - Add the thumbnails service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add a command to list the versions of running instances: [#226](https://github.com/owncloud/product/issues/226)
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
+* Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
@@ -331,6 +333,17 @@
    list`, `ocis kill` and `ocis run` available for service runtime management.
 
    https://github.com/owncloud/ocis/pull/287
+
+* Change - Move ocis default config to root level: [#842](https://github.com/owncloud/ocis/pull/842)
+
+   Tags: ocis
+
+   We moved the tracing config to the `root` flagset so that they are parsed on all commands. We also
+   introduced a `JWTSecret` flag in the root flagset, in order to apply a common default JWTSecret
+   to all services that have one.
+
+   https://github.com/owncloud/ocis/pull/842
+   https://github.com/owncloud/ocis/pull/843
 
 * Change - Remove username field in OCS: [#709](https://github.com/owncloud/ocis/pull/709)
 
@@ -1478,6 +1491,26 @@
   * Enhancement - Implement preview API: [#13](https://github.com/owncloud/ocis-webdav/pull/13)
 
    https://github.com/owncloud/product/issues/244
+
+* Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
+
+   Tags: ocis
+
+   There are a few building blocks that we were relying on default behavior, such as
+   `micro.Registry` and the go-micro client. In order for oCIS to work in any environment and not
+   relying in black magic configuration or running daemons we need to be able to:
+
+   - Provide with a configurable go-micro registry. - Use our own go-micro client adjusted to our
+   own needs (i.e: custom timeout, custom dial timeout, custom transport...)
+
+   This PR is relying on 2 env variables from Micro: `MICRO_REGISTRY` and
+   `MICRO_REGISTRY_ADDRESS`. The latter does not make sense to provide if the registry is not
+   `etcd`.
+
+   The current implementation only accounts for `mdns` and `etcd` registries, defaulting to
+   `mdns` when not explicitly defined to use `etcd`.
+
+   https://github.com/owncloud/ocis/pull/840
 
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 

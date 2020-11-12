@@ -14,4 +14,7 @@ require (
 	github.com/spf13/viper v1.7.0
 )
 
-replace github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+replace (
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)

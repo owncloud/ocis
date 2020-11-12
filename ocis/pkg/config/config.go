@@ -61,6 +61,7 @@ type TokenManager struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File         string
+	Registry     string
 	Log          Log
 	Debug        Debug
 	HTTP         HTTP
