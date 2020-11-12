@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oregistry "github.com/owncloud/ocis/ocis-pkg/registry"
 )
 
 // RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of
@@ -24,6 +25,8 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
 
+	r := *oregistry.GetRegistry()
+
 	service := &registry.Service{
 		Name:      serviceID,
 		Version:   "",
@@ -31,11 +34,10 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 		Endpoints: make([]*registry.Endpoint, 0),
 	}
 
-	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
-
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
-	if err := registry.Register(service, rOpts...); err != nil {
+	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
+	if err := r.Register(service, rOpts...); err != nil {
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", serviceID)
 	}
 
