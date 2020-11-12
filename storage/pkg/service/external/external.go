@@ -2,7 +2,12 @@ package external
 
 import (
 	"context"
+	"os"
+	"strings"
 	"time"
+
+	etcdr "github.com/micro/go-micro/v2/registry/etcd"
+	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
 
 	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/registry"
@@ -24,6 +29,16 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
 
+	addresses := strings.Split(os.Getenv("MICRO_REGISTRY_ADDRESS"), ",")
+	var r registry.Registry
+
+	switch os.Getenv("MICRO_REGISTRY") {
+	case "etcd":
+		r = etcdr.NewRegistry(registry.Addrs(addresses...))
+	default:
+		r = mdnsr.NewRegistry()
+	}
+
 	service := &registry.Service{
 		Name:      serviceID,
 		Version:   "",
@@ -31,11 +46,10 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 		Endpoints: make([]*registry.Endpoint, 0),
 	}
 
-	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
-
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
-	if err := registry.Register(service, rOpts...); err != nil {
+	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
+	if err := r.Register(service, rOpts...); err != nil {
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", serviceID)
 	}
 
