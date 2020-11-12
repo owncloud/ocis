@@ -2,16 +2,12 @@ package external
 
 import (
 	"context"
-	"os"
-	"strings"
 	"time"
-
-	etcdr "github.com/micro/go-micro/v2/registry/etcd"
-	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
 
 	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oregistry "github.com/owncloud/ocis/ocis-pkg/registry"
 )
 
 // RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of
@@ -29,15 +25,7 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
 
-	addresses := strings.Split(os.Getenv("MICRO_REGISTRY_ADDRESS"), ",")
-	var r registry.Registry
-
-	switch os.Getenv("MICRO_REGISTRY") {
-	case "etcd":
-		r = etcdr.NewRegistry(registry.Addrs(addresses...))
-	default:
-		r = mdnsr.NewRegistry()
-	}
+	r := *oregistry.GetRegistry()
 
 	service := &registry.Service{
 		Name:      serviceID,

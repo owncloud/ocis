@@ -4,14 +4,11 @@ import (
 	"os"
 	"strings"
 
-	etcdr "github.com/micro/go-micro/v2/registry/etcd"
-	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
-
 	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/v2/registry"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oregistry "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -50,15 +47,7 @@ func Execute() error {
 		)
 	}
 
-	addresses := strings.Split(os.Getenv("MICRO_REGISTRY_ADDRESS"), ",")
-
-	var r registry.Registry
-	switch os.Getenv("MICRO_REGISTRY") {
-	case "etcd":
-		r = etcdr.NewRegistry(registry.Addrs(addresses...))
-	default:
-		r = mdnsr.NewRegistry()
-	}
+	r := *oregistry.GetRegistry()
 
 	opts := micro.Options{
 		Registry: r,
