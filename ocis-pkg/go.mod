@@ -12,7 +12,6 @@ require (
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/iancoleman/strcase v0.1.2
 	github.com/justinas/alice v1.2.0
-	github.com/mennanov/fieldmask-utils v0.3.3 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1

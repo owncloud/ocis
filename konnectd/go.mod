@@ -29,8 +29,6 @@ require (
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/net v0.0.0-20201022231255-08b38378de70
 	golang.org/x/sys v0.0.0-20201022201747-fb209a7c41cd // indirect
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 	stash.kopano.io/kc/konnect v0.33.3
 	stash.kopano.io/kgol/rndm v1.1.0
 )
