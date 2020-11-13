@@ -33,74 +33,76 @@ import (
 
 // GetSelf returns the currently logged in user
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
-	var account *accounts.Account
-	var err error
 	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
 		return
 	}
-
-	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-		Id: u.Id.OpaqueId,
-	})
-
-	if err != nil {
-		merr := merrors.FromError(err)
-		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
-		// cs3, we cannot count with the accounts service.
-		if u != nil {
-			d := &data.User{
-				UserID:            u.Username,
-				DisplayName:       u.DisplayName,
-				LegacyDisplayName: u.DisplayName,
-				Email:             u.Mail,
-				UIDNumber:         u.UidNumber,
-				GIDNumber:         u.GidNumber,
-			}
-			o.mustRender(w, r, response.DataRender(d))
-			return
-		}
-		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
-		return
-	}
-
-	// remove password from log if it is set
-	if account.PasswordProfile != nil {
-		account.PasswordProfile.Password = ""
-	}
-	o.logger.Debug().Interface("account", account).Msg("got user")
+	o.logger.Debug().Interface("user", u).Msg("got user from context")
 
 	d := &data.User{
-		UserID:            account.OnPremisesSamAccountName,
-		DisplayName:       account.DisplayName,
-		LegacyDisplayName: account.DisplayName,
-		Email:             account.Mail,
-		UIDNumber:         account.UidNumber,
-		GIDNumber:         account.GidNumber,
+		UserID:            u.Username,
+		DisplayName:       u.DisplayName,
+		LegacyDisplayName: u.DisplayName,
+		Email:             u.Mail,
 		// TODO hide enabled flag or it might get rendered as false
+	}
+	if u.Opaque != nil && u.Opaque.Map != nil {
+		var err error
+		if uidObj, ok := u.Opaque.Map["uid"]; ok {
+			if uidObj.Decoder == "plain" {
+				d.UIDNumber, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
+				o.logger.Error().Err(err).Interface("user", u).Msg("cannot parse uidnumber")
+			}
+		}
+		if gidObj, ok := u.Opaque.Map["gid"]; ok {
+			if gidObj.Decoder == "plain" {
+				d.GIDNumber, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
+				o.logger.Error().Err(err).Interface("user", u).Msg("cannot parse gidnumber")
+			}
+		}
 	}
 	o.mustRender(w, r, response.DataRender(d))
 }
 
 // GetUser returns the user with the given userid
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "GetUser")
+	defer span.End()
+
 	userid := chi.URLParam(r, "userid")
 	userid, err := url.PathUnescape(userid)
 	if err != nil {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
-	var account *accounts.Account
 
-	switch {
-	case userid == "":
+	if userid == "" {
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
+		return
+	}
+
+	u, ok := revactx.ContextGetUser(r.Context())
+	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
+		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+		return
+	}
+
+	if userid == u.Username {
+		o.GetSelf(w, r)
+		return
+	}
+
+	var account *accounts.Account
+	switch {
 	case o.config.AccountBackend == "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case o.config.AccountBackend == "cs3":
 		account, err = o.fetchAccountFromCS3Backend(r.Context(), userid)
 	default:
-		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+		o.logger.Error().Str("backend", o.config.AccountBackend).Msg("Invalid accounts backend type")
+		return
 	}
 
 	if err != nil {
@@ -110,7 +112,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
-		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
 	}
 
@@ -145,11 +146,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Definition: "default",
 		},
 	}
-
-	_, span := ocstracing.TraceProvider.
-		Tracer("ocs").
-		Start(r.Context(), "GetUser")
-	defer span.End()
 
 	o.mustRender(w, r, response.DataRender(d))
 }
