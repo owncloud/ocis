@@ -91,6 +91,7 @@ generate: assets
 assets: static-assets
 
 static-assets:
+	mkdir -p assets/identifier/static
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
