@@ -1494,6 +1494,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
     'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
     'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
     'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
+    'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
     'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
