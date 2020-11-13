@@ -96,8 +96,10 @@ def getCoreApiTestPipelineNames():
 def getDependsOnAllTestPipelines(ctx):
   dependencies = getTestSuiteNames() + [
     'upload-coverage',
-    'localApiTests-owncloud-storage',
-    'localApiTests-ocis-storage',
+    'localApiTests-apiOcisSpecific-owncloud',
+    'localApiTests-apiOcisSpecific-ocis',
+    'localApiTests-apiBasic-owncloud',
+    'localApiTests-apiBasic-ocis',
   ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
 
   return dependencies
@@ -148,8 +150,10 @@ def testPipelines(ctx):
 
   pipelines += [
     uploadCoverage(ctx),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud'),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis')
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiOcisSpecific'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiOcisSpecific'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiBasic', 'default'),
+    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiBasic', 'default')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
@@ -336,11 +340,11 @@ def uploadCoverage(ctx):
     'depends_on': getTestSuiteNames(),
   }
 
-def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud'):
+def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'localApiTests-%s-storage' % (storage),
+    'name': 'localApiTests-%s-%s' % (suite, storage),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
@@ -348,10 +352,10 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) +
+      ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
-        'name': 'localApiTests-%s-storage' % (storage),
+        'name': 'localApiTests-%s-%s' % (suite, storage),
         'image': 'owncloudci/php:7.4',
         'pull': 'always',
         'environment' : {
@@ -361,6 +365,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
+          'BEHAT_SUITE': suite,
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner',
         },
@@ -391,7 +396,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     },
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud'):
+def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -403,7 +408,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) +
+      ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
@@ -452,7 +457,7 @@ def uiTests(ctx, phoenixBranch, phoenixCommit):
   suiteNames = getUITestSuiteNames()
   return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
 
-def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud'):
+def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = getUITestSuites()
   paths = ""
   for path in suites[suiteName]:
@@ -469,7 +474,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) + [
+      ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'webUITests',
         'image': 'owncloudci/nodejs:11',
@@ -529,7 +534,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
     },
   }
 
-def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
+def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -541,7 +546,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud'):
     'steps':
       generate('ocis') +
       build() +
-      ocisServer(storage) + [
+      ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'WebUIAcceptanceTests',
         'image': 'owncloudci/nodejs:11',
@@ -1383,37 +1388,44 @@ def frontend(module):
     }
   ]
 
-def ocisServer(storage):
+def ocisServer(storage, accounts_hash_difficulty = 4):
+  environment = {
+    #'OCIS_LOG_LEVEL': 'debug',
+    'STORAGE_HOME_DRIVER': '%s' % (storage),
+    'STORAGE_USERS_DRIVER': '%s' % (storage),
+    'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
+    'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
+    'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
+    'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
+    'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+    'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
+    'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
+    'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
+    'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
+    'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
+    'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
+    'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
+    'PROXY_ENABLE_BASIC_AUTH': True,
+    'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
+    'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
+    'KONNECTD_ISS': 'https://ocis-server:9200',
+    'KONNECTD_TLS': 'true',
+  }
+
+  # Pass in "default" accounts_hash_difficulty to not set this environment variable.
+  # That will allow OCIS to use whatever its built-in default is.
+  # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
+  # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
+  if (accounts_hash_difficulty != 'default'):
+    environment['ACCOUNTS_HASH_DIFFICULTY'] = accounts_hash_difficulty
+
   return [
     {
       'name': 'ocis-server',
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'detach': True,
-      'environment' : {
-        #'OCIS_LOG_LEVEL': 'debug',
-        'STORAGE_HOME_DRIVER': '%s' % (storage),
-        'STORAGE_USERS_DRIVER': '%s' % (storage),
-        'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
-        'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
-        'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
-        'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
-        'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-        'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
-        'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
-        'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
-        'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
-        'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
-        'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
-        'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
-        'PROXY_ENABLE_BASIC_AUTH': True,
-        'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
-        'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
-        'KONNECTD_ISS': 'https://ocis-server:9200',
-        'KONNECTD_TLS': 'true',
-        # 4 is the lowest possible value. ONLY FOR TESTS
-        'ACCOUNTS_HASH_DIFFICULTY': 4,
-      },
+      'environment' : environment,
       'commands': [
         'apk add mailcap', # install /etc/mime.types
         'mkdir -p /srv/app/tmp/ocis/owncloud/data/',
