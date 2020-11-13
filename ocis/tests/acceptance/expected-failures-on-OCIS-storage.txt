@@ -137,8 +137,6 @@ apiFavorites/favoritesSharingToShares.feature:49
 apiFavorites/favoritesSharingToShares.feature:50
 apiFavorites/favoritesSharingToShares.feature:63
 apiFavorites/favoritesSharingToShares.feature:64
-apiFavorites/favoritesSharingToShares.feature:77
-apiFavorites/favoritesSharingToShares.feature:78
 #
 # https://github.com/owncloud/product/issues/187
 # Cannot create user with different username and emails
@@ -308,6 +306,15 @@ apiSharees/sharees.feature:538
 # https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareManagementToShares/acceptShares.feature:22
+apiShareManagementToShares/acceptShares.feature:71
+apiShareManagementToShares/acceptShares.feature:156
+apiShareManagementToShares/acceptShares.feature:157
+apiShareManagementToShares/acceptShares.feature:158
+apiShareManagementToShares/acceptShares.feature:159
+apiShareManagementToShares/acceptShares.feature:160
+apiShareManagementToShares/acceptShares.feature:162
+apiShareManagementToShares/acceptShares.feature:175
+apiShareManagementToShares/acceptShares.feature:196
 apiShareManagementToShares/acceptShares.feature:223
 apiShareManagementToShares/acceptShares.feature:270
 apiShareManagementToShares/acceptShares.feature:342
@@ -417,11 +424,6 @@ apiShareManagementBasicToShares/deleteShareFromShares.feature:181
 apiShareManagementBasicToShares/deleteShareFromShares.feature:182
 apiShareManagementBasicToShares/deleteShareFromShares.feature:183
 apiShareManagementBasicToShares/deleteShareFromShares.feature:184
-#
-# https://github.com/owncloud/ocis-reva/issues/260 Sharee retrieves the information about a share -but gets response containing all the shares
-#
-apiShareOperationsToShares/accessToShare.feature:55
-apiShareOperationsToShares/accessToShare.feature:56
 #
 # https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
 #
