@@ -1934,6 +1934,10 @@ apiShareManagementToShares/moveReceivedShare.feature:70
 apiShareManagementToShares/moveReceivedShare.feature:71
 apiShareManagementToShares/moveReceivedShare.feature:73
 apiShareManagementToShares/moveReceivedShare.feature:88
+
+#
+# https://github.com/owncloud/product/issues/203 file_target in share response
+# https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:38
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:39
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:59
@@ -2328,3 +2332,128 @@ apiWebdavProperties1/copyFile.feature:306
 apiWebdavProperties1/copyFile.feature:307
 apiWebdavProperties1/copyFile.feature:329
 apiWebdavProperties1/copyFile.feature:330
+
+
+# https://github.com/owncloud/product/issues/281 groups are not case sensitive
+# apiProvisioningGroups-v1/addGroup.feature:66
+# apiProvisioningGroups-v1/addGroup.feature:67
+# apiProvisioningGroups-v1/addGroup.feature:68
+# apiProvisioningGroups-v1/addToGroup.feature:94
+# apiProvisioningGroups-v1/addToGroup.feature:95
+# apiProvisioningGroups-v1/addToGroup.feature:96
+# apiProvisioningGroups-v1/deleteGroup.feature:71
+# apiProvisioningGroups-v1/deleteGroup.feature:72
+# apiProvisioningGroups-v1/deleteGroup.feature:73
+# apiProvisioningGroups-v1/getGroup.feature:46
+# apiProvisioningGroups-v1/getGroup.feature:47
+# apiProvisioningGroups-v1/getGroup.feature:48
+# apiProvisioningGroups-v1/getGroup.feature:49
+# apiProvisioningGroups-v1/getGroup.feature:50
+# apiProvisioningGroups-v1/getGroup.feature:51
+# apiProvisioningGroups-v1/removeFromGroup.feature:97
+# apiProvisioningGroups-v1/removeFromGroup.feature:98
+# apiProvisioningGroups-v1/removeFromGroup.feature:99
+
+# apiProvisioningGroups-v2/addGroup.feature:66
+# apiProvisioningGroups-v2/addGroup.feature:67
+# apiProvisioningGroups-v2/addGroup.feature:68
+# apiProvisioningGroups-v2/addToGroup.feature:94
+# apiProvisioningGroups-v2/addToGroup.feature:95
+# apiProvisioningGroups-v2/addToGroup.feature:96
+# apiProvisioningGroups-v2/deleteGroup.feature:71
+# apiProvisioningGroups-v2/deleteGroup.feature:72
+# apiProvisioningGroups-v2/deleteGroup.feature:73
+# apiProvisioningGroups-v2/getGroup.feature:46
+# apiProvisioningGroups-v2/getGroup.feature:47
+# apiProvisioningGroups-v2/getGroup.feature:48
+# apiProvisioningGroups-v2/getGroup.feature:49
+# apiProvisioningGroups-v2/getGroup.feature:50
+# apiProvisioningGroups-v2/getGroup.feature:51
+# apiProvisioningGroups-v2/removeFromGroup.feature:97
+# apiProvisioningGroups-v2/removeFromGroup.feature:98
+# apiProvisioningGroups-v2/removeFromGroup.feature:99
+
+# https://github.com/owncloud/product/issues/282 creating existing group doesn't gives error
+apiProvisioningGroups-v1/addGroup.feature:94
+apiProvisioningGroups-v2/addGroup.feature:94
+
+# https://github.com/owncloud/product/issues/285 cannot create group with '/'
+apiProvisioningGroups-v1/addToGroup.feature:75
+apiProvisioningGroups-v1/addToGroup.feature:76
+apiProvisioningGroups-v1/addToGroup.feature:77
+apiProvisioningGroups-v1/deleteGroup.feature:85
+apiProvisioningGroups-v1/deleteGroup.feature:86
+apiProvisioningGroups-v1/deleteGroup.feature:87
+apiProvisioningGroups-v1/getUserGroups.feature:38
+apiProvisioningGroups-v1/removeFromGroup.feature:76
+apiProvisioningGroups-v1/removeFromGroup.feature:77
+apiProvisioningGroups-v1/removeFromGroup.feature:78
+
+apiProvisioningGroups-v2/addToGroup.feature:70
+apiProvisioningGroups-v2/addToGroup.feature:71
+apiProvisioningGroups-v2/addToGroup.feature:72
+apiProvisioningGroups-v2/deleteGroup.feature:85
+apiProvisioningGroups-v2/deleteGroup.feature:86
+apiProvisioningGroups-v2/deleteGroup.feature:87
+apiProvisioningGroups-v2/getUserGroups.feature:38
+apiProvisioningGroups-v2/removeFromGroup.feature:76
+apiProvisioningGroups-v2/removeFromGroup.feature:77
+apiProvisioningGroups-v2/removeFromGroup.feature:78
+
+# https://github.com/owncloud/product/issues/286 adding user to non-existant group gives wrong statuscode
+apiProvisioningGroups-v1/addToGroup.feature:107
+apiProvisioningGroups-v1/removeFromGroup.feature:101
+
+apiProvisioningGroups-v2/removeFromGroup.feature:101
+
+# https://github.com/owncloud/product/issues/287 adding user to empty group gives wrong statuscode
+apiProvisioningGroups-v1/addToGroup.feature:116
+
+# https://github.com/owncloud/product/issues/288 adding non-existant user to a group gives wrong status code
+apiProvisioningGroups-v1/addToGroup.feature:124
+
+# https://github.com/owncloud/product/issues/289 subadmin endpoints not implemented
+apiProvisioningGroups-v1/addGroup.feature:87
+apiProvisioningGroups-v1/addToGroup.feature:133
+apiProvisioningGroups-v1/addToGroup.feature:146
+apiProvisioningGroups-v1/deleteGroup.feature:99
+apiProvisioningGroups-v1/getGroup.feature:72
+apiProvisioningGroups-v1/getSubAdminGroups.feature:11
+apiProvisioningGroups-v1/getSubAdminGroups.feature:24
+apiProvisioningGroups-v1/getUserGroups.feature:56
+apiProvisioningGroups-v1/removeFromGroup.feature:110
+apiProvisioningGroups-v1/removeFromGroup.feature:123
+
+apiProvisioningGroups-v2/addGroup.feature:87
+apiProvisioningGroups-v2/addGroup.feature:109
+apiProvisioningGroups-v2/addToGroup.feature:128
+apiProvisioningGroups-v2/addToGroup.feature:141
+apiProvisioningGroups-v2/deleteGroup.feature:101
+apiProvisioningGroups-v2/getGroup.feature:55
+apiProvisioningGroups-v2/getGroup.feature:73
+apiProvisioningGroups-v2/getSubAdminGroups.feature:11
+apiProvisioningGroups-v2/getSubAdminGroups.feature:24
+apiProvisioningGroups-v2/getUserGroups.feature:56
+apiProvisioningGroups-v2/removeFromGroup.feature:110
+apiProvisioningGroups-v2/removeFromGroup.feature:123
+
+# https://github.com/owncloud/product/issues/187
+# Cannot create user with different username and emails
+# special character username not valid
+apiProvisioningGroups-v1/getGroup.feature:11
+apiProvisioningGroups-v2/getGroup.feature:11
+
+# https://github.com/owncloud/product/issues/290 normal users can list the members of the group
+apiProvisioningGroups-v1/getGroup.feature:81
+apiProvisioningGroups-v1/deleteGroup.feature:90
+apiProvisioningGroups-v2/getGroup.feature:83
+
+# https://github.com/owncloud/product/issues/291 ocs v2 invalid status code for group endpoints
+apiProvisioningGroups-v2/addGroup.feature:102
+apiProvisioningGroups-v2/addToGroup.feature:94
+apiProvisioningGroups-v2/addToGroup.feature:102
+apiProvisioningGroups-v2/addToGroup.feature:119
+apiProvisioningGroups-v2/deleteGroup.feature:91
+apiProvisioningGroups-v2/getGroup.feature:33
+apiProvisioningGroups-v2/getUserGroups.feature:73
+apiProvisioningGroups-v2/removeFromGroup.feature:138
