@@ -3,7 +3,7 @@ title: "Configuration"
 date: "{{ date "2006-01-02T15:04:05-0700" now }}"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/storage
+geekdocEditPath: edit/master/docs/extensions/settings
 geekdocFilePath: configuration.md
 ---
 {{- define "options"}}
@@ -11,25 +11,12 @@ geekdocFilePath: configuration.md
 {{ range $opt := first . }}{{ with list $fnName $opt -}}
 {{ $o := last . -}}
 {{ if eq $o.FnName $fnName -}}
---{{ $o.Name }} | ${{ index $o.Env 0 }}
+--{{ $o.Name }} | ${{ index $o.Env 0 }}  
 : {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
 {{ end -}}
 {{ end -}}
 {{ end -}}
-{{ end }}
-{{- define "option"}}
-{{- $options := first . }}
-{{- $oName := last . }}
-{{- range $o := $options }}{{ with (list $o $oName) -}}
-{{- $o := first . }}
-{{- if eq $o.FnName (last .) -}}
---{{ $o.Name }} | ${{ index $o.Env 0 }}
-: {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
-
-{{ end -}}
-{{- end -}}
-{{- end -}}
 {{ end }}
 
 {{`{{< toc >}}`}}
@@ -65,12 +52,12 @@ If you prefer to configure the service with commandline flags you can see the av
 {{ $options := .Options -}}
 {{ range $com := .Commands }}{{ with (list $options $com) -}}
 {{ $c := last . -}}
-{{ if eq $c.Name "storage" -}}
+{{ if eq $c.Name "settings" -}}
 ## Root Command
 
 {{ $c.Usage }}
 
-Usage: `storage [global options] command [command options] [arguments...]`
+Usage: `settings [global options] command [command options] [arguments...]`
 {{ template "options" . -}}
 ## Sub Commands
 
@@ -79,37 +66,13 @@ Usage: `storage [global options] command [command options] [arguments...]`
 {{ end -}}
 {{- range $com := .Commands }}{{ with (list $options $com) -}}
 {{- $c := last . }}
-{{- if ne $c.Name "ocis-reva" -}}
-### storage {{ $c.Name }}
+{{- if ne $c.Name "settings" -}}
+### settings {{ $c.Name }}
 
 {{ $c.Usage }}
 
-Usage: `storage {{ $c.Name }} [command options] [arguments...]`
+Usage: `settings {{ $c.Name }} [command options] [arguments...]`
 {{ template "options" . }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
-## Config for the different Storage Drivers
-
-You can set different storage drivers for the Storage Providers. Please check the storage provider configuration.
-
-Example: Set the home and users Storage Provider to `ocis`
-
-`STORAGE_HOME_DRIVER=ocis`
-`STORAGE_USERS_DRIVER=ocis`
-
-### Local Driver
-
-{{ template "option" (list .Options "DriverLocalWithConfig") -}}
-
-### Eos Driver
-
-{{ template "option" (list .Options "DriverEOSWithConfig") -}}
-
-### owCloud Driver
-
-{{ template "option" (list .Options "DriverOwnCloudWithConfig") -}}
-
-### Ocis Driver
-
-{{ template "option" (list .Options "DriverOCISWithConfig") -}}
