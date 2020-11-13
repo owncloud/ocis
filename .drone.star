@@ -80,6 +80,17 @@ def getTestSuiteNames():
     names.append('linting&unitTests-%s' % (key))
   return names
 
+def getUITestPipelineNames():
+  suiteNames = getUITestSuiteNames()
+  return [
+    uiTestPipelineName(suiteName, 'owncloud') for suiteName in suiteNames
+  ] + [
+    uiTestPipelineName(suiteName, 'ocis') for suiteName in suiteNames
+  ]
+
+def uiTestPipelineName(suiteName, storage):
+  return '%s-%s' % (suiteName, storage)
+
 def getUITestSuiteNames():
   return config['uiTests']['suites'].keys()
 
@@ -100,7 +111,7 @@ def getDependsOnAllTestPipelines(ctx):
     'localApiTests-apiOcisSpecific-ocis',
     'localApiTests-apiBasic-owncloud',
     'localApiTests-apiBasic-ocis',
-  ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
+  ] + getCoreApiTestPipelineNames() + getUITestPipelineNames() + ['accountsUITests']
 
   return dependencies
 
@@ -455,7 +466,11 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
 
 def uiTests(ctx, phoenixBranch, phoenixCommit):
   suiteNames = getUITestSuiteNames()
-  return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
+  return [
+    uiTestPipeline(suiteName, phoenixBranch, phoenixCommit, 'owncloud') for suiteName in suiteNames
+  ] + [
+    uiTestPipeline(suiteName, phoenixBranch, phoenixCommit, 'ocis') for suiteName in suiteNames
+  ]
 
 def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = getUITestSuites()
@@ -466,7 +481,7 @@ def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', stor
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': suiteName,
+    'name': uiTestPipelineName(suiteName, storage),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
