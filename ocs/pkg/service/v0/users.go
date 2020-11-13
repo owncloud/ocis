@@ -421,8 +421,8 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// use the user's UUID
-	userID := u.Id.OpaqueId
+	// use the user's username
+	username := u.Username
 
 	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
 	res, err := c.Read(r.Context(), &storepb.ReadRequest{
@@ -430,11 +430,11 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Key: userID,
+		Key: username,
 	})
 	if err == nil && len(res.Records) > 0 {
 		render.Render(w, r, response.DataRender(&data.SigningKey{
-			User:       userID,
+			User:       username,
 			SigningKey: string(res.Records[0].Value),
 		}))
 		return
@@ -464,7 +464,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 			Table:    "signing-keys",
 		},
 		Record: &storepb.Record{
-			Key:   userID,
+			Key:   username,
 			Value: []byte(signingKey),
 			// TODO Expiry?
 		},
@@ -477,7 +477,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, response.DataRender(&data.SigningKey{
-		User:       userID,
+		User:       username,
 		SigningKey: signingKey,
 	}))
 }

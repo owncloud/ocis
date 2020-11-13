@@ -32,7 +32,7 @@ func PresignedURL(opts ...Option) func(next http.Handler) http.Handler {
 				if signedRequestIsValid(l, r, opt.Store, cfg) {
 					// use openid claims to let the account_uuid middleware do a lookup by username
 					claims := ocisoidc.StandardClaims{
-						OcisID: r.URL.Query().Get("OC-Credential"),
+						PreferredUsername: r.URL.Query().Get("OC-Credential"),
 					}
 
 					// inject claims to the request context for the account_uuid middleware
