@@ -140,8 +140,8 @@ services:
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN}
       STORAGE_OIDC_INSECURE: "${INSECURE}"
       STORAGE_TRANSFER_EXPIRES: 86400
-      STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN}
-      STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN}/data
+      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN}
+      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN}/data
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN}
     volumes:
       - ./ocis/config/proxy-config.json:/etc/ocis/proxy.json
