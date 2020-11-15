@@ -1,0 +1,8 @@
+coverage.out
+
+/bin
+/dist
+/hugo
+
+/node_modules
+/assets/**

@@ -33,14 +33,16 @@ var (
 
 	// Extensions are ocis extension services
 	Extensions = []string{
-		"proxy",
-		"store",
-		"settings",
-		"phoenix",
+		"glauth",
 		"graph",
 		"graph-explorer",
+		"konnectd",
 		"ocs",
-		"webdav",
+		"onlyoffice",
+		"phoenix",
+		"proxy",
+		"settings",
+		"store",
 		"storage-frontend",
 		"storage-gateway",
 		"storage-userprovider",
@@ -50,9 +52,8 @@ var (
 		"storage-users",
 		"storage-metadata",
 		"storage-public-link",
-		"glauth",
-		"konnectd",
 		"thumbnails",
+		"webdav",
 	}
 
 	// There seem to be a race condition when reva-sharing needs to read the sharing.json file and the parent folder is not present.
