@@ -42,7 +42,7 @@ type Unique struct {
 	cs3conf *Config
 }
 
-// Config represents cs3conf. Should be deprecated in favor of config.Config.
+// Config represents cs3conf. CanHandle be deprecated in favor of config.Config.
 type Config struct {
 	ProviderAddr string
 	DataURL      string

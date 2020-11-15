@@ -6,7 +6,7 @@ import (
 )
 
 // RedirectToHTTPS redirects insecure requests to https
-func RedirectToHTTPS(next http.Handler) http.Handler {
+func HTTPsRedirect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		proto := req.Header.Get("x-forwarded-proto")
 		if proto == "http" || proto == "HTTP" {

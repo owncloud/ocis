@@ -1,5 +1,6 @@
 package middleware
 
+/*
 import (
 	"context"
 	"fmt"
@@ -103,4 +104,4 @@ func mockAccountUUIDMiddlewareRolesSvc(returnError bool) settings.RoleService {
 			}, nil
 		},
 	}
-}
+}*/

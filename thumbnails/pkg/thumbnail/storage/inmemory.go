@@ -12,7 +12,7 @@ func NewInMemoryStorage() InMemory {
 }
 
 // InMemory represents an in memory storage for thumbnails
-// Can be used during development
+// CanHandle be used during development
 type InMemory struct {
 	store map[string]map[string][]byte
 }

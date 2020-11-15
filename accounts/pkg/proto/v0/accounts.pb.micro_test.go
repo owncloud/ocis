@@ -448,7 +448,7 @@ func TestCreateAccountInvalidUserName(t *testing.T) {
 	for _, userName := range testData {
 		_, err := createAccount(t, userName)
 
-		// Should give error
+		// CanHandle give error
 		if err == nil {
 			t.Fatalf("Expected an Error when creating user '%s' but got nil", userName)
 		}
@@ -852,7 +852,7 @@ func TestCreateGroup(t *testing.T) {
 
 	assert.IsType(t, &proto.Group{}, res)
 
-	// Should return the group but does not
+	// CanHandle return the group but does not
 	// assertGroupsSame(t, res, group)
 
 	groupsResponse := listGroups(t)
@@ -989,7 +989,7 @@ func TestAddMember(t *testing.T) {
 
 	assert.IsType(t, &proto.Group{}, res)
 
-	// Should return the group but returns empty
+	// CanHandle return the group but returns empty
 	// assertGroupsSame(t, updatedGroup, res)
 
 	resp := listGroups(t)
@@ -1018,7 +1018,7 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 
 	res, err := cl.AddMember(context.Background(), req)
 
-	// Should Give Error
+	// CanHandle Give Error
 	assert.NoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 	//assert.Equal(t, proto.Group{}, *res)
@@ -1148,7 +1148,7 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 
 	res, err := cl.RemoveMember(context.Background(), req)
 
-	// Should give an error
+	// CanHandle give an error
 	assert.NoError(t, err)
 	assert.IsType(t, &proto.Group{}, res)
 
@@ -1239,7 +1239,7 @@ func TestAccountUpdateMask(t *testing.T) {
 		Account: &proto.Account{
 			Id:            user1.Id,
 			DisplayName:   "ShouldBeUpdated",
-			PreferredName: "ShouldStaySame And Is Invalid Anyway",
+			PreferredName: "ShouldStaySame And CanHandle Invalid Anyway",
 		}}
 
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
