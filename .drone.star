@@ -117,11 +117,14 @@ def main(ctx):
   Returns:
     none
   """
+
   pipelines = []
 
   before = \
+    [ buildOcisBinaryForTesting(ctx) ] + \
     testOcisModules(ctx) + \
     testPipelines(ctx)
+
 
   stages = [
     docker(ctx, 'amd64'),
@@ -200,7 +203,7 @@ def testPipelines(ctx):
   return pipelines
 
 def testOcisModule(ctx, module):
-  steps = generate(module) + [
+  steps = makeGenerate(module) + [
     {
       'name': 'vet',
       'image': 'webhippie/golang:1.14',
@@ -307,6 +310,34 @@ def testOcisModule(ctx, module):
     ],
   }
 
+def buildOcisBinaryForTesting(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'build_ocis_binary_for_testing',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      makeGenerate('ocis') +
+      build() +
+      rebuildBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis'),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+  }
+
 def uploadCoverage(ctx):
   return {
     'kind': 'pipeline',
@@ -385,8 +416,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') +
-      build() +
+      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
@@ -421,6 +451,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'temp': {},
       },
     ],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -440,8 +471,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') +
-      build() +
+      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
@@ -477,6 +507,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'temp': {},
       },
     ],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -509,8 +540,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') +
-      build() +
+      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'webUITests',
@@ -562,6 +592,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
         'temp': {}
       }
     ],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -581,8 +612,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', acc
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') +
-      build() +
+      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'WebUIAcceptanceTests',
@@ -655,6 +685,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', acc
         'temp': {}
       }
     ],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -674,7 +705,7 @@ def docker(ctx, arch):
       'arch': arch,
     },
     'steps':
-      generate('ocis') +
+      makeGenerate('ocis') +
       build() + [
       {
         'name': 'dryrun',
@@ -747,7 +778,7 @@ def dockerEos(ctx):
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') +
+      makeGenerate('ocis') +
       build() + [
         {
           'name': 'dryrun-eos-ocis',
@@ -858,7 +889,7 @@ def binary(ctx, name):
       'arch': 'amd64',
     },
     'steps':
-      generate('ocis') + [
+      makeGenerate('ocis') + [
       {
         'name': 'build',
         'image': 'webhippie/golang:1.14',
@@ -1312,7 +1343,7 @@ def docs(ctx):
     },
   }
 
-def generate(module):
+def makeGenerate(module):
   return [
     {
       'name': 'generate',
@@ -1541,3 +1572,56 @@ def build():
       ],
     },
   ]
+
+def genericCache(name, action, mounts, cache_key):
+  rebuild = 'false'
+  restore = 'false'
+  if action == 'rebuild':
+    rebuild = 'true'
+    action = 'rebuild'
+  else:
+    restore = 'true'
+    action = 'restore'
+
+  cleaned_mounts = []
+  for mount in mounts:
+    cleaned_mounts.append(mount.lstrip('/'))
+
+  step = {
+      'name': '%s_%s' %(action, name),
+      'image': 'meltwater/drone-cache:v1',
+      'pull': 'always',
+      'environment': {
+        'AWS_ACCESS_KEY_ID': {
+          'from_secret': 'cache_s3_access_key',
+        },
+        'AWS_SECRET_ACCESS_KEY': {
+          'from_secret': 'cache_s3_secret_key',
+        },
+      },
+      'settings': {
+        'endpoint': {
+            'from_secret': 'cache_s3_endpoint'
+          },
+        'bucket': 'cache',
+        'region': 'us-east-1', # not used at all, but failes if not given!
+        'path_style': 'true',
+        'cache_key': cache_key,
+        'rebuild': rebuild,
+        'restore': restore,
+        'mount': cleaned_mounts,
+      },
+    }
+
+  return step
+
+def genericBuildArtifactCache(name, action, path):
+  name = '%s_build_artifact_cache' %(name)
+  cache_key = '{{ .Repo.Name }}/{{ .Commit.Sha }}-{{ .Build.Number }}/%s' %(name)
+  return genericCache(name, action, [path], cache_key)
+
+def restoreBuildArtifactCache(name, path):
+  return [genericBuildArtifactCache(name, 'restore', path)]
+
+def rebuildBuildArtifactCache(name, path):
+  return [genericBuildArtifactCache(name, 'rebuild', path)]
