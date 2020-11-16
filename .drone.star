@@ -120,7 +120,10 @@ def main(ctx):
   pipelines = []
 
   before = \
-    [ buildOcisBinaryForTesting(ctx) ] + \
+    [
+    buildOcisBinaryForTesting(ctx),
+    refreshOcisDependencyCache(ctx),
+    ] + \
     testOcisModules(ctx) + \
     testPipelines(ctx)
 
@@ -182,6 +185,47 @@ def main(ctx):
 
   return pipelines
 
+def refreshOcisDependencyCache(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'refresh_oCIS_dependency_cache',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      restore_dependency_cache(['go-webhippie']) +
+      [{
+      'name': 'generate',
+      'image': 'webhippie/golang:1.14',
+      'pull': 'always',
+      'commands': [
+        'cd ocis',
+        'go mod download'
+      ],
+      'volumes': [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ],
+      }] +
+      rebuild_dependency_cache(['go-webhippie']),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
+  }
 def testOcisModules(ctx):
   pipelines = []
   for module in config['modules']:
@@ -209,7 +253,7 @@ def testPipelines(ctx):
   return pipelines
 
 def testOcisModule(ctx, module):
-  steps = makeGenerate(module) + [
+  steps = restore_dependency_cache(['go-webhippie']) + makeGenerate(module) + [
     {
       'name': 'vet',
       'image': 'webhippie/golang:1.14',
@@ -300,6 +344,7 @@ def testOcisModule(ctx, module):
       'arch': 'amd64',
     },
     'steps': steps,
+    'depends_on': getPipelineNames([refreshOcisDependencyCache(ctx)]),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -711,6 +756,7 @@ def docker(ctx, arch):
       'arch': arch,
     },
     'steps':
+      restore_dependency_cache(['go-webhippie']) +
       makeGenerate('ocis') +
       build() + [
       {
@@ -784,6 +830,7 @@ def dockerEos(ctx):
       'arch': 'amd64',
     },
     'steps':
+      restore_dependency_cache(['go-webhippie']) +
       makeGenerate('ocis') +
       build() + [
         {
@@ -895,6 +942,7 @@ def binary(ctx, name):
       'arch': 'amd64',
     },
     'steps':
+      restore_dependency_cache(['go-webhippie']) +
       makeGenerate('ocis') + [
       {
         'name': 'build',
@@ -1589,6 +1637,10 @@ def genericCache(name, action, mounts, cache_key):
     restore = 'true'
     action = 'restore'
 
+  cleaned_mounts = []
+  for mount in mounts:
+    cleaned_mounts.append(mount.lstrip('/'))
+
   step = {
       'name': '%s_%s' %(action, name),
       'image': 'meltwater/drone-cache:v1',
@@ -1611,7 +1663,7 @@ def genericCache(name, action, mounts, cache_key):
         'cache_key': cache_key,
         'rebuild': rebuild,
         'restore': restore,
-        'mount': mounts,
+        'mount': cleaned_mounts,
       },
     }
   return step
@@ -1670,3 +1722,93 @@ def rebuildBuildArtifactCache(ctx, name, path):
 
 def purgeBuildArtifactCache(ctx, name):
   return genericBuildArtifactCache(ctx, name, 'purge', [])
+
+def generic_dependency_cache(action, types):
+  caches = []
+  for type in types:
+    mounts = dependency_cache_mounts(type)
+    volumes = dependency_cache_volumes(type)
+    specifier = dependency_specifier(type)
+    if mounts == []:
+      continue
+
+    name = '%s_dependency_cache' %(type)
+    cache_key = '{{ .Repo.Name }}/{{ checksum "%s" }}/%s_dependency_cache' %(specifier, type)
+
+    for mount in mounts:
+      if mount.startswith('/') and action == 'rebuild':
+        caches.append(
+          {
+          'name': 'cp %s to %s' %(mount, mount.lstrip('/')),
+          'image': 'busybox',
+          'pull': 'true',
+          'commands': [
+            "mkdir -p %s" % (mount.lstrip('/')),
+            "cp -fR %s/* ./%s" %(mount.rstrip('/'), mount.lstrip('/')),
+          ],
+          'volumes': volumes,
+        }
+        )
+    caches.append(genericCache(name, action, mounts, cache_key))
+
+    for mount in mounts:
+      if mount.startswith('/') and action == 'restore':
+        caches.append(
+          {
+          'name': 'move %s to %s' %(mount.lstrip('/'), mount),
+          'image': 'busybox',
+          'failure': 'ignore',
+          'pull': 'true',
+          'commands': [
+            "mkdir -p %s" % (mount),
+            "mv -f ./%s/* %s" %(mount.lstrip('/').rstrip('/'), mount),
+          ],
+          'volumes': volumes,
+        }
+        )
+      if mount.startswith('/') and action == 'rebuild':
+        caches.append(
+          {
+          'name': 'rm %s' %(mount.lstrip('/')),
+          'image': 'busybox',
+          'failure': 'ignore',
+          'pull': 'true',
+          'commands': [
+            "rm -rf ./%s" %(mount.lstrip('/')),
+          ],
+          'volumes': volumes,
+        }
+        )
+
+  return caches
+
+def restore_dependency_cache(types):
+  return generic_dependency_cache('restore', types)
+
+def rebuild_dependency_cache(types):
+  return generic_dependency_cache('rebuild', types)
+
+def dependency_cache_mounts(type):
+  if type == 'go-webhippie':
+    return [
+          '/srv/app/pkg',
+        ]
+  else:
+    return []
+
+def dependency_cache_volumes(type):
+  if type == 'go-webhippie':
+    return  [
+        {
+          'name': 'gopath',
+          'path': '/srv/app',
+        },
+      ]
+  else:
+    return []
+
+def dependency_specifier(type):
+  if type == 'go-webhippie':
+    return  "./ocis/go.mod"
+  else:
+    return []
