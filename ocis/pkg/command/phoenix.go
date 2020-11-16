@@ -47,7 +47,6 @@ func configurePhoenix(cfg *config.Config) *config.Config {
 		cfg.Phoenix.Tracing.Type = cfg.Tracing.Type
 		cfg.Phoenix.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Phoenix.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Phoenix.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg

@@ -82,7 +82,9 @@ func Server(cfg *config.Config) *cli.Command {
 						jaeger.Options{
 							AgentEndpoint:     cfg.Tracing.Endpoint,
 							CollectorEndpoint: cfg.Tracing.Collector,
-							ServiceName:       cfg.Tracing.Service,
+							Process: jaeger.Process{
+								ServiceName: cfg.Tracing.Service,
+							},
 						},
 					)
 
@@ -244,9 +246,6 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
-
-	// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-	// https://github.com/owncloud/ocis/proxy/issues/38
 	accountsClient := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
 	rolesClient := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
 	storeClient := storepb.NewStoreService("com.owncloud.api.store", mclient.DefaultClient)

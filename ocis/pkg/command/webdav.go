@@ -45,7 +45,6 @@ func configureWebDAV(cfg *config.Config) *svcconfig.Config {
 		cfg.WebDAV.Tracing.Type = cfg.Tracing.Type
 		cfg.WebDAV.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.WebDAV.Tracing.Collector = cfg.Tracing.Collector
-		cfg.WebDAV.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg.WebDAV

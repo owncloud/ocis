@@ -32,7 +32,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			r := runtime.New()
+			r := runtime.New(cfg)
 			return r.Start()
 		},
 	}

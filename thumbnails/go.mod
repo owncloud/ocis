@@ -10,32 +10,29 @@ require (
 	github.com/cespare/reflex v0.2.0
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/golang/protobuf v1.4.2
-	github.com/google/uuid v1.1.2 // indirect
+	github.com/golang/protobuf v1.4.3
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/kr/pty v1.1.8 // indirect
-	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/ogier/pflag v0.0.1
-	github.com/oklog/run v1.0.0
-	github.com/olekukonko/tablewriter v0.0.1
+	github.com/oklog/run v1.1.0
+	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.3.4 // indirect
-	github.com/spf13/viper v1.6.3
+	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
-	go.opencensus.io v0.22.4
+	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	google.golang.org/genproto v0.0.0-20200918140846-d0d605568037 // indirect
-	google.golang.org/protobuf v1.25.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.5.0
+	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
 replace (

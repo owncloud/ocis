@@ -45,7 +45,9 @@ func Start(cfg *config.Config) error {
 				jaeger.Options{
 					AgentEndpoint:     cfg.Tracing.Endpoint,
 					CollectorEndpoint: cfg.Tracing.Collector,
-					ServiceName:       cfg.Tracing.Service,
+					Process: jaeger.Process{
+						ServiceName: cfg.Tracing.Service,
+					},
 				},
 			)
 

@@ -1,13 +1,41 @@
 package grpc
 
 import (
+	"os"
 	"strings"
 	"time"
 
 	"github.com/micro/go-micro/v2"
+	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/client/grpc"
+
+	etcdr "github.com/micro/go-micro/v2/registry/etcd"
+	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
+
+	"github.com/micro/go-micro/v2/registry"
+
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
+
+// DefaultClient is a custom ocis grpc configured client.
+var DefaultClient = newGrpcClient()
+
+func newGrpcClient() mclient.Client {
+	var r registry.Registry
+	switch os.Getenv("MICRO_REGISTRY") {
+	case "etcd":
+		r = etcdr.NewRegistry()
+	default:
+		r = mdnsr.NewRegistry()
+	}
+
+	c := grpc.NewClient(
+		mclient.RequestTimeout(10*time.Second),
+		mclient.Registry(r),
+	)
+	return c
+}
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {
@@ -33,6 +61,7 @@ func NewService(opts ...Option) Service {
 				".",
 			),
 		),
+		micro.Client(DefaultClient),
 		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),

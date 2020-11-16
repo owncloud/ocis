@@ -4,8 +4,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/registry"
+
+	"github.com/micro/go-micro/v2"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -14,7 +19,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Execute is the entry point for the ocis-ocis command.
+// Execute is the entry point for the ocis command.
 func Execute() error {
 	cfg := config.New()
 
@@ -44,7 +49,13 @@ func Execute() error {
 		)
 	}
 
-	runtime.AddMicroPlatform(app)
+	r := *registry.GetRegistry()
+
+	opts := micro.Options{
+		Registry: r,
+	}
+
+	runtime.AddMicroPlatform(app, opts)
 
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",

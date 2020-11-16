@@ -13,7 +13,6 @@ require (
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2
@@ -29,8 +28,6 @@ require (
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/net v0.0.0-20201022231255-08b38378de70
 	golang.org/x/sys v0.0.0-20201022201747-fb209a7c41cd // indirect
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 	stash.kopano.io/kc/konnect v0.33.3
 	stash.kopano.io/kgol/rndm v1.1.0
 )

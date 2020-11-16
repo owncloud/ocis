@@ -46,7 +46,6 @@ func configureThumbnails(cfg *config.Config) *svcconfig.Config {
 		cfg.Thumbnails.Tracing.Type = cfg.Tracing.Type
 		cfg.Thumbnails.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Thumbnails.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Thumbnails.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg.Thumbnails

@@ -139,7 +139,7 @@ proto-docs-build:
 
 .PHONY: config-docs-generate
 config-docs-generate:
-#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: watch
 watch:

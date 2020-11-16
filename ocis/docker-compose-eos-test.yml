@@ -43,8 +43,8 @@ services:
       ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts
       # TODO make id the default in ocis-storage
       STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
-      STORAGE_FRONTEND_URL: https://${OCIS_DOMAIN:-localhost}:9200
-      STORAGE_DATAGATEWAY_URL: https://${OCIS_DOMAIN:-localhost}:9200/data
+      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-localhost}:9200
+      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-localhost}:9200/data
       # common eos settings used for both drivers: eos and eoshome
       STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}

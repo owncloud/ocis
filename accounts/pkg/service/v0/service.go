@@ -9,12 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	"github.com/owncloud/ocis/ocis-pkg/indexer"
 	idxcfg "github.com/owncloud/ocis/ocis-pkg/indexer/config"
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
-	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -34,9 +35,7 @@ func New(opts ...Option) (s *Service, err error) {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		// https://github.com/owncloud/ocis-proxy/issues/38
-		// TODO this won't work with a registry other than mdns. Look into Micro's client initialization.
-		roleService = settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+		roleService = settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {

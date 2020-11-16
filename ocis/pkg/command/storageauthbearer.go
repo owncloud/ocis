@@ -39,7 +39,6 @@ func configureStorageAuthBearer(cfg *config.Config) *svcconfig.Config {
 		cfg.Storage.Tracing.Type = cfg.Tracing.Type
 		cfg.Storage.Tracing.Endpoint = cfg.Tracing.Endpoint
 		cfg.Storage.Tracing.Collector = cfg.Tracing.Collector
-		cfg.Storage.Tracing.Service = cfg.Tracing.Service
 	}
 
 	return cfg.Storage
