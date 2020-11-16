@@ -8,6 +8,7 @@
 * Bugfix - Accounts config sometimes being overwritten: [#808](https://github.com/owncloud/ocis/pull/808)
 * Bugfix - Make settings service start without go coroutines: [#835](https://github.com/owncloud/ocis/pull/835)
 * Bugfix - Fix button layout after phoenix update: [#625](https://github.com/owncloud/ocis/pull/625)
+* Bugfix - Fix choose account dialogue: [#846](https://github.com/owncloud/ocis/pull/846)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Fix konnectd build: [#809](https://github.com/owncloud/ocis/pull/809)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
@@ -64,6 +65,7 @@
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
+* Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
@@ -125,6 +127,15 @@
    accordingly.
 
    https://github.com/owncloud/ocis/pull/625
+
+* Bugfix - Fix choose account dialogue: [#846](https://github.com/owncloud/ocis/pull/846)
+
+   Tags: konnectd
+
+   We've fixed the choose account dialogue in konnectd bug that the user hasn't been logged in
+   after selecting account.
+
+   https://github.com/owncloud/ocis/pull/846
 
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 
@@ -1525,6 +1536,17 @@
 
    https://github.com/owncloud/ocis-glauth/issues/18
    https://github.com/owncloud/ocis/pull/649
+
+* Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
+
+   Methodology:
+
+   ``` go-modules() { find . \( -name vendor -o -name '[._].*' -o -name node_modules \) -prune -o
+   -name go.mod -print | sed 's:/go.mod$::' } ```
+
+   ``` for m in $(go-modules); do (cd $m && go mod tidy); done ```
+
+   https://github.com/owncloud/ocis/pull/845
 
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
 
