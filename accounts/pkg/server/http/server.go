@@ -52,6 +52,7 @@ func Server(opts ...Option) http.Service {
 			assets.Logger(options.Logger),
 			assets.Config(options.Config),
 		),
+		options.Config.HTTP.CacheTTL,
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {

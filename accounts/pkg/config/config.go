@@ -29,6 +29,7 @@ type HTTP struct {
 	Addr      string
 	Namespace string
 	Root      string
+	CacheTTL  int
 }
 
 // GRPC defines the available grpc configuration.

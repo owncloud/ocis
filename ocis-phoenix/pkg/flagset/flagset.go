@@ -136,6 +136,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PHOENIX_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
+		&cli.IntFlag{
+			Name:        "http-cache-ttl",
+			Value:       604800, // 7 days
+			Usage:       "Set the static assets caching duration in seconds",
+			EnvVars:     []string{"PHOENIX_CACHE_TTL"},
+			Destination: &cfg.HTTP.CacheTTL,
+		},
 		&cli.StringFlag{
 			Name:        "asset-path",
 			Value:       "",

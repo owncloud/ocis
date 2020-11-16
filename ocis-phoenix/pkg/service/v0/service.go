@@ -2,10 +2,13 @@ package svc
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis/ocis-phoenix/pkg/assets"
@@ -39,7 +42,7 @@ func NewService(opts ...Option) Service {
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Get("/config.json", svc.Config)
-		r.Mount("/", svc.Static())
+		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
 	})
 
 	return svc
@@ -124,7 +127,7 @@ func (p Phoenix) Config(w http.ResponseWriter, r *http.Request) {
 }
 
 // Static simply serves all static files.
-func (p Phoenix) Static() http.HandlerFunc {
+func (p Phoenix) Static(ttl int) http.HandlerFunc {
 	rootWithSlash := p.config.HTTP.Root
 
 	if !strings.HasSuffix(rootWithSlash, "/") {
@@ -141,7 +144,10 @@ func (p Phoenix) Static() http.HandlerFunc {
 		),
 	)
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// we don't have a last modification date of the static assets, so we use the service start date
+	lastModified := time.Now().UTC().Format(http.TimeFormat)
+
+	return func(w http.ResponseWriter, r *http.Request) {
 		if rootWithSlash != "/" && r.URL.Path == p.config.HTTP.Root {
 			http.Redirect(
 				w,
@@ -162,6 +168,10 @@ func (p Phoenix) Static() http.HandlerFunc {
 			return
 		}
 
+		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+		w.Header().Set("Last-Modified", lastModified)
+		w.Header().Del("Expires")
+
 		static.ServeHTTP(w, r)
-	})
+	}
 }
