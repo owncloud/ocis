@@ -1369,6 +1369,9 @@ def notify(ctx):
         'refs/heads/release*',
         'refs/tags/**',
       ],
+      'status': [
+				'failure'
+			]
     }
   }
 
