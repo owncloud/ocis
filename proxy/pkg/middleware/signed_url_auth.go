@@ -174,19 +174,19 @@ func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) 
 }
 func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
 	// check if url is expired by checking if given date (OC-Date) + expires in seconds (OC-Expires) is after now
-	date, err := time.Parse(time.RFC3339, query.Get("OC-Date"))
+	validFrom, err := time.Parse(time.RFC3339, query.Get("OC-Date"))
 	if err != nil {
 		return true, err
 	}
 
-	expires, err := time.ParseDuration(query.Get("OC-Expires") + "s")
+	requestExpiry, err := time.ParseDuration(query.Get("OC-Expires") + "s")
 	if err != nil {
 		return true, err
 	}
 
-	date.Add(expires)
+	validTo := validFrom.Add(requestExpiry)
 
-	return date.After(now()), nil
+	return !(now().After(validFrom) && now().Before(validTo)), nil
 }
 
 func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {

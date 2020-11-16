@@ -97,24 +97,26 @@ func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
 func TestSignedURLAuth_urlIsExpired(t *testing.T) {
 	pua := signedURLAuth{}
 	nowFunc := func() time.Time {
-		t, _ := time.Parse(time.RFC3339, "2020-08-19T15:12:43.478Z")
+		t, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
 		return t
 	}
 
 	tests := []struct {
 		url      string
-		expected bool
+		isExpired bool
 	}{
-		{"http://example.com/example.jpg?OC-Date=2020-08-19T15:02:43.478Z&OC-Expires=1200", false},
-		{"http://example.com/example.jpg?OC-Date=invalid&OC-Expires=1200", true},
-		{"http://example.com/example.jpg?OC-Date=2020-08-19T15:02:43.478Z&OC-Expires=invalid", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=61", false},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=invalid", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=59", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-03T12:29:00.000Z&OC-Expires=59", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-01T12:29:00.000Z&OC-Expires=59", true},
 	}
 
 	for _, tt := range tests {
 		r := httptest.NewRequest("", tt.url, nil)
-		ok, _ := pua.urlIsExpired(r.URL.Query(), nowFunc)
-		if ok != tt.expected {
-			t.Errorf("with %s expected %t got %t", tt.url, tt.expected, ok)
+		expired, _ := pua.urlIsExpired(r.URL.Query(), nowFunc)
+		if expired != tt.isExpired {
+			t.Errorf("with %s expected %t got %t", tt.url, tt.isExpired, expired)
 		}
 	}
 }
