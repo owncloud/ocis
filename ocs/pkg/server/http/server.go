@@ -26,7 +26,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,
-			middleware.Cache,
+			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(

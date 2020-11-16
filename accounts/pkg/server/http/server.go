@@ -29,7 +29,7 @@ func Server(opts ...Option) http.Service {
 
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.RequestID)
-	mux.Use(middleware.Cache)
+	mux.Use(middleware.NoCache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)
 	mux.Use(middleware.ExtractAccountUUID(
