@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-12T13:59:14+0000"
+date: "2020-11-16T23:39:37+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/webdav
@@ -13,7 +13,7 @@ geekdocFilePath: configuration.md
 
 oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
 
-Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/ocis_proxy/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
+Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/proxy/configuration/) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
 ### Configuration using config files
 
@@ -53,15 +53,6 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
---debug-addr | $WEBDAV_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9119`.
 
 ### webdav server
 
@@ -122,4 +113,13 @@ Usage: `webdav version [command options] [arguments...]`
 
 --service-name | $WEBDAV_SERVICE_NAME  
 : Service name. Default: `webdav`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+--debug-addr | $WEBDAV_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9119`.
 

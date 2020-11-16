@@ -1,9 +1,9 @@
 ---
 title: "Configuration"
-date: "2020-11-12T13:59:10+0000"
+date: "2020-11-16T23:39:29+0000"
 weight: 20
-geekdocRepo: https://github.com/owncloud/ocis-konnectd
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/konnectd
 geekdocFilePath: configuration.md
 ---
 
@@ -13,7 +13,7 @@ geekdocFilePath: configuration.md
 
 oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
 
-Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/ocis_proxy/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
+Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/ocis_konnectd/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
 ### Configuration using config files
 
@@ -25,7 +25,7 @@ $HOME/.ocis
 ./config
 ```
 
-For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
+For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-konnectd reads `konnectd.json | yaml | toml ...`*.
 
 So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
@@ -37,11 +37,20 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-## Root Command
+### konnectd health
+
+Check health status
+
+Usage: `konnectd health [command options] [arguments...]`
+
+--debug-addr | $KONNECTD_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
+
+### konnectd ocis-konnectd
 
 Serve Konnectd API for oCIS
 
-Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
+Usage: `konnectd ocis-konnectd [command options] [arguments...]`
 
 --log-level | $KONNECTD_LOG_LEVEL  
 : Set logging level. Default: `info`.
@@ -52,13 +61,11 @@ Usage: `ocis-konnectd [global options] command [command options] [arguments...]`
 --log-color | $KONNECTD_LOG_COLOR  
 : Enable colored logging. Default: `true`.
 
-## Sub Commands
-
-### ocis-konnectd server
+### konnectd server
 
 Start integrated server
 
-Usage: `ocis-konnectd server [command options] [arguments...]`
+Usage: `konnectd server [command options] [arguments...]`
 
 --config-file | $KONNECTD_CONFIG_FILE  
 : Path to config file.
@@ -168,24 +175,15 @@ Usage: `ocis-konnectd server [command options] [arguments...]`
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
 
-### ocis-konnectd version
+### konnectd version
 
 Print the versions of the running instances
 
-Usage: `ocis-konnectd version [command options] [arguments...]`
+Usage: `konnectd version [command options] [arguments...]`
 
 --http-namespace | $KONNECTD_HTTP_NAMESPACE  
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
 --name | $KONNECTD_NAME  
 : Service name. Default: `konnectd`.
-
-### ocis-konnectd health
-
-Check health status
-
-Usage: `ocis-konnectd health [command options] [arguments...]`
-
---debug-addr | $KONNECTD_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
 
