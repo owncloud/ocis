@@ -15,7 +15,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
-	mclient "github.com/micro/go-micro/v2/client"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
@@ -246,9 +246,9 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
-	accountsClient := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
-	rolesClient := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
-	storeClient := storepb.NewStoreService("com.owncloud.api.store", mclient.DefaultClient)
+	accountsClient := acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient)
+	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	storeClient := storepb.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	if err != nil {
 		l.Error().Err(err).
