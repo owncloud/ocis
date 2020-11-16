@@ -267,7 +267,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	}
 
 	return alice.New(
-		middleware.HTTPsRedirect,
+		middleware.HTTPSRedirect,
 		middleware.OIDCAuth(
 			middleware.Logger(l),
 			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {

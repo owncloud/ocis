@@ -14,6 +14,7 @@ import (
 	"net/http"
 )
 
+// CreateHome provides a middleware which sends a CreateHome request to the reva gateway
 func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	logger := options.Logger

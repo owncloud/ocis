@@ -17,6 +17,8 @@ import (
 	"strings"
 )
 
+// AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based
+// on the oidc-claims
 func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	logger := options.Logger

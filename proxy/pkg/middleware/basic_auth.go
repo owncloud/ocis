@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// BasicAuth provides a middleware to check if BasicAuth is provided
 func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 

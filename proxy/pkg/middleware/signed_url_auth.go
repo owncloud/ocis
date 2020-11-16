@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// SignedURLAuth provides a middleware to check access secured by a signed URL.
 func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 

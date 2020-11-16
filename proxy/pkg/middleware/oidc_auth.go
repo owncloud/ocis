@@ -10,10 +10,12 @@ import (
 	"strings"
 )
 
+// OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
 }
 
+// OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 
@@ -111,9 +113,5 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 		}
 	}
 
-	if !strings.HasPrefix(header, "Bearer ") {
-		return false
-	}
-
-	return true
+	return strings.HasPrefix(header, "Bearer ")
 }
