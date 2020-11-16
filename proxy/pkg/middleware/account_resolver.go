@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	revaUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -154,4 +155,55 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	req.Header.Set("x-access-token", token)
 
 	m.next.ServeHTTP(w, req)
+}
+
+
+func getAccount(logger log.Logger, ac accounts.AccountsService, query string) (account *accounts.Account, status int) {
+	resp, err := ac.ListAccounts(context.Background(), &accounts.ListAccountsRequest{
+		Query:    query,
+		PageSize: 2,
+	})
+
+	if err != nil {
+		logger.Error().Err(err).Str("query", query).Msgf("Error fetching from accounts-service")
+		status = http.StatusInternalServerError
+		return
+	}
+
+	if len(resp.Accounts) <= 0 {
+		logger.Error().Str("query", query).Msgf("AccountResolver not found")
+		status = http.StatusNotFound
+		return
+	}
+
+	if len(resp.Accounts) > 1 {
+		logger.Error().Str("query", query).Msgf("More than one accountResolver found. Not logging user in.")
+		status = http.StatusForbidden
+		return
+	}
+
+	account = resp.Accounts[0]
+	return
+}
+
+func createAccount(l log.Logger, claims *oidc.StandardClaims, ac accounts.AccountsService) (*accounts.Account, int) {
+	// TODO check if fields are missing.
+	req := &accounts.CreateAccountRequest{
+		Account: &accounts.Account{
+			DisplayName:              claims.DisplayName,
+			PreferredName:            claims.PreferredUsername,
+			OnPremisesSamAccountName: claims.PreferredUsername,
+			Mail:                     claims.Email,
+			CreationType:             "LocalAccount",
+			AccountEnabled:           true,
+			// TODO assign uidnumber and gidnumber? better do that in ocis-accounts as it can keep track of the next numbers
+		},
+	}
+	created, err := ac.CreateAccount(context.Background(), req)
+	if err != nil {
+		l.Error().Err(err).Interface("accountResolver", req.Account).Msg("could not create accountResolver")
+		return nil, http.StatusInternalServerError
+	}
+
+	return created, 0
 }

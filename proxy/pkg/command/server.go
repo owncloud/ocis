@@ -289,7 +289,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.AccountsClient(accountsClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 		),
-		middleware.PresignedURLAuth(
+		middleware.SignedURLAuth(
 			middleware.Logger(l),
 			middleware.PreSignedURLConfig(cfg.PreSignedURL),
 			middleware.AccountsClient(accountsClient),

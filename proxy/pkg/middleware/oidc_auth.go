@@ -4,10 +4,15 @@ import (
 	"context"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	gOidc "github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"
 )
+
+type OIDCProvider interface {
+	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
+}
 
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
@@ -33,6 +38,7 @@ type oidcAuth struct {
 }
 
 func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
 	if !m.shouldServe(req) {
 		m.next.ServeHTTP(w, req)
 		return

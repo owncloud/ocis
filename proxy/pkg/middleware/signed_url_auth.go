@@ -19,11 +19,11 @@ import (
 	store "github.com/owncloud/ocis/store/pkg/proto/v0"
 )
 
-func PresignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
+func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 
 	return func(next http.Handler) http.Handler {
-		return &presignedURLAuth{
+		return &signedURLAuth{
 			next:               next,
 			logger:             options.Logger,
 			preSignedURLConfig: options.PreSignedURLConfig,
@@ -33,7 +33,7 @@ func PresignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Hand
 	}
 }
 
-type presignedURLAuth struct {
+type signedURLAuth struct {
 	next               http.Handler
 	logger             log.Logger
 	preSignedURLConfig config.PreSignedURL
@@ -41,7 +41,7 @@ type presignedURLAuth struct {
 	store              store.StoreService
 }
 
-func (m presignedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if !m.shouldServe(req) {
 		m.next.ServeHTTP(w, req)
 		return
@@ -61,7 +61,7 @@ func (m presignedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	m.next.ServeHTTP(w, req.WithContext(ocisoidc.NewContext(req.Context(), claims)))
 }
 
-func (m presignedURLAuth) claims(credential string) (*ocisoidc.StandardClaims, error) {
+func (m signedURLAuth) claims(credential string) (*ocisoidc.StandardClaims, error) {
 	// use openid claims to let the account_uuid middleware do a lookup by username
 	claims := ocisoidc.StandardClaims{
 		OcisID: credential,
@@ -94,11 +94,11 @@ func (m presignedURLAuth) claims(credential string) (*ocisoidc.StandardClaims, e
 	return &claims, nil
 }
 
-func (m presignedURLAuth) shouldServe(req *http.Request) bool {
+func (m signedURLAuth) shouldServe(req *http.Request) bool {
 	return req.URL.Query().Get("OC-Signature") != ""
 }
 
-func (m presignedURLAuth) validate(req *http.Request) (err error) {
+func (m signedURLAuth) validate(req *http.Request) (err error) {
 	query := req.URL.Query()
 
 	if ok, err := m.allRequiredParametersArePresent(query); !ok {
@@ -113,7 +113,7 @@ func (m presignedURLAuth) validate(req *http.Request) (err error) {
 		return err
 	}
 
-	if expired, err := m.urlIsExpired(query); expired {
+	if expired, err := m.urlIsExpired(query, time.Now); expired {
 		return err
 	}
 
@@ -124,7 +124,7 @@ func (m presignedURLAuth) validate(req *http.Request) (err error) {
 	return nil
 }
 
-func (m presignedURLAuth) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
+func (m signedURLAuth) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
 	// check if required query parameters exist in given request query parameters
 	// OC-Signature - the computed signature - server will verify the request upon this REQUIRED
 	// OC-Credential - defines the user scope (shall we use the owncloud user id here - this might leak internal data ....) REQUIRED
@@ -146,7 +146,7 @@ func (m presignedURLAuth) allRequiredParametersArePresent(query url.Values) (ok 
 	return true, nil
 }
 
-func (m presignedURLAuth) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
+func (m signedURLAuth) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
 	// check if given url query parameter OC-Verb matches given request method
 	if !strings.EqualFold(meth, query.Get("OC-Verb")) {
 		return false, errors.New("required OC-Verb parameter did not match request method")
@@ -155,7 +155,7 @@ func (m presignedURLAuth) requestMethodMatches(meth string, query url.Values) (o
 	return true, nil
 }
 
-func (m presignedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) {
+func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) {
 	//  check if given request method is allowed
 	methodIsAllowed := false
 	for _, am := range m.preSignedURLConfig.AllowedHTTPMethods {
@@ -171,7 +171,7 @@ func (m presignedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err erro
 
 	return true, nil
 }
-func (m presignedURLAuth) urlIsExpired(query url.Values) (expired bool, err error) {
+func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
 	// check if url is expired by checking if given date (OC-Date) + expires in seconds (OC-Expires) is after now
 	date, err := time.Parse(time.RFC3339, query.Get("OC-Date"))
 	if err != nil {
@@ -185,10 +185,10 @@ func (m presignedURLAuth) urlIsExpired(query url.Values) (expired bool, err erro
 
 	date.Add(expires)
 
-	return date.After(time.Now()), nil
+	return date.After(now()), nil
 }
 
-func (m presignedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
+func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
 	signingKey, err := m.getSigningKey(req.Context(), req.URL.Query().Get("OC-Credential"))
 	if err != nil {
 		m.logger.Error().Err(err).Msg("could not retrieve signing key")
@@ -210,7 +210,7 @@ func (m presignedURLAuth) signatureIsValid(req *http.Request) (ok bool, err erro
 	return m.createSignature(url, signingKey) == signature, nil
 }
 
-func (m presignedURLAuth) createSignature(url string, signingKey []byte) string {
+func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
 	// the oc10 signature check: $hash = \hash_pbkdf2("sha512", $url, $signingKey, 10000, 64, false);
 	// - sets the length of the output string to 64
 	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).
@@ -220,7 +220,7 @@ func (m presignedURLAuth) createSignature(url string, signingKey []byte) string 
 	return hex.EncodeToString(hash)
 }
 
-func (m presignedURLAuth) getSigningKey(ctx context.Context, credential string) ([]byte, error) {
+func (m signedURLAuth) getSigningKey(ctx context.Context, credential string) ([]byte, error) {
 	claims, err := m.claims(credential)
 	if err != nil {
 		return []byte{}, err
