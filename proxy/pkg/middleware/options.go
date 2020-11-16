@@ -21,7 +21,7 @@ type Options struct {
 	Logger log.Logger
 	// TokenManagerConfig for communicating with the reva token manager
 	TokenManagerConfig config.TokenManager
-	// HTTPClient to use for communication with the oidc provider
+	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
 	AccountsClient acc.AccountsService
@@ -29,7 +29,7 @@ type Options struct {
 	SettingsRoleService settings.RoleService
 	// OIDCProviderFunc to lazily initialize a provider, must be set for the oidcProvider middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
-	// OIDCIss is the oidc-issuer
+	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
 	// RevaGatewayClient to send requests to the reva gateway
 	RevaGatewayClient gateway.GatewayAPIClient
@@ -37,7 +37,7 @@ type Options struct {
 	Store storepb.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
-	// AutoprovisionAccounts when an account does not exist.
+	// AutoprovisionAccounts when an accountResolver does not exist.
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
@@ -89,14 +89,14 @@ func SettingsRoleService(rc settings.RoleService) Option {
 	}
 }
 
-// OIDCProviderFunc provides a function to set the the oidc provider function option.
+// OIDCProviderFunc provides a function to set the the oidcAuth provider function option.
 func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 	return func(o *Options) {
 		o.OIDCProviderFunc = f
 	}
 }
 
-// OIDCIss sets the oidc issuer url
+// OIDCIss sets the oidcAuth issuer url
 func OIDCIss(iss string) Option {
 	return func(o *Options) {
 		o.OIDCIss = iss

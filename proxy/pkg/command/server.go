@@ -15,13 +15,12 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
-	"github.com/micro/go-micro/v2/client/grpc"
+	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	ogrpc "github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
@@ -247,73 +246,67 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
-
-	psMW := middleware.PresignedURL(
-		middleware.Logger(l),
-		middleware.Store(storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())),
-		middleware.PreSignedURLConfig(cfg.PreSignedURL),
-	)
-
-	accounts := acc.NewAccountsService("com.owncloud.api.accounts", ogrpc.DefaultClient)
-	roles := settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
-
-	uuidMW := middleware.AccountUUID(
-		middleware.Logger(l),
-		middleware.TokenManagerConfig(cfg.TokenManager),
-		middleware.AccountsClient(accounts),
-		middleware.SettingsRoleService(roles),
-		middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
-		middleware.EnableBasicAuth(cfg.EnableBasicAuth),
-		middleware.OIDCIss(cfg.OIDC.Issuer),
-	)
-
-	// the connection will be established in a non blocking fashion
-	sc, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
+	accountsClient := acc.NewAccountsService("com.owncloud.api.accounts", mclient.DefaultClient)
+	rolesClient := settings.NewRoleService("com.owncloud.api.settings", mclient.DefaultClient)
+	storeClient := storepb.NewStoreService("com.owncloud.api.store", mclient.DefaultClient)
+	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	if err != nil {
 		l.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
 			Msg("Failed to create reva gateway service client")
 	}
 
-	chMW := middleware.CreateHome(
-		middleware.Logger(l),
-		middleware.RevaGatewayClient(sc),
-		middleware.AccountsClient(accounts),
-		middleware.TokenManagerConfig(cfg.TokenManager),
-	)
-
-	if cfg.OIDC.Issuer != "" {
-		l.Info().Msg("loading OIDC middleware")
-		l.Debug().Interface("oidc_config", cfg.OIDC).Msg("OIDC-Config")
-
-		var oidcHTTPClient = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: cfg.OIDC.Insecure,
-				},
-				DisableKeepAlives: true,
+	var oidcHTTPClient = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: cfg.OIDC.Insecure,
 			},
-			Timeout: time.Second * 10,
-		}
-
-		customCtx := context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient)
-
-		// Initialize a provider by specifying the issuer URL.
-		// it will fetch the keys from the issuer using the .well-known
-		// endpoint
-		provider := func() (middleware.OIDCProvider, error) {
-			return oidc.NewProvider(customCtx, cfg.OIDC.Issuer)
-		}
-
-		oidcMW := middleware.OpenIDConnect(
-			middleware.Logger(l),
-			middleware.HTTPClient(oidcHTTPClient),
-			middleware.OIDCProviderFunc(provider),
-			middleware.OIDCIss(cfg.OIDC.Issuer),
-		)
-
-		return alice.New(middleware.RedirectToHTTPS, oidcMW, psMW, uuidMW, chMW)
+			DisableKeepAlives: true,
+		},
+		Timeout: time.Second * 10,
 	}
 
-	return alice.New(middleware.RedirectToHTTPS, psMW, uuidMW, chMW)
+	return alice.New(
+		middleware.HTTPsRedirect,
+		middleware.OIDCAuth(
+			middleware.Logger(l),
+			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
+				// Initialize a provider by specifying the issuer URL.
+				// it will fetch the keys from the issuer using the .well-known
+				// endpoint
+				return oidc.NewProvider(
+					context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
+					cfg.OIDC.Issuer,
+				)
+			}),
+			middleware.HTTPClient(oidcHTTPClient),
+			middleware.OIDCIss(cfg.OIDC.Issuer),
+		),
+		middleware.BasicAuth(
+			middleware.Logger(l),
+			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
+			middleware.AccountsClient(accountsClient),
+			middleware.OIDCIss(cfg.OIDC.Issuer),
+		),
+		middleware.SignedURLAuth(
+			middleware.Logger(l),
+			middleware.PreSignedURLConfig(cfg.PreSignedURL),
+			middleware.AccountsClient(accountsClient),
+			middleware.Store(storeClient),
+		),
+		middleware.AccountResolver(
+			middleware.Logger(l),
+			middleware.AccountsClient(accountsClient),
+			middleware.OIDCIss(cfg.OIDC.Issuer),
+			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
+			middleware.SettingsRoleService(rolesClient),
+		),
+		middleware.CreateHome(
+			middleware.Logger(l),
+			middleware.AccountsClient(accountsClient),
+			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.RevaGatewayClient(revaClient),
+		),
+	)
 }

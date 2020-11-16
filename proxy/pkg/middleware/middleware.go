@@ -1,6 +1,11 @@
 package middleware
 
-import "net/http"
+import (
+	"errors"
+)
 
-// M undocummented
-type M func(next http.Handler) http.Handler
+var (
+	ErrInvalidToken = errors.New("invalid or missing token")
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrInternal     = errors.New("internal error")
+)
