@@ -25,7 +25,7 @@ TBD
 
 We provide overall three different variants of configuration. The variant based on environment variables and commandline flags are split up into global values and command-specific values.
 
-### Envrionment variables
+### Environment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 

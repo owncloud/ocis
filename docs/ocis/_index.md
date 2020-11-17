@@ -1,5 +1,5 @@
 ---
-title: "oCIS"
+title: "oCIS - ownCloud Infinite Scale"
 date: 2020-02-27T20:35:00+01:00
 weight: -10
 geekdocRepo: https://github.com/owncloud/ocis
@@ -11,27 +11,27 @@ geekdocFilePath: _index.md
 
 ## ownCloud Infinite Scale
 
-Welcome to oCIS! We develop a modern file-sync and share plattform, based on our knowledge and experience with the PHP ownCloud server project.
+Welcome to oCIS, the modern file-sync and share platform, which is based on our knowledge and experience with the PHP based [ownCloud server](https://owncloud.com/#server).
 
-### oCIS Server
+### oCIS server
 
-The oCIS server implementation follows go-lang best practices and is based on the [go-micro](https://go-micro.dev/) framework and [REVA](https://reva.link/). We love and stick to [12 Factor](https://12factor.net/). 
+The oCIS server implementation follows [Go](https://golang.org/) best practices and is based on the [go-micro](https://go-micro.dev/) framework and [REVA](https://reva.link/). We love and stick to [12 Factor](https://12factor.net/).
 oCIS is a micro-service based server, which allows scale-out of individual services to meet your specific performance requirements.
-We run a huge test suite, which was originated in ownCloud 10 and continues to grow.
+We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which was originated in ownCloud 10 and continues to grow.
 
 ### Architecture Overview
 
 {{< mermaid class="text-center">}}
 graph TD
-ocis-proxy -->
-    ocis-konnectd & ocis-phoenix & ocis-thumbnails & ocis-ocs & ocis-webdav
+proxy -->
+    konnectd & ocis-phoenix & thumbnails & ocs & webdav
 
 ocis-phoenix --> ocis-reva-fronted
 ocis-reva-fronted --> ocis-reva-gateway
-ocis-konnectd --> ocis-glauth
+konnectd --> glauth
 
 
-ocis-reva-gateway --> ocis-reva-users
+ocis-reva-gateway --> accounts
 ocis-reva-gateway --> ocis-reva-authbasic
 ocis-reva-gateway --> ocis-reva-auth-bearer
 

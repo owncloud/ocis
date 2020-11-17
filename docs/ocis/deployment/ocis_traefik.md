@@ -49,7 +49,7 @@ geekdocFilePath: ocis_traefik.md
 
   `$ sudo chmod +x /usr/local/bin/docker-compose`
 
-* Environment variables for OCIS Stack are provided by .env file
+* Environment variables for oCIS Stack are provided by .env file
 
 ### Setup on server
 

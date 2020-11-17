@@ -57,7 +57,7 @@ The described setup can also be used to do a zero-downtime migration from ownClo
 
   `$ sudo chmod +x /usr/local/bin/docker-compose`
 
-* Environment variables for OCIS Stack are provided by .env file
+* Environment variables for oCIS Stack are provided by .env file
 
 ### Setup on server
 

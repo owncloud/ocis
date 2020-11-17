@@ -32,7 +32,7 @@ In the context of this extension and oCIS in general, we are using the following
 ### Settings Bundle
 
 - Collection of related settings
-- Registered by an ocis extension
+- Registered by an oCIS extension
 
 ### Settings Value
 

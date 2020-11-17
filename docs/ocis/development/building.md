@@ -20,9 +20,9 @@ git clone https://github.com/owncloud/ocis.git
 cd ocis
 {{< / highlight >}}
 
-## Build the ocis binary
+## Build the oCIS binary
 
-The ocis binary source is in the ocis/ocis folder. In this folder you can build the ocis binary:
+The oCIS binary source is in the ocis/ocis folder. In this folder you can build the ocis binary:
 
 {{< highlight txt >}}
 make generate
