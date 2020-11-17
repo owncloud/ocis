@@ -16,7 +16,7 @@
         "de": "Klassisches ownCloud"
       },
       "icon": "switch_ui",
-      "url": "https://ocis.example.org",
+      "url": "https://oc10.example.org",
       "target": "_self"
     },
     {
@@ -25,7 +25,7 @@
         "de": "Einstellungen"
       },
       "icon": "application",
-      "url": "https://ocis.example.org/index.php/settings/personal",
+      "url": "https://oc10.example.org/index.php/settings/personal",
       "target": "_self",
       "menu": "user"
     }
