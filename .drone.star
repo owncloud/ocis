@@ -330,7 +330,6 @@ def testing(ctx, module):
           'source': '%s_coverage.out' % (module),
           'target': '%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
           'path_style': True,
-          'strip_prefix': module,
           'access_key': {
             'from_secret': 'cache_s3_access_key'
           },
