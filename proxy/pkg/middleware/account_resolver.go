@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+
 	revaUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	tokenPkg "github.com/cs3org/reva/pkg/token"
@@ -12,9 +16,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based
@@ -74,7 +75,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		account, status = getAccount(m.logger, m.accountsClient, fmt.Sprintf("id eq '%s'", strings.ReplaceAll(claims.OcisID, "'", "''")))
 	default:
 		// TODO allow lookup by custom claim, eg an id ... or sub
-		m.logger.Error().Msg("Could not lookup accountResolver, no mail or preferred_username claim set")
+		m.logger.Error().Msg("Could not lookup account, no mail or preferred_username claim set")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -88,7 +89,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if !account.AccountEnabled {
-		m.logger.Debug().Interface("accountResolver", account).Msg("accountResolver is disabled")
+		m.logger.Debug().Interface("account", account).Msg("account is disabled")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -110,7 +111,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	m.logger.Debug().Interface("claims", claims).Interface("accountResolver", account).Msgf("Associated claims with uuid")
+	m.logger.Debug().Interface("claims", claims).Interface("account", account).Msgf("associated claims with uuid")
 
 	user := &revaUser.User{
 		Id: &revaUser.UserId{
@@ -149,7 +150,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	token, err := m.tokenManager.MintToken(req.Context(), user)
 
 	if err != nil {
-		m.logger.Error().Err(err).Msgf("Could not mint token")
+		m.logger.Error().Err(err).Msgf("could not mint token")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -166,19 +167,19 @@ func getAccount(logger log.Logger, ac accounts.AccountsService, query string) (a
 	})
 
 	if err != nil {
-		logger.Error().Err(err).Str("query", query).Msgf("Error fetching from accounts-service")
+		logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service")
 		status = http.StatusInternalServerError
 		return
 	}
 
 	if len(resp.Accounts) <= 0 {
-		logger.Error().Str("query", query).Msgf("AccountResolver not found")
+		logger.Error().Str("query", query).Msgf("account not found")
 		status = http.StatusNotFound
 		return
 	}
 
 	if len(resp.Accounts) > 1 {
-		logger.Error().Str("query", query).Msgf("More than one accountResolver found. Not logging user in.")
+		logger.Error().Str("query", query).Msgf("more than one account found, aborting")
 		status = http.StatusForbidden
 		return
 	}
@@ -202,7 +203,7 @@ func createAccount(l log.Logger, claims *oidc.StandardClaims, ac accounts.Accoun
 	}
 	created, err := ac.CreateAccount(context.Background(), req)
 	if err != nil {
-		l.Error().Err(err).Interface("accountResolver", req.Account).Msg("could not create accountResolver")
+		l.Error().Err(err).Interface("account", req.Account).Msg("could not create account")
 		return nil, http.StatusInternalServerError
 	}
 
