@@ -72,8 +72,22 @@ func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
 
+	claims, status := m.getClaims(token, req)
+	if status != 0 {
+		w.WriteHeader(status)
+		return
+	}
+
+	// inject claims to the request context for the account_uuid middleware.
+	req = req.WithContext(oidc.NewContext(req.Context(), &claims))
+
+	// store claims in context
+	// uses the original context, not the one with probably reduced security
+	m.next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), &claims)))
+}
+
+func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.StandardClaims, status int) {
 	hit := m.tokenCache.Get(token)
-	var claims oidc.StandardClaims
 	if hit == nil {
 		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
 		oauth2Token := &oauth2.Token{
@@ -86,13 +100,13 @@ func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		)
 		if err != nil {
 			m.logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
-			http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
+			status = http.StatusUnauthorized
 			return
 		}
 
 		if err := userInfo.Claims(&claims); err != nil {
 			m.logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
-			w.WriteHeader(http.StatusInternalServerError)
+			status = http.StatusInternalServerError
 			return
 		}
 
@@ -102,21 +116,16 @@ func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		claims.Iss = m.oidcIss
 
 		m.tokenCache.Set(token, claims)
-	} else {
-		var ok = false
-		if claims, ok = hit.V.(oidc.StandardClaims); !ok {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		m.logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+		return
 	}
 
-	// inject claims to the request context for the account_uuid middleware.
-	req = req.WithContext(oidc.NewContext(req.Context(), &claims))
-
-	// store claims in context
-	// uses the original context, not the one with probably reduced security
-	m.next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), &claims)))
+	var ok = false
+	if claims, ok = hit.V.(oidc.StandardClaims); !ok {
+		status = http.StatusInternalServerError
+		return
+	}
+	m.logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+	return
 }
 
 func (m oidcAuth) shouldServe(req *http.Request) bool {
