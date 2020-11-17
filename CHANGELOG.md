@@ -48,6 +48,7 @@
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
+* Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -528,6 +529,17 @@
    We moved settings and accounts to the user menu.
 
    https://github.com/owncloud/ocis/pull/656
+
+* Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
+
+   Tags: accounts, settings, web
+
+   We now set http caching headers for static web assets, so that they don't get force-reloaded on
+   each request. The max-age for the caching is configurable and defaults to 7 days. The last
+   modified date of the assets is set to the service start date, so that a service restart results in
+   cache invalidation.
+
+   https://github.com/owncloud/ocis/pull/866
 
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 
