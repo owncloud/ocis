@@ -1,20 +1,21 @@
 package cache
 
 import (
-	"fmt"
 	"sync"
+	"time"
 )
 
 // Entry represents an entry on the cache. You can type assert on V.
 type Entry struct {
-	V     interface{}
-	Valid bool
+	V        interface{}
+	inserted time.Time
 }
 
 // Cache is a barebones cache implementation.
 type Cache struct {
-	entries map[string]map[string]Entry
+	entries map[string]*Entry
 	size    int
+	ttl     time.Duration
 	m       sync.Mutex
 }
 
@@ -24,78 +25,56 @@ func NewCache(o ...Option) Cache {
 
 	return Cache{
 		size:    opts.size,
-		entries: map[string]map[string]Entry{},
+		ttl:     opts.ttl,
+		entries: map[string]*Entry{},
 	}
 }
 
-// Get gets an entry on a service `svcKey` by a give `key`.
-func (c *Cache) Get(svcKey, key string) (*Entry, error) {
-	var value Entry
-	ok := true
-
+// Get gets a role-bundle by a given `roleID`.
+func (c *Cache) Get(k string) *Entry {
 	c.m.Lock()
 	defer c.m.Unlock()
 
-	if value, ok = c.entries[svcKey][key]; !ok {
-		return nil, fmt.Errorf("invalid service key: `%v`", key)
+	if _, ok := c.entries[k]; ok {
+		if c.expired(c.entries[k]) {
+			delete(c.entries, k)
+			return nil
+		}
+		return c.entries[k]
 	}
-
-	return &value, nil
+	return nil
 }
 
-// Set sets a key / value. It lets a service add entries on a request basis.
-func (c *Cache) Set(svcKey, key string, val interface{}) error {
+// Set sets a roleID / role-bundle.
+func (c *Cache) Set(k string, val interface{}) {
 	c.m.Lock()
 	defer c.m.Unlock()
 
 	if !c.fits() {
-		return fmt.Errorf("cache is full")
+		c.evict()
 	}
 
-	if _, ok := c.entries[svcKey]; !ok {
-		c.entries[svcKey] = map[string]Entry{}
+	c.entries[k] = &Entry{
+		val,
+		time.Now(),
 	}
-
-	if _, ok := c.entries[svcKey][key]; ok {
-		return fmt.Errorf("key `%v` already exists", key)
-	}
-
-	c.entries[svcKey][key] = Entry{
-		V:     val,
-		Valid: true,
-	}
-
-	return nil
 }
 
-// Invalidate invalidates a cache Entry by key.
-func (c *Cache) Invalidate(svcKey, key string) error {
-	r, err := c.Get(svcKey, key)
-	if err != nil {
-		return err
-	}
-
-	r.Valid = false
-	c.entries[svcKey][key] = *r
-	return nil
-}
-
-// Evict frees memory from the cache by removing invalid keys. It is a noop.
-func (c *Cache) Evict() {
-	for _, v := range c.entries {
-		for k, svcEntry := range v {
-			if !svcEntry.Valid {
-				delete(v, k)
-			}
+// evict frees memory from the cache by removing entries that exceeded the cache TTL.
+func (c *Cache) evict() {
+	for i := range c.entries {
+		if c.expired(c.entries[i]) {
+			delete(c.entries, i)
 		}
 	}
 }
 
-// Length returns the amount of entries per service key.
-func (c *Cache) Length(k string) int {
-	return len(c.entries[k])
+// expired checks if an entry is expired
+func (c *Cache) expired(e *Entry) bool {
+	return e.inserted.Add(c.ttl).Before(time.Now())
 }
 
+// fits returns whether the cache fits more entries.
 func (c *Cache) fits() bool {
-	return c.size >= len(c.entries)
+	return c.size > len(c.entries)
 }

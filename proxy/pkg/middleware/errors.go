@@ -12,5 +12,5 @@ var (
 	ErrUnauthorized = errors.New("unauthorized")
 
 	// ErrInternal is returned if something went wrong
-	ErrInternal     = errors.New("internal error")
+	ErrInternal = errors.New("internal error")
 )

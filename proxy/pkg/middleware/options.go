@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
@@ -41,6 +42,10 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
+	// TokenCacheSize defines the max number of entries in the token cache
+	TokenCacheSize int
+	// TokenCacheTTL sets the max cache duration for the token cache
+	TokenCacheTTL time.Duration
 }
 
 // newOptions initializes the available default options.
@@ -135,5 +140,19 @@ func AutoprovisionAccounts(val bool) Option {
 func EnableBasicAuth(enableBasicAuth bool) Option {
 	return func(o *Options) {
 		o.EnableBasicAuth = enableBasicAuth
+	}
+}
+
+// TokenCacheSize provides a function to set the TokenCacheSize
+func TokenCacheSize(size int) Option {
+	return func(o *Options) {
+		o.TokenCacheSize = size
+	}
+}
+
+// TokenCacheTTL provides a function to set the TokenCacheTTL
+func TokenCacheTTL(ttl time.Duration) Option {
+	return func(o *Options) {
+		o.TokenCacheTTL = ttl
 	}
 }

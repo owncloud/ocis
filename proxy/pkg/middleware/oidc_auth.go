@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"context"
+	"net/http"
+	"strings"
+
 	gOidc "github.com/coreos/go-oidc"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/proxy/pkg/cache"
 	"golang.org/x/oauth2"
-	"net/http"
-	"strings"
 )
 
 // OIDCProvider used to mock the oidc provider during tests
@@ -18,6 +20,10 @@ type OIDCProvider interface {
 // OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
+	tokenCache := cache.NewCache(
+		cache.Size(options.TokenCacheSize),
+		cache.TTL(options.TokenCacheTTL),
+	)
 
 	return func(next http.Handler) http.Handler {
 		return &oidcAuth{
@@ -26,6 +32,7 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			providerFunc: options.OIDCProviderFunc,
 			httpClient:   options.HTTPClient,
 			oidcIss:      options.OIDCIss,
+			tokenCache:   &tokenCache,
 		}
 	}
 }
@@ -37,6 +44,7 @@ type oidcAuth struct {
 	providerFunc func() (OIDCProvider, error)
 	httpClient   *http.Client
 	oidcIss      string
+	tokenCache   *cache.Cache
 }
 
 func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -64,35 +72,47 @@ func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
 
-	// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
-	oauth2Token := &oauth2.Token{
-		AccessToken: token,
-	}
-
-	userInfo, err := m.provider.UserInfo(
-		context.WithValue(req.Context(), oauth2.HTTPClient, m.httpClient),
-		oauth2.StaticTokenSource(oauth2Token),
-	)
-	if err != nil {
-		m.logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
-		http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
-		return
-	}
-
+	hit := m.tokenCache.Get(token)
 	var claims oidc.StandardClaims
-	if err := userInfo.Claims(&claims); err != nil {
-		m.logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	if hit == nil {
+		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
+		oauth2Token := &oauth2.Token{
+			AccessToken: token,
+		}
 
-	//TODO: This should be read from the token instead of config
-	claims.Iss = m.oidcIss
+		userInfo, err := m.provider.UserInfo(
+			context.WithValue(req.Context(), oauth2.HTTPClient, m.httpClient),
+			oauth2.StaticTokenSource(oauth2Token),
+		)
+		if err != nil {
+			m.logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
+			http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		if err := userInfo.Claims(&claims); err != nil {
+			m.logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		m.logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")
+
+		//TODO: This should be read from the token instead of config
+		claims.Iss = m.oidcIss
+
+		m.tokenCache.Set(token, claims)
+	} else {
+		var ok = false
+		if claims, ok = hit.V.(oidc.StandardClaims); !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		m.logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+	}
 
 	// inject claims to the request context for the account_uuid middleware.
 	req = req.WithContext(oidc.NewContext(req.Context(), &claims))
-
-	m.logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")
 
 	// store claims in context
 	// uses the original context, not the one with probably reduced security
