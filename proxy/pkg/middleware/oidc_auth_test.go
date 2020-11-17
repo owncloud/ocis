@@ -3,24 +3,25 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/coreos/go-oidc"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"golang.org/x/oauth2"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
-func TestOpenIDConnectMiddleware(t *testing.T) {
+func TestOIDCAuthMiddleware(t *testing.T) {
 	svcCache.Invalidate(AccountsKey, "success")
+
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
-	m := OpenIDConnect(
+	m := OIDCAuth(
 		Logger(log.NewLogger()),
 		OIDCProviderFunc(func() (OIDCProvider, error) {
 			return mockOP(false), nil
 		}),
+		OIDCIss("https://localhost:9200"),
 	)(next)
 
 	r := httptest.NewRequest(http.MethodGet, "https://idp.example.com", nil)

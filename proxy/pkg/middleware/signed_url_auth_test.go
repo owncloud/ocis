@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-func TestIsSignedRequest(t *testing.T) {
+func TestSignedURLAuth_shouldServe(t *testing.T) {
+	pua := signedURLAuth{}
 	tests := []struct {
 		url      string
 		expected bool
@@ -17,14 +18,16 @@ func TestIsSignedRequest(t *testing.T) {
 
 	for _, tt := range tests {
 		r := httptest.NewRequest("", tt.url, nil)
-		result := isSignedRequest(r)
+		result := pua.shouldServe(r)
+
 		if result != tt.expected {
 			t.Errorf("with %s expected %t got %t", tt.url, tt.expected, result)
 		}
 	}
 }
 
-func TestAllRequiredParametersPresent(t *testing.T) {
+func TestSignedURLAuth_allRequiredParametersPresent(t *testing.T) {
+	pua := signedURLAuth{}
 	baseURL := "https://example.com/example.jpg?"
 	tests := []struct {
 		params   string
@@ -39,14 +42,15 @@ func TestAllRequiredParametersPresent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		r := httptest.NewRequest("", baseURL+tt.params, nil)
-		result := allRequiredParametersArePresent(r)
-		if result != tt.expected {
-			t.Errorf("with %s expected %t got %t", tt.params, tt.expected, result)
+		ok, _ := pua.allRequiredParametersArePresent(r.URL.Query())
+		if ok != tt.expected {
+			t.Errorf("with %s expected %t got %t", tt.params, tt.expected, ok)
 		}
 	}
 }
 
-func TestRequestMethodMatches(t *testing.T) {
+func TestSignedURLAuth_requestMethodMatches(t *testing.T) {
+	pua := signedURLAuth{}
 	tests := []struct {
 		method   string
 		url      string
@@ -59,14 +63,15 @@ func TestRequestMethodMatches(t *testing.T) {
 
 	for _, tt := range tests {
 		r := httptest.NewRequest(tt.method, tt.url, nil)
-		result := requestMethodMatches(r)
-		if result != tt.expected {
-			t.Errorf("with method %s and url %s expected %t got %t", tt.method, tt.url, tt.expected, result)
+		ok, _ := pua.requestMethodMatches(r.Method, r.URL.Query())
+		if ok != tt.expected {
+			t.Errorf("with method %s and url %s expected %t got %t", tt.method, tt.url, tt.expected, ok)
 		}
 	}
 }
 
-func TestRequestMethodIsAllowed(t *testing.T) {
+func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
+	pua := signedURLAuth{}
 	tests := []struct {
 		method   string
 		allowed  []string
@@ -80,40 +85,46 @@ func TestRequestMethodIsAllowed(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := requestMethodIsAllowed(tt.method, tt.allowed)
-		if result != tt.expected {
-			t.Errorf("with method %s and allowed methods %s expected %t got %t", tt.method, tt.allowed, tt.expected, result)
+		pua.preSignedURLConfig.AllowedHTTPMethods = tt.allowed
+		ok, _ := pua.requestMethodIsAllowed(tt.method)
+
+		if ok != tt.expected {
+			t.Errorf("with method %s and allowed methods %s expected %t got %t", tt.method, tt.allowed, tt.expected, ok)
 		}
 	}
 }
 
-func TestUrlIsExpired(t *testing.T) {
+func TestSignedURLAuth_urlIsExpired(t *testing.T) {
+	pua := signedURLAuth{}
 	nowFunc := func() time.Time {
-		t, _ := time.Parse(time.RFC3339, "2020-08-19T15:12:43.478Z")
+		t, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
 		return t
 	}
 
 	tests := []struct {
 		url      string
-		expected bool
+		isExpired bool
 	}{
-		{"http://example.com/example.jpg?OC-Date=2020-08-19T15:02:43.478Z&OC-Expires=1200", false},
-		{"http://example.com/example.jpg?OC-Date=invalid&OC-Expires=1200", true},
-		{"http://example.com/example.jpg?OC-Date=2020-08-19T15:02:43.478Z&OC-Expires=invalid", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=61", false},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=invalid", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=59", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-03T12:29:00.000Z&OC-Expires=59", true},
+		{"http://example.com/example.jpg?OC-Date=2020-02-01T12:29:00.000Z&OC-Expires=59", true},
 	}
 
 	for _, tt := range tests {
 		r := httptest.NewRequest("", tt.url, nil)
-		result := urlIsExpired(r, nowFunc)
-		if result != tt.expected {
-			t.Errorf("with %s expected %t got %t", tt.url, tt.expected, result)
+		expired, _ := pua.urlIsExpired(r.URL.Query(), nowFunc)
+		if expired != tt.isExpired {
+			t.Errorf("with %s expected %t got %t", tt.url, tt.isExpired, expired)
 		}
 	}
 }
 
-func TestCreateSignature(t *testing.T) {
+func TestSignedURLAuth_createSignature(t *testing.T) {
+	pua := signedURLAuth{}
 	expected := "27d2ebea381384af3179235114801dcd00f91e46f99fca72575301cf3948101d"
-	s := createSignature("something", []byte("somerandomkey"))
+	s := pua.createSignature("something", []byte("somerandomkey"))
 
 	if s != expected {
 		t.Fail()

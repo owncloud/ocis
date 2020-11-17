@@ -684,11 +684,6 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:103
 apiSharePublicLink2/uploadToPublicLinkShare.feature:121
 apiSharePublicLink2/uploadToPublicLinkShare.feature:139
 #
-# https://github.com/owncloud/ocis/issues/801 deleting a folder should delete share links to it as well
-#
-apiSharePublicLink2/uploadToPublicLinkShare.feature:48
-apiSharePublicLink2/uploadToPublicLinkShare.feature:49
-#
 # https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
 #
 apiSharePublicLink2/uploadToPublicLinkShare.feature:23
