@@ -2,12 +2,15 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	"net/http"
-	"strings"
 )
+
+const publicFilesEndpoint = "/remote.php/dav/public-files/"
 
 // BasicAuth provides a middleware to check if BasicAuth is provided
 func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
@@ -33,7 +36,7 @@ type basicAuth struct {
 }
 
 func (m basicAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if !m.shouldServe(req) {
+	if m.isPublicLink(req) || !m.isBasicAuth(req) {
 		m.next.ServeHTTP(w, req)
 		return
 	}
@@ -57,16 +60,14 @@ func (m basicAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	m.next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 }
 
-func (m basicAuth) shouldServe(req *http.Request) bool {
+func (m basicAuth) isPublicLink(req *http.Request) bool {
+	login, _, ok := req.BasicAuth()
+
+	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
+}
+
+func (m basicAuth) isBasicAuth(req *http.Request) bool {
 	login, password, ok := req.BasicAuth()
 
-	if ok && login == "public" && strings.HasPrefix(req.URL.Path, "/remote.php/dav/public-files/") {
-		return true
-	}
-
-	if m.enabled && ok && login != "" && password != "" {
-		return true
-	}
-
-	return false
+	return m.enabled && ok && login != "" && password != ""
 }
