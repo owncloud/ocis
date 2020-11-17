@@ -10,7 +10,7 @@ geekdocFilePath: testing.md
 
 ## Acceptance tests
 
-We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the oCIS code.
+We are using the ownCloud 10 acceptance test suite against oCIS. To set this up you need the ownCloud 10 core repo, a LDAP server that the acceptance tests can use to manage users, a redis server for file-versions and the oCIS code.
 
 ### Getting the tests
 
@@ -42,7 +42,7 @@ In the ownCloud 10 core clone the testing app with the following command:
 git clone https://github.com/owncloud/testing apps/testing
 ```
 
-Then run the api acceptance tests with the  following command:
+Then run the api acceptance tests with the following command inside the `./ocis` directory:
 ```
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
@@ -84,7 +84,7 @@ If you want to work on a specific issue
           }
         }
 
-2.  locally run each of the tests marked with that issue in the expected failures file
+2.  locally run each of the tests marked with that issue in the expected failures file. This must be run inside the `./ocis` directory.
 
     E.g.:
     ```
