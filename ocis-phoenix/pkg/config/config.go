@@ -20,6 +20,7 @@ type HTTP struct {
 	Addr      string
 	Root      string
 	Namespace string
+	CacheTTL  int
 }
 
 // Tracing defines the available tracing configuration.

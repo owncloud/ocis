@@ -136,6 +136,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"SETTINGS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.IntFlag{
+			Name:        "http-cache-ttl",
+			Value:       604800, // 7 days
+			Usage:       "Set the static assets caching duration in seconds",
+			EnvVars:     []string{"SETTINGS_CACHE_TTL"},
+			Destination: &cfg.HTTP.CacheTTL,
+		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
 			Value:       "0.0.0.0:9191",

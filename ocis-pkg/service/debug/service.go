@@ -49,7 +49,7 @@ func NewService(opts ...Option) *http.Server {
 		Handler: alice.New(
 			middleware.RealIP,
 			middleware.RequestID,
-			middleware.Cache,
+			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(
