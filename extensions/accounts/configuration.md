@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-17T15:53:24+0000"
+date: "2020-11-18T08:46:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/accounts
@@ -48,12 +48,6 @@ Usage: `accounts list [command options] [arguments...]`
 
 --name | $ACCOUNTS_NAME  
 : service name. Default: `accounts`.
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
 
 ### accounts server
 
@@ -109,11 +103,11 @@ Usage: `accounts server [command options] [arguments...]`
 --service-user-username | $ACCOUNTS_SERVICE_USER_USERNAME  
 : username of the internal service user (required on EOS).
 
-### accounts version
+### accounts inspect
 
-Print the versions of the running instances
+Show detailed data on an existing account
 
-Usage: `accounts version [command options] [arguments...]`
+Usage: `accounts inspect [command options] [arguments...]`
 
 --grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
@@ -136,11 +130,11 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 --log-color | $ACCOUNTS_LOG_COLOR  
 : Enable colored logging. Default: `true`.
 
-### accounts update
+### accounts add
 
-Make changes to an existing account
+Create a new account
 
-Usage: `accounts update [command options] [arguments...]`
+Usage: `accounts add [command options] [arguments...]`
 
 ### accounts remove
 
@@ -154,11 +148,11 @@ Usage: `accounts remove [command options] [arguments...]`
 --name | $ACCOUNTS_NAME  
 : service name. Default: `accounts`.
 
-### accounts inspect
+### accounts version
 
-Show detailed data on an existing account
+Print the versions of the running instances
 
-Usage: `accounts inspect [command options] [arguments...]`
+Usage: `accounts version [command options] [arguments...]`
 
 --grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
@@ -171,4 +165,10 @@ Usage: `accounts inspect [command options] [arguments...]`
 Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
 
 Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
 
