@@ -7,15 +7,14 @@ import (
 
 // Entry represents an entry on the cache. You can type assert on V.
 type Entry struct {
-	V        interface{}
-	inserted time.Time
+	V          interface{}
+	expiration time.Time
 }
 
 // Cache is a barebones cache implementation.
 type Cache struct {
 	entries map[string]*Entry
 	size    int
-	ttl     time.Duration
 	m       sync.Mutex
 }
 
@@ -25,7 +24,6 @@ func NewCache(o ...Option) Cache {
 
 	return Cache{
 		size:    opts.size,
-		ttl:     opts.ttl,
 		entries: map[string]*Entry{},
 	}
 }
@@ -46,7 +44,7 @@ func (c *Cache) Get(k string) *Entry {
 }
 
 // Set sets a roleID / role-bundle.
-func (c *Cache) Set(k string, val interface{}) {
+func (c *Cache) Set(k string, val interface{}, expiration time.Time) {
 	c.m.Lock()
 	defer c.m.Unlock()
 
@@ -56,7 +54,7 @@ func (c *Cache) Set(k string, val interface{}) {
 
 	c.entries[k] = &Entry{
 		val,
-		time.Now(),
+		expiration,
 	}
 }
 
@@ -71,7 +69,7 @@ func (c *Cache) evict() {
 
 // expired checks if an entry is expired
 func (c *Cache) expired(e *Entry) bool {
-	return e.inserted.Add(c.ttl).Before(time.Now())
+	return e.expiration.Before(time.Now())
 }
 
 // fits returns whether the cache fits more entries.
