@@ -226,12 +226,12 @@ apiProvisioning-v2/getUsers.feature:44
 #
 apiProvisioning-v2/getUser.feature:47
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/289 subadmin endpoints not implemented
 #
 apiProvisioning-v2/disableUser.feature:48
 apiProvisioning-v2/disableUser.feature:64
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/292 invalid format of sharees response
 #
 apiSharees/sharees.feature:32
 apiSharees/sharees.feature:33
@@ -286,32 +286,33 @@ apiSharees/sharees.feature:516
 apiSharees/sharees.feature:537
 apiSharees/sharees.feature:538
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareManagementToShares/acceptShares.feature:22
-apiShareManagementToShares/acceptShares.feature:71
-apiShareManagementToShares/acceptShares.feature:156
-apiShareManagementToShares/acceptShares.feature:157
-apiShareManagementToShares/acceptShares.feature:158
-apiShareManagementToShares/acceptShares.feature:159
-apiShareManagementToShares/acceptShares.feature:160
-apiShareManagementToShares/acceptShares.feature:162
-apiShareManagementToShares/acceptShares.feature:175
-apiShareManagementToShares/acceptShares.feature:196
-apiShareManagementToShares/acceptShares.feature:216
 apiShareManagementToShares/acceptShares.feature:223
-apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptShares.feature:270
-apiShareManagementToShares/acceptShares.feature:279
-apiShareManagementToShares/acceptShares.feature:298
 apiShareManagementToShares/acceptShares.feature:342
 apiShareManagementToShares/acceptShares.feature:378
 apiShareManagementToShares/acceptShares.feature:417
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
+# User cannot create a folder named Share
+apiShareManagementToShares/acceptShares.feature:279
+apiShareManagementToShares/acceptShares.feature:298
+#
+apiShareManagementToShares/acceptShares.feature:71
+apiShareManagementToShares/acceptShares.feature:162
+apiShareManagementToShares/acceptShares.feature:175
+apiShareManagementToShares/acceptShares.feature:196
+apiShareManagementToShares/acceptShares.feature:216
+apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:48
+apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:140
+apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:141
+apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:176
+apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:177
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 #
@@ -332,13 +333,16 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:289
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:305
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:306
 apiShareManagementBasicToShares/deleteShareFromShares.feature:46
+apiShareManagementToShares/mergeShare.feature:32
+apiShareManagementToShares/mergeShare.feature:42
+apiShareManagementToShares/mergeShare.feature:89
 #
 # https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
 #
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:100
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:101
 #
-# https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:179
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:180
@@ -361,18 +365,6 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:501
 apiShareManagementBasicToShares/deleteShareFromShares.feature:28
 apiShareManagementBasicToShares/deleteShareFromShares.feature:29
 apiShareManagementBasicToShares/deleteShareFromShares.feature:89
-apiShareManagementBasicToShares/deleteShareFromShares.feature:163
-apiShareManagementBasicToShares/deleteShareFromShares.feature:164
-apiShareManagementBasicToShares/deleteShareFromShares.feature:165
-apiShareManagementBasicToShares/deleteShareFromShares.feature:166
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:42
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:43
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:69
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:70
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:97
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:98
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:135
-apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 #
 # https://github.com/owncloud/ocis/issues/720 shares are mounted into /Shares folder even after the sharer deletes the collaborator
 # https://github.com/owncloud/ocis/issues/721 deleting share response does not contain `data` field
@@ -559,6 +551,18 @@ apiSharePublicLink1/createPublicLinkShare.feature:678
 apiSharePublicLink1/createPublicLinkShare.feature:679
 apiSharePublicLink1/createPublicLinkShare.feature:729
 apiSharePublicLink1/createPublicLinkShare.feature:730
+apiShareManagementBasicToShares/deleteShareFromShares.feature:163
+apiShareManagementBasicToShares/deleteShareFromShares.feature:164
+apiShareManagementBasicToShares/deleteShareFromShares.feature:165
+apiShareManagementBasicToShares/deleteShareFromShares.feature:166
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:42
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:43
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:69
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:70
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:97
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:98
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:135
+apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:136
 #
 # https://github.com/owncloud/core/issues/37605 Public cannot upload file with mtime set on a public link share with new version of WebDAV API
 #
@@ -759,6 +763,10 @@ apiShareReshareToShares2/reShareSubfolder.feature:82
 apiShareReshareToShares2/reShareSubfolder.feature:83
 apiShareReshareToShares2/reShareSubfolder.feature:84
 apiShareReshareToShares2/reShareSubfolder.feature:85
+apiShareManagementToShares/mergeShare.feature:24
+apiShareManagementToShares/mergeShare.feature:52
+apiShareManagementToShares/mergeShare.feature:79
+apiShareManagementToShares/mergeShare.feature:99
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
@@ -856,7 +864,7 @@ apiShareReshareToShares2/reShareSubfolder.feature:129
 apiShareReshareToShares2/reShareSubfolder.feature:150
 apiShareReshareToShares2/reShareSubfolder.feature:151
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature:24
 apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature:25
@@ -1193,7 +1201,7 @@ apiWebdavProperties1/copyFile.feature:166
 apiWebdavProperties1/copyFile.feature:202
 apiWebdavProperties1/copyFile.feature:203
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiWebdavProperties1/copyFile.feature:350
 apiWebdavProperties1/copyFile.feature:351
@@ -1259,7 +1267,7 @@ apiWebdavProperties2/getFileProperties.feature:136
 apiWebdavProperties2/getFileProperties.feature:174
 apiWebdavProperties2/getFileProperties.feature:175
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiWebdavProperties2/getFileProperties.feature:156
 apiWebdavProperties2/getFileProperties.feature:157
@@ -1478,8 +1486,7 @@ apiWebdavPreviews/previews.feature:179
 apiShareOperationsToShares/uploadToShare.feature:64
 apiShareOperationsToShares/uploadToShare.feature:65
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
-# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareOperationsToShares/uploadToShare.feature:39
 apiShareOperationsToShares/uploadToShare.feature:40
@@ -1532,8 +1539,7 @@ apiVersions/fileVersionsSharingToShares.feature:163
 apiVersions/fileVersionsSharingToShares.feature:250
 apiVersions/fileVersionsSharingToShares.feature:251
 #
-# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
-# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiVersions/fileVersionsSharingToShares.feature:179
 #
@@ -1872,7 +1878,7 @@ apiShareCreateSpecialToShares1/createShareExpirationDate.feature:760
 apiShareCreateSpecialToShares1/createShareExpirationDate.feature:781
 apiShareCreateSpecialToShares1/createShareExpirationDate.feature:782
 #
-# Groups Endpoint does not exist  https://github.com/owncloud/ocis-reva/issues/34
+# https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:36
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:37
@@ -1882,10 +1888,6 @@ apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:85
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:86
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:106
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:107
-apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:140
-apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:141
-apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:176
-apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:177
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:201
 apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:202
 apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature:10
@@ -1906,13 +1908,6 @@ apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:86
 apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:87
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:438
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:439
-apiShareManagementToShares/mergeShare.feature:24
-apiShareManagementToShares/mergeShare.feature:32
-apiShareManagementToShares/mergeShare.feature:42
-apiShareManagementToShares/mergeShare.feature:52
-apiShareManagementToShares/mergeShare.feature:79
-apiShareManagementToShares/mergeShare.feature:89
-apiShareManagementToShares/mergeShare.feature:99
 apiShareOperationsToShares/accessToShare.feature:71
 apiShareOperationsToShares/accessToShare.feature:72
 #
@@ -1934,6 +1929,10 @@ apiShareManagementToShares/moveReceivedShare.feature:70
 apiShareManagementToShares/moveReceivedShare.feature:71
 apiShareManagementToShares/moveReceivedShare.feature:73
 apiShareManagementToShares/moveReceivedShare.feature:88
+
+#
+# https://github.com/owncloud/product/issues/203 file_target in share response
+# https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:38
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:39
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:59
@@ -2328,3 +2327,88 @@ apiWebdavProperties1/copyFile.feature:306
 apiWebdavProperties1/copyFile.feature:307
 apiWebdavProperties1/copyFile.feature:329
 apiWebdavProperties1/copyFile.feature:330
+
+# https://github.com/owncloud/product/issues/282 creating existing group doesn't gives error
+apiProvisioningGroups-v1/addGroup.feature:94
+apiProvisioningGroups-v2/addGroup.feature:94
+
+# https://github.com/owncloud/product/issues/285 cannot create group with '/'
+apiProvisioningGroups-v1/addToGroup.feature:75
+apiProvisioningGroups-v1/addToGroup.feature:76
+apiProvisioningGroups-v1/addToGroup.feature:77
+apiProvisioningGroups-v1/deleteGroup.feature:85
+apiProvisioningGroups-v1/deleteGroup.feature:86
+apiProvisioningGroups-v1/deleteGroup.feature:87
+apiProvisioningGroups-v1/getUserGroups.feature:38
+apiProvisioningGroups-v1/removeFromGroup.feature:76
+apiProvisioningGroups-v1/removeFromGroup.feature:77
+apiProvisioningGroups-v1/removeFromGroup.feature:78
+
+apiProvisioningGroups-v2/addToGroup.feature:70
+apiProvisioningGroups-v2/addToGroup.feature:71
+apiProvisioningGroups-v2/addToGroup.feature:72
+apiProvisioningGroups-v2/deleteGroup.feature:85
+apiProvisioningGroups-v2/deleteGroup.feature:86
+apiProvisioningGroups-v2/deleteGroup.feature:87
+apiProvisioningGroups-v2/getUserGroups.feature:38
+apiProvisioningGroups-v2/removeFromGroup.feature:76
+apiProvisioningGroups-v2/removeFromGroup.feature:77
+apiProvisioningGroups-v2/removeFromGroup.feature:78
+
+# https://github.com/owncloud/product/issues/286 adding user to non-existant group gives wrong statuscode
+apiProvisioningGroups-v1/addToGroup.feature:107
+apiProvisioningGroups-v1/removeFromGroup.feature:101
+
+apiProvisioningGroups-v2/removeFromGroup.feature:101
+
+# https://github.com/owncloud/product/issues/287 adding user to empty group gives wrong statuscode
+apiProvisioningGroups-v1/addToGroup.feature:116
+
+# https://github.com/owncloud/product/issues/288 adding non-existant user to a group gives wrong status code
+apiProvisioningGroups-v1/addToGroup.feature:124
+
+# https://github.com/owncloud/product/issues/289 subadmin endpoints not implemented
+apiProvisioningGroups-v1/addGroup.feature:87
+apiProvisioningGroups-v1/addToGroup.feature:133
+apiProvisioningGroups-v1/addToGroup.feature:146
+apiProvisioningGroups-v1/deleteGroup.feature:99
+apiProvisioningGroups-v1/getGroup.feature:72
+apiProvisioningGroups-v1/getSubAdminGroups.feature:11
+apiProvisioningGroups-v1/getSubAdminGroups.feature:24
+apiProvisioningGroups-v1/getUserGroups.feature:56
+apiProvisioningGroups-v1/removeFromGroup.feature:110
+apiProvisioningGroups-v1/removeFromGroup.feature:123
+
+apiProvisioningGroups-v2/addGroup.feature:87
+apiProvisioningGroups-v2/addGroup.feature:109
+apiProvisioningGroups-v2/addToGroup.feature:128
+apiProvisioningGroups-v2/addToGroup.feature:141
+apiProvisioningGroups-v2/deleteGroup.feature:101
+apiProvisioningGroups-v2/getGroup.feature:55
+apiProvisioningGroups-v2/getGroup.feature:73
+apiProvisioningGroups-v2/getSubAdminGroups.feature:11
+apiProvisioningGroups-v2/getSubAdminGroups.feature:24
+apiProvisioningGroups-v2/getUserGroups.feature:56
+apiProvisioningGroups-v2/removeFromGroup.feature:110
+apiProvisioningGroups-v2/removeFromGroup.feature:123
+
+# https://github.com/owncloud/product/issues/187
+# Cannot create user with different username and emails
+# special character username not valid
+apiProvisioningGroups-v1/getGroup.feature:11
+apiProvisioningGroups-v2/getGroup.feature:11
+
+# https://github.com/owncloud/product/issues/290 normal users can list the members of the group
+apiProvisioningGroups-v1/getGroup.feature:81
+apiProvisioningGroups-v1/deleteGroup.feature:90
+apiProvisioningGroups-v2/getGroup.feature:83
+
+# https://github.com/owncloud/product/issues/291 ocs v2 invalid status code for group endpoints
+apiProvisioningGroups-v2/addGroup.feature:102
+apiProvisioningGroups-v2/addToGroup.feature:94
+apiProvisioningGroups-v2/addToGroup.feature:102
+apiProvisioningGroups-v2/addToGroup.feature:119
+apiProvisioningGroups-v2/deleteGroup.feature:91
+apiProvisioningGroups-v2/getGroup.feature:33
+apiProvisioningGroups-v2/getUserGroups.feature:73
+apiProvisioningGroups-v2/removeFromGroup.feature:138
