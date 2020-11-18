@@ -306,15 +306,6 @@ apiSharees/sharees.feature:538
 # https://github.com/owncloud/product/issues/293 sharing with group not available
 #
 apiShareManagementToShares/acceptShares.feature:22
-apiShareManagementToShares/acceptShares.feature:71
-apiShareManagementToShares/acceptShares.feature:156
-apiShareManagementToShares/acceptShares.feature:157
-apiShareManagementToShares/acceptShares.feature:158
-apiShareManagementToShares/acceptShares.feature:159
-apiShareManagementToShares/acceptShares.feature:160
-apiShareManagementToShares/acceptShares.feature:162
-apiShareManagementToShares/acceptShares.feature:175
-apiShareManagementToShares/acceptShares.feature:196
 apiShareManagementToShares/acceptShares.feature:223
 apiShareManagementToShares/acceptShares.feature:270
 apiShareManagementToShares/acceptShares.feature:342
@@ -331,7 +322,6 @@ apiShareManagementToShares/acceptShares.feature:71
 apiShareManagementToShares/acceptShares.feature:162
 apiShareManagementToShares/acceptShares.feature:175
 apiShareManagementToShares/acceptShares.feature:196
-apiShareManagementToShares/acceptShares.feature:216
 apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:48

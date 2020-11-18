@@ -1,4 +1,4 @@
-Enhancement: Update reva to v1.3.1-0.20201112131316-1c425035c8a2
+Enhancement: Update reva to v1.4.0
 
 * Refactor the uploading files workflow from various clients [cs3org/reva#1285](https://github.com/cs3org/reva/pull/1285), [cs3org/reva#1314](https://github.com/cs3org/reva/pull/1314)
 * [OCS] filter share with me requests [cs3org/reva#1302](https://github.com/cs3org/reva/pull/1302)
