@@ -38,6 +38,7 @@
 * Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
+* Change - Theme welcome and choose account pages: [#887](https://github.com/owncloud/ocis/pull/887)
 * Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 * Change - Unify Configuration Parsing: [#675](https://github.com/owncloud/ocis/pull/675)
 * Change - Update phoenix to v0.20.0: [#674](https://github.com/owncloud/ocis/pull/674)
@@ -45,6 +46,7 @@
 * Change - Update phoenix to v0.22.0: [#757](https://github.com/owncloud/ocis/pull/757)
 * Change - Update phoenix to v0.23.0: [#785](https://github.com/owncloud/ocis/pull/785)
 * Change - Update phoenix to v0.24.0: [#817](https://github.com/owncloud/ocis/pull/817)
+* Change - Update phoenix to v0.25.0: [#868](https://github.com/owncloud/ocis/pull/868)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -65,9 +67,11 @@
 * Enhancement - Add a command to list the versions of running instances: [#226](https://github.com/owncloud/product/issues/226)
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
+* Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
+* Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
@@ -435,6 +439,15 @@
    https://github.com/owncloud/ocis/issues/119
    https://github.com/owncloud/ocis/issues/136
 
+* Change - Theme welcome and choose account pages: [#887](https://github.com/owncloud/ocis/pull/887)
+
+   Tags: konnectd
+
+   We've themed the konnectd pages Welcome and Choose account. All text has a white color now to be
+   easily readable on the dark background.
+
+   https://github.com/owncloud/ocis/pull/887
+
 * Change - Bring oC theme: [#698](https://github.com/owncloud/ocis/pull/698)
 
    Tags: konnectd
@@ -503,6 +516,16 @@
 
    https://github.com/owncloud/ocis/pull/817
    https://github.com/owncloud/phoenix/releases/tag/v0.24.0
+
+* Change - Update phoenix to v0.25.0: [#868](https://github.com/owncloud/ocis/pull/868)
+
+   Tags: web
+
+   We updated phoenix to v0.25.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/868
+   https://github.com/owncloud/phoenix/releases/tag/v0.25.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
@@ -1535,6 +1558,12 @@
 
    https://github.com/owncloud/ocis/pull/840
 
+* Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
+
+   Show basic-auth warning only on startup instead on every request.
+
+   https://github.com/owncloud/ocis/pull/886
+
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 
    We introduced the `fallback-datastore` config option and the corresponding options to allow
@@ -1568,6 +1597,16 @@
    services should talk to this storage directly, bypassing reva-gateway.
 
    https://github.com/owncloud/ocis/pull/602
+
+* Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
+
+   Tags: proxy
+
+   We introduced caching for the userinfo response. The token expiration is used for cache
+   invalidation if available. Otherwise we fall back to a preconfigured TTL (default 10
+   seconds).
+
+   https://github.com/owncloud/ocis/pull/877
 
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
