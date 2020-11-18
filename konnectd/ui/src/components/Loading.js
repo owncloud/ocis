@@ -13,9 +13,7 @@ import renderIf from 'render-if';
 import { retryHello } from '../actions/common';
 import { ErrorMessage } from '../errors';
 
-function Loading(props) {
-  const { error } = props;
-
+function Loading({ error, dispatch }) {
   const retry = (event) => {
     event.preventDefault();
     dispatch(retryHello());

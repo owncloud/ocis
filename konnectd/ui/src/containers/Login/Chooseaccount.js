@@ -69,10 +69,10 @@ function Chooseaccount({ loading, errors, classes, hello, history, dispatch }) {
 
   return (
     <div>
-      <Typography variant="h5" component="h3">
+      <Typography variant="h5" component="h3" className="oc-light">
         <FormattedMessage id="konnect.chooseaccount.headline" defaultMessage="Choose an account"></FormattedMessage>
       </Typography>
-      <Typography variant="subtitle1" className={classes.subHeader}>
+      <Typography variant="subtitle1" className={classes.subHeader + " oc-light"}>
         <FormattedMessage id="konnect.chooseaccount.subHeader" defaultMessage="to sign in to Kopano">
         </FormattedMessage>
       </Typography>
@@ -86,7 +86,7 @@ function Chooseaccount({ loading, errors, classes, hello, history, dispatch }) {
             disabled={!!loading}
             onClick={(event) => logon(event)}
           ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
-            <ListItemText primary={username} />
+            <ListItemText className="oc-light" primary={username} />
           </ListItem>
           <ListItem
             button
@@ -102,6 +102,7 @@ function Chooseaccount({ loading, errors, classes, hello, history, dispatch }) {
               </Avatar>
             </ListItemAvatar>
             <ListItemText
+              className="oc-light"
               primary={
                 <FormattedMessage
                   id="konnect.chooseaccount.useOther.label"
