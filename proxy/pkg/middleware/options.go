@@ -42,10 +42,10 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
-	// TokenCacheSize defines the max number of entries in the token cache, intended for the oidc_auth middleware
-	TokenCacheSize int
-	// TokenCacheTTL sets the max cache duration for the token cache, intended for the oidc_auth middleware
-	TokenCacheTTL time.Duration
+	// UserinfoCacheSize defines the max number of entries in the userinfo cache, intended for the oidc_auth middleware
+	UserinfoCacheSize int
+	// UserinfoCacheTTL sets the max cache duration for the userinfo cache, intended for the oidc_auth middleware
+	UserinfoCacheTTL time.Duration
 }
 
 // newOptions initializes the available default options.
@@ -146,13 +146,13 @@ func EnableBasicAuth(enableBasicAuth bool) Option {
 // TokenCacheSize provides a function to set the TokenCacheSize
 func TokenCacheSize(size int) Option {
 	return func(o *Options) {
-		o.TokenCacheSize = size
+		o.UserinfoCacheSize = size
 	}
 }
 
 // TokenCacheTTL provides a function to set the TokenCacheTTL
 func TokenCacheTTL(ttl time.Duration) Option {
 	return func(o *Options) {
-		o.TokenCacheTTL = ttl
+		o.UserinfoCacheTTL = ttl
 	}
 }

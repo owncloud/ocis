@@ -281,8 +281,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			}),
 			middleware.HTTPClient(oidcHTTPClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
-			middleware.TokenCacheSize(1024),
-			middleware.TokenCacheTTL(time.Second*10),
+			middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
+			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
 		),
 		middleware.BasicAuth(
 			middleware.Logger(l),

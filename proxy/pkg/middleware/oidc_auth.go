@@ -21,8 +21,8 @@ type OIDCProvider interface {
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	tokenCache := cache.NewCache(
-		cache.Size(options.TokenCacheSize),
-		cache.TTL(options.TokenCacheTTL),
+		cache.Size(options.UserinfoCacheSize),
+		cache.TTL(options.UserinfoCacheTTL),
 	)
 
 	return func(next http.Handler) http.Handler {
@@ -54,20 +54,9 @@ func (m oidcAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if m.provider == nil {
-		// Lazily initialize a provider
-
-		// provider needs to be cached as when it is created
-		// it will fetch the keys from the issuer using the .well-known
-		// endpoint
-		provider, err := m.providerFunc()
-		if err != nil {
-			m.logger.Error().Err(err).Msg("could not initialize oidcAuth provider")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		m.provider = provider
+	if m.getProvider() == nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
@@ -136,6 +125,7 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 	}
 
 	// todo: looks dirty, check later
+	// TODO: make a PR to coreos/go-oidc for exposing userinfo endpoint on provider, see https://github.com/coreos/go-oidc/issues/248
 	for _, ignoringPath := range []string{"/konnect/v1/userinfo"} {
 		if req.URL.Path == ignoringPath {
 			return false
@@ -143,4 +133,22 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 	}
 
 	return strings.HasPrefix(header, "Bearer ")
+}
+
+func (m oidcAuth) getProvider() OIDCProvider {
+	if m.provider == nil {
+		// Lazily initialize a provider
+
+		// provider needs to be cached as when it is created
+		// it will fetch the keys from the issuer using the .well-known
+		// endpoint
+		provider, err := m.providerFunc()
+		if err != nil {
+			m.logger.Error().Err(err).Msg("could not initialize oidcAuth provider")
+			return nil
+		}
+
+		m.provider = provider
+	}
+	return m.provider
 }
