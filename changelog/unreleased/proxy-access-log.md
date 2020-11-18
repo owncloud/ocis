@@ -1,4 +1,4 @@
-Enhancement: Create a proxy acess-log
+Enhancement: Create a proxy access-log
 
 Logs client access at the proxy
 
