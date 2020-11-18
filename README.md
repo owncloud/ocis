@@ -14,6 +14,8 @@
 
 You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/ocis/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis/)
 
+Trigger CI
+
 ## Development
 
 Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.13.
