@@ -11,6 +11,11 @@ const (
 
 	// BundleUUIDRoleGuest represents the guest role.
 	BundleUUIDRoleGuest = "38071a68-456a-4553-846a-fa67bf5596cc"
+
+	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
+	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
+	// RoleManagementPermissionName is the hardcoded setting name for the role management permission
+	RoleManagementPermissionName string = "role-management"
 )
 
 // generateBundlesDefaultRoles bootstraps the default roles.
@@ -61,5 +66,29 @@ func generateBundleGuestRole() *settings.Bundle {
 			Type: settings.Resource_TYPE_SYSTEM,
 		},
 		Settings: []*settings.Setting{},
+	}
+}
+
+func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
+	return []*settings.AddSettingToBundleRequest{
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          RoleManagementPermissionID,
+				Name:        RoleManagementPermissionName,
+				DisplayName: "Role Management",
+				Description: "This permission gives full access to everything that is related to role management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+					Id:   "all",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
 	}
 }
