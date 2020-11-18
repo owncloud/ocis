@@ -8,9 +8,13 @@ networks:
 services:
   ocis:
     container_name: ocis
-    #image: owncloud/eos-ocis:1.0.0-rc2
-    build:
-      context: ./docker/eos-ocis
+    ## Comment out either the 'build:' section or the 'image:' line. They are mutually exclusive.
+    ## Using an image is prefered, as this is the published way of building and faster.
+    image: owncloud/eos-ocis:${EOS_OCIS_TAG:-1.0.0-rc5}
+    #build:
+    #  context: ./docker/eos-ocis
+    #  args:
+    #    BRANCH: ${BRANCH:-v1.0.0-rc5}
     tty: true
     privileged: true
     stdin_open: true
