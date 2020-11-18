@@ -202,6 +202,20 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
+		&cli.IntFlag{
+			Name:        "oidc-userinfo-cache-tll",
+			Value:       10,
+			Usage:       "Fallback TTL in seconds for caching userinfo, when no token lifetime can be identified",
+			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_TTL"},
+			Destination: &cfg.OIDC.UserinfoCache.TTL,
+		},
+		&cli.IntFlag{
+			Name:        "oidc-userinfo-cache-size",
+			Value:       1024,
+			Usage:       "Max entries for caching userinfo",
+			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_SIZE"},
+			Destination: &cfg.OIDC.UserinfoCache.Size,
+		},
 
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",

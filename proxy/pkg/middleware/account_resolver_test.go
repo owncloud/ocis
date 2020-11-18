@@ -3,33 +3,31 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/micro/go-micro/v2/client"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestGetAccountSuccess(t *testing.T) {
-	svcCache.Invalidate(AccountsKey, "success")
 	if _, status := getAccount(log.NewLogger(), mockAccountResolverMiddlewareAccSvc(false, true), "mail eq 'success'"); status != 0 {
 		t.Errorf("expected an account")
 	}
 }
 
 func TestGetAccountInternalError(t *testing.T) {
-	svcCache.Invalidate(AccountsKey, "failure")
 	if _, status := getAccount(log.NewLogger(), mockAccountResolverMiddlewareAccSvc(true, false), "mail eq 'failure'"); status != http.StatusInternalServerError {
 		t.Errorf("expected an internal server error")
 	}
 }
 
 func TestAccountResolverMiddleware(t *testing.T) {
-	svcCache.Invalidate(AccountsKey, "success")
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	m := AccountResolver(
 		Logger(log.NewLogger()),
@@ -50,7 +48,6 @@ func TestAccountResolverMiddleware(t *testing.T) {
 }
 
 func TestAccountResolverMiddlewareWithDisabledAccount(t *testing.T) {
-	svcCache.Invalidate(AccountsKey, "failure")
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	m := AccountResolver(
 		Logger(log.NewLogger()),

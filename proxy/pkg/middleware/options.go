@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
@@ -27,7 +28,7 @@ type Options struct {
 	AccountsClient acc.AccountsService
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settings.RoleService
-	// OIDCProviderFunc to lazily initialize a provider, must be set for the oidcProvider middleware
+	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
@@ -41,6 +42,10 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
+	// UserinfoCacheSize defines the max number of entries in the userinfo cache, intended for the oidc_auth middleware
+	UserinfoCacheSize int
+	// UserinfoCacheTTL sets the max cache duration for the userinfo cache, intended for the oidc_auth middleware
+	UserinfoCacheTTL time.Duration
 }
 
 // newOptions initializes the available default options.
@@ -89,7 +94,7 @@ func SettingsRoleService(rc settings.RoleService) Option {
 	}
 }
 
-// OIDCProviderFunc provides a function to set the the oidcAuth provider function option.
+// OIDCProviderFunc provides a function to set the the oidc provider function option.
 func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 	return func(o *Options) {
 		o.OIDCProviderFunc = f
@@ -135,5 +140,19 @@ func AutoprovisionAccounts(val bool) Option {
 func EnableBasicAuth(enableBasicAuth bool) Option {
 	return func(o *Options) {
 		o.EnableBasicAuth = enableBasicAuth
+	}
+}
+
+// TokenCacheSize provides a function to set the TokenCacheSize
+func TokenCacheSize(size int) Option {
+	return func(o *Options) {
+		o.UserinfoCacheSize = size
+	}
+}
+
+// TokenCacheTTL provides a function to set the TokenCacheTTL
+func TokenCacheTTL(ttl time.Duration) Option {
+	return func(o *Options) {
+		o.UserinfoCacheTTL = ttl
 	}
 }

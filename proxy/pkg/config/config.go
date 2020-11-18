@@ -83,6 +83,12 @@ type Reva struct {
 	Address string
 }
 
+// Cache is a TTL cache configuration.
+type Cache struct {
+	Size int
+	TTL  int
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File                  string
@@ -105,8 +111,9 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer   string
-	Insecure bool
+	Issuer        string
+	Insecure      bool
+	UserinfoCache Cache
 }
 
 // PolicySelector is the toplevel-configuration for different selectors

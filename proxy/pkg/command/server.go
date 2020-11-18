@@ -15,12 +15,12 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/oklog/run"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
@@ -281,6 +281,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			}),
 			middleware.HTTPClient(oidcHTTPClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
+			middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
+			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
 		),
 		middleware.BasicAuth(
 			middleware.Logger(l),

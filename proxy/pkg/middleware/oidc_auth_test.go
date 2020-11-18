@@ -3,17 +3,16 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/coreos/go-oidc"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/coreos/go-oidc"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"golang.org/x/oauth2"
 )
 
 func TestOIDCAuthMiddleware(t *testing.T) {
-	svcCache.Invalidate(AccountsKey, "success")
-
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
 	m := OIDCAuth(
