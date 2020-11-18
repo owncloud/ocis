@@ -54,13 +54,24 @@ func (g Service) RegisterDefaultRoles() {
 		}
 		g.logger.Debug().Str("bundleID", bundleID).Msg("successfully registered bundle")
 	}
+
+	for _, req := range generatePermissionRequests() {
+		_, err := g.manager.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
+		if err != nil {
+			g.logger.Error().
+				Err(err).
+				Str("bundleID", req.GetBundleId()).
+				Interface("setting", req.GetSetting()).
+				Msg("failed to register permission")
+		}
+	}
 }
 
 // TODO: check permissions on every request
 
 // SaveBundle implements the BundleServiceHandler interface
-func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
-	cleanUpResource(c, req.Bundle.Resource)
+func (g Service) SaveBundle(ctx context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
+	cleanUpResource(ctx, req.Bundle.Resource)
 	if validationError := validateSaveBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -73,7 +84,7 @@ func (g Service) SaveBundle(c context.Context, req *proto.SaveBundleRequest, res
 }
 
 // GetBundle implements the BundleServiceHandler interface
-func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
+func (g Service) GetBundle(ctx context.Context, req *proto.GetBundleRequest, res *proto.GetBundleResponse) error {
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -81,7 +92,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	filteredBundle := g.getFilteredBundle(g.getRoleIDs(c), bundle)
+	filteredBundle := g.getFilteredBundle(g.getRoleIDs(ctx), bundle)
 	if len(filteredBundle.Settings) == 0 {
 		err = fmt.Errorf("could not read bundle: %s", req.BundleId)
 		return merrors.NotFound(g.id, "%s", err)
@@ -91,7 +102,7 @@ func (g Service) GetBundle(c context.Context, req *proto.GetBundleRequest, res *
 }
 
 // ListBundles implements the BundleServiceHandler interface
-func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
+func (g Service) ListBundles(ctx context.Context, req *proto.ListBundlesRequest, res *proto.ListBundlesResponse) error {
 	// fetch all bundles
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
@@ -100,7 +111,7 @@ func (g Service) ListBundles(c context.Context, req *proto.ListBundlesRequest, r
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	roleIDs := g.getRoleIDs(c)
+	roleIDs := g.getRoleIDs(ctx)
 
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*proto.Bundle
@@ -151,8 +162,8 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *proto.Bundle) *prot
 }
 
 // AddSettingToBundle implements the BundleServiceHandler interface
-func (g Service) AddSettingToBundle(c context.Context, req *proto.AddSettingToBundleRequest, res *proto.AddSettingToBundleResponse) error {
-	cleanUpResource(c, req.Setting.Resource)
+func (g Service) AddSettingToBundle(ctx context.Context, req *proto.AddSettingToBundleRequest, res *proto.AddSettingToBundleResponse) error {
+	cleanUpResource(ctx, req.Setting.Resource)
 	if validationError := validateAddSettingToBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -165,7 +176,7 @@ func (g Service) AddSettingToBundle(c context.Context, req *proto.AddSettingToBu
 }
 
 // RemoveSettingFromBundle implements the BundleServiceHandler interface
-func (g Service) RemoveSettingFromBundle(c context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
+func (g Service) RemoveSettingFromBundle(ctx context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
 	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -177,9 +188,9 @@ func (g Service) RemoveSettingFromBundle(c context.Context, req *proto.RemoveSet
 }
 
 // SaveValue implements the ValueServiceHandler interface
-func (g Service) SaveValue(c context.Context, req *proto.SaveValueRequest, res *proto.SaveValueResponse) error {
-	req.Value.AccountUuid = getValidatedAccountUUID(c, req.Value.AccountUuid)
-	cleanUpResource(c, req.Value.Resource)
+func (g Service) SaveValue(ctx context.Context, req *proto.SaveValueRequest, res *proto.SaveValueResponse) error {
+	req.Value.AccountUuid = getValidatedAccountUUID(ctx, req.Value.AccountUuid)
+	cleanUpResource(ctx, req.Value.Resource)
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
@@ -197,7 +208,7 @@ func (g Service) SaveValue(c context.Context, req *proto.SaveValueRequest, res *
 }
 
 // GetValue implements the ValueServiceHandler interface
-func (g Service) GetValue(c context.Context, req *proto.GetValueRequest, res *proto.GetValueResponse) error {
+func (g Service) GetValue(ctx context.Context, req *proto.GetValueRequest, res *proto.GetValueResponse) error {
 	if validationError := validateGetValue(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -235,8 +246,8 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *proto.Get
 }
 
 // ListValues implements the ValueServiceHandler interface
-func (g Service) ListValues(c context.Context, req *proto.ListValuesRequest, res *proto.ListValuesResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+func (g Service) ListValues(ctx context.Context, req *proto.ListValuesRequest, res *proto.ListValuesResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
 	if validationError := validateListValues(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -271,8 +282,8 @@ func (g Service) ListRoles(c context.Context, req *proto.ListBundlesRequest, res
 }
 
 // ListRoleAssignments implements the RoleServiceHandler interface
-func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssignmentsRequest, res *proto.ListRoleAssignmentsResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+func (g Service) ListRoleAssignments(ctx context.Context, req *proto.ListRoleAssignmentsRequest, res *proto.ListRoleAssignmentsResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
 	if validationError := validateListRoleAssignments(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -285,8 +296,12 @@ func (g Service) ListRoleAssignments(c context.Context, req *proto.ListRoleAssig
 }
 
 // AssignRoleToUser implements the RoleServiceHandler interface
-func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(c, req.AccountUuid)
+func (g Service) AssignRoleToUser(ctx context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
+	if !g.hasRoleManagementPermission(ctx) {
+		return merrors.Forbidden(g.id, "the user is not allowed to assign roles")
+	}
+
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -299,7 +314,11 @@ func (g Service) AssignRoleToUser(c context.Context, req *proto.AssignRoleToUser
 }
 
 // RemoveRoleFromUser implements the RoleServiceHandler interface
-func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
+func (g Service) RemoveRoleFromUser(ctx context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
+	if !g.hasRoleManagementPermission(ctx) {
+		return merrors.Forbidden(g.id, "the user is not allowed to assign roles")
+	}
+
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -310,11 +329,11 @@ func (g Service) RemoveRoleFromUser(c context.Context, req *proto.RemoveRoleFrom
 }
 
 // ListPermissionsByResource implements the PermissionServiceHandler interface
-func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPermissionsByResourceRequest, res *proto.ListPermissionsByResourceResponse) error {
+func (g Service) ListPermissionsByResource(ctx context.Context, req *proto.ListPermissionsByResourceRequest, res *proto.ListPermissionsByResourceResponse) error {
 	if validationError := validateListPermissionsByResource(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permissions, err := g.manager.ListPermissionsByResource(req.Resource, g.getRoleIDs(c))
+	permissions, err := g.manager.ListPermissionsByResource(req.Resource, g.getRoleIDs(ctx))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -323,11 +342,11 @@ func (g Service) ListPermissionsByResource(c context.Context, req *proto.ListPer
 }
 
 // GetPermissionByID implements the PermissionServiceHandler interface
-func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionByIDRequest, res *proto.GetPermissionByIDResponse) error {
+func (g Service) GetPermissionByID(ctx context.Context, req *proto.GetPermissionByIDRequest, res *proto.GetPermissionByIDResponse) error {
 	if validationError := validateGetPermissionByID(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permission, err := g.manager.ReadPermissionByID(req.PermissionId, g.getRoleIDs(c))
+	permission, err := g.manager.ReadPermissionByID(req.PermissionId, g.getRoleIDs(ctx))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -339,17 +358,17 @@ func (g Service) GetPermissionByID(c context.Context, req *proto.GetPermissionBy
 }
 
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.
-func cleanUpResource(c context.Context, resource *proto.Resource) {
+func cleanUpResource(ctx context.Context, resource *proto.Resource) {
 	if resource != nil && resource.Type == proto.Resource_TYPE_USER {
-		resource.Id = getValidatedAccountUUID(c, resource.Id)
+		resource.Id = getValidatedAccountUUID(ctx, resource.Id)
 	}
 }
 
 // getValidatedAccountUUID converts `me` into an actual account uuid from the context, if possible.
 // the result of this function will always be a valid lower-case UUID or an empty string.
-func getValidatedAccountUUID(c context.Context, accountUUID string) string {
+func getValidatedAccountUUID(ctx context.Context, accountUUID string) string {
 	if accountUUID == "me" {
-		if ownAccountUUID, ok := metadata.Get(c, middleware.AccountID); ok {
+		if ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID); ok {
 			accountUUID = ownAccountUUID
 		}
 	}
@@ -361,8 +380,8 @@ func getValidatedAccountUUID(c context.Context, accountUUID string) string {
 }
 
 // getRoleIDs extracts the roleIDs of the authenticated user from the context.
-func (g Service) getRoleIDs(c context.Context) []string {
-	if ownRoleIDs, ok := roles.ReadRoleIDsFromContext(c); ok {
+func (g Service) getRoleIDs(ctx context.Context) []string {
+	if ownRoleIDs, ok := roles.ReadRoleIDsFromContext(ctx); ok {
 		return ownRoleIDs
 	}
 	return []string{}
@@ -385,4 +404,22 @@ func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIde
 		},
 		Value: value,
 	}, nil
+}
+
+func (g Service) hasRoleManagementPermission(ctx context.Context) bool {
+	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
+	if !ok {
+		/**
+		* FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
+		* metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
+		* for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
+		 */
+		// TODO add system role for internal requests.
+		// - at least the proxy needs to look up account info
+		// - glauth needs to make bind requests
+		// tracked as OCIS-454
+		return true
+	}
+	p, err := g.manager.ReadPermissionByID(RoleManagementPermissionID, roleIDs)
+	return err == nil && p != nil
 }

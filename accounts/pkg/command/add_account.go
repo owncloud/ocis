@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/owncloud/ocis/accounts/pkg/config"

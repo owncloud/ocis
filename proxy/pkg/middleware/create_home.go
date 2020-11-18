@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"net/http"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -11,7 +13,6 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
-	"net/http"
 )
 
 // CreateHome provides a middleware which sends a CreateHome request to the reva gateway
