@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-18T08:46:59+0000"
+date: "2020-11-18T09:17:23+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/accounts
@@ -36,6 +36,18 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### accounts version
+
+Print the versions of the running instances
+
+Usage: `accounts version [command options] [arguments...]`
+
+--grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $ACCOUNTS_NAME  
+: service name. Default: `accounts`.
 
 ### accounts list
 
@@ -130,6 +142,18 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 --log-color | $ACCOUNTS_LOG_COLOR  
 : Enable colored logging. Default: `true`.
 
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
+
 ### accounts add
 
 Create a new account
@@ -147,28 +171,4 @@ Usage: `accounts remove [command options] [arguments...]`
 
 --name | $ACCOUNTS_NAME  
 : service name. Default: `accounts`.
-
-### accounts version
-
-Print the versions of the running instances
-
-Usage: `accounts version [command options] [arguments...]`
-
---grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $ACCOUNTS_NAME  
-: service name. Default: `accounts`.
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
 
