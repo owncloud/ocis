@@ -67,6 +67,7 @@
 * Enhancement - Add a command to list the versions of running instances: [#226](https://github.com/owncloud/product/issues/226)
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
+* Enhancement - Add permission check when assigning and removing roles: [#879](https://github.com/owncloud/ocis/issues/879)
 * Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
@@ -1557,6 +1558,13 @@
    `mdns` when not explicitly defined to use `etcd`.
 
    https://github.com/owncloud/ocis/pull/840
+
+* Enhancement - Add permission check when assigning and removing roles: [#879](https://github.com/owncloud/ocis/issues/879)
+
+   Everyone could add and remove roles from users. Added a new permission and a check so that only
+   users with the role management permissions can assign and unassign roles.
+
+   https://github.com/owncloud/ocis/issues/879
 
 * Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
 
