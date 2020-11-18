@@ -15,6 +15,9 @@ const publicFilesEndpoint = "/remote.php/dav/public-files/"
 // BasicAuth provides a middleware to check if BasicAuth is provided
 func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
+	if options.EnableBasicAuth {
+		options.Logger.Warn().Msg("basic auth enabled, use only for testing or development")
+	}
 
 	return func(next http.Handler) http.Handler {
 		return &basicAuth{
@@ -40,8 +43,6 @@ func (m basicAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.next.ServeHTTP(w, req)
 		return
 	}
-
-	m.logger.Warn().Msg("basic auth enabled, use only for testing or development")
 
 	login, password, _ := req.BasicAuth()
 
