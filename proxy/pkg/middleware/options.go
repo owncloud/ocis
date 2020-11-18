@@ -28,7 +28,7 @@ type Options struct {
 	AccountsClient acc.AccountsService
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settings.RoleService
-	// OIDCProviderFunc to lazily initialize a provider, must be set for the oidcProvider middleware
+	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
@@ -42,9 +42,9 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
-	// TokenCacheSize defines the max number of entries in the token cache
+	// TokenCacheSize defines the max number of entries in the token cache, intended for the oidc_auth middleware
 	TokenCacheSize int
-	// TokenCacheTTL sets the max cache duration for the token cache
+	// TokenCacheTTL sets the max cache duration for the token cache, intended for the oidc_auth middleware
 	TokenCacheTTL time.Duration
 }
 
@@ -94,7 +94,7 @@ func SettingsRoleService(rc settings.RoleService) Option {
 	}
 }
 
-// OIDCProviderFunc provides a function to set the the oidcAuth provider function option.
+// OIDCProviderFunc provides a function to set the the oidc provider function option.
 func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 	return func(o *Options) {
 		o.OIDCProviderFunc = f
