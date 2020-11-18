@@ -117,13 +117,20 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 		}
 		for endpoint := range p.Directors[pol][rt] {
 			if handler(endpoint, *r.URL) {
-				p.logger.
-					Debug().
+
+				p.logger.Debug().
 					Str("policy", pol).
 					Str("prefix", endpoint).
 					Str("path", r.URL.Path).
 					Str("routeType", string(rt)).
 					Msg("director found")
+
+				p.logger.
+					Info().Fields(map[string]interface{}{
+					"method": r.Method,
+					"path":   r.URL.Path,
+					"from":   r.RemoteAddr,
+				}).Msg("access-log")
 				p.Directors[pol][rt][endpoint](r)
 				return
 			}
