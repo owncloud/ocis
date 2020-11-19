@@ -20,6 +20,7 @@ clients:
     insecure: yes
     trusted: yes
     redirect_uris:
+      - https://oc10.example.org/
       - https://oc10.example.org/apps/openidconnect/redirect
     origins:
       - https://oc10.example.org
