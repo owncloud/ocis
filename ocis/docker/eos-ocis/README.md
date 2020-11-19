@@ -1,4 +1,4 @@
-# Docker image for ocis running on eos
+# Docker image for oCIS running on eos
 
 Image is based on [owncloud/eos-base](https://hub.docker.com/r/owncloud/eos-base) from [eos-stack](https://github.com/owncloud-docker/eos-stack)
 

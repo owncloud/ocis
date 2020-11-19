@@ -9,16 +9,15 @@ geekdocFilePath: _index.md
 
 {{< toc >}}
 
-## Deployments Scenarios and Examples
-This section handles deployments and operations for admins. If you are looking for a development setup, start with
+## Deployments scenarios and examples
+This section handles deployments and operations for admins. If you are looking for a development setup, start with [Getting started](https://owncloud.github.io/ocis/getting-started/).
 
-### Setup oCIS
-oCIS deployments are super simple, yet there are many configrations possible for advanced setups.
+### Setup oCIS on your server
+oCIS deployments are super simple, yet there are many configurations possible for advanced setups.
 
-- Basic setup - download and run
-- Pick services and manage them individually
-- SSL offloading with Traefik
-- Use an external IDP
+- [Basic oCIS setup]({{< ref "basic-remote-setup.md" >}}) - configure domain, certificates and port
+- [oCIS setup with Traefik for ssl termination]({{< ref "ocis_traefik.md" >}})
+- [oCIS setup with external OIDC IDP]({{< ref "ocis_external_idp.md" >}})
 
 ### Migrate an existing ownCloud 10
 You can run ownCloud 10 and oCIS together. This allows you to use new parts of oCIS already with ownCloud 10 and also to have a smooth transition for users from ownCloud 10 to oCIS.

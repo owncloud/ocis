@@ -8,5 +8,3 @@ geekdocFilePath: _index.md
 ---
 
 {{< toc >}}
-
-## Deployments Scenarios and Examples

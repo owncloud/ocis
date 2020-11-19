@@ -10,7 +10,7 @@ geekdocFilePath: testing.md
 
 ## Acceptance tests
 
-We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the ocis code.
+We are using the ownCloud 10 acceptance testsuite against ocis. To set this up you need the owncloud 10 core repo, a ldap server that the acceptance tests can use to manage users, a redis server for file-versions and the oCIS code.
 
 ### Getting the tests
 

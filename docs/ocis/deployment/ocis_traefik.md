@@ -1,5 +1,5 @@
 ---
-title: "ocis with traefik deployment scenario"
+title: "oCIS with Traefik"
 date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
@@ -11,47 +11,27 @@ geekdocFilePath: ocis_traefik.md
 
 ## Overview
 
-* ocis running on a hcloud node behind traefik as reverse proxy
-* Cloudflare DNS is resolving the domain
-* Letsencrypt provides a ssl certificate for the domain
-* Traefik docker container terminates ssl and forwards http requests to ocis
+* oCIS running behind traefik as reverse proxy
+* Valid ssl certificates for the domains for ssl termination
 
-## Node
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_traefik)
+
+
+
+## Server Deployment
 
 ### Requirements
 
-* Server running Ubuntu 20.04 is public availible with a static ip address
-* Two A-records for both domains are pointing on the servers ip address
-* Create user
+* Linux server(s) with docker and docker-compose installed
+* Two domains set up and pointing to your server(s)
 
-  `$ sudo adduser username`
+See also [example server setup]({{< ref "preparing_server.md" >}})
 
-* Add user to sudo group
 
-  `$ sudo usermod -aG sudo username`
+### Install oCIS and Traefik
 
-* Add users pub key to `~/.ssh/authorized_keys`
-* Setup ssh to permit authorisation only by ssh key
-* Install docker
-
-  `$ sudo apt install docker.io`
-
-* Add user to docker group
-
-  `$ sudo usermod -aG docker username`
-
-* Install docker-compose via
-
-  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-
-  (docker compose version 1.27.4 as of today)
-* Make docker-compose executable
-
-  `$ sudo chmod +x /usr/local/bin/docker-compose`
-
-* Environment variables for OCIS Stack are provided by .env file
-
-### Setup on server
+The application stack contains two containers. The first one is a traefik proxy which is terminating ssl and forwards the requests to the internal docker network. Additional, traefik is creating a certificate that is stored in `acme.json` in the folder `letsencrypt` inside the users home directory.
+The second one is th ocis server which is exposing the webservice on port 9200 to traefik.
 
 * Clone ocis repository
 
@@ -77,12 +57,7 @@ geekdocFilePath: ocis_traefik.md
 
   `docker-compose up -d`
 
-### Stack
-
-The application stack contains two containers. The first one is a traefik proxy which is terminating ssl and forwards the requests to the internal docker network. Additional, traefik is creating a certificate that is stored in `acme.json` in the folder `letsencrypt` inside the users home directory.
-The second one is th ocis server which is exposing the webservice on port 9200 to traefic.
-
-### Config
+### Configuration
 
 Edit docker-compose.yml file to fit your domain setup
 
@@ -146,3 +121,8 @@ To make it availible for ocis inside of the container, `config` hast to be mount
       KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/etc/ocis/identifier-registration.yml"
       ...
 ```
+
+## Local setup
+For simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
+
+Local setup with Traefik coming soon
