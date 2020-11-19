@@ -40,6 +40,7 @@ function getConfigFromEnv() {
         'mode' => 'userid',
         'autoRedirectOnLoginPage' => true,
         'insecure' => true,
+        'post_logout_redirect_uri' => 'https://' . getenv('OWNCLOUD_DOMAIN') . '/',
       ],
     'datadirectory' => getenv('OWNCLOUD_VOLUME_FILES'),
     'dbtype' => getenv('OWNCLOUD_DB_TYPE'),
