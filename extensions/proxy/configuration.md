@@ -1,10 +1,10 @@
 ---
 title: "Configuration"
-date: "2020-11-19T12:06:05+0000"
+date: "2020-11-19T13:27:43+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/proxy
-geekdocFilePath: configuration.md
+geekdocEditPath: edit/master/proxy/templates
+geekdocFilePath: CONFIGURATION.tmpl
 ---
 
 {{< toc >}}
@@ -29,13 +29,49 @@ For this configuration to be picked up, have a look at your extension `root` com
 
 So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
-### Envrionment variables
+### Environment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### proxy version
+
+Print the versions of the running instances
+
+Usage: `proxy version [command options] [arguments...]`
+
+--service-namespace | $PROXY_SERVICE_NAMESPACE  
+: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
+
+--service-name | $PROXY_SERVICE_NAME  
+: Service name. Default: `proxy`.
+
+### proxy health
+
+Check health status
+
+Usage: `proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
+
+### proxy ocis-proxy
+
+proxy for Reva/oCIS
+
+Usage: `proxy ocis-proxy [command options] [arguments...]`
+
+--log-level | $PROXY_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $PROXY_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $PROXY_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### proxy server
 
@@ -114,40 +150,4 @@ Usage: `proxy server [command options] [arguments...]`
 
 --enable-basic-auth | $PROXY_ENABLE_BASIC_AUTH  
 : enable basic authentication. Default: `false`.
-
-### proxy version
-
-Print the versions of the running instances
-
-Usage: `proxy version [command options] [arguments...]`
-
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
-
-### proxy health
-
-Check health status
-
-Usage: `proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
-
-### proxy ocis-proxy
-
-proxy for Reva/oCIS
-
-Usage: `proxy ocis-proxy [command options] [arguments...]`
-
---log-level | $PROXY_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $PROXY_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $PROXY_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 

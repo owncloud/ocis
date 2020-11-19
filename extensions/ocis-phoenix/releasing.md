@@ -10,7 +10,7 @@ geekdocFilePath: releasing.md
 
 ## Releasing
 
-The next generation Web Frontend is shipped as an ocis Extension. The `ocis-phoenix` extension is also embedded in the single binary and part of the `ocis server` command.
+The next generation Web Frontend is shipped as an oCIS Extension. The `ocis-phoenix` extension is also embedded in the single binary and part of the `ocis server` command.
 
 To update this package within all the deliveries, we need to update the package in the following chain from the bottom to the top.
 
