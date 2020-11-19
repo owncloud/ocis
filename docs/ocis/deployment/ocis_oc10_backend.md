@@ -1,5 +1,5 @@
 ---
-title: "ocis frontend with oc10 backend deployment scenario"
+title: "ownCloud Web with ownCloud 10"
 date: 2020-10-12T14:04:00+01:00
 weight: 25
 geekdocRepo: https://github.com/owncloud/ocis
@@ -9,57 +9,34 @@ geekdocFilePath: ocis_frontend_oc10_backend.md
 
 {{< toc >}}
 
-This deployment scenario shows how to use ocis as frontend for an existing ownCloud 10 production installation. It enables
-ownCloud 10 users to log in and work with their files using the new ocis-web UI. While the scenario includes
+This deployment scenario shows how to use ownCloud Web as frontend for an existing ownCloud 10 production installation. It enables
+ownCloud 10 users to log in and work with their files using the new ownCloud Web. While the scenario includes
 an ownCloud 10 instance, it only exists to show the necessary configuration for your already existing ownCloud 10
 installation.
 
-The described setup can also be used to do a zero-downtime migration from ownCloud 10 to ocis.
-
 ## Overview
 
-### Node Setup
+* oCIS setup serving ownCloud Web
+* ownCloud 10 setup connected to oCIS
+* DNS is resolving one domain for ocis and one for oc10
+* Valid ssl certificates for the domains for ssl termination
 
-* ocis and oc10 running as docker containers behind traefik as reverse proxy
-* Cloudflare DNS is resolving one domain for ocis and one for oc10
-* Letsencrypt is providing valid ssl certificate for both domains
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_external_konnectd)
 
-## Node Deployment
+## Server Deployment
 
 ### Requirements
 
-* Server running Ubuntu 20.04 is publicly available with a static ip address
-* Two A-records for both domains are pointing to the servers ip address
-* Create user
+* Linux server(s) with docker and docker-compose installed
+* Two domains set up and pointing to your server(s)
 
-  `$ sudo adduser username`
-
-* Add user to sudo group
-
-  `$ sudo usermod -aG sudo username`
-
-* Add users pub key to `~/.ssh/authorized_keys`
-* Setup ssh to permit authorisation only by ssh key
-* Install docker
-
-  `$ sudo apt install docker.io`
-
-* Add user to docker group
-
-  `$ sudo usermod -aG docker username`
-
-* Install docker-compose via
-
-  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-
-  (docker compose version 1.27.4 as of today)
-* Make docker-compose executable
-
-  `$ sudo chmod +x /usr/local/bin/docker-compose`
-
-* Environment variables for oCIS Stack are provided by .env file
+See also [example server setup]({{< ref "preparing_server.md" >}})
 
 ### Setup on server
+
+The application stack is separated in docker containers. One is a traefik proxy which is terminating ssl and forwards the https requests to the internal docker network. Additionally, traefik is creating two certificates that are stored in the file `letsencrypt/acme.json` of the users home directory. In a local setup, this traefik is not included.
+The next container is the ocis server which is exposing the webservice on port 9200 to traefik and provides the oidc provider `konnectd` to owncloud.
+oc10 is running as a three container setup out of owncloud-server, a db container and a redis container as memcache storage.
 
 * Clone ocis repository
 
@@ -84,11 +61,6 @@ The described setup can also be used to do a zero-downtime migration from ownClo
 
   The domains from your `.env` will be used for building the configuration files during the docker start.
 
-### Stack
-
-The application stack is separated in docker containers. One is a traefik proxy which is terminating ssl and forwards the https requests to the internal docker network. Additionally, traefik is creating two certificates that are stored in the file `letsencrypt/acme.json` of the users home directory. In a local setup, this traefik is not included.
-The next container is the ocis server which is exposing the webservice on port 9200 to traefik and provides the oidc provider `konnectd` to owncloud.
-oc10 is running as a three container setup out of owncloud-server, a db container and a redis container as memcache storage.
 
 ### Config
 
@@ -366,7 +338,8 @@ Constraints: In this setup it's mandatory that the user has an email address set
 Especially the default admin user doesn't have an email assigned. If your admin user doesn't have an email address, yet, please
 set one: `docker-compose exec owncloud occ user:modify admin email "admin@example.org"`
 
-## Local deployment
+## Local setup
+For simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
 
 If you want to start the bridge setup on your local development machine, there are a few steps necessary:
 

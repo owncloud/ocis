@@ -24,19 +24,10 @@ We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), 
 {{< mermaid class="text-center">}}
 graph TD
 proxy -->
-    konnectd & ocis-phoenix & thumbnails & ocs & webdav
+    konnectd & ocis-phoenix & thumbnails & ocs & webdav & storage & accounts & store & settings
 
-ocis-phoenix --> ocis-reva-fronted
-ocis-reva-fronted --> ocis-reva-gateway
 konnectd --> glauth
 
+storage --> REVA
 
-ocis-reva-gateway --> accounts
-ocis-reva-gateway --> ocis-reva-authbasic
-ocis-reva-gateway --> ocis-reva-auth-bearer
-
-ocis-reva-gateway --> ocis-reva-sharing
-ocis-reva-gateway --> ocis-reva-storage-home-*
-ocis-reva-storage-home-* --> ocis-reva-storage-home-*-data
-ocis-reva-sharing --> redis
 {{< /mermaid >}}
