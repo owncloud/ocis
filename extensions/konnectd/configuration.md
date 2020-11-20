@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-20T13:42:51+0000"
+date: "2020-11-20T14:49:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -36,21 +36,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### konnectd ocis-konnectd
-
-Serve Konnectd API for oCIS
-
-Usage: `konnectd ocis-konnectd [command options] [arguments...]`
-
---log-level | $KONNECTD_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $KONNECTD_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $KONNECTD_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### konnectd server
 
@@ -161,7 +146,7 @@ Usage: `konnectd server [command options] [arguments...]`
 : Allow sign in of client controlled guest users.
 
 --allow-dynamic-client-registration | $KONNECTD_ALLOW_DYNAMIC_CLIENT_REGISTRATION  
-: Allow dynamic OAuth2 client registration.
+: Allow dynamic OAuth2 client registration. Default: `true`.
 
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
@@ -186,4 +171,19 @@ Usage: `konnectd health [command options] [arguments...]`
 
 --debug-addr | $KONNECTD_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9134`.
+
+### konnectd ocis-konnectd
+
+Serve Konnectd API for oCIS
+
+Usage: `konnectd ocis-konnectd [command options] [arguments...]`
+
+--log-level | $KONNECTD_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $KONNECTD_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $KONNECTD_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
