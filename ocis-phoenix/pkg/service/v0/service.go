@@ -81,10 +81,6 @@ func (p Phoenix) getPayload() (payload []byte, err error) {
 					ID:   "accounts",
 					Path: "/accounts.js",
 				},
-				{
-					ID:   "onlyoffice",
-					Path: "/onlyoffice.js",
-				},
 			}
 		}
 
