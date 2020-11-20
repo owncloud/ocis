@@ -13,8 +13,26 @@ const appInfo = {
       },
       newFileMenu: {
         menuTitle($gettext) {
-          return $gettext('New Onlyoffice document')
+          return $gettext('New OnlyOFFICE document')
         }
+      }
+    },
+    {
+      extension: 'xlsx',
+      handler: function(config, filePath, fileId) {
+        window.open(
+          `${config.server}/apps/onlyoffice/${fileId}?filePath=${encodeURIComponent(filePath)}`,
+          '_blank'
+        )
+      }
+    },
+    {
+      extension: 'pptx',
+      handler: function(config, filePath, fileId) {
+        window.open(
+          `${config.server}/apps/onlyoffice/${fileId}?filePath=${encodeURIComponent(filePath)}`,
+          '_blank'
+        )
       }
     }
   ]
