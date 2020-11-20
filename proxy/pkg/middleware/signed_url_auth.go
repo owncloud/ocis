@@ -6,6 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/google/uuid"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -13,10 +18,6 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 )
 
 // SignedURLAuth provides a middleware to check access secured by a signed URL.
@@ -96,6 +97,9 @@ func (m signedURLAuth) claims(credential string) (*ocisoidc.StandardClaims, erro
 }
 
 func (m signedURLAuth) shouldServe(req *http.Request) bool {
+	if !m.preSignedURLConfig.Enabled {
+		return false
+	}
 	return req.URL.Query().Get("OC-Signature") != ""
 }
 
