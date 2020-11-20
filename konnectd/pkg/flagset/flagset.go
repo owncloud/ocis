@@ -303,6 +303,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "allow-dynamic-client-registration",
 			Usage:       "Allow dynamic OAuth2 client registration",
 			EnvVars:     []string{"KONNECTD_ALLOW_DYNAMIC_CLIENT_REGISTRATION"},
+			Value:       true,
 			Destination: &cfg.Konnectd.AllowDynamicClientRegistration,
 		},
 		&cli.BoolFlag{
