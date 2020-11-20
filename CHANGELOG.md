@@ -2,6 +2,7 @@
 
 ## Summary
 
+* Bugfix - Enable scrolling in accounts list: [#909](https://github.com/owncloud/ocis/pull/909)
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
@@ -72,6 +73,7 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
+* Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
@@ -81,6 +83,14 @@
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
+
+* Bugfix - Enable scrolling in accounts list: [#909](https://github.com/owncloud/ocis/pull/909)
+
+   Tags: accounts
+
+   We've fixed the accounts list to enable scrolling.
+
+   https://github.com/owncloud/ocis/pull/909
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 
@@ -1605,6 +1615,12 @@
    services should talk to this storage directly, bypassing reva-gateway.
 
    https://github.com/owncloud/ocis/pull/602
+
+* Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
+
+   Logs client access at the proxy
+
+   https://github.com/owncloud/ocis/pull/889
 
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 
