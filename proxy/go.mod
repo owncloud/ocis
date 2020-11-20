@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
-	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
+	github.com/cs3org/reva v1.4.1-0.20201120104232-f5afafc04c3b
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.1.2
 	github.com/justinas/alice v1.2.0
@@ -28,7 +28,7 @@ require (
 	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	google.golang.org/grpc v1.33.1
+	google.golang.org/grpc v1.33.2
 )
 
 replace (

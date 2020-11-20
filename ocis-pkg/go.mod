@@ -7,7 +7,7 @@ require (
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
-	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
+	github.com/cs3org/reva v1.4.1-0.20201120104232-f5afafc04c3b
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/iancoleman/strcase v0.1.2
@@ -26,7 +26,7 @@ require (
 	go.opencensus.io v0.22.5
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	google.golang.org/grpc v1.33.1
+	google.golang.org/grpc v1.33.2
 	honnef.co/go/tools v0.0.1-2020.1.5
 )
 
