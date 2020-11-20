@@ -30,14 +30,10 @@ func Static(root string, fs http.FileSystem, ttl int) func(http.Handler) http.Ha
 			if strings.HasPrefix(r.URL.Path, path.Join(root, "api")) {
 				next.ServeHTTP(w, r)
 			} else {
-				if strings.HasSuffix(r.URL.Path, "/") {
-					http.NotFound(w, r)
-				} else {
-					w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
-					w.Header().Set("Last-Modified", lastModified)
-					w.Header().Del("Expires")
-					static.ServeHTTP(w, r)
-				}
+				w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+				w.Header().Set("Last-Modified", lastModified)
+				w.Header().Del("Expires")
+				static.ServeHTTP(w, r)
 			}
 		})
 	}
