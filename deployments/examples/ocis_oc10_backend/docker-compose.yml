@@ -70,7 +70,6 @@ services:
       OWNCLOUD_MYSQL_UTF8MB4: "true"
       OWNCLOUD_REDIS_ENABLED: "true"
       OWNCLOUD_REDIS_HOST: redis
-      OWNCLOUD_DEBUG: "true"
       OWNCLOUD_TRUSTED_PROXIES: ${OC10_DOMAIN}
       OWNCLOUD_OVERWRITE_PROTOCOL: https
       OWNCLOUD_OVERWRITE_HOST: ${OC10_DOMAIN}
@@ -111,6 +110,7 @@ services:
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_OIDC_INSECURE: "${INSECURE}"
+      PROXY_ENABLE_PRESIGNEDURLS: "false"
       # konnectd - binddn must exist as oc10 admin user
       KONNECTD_ISS: https://${OCIS_DOMAIN}
       KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"

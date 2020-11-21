@@ -226,12 +226,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		// Presigned URLs
-
 		&cli.StringSliceFlag{
 			Name:    "presignedurl-allow-method",
 			Value:   cli.NewStringSlice("GET"),
 			Usage:   "--presignedurl-allow-method GET [--presignedurl-allow-method POST]",
 			EnvVars: []string{"PRESIGNEDURL_ALLOWED_METHODS"},
+		},
+		&cli.BoolFlag{
+			Name:        "enable-presignedurls",
+			Value:       true,
+			Usage:       "Enable or disable handling the presigned urls in the proxy",
+			EnvVars:     []string{"PROXY_ENABLE_PRESIGNEDURLS"},
+			Destination: &cfg.PreSignedURL.Enabled,
 		},
 
 		// Basic auth
