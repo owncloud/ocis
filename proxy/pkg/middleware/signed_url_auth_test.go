@@ -10,13 +10,17 @@ func TestSignedURLAuth_shouldServe(t *testing.T) {
 	pua := signedURLAuth{}
 	tests := []struct {
 		url      string
+		enabled  bool
 		expected bool
 	}{
-		{"https://example.com/example.jpg", false},
-		{"https://example.com/example.jpg?OC-Signature=something", true},
+		{"https://example.com/example.jpg", true, false},
+		{"https://example.com/example.jpg?OC-Signature=something", true, true},
+		{"https://example.com/example.jpg", false, false},
+		{"https://example.com/example.jpg?OC-Signature=something", false, false},
 	}
 
 	for _, tt := range tests {
+		pua.preSignedURLConfig.Enabled = tt.enabled
 		r := httptest.NewRequest("", tt.url, nil)
 		result := pua.shouldServe(r)
 
@@ -102,7 +106,7 @@ func TestSignedURLAuth_urlIsExpired(t *testing.T) {
 	}
 
 	tests := []struct {
-		url      string
+		url       string
 		isExpired bool
 	}{
 		{"http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=61", false},
