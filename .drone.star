@@ -97,7 +97,7 @@ config = {
             'webUISharingPermissionToRoot',
         ],
         'webUIResharing': [
-            'webUIResharing', # for now run this suite by itself see https://github.com/owncloud//issues/736
+            'webUIResharing',
         ],
         'webUIResharingToRoot': [
             'webUIResharingToRoot',
