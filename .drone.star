@@ -20,53 +20,122 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '779d002fb18e5f183c8a3fe012558f6dd1de8ba2',
-    'suites': {
-      'phoenixWebUI1': [
-        'webUICreateFilesFolders',
-        'webUIDeleteFilesFolders',
-        'webUIFavorites',
-      ],
-      'phoenixWebUI2' : [
-        'webUIFiles',
-        'webUILogin',
-        'webUINotifications',
-        'webUIPrivateLinks',
-      ],
-      'phoenixWebUI3': [
-        'webUIAccount',
-        'webUIRenameFiles',
-        'webUIRenameFolders',
-      ],
-      'phoenixWebUI4': [
-        'webUITrashbin',
-        'webUIUpload',
-        'webUIRestrictSharing',
+    'phoenixCommit': 'f1d6f39a31ca77cf85f1c687b85e9086edf462cc',
+      'suites': {
+        'webUIBasic': [
+          'webUILogin',
+          'webUINotifications',
+          'webUIPrivateLinks',
+          'webUIPreview',
+          'webUIAccount',
         ],
-      'phoenixWebUI5': [
-        'webUISharingAutocompletion',
-        'webUISharingInternalGroups',
-        'webUISharingInternalUsers',
-        'webUISharingPermissionsUsers',
-        'webUISharingFilePermissionsGroups',
-        'webUISharingFolderPermissionsGroups',
-        'webUISharingFolderAdvancedPermissionsGroups',
+        'webUICreate': [
+          'webUICreateFilesFolders',
         ],
-      'phoenixWebUI6': [
-        'webUIResharing',
-        'webUISharingPublic',
-        'webUISharingPublicDifferentRoles',
-        'webUISharingAcceptShares',
-        'webUISharingNotifications',
-      ],
-      'phoenixWebUI7': [
-        'webUISharingFilePermissionMultipleUsers',
-      ],
-      'phoenixWebUI8': [
-        'webUISharingFolderPermissionMultipleUsers',
-        'webUISharingFolderAdvancedPermissionMultipleUsers',
-      ],
-    }
+        'webUIDelete': [
+          'webUIDeleteFilesFolders',
+        ],
+        'webUIRename': [
+          'webUIRenameFiles',
+          'webUIRenameFolders',
+        ],
+        'webUISharingBasic': [
+          'webUISharingAcceptShares',
+          'webUISharingAcceptSharesToRoot',
+        ],
+        'webUIRestrictSharing': [
+          'webUIRestrictSharing',
+        ],
+        'webUISharingNotifications': [
+          'webUISharingNotifications',
+          'webUISharingNotificationsToRoot',
+        ],
+        'webUIFavorites': [
+            'webUIFavorites',
+        ],
+        'webUIFiles': [
+            'webUIFiles',
+        ],
+        'webUISharingAutocompletion': [
+            'webUISharingAutocompletion',
+        ],
+        'webUISharingInternalGroups': [
+          'webUISharingInternalGroups',
+          'webUISharingInternalGroupsEdgeCases',
+          'webUISharingInternalGroupsSharingIndicator',
+          'webUISharingInternalGroupsToRoot',
+          'webUISharingInternalGroupsToRootEdgeCases',
+          'webUISharingInternalGroupsToRootSharingIndicator',
+        ],
+        'webUISharingInternalUsers': [
+          'webUISharingInternalUsers',
+          'webUISharingInternalUsersBlacklisted',
+          'webUISharingInternalUsersSharingIndicator',
+          'webUISharingInternalUsersToRoot',
+          'webUISharingInternalUsersToRootBlacklisted',
+          'webUISharingInternalUsersToRootSharingIndicator',
+        ],
+        'webUISharingInternalUsersExpire': [
+            'webUISharingInternalUsersExpire',
+        ],
+        'webUISharingInternalUsersExpireToRoot': [
+            'webUISharingInternalUsersExpireToRoot',
+        ],
+        'webUISharingPermissionsUsers': [
+            'webUISharingPermissionsUsers',
+        ],
+        'webUISharingFilePermissionsGroups': [
+            'webUISharingFilePermissionsGroups',
+        ],
+        'webUISharingFolderPermissionsGroups': [
+            'webUISharingFolderPermissionsGroups',
+        ],
+        'webUISharingFolderAdvancedPermissionsGroups': [
+            'webUISharingFolderAdvPermissionsGrp',
+        ],
+        'webUISharingPermissionToRoot': [
+            'webUISharingPermissionToRoot',
+        ],
+        'webUIResharing': [
+            'webUIResharing', # for now run this suite by itself see https://github.com/owncloud//issues/736
+        ],
+        'webUIResharingToRoot': [
+            'webUIResharingToRoot',
+        ],
+        'webUISharingPublic': [
+            'webUISharingPublic',
+        ],
+        'webUISharingPublicExpire': [
+            'webUISharingPublicExpire',
+        ],
+        'webUISharingPublicDifferentRoles': [
+            'webUISharingPublicDifferentRoles',
+        ],
+        'webUITrashbin': [
+            'webUITrashbin',
+        ],
+        'webUITrashbinFilesFolders': [
+            'webUITrashbinFilesFolders',
+        ],
+        'webUITrashbinRestore': [
+            'webUITrashbinRestore',
+        ],
+        'webUIUpload': [
+            'webUIUpload',
+        ],
+        'webUISharingFilePermissionMultipleUsers': [
+            'webUISharingFilePermissionMultipleUsers',
+        ],
+        'webUISharingFolderPermissionMultipleUsers': [
+            'webUISharingFolderPermissionMultipleUsers',
+        ],
+        'webUISharingFolderAdvancedPermissionMultipleUsers': [
+            'webUISharingFolderAdvancedPermissionMU',
+        ],
+        'webUIMoveFilesFolders': [
+            'webUIMove',
+        ],
+      },
   },
   'rocketchat': {
     'channel': 'ocis-internal',
