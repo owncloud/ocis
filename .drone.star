@@ -29,12 +29,8 @@ config = {
           'webUIPreview',
           'webUIAccount',
         ],
-        'webUICreate': [
-          'webUICreateFilesFolders',
-        ],
-        'webUIDelete': [
-          'webUIDeleteFilesFolders',
-        ],
+        'webUICreateFilesFolders': 'webUICreateFilesFolders',
+        'webUIDeleteFilesFolders': 'webUIDeleteFilesFolders',
         'webUIRename': [
           'webUIRenameFiles',
           'webUIRenameFolders',
@@ -43,22 +39,14 @@ config = {
           'webUISharingAcceptShares',
           'webUISharingAcceptSharesToRoot',
         ],
-        'webUIRestrictSharing': [
-          'webUIRestrictSharing',
-        ],
+        'webUIRestrictSharing': 'webUIRestrictSharing',
         'webUISharingNotifications': [
           'webUISharingNotifications',
           'webUISharingNotificationsToRoot',
         ],
-        'webUIFavorites': [
-            'webUIFavorites',
-        ],
-        'webUIFiles': [
-            'webUIFiles',
-        ],
-        'webUISharingAutocompletion': [
-            'webUISharingAutocompletion',
-        ],
+        'webUIFavorites': 'webUIFavorites',
+        'webUIFiles': 'webUIFiles',
+        'webUISharingAutocompletion': 'webUISharingAutocompletion',
         'webUISharingInternalGroups': [
           'webUISharingInternalGroups',
           'webUISharingInternalGroupsEdgeCases',
@@ -75,66 +63,28 @@ config = {
           'webUISharingInternalUsersToRootBlacklisted',
           'webUISharingInternalUsersToRootSharingIndicator',
         ],
-        'webUISharingInternalUsersExpire': [
-            'webUISharingInternalUsersExpire',
-        ],
-        'webUISharingInternalUsersExpireToRoot': [
-            'webUISharingInternalUsersExpireToRoot',
-        ],
-        'webUISharingPermissionsUsers': [
-            'webUISharingPermissionsUsers',
-        ],
-        'webUISharingFilePermissionsGroups': [
-            'webUISharingFilePermissionsGroups',
-        ],
-        'webUISharingFolderPermissionsGroups': [
-            'webUISharingFolderPermissionsGroups',
-        ],
-        'webUISharingFolderAdvancedPermissionsGroups': [
-            'webUISharingFolderAdvPermissionsGrp',
-        ],
-        'webUISharingPermissionToRoot': [
-            'webUISharingPermissionToRoot',
-        ],
-        'webUIResharing': [
-            'webUIResharing',
-        ],
-        'webUIResharingToRoot': [
-            'webUIResharingToRoot',
-        ],
-        'webUISharingPublic': [
-            'webUISharingPublic',
-        ],
-        'webUISharingPublicExpire': [
-            'webUISharingPublicExpire',
-        ],
-        'webUISharingPublicDifferentRoles': [
-            'webUISharingPublicDifferentRoles',
-        ],
-        'webUITrashbin': [
-            'webUITrashbin',
-        ],
-        'webUITrashbinFilesFolders': [
-            'webUITrashbinFilesFolders',
-        ],
-        'webUITrashbinRestore': [
-            'webUITrashbinRestore',
-        ],
-        'webUIUpload': [
-            'webUIUpload',
-        ],
-        'webUISharingFilePermissionMultipleUsers': [
-            'webUISharingFilePermissionMultipleUsers',
-        ],
-        'webUISharingFolderPermissionMultipleUsers': [
-            'webUISharingFolderPermissionMultipleUsers',
-        ],
+        'webUISharingInternalUsersExpire': 'webUISharingInternalUsersExpire',
+        'webUISharingInternalUsersExpireToRoot': 'webUISharingInternalUsersExpireToRoot',
+        'webUISharingPermissionsUsers': 'webUISharingPermissionsUsers',
+        'webUISharingFilePermissionsGroups': 'webUISharingFilePermissionsGroups',
+        'webUISharingFolderPermissionsGroups': 'webUISharingFolderPermissionsGroups',
+        'webUISharingFolderAdvancedPermissionsGroups': 'webUISharingFolderAdvPermissionsGrp',
+        'webUISharingPermissionToRoot': 'webUISharingPermissionToRoot',
+        'webUIResharing': 'webUIResharing',
+        'webUIResharingToRoot': 'webUIResharingToRoot',
+        'webUISharingPublic': 'webUISharingPublic',
+        'webUISharingPublicExpire': 'webUISharingPublicExpire',
+        'webUISharingPublicDifferentRoles': 'webUISharingPublicDifferentRoles',
+        'webUITrashbin': 'webUITrashbin',
+        'webUITrashbinFilesFolders': 'webUITrashbinFilesFolders',
+        'webUITrashbinRestore': 'webUITrashbinRestore',
+        'webUIUpload': 'webUIUpload',
+        'webUISharingFilePermissionMultipleUsers': 'webUISharingFilePermissionMultipleUsers',
+        'webUISharingFolderPermissionMultipleUsers': 'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers': [
             'webUISharingFolderAdvancedPermissionMU',
         ],
-        'webUIMoveFilesFolders': [
-            'webUIMove',
-        ],
+        'webUIMoveFilesFolders': 'webUIMoveFilesFolders',
       },
   },
   'rocketchat': {
@@ -549,8 +499,12 @@ def uiTests(ctx, phoenixBranch, phoenixCommit):
 def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = getUITestSuites()
   paths = ""
-  for path in suites[suiteName]:
-    paths = paths + "tests/acceptance/features/" + path + " "
+  suite = suites[suiteName]
+  if type(suite) == "list":
+    for path in suite:
+      paths = paths + "tests/acceptance/features/" + path + " "
+  else:
+    paths = paths + "tests/acceptance/features/" + suite + " "
 
   return {
     'kind': 'pipeline',
