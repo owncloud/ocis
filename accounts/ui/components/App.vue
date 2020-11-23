@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="uk-flex uk-flex-column" id="accounts-app">
+    <div class="uk-flex uk-flex-column uk-height-1-1" id="accounts-app">
       <template v-if="isInitialized">
         <div class="oc-app-bar">
           <accounts-batch-actions
@@ -10,7 +10,7 @@
           />
           <accounts-create v-else />
         </div>
-        <oc-grid class="uk-height-1-1 uk-flex-1 uk-overflow-auto">
+        <oc-grid class="uk-flex-1 uk-overflow-auto">
           <div class="uk-width-expand">
             <accounts-list :accounts="accounts" />
           </div>

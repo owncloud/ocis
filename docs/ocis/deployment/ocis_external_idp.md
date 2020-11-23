@@ -1,59 +1,36 @@
 ---
-title: "ocis with konnectd on external node deployment scenario"
+title: "oCIS with external IDP"
 date: 2020-10-12T14:39:00+01:00
 weight: 26
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_external_konnectd.md
+geekdocFilePath: ocis_external_idp.md
 ---
 
 {{< toc >}}
 
-This scenario shows how to setup ocis with konnectd as idp running on a separate node. Both node are having separate domains pointing on the servers.
+This scenario shows how to setup oCIS and konnectd as external IDP (identity provider). Both have separate domains and will be configured to work together.
 
 ## Overview
 
-* ocis and konnectd running on linux nodes behind traefik as reverse proxy
-* Cloudflare DNS is resolving the domains
-* Letsencrypt provides ssl certificates for the domains
-* Traefik docker container terminates ssl and forwards http requests to the services
+* Server 1: oCIS running behind traefik as reverse proxy
+* Server 2: IDP running behind traefik as reverse proxy
+* Valid ssl certificates for the domains for ssl termination
 
-## Nodes
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_external_konnectd)
+
+
+
+## Server Deployment
 
 ### Requirements
 
-* Server running Ubuntu 20.04 is public availible with a static ip address
-* Two A-records for both domains are pointing on the servers ip address
-* Create user
+* 2 Linux servers, each with docker and docker-compose installed
+* Two domains set up and pointing to the target server
 
-  `$ sudo adduser username`
+See also [example server setup]({{< ref "preparing_server.md" >}})
 
-* Add user to sudo group
-
-  `$ sudo usermod -aG sudo username`
-
-* Add users pub key to `~/.ssh/authorized_keys`
-* Setup ssh to permit authorisation only by ssh key
-* Install docker
-
-  `$ sudo apt install docker.io`
-
-* Add user to docker group
-
-  `$ sudo usermod -aG docker username`
-
-* Install docker-compose via
-
-  `$ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-
-  (docker compose version 1.27.4 as of today)
-* Make docker-compose executable
-
-  `$ sudo chmod +x /usr/local/bin/docker-compose`
-
-* Environment variables for OCIS Stack are provided by .env file
-
-### Setup on ocis server
+### Install oCIS server
 
 * Clone ocis repository
 
@@ -77,7 +54,7 @@ This scenario shows how to setup ocis with konnectd as idp running on a separate
 
   `docker-compose up -d`
 
-### Setup on idp server
+### Install IDP server
 
 * Clone ocis repository
 
@@ -105,11 +82,7 @@ This scenario shows how to setup ocis with konnectd as idp running on a separate
 
   `docker-compose up -d`
 
-### Stack
-
-On both nodes, a traefik dokcer container is terminating ssl and forwards the http requests to the services. The nodes are named according to their services.
-
-### Config
+### Configuration
 
 #### Repository structure
 
@@ -192,3 +165,8 @@ ocis:
       - 9125:9125
 ...
 ```
+
+## Local setup
+For simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
+
+Local setup coming soon

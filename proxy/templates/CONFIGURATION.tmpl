@@ -3,8 +3,8 @@ title: "Configuration"
 date: "{{ date "2006-01-02T15:04:05-0700" now }}"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/proxy
-geekdocFilePath: configuration.md
+geekdocEditPath: edit/master/proxy/templates
+geekdocFilePath: CONFIGURATION.tmpl
 ---
 {{- define "options"}}
 {{ $fnName := (last . ).Flags -}}
@@ -41,7 +41,7 @@ For this configuration to be picked up, have a look at your extension `root` com
 
 So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
-### Envrionment variables
+### Environment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 

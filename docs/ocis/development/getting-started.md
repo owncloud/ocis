@@ -19,7 +19,7 @@ To build and run your local ocis code with default storage driver
 docker run --rm -ti --name ocis -v $PWD:/ocis -p 9200:9200 owncloud/eos-ocis-dev
 ```
 
-The eos-ocis-dev container will build and run ocis using the owncloud storage driver and store files in the container at `/var/tmp/reva/data/<username>/files`
+The eos-ocis-dev container will build and run oCIS using the ownCloud storage driver and store files in the container at `/var/tmp/reva/data/<username>/files`
 
 To check the uploaded files start digging with: `docker exec -it ocis ls -l /var/tmp/reva/`
 

@@ -135,6 +135,7 @@ type TokenManager struct {
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string
+	Enabled            bool
 }
 
 // MigrationSelectorConf is the config for the migration-selector

@@ -2,6 +2,7 @@
 
 ## Summary
 
+* Bugfix - Enable scrolling in accounts list: [#909](https://github.com/owncloud/ocis/pull/909)
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 * Bugfix - Don't enforce empty external apps slice: [#473](https://github.com/owncloud/ocis/pull/473)
 * Bugfix - Lower Bound was not working for the cs3 api index implementation: [#741](https://github.com/owncloud/ocis/pull/741)
@@ -14,6 +15,7 @@
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 * Bugfix - Allow consent-prompt with switch-account: [#788](https://github.com/owncloud/ocis/pull/788)
 * Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
+* Bugfix - Serve index.html for directories: [#912](https://github.com/owncloud/ocis/pull/912)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
@@ -23,6 +25,7 @@
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
+* Change - Enable OpenID dynamic client registration: [#811](https://github.com/owncloud/ocis/issues/811)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 * Change - Improve reva service descriptions: [#536](https://github.com/owncloud/ocis/pull/536)
 * Change - Initial release of basic version: [#2](https://github.com/owncloud/ocis/issues/2)
@@ -72,6 +75,8 @@
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
 * Enhancement - Launch a storage to store ocis-metadata: [#602](https://github.com/owncloud/ocis/pull/602)
+* Enhancement - Add a version command to ocis: [#915](https://github.com/owncloud/ocis/pull/915)
+* Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
@@ -81,6 +86,14 @@
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
 ## Details
+
+* Bugfix - Enable scrolling in accounts list: [#909](https://github.com/owncloud/ocis/pull/909)
+
+   Tags: accounts
+
+   We've fixed the accounts list to enable scrolling.
+
+   https://github.com/owncloud/ocis/pull/909
 
 * Bugfix - Add missing env vars to docker compose: [#392](https://github.com/owncloud/ocis/pull/392)
 
@@ -188,6 +201,14 @@
 
    https://github.com/owncloud/ocis/pull/737
 
+* Bugfix - Serve index.html for directories: [#912](https://github.com/owncloud/ocis/pull/912)
+
+   The static middleware in ocis-pkg now serves index.html instead of returning 404 on paths with
+   a trailing `/`.
+
+   https://github.com/owncloud/ocis-pkg/issues/63
+   https://github.com/owncloud/ocis/pull/912
+
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 
    Tags: accounts
@@ -277,6 +298,13 @@
    service.
 
    https://github.com/owncloud/ocis/pull/623
+
+* Change - Enable OpenID dynamic client registration: [#811](https://github.com/owncloud/ocis/issues/811)
+
+   Enable OpenID dynamic client registration
+
+   https://github.com/owncloud/ocis/issues/811
+   https://github.com/owncloud/ocis/pull/813
 
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
 
@@ -1605,6 +1633,19 @@
    services should talk to this storage directly, bypassing reva-gateway.
 
    https://github.com/owncloud/ocis/pull/602
+
+* Enhancement - Add a version command to ocis: [#915](https://github.com/owncloud/ocis/pull/915)
+
+   The version command was only implemented in the extensions. This adds the version command to
+   ocis to list all services in the ocis namespace.
+
+   https://github.com/owncloud/ocis/pull/915
+
+* Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
+
+   Logs client access at the proxy
+
+   https://github.com/owncloud/ocis/pull/889
 
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 
