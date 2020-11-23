@@ -1,33 +1,20 @@
 import {sleep, check} from 'k6';
 import {Options} from "k6/options";
-import {sample} from 'lodash';
-import {defaults, tasks} from "./lib";
-import {getFile} from "./lib/utils";
+import {defaults, api, utils} from "./lib";
 
 export let options: Options = {
     insecureSkipTLSVerify: true,
-    vus: 10,
-    duration: '10s',
 };
 
-export const setup = () => {
-    return {}
-}
-
-
 export default () => {
-    const file = getFile();
-    const account = sample(defaults.accounts);
+    Object.keys(defaults.files).forEach(name => {
+        const file = utils.getFile(name);
+        const uploadResponse = api.uploadFile(utils.getAccount(), file.bytes, file.nameRandom)
 
-    const userInfoResponse = tasks.userInfo(account)
-    check(userInfoResponse, {
-        'status is 200': () => userInfoResponse.status === 200,
-    });
-
-    const uploadResponse = tasks.uploadFile(file.bytes, file.name, account)
-    check(uploadResponse, {
-        'status is 201': () => uploadResponse.status === 201,
-    });
+        check(uploadResponse, {
+            'status is 201': () => uploadResponse.status === 201,
+        });
+    })
 
     sleep(1);
 };

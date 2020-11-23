@@ -1,3 +1,3 @@
 export * as defaults from './defaults'
-export * as tasks from './tasks'
+export * as api from './api'
 export * as utils from './utils'
