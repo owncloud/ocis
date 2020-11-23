@@ -148,7 +148,7 @@ def main(ctx):
     notify(ctx),
   ]
 
-  if ctx.build.cron != "":
+  if ctx.build.event == "cron":
     notify_pipelines = notify(ctx)
     notify_pipelines['depends_on'] = getTestPipelinesNames(ctx)
     pipelines = [ before, notify_pipelines ]
