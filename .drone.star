@@ -129,7 +129,12 @@ def main(ctx):
     notify(ctx),
   ]
 
-  if '[docs-only]' in (ctx.build.title + ctx.build.message):
+  if ctx.build.cron != "":
+    notify_pipelines = notify(ctx)
+    notify_pipelines['depends_on'] = getTestPipelinesNames(ctx)
+    pipelines = [ before, notify_pipelines ]
+
+  elif '[docs-only]' in (ctx.build.title + ctx.build.message):
     doc_pipelines = docs(ctx)
     doc_pipelines['depends_on'] = []
 
@@ -140,6 +145,28 @@ def main(ctx):
   else:
     pipelines = before + stages + after
 
+  return pipelines
+
+def getTestPipelinesNames(ctx):
+  pipelines = []
+
+  for module in config['modules']:
+    pipelines.append(testing(ctx, module))
+
+  pipelines += [
+    'localApiTests-apiOcisSpecific-owncloud',
+    'localApiTests-apiOcisSpecific-ocis',
+    'localApiTests-apiBasic-owncloud',
+    'localApiTests-apiBasic-ocis',
+  ]
+
+  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    pipelines.append('Core-API-Tests-ocis-storage-' + runPart)
+    pipelines.append('oC10ApiTests-owncloud-storage-ocis' + runPart)
+
+  pipelines = pipelines + getUITestSuiteNames()
+
+  pipelines.append('accountsUITests')
   return pipelines
 
 def testPipelines(ctx):
