@@ -14,7 +14,8 @@ const appInfo = {
       newFileMenu: {
         menuTitle($gettext) {
           return $gettext('New OnlyOFFICE document')
-        }
+        },
+        icon: 'x-office-document'
       }
     },
     {
