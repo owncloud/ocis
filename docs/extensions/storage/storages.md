@@ -99,7 +99,7 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
 - grant persistence
   - using POSIX ACLs
     - requires an LDAP server to make guest accounts available in the OS
-      - OCIS has glauth which contains all users
+      - oCIS has glauth which contains all users
       - an existing LDAP could be used if guests ar provisioned in another way
   - using extended attributes to implement expiry or sharing that does not require OS level integration
   - fuse filesystem overlay

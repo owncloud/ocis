@@ -130,19 +130,19 @@ BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 
 Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment.
 
-This will run all tests that are relevant to OCIS.
+This will run all tests that are relevant to oCIS.
 
 To run a single test add `BEHAT_FEATURE=<feature file>`
 
 ### use existing tests for BDD
 
 As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in ocis.
-Every scenario that does not work in OCIS with "owncloud" storage, is listed in `tests/acceptance/expected-failures-on-OWNCLOUD-storage.txt` with a link to the related issue.
-Every scenario that does not work in OCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-on-OCIS-storage.txt` with a link to the related issue.
+Every scenario that does not work in oCIS with "owncloud" storage, is listed in `tests/acceptance/expected-failures-on-OWNCLOUD-storage.txt` with a link to the related issue.
+Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-on-OCIS-storage.txt` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
-Similarly, scenarios that do not work in OCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.txt`.
+Similarly, scenarios that do not work in oCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.txt`.
 Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva).
 Those scenarios are in this ocis repository in `tests/acceptance/features/apiOcisSpecific`.
 Have a look into the [documentation](https://doc.owncloud.com/server/developer_manual/testing/acceptance-tests.html#writing-scenarios-for-bugs) to understand why we are writing those tests.
