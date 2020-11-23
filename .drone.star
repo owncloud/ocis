@@ -187,9 +187,6 @@ def getUITestSuites():
 
 def getCoreApiTestPipelineNames():
   names = []
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    names.append('Core-API-Tests-owncloud-storage-%s' % runPart)
-    names.append('Core-API-Tests-ocis-storage-%s' % runPart)
   return names
 
 def getDependsOnAllTestPipelines(ctx):
