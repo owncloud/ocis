@@ -31,7 +31,7 @@ func Static(root string, fs http.FileSystem, ttl int) func(http.Handler) http.Ha
 			if strings.HasPrefix(r.URL.Path, path.Join(root, "api")) {
 				next.ServeHTTP(w, r)
 			} else {
-				w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+				w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
 				w.Header().Set("Expires", expires)
 				w.Header().Set("Last-Modified", lastModified)
 				static.ServeHTTP(w, r)

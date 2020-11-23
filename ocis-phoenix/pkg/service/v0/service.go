@@ -169,7 +169,7 @@ func (p Phoenix) Static(ttl int) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
 		w.Header().Set("Expires", expires)
 		w.Header().Set("Last-Modified", lastModified)
 
