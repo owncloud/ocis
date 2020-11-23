@@ -28,36 +28,46 @@ config = {
           'webUIPrivateLinks',
           'webUIPreview',
           'webUIAccount',
+          'webUIResharing',
         ],
         'webUICreate': [
           'webUICreateFilesFolders',
+          'webUIResharing',
         ],
         'webUIDelete': [
           'webUIDeleteFilesFolders',
+          'webUIResharing',
         ],
         'webUIRename': [
           'webUIRenameFiles',
           'webUIRenameFolders',
+          'webUIResharing',
         ],
         'webUISharingBasic': [
           'webUISharingAcceptShares',
           'webUISharingAcceptSharesToRoot',
+          'webUIResharing',
         ],
         'webUIRestrictSharing': [
           'webUIRestrictSharing',
+          'webUIResharing',
         ],
         'webUISharingNotifications': [
           'webUISharingNotifications',
           'webUISharingNotificationsToRoot',
+          'webUIResharing',
         ],
         'webUIFavorites': [
             'webUIFavorites',
+            'webUIResharing',
         ],
         'webUIFiles': [
             'webUIFiles',
+            'webUIResharing',
         ],
         'webUISharingAutocompletion': [
             'webUISharingAutocompletion',
+            'webUIResharing',
         ],
         'webUISharingInternalGroups': [
           'webUISharingInternalGroups',
@@ -66,6 +76,7 @@ config = {
           'webUISharingInternalGroupsToRoot',
           'webUISharingInternalGroupsToRootEdgeCases',
           'webUISharingInternalGroupsToRootSharingIndicator',
+          'webUIResharing',
         ],
         'webUISharingInternalUsers': [
           'webUISharingInternalUsers',
@@ -74,27 +85,35 @@ config = {
           'webUISharingInternalUsersToRoot',
           'webUISharingInternalUsersToRootBlacklisted',
           'webUISharingInternalUsersToRootSharingIndicator',
+          'webUIResharing',
         ],
         'webUISharingInternalUsersExpire': [
             'webUISharingInternalUsersExpire',
+            'webUIResharing',
         ],
         'webUISharingInternalUsersExpireToRoot': [
             'webUISharingInternalUsersExpireToRoot',
+            'webUIResharing',
         ],
         'webUISharingPermissionsUsers': [
             'webUISharingPermissionsUsers',
+            'webUIResharing',
         ],
         'webUISharingFilePermissionsGroups': [
             'webUISharingFilePermissionsGroups',
+            'webUIResharing',
         ],
         'webUISharingFolderPermissionsGroups': [
             'webUISharingFolderPermissionsGroups',
+            'webUIResharing',
         ],
         'webUISharingFolderAdvancedPermissionsGroups': [
             'webUISharingFolderAdvPermissionsGrp',
+            'webUIResharing',
         ],
         'webUISharingPermissionToRoot': [
             'webUISharingPermissionToRoot',
+            'webUIResharing',
         ],
         'webUIResharing': [
             'webUIResharing', # for now run this suite by itself see https://github.com/owncloud//issues/736
@@ -104,36 +123,47 @@ config = {
         ],
         'webUISharingPublic': [
             'webUISharingPublic',
+            'webUIResharing',
         ],
         'webUISharingPublicExpire': [
             'webUISharingPublicExpire',
+            'webUIResharing',
         ],
         'webUISharingPublicDifferentRoles': [
             'webUISharingPublicDifferentRoles',
+            'webUIResharing',
         ],
         'webUITrashbin': [
             'webUITrashbin',
+            'webUIResharing',
         ],
         'webUITrashbinFilesFolders': [
             'webUITrashbinFilesFolders',
+            'webUIResharing',
         ],
         'webUITrashbinRestore': [
             'webUITrashbinRestore',
+            'webUIResharing',
         ],
         'webUIUpload': [
             'webUIUpload',
+            'webUIResharing',
         ],
         'webUISharingFilePermissionMultipleUsers': [
             'webUISharingFilePermissionMultipleUsers',
+            'webUIResharing',
         ],
         'webUISharingFolderPermissionMultipleUsers': [
             'webUISharingFolderPermissionMultipleUsers',
+            'webUIResharing',
         ],
         'webUISharingFolderAdvancedPermissionMultipleUsers': [
             'webUISharingFolderAdvancedPermissionMU',
+            'webUIResharing',
         ],
         'webUIMoveFilesFolders': [
             'webUIMove',
+            'webUIResharing',
         ],
       },
   },
