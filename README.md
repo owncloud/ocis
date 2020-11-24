@@ -5,97 +5,20 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/gh/owncloud/ocis/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=owncloud/ocis&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/dc97ddfa167641d8b107e9b618823c71)](https://www.codacy.com/gh/owncloud/ocis/dashboard?utm_source=github.com&utm_medium=referral&utm_content=owncloud/ocis&utm_campaign=Badge_Coverage)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis?status.svg)](http://godoc.org/github.com/owncloud/ocis)
-[![Go Report](http://goreportcard.com/badge/github.com/owncloud/ocis)](http://goreportcard.com/report/github.com/owncloud/ocis)
-[![](https://images.microbadger.com/badges/image/owncloud/ocis.svg)](http://microbadger.com/images/owncloud/ocis "Get your own image badge on microbadger.com")
+[![Go Report](https://goreportcard.com/badge/github.com/owncloud/ocis)](https://goreportcard.com/report/github.com/owncloud/ocis)
+[![](https://images.microbadger.com/badges/image/owncloud/ocis.svg)](https://hub.docker.com/r/owncloud/ocis "oCIS docker image")
 
-**This project is under heavy development, it's not in a working state yet!**
+## Run ownCloud Infinite Scale
 
-## Install
-
-You can download prebuilt binaries from the GitHub releases or from our [download mirrors](http://download.owncloud.com/ocis/ocis/). For instructions how to install this on your platform you should take a look at our [documentation](https://owncloud.github.io/ocis/)
+Please see [Getting Started](https://owncloud.github.io/ocis/getting-started/)
 
 ## Development
 
-Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.13.
-
-```console
-git clone https://github.com/owncloud/ocis.git
-cd ocis/ocis
-
-make generate build
-
-./bin/ocis -h
-```
-
-### Folder Structure
-
-This is a monorepo for multiple microservices. The individual services are located in subfolders like `accounts`. The code in the `ocis` subfolder aggregates all the go modules and implements commands to start the individual services or the full-stack server with a default config. It also builds a single binary and docker images.
-
-## Prerequisites
-
-### Redis server
-
-You will need to start a redis server as a cache. The ownCloud storage driver currently will try to connect to the default port.
-A quick way to start one for testing is using this docker instance: `docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
-
-### Root storage
-
-To prepare the root storage you should fill it with two folders. They are necessary for resolving the home and ownCloud storages. This is subject to change.
-
-```console
-mkdir -p /var/tmp/reva/root/{home,oc}
-```
-
-## Quickstart
-
-- Make sure that the binary was built with the above steps.
-- Now start all services with the following command
-
-```console
-./bin/ocis server
-```
-
-- Open <https://localhost:9200>
-- Accept the self-signed certificate (it is regenerated every time the server starts)
-- Login using one of the demo accounts:
-
-```console
-einstein:relativity
-marie:radioactivity
-richard:superfluidity
-```
-
-## Create a local Docker image for testing
-
-Navigate into the root folder of the repository and execute
-
-```console
-docker build -t owncloud/ocis:dev .
-```
-
-To run it, execute
-
-```console
-docker run --rm -ti owncloud/ocis:dev
-```
-
-The image can be tagged however you like, just make sure you run the right one then
-
-## Running single extensions
-
-The list of available extensions can be found in the "Extensions" section when running `./bin/ocis`.
-
-For example to run the "phoenix" extension:
-
-```console
-./bin/ocis --log-level debug phoenix
-```
-
-⚠ do not use the **run** subcommand for running extensions
+Please see [Development - Getting Started](https://owncloud.github.io/ocis/development/getting-started/)
 
 ## Security
 
-If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first
 
 ## Contributing
 

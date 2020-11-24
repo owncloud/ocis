@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 date: 2020-02-27T20:35:00+01:00
-weight: -15
+weight: 0
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: getting-started.md
@@ -47,7 +47,7 @@ docker run --rm -ti -p 9200:9200 owncloud/ocis
 
 ### Login to oCIS Web
 
-Open https://localhost:9200 and login using one of the demo accounts:
+Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
 
 ```console
 einstein:relativity
@@ -61,11 +61,9 @@ moss:vista
 admin:admin
 ```
 
-### Basic Commands
+### Basic Management Commands
 
-The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formatted help output if you execute the binary via `ocis --help`.
-
-The server command is used to start the http and debug server on two addresses within a single process. The http server is serving the general web service while the debug server is used for health check, readiness check and to server the metrics mentioned below.
+The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< relref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< relref "configuration.md" >}}).
 
 To start oCIS server:
 
@@ -73,7 +71,7 @@ To start oCIS server:
 ocis server
 {{< / highlight >}}
 
-The list command prints all running oCIS services.
+The list command prints all running oCIS extensions.
 {{< highlight txt >}}
 ocis list
 {{< / highlight >}}
