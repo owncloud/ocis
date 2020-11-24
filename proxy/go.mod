@@ -26,6 +26,7 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
 	go.opencensus.io v0.22.5
+	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	google.golang.org/grpc v1.33.1

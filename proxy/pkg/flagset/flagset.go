@@ -248,6 +248,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,
 		},
+
+		&cli.IntFlag{
+			Name:        "rate-limit",
+			Value:       100,
+			Usage:       "allowed requests per second",
+			EnvVars:     []string{"PROXY_RATE_LIMIT"},
+			Destination: &cfg.RateLimit,
+		},
 	}
 
 }
