@@ -15,8 +15,6 @@ export default [
     external: [
       'k6',
       'k6/http',
-      ...Object.keys(pkg.devDependencies || {}).map(d => new RegExp(`${ d }(\/.*)?`)),
-      ...Object.keys(pkg.peerDependencies || {}).map(d => new RegExp(`${ d }(\/.*)?`)),
     ],
     output: [
       {
