@@ -6,7 +6,7 @@ import { terser } from 'rollup-plugin-terser'
 import multiInput from 'rollup-plugin-multi-input';
 import path from 'path';
 
-const extensions = ['.js', '.jsx', '.ts', '.tsx']
+const extensions = ['.js', '.ts'];
 
 export default [
   {
