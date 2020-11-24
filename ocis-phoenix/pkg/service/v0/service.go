@@ -146,6 +146,7 @@ func (p Phoenix) Static(ttl int) http.HandlerFunc {
 
 	// we don't have a last modification date of the static assets, so we use the service start date
 	lastModified := time.Now().UTC().Format(http.TimeFormat)
+	expires := time.Now().Add(time.Second * time.Duration(ttl)).UTC().Format(http.TimeFormat)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if rootWithSlash != "/" && r.URL.Path == p.config.HTTP.Root {
@@ -168,9 +169,9 @@ func (p Phoenix) Static(ttl int) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", strconv.Itoa(ttl)))
+		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
+		w.Header().Set("Expires", expires)
 		w.Header().Set("Last-Modified", lastModified)
-		w.Header().Del("Expires")
 
 		static.ServeHTTP(w, r)
 	}

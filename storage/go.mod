@@ -3,7 +3,7 @@ module github.com/owncloud/ocis/storage
 go 1.13
 
 require (
-	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
+	github.com/cs3org/reva v1.4.1-0.20201123062044-b2c4af4e897d
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1

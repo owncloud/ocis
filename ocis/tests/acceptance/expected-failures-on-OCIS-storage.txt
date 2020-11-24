@@ -322,7 +322,6 @@ apiShareManagementToShares/acceptShares.feature:71
 apiShareManagementToShares/acceptShares.feature:162
 apiShareManagementToShares/acceptShares.feature:175
 apiShareManagementToShares/acceptShares.feature:196
-apiShareManagementToShares/acceptShares.feature:216
 apiShareManagementToShares/acceptShares.feature:249
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:28
 apiShareManagementToShares/acceptSharesToSharesFolder.feature:48
@@ -415,11 +414,6 @@ apiShareManagementBasicToShares/deleteShareFromShares.feature:181
 apiShareManagementBasicToShares/deleteShareFromShares.feature:182
 apiShareManagementBasicToShares/deleteShareFromShares.feature:183
 apiShareManagementBasicToShares/deleteShareFromShares.feature:184
-#
-# https://github.com/owncloud/ocis-reva/issues/260 Sharee retrieves the information about a share -but gets response containing all the shares
-#
-apiShareOperationsToShares/accessToShare.feature:55
-apiShareOperationsToShares/accessToShare.feature:56
 #
 # https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
 #
@@ -1430,7 +1424,6 @@ apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36
 apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
-apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:40
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1448,7 +1441,6 @@ apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:20
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:37
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38
 apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
-apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:42
 #
 # https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
 #
@@ -1469,12 +1461,7 @@ apiWebdavUpload2/uploadFileUsingNewChunking.feature:169
 #
 # https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
 #
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:25
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:34
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:43
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:75
-apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:96
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:98

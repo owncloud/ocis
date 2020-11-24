@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'f1d6f39a31ca77cf85f1c687b85e9086edf462cc',
+    'phoenixCommit': '4395234656fb70c869ee960ca5d7b853ffcc5ef8',
       'suites': {
         'webUIBasic': [
           'webUILogin',
@@ -29,12 +29,8 @@ config = {
           'webUIPreview',
           'webUIAccount',
         ],
-        'webUICreate': [
-          'webUICreateFilesFolders',
-        ],
-        'webUIDelete': [
-          'webUIDeleteFilesFolders',
-        ],
+        'webUICreateFilesFolders': 'webUICreateFilesFolders',
+        'webUIDeleteFilesFolders': 'webUIDeleteFilesFolders',
         'webUIRename': [
           'webUIRenameFiles',
           'webUIRenameFolders',
@@ -43,22 +39,14 @@ config = {
           'webUISharingAcceptShares',
           'webUISharingAcceptSharesToRoot',
         ],
-        'webUIRestrictSharing': [
-          'webUIRestrictSharing',
-        ],
+        'webUIRestrictSharing': 'webUIRestrictSharing',
         'webUISharingNotifications': [
           'webUISharingNotifications',
           'webUISharingNotificationsToRoot',
         ],
-        'webUIFavorites': [
-            'webUIFavorites',
-        ],
-        'webUIFiles': [
-            'webUIFiles',
-        ],
-        'webUISharingAutocompletion': [
-            'webUISharingAutocompletion',
-        ],
+        'webUIFavorites': 'webUIFavorites',
+        'webUIFiles': 'webUIFiles',
+        'webUISharingAutocompletion': 'webUISharingAutocompletion',
         'webUISharingInternalGroups': [
           'webUISharingInternalGroups',
           'webUISharingInternalGroupsEdgeCases',
@@ -75,66 +63,28 @@ config = {
           'webUISharingInternalUsersToRootBlacklisted',
           'webUISharingInternalUsersToRootSharingIndicator',
         ],
-        'webUISharingInternalUsersExpire': [
-            'webUISharingInternalUsersExpire',
-        ],
-        'webUISharingInternalUsersExpireToRoot': [
-            'webUISharingInternalUsersExpireToRoot',
-        ],
-        'webUISharingPermissionsUsers': [
-            'webUISharingPermissionsUsers',
-        ],
-        'webUISharingFilePermissionsGroups': [
-            'webUISharingFilePermissionsGroups',
-        ],
-        'webUISharingFolderPermissionsGroups': [
-            'webUISharingFolderPermissionsGroups',
-        ],
-        'webUISharingFolderAdvancedPermissionsGroups': [
-            'webUISharingFolderAdvPermissionsGrp',
-        ],
-        'webUISharingPermissionToRoot': [
-            'webUISharingPermissionToRoot',
-        ],
-        'webUIResharing': [
-            'webUIResharing',
-        ],
-        'webUIResharingToRoot': [
-            'webUIResharingToRoot',
-        ],
-        'webUISharingPublic': [
-            'webUISharingPublic',
-        ],
-        'webUISharingPublicExpire': [
-            'webUISharingPublicExpire',
-        ],
-        'webUISharingPublicDifferentRoles': [
-            'webUISharingPublicDifferentRoles',
-        ],
-        'webUITrashbin': [
-            'webUITrashbin',
-        ],
-        'webUITrashbinFilesFolders': [
-            'webUITrashbinFilesFolders',
-        ],
-        'webUITrashbinRestore': [
-            'webUITrashbinRestore',
-        ],
-        'webUIUpload': [
-            'webUIUpload',
-        ],
-        'webUISharingFilePermissionMultipleUsers': [
-            'webUISharingFilePermissionMultipleUsers',
-        ],
-        'webUISharingFolderPermissionMultipleUsers': [
-            'webUISharingFolderPermissionMultipleUsers',
-        ],
+        'webUISharingInternalUsersExpire': 'webUISharingInternalUsersExpire',
+        'webUISharingInternalUsersExpireToRoot': 'webUISharingInternalUsersExpireToRoot',
+        'webUISharingPermissionsUsers': 'webUISharingPermissionsUsers',
+        'webUISharingFilePermissionsGroups': 'webUISharingFilePermissionsGroups',
+        'webUISharingFolderPermissionsGroups': 'webUISharingFolderPermissionsGroups',
+        'webUISharingFolderAdvancedPermissionsGroups': 'webUISharingFolderAdvPermissionsGrp',
+        'webUISharingPermissionToRoot': 'webUISharingPermissionToRoot',
+        'webUIResharing': 'webUIResharing',
+        'webUIResharingToRoot': 'webUIResharingToRoot',
+        'webUISharingPublic': 'webUISharingPublic',
+        'webUISharingPublicExpire': 'webUISharingPublicExpire',
+        'webUISharingPublicDifferentRoles': 'webUISharingPublicDifferentRoles',
+        'webUITrashbin': 'webUITrashbin',
+        'webUITrashbinFilesFolders': 'webUITrashbinFilesFolders',
+        'webUITrashbinRestore': 'webUITrashbinRestore',
+        'webUIUpload': 'webUIUpload',
+        'webUISharingFilePermissionMultipleUsers': 'webUISharingFilePermissionMultipleUsers',
+        'webUISharingFolderPermissionMultipleUsers': 'webUISharingFolderPermissionMultipleUsers',
         'webUISharingFolderAdvancedPermissionMultipleUsers': [
             'webUISharingFolderAdvancedPermissionMU',
         ],
-        'webUIMoveFilesFolders': [
-            'webUIMove',
-        ],
+        'webUIMoveFilesFolders': 'webUIMoveFilesFolders',
       },
   },
   'rocketchat': {
@@ -198,10 +148,10 @@ def main(ctx):
     notify(ctx),
   ]
 
-  if ctx.build.cron != "":
+  if ctx.build.event == "cron":
     notify_pipelines = notify(ctx)
     notify_pipelines['depends_on'] = getTestPipelinesNames(ctx)
-    pipelines = [ before, notify_pipelines ]
+    pipelines = before + [ notify_pipelines ]
 
   elif '[docs-only]' in (ctx.build.title + ctx.build.message):
     doc_pipelines = docs(ctx)
@@ -217,10 +167,7 @@ def main(ctx):
   return pipelines
 
 def getTestPipelinesNames(ctx):
-  pipelines = []
-
-  for module in config['modules']:
-    pipelines.append(testing(ctx, module))
+  pipelines = getTestSuiteNames()
 
   pipelines += [
     'localApiTests-apiOcisSpecific-owncloud',
@@ -230,8 +177,8 @@ def getTestPipelinesNames(ctx):
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append('Core-API-Tests-ocis-storage-' + runPart)
-    pipelines.append('oC10ApiTests-owncloud-storage-ocis' + runPart)
+    pipelines.append('Core-API-Tests-ocis-storage-%s' % (runPart))
+    pipelines.append('Core-API-Tests-owncloud-storage-%s' % (runPart))
 
   pipelines = pipelines + getUITestSuiteNames()
 
@@ -267,8 +214,7 @@ def testing(ctx, module):
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
-        'cd %s' % (module),
-        'make vet',
+        'make -C %s vet' % (module),
       ],
       'volumes': [
         {
@@ -282,8 +228,7 @@ def testing(ctx, module):
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
-        'cd %s' % (module),
-        'make staticcheck',
+        'make -C %s staticcheck' % (module),
       ],
       'volumes': [
         {
@@ -297,8 +242,7 @@ def testing(ctx, module):
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
-        'cd %s' % (module),
-        'make lint',
+        'make -C %s lint' % (module),
       ],
       'volumes': [
         {
@@ -312,9 +256,8 @@ def testing(ctx, module):
         'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
-          'cd %s' % (module),
-          'make test',
-          'mv coverage.out %s_coverage.out' % (module),
+          'make -C %s test' % (module),
+          'mv %s/coverage.out %s_coverage.out' % (module, module),
         ],
         'volumes': [
           {
@@ -331,10 +274,9 @@ def testing(ctx, module):
             'from_secret': 'cache_s3_endpoint'
           },
           'bucket': 'cache',
-          'source': '%s/%s_coverage.out' % (module, module),
+          'source': '%s_coverage.out' % (module),
           'target': '%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
           'path_style': True,
-          'strip_prefix': module,
           'access_key': {
             'from_secret': 'cache_s3_access_key'
           },
@@ -466,8 +408,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'PATH_TO_CORE': '/srv/app/testrunner',
         },
         'commands': [
-          'cd ocis',
-          'make test-acceptance-api',
+          'make -C ocis test-acceptance-api',
         ],
         'volumes': [{
           'name': 'gopath',
@@ -523,8 +464,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
           'EXPECTED_FAILURES_FILE': '/drone/src/ocis/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
         },
         'commands': [
-          'cd /srv/app/testrunner',
-          'make test-acceptance-api',
+          'make -C /srv/app/testrunner test-acceptance-api',
         ],
         'volumes': [{
           'name': 'gopath',
@@ -556,8 +496,12 @@ def uiTests(ctx, phoenixBranch, phoenixCommit):
 def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = getUITestSuites()
   paths = ""
-  for path in suites[suiteName]:
-    paths = paths + "tests/acceptance/features/" + path + " "
+  suite = suites[suiteName]
+  if type(suite) == "list":
+    for path in suite:
+      paths = paths + "tests/acceptance/features/" + path + " "
+  else:
+    paths = paths + "tests/acceptance/features/" + suite + " "
 
   return {
     'kind': 'pipeline',
@@ -923,8 +867,7 @@ def binary(ctx, name):
         'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
-          'cd ocis',
-          'make release-%s' % (name),
+          'make -C ocis release-%s' % (name),
         ],
         'volumes': [
           {
@@ -938,8 +881,7 @@ def binary(ctx, name):
         'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
-          'cd ocis',
-          'make release-finish',
+          'make -C ocis release-finish',
         ],
         'volumes': [
           {
@@ -1128,8 +1070,7 @@ def changelog(ctx):
         'image': 'webhippie/golang:1.14',
         'pull': 'always',
         'commands': [
-          'cd ocis',
-          'make changelog',
+          'make -C ocis changelog',
         ],
       },
       {
@@ -1269,7 +1210,7 @@ def docs(ctx):
   generateConfigDocs = []
 
   for module in config['modules']:
-    generateConfigDocs += ['cd /drone/src/%s' % (module), 'make config-docs-generate']
+    generateConfigDocs.append('make -C %s config-docs-generate' % (module))
 
   return {
     'kind': 'pipeline',
@@ -1284,7 +1225,7 @@ def docs(ctx):
         'name': 'prepare',
         'image': 'owncloudci/alpine:latest',
         'commands': [
-          'make docs-copy'
+          'make -C docs docs-copy'
         ],
       },
       {
@@ -1302,15 +1243,16 @@ def docs(ctx):
         'name': 'test',
         'image': 'owncloudci/hugo:0.71.0',
         'commands': [
-          'cd hugo',
+          'cd docs/hugo',
           'hugo',
         ],
       },
       {
-        'name': 'list',
+        'name': 'list and remove temporary files',
         'image': 'owncloudci/alpine:latest',
         'commands': [
           'tree hugo/public',
+          'rm -rf docs/hugo',
         ],
       },
       {
@@ -1380,8 +1322,7 @@ def generate(module):
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
-        'cd %s' % (module),
-        'make generate',
+        'make -C %s generate' % (module),
       ],
       'volumes': [
         {
@@ -1504,6 +1445,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
     'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
     'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
     'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
+    'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
     'PHOENIX_WEB_CONFIG': '/drone/src/ocis/tests/config/drone/ocis-config.json',
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/ocis/tests/config/drone/identifier-registration.yml',
@@ -1592,8 +1534,7 @@ def build():
       'image': 'webhippie/golang:1.14',
       'pull': 'always',
       'commands': [
-        'cd ocis',
-        'make build',
+        'make -C ocis build',
       ],
       'volumes': [
         {
