@@ -22,6 +22,7 @@
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
+* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
@@ -274,6 +275,12 @@
    storage for loading all existing documents.
 
    https://github.com/owncloud/ocis/pull/748
+
+* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
+
+   Add k6 as a load testing framework
+
+   https://github.com/owncloud/ocis/pull/941
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
