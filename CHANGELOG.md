@@ -52,6 +52,7 @@
 * Change - Update phoenix to v0.25.0: [#868](https://github.com/owncloud/ocis/pull/868)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
+* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -82,6 +83,7 @@
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
+* Enhancement - Update reva to v1.4.1-0.20201123062044-b2c4af4e897d: [#823](https://github.com/owncloud/ocis/pull/823)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 
@@ -576,6 +578,16 @@
 
    https://github.com/owncloud/ocis/pull/729
 
+* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
+
+   Tags: web
+
+   We updated phoenix to v0.26.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/935
+   https://github.com/owncloud/phoenix/releases/tag/v0.26.0
+
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
    We moved settings and accounts to the user menu.
@@ -592,6 +604,7 @@
    cache invalidation.
 
    https://github.com/owncloud/ocis/pull/866
+   https://github.com/owncloud/ocis/pull/934
 
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 
@@ -1700,6 +1713,29 @@
    ca-certificates version
 
    https://github.com/owncloud/ocis/pull/744
+
+* Enhancement - Update reva to v1.4.1-0.20201123062044-b2c4af4e897d: [#823](https://github.com/owncloud/ocis/pull/823)
+
+  * Refactor the uploading files workflow from various clients [cs3org/reva#1285](https://github.com/cs3org/reva/pull/1285), [cs3org/reva#1314](https://github.com/cs3org/reva/pull/1314)
+  * [OCS] filter share with me requests [cs3org/reva#1302](https://github.com/cs3org/reva/pull/1302)
+  * Fix listing shares for nonexisting path [cs3org/reva#1316](https://github.com/cs3org/reva/pull/1316)
+  * prevent nil pointer when listing shares [cs3org/reva#1317](https://github.com/cs3org/reva/pull/1317)
+  * Sharee retrieves the information about a share -but gets response containing all the shares [owncloud/ocis-reva#260](https://github.com/owncloud/ocis-reva/issues/260)
+  * Deleting a public link after renaming a file [owncloud/ocis-reva#311](https://github.com/owncloud/ocis-reva/issues/311)
+  * Avoid log spam [cs3org/reva#1323](https://github.com/cs3org/reva/pull/1323), [cs3org/reva#1324](https://github.com/cs3org/reva/pull/1324)
+  * Fix trashbin [cs3org/reva#1326](https://github.com/cs3org/reva/pull/1326)
+
+   https://github.com/owncloud/ocis-reva/issues/260
+   https://github.com/owncloud/ocis-reva/issues/311
+   https://github.com/owncloud/ocis/pull/823
+   https://github.com/cs3org/reva/pull/1285
+   https://github.com/cs3org/reva/pull/1302
+   https://github.com/cs3org/reva/pull/1314
+   https://github.com/cs3org/reva/pull/1316
+   https://github.com/cs3org/reva/pull/1317
+   https://github.com/cs3org/reva/pull/1323
+   https://github.com/cs3org/reva/pull/1324
+   https://github.com/cs3org/reva/pull/1326
 
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 

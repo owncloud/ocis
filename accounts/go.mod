@@ -3,8 +3,8 @@ module github.com/owncloud/ocis/accounts
 go 1.13
 
 require (
-	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
-	github.com/cs3org/reva v1.3.1-0.20201023144216-cdb3d6688da5
+	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
+	github.com/cs3org/reva v1.4.1-0.20201123062044-b2c4af4e897d
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible
@@ -24,7 +24,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
-	google.golang.org/grpc v1.33.1
+	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.25.0
 )
 

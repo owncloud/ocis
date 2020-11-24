@@ -625,22 +625,23 @@ def website(ctx):
         'name': 'prepare',
         'image': 'owncloudci/alpine:latest',
         'commands': [
-          'make docs-copy'
+          'make -C docs docs-copy'
         ],
       },
       {
         'name': 'test',
         'image': 'webhippie/hugo:latest',
         'commands': [
-          'cd hugo',
+          'cd docs/hugo',
           'hugo',
         ],
       },
       {
-        'name': 'list',
+        'name': 'list and remove temporary files',
         'image': 'owncloudci/alpine:latest',
         'commands': [
-          'tree hugo/public',
+          'tree docs/hugo/public',
+          'rm -rf docs/hugo',
         ],
       },
       {
