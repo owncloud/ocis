@@ -593,6 +593,7 @@
    cache invalidation.
 
    https://github.com/owncloud/ocis/pull/866
+   https://github.com/owncloud/ocis/pull/934
 
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 
