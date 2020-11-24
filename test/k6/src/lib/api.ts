@@ -2,8 +2,9 @@ import encoding from 'k6/encoding';
 import {bytes} from "k6";
 import http, {RefinedResponse, ResponseType} from "k6/http";
 import * as defaults from "./defaults";
+import * as types from "./types";
 
-export const uploadFile = <RT extends ResponseType | undefined>(account: any, data: bytes, name: string): RefinedResponse<RT> => {
+export const uploadFile = <RT extends ResponseType | undefined>(account: types.Account, data: bytes, name: string): RefinedResponse<RT> => {
     return http.put(
         `https://${defaults.host.name}/remote.php/dav/files/${account.login}/${name}`,
         data as any,
