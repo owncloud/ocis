@@ -1,7 +1,7 @@
 ---
 title: "Settings"
 date: 2018-05-02T00:00:00+00:00
-weight: 10
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/settings
 geekdocFilePath: _index.md
@@ -14,7 +14,7 @@ for other extensions to register new settings within oCIS. It is responsible for
 settings values as well.
 
 For ease of use, this extension provides an ocis-web extension which allows users to change their settings values.
-Please refer to the [ocis-web extension docs](https://owncloud.github.io/ocis/extensions/#external-phoenix-apps)
+Please refer to the [ocis-web extension docs]({{< relref "../../ocis/development/extensions/#external-phoenix-apps" >}})
 for running ocis-web extensions.
 
 {{< mermaid class="text-center">}}

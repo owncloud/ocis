@@ -3,12 +3,13 @@ config = {
     'accounts': 'frontend',
     'glauth':'',
     'konnectd':'',
+    'ocis': '',
     'ocis-phoenix':'',
     'ocis-pkg':'',
-    'storage':'',
     'ocs':'',
     'proxy':'',
     'settings':'frontend',
+    'storage':'',
     'store':'',
     'thumbnails':'',
     'webdav':'',
@@ -1256,13 +1257,6 @@ def docs(ctx):
     },
     'steps': [
       {
-        'name': 'prepare',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'make -C docs docs-copy'
-        ],
-      },
-      {
         'name': 'generate-config-docs',
         'image': 'webhippie/golang:1.14',
         'commands': generateConfigDocs,
@@ -1271,6 +1265,13 @@ def docs(ctx):
             'name': 'gopath',
             'path': '/srv/app',
           },
+        ],
+      },
+      {
+        'name': 'prepare',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'make -C docs docs-copy'
         ],
       },
       {

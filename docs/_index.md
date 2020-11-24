@@ -2,6 +2,8 @@
 title: ownCloud
 ---
 
+{{< toc >}}
+
 ## Developer Documentation
 
 Welcome to our developer documentation. Here you can find developer documentation on:
