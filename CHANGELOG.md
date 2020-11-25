@@ -51,9 +51,10 @@
 * Change - Update phoenix to v0.23.0: [#785](https://github.com/owncloud/ocis/pull/785)
 * Change - Update phoenix to v0.24.0: [#817](https://github.com/owncloud/ocis/pull/817)
 * Change - Update phoenix to v0.25.0: [#868](https://github.com/owncloud/ocis/pull/868)
+* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
+* Change - Update phoenix to v0.27.0: [#943](https://github.com/owncloud/ocis/pull/943)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
-* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -565,6 +566,26 @@
    https://github.com/owncloud/ocis/pull/868
    https://github.com/owncloud/phoenix/releases/tag/v0.25.0
 
+* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
+
+   Tags: web
+
+   We updated phoenix to v0.26.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/935
+   https://github.com/owncloud/phoenix/releases/tag/v0.26.0
+
+* Change - Update phoenix to v0.27.0: [#943](https://github.com/owncloud/ocis/pull/943)
+
+   Tags: web
+
+   We updated phoenix to v0.27.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/943
+   https://github.com/owncloud/phoenix/releases/tag/v0.27.0
+
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
   * EOS homes are not configured with an enable-flag anymore, but with a dedicated storage driver.
@@ -584,16 +605,6 @@
    `STORAGE_DRIVER_EOS_LAYOUT=...` less confusing.
 
    https://github.com/owncloud/ocis/pull/729
-
-* Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
-
-   Tags: web
-
-   We updated phoenix to v0.26.0. Please refer to the changelog (linked) for details on the
-   phoenix release.
-
-   https://github.com/owncloud/ocis/pull/935
-   https://github.com/owncloud/phoenix/releases/tag/v0.26.0
 
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
