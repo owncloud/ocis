@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': '4395234656fb70c869ee960ca5d7b853ffcc5ef8',
+    'phoenixCommit': 'fd281418cc30af9c9795e627692caf45c0d3bf30',
       'suites': {
         'webUIBasic': [
           'webUILogin',
