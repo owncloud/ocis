@@ -1,22 +1,34 @@
-config-docs-generate:
-	make -C ../accounts config-docs-generate
-	make -C ../glauth config-docs-generate
-	make -C ../konnectd config-docs-generate
-	make -C ../ocis config-docs-generate
-	make -C ../web config-docs-generate
-	make -C ../ocis-pkg config-docs-generate
-	make -C ../ocs config-docs-generate
-	make -C ../proxy config-docs-generate
-	make -C ../settings config-docs-generate
-	make -C ../storage config-docs-generate
-	make -C ../store config-docs-generate
-	make -C ../thumbnails config-docs-generate
-	make -C ../webdav config-docs-generate
+SHELL := bash
+
+OCIS_MODULES = \
+	accounts \
+	glauth \
+	konnectd \
+	ocis \
+	ocs \
+	ocis-pkg \
+	proxy \
+	settings \
+	storage \
+	store \
+	thumbnails \
+	web \
+	webdav
+
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: config-docs-generate
+config-docs-generate: ## run config-docs-generate for all oCIS extensions
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C ../$$mod config-docs-generate; \
+    done
 
 .PHONY: docs-copy
-docs-copy:
-	mkdir -p hugo/content/
-	cd hugo; \
+docs-copy: ## copy docs to hugo
+	@mkdir -p hugo/content/
+	@cd hugo; \
 	git init; \
 	git config advice.detachedHead false; \
 	git remote rm origin; \
@@ -29,6 +41,10 @@ docs-copy:
 docs-serve: config-docs-generate docs-copy
 	docker run --rm --network host -v $(shell pwd)/hugo:/src owncloudci/hugo:0 server
 
+.PHONY: docs-serve
+docs-serve: config-docs-generate docs-copy ## serve docs with hugo
+	@docker run --rm --network host -v $(shell pwd)/hugo:/src owncloudci/hugo:0 server
+
 .PHONY: clean
-clean:
-	rm -rf hugo
+clean: ## clean up docs build artifacts
+	@rm -rf hugo
