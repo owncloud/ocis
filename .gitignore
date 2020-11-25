@@ -15,3 +15,9 @@ node_modules/
 
 # Konnectd
 konnectd/assets/identifier
+
+# Composer - used for API acceptance tests
+composer.lock
+vendor
+vendor-bin/**/vendor
+vendor-bin/**/composer.lock

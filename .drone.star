@@ -408,7 +408,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
           'PATH_TO_CORE': '/srv/app/testrunner',
         },
         'commands': [
-          'make -C ocis test-acceptance-api',
+          'make test-acceptance-api',
         ],
         'volumes': [{
           'name': 'gopath',
