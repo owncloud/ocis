@@ -81,6 +81,7 @@
 * Enhancement - Add a version command to ocis: [#915](https://github.com/owncloud/ocis/pull/915)
 * Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
+* Enhancement - Update reva to v1.4.1-0.20201125144025-57da0c27434c: [#1320](https://github.com/cs3org/reva/pull/1320)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
@@ -1687,6 +1688,13 @@
    seconds).
 
    https://github.com/owncloud/ocis/pull/877
+
+* Enhancement - Update reva to v1.4.1-0.20201125144025-57da0c27434c: [#1320](https://github.com/cs3org/reva/pull/1320)
+
+   Mostly to bring fixes to pressing changes.
+
+   https://github.com/cs3org/reva/pull/1320
+   https://github.com/cs3org/reva/pull/1338
 
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
