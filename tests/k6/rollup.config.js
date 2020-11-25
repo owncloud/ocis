@@ -5,13 +5,18 @@ import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
 import multiInput from 'rollup-plugin-multi-input';
 import path from 'path';
+import utils from '@rollup/pluginutils';
+import pkg from './package.json';
 
 const extensions = ['.js', '.ts'];
 
 export default [
   {
     input: ['src/test-*.ts'],
-    external: id => ['k6'].some(m => id.includes(m)),
+    external: utils.createFilter([
+      'k6/**',
+      ...Object.keys(pkg.devDependencies),
+    ], null, { resolve: false }),
     output: [
       {
         dir: 'dist',
