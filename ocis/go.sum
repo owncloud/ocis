@@ -219,6 +219,7 @@ github.com/caddyserver/certmagic v0.10.6 h1:sCya6FmfaN74oZE46kqfaFOVoROD/mF36rTQ
 github.com/caddyserver/certmagic v0.10.6/go.mod h1:Y8jcUBctgk/IhpAzlHKfimZNyXCkfGgRTC0orl8gROQ=
 github.com/cenkalti/backoff v2.1.1+incompatible h1:tKJnvO2kl0zmb/jA5UKAt4VoEVw1qxKWjE/Bpp46npY=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
+github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff/v3 v3.0.0/go.mod h1:cIeZDE3IrqwwJl6VUwCN6trj1oXrTS4rc0ij+ULvLYs=
 github.com/cenkalti/backoff/v4 v4.0.0 h1:6VeaLF9aI+MAUQ95106HwWzYZgJJpZ4stumjj6RFYAU=
@@ -306,6 +307,7 @@ github.com/cs3org/go-cs3apis v0.0.0-20191128165347-19746c015c83/go.mod h1:IsVGyZ
 github.com/cs3org/go-cs3apis v0.0.0-20200730121022-c4f3d4f7ddfd/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00 h1:LVl25JaflluOchVvaHWtoCynm5OaM+VNai0IYkcCSe0=
 github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21 h1:mZpylrgnCgSeaZ5EznvHIPIKuaQHMHZDi2wkJtk4M8Y=
 github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5/go.mod h1:Hk3eCcdhtv4eIhKvRK736fQuOyS1HuHnUcz0Dq6NK1A=
 github.com/cs3org/reva v1.1.0/go.mod h1:fBzTrNuAKdQ62ybjpdu8nyhBin90/3/3s6DGQDCdBp4=
@@ -315,6 +317,8 @@ github.com/cs3org/reva v1.3.1-0.20201112131316-1c425035c8a2 h1:vBgCFcQMxcu7wDPo4
 github.com/cs3org/reva v1.3.1-0.20201112131316-1c425035c8a2/go.mod h1:oqkkfe0g/dvrFFrmwd/VVfmrxhfswHp7+IB2PNeADSE=
 github.com/cs3org/reva v1.4.1-0.20201120104232-f5afafc04c3b/go.mod h1:oqkkfe0g/dvrFFrmwd/VVfmrxhfswHp7+IB2PNeADSE=
 github.com/cs3org/reva v1.4.1-0.20201123062044-b2c4af4e897d/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
+github.com/cs3org/reva v1.4.1-0.20201125144025-57da0c27434c h1:x7HkQqFGA+7FJUfyDO9tM2gF5i540PQePx+1kGUUYgA=
+github.com/cs3org/reva v1.4.1-0.20201125144025-57da0c27434c/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 h1:iwZdTE0PVqJCos1vaoKsclOGD3ADKpshg3SRtYBbwso=
@@ -371,6 +375,7 @@ github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68 h1:DHBMBKJK69xBWnD/jNkTN0sOT7nT7I5If9VMsk9Jj5Y=
 github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68/go.mod h1:8FuQ7lU9ZvIJGvc04F/qblkjqIfBahAoEFV+XPxByGw=
+github.com/evanphx/json-patch v4.2.0+incompatible h1:fUDGZCv/7iAN7u0puUVhvKCcsR6vRfwrJatElLBEf0I=
 github.com/evanphx/json-patch v4.2.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/evanphx/json-patch/v5 v5.0.0 h1:dKTrUeykyQwKb/kx7Z+4ukDs6l+4L41HqG1XHnhX7WE=
 github.com/evanphx/json-patch/v5 v5.0.0/go.mod h1:G79N1coSVB93tBe7j6PhzjmR3/2VvlbKOFpnXhI9Bw4=
@@ -444,6 +449,7 @@ github.com/go-ini/ini v1.25.4/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3I
 github.com/go-ini/ini v1.44.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/kit v0.9.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
+github.com/go-ldap/ldap v3.0.2+incompatible h1:kD5HQcAzlQ7yrhfn+h+MSABeAy/jAJhvIJ/QDllP44g=
 github.com/go-ldap/ldap v3.0.2+incompatible/go.mod h1:qfd9rJvER9Q0/D/Sqn1DfHRoBp40uXYvFoEVrNEPqRc=
 github.com/go-ldap/ldap/v3 v3.1.7/go.mod h1:5Zun81jBTabRaI8lzN7E1JjyEl1g6zI6u9pd8luAK4Q=
 github.com/go-ldap/ldap/v3 v3.2.3/go.mod h1:iYS1MdmrmceOJ1QOTnRXrIs7i3kloqtmGQjRvjKpyMg=
@@ -1024,11 +1030,13 @@ github.com/micro/go-micro/v2 v2.0.0/go.mod h1:v7QP5UhKRt37ixjJe8DouWmg0/eE6dltr5
 github.com/micro/go-micro/v2 v2.8.0/go.mod h1:hSdOM6jb6aGswjBpCeB9wJ0yVH+CugevRm/CX7NlSrQ=
 github.com/micro/go-micro/v2 v2.9.1 h1:+S9koIrNWARjpP6k2TZ7kt0uC9zUJtNXzIdZTZRms7Q=
 github.com/micro/go-micro/v2 v2.9.1/go.mod h1:x55ZM3Puy0FyvvkR3e0ha0xsE9DFwfPSUMWAIbFY0SY=
+github.com/micro/go-plugins v1.5.1 h1:swcFD7ynCTUo98APqIEIbPu2XMd6yVGTnI8PqdnCwOQ=
 github.com/micro/go-plugins v1.5.1/go.mod h1:jcxejzJCAMH731cQHbS/hncyKe0rxAbzKkibj8glad4=
 github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.0.1/go.mod h1:QrkcwcDtIs2hIJpIEhozekyf6Rfz5C36kFI8+zzCpX0=
 github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1 h1:IaZUsLp0Omb/ozDnRKEvVY56C0UocBdPxxg2S2Pk2j0=
 github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1/go.mod h1:26UmOLM/I487NqTg3n6zJiBrYmIb684M2Zp4WH98XzU=
 github.com/micro/mdns v0.3.0/go.mod h1:KJ0dW7KmicXU2BV++qkLlmHYcVv7/hHnbtguSWt9Aoc=
+github.com/micro/micro v1.16.0 h1:qCZV20WoTOtJ1IyLU/a0A0BMSertfu+iOj/2AJ4Uvrk=
 github.com/micro/micro v1.16.0/go.mod h1:TO5Ng0KidbfRYIxVM4Q3deZ0A+qwRyP9WeXp+k2fWNA=
 github.com/micro/micro/v2 v2.8.0 h1:AMqpnKsOBnuGHjU0jVmTL17BRdsOx0FbvI/Gkl2uLrA=
 github.com/micro/micro/v2 v2.8.0/go.mod h1:VTIGqEBLAMh22q72DnGd95iJSQY/3yvXd9GIIooQ69c=
