@@ -187,7 +187,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 			if e == nil {
 				suspicious = !isPasswordValid(s.log, a.PasswordProfile.Password, password)
-			} else if bytes.Compare(e.V.([]byte), m) != 0 {
+			} else if !bytes.Equal(e.V.([]byte), m) {
 				suspicious = true
 			}
 
