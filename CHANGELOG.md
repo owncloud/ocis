@@ -20,11 +20,13 @@
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
+* Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
+* Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Enable OpenID dynamic client registration: [#811](https://github.com/owncloud/ocis/issues/811)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -249,6 +251,15 @@
 
    https://github.com/owncloud/ocis/pull/656
 
+* Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
+
+   Tags: accounts
+
+   The password validity check for requests like `login eq '%s' and password eq '%s'` is now cached
+   for 10 minutes. This improves the performance for basic auth requests.
+
+   https://github.com/owncloud/ocis/pull/958
+
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 
    Tags: accounts, storage
@@ -299,6 +310,12 @@
    accounts folder.
 
    https://github.com/owncloud/ocis/issues/510
+
+* Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
+
+   The library went out of support. Also did some refactoring of the thumbnails service code.
+
+   https://github.com/owncloud/ocis/pull/910
 
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 
