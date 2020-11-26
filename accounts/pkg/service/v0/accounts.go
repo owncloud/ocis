@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/owncloud/ocis/ocis-pkg/cache"
 	"golang.org/x/crypto/bcrypt"
@@ -167,11 +168,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		//
 		// flow:
 		// - request comes in
-		// - it creates a sha256 based on found account PasswordProfile.LastPasswordChangeDateTime and requested password
-		// - it checks if the cache already contains an entry that matches found account Id
+		// - it creates a sha256 based on found account PasswordProfile.LastPasswordChangeDateTime and requested password (v)
+		// - it checks if the cache already contains an entry that matches found account Id // account PasswordProfile.LastPasswordChangeDateTime (k)
 		// - if no entry exists it runs the bcrypt.CompareHashAndPassword as before and if everything is ok it stores the
-		//   result by the account Id as key and mentioned hash as value. If not it errors
-		// - if a entry is found it checks if the given value matches the mentioned hash. If it doesnt match the cache entry gets removed
+		//   result by the (k) as key and (v) as value. If not it errors
+		// - if a entry is found it checks if the given value matches (v). If it doesnt match the cache entry gets removed
 		//   and it errors.
 		//
 		// if many concurrent requests from the same user come in within a short period of time, it's possible that e is still nil.
@@ -179,25 +180,29 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		{
 			var suspicious bool
 
-			h := sha256.New()
-			h.Write([]byte(a.PasswordProfile.Password))
+			kh := sha256.New()
+			kh.Write([]byte(a.Id))
+			k := hex.EncodeToString(kh.Sum([]byte(a.PasswordProfile.LastPasswordChangeDateTime.String())))
 
-			m := h.Sum([]byte(password))
-			e := passwordValidCache.Get(a.Id)
+			vh := sha256.New()
+			vh.Write([]byte(a.PasswordProfile.Password))
+			v := vh.Sum([]byte(password))
+
+			e := passwordValidCache.Get(k)
 
 			if e == nil {
 				suspicious = !isPasswordValid(s.log, a.PasswordProfile.Password, password)
-			} else if !bytes.Equal(e.V.([]byte), m) {
+			} else if !bytes.Equal(e.V.([]byte), v) {
 				suspicious = true
 			}
 
 			if suspicious {
-				passwordValidCache.Unset(a.Id)
+				passwordValidCache.Unset(k)
 				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 			}
 
 			if e == nil {
-				passwordValidCache.Set(a.Id, m, time.Now().Add(passwordValidCacheExpiration))
+				passwordValidCache.Set(k, v, time.Now().Add(passwordValidCacheExpiration))
 			}
 		}
 
