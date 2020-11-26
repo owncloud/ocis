@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-26T11:53:31+0000"
+date: "2020-11-26T17:03:40+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -36,6 +36,18 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### konnectd version
+
+Print the versions of the running instances
+
+Usage: `konnectd version [command options] [arguments...]`
+
+--http-namespace | $KONNECTD_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
 
 ### konnectd health
 
@@ -174,16 +186,4 @@ Usage: `konnectd server [command options] [arguments...]`
 
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
-
-### konnectd version
-
-Print the versions of the running instances
-
-Usage: `konnectd version [command options] [arguments...]`
-
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
 
