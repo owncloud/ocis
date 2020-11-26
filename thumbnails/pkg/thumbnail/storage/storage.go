@@ -1,12 +1,14 @@
 package storage
 
-import "github.com/owncloud/ocis/thumbnails/pkg/thumbnail/resolution"
+import (
+	"image"
+)
 
 // Request combines different attributes needed for storage operations.
 type Request struct {
 	ETag       string
 	Types      []string
-	Resolution resolution.Resolution
+	Resolution image.Rectangle
 }
 
 // Storage defines the interface for a thumbnail store.

@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/pkg/errors"
 )
 
 // NewWebDavSource creates a new webdav instance.
@@ -32,13 +33,13 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	u.Path = path.Join(u.Path, file)
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure}
 
-	auth := authorization(ctx)
-	if auth == "" {
+	auth, ok := ContextGetAuthorization(ctx)
+	if !ok {
 		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
 	}
 	req.Header.Add("Authorization", auth)
@@ -46,7 +47,7 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("could not get the image \"%s\" error: %s", file, err.Error())
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -55,7 +56,7 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode the image \"%s\". error: %s", file, err.Error())
+		return nil, errors.Wrapf(err, `could not decode the image "%s"`, file)
 	}
 	return img, nil
 }
