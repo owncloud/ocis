@@ -23,8 +23,3 @@ type logging struct {
 func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }
-
-// Dummy implements the Service interface.
-func (l logging) Dummy(w http.ResponseWriter, r *http.Request) {
-	l.next.Dummy(w, r)
-}

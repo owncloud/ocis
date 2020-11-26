@@ -12,6 +12,7 @@ config = {
     'store':'',
     'thumbnails':'',
     'webdav':'',
+    'onlyoffice':''
   },
   'apiTests': {
     'coreBranch': 'master',

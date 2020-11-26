@@ -25,4 +25,4 @@ make generate
 make build
 {{< / highlight >}}
 
-Finally you should have the binary within the `bin/` folder now, give it a try with `./bin/ocis-onlyoffice -h` to see all available options.
+Finally you should have the binary within the `bin/` folder now, give it a try with `./bin/onlyoffice -h` to see all available options.

@@ -10,7 +10,6 @@ import (
 // Service defines the extension handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
-	Dummy(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -25,10 +24,6 @@ func NewService(opts ...Option) Service {
 		mux:    m,
 	}
 
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/", svc.Dummy)
-	})
-
 	return svc
 }
 
@@ -41,12 +36,4 @@ type Onlyoffice struct {
 // ServeHTTP implements the Service interface.
 func (g Onlyoffice) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
-}
-
-// Dummy implements the Service interface.
-func (g Onlyoffice) Dummy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-
-	w.Write([]byte("Hello ocis-onlyoffice!"))
 }

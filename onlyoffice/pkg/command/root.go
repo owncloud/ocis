@@ -17,9 +17,9 @@ func Execute() error {
 	cfg := config.New()
 
 	app := &cli.App{
-		Name:     "ocis-onlyoffice",
+		Name:     "onlyoffice",
 		Version:  version.String,
-		Usage:    "Onlyoffice ocis extension",
+		Usage:    "OnlyOffice oCIS extension",
 		Compiled: version.Compiled(),
 
 		Authors: []*cli.Author{
