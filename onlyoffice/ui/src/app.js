@@ -5,14 +5,14 @@ const appInfo = {
   extensions: [
     {
       extension: 'docx',
-      handler: function({ extensionConfig, filePath, fileId }) {
+      handler: function ({ extensionConfig, filePath, fileId }) {
         window.open(
           `${extensionConfig.server}/apps/onlyoffice/${fileId}?filePath=${encodeURIComponent(filePath)}`,
           '_blank'
         )
       },
       newFileMenu: {
-        menuTitle($gettext) {
+        menuTitle ($gettext) {
           return $gettext('New OnlyOffice document')
         },
         icon: 'x-office-document'
@@ -20,7 +20,7 @@ const appInfo = {
     },
     {
       extension: 'xlsx',
-      handler: function({ extensionConfig, filePath, fileId }) {
+      handler: function ({ extensionConfig, filePath, fileId }) {
         window.open(
           `${extensionConfig.server}/apps/onlyoffice/${fileId}?filePath=${encodeURIComponent(filePath)}`,
           '_blank'
@@ -29,7 +29,7 @@ const appInfo = {
     },
     {
       extension: 'pptx',
-      handler: function({ extensionConfig, filePath, fileId }) {
+      handler: function ({ extensionConfig, filePath, fileId }) {
         window.open(
           `${extensionConfig.server}/apps/onlyoffice/${fileId}?filePath=${encodeURIComponent(filePath)}`,
           '_blank'
@@ -42,4 +42,3 @@ const appInfo = {
 export default {
   appInfo
 }
-
