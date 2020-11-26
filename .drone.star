@@ -307,6 +307,12 @@ def testing(ctx, module):
         'refs/pull/**',
       ],
     },
+    'volumes': [
+      {
+        'name': 'gopath',
+        'temp': {},
+      },
+    ],
   }
 
 def uploadCoverage(ctx):
