@@ -10,9 +10,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 
 	gOidc "github.com/coreos/go-oidc"
+	"github.com/owncloud/ocis/ocis-pkg/cache"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/proxy/pkg/cache"
 	"golang.org/x/oauth2"
 )
 
