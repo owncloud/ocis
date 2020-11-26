@@ -13,10 +13,14 @@ export let options: Options = {
 };
 
 export default () => {
-    const res = api.uploadFile(defaults.accounts.einstein, files['kb_50.jpg'], `kb_50-${__VU}-${__ITER}.jpg`)
+    const res = api.uploadFile(
+        defaults.accounts.einstein,
+        files['kb_50.jpg'],
+        `kb_50-${__VU}-${__ITER}.jpg`,
+    );
 
     check(res, {
-        'status is 201': () => res.status === 201,
+        'status is 204': () => res.status === 204,
     });
 
     sleep(1);

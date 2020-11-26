@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"fmt"
@@ -160,23 +161,49 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
 
-		h := sha256.New()
-		h.Write([]byte(a.PasswordProfile.Password))
+		// isPasswordValid uses bcrypt.CompareHashAndPassword which is slow by design.
+		// if every request that matches authQuery regex needs to do this step over and over again,
+		// this is secure but also slow. In this implementation we keep it same secure but increase the speed.
+		//
+		// flow:
+		// - request comes in
+		// - it creates a sha256 based on found account PasswordProfile.LastPasswordChangeDateTime and requested password
+		// - it checks if the cache already contains an entry that matches found account Id
+		// - if no entry exists it runs the bcrypt.CompareHashAndPassword as before and if everything is ok it stores the
+		//   result by the account Id as key and mentioned hash as value. If not it errors
+		// - if a entry is found it checks if the given value matches the mentioned hash. If it doesnt match the cache entry gets removed
+		//   and it errors.
+		//
+		// if many concurrent requests from the same user come in within a short period of time, it's possible that e is still nil.
+		// This is why all this needs to be wrapped within a sync.Mutex locking to prevent calling bcrypt.CompareHashAndPassword unnecessarily too often.
+		{
+			var suspicious bool
 
-		k := fmt.Sprintf("%x", h.Sum([]byte(password)))
+			h := sha256.New()
+			h.Write([]byte(a.PasswordProfile.Password))
 
-		if hit := passwordValidCache.Get(k); hit == nil || !hit.V.(bool) {
-			var ok bool
+			m := h.Sum([]byte(password))
+			e := passwordValidCache.Get(a.Id)
 
-			if ok = isPasswordValid(s.log, a.PasswordProfile.Password, password); !ok {
+			if e == nil {
+				suspicious = !isPasswordValid(s.log, a.PasswordProfile.Password, password)
+			} else if bytes.Compare(e.V.([]byte), m) != 0 {
+				suspicious = true
+			}
+
+			if suspicious {
+				passwordValidCache.Unset(a.Id)
 				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 			}
 
-			passwordValidCache.Set(k, ok, time.Now().Add(passwordValidCacheExpiration))
+			if e == nil {
+				passwordValidCache.Set(a.Id, m, time.Now().Add(passwordValidCacheExpiration))
+			}
 		}
 
 		a.PasswordProfile.Password = ""
 		out.Accounts = []*proto.Account{a}
+
 		return nil
 	}
 
