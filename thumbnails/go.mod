@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/cespare/reflex v0.2.0
+	github.com/cs3org/go-cs3apis v0.0.0-20201007120910-416ed6cf8b00
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.3
@@ -31,7 +32,9 @@ require (
 	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	google.golang.org/genproto v0.0.0-20200918140846-d0d605568037 // indirect
+	google.golang.org/grpc v1.33.1
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
 

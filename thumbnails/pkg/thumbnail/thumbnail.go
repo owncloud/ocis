@@ -4,16 +4,14 @@ import (
 	"bytes"
 	"image"
 
-	"github.com/nfnt/resize"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/resolution"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
+	"golang.org/x/image/draw"
 )
 
 // Request bundles information needed to generate a thumbnail for afile
 type Request struct {
-	Resolution resolution.Resolution
-	ImagePath  string
+	Resolution image.Rectangle
 	Encoder    Encoder
 	ETag       string
 	Username   string
@@ -29,22 +27,25 @@ type Manager interface {
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
-func NewSimpleManager(storage storage.Storage, logger log.Logger) SimpleManager {
+func NewSimpleManager(resolutions Resolutions, storage storage.Storage, logger log.Logger) SimpleManager {
 	return SimpleManager{
-		storage: storage,
-		logger:  logger,
+		storage:     storage,
+		logger:      logger,
+		resolutions: resolutions,
 	}
 }
 
 // SimpleManager is a simple implementation of Manager
 type SimpleManager struct {
-	storage storage.Storage
-	logger  log.Logger
+	storage     storage.Storage
+	logger      log.Logger
+	resolutions Resolutions
 }
 
 // Get implements the Get Method of Manager
 func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
-	thumbnail := s.generate(r, img)
+	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
+	thumbnail := s.generate(match, img)
 
 	key := s.storage.BuildKey(mapToStorageRequest(r))
 
@@ -69,8 +70,10 @@ func (s SimpleManager) GetStored(r Request) []byte {
 	return stored
 }
 
-func (s SimpleManager) generate(r Request, img image.Image) image.Image {
-	thumbnail := resize.Thumbnail(uint(r.Resolution.Width), uint(r.Resolution.Height), img, resize.Lanczos2)
+func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {
+	targetResolution := mapRatio(img.Bounds(), r)
+	thumbnail := image.NewRGBA(targetResolution)
+	draw.ApproxBiLinear.Scale(thumbnail, targetResolution, img, img.Bounds(), draw.Over, nil)
 	return thumbnail
 }
 
