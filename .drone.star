@@ -12,7 +12,7 @@ config = {
     'store':'',
     'thumbnails':'',
     'webdav':'',
-    'onlyoffice':''
+    'onlyoffice':'frontend'
   },
   'apiTests': {
     'coreBranch': 'master',
