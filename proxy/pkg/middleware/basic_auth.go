@@ -2,13 +2,11 @@ package middleware
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-	"sync"
-
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"net/http"
+	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -59,22 +57,21 @@ type basicAuth struct {
 	logger         log.Logger
 	enabled        bool
 	accountsClient accounts.AccountsService
-	m              sync.Mutex
 }
 
-func (m *basicAuth) isPublicLink(req *http.Request) bool {
+func (m basicAuth) isPublicLink(req *http.Request) bool {
 	login, _, ok := req.BasicAuth()
 
 	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
 }
 
-func (m *basicAuth) isBasicAuth(req *http.Request) bool {
+func (m basicAuth) isBasicAuth(req *http.Request) bool {
 	login, password, ok := req.BasicAuth()
 
 	return m.enabled && ok && login != "" && password != ""
 }
 
-func (m *basicAuth) getAccount(req *http.Request) (*accounts.Account, bool) {
+func (m basicAuth) getAccount(req *http.Request) (*accounts.Account, bool) {
 	login, password, _ := req.BasicAuth()
 
 	account, status := getAccount(
