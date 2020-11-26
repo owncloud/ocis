@@ -12,7 +12,7 @@
     "email": "support@owncloud.com"
   },
   "scripts": {
-    "lint": "eslint ui/**/*.vue ui/**/*.js --color --global requirejs --global require",
+    "lint": "eslint ui/**/*.js --color --global require",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "echo 'Not implemented'",
