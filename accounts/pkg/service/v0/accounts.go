@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
+	"github.com/owncloud/ocis/ocis-pkg/cache"
 	"golang.org/x/crypto/bcrypt"
 	"path"
 	"regexp"
@@ -31,6 +33,12 @@ import (
 
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
+
+// passwordValidCache caches basic auth password validations
+var passwordValidCache = cache.NewCache(cache.Size(1024))
+
+// passwordValidCacheExpiration defines the entry lifetime
+const passwordValidCacheExpiration = 10 * time.Minute
 
 // an auth request is currently hardcoded and has to match this regex
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
@@ -128,7 +136,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
-
 	match, authRequest := getAuthQueryMatch(in.Query)
 	if authRequest {
 		password := match[2]
@@ -152,9 +159,22 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		if err != nil || a.PasswordProfile == nil || len(a.PasswordProfile.Password) == 0 {
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
-		if !isPasswordValid(s.log, a.PasswordProfile.Password, password) {
-			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+
+		h := sha256.New()
+		h.Write([]byte(a.PasswordProfile.Password))
+
+		k := fmt.Sprintf("%x", h.Sum([]byte(password)))
+
+		if hit := passwordValidCache.Get(k); hit == nil || !hit.V.(bool) {
+			var ok bool
+
+			if ok = isPasswordValid(s.log, a.PasswordProfile.Password, password); !ok {
+				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+			}
+
+			passwordValidCache.Set(k, ok, time.Now().Add(passwordValidCacheExpiration))
 		}
+
 		a.PasswordProfile.Password = ""
 		out.Accounts = []*proto.Account{a}
 		return nil
