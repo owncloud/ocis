@@ -50,6 +50,7 @@ func Execute() error {
 			RemoveAccount(cfg),
 			PrintVersion(cfg),
 			RebuildIndex(cfg),
+			Login(cfg),
 		},
 	}
 

@@ -438,3 +438,45 @@ func InspectAccountWithConfig(cfg *config.Config) []cli.Flag {
 		},
 	}
 }
+
+// LoginWithConfig applies list command flags to cfg
+func LoginWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "grpc-namespace",
+			Value:       "com.owncloud.api",
+			Usage:       "Set the base namespace for the grpc namespace",
+			EnvVars:     []string{"ACCOUNTS_GRPC_NAMESPACE"},
+			Destination: &cfg.GRPC.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "name",
+			Value:       "accounts",
+			Usage:       "service name",
+			EnvVars:     []string{"ACCOUNTS_NAME"},
+			Destination: &cfg.Server.Name,
+		},
+		&cli.StringFlag{
+			Name:     "username",
+			Usage:    "username",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "password",
+			Usage:    "password",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "issuer",
+			Usage:    "issuer-url",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       "Pive-Fumkiu4",
+			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
+			EnvVars:     []string{"ACCOUNTS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
+	}
+}
