@@ -15,11 +15,13 @@ export let options: Options = {
 export const setup = (): void => {
     console.log("setup for download")
     const res = api.uploadFile(defaults.accounts.einstein, files['kb_50.jpg'], 'downloadfile.jpg')
+    if (res.status !== 201) {
+        fail("Status is not 201 while uploading the user")
+    }
     check(res, {
       'status is 201': () => res.status === 201,
     })
     console.log("uploaded file")
-    sleep(1)
 }
 
 export default () => {
