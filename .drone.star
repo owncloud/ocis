@@ -99,7 +99,55 @@ config = {
     'channel': 'ocis-internal',
     'from_secret': 'private_rocketchat',
   },
+  'binaryReleases': {
+    'os': ['linux', 'darwin', 'windows'],
+  },
+  'dockerReleases': {
+    'architectures': ['arm', 'arm64', 'amd64'],
+  },
 }
+
+
+# volume for steps to cache Go dependencies between steps of a pipeline
+# GOPATH must be set to /srv/app inside the image, which is the case for webhippie/golang
+stepVolumeGoWebhippie = \
+  {
+  'name': 'gopath',
+  'path': '/srv/app',
+  }
+
+# volume for pipeline to cache Go dependencies between steps of a pipeline
+# to be used in combination with stepVolumeGoWebhippie
+pipelineVolumeGoWebhippie = \
+  {
+  'name': 'gopath',
+  'temp': {},
+  }
+
+stepVolumeOC10Tests = \
+  {
+  'name': 'oC10Tests',
+  'path': '/srv/app',
+  }
+
+pipelineVolumeOC10Tests = \
+  {
+  'name': 'oC10Tests',
+  'temp': {},
+  }
+
+def pipelineDependsOn(pipeline, dependant_pipelines):
+  pipeline['depends_on'] = getPipelineNames(dependant_pipelines)
+  return pipeline
+
+def pipelinesDependsOn(pipelines, dependant_pipelines):
+  pipes = []
+  for pipeline in pipelines:
+    pipeline['depends_on'] = getPipelineNames(dependant_pipelines)
+    pipes.append(pipeline)
+
+  return pipes
+
 
 def getPipelineNames(pipelines=[]):
   """getPipelineNames returns names of pipelines as a string array
@@ -127,79 +175,68 @@ def main(ctx):
 
   pipelines = []
 
-  before = \
+  test_pipelines = \
     [ buildOcisBinaryForTesting(ctx) ] + \
     testOcisModules(ctx) + \
     testPipelines(ctx)
 
-  stages = [
-    docker(ctx, 'amd64'),
-    docker(ctx, 'arm64'),
-    docker(ctx, 'arm'),
-    dockerEos(ctx),
-    binary(ctx, 'linux'),
-    binary(ctx, 'darwin'),
-    binary(ctx, 'windows'),
-    releaseSubmodule(ctx),
-  ]
+  build_release_pipelines = \
+    dockerReleases(ctx) + \
+    [dockerEos(ctx)] + \
+    binaryReleases(ctx) + \
+    [releaseSubmodule(ctx)]
 
-  after = [
-    manifest(ctx),
+  build_release_helpers = [
     changelog(ctx),
-    readme(ctx),
-    badges(ctx),
     docs(ctx),
+    refreshDockerBadges(ctx),
     updateDeployment(ctx),
   ]
 
   if ctx.build.event == "cron":
-    before.append(benchmark(ctx))
-
-    purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
-    purge['depends_on'] = getPipelineNames(before)
-
-    before.append(purge)
-
-    notify_pipeline = notify(ctx)
-    notify_pipeline['depends_on'] = \
-      getPipelineNames(before)
-
-    pipelines = before + [ notify_pipeline ]
+    pipelines = test_pipelines + [
+      benchmark(ctx),
+      pipelineDependsOn(
+        purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
+        testPipelines(ctx) + [benchmark(ctx)]
+      )
+    ]
 
   elif \
   (ctx.build.event == "pull" and '[docs-only]' in ctx.build.title) \
   or \
   (ctx.build.event != "pull" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
   # [docs-only] is not taken from PR messages, but from commit messages
-
-    docs_pipeline = docs(ctx)
-    docs_pipeline['depends_on'] = []
-    docs_pipelines = [ docs_pipeline ]
-
-    notify_pipeline = notify(ctx)
-    notify_pipeline['depends_on'] = \
-      getPipelineNames(docs_pipelines)
-
-    pipelines = docs_pipelines + [ notify_pipeline ]
+    pipelines = docs(ctx)
 
   else:
-    purge_dependencies = testPipelines(ctx)
-
     if '[with-benchmarks]' in (ctx.build.title + ctx.build.message):
-      before.append(benchmark(ctx))
-      purge_dependencies.append(benchmark(ctx))
+      test_pipelines += [
+      benchmark(ctx),
+      pipelineDependsOn(
+        purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
+        testPipelines(ctx) + [benchmark(ctx)]
+      )
+    ]
+    else:
+      test_pipelines.append(
+        pipelineDependsOn(
+          purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
+          testPipelines(ctx)
+        )
+      )
 
-    purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
-    purge['depends_on'] = getPipelineNames(purge_dependencies)
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
-    pipelines = before + stages + after + [purge]
+  # always append notification step
+  pipelines.append(
+    pipelineDependsOn(
+      notify(ctx),
+      pipelines
+    )
+  )
 
-    notify_pipeline = notify(ctx)
-    notify_pipeline['depends_on'] = \
-      getPipelineNames(pipelines)
-
-    pipelines = pipelines + [ notify_pipeline ]
-
+  pipelineSanityChecks(ctx, pipelines)
   return pipelines
 
 def testOcisModules(ctx):
@@ -237,12 +274,7 @@ def testOcisModule(ctx, module):
       'commands': [
         'make -C %s vet' % (module),
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
+      'volumes': [stepVolumeGoWebhippie,],
     },
     {
       'name': 'staticcheck',
@@ -251,12 +283,7 @@ def testOcisModule(ctx, module):
       'commands': [
         'make -C %s staticcheck' % (module),
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
+      'volumes': [stepVolumeGoWebhippie,],
     },
     {
       'name': 'lint',
@@ -265,12 +292,7 @@ def testOcisModule(ctx, module):
       'commands': [
         'make -C %s lint' % (module),
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
+      'volumes': [stepVolumeGoWebhippie,],
     },
     {
         'name': 'test',
@@ -280,12 +302,7 @@ def testOcisModule(ctx, module):
           'make -C %s test' % (module),
           'mv %s/coverage.out %s_coverage.out' % (module, module),
         ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
+        'volumes': [stepVolumeGoWebhippie,],
       },
       {
         'name': 'coverage-cache',
@@ -328,12 +345,7 @@ def testOcisModule(ctx, module):
         'refs/pull/**',
       ],
     },
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
+    'volumes': [pipelineVolumeGoWebhippie],
   }
 
 def buildOcisBinaryForTesting(ctx):
@@ -356,12 +368,7 @@ def buildOcisBinaryForTesting(ctx):
         'refs/pull/**',
       ],
     },
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
+    'volumes': [pipelineVolumeGoWebhippie],
   }
 
 def uploadCoverage(ctx):
@@ -443,7 +450,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     },
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer(storage, accounts_hash_difficulty) +
+      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'localApiTests-%s-%s' % (suite, storage),
@@ -463,20 +470,11 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'commands': [
           'make test-acceptance-api',
         ],
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        }]
+        'volumes': [stepVolumeOC10Tests],
       },
     ],
     'services':
       redis(),
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -485,6 +483,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
         'refs/pull/**',
       ],
     },
+    'volumes': [pipelineVolumeOC10Tests],
   }
 
 def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
@@ -498,7 +497,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     },
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer(storage, accounts_hash_difficulty) +
+      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
@@ -519,20 +518,11 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'commands': [
           'make -C /srv/app/testrunner test-acceptance-api',
         ],
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        }]
+        'volumes': [stepVolumeOC10Tests],
       },
     ],
     'services':
       redis(),
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -541,6 +531,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
         'refs/pull/**',
       ],
     },
+    'volumes': [pipelineVolumeOC10Tests],
   }
 
 def benchmark(ctx):
@@ -613,7 +604,7 @@ def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage
     },
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer(storage, accounts_hash_difficulty) + [
+      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'webUITests',
         'image': 'webhippie/nodejs:latest',
@@ -641,29 +632,23 @@ def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage
           'yarn install-all',
           'yarn run acceptance-tests-drone'
         ],
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-        {
-          'name': 'uploads',
-          'path': '/uploads'
-        }]
+        'volumes':
+          [stepVolumeOC10Tests] +
+          [{
+            'name': 'uploads',
+            'path': '/uploads'
+          }]
       },
     ],
     'services':
       redis() +
       selenium(),
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-      {
+    'volumes':
+      [pipelineVolumeOC10Tests] +
+      [{
         'name': 'uploads',
         'temp': {}
-      }
-    ],
+      }],
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -685,7 +670,7 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
     },
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer(storage, accounts_hash_difficulty) + [
+      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'WebUIAcceptanceTests',
         'image': 'webhippie/nodejs:latest',
@@ -716,14 +701,12 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
           'yarn install --all',
           'make test-acceptance-webui'
         ],
-        'volumes': [{
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-        {
-          'name': 'uploads',
-          'path': '/uploads'
-        }],
+        'volumes':
+          [stepVolumeOC10Tests] +
+          [{
+            'name': 'uploads',
+            'path': '/uploads'
+          }]
       },
     ],
     'services': [
@@ -747,16 +730,12 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
         ],
       },
     ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-      {
+    'volumes':
+      [stepVolumeOC10Tests] +
+      [{
         'name': 'uploads',
         'temp': {}
-      }
-    ],
+      }],
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -767,7 +746,22 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
     },
   }
 
-def docker(ctx, arch):
+def dockerReleases(ctx):
+  pipelines = []
+  for arch in config['dockerReleases']['architectures']:
+    pipelines.append(dockerRelease(ctx, arch))
+
+  manifest = releaseDockerManifest(ctx)
+  manifest['depends_on'] = getPipelineNames(pipelines)
+  pipelines.append(manifest)
+
+  readme = releaseDockerReadme(ctx)
+  readme['depends_on'] = getPipelineNames(pipelines)
+  pipelines.append(readme)
+
+  return pipelines
+
+def dockerRelease(ctx, arch):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -824,12 +818,6 @@ def docker(ctx, arch):
         },
       },
     ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
@@ -838,6 +826,7 @@ def docker(ctx, arch):
         'refs/pull/**',
       ],
     },
+    'volumes': [pipelineVolumeGoWebhippie],
   }
 
 def dockerEos(ctx):
@@ -896,12 +885,6 @@ def dockerEos(ctx):
           },
         },
       ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
@@ -910,9 +893,17 @@ def dockerEos(ctx):
         'refs/pull/**',
       ],
     },
+    'volumes': [pipelineVolumeGoWebhippie],
   }
 
-def binary(ctx, name):
+def binaryReleases(ctx):
+  pipelines = []
+  for os in config['binaryReleases']['os']:
+    pipelines.append(binaryRelease(ctx, os))
+
+  return pipelines
+
+def binaryRelease(ctx, name):
   # uploads binary to https://download.owncloud.com/ocis/ocis/testing/
   target = '/ocis/%s/testing' % (ctx.repo.name.replace("ocis-", ""))
   if ctx.build.event == "tag":
@@ -938,7 +929,6 @@ def binary(ctx, name):
     'target': target,
   }
 
-
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -956,12 +946,6 @@ def binary(ctx, name):
         'commands': [
           'make -C ocis release-%s' % (name),
         ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
       },
       {
         'name': 'finish',
@@ -969,12 +953,6 @@ def binary(ctx, name):
         'pull': 'always',
         'commands': [
           'make -C ocis release-finish',
-        ],
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
         ],
         'when': {
           'ref': [
@@ -1031,12 +1009,6 @@ def binary(ctx, name):
         },
       },
     ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
@@ -1045,6 +1017,7 @@ def binary(ctx, name):
         'refs/pull/**',
       ],
     },
+    'volumes': [pipelineVolumeGoWebhippie],
   }
 
 def releaseSubmodule(ctx):
@@ -1083,12 +1056,6 @@ def releaseSubmodule(ctx):
         },
       },
     ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'depends_on': depends,
     'trigger': {
       'ref': [
@@ -1098,7 +1065,7 @@ def releaseSubmodule(ctx):
   }
 
 
-def manifest(ctx):
+def releaseDockerManifest(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1124,15 +1091,6 @@ def manifest(ctx):
           'ignore_missing': True,
         },
       },
-    ],
-    'depends_on': [
-      'docker-amd64',
-      'docker-arm64',
-      'docker-arm',
-      'docker-eos-ocis',
-      'binaries-linux',
-      'binaries-darwin',
-      'binaries-windows',
     ],
     'trigger': {
       'ref': [
@@ -1162,7 +1120,7 @@ def changelog(ctx):
       },
       {
         'name': 'diff',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'git diff',
@@ -1170,7 +1128,7 @@ def changelog(ctx):
       },
       {
         'name': 'output',
-        'image': 'owncloud/alpine:latest',
+        'image': 'owncloudci/alpine:latest',
         'pull': 'always',
         'commands': [
           'cat CHANGELOG.md',
@@ -1206,9 +1164,6 @@ def changelog(ctx):
         },
       },
     ],
-    'depends_on': [
-      'manifest',
-    ],
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1217,7 +1172,7 @@ def changelog(ctx):
     },
   }
 
-def readme(ctx):
+def releaseDockerReadme(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1245,11 +1200,6 @@ def readme(ctx):
         },
       },
     ],
-    'depends_on': [
-      'docker-amd64',
-      'docker-arm64',
-      'docker-arm',
-    ],
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1258,7 +1208,7 @@ def readme(ctx):
     },
   }
 
-def badges(ctx):
+def refreshDockerBadges(ctx):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1279,26 +1229,16 @@ def badges(ctx):
         },
       },
     ],
-    'depends_on': [
-      'docker-amd64',
-      'docker-arm64',
-      'docker-arm',
-      'docker-eos-ocis',
-    ],
     'trigger': {
       'ref': [
         'refs/heads/master',
         'refs/tags/v*',
       ],
     },
+    'depends_on': getPipelineNames(dockerReleases(ctx)),
   }
 
 def docs(ctx):
-  generateConfigDocs = []
-
-  for module in config['modules']:
-    generateConfigDocs.append('make -C %s config-docs-generate' % (module))
-
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1311,13 +1251,7 @@ def docs(ctx):
       {
         'name': 'generate-config-docs',
         'image': 'webhippie/golang:1.14',
-        'commands': generateConfigDocs,
-        'volumes': [
-          {
-            'name': 'gopath',
-            'path': '/srv/app',
-          },
-        ],
+        'commands': ['make -C %s config-docs-generate' % (module) for module in config['modules']],
       },
       {
         'name': 'prepare',
@@ -1385,15 +1319,6 @@ def docs(ctx):
         },
       },
     ],
-    'depends_on': [
-      'badges',
-    ],
-    'volumes': [
-      {
-        'name': 'gopath',
-        'temp': {},
-      },
-    ],
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1411,12 +1336,7 @@ def makeGenerate(module):
       'commands': [
         'make -C %s generate' % (module),
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
+      'volumes': [stepVolumeGoWebhippie,],
     }
   ]
 
@@ -1432,7 +1352,7 @@ def updateDeployment(ctx):
     'steps': [
       {
         'name': 'webhook',
-        'image': 'plugins/webhook',
+        'image': 'plugins/webhook:1',
         'settings': {
           'username': {
             'from_secret': 'webhook_username',
@@ -1445,14 +1365,7 @@ def updateDeployment(ctx):
         }
       }
     ],
-    'depends_on': [
-      'docker-amd64',
-      'docker-arm64',
-      'docker-arm',
-      'binaries-linux',
-      'binaries-darwin',
-      'binaries-windows',
-    ],
+    'depends_on': getPipelineNames(dockerReleases(ctx) + binaryReleases(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1515,7 +1428,7 @@ def frontend(module):
     }
   ]
 
-def ocisServer(storage, accounts_hash_difficulty = 4):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
   environment = {
     #'OCIS_LOG_LEVEL': 'debug',
     'STORAGE_HOME_DRIVER': '%s' % (storage),
@@ -1551,22 +1464,15 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
   return [
     {
       'name': 'ocis-server',
-      'image': 'webhippie/golang:1.14',
+      'image': 'owncloudci/alpine:latest',
       'pull': 'always',
       'detach': True,
       'environment' : environment,
       'commands': [
         'apk add mailcap', # install /etc/mime.types
-        'mkdir -p /srv/app/tmp/ocis/owncloud/data/',
-        'mkdir -p /srv/app/tmp/ocis/storage/users/',
         'ocis/bin/ocis server'
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app'
-        },
-      ]
+      'volumes': volumes,
     },
   ]
 
@@ -1583,10 +1489,7 @@ def cloneCoreRepos(coreBranch, coreCommit):
       ] + ([
         'git checkout %s' % (coreCommit)
       ] if coreCommit != '' else []),
-      'volumes': [{
-        'name': 'gopath',
-        'path': '/srv/app',
-      }]
+      'volumes': [stepVolumeOC10Tests],
     }
   ]
 
@@ -1624,12 +1527,7 @@ def build():
       'commands': [
         'make -C ocis build',
       ],
-      'volumes': [
-        {
-          'name': 'gopath',
-          'path': '/srv/app',
-        },
-      ],
+      'volumes': [stepVolumeGoWebhippie,],
     },
   ]
 
@@ -1724,3 +1622,70 @@ def rebuildBuildArtifactCache(ctx, name, path):
 
 def purgeBuildArtifactCache(ctx, name):
   return genericBuildArtifactCache(ctx, name, 'purge', [])
+
+def pipelineSanityChecks(ctx, pipelines):
+  """pipelineSanityChecks helps the CI developers to find errors before running it
+
+  These sanity checks are only executed on when converting starlark to yaml.
+  Error outputs are only visible when the conversion is done with the drone cli.
+
+  Args:
+    ctx: drone passes a context with information which the pipeline can be adapted to
+    pipelines: pipelines to be checked, normally you should run this on the return value of main()
+
+  Returns:
+    none
+  """
+
+  # check if name length of pipeline and steps are exceeded.
+  max_name_length = 50
+  for pipeline in pipelines:
+    pipeline_name = pipeline["name"]
+    if len(pipeline_name) > max_name_length:
+      print("Error: pipeline name %s is longer than 50 characters" %(pipeline_name))
+
+    for step in pipeline["steps"]:
+      step_name = step["name"]
+      if len(step_name) > max_name_length:
+        print("Error: step name %s in pipeline %s is longer than 50 characters" %(step_name, pipeline_name))
+
+  # check for non existing depends_on
+  possible_depends = []
+  for pipeline in pipelines:
+    possible_depends.append(pipeline["name"])
+
+  for pipeline in pipelines:
+    if "depends_on" in pipeline.keys():
+      for depends in pipeline["depends_on"]:
+        if not depends in possible_depends:
+          print("Error: depends_on %s for pipeline %s is not defined" %(depends, pipeline["name"]))
+
+  # check for non declared volumes
+  for pipeline in pipelines:
+    pipeline_volumes = []
+    if "volumes" in pipeline.keys():
+      for volume in pipeline['volumes']:
+        pipeline_volumes.append(volume['name'])
+
+    for step in pipeline["steps"]:
+      if "volumes" in step.keys():
+        for volume in step["volumes"]:
+          if not volume['name'] in pipeline_volumes:
+            print("Warning: volume %s for step %s is not defined in pipeline %s" %(volume['name'], step['name'], pipeline['name']))
+
+  # list used docker images
+  print("")
+  print("List of used docker images:")
+
+  images = {}
+
+  for pipeline in pipelines:
+    for step in pipeline['steps']:
+      image = step["image"]
+      if image in images.keys():
+        images[image] = images[image] + 1
+      else:
+        images[image] = 1
+
+  for image in images.keys():
+    print(" %sx\t%s" %(images[image], image))
