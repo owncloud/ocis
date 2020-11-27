@@ -92,40 +92,36 @@ config = {
     'from_secret': 'private_rocketchat',
   },
 }
-def getTestSuiteNames():
-  keys = config['modules'].keys()
+
+def getPipelineNames(pipelines=[]):
+  """getPipelineNames returns names of pipelines as a string array
+
+  Args:
+    pipelines: array of drone pipelines
+
+  Returns:
+    names of the given pipelines as string array
+  """
   names = []
-  for key in keys:
-    names.append('linting&unitTests-%s' % (key))
+  for pipeline in pipelines:
+    names.append(pipeline['name'])
   return names
 
-def getUITestSuiteNames():
-  return config['uiTests']['suites'].keys()
-
-def getUITestSuites():
-  return config['uiTests']['suites']
-
-def getCoreApiTestPipelineNames():
-  names = []
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    names.append('Core-API-Tests-owncloud-storage-%s' % runPart)
-    names.append('Core-API-Tests-ocis-storage-%s' % runPart)
-  return names
-
-def getDependsOnAllTestPipelines(ctx):
-  dependencies = getTestSuiteNames() + [
-    'upload-coverage',
-    'localApiTests-apiOcisSpecific-owncloud',
-    'localApiTests-apiOcisSpecific-ocis',
-    'localApiTests-apiBasic-owncloud',
-    'localApiTests-apiBasic-ocis',
-  ] + getCoreApiTestPipelineNames() + getUITestSuiteNames() + ['accountsUITests']
-
-  return dependencies
 
 def main(ctx):
+  """main is the entrypoint for drone
+
+  Args:
+    ctx: drone passes a context with information which the pipeline can be adapted to
+
+  Returns:
+    none
+  """
   pipelines = []
-  before = testPipelines(ctx)
+
+  before = \
+    testOcisModules(ctx) + \
+    testPipelines(ctx)
 
   stages = [
     docker(ctx, 'amd64'),
@@ -145,54 +141,50 @@ def main(ctx):
     badges(ctx),
     docs(ctx),
     updateDeployment(ctx),
-    notify(ctx),
   ]
 
   if ctx.build.event == "cron":
-    notify_pipelines = notify(ctx)
-    notify_pipelines['depends_on'] = getTestPipelinesNames(ctx)
-    pipelines = before + [ notify_pipelines ]
+    notify_pipeline = notify(ctx)
+    notify_pipeline['depends_on'] = \
+      getPipelineNames(before)
+
+    pipelines = before + [ notify_pipeline ]
 
   elif '[docs-only]' in (ctx.build.title + ctx.build.message):
-    doc_pipelines = docs(ctx)
-    doc_pipelines['depends_on'] = []
+    docs_pipeline = docs(ctx)
+    docs_pipeline['depends_on'] = []
+    docs_pipelines = [ docs_pipeline ]
 
-    notify_pipelines = notify(ctx)
-    notify_pipelines['depends_on'] = ['docs']
+    notify_pipeline = notify(ctx)
+    notify_pipeline['depends_on'] = \
+      getPipelineNames(docs_pipelines)
 
-    pipelines = [ doc_pipelines, notify_pipelines ]
+    pipelines = docs_pipelines + [ notify_pipeline ]
+
   else:
     pipelines = before + stages + after
 
+    notify_pipeline = notify(ctx)
+    notify_pipeline['depends_on'] = \
+      getPipelineNames(pipelines)
+
+    pipelines = pipelines + [ notify_pipeline ]
+
   return pipelines
 
-def getTestPipelinesNames(ctx):
-  pipelines = getTestSuiteNames()
+def testOcisModules(ctx):
+  pipelines = []
+  for module in config['modules']:
+    pipelines.append(testOcisModule(ctx, module))
 
-  pipelines += [
-    'localApiTests-apiOcisSpecific-owncloud',
-    'localApiTests-apiOcisSpecific-ocis',
-    'localApiTests-apiBasic-owncloud',
-    'localApiTests-apiBasic-ocis',
-  ]
+  coverage_upload = uploadCoverage(ctx)
+  coverage_upload['depends_on'] = getPipelineNames(pipelines)
 
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append('Core-API-Tests-ocis-storage-%s' % (runPart))
-    pipelines.append('Core-API-Tests-owncloud-storage-%s' % (runPart))
+  return pipelines + [coverage_upload]
 
-  pipelines = pipelines + getUITestSuiteNames()
-
-  pipelines.append('accountsUITests')
-  return pipelines
 
 def testPipelines(ctx):
-  pipelines = []
-
-  for module in config['modules']:
-    pipelines.append(testing(ctx, module))
-
-  pipelines += [
-    uploadCoverage(ctx),
+  pipelines = [
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiOcisSpecific'),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiOcisSpecific'),
     localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiBasic', 'default'),
@@ -207,7 +199,7 @@ def testPipelines(ctx):
   pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
   return pipelines
 
-def testing(ctx, module):
+def testOcisModule(ctx, module):
   steps = generate(module) + [
     {
       'name': 'vet',
@@ -381,7 +373,6 @@ def uploadCoverage(ctx):
         'refs/pull/**',
       ],
     },
-    'depends_on': getTestSuiteNames(),
   }
 
 def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
@@ -496,11 +487,11 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
   }
 
 def uiTests(ctx, phoenixBranch, phoenixCommit):
-  suiteNames = getUITestSuiteNames()
-  return [uiTestPipeline(suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
+  suiteNames = config['uiTests']['suites'].keys()
+  return [uiTestPipeline(ctx, suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
 
-def uiTestPipeline(suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
-  suites = getUITestSuites()
+def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
+  suites = config['uiTests']['suites']
   paths = ""
   suite = suites[suiteName]
   if type(suite) == "list":
@@ -736,7 +727,7 @@ def docker(ctx, arch):
         'temp': {},
       },
     ],
-    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -808,7 +799,7 @@ def dockerEos(ctx):
         'temp': {},
       },
     ],
-    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -956,7 +947,7 @@ def binary(ctx, name):
         'temp': {},
       },
     ],
-    'depends_on': getDependsOnAllTestPipelines(ctx),
+    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
