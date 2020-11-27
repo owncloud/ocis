@@ -107,7 +107,6 @@ def getPipelineNames(pipelines=[]):
     names.append(pipeline['name'])
   return names
 
-
 def main(ctx):
   """main is the entrypoint for drone
 
@@ -125,7 +124,6 @@ def main(ctx):
     testOcisModules(ctx) + \
     testPipelines(ctx)
 
-
   stages = [
     docker(ctx, 'amd64'),
     docker(ctx, 'arm64'),
@@ -137,6 +135,9 @@ def main(ctx):
     releaseSubmodule(ctx),
   ]
 
+  purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
+  purge['depends_on'] = getPipelineNames(testPipelines(ctx))
+
   after = [
     manifest(ctx),
     changelog(ctx),
@@ -144,6 +145,7 @@ def main(ctx):
     badges(ctx),
     docs(ctx),
     updateDeployment(ctx),
+    purge,
   ]
 
   if ctx.build.event == "cron":
@@ -189,7 +191,6 @@ def testOcisModules(ctx):
   coverage_upload['depends_on'] = getPipelineNames(pipelines)
 
   return pipelines + [coverage_upload]
-
 
 def testPipelines(ctx):
   pipelines = [
@@ -327,7 +328,7 @@ def buildOcisBinaryForTesting(ctx):
     'steps':
       makeGenerate('ocis') +
       build() +
-      rebuildBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis'),
+      rebuildBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis'),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -421,7 +422,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
       'arch': 'amd64',
     },
     'steps':
-      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
@@ -476,7 +477,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       'arch': 'amd64',
     },
     'steps':
-      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) +
       cloneCoreRepos(coreBranch, coreCommit) + [
       {
@@ -545,7 +546,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
       'arch': 'amd64',
     },
     'steps':
-      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'webUITests',
@@ -617,7 +618,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', acc
       'arch': 'amd64',
     },
     'steps':
-      restoreBuildArtifactCache('ocis-binary-amd64', 'ocis/bin/ocis') +
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'WebUIAcceptanceTests',
@@ -1588,10 +1589,6 @@ def genericCache(name, action, mounts, cache_key):
     restore = 'true'
     action = 'restore'
 
-  cleaned_mounts = []
-  for mount in mounts:
-    cleaned_mounts.append(mount.lstrip('/'))
-
   step = {
       'name': '%s_%s' %(action, name),
       'image': 'meltwater/drone-cache:v1',
@@ -1614,19 +1611,58 @@ def genericCache(name, action, mounts, cache_key):
         'cache_key': cache_key,
         'rebuild': rebuild,
         'restore': restore,
-        'mount': cleaned_mounts,
+        'mount': mounts,
       },
     }
 
   return step
 
-def genericBuildArtifactCache(name, action, path):
+def genericCachePurge(name, cache_key):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'purge_%s_build_artifact_cache' %(name),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'purge-cache',
+        'image': 'minio/mc',
+        'environment': {
+          'MC_HOST_cache': {
+            'from_secret': 'cache_s3_connection_url'
+          }
+        },
+        'commands': [
+          'mc rm --force cache/%s' % (cache_key),
+        ]
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def genericBuildArtifactCache(ctx, name, action, path):
   name = '%s_build_artifact_cache' %(name)
-  cache_key = '{{ .Repo.Name }}/{{ .Commit.Sha }}-{{ .Build.Number }}/%s' %(name)
-  return genericCache(name, action, [path], cache_key)
+  cache_key = '%s/%s/%s' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}', name)
+  if action == "rebuild" or action == "restore":
+    return genericCache(name, action, [path], cache_key)
+  if action == "purge":
+    return genericCachePurge(name, cache_key)
+  return []
 
-def restoreBuildArtifactCache(name, path):
-  return [genericBuildArtifactCache(name, 'restore', path)]
+def restoreBuildArtifactCache(ctx, name, path):
+  return [genericBuildArtifactCache(ctx, name, 'restore', path)]
 
-def rebuildBuildArtifactCache(name, path):
-  return [genericBuildArtifactCache(name, 'rebuild', path)]
+def rebuildBuildArtifactCache(ctx, name, path):
+  return [genericBuildArtifactCache(ctx, name, 'rebuild', path)]
+
+def purgeBuildArtifactCache(ctx, name):
+  return genericBuildArtifactCache(ctx, name, 'purge', [])
