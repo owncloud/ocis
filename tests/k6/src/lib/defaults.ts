@@ -1,10 +1,18 @@
 import * as types from './types';
+import {Options} from "k6/options";
 
-export const host = {
-    name: __ENV.OC_HOST_NAME || 'localhost:9200'
+const ocTestFile = '../_files/' + (__ENV.OC_TEST_FILE || 'kb_50.jpg').split('/').pop()
+export const OC_OCIS_HOST = __ENV.OC_OCIS_HOST || 'https://localhost:9200'
+export const OC_OIDC_HOST = __ENV.OC_OIDC_HOST || OC_OCIS_HOST
+export const OC_OIDC = __ENV.OC_OIDC === 'true' || false
+export const OC_TEST_FILE = {
+    fileName: ocTestFile,
+    bytes: open(ocTestFile, 'b'),
 }
-
-export const accounts: { [key: string]: types.Account; } = {
+export const k6OptionsDefault: Options = {
+    insecureSkipTLSVerify: true,
+};
+export const knownAccounts: { [key: string]: types.Account; } = {
     einstein: {
         login: 'einstein',
         password: 'relativity',
