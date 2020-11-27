@@ -145,7 +145,7 @@ def main(ctx):
     badges(ctx),
     docs(ctx),
     updateDeployment(ctx),
-    purge,
+    #purge,
   ]
 
   if ctx.build.event == "cron":
@@ -1614,7 +1614,6 @@ def genericCache(name, action, mounts, cache_key):
         'mount': mounts,
       },
     }
-
   return step
 
 def genericCachePurge(name, cache_key):
