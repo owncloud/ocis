@@ -153,7 +153,12 @@ def main(ctx):
 
     pipelines = before + [ notify_pipeline ]
 
-  elif '[docs-only]' in (ctx.build.title + ctx.build.message):
+  elif \
+  (ctx.build.event == "pull" and '[docs-only]' in ctx.build.title) \
+  or \
+  (ctx.build.event != "pull" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
+  # [docs-only] is not taken from PR messages, but from commit messages
+
     docs_pipeline = docs(ctx)
     docs_pipeline['depends_on'] = []
     docs_pipelines = [ docs_pipeline ]
