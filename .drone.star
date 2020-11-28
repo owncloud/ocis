@@ -145,7 +145,7 @@ def main(ctx):
     badges(ctx),
     docs(ctx),
     updateDeployment(ctx),
-    #purge,
+    purge,
   ]
 
   if ctx.build.event == "cron":
@@ -1620,7 +1620,7 @@ def genericCachePurge(name, cache_key):
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'purge_%s_build_artifact_cache' %(name),
+    'name': 'purge_%s' %(name),
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
