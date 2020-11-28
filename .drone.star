@@ -1645,6 +1645,10 @@ def genericCachePurge(name, cache_key):
         'refs/tags/v*',
         'refs/pull/**',
       ],
+      'status': [
+        'success',
+        'failure',
+      ]
     },
   }
 
