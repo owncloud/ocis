@@ -1635,7 +1635,7 @@ def genericCachePurge(name, cache_key):
           }
         },
         'commands': [
-          'mc rm --force cache/%s' % (cache_key),
+          'mc rm --recursive --force %s' % (cache_key),
         ]
       },
     ],
