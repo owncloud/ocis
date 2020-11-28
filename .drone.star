@@ -1616,7 +1616,7 @@ def genericCache(name, action, mounts, cache_key):
     }
   return step
 
-def genericCachePurge(name, cache_key):
+def genericCachePurge(ctx, name, cache_key):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -1629,13 +1629,14 @@ def genericCachePurge(name, cache_key):
       {
         'name': 'purge-cache',
         'image': 'minio/mc',
+        'failure': 'ignore',
         'environment': {
           'MC_HOST_cache': {
             'from_secret': 'cache_s3_connection_url'
           }
         },
         'commands': [
-          'mc rm --recursive --force %s' % (cache_key),
+          'mc rm --recursive --force %s/%s' % (ctx.repo.name, cache_key),
         ]
       },
     ],
@@ -1658,7 +1659,7 @@ def genericBuildArtifactCache(ctx, name, action, path):
   if action == "rebuild" or action == "restore":
     return genericCache(name, action, [path], cache_key)
   if action == "purge":
-    return genericCachePurge(name, cache_key)
+    return genericCachePurge(ctx, name, cache_key)
   return []
 
 def restoreBuildArtifactCache(ctx, name, path):
