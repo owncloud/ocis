@@ -49,4 +49,3 @@ export const deleteFile = <RT extends ResponseType | undefined>(account: types.A
         }
     );
 }
-
