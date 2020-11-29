@@ -3,6 +3,7 @@ import {Options} from 'k6/options';
 import {sleep} from "k6";
 import * as auth from "../../lib/auth";
 import * as types from "../../lib/types";
+import * as utils from "../../lib/utils";
 
 interface dataI {
     credential: types.Account | types.Token;
@@ -13,7 +14,7 @@ export const options: Options = {
     iterations: 1,
     vus: 1,
 };
-const account = defaults.knownAccounts.einstein;
+const account = utils.getAccount('einstein');
 const playbooks = {
     fileUpload: playbook.dav.fileUpload(),
     fileDelete: playbook.dav.fileDelete(),
