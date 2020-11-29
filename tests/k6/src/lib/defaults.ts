@@ -1,7 +1,7 @@
 import * as types from './types';
 
 export const host: types.Host = {
-    name: __ENV.OC_HOST_NAME || 'localhost:9200',
+    name: __ENV.OC_HOST_NAME || 'https://localhost:9200',
     type: !!__ENV.TEST_OC10 ? types.HostType.Oc10 : types.HostType.Ocis
 }
 

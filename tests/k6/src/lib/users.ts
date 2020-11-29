@@ -31,13 +31,13 @@ export const createBatchUsers = (numberOfUsers: number): void => {
             userid: userName
         }
         const res = http.post(
-            `https://${defaults.host.name}/ocs/v2.php/cloud/users`,
+            `${defaults.host.name}/ocs/v2.php/cloud/users`,
             userData as any,
             {
                 headers: {
                     Authorization: `Basic ${encoding.b64encode(`${adminUser.login}:${adminUser.password}`)}`,
                 }
-            }
+            } 
         );
         if (res.status != 200) {
             fail("Failed while creating user")
@@ -54,7 +54,7 @@ export const deleteBatchUsers = (numberOfUsers: number, stopOnFailure: boolean =
     for (let i=1; i <= numberOfUsers; i++ ) {
         const userName = `k6users_${i}`
         const res = http.del(
-            `https://${defaults.host.name}/ocs/v2.php/cloud/users/${userName}`,
+            `${defaults.host.name}/ocs/v2.php/cloud/users/${userName}`,
             {},
             {
                 headers: {

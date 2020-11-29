@@ -11,6 +11,7 @@ export let options: Options = {
     insecureSkipTLSVerify: true,
     iterations: 300,
     vus: 100,
+    setupTimeout: '200s',
 };
 
 export const setup = (): void => {
