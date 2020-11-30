@@ -1465,11 +1465,6 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 #
-# https://github.com/owncloud/product/issues/293 sharing with group not available
-#
-apiWebdavUploadTUS/uploadToShare.feature:52
-apiWebdavUploadTUS/uploadToShare.feature:53
-#
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
 #
 apiWebdavPreviews/previews.feature:15
@@ -2495,3 +2490,13 @@ apiWebdavUploadTUS/uploadFileMtimeShares.feature:56
 # https://github.com/owncloud/ocis/issues/763 [OCIS-storage] reading a file that a collaborator uploaded is impossible
 apiWebdavUploadTUS/uploadFileMtimeShares.feature:70
 apiWebdavUploadTUS/uploadFileMtimeShares.feature:71
+
+# https://github.com/owncloud/ocis/issues/968 [ocis-storage] PROPFIND on a file uploaded by share receiver is not possible
+apiWebdavUploadTUS/uploadToShare.feature:23
+apiWebdavUploadTUS/uploadToShare.feature:24
+apiWebdavUploadTUS/uploadToShare.feature:37
+apiWebdavUploadTUS/uploadToShare.feature:38
+
+# https://github.com/owncloud/product/issues/293 sharing with group not available
+apiWebdavUploadTUS/uploadToShare.feature:52
+apiWebdavUploadTUS/uploadToShare.feature:53
