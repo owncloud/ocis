@@ -1,4 +1,4 @@
-import {sleep, check, fail} from 'k6';
+import {sleep, check} from 'k6';
 import {Options} from "k6/options";
 import {api} from "./lib";
 import {users} from "./lib"
