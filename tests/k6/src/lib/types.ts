@@ -9,10 +9,16 @@ export interface Token {
     accessToken: string;
     tokenType: string;
     idToken: string;
-    expiresIn: string;
+    expiresIn: number;
 }
 
 export interface Account {
     login: string
     password: string
+}
+
+export type Credential = Token | Account
+
+export interface AuthProvider {
+    credential: Credential
 }

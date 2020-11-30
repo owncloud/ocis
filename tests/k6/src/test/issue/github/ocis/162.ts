@@ -6,5 +6,4 @@ export const options: Options = {
     iterations: 200,
     vus: 50,
 };
-export const {setup} = uploadFilesBenchmark;
 export default uploadFilesBenchmark.default;

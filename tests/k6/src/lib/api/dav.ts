@@ -4,7 +4,7 @@ import * as defaults from "../defaults";
 import * as types from "../types";
 
 export const fileUpload = <RT extends ResponseType | undefined>(
-    {credential, userName, asset}: { credential: types.Account | types.Token; userName: string; asset: types.Asset }
+    {credential, userName, asset}: { credential: types.Credential; userName: string; asset: types.Asset }
 ): RefinedResponse<RT> => {
     return http.put(
         `${defaults.OC_HOST}/remote.php/dav/files/${userName}/${asset.fileName}`,
@@ -18,7 +18,7 @@ export const fileUpload = <RT extends ResponseType | undefined>(
 }
 
 export const fileDownload = <RT extends ResponseType | undefined>(
-    {credential, userName, fileName}: { credential: types.Account | types.Token; userName: string; fileName: string }
+    {credential, userName, fileName}: { credential: types.Credential; userName: string; fileName: string }
 ): RefinedResponse<RT> => {
     return http.get(
         `${defaults.OC_HOST}/remote.php/dav/files/${userName}/${fileName}`,
@@ -31,7 +31,7 @@ export const fileDownload = <RT extends ResponseType | undefined>(
 }
 
 export const fileDelete = <RT extends ResponseType | undefined>(
-    {credential, userName, fileName}: { credential: types.Account | types.Token; userName: string; fileName: string }
+    {credential, userName, fileName}: { credential: types.Credential; userName: string; fileName: string }
 ): RefinedResponse<RT> => {
     return http.del(
         `${defaults.OC_HOST}/remote.php/dav/files/${userName}/${fileName}`,

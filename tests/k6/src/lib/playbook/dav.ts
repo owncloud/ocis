@@ -8,7 +8,7 @@ export const fileUpload = () => {
     const fileUploadTrend = new Trend('occ_file_upload_trend', true);
     const fileUploadErrorRate = new Gauge('occ_file_upload_error_rate');
 
-    return ({credential, userName, asset}: { credential: types.Account | types.Token; userName: string; asset: types.Asset }): string => {
+    return ({credential, userName, asset}: { credential: types.Credential; userName: string; asset: types.Asset }): string => {
         const fileName = `upload-${userName}-${__VU}-${__ITER}.${utils.extension(asset.fileName)}`;
         const uploadResponse = api.dav.fileUpload({
             credential: credential as any,
@@ -33,7 +33,7 @@ export const fileDelete = () => {
     const fileDeleteTrend = new Trend('occ_file_delete_trend', true);
     const fileDeleteErrorRate = new Gauge('occ_file_delete_error_rate');
 
-    return ({credential, userName, fileName}: { credential: types.Account | types.Token, userName: string; fileName: string }) => {
+    return ({credential, userName, fileName}: { credential: types.Credential, userName: string; fileName: string }) => {
         const deleteResponse = api.dav.fileDelete({
             credential: credential as any,
             fileName,
@@ -52,7 +52,7 @@ export const fileDownload = () => {
     const fileDownloadTrend = new Trend('occ_file_download_trend', true);
     const fileDownloadErrorRate = new Gauge('occ_file_download_error_rate');
 
-    return ({credential, userName, fileName}: { credential: types.Account | types.Token, userName: string; fileName: string }): bytes => {
+    return ({credential, userName, fileName}: { credential: types.Credential, userName: string; fileName: string }): bytes => {
         const downloadResponse = api.dav.fileDownload({
             credential: credential as any,
             fileName,

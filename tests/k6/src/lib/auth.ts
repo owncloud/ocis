@@ -5,83 +5,159 @@ import * as types from "./types";
 import {fail} from 'k6';
 import {get} from 'lodash'
 
-export const oidc = (account: types.Account): types.Token => {
-    const redirectUri = `${defaults.OC_OIDC_HOST}/oidc-callback.html`;
 
-    const logonUri = `${defaults.OC_OIDC_HOST}/signin/v1/identifier/_/logon`;
-    const logonResponse = http.post(
-        logonUri,
-        JSON.stringify(
-            {
-                params: [account.login, account.password, '1'],
-                hello: {
-                    scope: 'openid profile email',
-                    client_id: 'phoenix',
-                    redirect_uri: redirectUri,
-                    flow: 'oidc'
-                },
-                'state': 'vp42cf'
-            },
-        ),
-        {
-            headers: {
-                'Kopano-Konnect-XSRF': '1',
-                Referer: defaults.OC_OIDC_HOST,
-                'Content-Type': 'application/json',
-            },
-        },
-    );
-    const authorizeURI = get(logonResponse.json(), 'hello.continue_uri');
+export default class Factory {
+    private provider!: types.AuthProvider;
+    public account!: types.Account;
 
-    if (logonResponse.status != 200 || !authorizeURI) {
-        fail(logonUri);
+    constructor(account: types.Account) {
+        this.account = account;
+
+        if (defaults.OC_OIDC) {
+            this.provider = new OIDCProvider(account);
+        }
+
+        if (!defaults.OC_OIDC) {
+            this.provider = new AccountProvider(account);
+        }
     }
 
-    const authorizeUri = `${authorizeURI}?${
-        queryString.stringify(
+    public get credential(): types.Credential {
+        return this.provider.credential
+    }
+}
+
+class AccountProvider implements types.AuthProvider {
+    private account: types.Account;
+
+    constructor(account: types.Account) {
+        this.account = account;
+    }
+
+    public get credential(): types.Account {
+        return this.account;
+    }
+}
+
+class OIDCProvider implements types.AuthProvider {
+    private account: types.Account;
+    private redirectUri = `${defaults.OC_OIDC_HOST}/oidc-callback.html`;
+    private logonUri = `${defaults.OC_OIDC_HOST}/signin/v1/identifier/_/logon`;
+    private tokenUrl = `${defaults.OC_OIDC_HOST}/konnect/v1/token`;
+    private cache!: {
+        validTo: Date;
+        token: types.Token;
+    }
+
+    constructor(account: types.Account) {
+        this.account = account;
+    }
+
+    public get credential(): types.Token {
+        if (!this.cache || this.cache.validTo <= new Date()) {
+            const continueURI = this.getContinueURI();
+            const code = this.getCode(continueURI);
+            const token = this.getToken(code);
+
+            this.cache = {
+                validTo: ((): Date => {
+                    const offset = 5;
+                    const d = new Date();
+
+                    d.setSeconds(d.getSeconds() + token.expiresIn - offset)
+
+                    return d
+                })(),
+                token,
+            }
+        }
+
+        return this.cache.token;
+    }
+
+    private getContinueURI(): string {
+        const logonResponse = http.post(
+            this.logonUri,
+            JSON.stringify(
+                {
+                    params: [this.account.login, this.account.password, '1'],
+                    hello: {
+                        scope: 'openid profile email',
+                        client_id: 'phoenix',
+                        redirect_uri: this.redirectUri,
+                        flow: 'oidc'
+                    },
+                    'state': 'vp42cf'
+                },
+            ),
             {
-                client_id: 'phoenix',
-                prompt: 'none',
-                redirect_uri: redirectUri,
-                response_mode: 'query',
-                response_type: 'code',
-                scope: 'openid profile email',
+                headers: {
+                    'Kopano-Konnect-XSRF': '1',
+                    Referer: defaults.OC_OIDC_HOST,
+                    'Content-Type': 'application/json',
+                },
+            },
+        );
+        const continueURI = get(logonResponse.json(), 'hello.continue_uri');
+
+        if (logonResponse.status != 200 || !continueURI) {
+            fail(this.logonUri);
+        }
+
+        return continueURI;
+    }
+
+    private getCode(continueURI: string): string {
+        const authorizeUri = `${continueURI}?${
+            queryString.stringify(
+                {
+                    client_id: 'phoenix',
+                    prompt: 'none',
+                    redirect_uri: this.redirectUri,
+                    response_mode: 'query',
+                    response_type: 'code',
+                    scope: 'openid profile email',
+                },
+            )
+        }`;
+        const authorizeResponse = http.get(
+            authorizeUri,
+            {
+                redirects: 0,
             },
         )
-    }`;
-    const authorizeResponse = http.get(
-        authorizeUri,
-        {
-            redirects: 0,
-        },
-    )
-    const authCode = get(queryString.parseUrl(authorizeResponse.headers.Location), 'query.code')
 
-    if (authorizeResponse.status != 302 || !authCode) {
-        fail(authorizeURI);
-    }
+        const code = get(queryString.parseUrl(authorizeResponse.headers.Location), 'query.code')
 
-    const tokenUrl = `${defaults.OC_OIDC_HOST}/konnect/v1/token`;
-    const tokenResponse = http.post(
-        tokenUrl,
-        {
-            client_id: 'phoenix',
-            code: authCode,
-            redirect_uri: redirectUri,
-            grant_type: 'authorization_code'
+        if (authorizeResponse.status != 302 || !code) {
+            fail(continueURI);
         }
-    )
 
-    const token = {
-        accessToken: get(tokenResponse.json(), 'access_token'),
-        tokenType: get(tokenResponse.json(), 'token_type'),
-        idToken: get(tokenResponse.json(), 'id_token'),
-        expiresIn: get(tokenResponse.json(), 'expires_in'),
+        return code
     }
 
-    if (tokenResponse.status != 200 || !token.accessToken || !token.tokenType || !token.idToken || !token.expiresIn) {
-        fail(authorizeURI);
-    }
+    private getToken(code: string): types.Token {
+        const tokenResponse = http.post(
+            this.tokenUrl,
+            {
+                client_id: 'phoenix',
+                code,
+                redirect_uri: this.redirectUri,
+                grant_type: 'authorization_code'
+            }
+        )
 
-    return token
+        const token = {
+            accessToken: get(tokenResponse.json(), 'access_token'),
+            tokenType: get(tokenResponse.json(), 'token_type'),
+            idToken: get(tokenResponse.json(), 'id_token'),
+            expiresIn: get(tokenResponse.json(), 'expires_in'),
+        }
+
+        if (tokenResponse.status != 200 || !token.accessToken || !token.tokenType || !token.idToken || !token.expiresIn) {
+            fail(this.tokenUrl);
+        }
+
+        return token;
+    }
 }

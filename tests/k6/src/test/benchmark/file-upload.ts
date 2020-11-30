@@ -1,34 +1,22 @@
 import {defaults, playbook} from '../../lib'
 import {Options} from 'k6/options';
 import {sleep} from "k6";
-import * as auth from "../../lib/auth";
-import * as types from "../../lib/types";
-import * as utils from "../../lib/utils";
-
-interface dataI {
-    credential: types.Account | types.Token;
-}
+import auth from "../../lib/auth";
 
 export const options: Options = {
-    ...defaults.k6OptionsDefault,
+    ...defaults.K6_OPTION_DEFAULTS,
     iterations: 1,
     vus: 1,
 };
-const account = utils.getAccount('einstein');
+const authFactory = new auth(defaults.ACCOUNTS.for(defaults.ACCOUNTS.EINSTEIN));
 const playbooks = {
     fileUpload: playbook.dav.fileUpload(),
     fileDelete: playbook.dav.fileDelete(),
 }
-export const setup = (): dataI => {
-    return {
-        credential: defaults.OC_OIDC ? auth.oidc(account) : account,
-    }
-}
-export default (data: dataI) => {
-    const credential = data.credential;
-    const userName = account.login;
+export default () => {
+    const {login: userName} = authFactory.account;
     const fileName = playbooks.fileUpload({
-        credential,
+        credential: authFactory.credential,
         userName,
         asset: defaults.OC_TEST_FILE
     });
@@ -36,7 +24,7 @@ export default (data: dataI) => {
     sleep(1)
 
     playbooks.fileDelete({
-        credential,
+        credential: authFactory.credential,
         userName,
         fileName,
     });
