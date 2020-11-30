@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.4.1-0.20201125144025-57da0c27434c
+	github.com/cs3org/reva v1.4.1-0.20201130061320-ac85e68e0600
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible

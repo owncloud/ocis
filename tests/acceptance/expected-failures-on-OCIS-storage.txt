@@ -1171,10 +1171,6 @@ apiWebdavOperations/downloadFile.feature:85
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
 #
-# https://github.com/owncloud/ocis/issues/751 PROPFIND to https://localhost:9200/remote.php/dav/files gets an error 500 response
-#
-apiWebdavOperations/propfind.feature:5
-#
 # https://github.com/owncloud/ocis-reva/issues/39  REPORT request not implemented
 #
 apiWebdavOperations/search.feature:42
@@ -1640,8 +1636,6 @@ apiVersions/fileVersionsSharingToShares.feature:179
 #
 apiVersions/fileVersionsSharingToShares.feature:222
 apiVersions/fileVersionsSharingToShares.feature:223
-apiVersions/fileVersionsSharingToShares.feature:224
-apiVersions/fileVersionsSharingToShares.feature:225
 #
 # getting the metadata without permission results in a 403 error https://github.com/owncloud/ocis/issues/773
 #
@@ -2474,3 +2468,25 @@ apiVersions/fileVersionsSharingToShares.feature:279
 # https://github.com/owncloud/ocis/issues/719 when a share exists its impossible to share a renamed folder
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:611
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:612
+
+# https://github.com/owncloud/ocis/issues/965 ocis-storage does not use the mtime send in the `Upload-Metadata` header when uploading via TUS
+apiWebdavUploadTUS/uploadFileMtime.feature:17
+apiWebdavUploadTUS/uploadFileMtime.feature:18
+apiWebdavUploadTUS/uploadFileMtime.feature:27
+apiWebdavUploadTUS/uploadFileMtime.feature:28
+apiWebdavUploadTUS/uploadFileMtime.feature:38
+apiWebdavUploadTUS/uploadFileMtime.feature:39
+apiWebdavUploadTUS/uploadFileMtime.feature:49
+apiWebdavUploadTUS/uploadFileMtime.feature:50
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:40
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:41
+
+# https://github.com/owncloud/ocis/issues/968 [ocis-storage] PROPFIND on a file uploaded by share receiver is not possible
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:26
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:27
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:55
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:56
+
+# https://github.com/owncloud/ocis/issues/763 [OCIS-storage] reading a file that a collaborator uploaded is impossible
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:70
+apiWebdavUploadTUS/uploadFileMtimeShares.feature:71

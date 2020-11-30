@@ -2,12 +2,12 @@ package imgsource
 
 import (
 	"context"
-	"fmt"
 	"image"
 	"os"
 	"path/filepath"
 
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/pkg/errors"
 )
 
 // NewFileSystemSource return a new FileSystem instance
@@ -27,12 +27,12 @@ func (s FileSystem) Get(ctx context.Context, file string) (image.Image, error) {
 	imgPath := filepath.Join(s.basePath, file)
 	f, err := os.Open(filepath.Clean(imgPath))
 	if err != nil {
-		return nil, fmt.Errorf("failed to load the file %s from %s error %s", file, imgPath, err.Error())
+		return nil, errors.Wrapf(err, "failed to load the file %s from %s", file, imgPath)
 	}
 
 	img, _, err := image.Decode(f)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Get: Decode:")
 	}
 
 	return img, nil

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -70,7 +71,7 @@ func (s *FileSystem) Set(username string, key string, img []byte) error {
 func (s *FileSystem) BuildKey(r Request) string {
 	etag := r.ETag
 	filetype := r.Types[0]
-	filename := r.Resolution.String() + "." + filetype
+	filename := strconv.Itoa(r.Resolution.Dx()) + "x" + strconv.Itoa(r.Resolution.Dy()) + "." + filetype
 
 	return filepath.Join(etag[:2], etag[2:4], etag[4:], filename)
 }

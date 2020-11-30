@@ -1,8 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"github.com/owncloud/ocis/ocis-pkg/cache"
 	"golang.org/x/crypto/bcrypt"
 	"path"
 	"regexp"
@@ -31,6 +35,12 @@ import (
 
 // accLock mutually exclude readers from writers on account files
 var accLock sync.Mutex
+
+// passwordValidCache caches basic auth password validations
+var passwordValidCache = cache.NewCache(cache.Size(1024))
+
+// passwordValidCacheExpiration defines the entry lifetime
+const passwordValidCacheExpiration = 10 * time.Minute
 
 // an auth request is currently hardcoded and has to match this regex
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
@@ -128,7 +138,6 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 
 	teardownServiceUser := s.serviceUserToIndex()
 	defer teardownServiceUser()
-
 	match, authRequest := getAuthQueryMatch(in.Query)
 	if authRequest {
 		password := match[2]
@@ -152,11 +161,54 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		if err != nil || a.PasswordProfile == nil || len(a.PasswordProfile.Password) == 0 {
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
-		if !isPasswordValid(s.log, a.PasswordProfile.Password, password) {
-			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+
+		// isPasswordValid uses bcrypt.CompareHashAndPassword which is slow by design.
+		// if every request that matches authQuery regex needs to do this step over and over again,
+		// this is secure but also slow. In this implementation we keep it same secure but increase the speed.
+		//
+		// flow:
+		// - request comes in
+		// - it creates a sha256 based on found account PasswordProfile.LastPasswordChangeDateTime and requested password (v)
+		// - it checks if the cache already contains an entry that matches found account Id // account PasswordProfile.LastPasswordChangeDateTime (k)
+		// - if no entry exists it runs the bcrypt.CompareHashAndPassword as before and if everything is ok it stores the
+		//   result by the (k) as key and (v) as value. If not it errors
+		// - if a entry is found it checks if the given value matches (v). If it doesnt match the cache entry gets removed
+		//   and it errors.
+		//
+		// if many concurrent requests from the same user come in within a short period of time, it's possible that e is still nil.
+		// This is why all this needs to be wrapped within a sync.Mutex locking to prevent calling bcrypt.CompareHashAndPassword unnecessarily too often.
+		{
+			var suspicious bool
+
+			kh := sha256.New()
+			kh.Write([]byte(a.Id))
+			k := hex.EncodeToString(kh.Sum([]byte(a.PasswordProfile.LastPasswordChangeDateTime.String())))
+
+			vh := sha256.New()
+			vh.Write([]byte(a.PasswordProfile.Password))
+			v := vh.Sum([]byte(password))
+
+			e := passwordValidCache.Get(k)
+
+			if e == nil {
+				suspicious = !isPasswordValid(s.log, a.PasswordProfile.Password, password)
+			} else if !bytes.Equal(e.V.([]byte), v) {
+				suspicious = true
+			}
+
+			if suspicious {
+				passwordValidCache.Unset(k)
+				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
+			}
+
+			if e == nil {
+				passwordValidCache.Set(k, v, time.Now().Add(passwordValidCacheExpiration))
+			}
 		}
+
 		a.PasswordProfile.Password = ""
 		out.Accounts = []*proto.Account{a}
+
 		return nil
 	}
 

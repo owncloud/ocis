@@ -20,11 +20,13 @@
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
+* Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
+* Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 * Change - Enable OpenID dynamic client registration: [#811](https://github.com/owncloud/ocis/issues/811)
 * Change - Integrate import command from ocis-migration: [#249](https://github.com/owncloud/ocis/pull/249)
@@ -87,8 +89,10 @@
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
 * Enhancement - Update reva to v1.4.1-0.20201123062044-b2c4af4e897d: [#823](https://github.com/owncloud/ocis/pull/823)
+* Enhancement - Update reva to v1.4.1-0.20201130061320-ac85e68e0600: [#980](https://github.com/owncloud/ocis/pull/980)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
+* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
 
 ## Details
 
@@ -249,6 +253,15 @@
 
    https://github.com/owncloud/ocis/pull/656
 
+* Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
+
+   Tags: accounts
+
+   The password validity check for requests like `login eq '%s' and password eq '%s'` is now cached
+   for 10 minutes. This improves the performance for basic auth requests.
+
+   https://github.com/owncloud/ocis/pull/958
+
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 
    Tags: accounts, storage
@@ -299,6 +312,12 @@
    accounts folder.
 
    https://github.com/owncloud/ocis/issues/510
+
+* Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
+
+   The library went out of support. Also did some refactoring of the thumbnails service code.
+
+   https://github.com/owncloud/ocis/pull/910
 
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
 
@@ -1763,6 +1782,14 @@
    https://github.com/cs3org/reva/pull/1324
    https://github.com/cs3org/reva/pull/1326
 
+* Enhancement - Update reva to v1.4.1-0.20201130061320-ac85e68e0600: [#980](https://github.com/owncloud/ocis/pull/980)
+
+  * Fix move operation in ocis storage driver [csorg/reva#1343](https://github.com/cs3org/reva/pull/1343)
+
+   https://github.com/owncloud/ocis/issues/975
+   https://github.com/owncloud/ocis/pull/980
+   https://github.com/cs3org/reva/pull/1343
+
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 
   * let the gateway filter invalid references
@@ -1776,3 +1803,14 @@
 
    https://github.com/owncloud/ocis/pull/725
    https://github.com/cs3org/reva/pull/1264
+
+* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
+
+   Tags: reva
+
+  * Fix capabilities response for multiple client versions #1331 [cs3org/reva#1331](https://github.com/cs3org/reva/pull/1331)
+  * Fix home storage redirect for remote.php/dav/files [cs3org/reva#1342](https://github.com/cs3org/reva/pull/1342)
+
+   https://github.com/owncloud/ocis/pull/971
+   https://github.com/cs3org/reva/pull/1331
+   https://github.com/cs3org/reva/pull/1342

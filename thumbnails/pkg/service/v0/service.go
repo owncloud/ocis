@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"image"
 
 	"gopkg.in/square/go-jose.v2/jwt"
 
@@ -10,7 +11,6 @@ import (
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
-	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/resolution"
 	"github.com/pkg/errors"
 )
 
@@ -18,19 +18,19 @@ import (
 func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 	logger := options.Logger
-	resolutions, err := resolution.New(options.Config.Thumbnail.Resolutions)
+	resolutions, err := thumbnail.ParseResolutions(options.Config.Thumbnail.Resolutions)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
 		serviceID: options.Config.Server.Namespace + "." + options.Config.Server.Name,
 		manager: thumbnail.NewSimpleManager(
+			resolutions,
 			options.ThumbnailStorage,
 			logger,
 		),
-		resolutions: resolutions,
-		source:      options.ImageSource,
-		logger:      logger,
+		source: options.ImageSource,
+		logger: logger,
 	}
 
 	return svc
@@ -38,11 +38,10 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID   string
-	manager     thumbnail.Manager
-	resolutions resolution.Resolutions
-	source      imgsource.Source
-	logger      log.Logger
+	serviceID string
+	manager   thumbnail.Manager
+	source    imgsource.Source
+	logger    log.Logger
 }
 
 // GetThumbnail retrieves a thumbnail for an image
@@ -52,7 +51,6 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		g.logger.Debug().Str("filetype", req.Filetype.String()).Msg("unsupported filetype")
 		return nil
 	}
-	r := g.resolutions.ClosestMatch(int(req.Width), int(req.Height))
 
 	auth := req.Authorization
 	if auth == "" {
@@ -64,8 +62,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	}
 
 	tr := thumbnail.Request{
-		Resolution: r,
-		ImagePath:  req.Filepath,
+		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
 		Encoder:    encoder,
 		ETag:       req.Etag,
 		Username:   username,
@@ -78,8 +75,8 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 		return nil
 	}
 
-	sCtx := imgsource.WithAuthorization(ctx, auth)
-	img, err := g.source.Get(sCtx, tr.ImagePath)
+	sCtx := imgsource.ContextSetAuthorization(ctx, auth)
+	img, err := g.source.Get(sCtx, req.Filepath)
 	if err != nil {
 		return merrors.InternalServerError(g.serviceID, "could not get image from source: %v", err.Error())
 	}

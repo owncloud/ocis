@@ -28,7 +28,7 @@ func NewCache(o ...Option) Cache {
 	}
 }
 
-// Get gets a role-bundle by a given `roleID`.
+// Get gets an entry by given key
 func (c *Cache) Get(k string) *Entry {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -43,7 +43,7 @@ func (c *Cache) Get(k string) *Entry {
 	return nil
 }
 
-// Set sets a roleID / role-bundle.
+// Set adds an entry for given key and value
 func (c *Cache) Set(k string, val interface{}, expiration time.Time) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -56,6 +56,16 @@ func (c *Cache) Set(k string, val interface{}, expiration time.Time) {
 		val,
 		expiration,
 	}
+}
+
+// Unset removes an entry by given key
+func (c *Cache) Unset(k string) bool {
+	if _, ok := c.entries[k]; !ok {
+		return false
+	}
+
+	delete(c.entries, k)
+	return true
 }
 
 // evict frees memory from the cache by removing entries that exceeded the cache TTL.
