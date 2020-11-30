@@ -4,28 +4,25 @@ import {sleep} from "k6";
 import auth from "../../lib/auth";
 
 export const options: Options = {
-    ...defaults.K6_OPTION_DEFAULTS,
-    iterations: 1,
-    vus: 1,
+    ...defaults.K6.OPTIONS,
 };
-const authFactory = new auth(defaults.ACCOUNTS.for(defaults.ACCOUNTS.EINSTEIN));
-const playbooks = {
+const authFactory = new auth(defaults.ACCOUNT.for(defaults.ACCOUNT.EINSTEIN));
+const plays = {
     fileUpload: playbook.dav.fileUpload(),
     fileDownload: playbook.dav.fileDownload(),
     fileDelete: playbook.dav.fileDelete(),
 }
-
 export default () => {
     const {login: userName} = authFactory.account;
-    const fileName = playbooks.fileUpload({
+    const fileName = plays.fileUpload({
         credential: authFactory.credential,
         userName,
-        asset: defaults.OC_TEST_FILE
+        asset: defaults.FILE,
     });
 
     sleep(1)
 
-    playbooks.fileDownload({
+    plays.fileDownload({
         credential: authFactory.credential,
         userName,
         fileName,
@@ -33,7 +30,7 @@ export default () => {
 
     sleep(1)
 
-    playbooks.fileDelete({
+    plays.fileDelete({
         credential: authFactory.credential,
         userName,
         fileName,

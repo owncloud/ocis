@@ -1,21 +1,29 @@
 import * as types from './types';
 import {Options} from "k6/options";
 
-const ocTestFile = '../_files/' + (__ENV.OC_TEST_FILE || 'kb_50.jpg').split('/').pop()
-export const OC_HOST = __ENV.OC_HOST || 'https://localhost:9200'
-export const OC_LOGIN = __ENV.OC_LOGIN
-export const OC_PASSWORD = __ENV.OC_PASSWORD
-export const OC_OIDC_HOST = __ENV.OC_OIDC_HOST || OC_HOST
-export const OC_OIDC = __ENV.OC_OIDC === 'true' || false
-export const OC_TEST_FILE = {
-    fileName: ocTestFile,
-    bytes: open(ocTestFile, 'b'),
+export class K6 {
+    public static readonly OPTIONS: Options = {
+        insecureSkipTLSVerify: true,
+        iterations: 1,
+        vus: 1,
+    };
 }
-export const K6_OPTION_DEFAULTS: Options = {
-    insecureSkipTLSVerify: true,
+
+export class ENV {
+    public static readonly HOST = __ENV.OC_HOST || 'https://localhost:9200';
+    public static readonly LOGIN = __ENV.OC_LOGIN;
+    public static readonly PASSWORD = __ENV.OC_PASSWORD;
+    public static readonly OIDC_HOST = __ENV.OC_OIDC_HOST || ENV.HOST;
+    public static readonly OIDC_ENABLED = __ENV.OC_OIDC_ENABLED === 'true' || false;
+    public static readonly FILE_NAME = '../_files/' + (__ENV.OC_TEST_FILE || 'kb_50.jpg').split('/').pop();
+}
+
+export const FILE = {
+    fileName: ENV.FILE_NAME,
+    bytes: open(ENV.FILE_NAME, 'b'),
 };
 
-export class ACCOUNTS {
+export class ACCOUNT {
     public static readonly EINSTEIN = 'einstein';
     public static readonly RICHARD = 'richard';
     private static readonly list: { [key: string]: types.Account; } = {
@@ -30,10 +38,10 @@ export class ACCOUNTS {
     }
 
     public static for(key: string): types.Account {
-        if (OC_LOGIN && OC_PASSWORD) {
+        if (ENV.LOGIN && ENV.PASSWORD) {
             return {
-                login: OC_LOGIN,
-                password: OC_PASSWORD,
+                login: ENV.LOGIN,
+                password: ENV.PASSWORD,
             }
         }
 

@@ -7,7 +7,7 @@ export const userInfo = <RT extends ResponseType | undefined>(
     {credential, userName}: { credential: types.Credential; userName: string; }
 ): RefinedResponse<RT> => {
     return http.get(
-        `${defaults.OC_HOST}/ocs/v1.php/cloud/users/${userName}`,
+        `${defaults.ENV.HOST}/ocs/v1.php/cloud/users/${userName}`,
         {
             headers: {
                 ...api.headersDefault({credential})

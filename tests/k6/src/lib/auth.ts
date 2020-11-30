@@ -13,13 +13,12 @@ export default class Factory {
     constructor(account: types.Account) {
         this.account = account;
 
-        if (defaults.OC_OIDC) {
+        if (defaults.ENV.OIDC_ENABLED) {
             this.provider = new OIDCProvider(account);
+            return
         }
 
-        if (!defaults.OC_OIDC) {
-            this.provider = new AccountProvider(account);
-        }
+        this.provider = new AccountProvider(account);
     }
 
     public get credential(): types.Credential {
@@ -41,9 +40,9 @@ class AccountProvider implements types.AuthProvider {
 
 class OIDCProvider implements types.AuthProvider {
     private account: types.Account;
-    private redirectUri = `${defaults.OC_OIDC_HOST}/oidc-callback.html`;
-    private logonUri = `${defaults.OC_OIDC_HOST}/signin/v1/identifier/_/logon`;
-    private tokenUrl = `${defaults.OC_OIDC_HOST}/konnect/v1/token`;
+    private redirectUri = `${defaults.ENV.OIDC_HOST}/oidc-callback.html`;
+    private logonUri = `${defaults.ENV.OIDC_HOST}/signin/v1/identifier/_/logon`;
+    private tokenUrl = `${defaults.ENV.OIDC_HOST}/konnect/v1/token`;
     private cache!: {
         validTo: Date;
         token: types.Token;
@@ -93,7 +92,7 @@ class OIDCProvider implements types.AuthProvider {
             {
                 headers: {
                     'Kopano-Konnect-XSRF': '1',
-                    Referer: defaults.OC_OIDC_HOST,
+                    Referer: defaults.ENV.OIDC_HOST,
                     'Content-Type': 'application/json',
                 },
             },
