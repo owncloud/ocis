@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-30T07:48:37+0000"
+date: "2020-11-30T08:51:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
