@@ -1402,6 +1402,11 @@ apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
 apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
 #
+# https://github.com/owncloud/product/issues/293 sharing with group not available
+#
+apiWebdavUploadTUS/uploadToShare.feature:52
+apiWebdavUploadTUS/uploadToShare.feature:53
+#
 # https://github.com/owncloud/ocis-reva/issues/243  Sharing does not work
 #
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:529
