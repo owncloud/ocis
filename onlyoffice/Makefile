@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocis-onlyoffice
+NAME := onlyoffice
 IMPORT := github.com/owncloud/$(NAME)
 BIN := bin
 DIST := dist
