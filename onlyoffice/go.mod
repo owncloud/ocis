@@ -18,4 +18,7 @@ require (
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 )
 
-replace github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+replace (
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)
