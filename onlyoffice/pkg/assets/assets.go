@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/onlyoffice/pkg/config"
 )
 

@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/owncloud/ocis-pkg/v2/middleware"
-	"github.com/owncloud/ocis-pkg/v2/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/onlyoffice/pkg/assets"
 	svc "github.com/owncloud/ocis/onlyoffice/pkg/service/v0"
 	"github.com/owncloud/ocis/onlyoffice/pkg/version"
@@ -28,7 +28,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			middleware.RealIP,
 			middleware.RequestID,
-			middleware.Cache,
+			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(
@@ -44,6 +44,7 @@ func Server(opts ...Option) (http.Service, error) {
 					assets.Logger(options.Logger),
 					assets.Config(options.Config),
 				),
+				options.Config.HTTP.CacheTTL,
 			),
 		),
 	)
