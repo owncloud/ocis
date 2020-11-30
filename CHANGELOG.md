@@ -92,7 +92,7 @@
 * Enhancement - Update reva to v1.4.1-0.20201130061320-ac85e68e0600: [#980](https://github.com/owncloud/ocis/pull/980)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
-* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
 
 ## Details
 
@@ -1804,12 +1804,13 @@
    https://github.com/owncloud/ocis/pull/725
    https://github.com/cs3org/reva/pull/1264
 
-* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
 
    Tags: reva
 
-  * Fix capabilities response for multiple client versions #1331 [cs3org/reva#1331](Fix capabilities response for multiple client versions #1331)
+  * Fix capabilities response for multiple client versions #1331 [cs3org/reva#1331](https://github.com/cs3org/reva/pull/1331)
   * Fix home storage redirect for remote.php/dav/files [cs3org/reva#1342](https://github.com/cs3org/reva/pull/1342)
 
+   https://github.com/owncloud/ocis/pull/971
    https://github.com/cs3org/reva/pull/1331
    https://github.com/cs3org/reva/pull/1342
