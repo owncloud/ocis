@@ -1636,8 +1636,6 @@ apiVersions/fileVersionsSharingToShares.feature:179
 #
 apiVersions/fileVersionsSharingToShares.feature:222
 apiVersions/fileVersionsSharingToShares.feature:223
-apiVersions/fileVersionsSharingToShares.feature:224
-apiVersions/fileVersionsSharingToShares.feature:225
 #
 # getting the metadata without permission results in a 403 error https://github.com/owncloud/ocis/issues/773
 #
