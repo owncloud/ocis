@@ -218,6 +218,8 @@ github.com/cs3org/reva v1.4.1-0.20201127111856-e6a6212c1b7b h1:Bypxdf3vXwyEeL86M
 github.com/cs3org/reva v1.4.1-0.20201127111856-e6a6212c1b7b/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
 github.com/cs3org/reva v1.4.1-0.20201130061320-ac85e68e0600 h1:4CKU+R4UNvILzsPrcAFwEbk/8Hc6vJqwO7SxK0gAm4I=
 github.com/cs3org/reva v1.4.1-0.20201130061320-ac85e68e0600/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
+github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3 h1:H3QnP+eApE2LDJrYjJrIBmJ04KGVdpR2QP+ipdPp3jE=
+github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
