@@ -27,7 +27,7 @@ We provide overall three different variants of configuration. The variant based 
 
 ### ownCloud Web configuration
 
-When loading the extension in the ownCloud Web, it is necessary to specify to which ownCloud 10 server is the extension supposed to connect to. This can be done via `config` object when registering the extension in `config.json`. For more details, you can take a look at the following example:
+When loading the extension in the ownCloud Web, it is necessary to specify to which ownCloud 10 server the extension is supposed to connect to. This can be done via `config` object when registering the extension in `config.json`. For more details, you can take a look at the following example:
 
 ```json
 "external_apps": [
@@ -108,62 +108,62 @@ If you prefer to configure the service with commandline flags you can see the av
 
 #### Global
 
---config-file | $ONLYOFFICE_CONFIG_FILE  
+--config-file | $ONLYOFFICE_CONFIG_FILE
 : Path to config file.
 
---log-level | $ONLYOFFICE_LOG_LEVEL  
+--log-level | $ONLYOFFICE_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $ONLYOFFICE_LOG_PRETTY  
+--log-pretty | $ONLYOFFICE_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $ONLYOFFICE_LOG_COLOR  
+--log-color | $ONLYOFFICE_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 #### Server
 
---tracing-enabled | $ONLYOFFICE_TRACING_ENABLED  
+--tracing-enabled | $ONLYOFFICE_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $ONLYOFFICE_TRACING_TYPE  
+--tracing-type | $ONLYOFFICE_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $ONLYOFFICE_TRACING_ENDPOINT  
+--tracing-endpoint | $ONLYOFFICE_TRACING_ENDPOINT
 : Endpoint for the agent.
 
---tracing-collector | $ONLYOFFICE_TRACING_COLLECTOR  
+--tracing-collector | $ONLYOFFICE_TRACING_COLLECTOR
 : Endpoint for the collector.
 
---tracing-service | $ONLYOFFICE_TRACING_SERVICE  
+--tracing-service | $ONLYOFFICE_TRACING_SERVICE
 : Service name for tracing. Default: `onlyoffice`.
 
---debug-addr | $ONLYOFFICE_DEBUG_ADDR  
+--debug-addr | $ONLYOFFICE_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9224`.
 
---debug-token | $ONLYOFFICE_DEBUG_TOKEN  
+--debug-token | $ONLYOFFICE_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $ONLYOFFICE_DEBUG_PPROF  
+--debug-pprof | $ONLYOFFICE_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $ONLYOFFICE_DEBUG_ZPAGES  
+--debug-zpages | $ONLYOFFICE_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---http-addr | $ONLYOFFICE_HTTP_ADDR  
+--http-addr | $ONLYOFFICE_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9220`.
 
---http-namespace | $ONLYOFFICE_HTTP_NAMESPACE  
+--http-namespace | $ONLYOFFICE_HTTP_NAMESPACE
 : Set the base namespace for the http namespace. Default: `com.owncloud.web`.
 
---http-root | $ONLYOFFICE_HTTP_ROOT  
+--http-root | $ONLYOFFICE_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
---asset-path | $ONLYOFFICE_ASSET_PATH  
+--asset-path | $ONLYOFFICE_ASSET_PATH
 : Path to custom assets.
 
 #### Health
 
---debug-addr | $ONLYOFFICE_DEBUG_ADDR  
+--debug-addr | $ONLYOFFICE_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9224`.
 
 ### Configuration file
