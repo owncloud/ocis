@@ -40,7 +40,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			httpNamespace := c.String("http-namespace")
 
 			if cfg.Tracing.Enabled {
 				switch t := cfg.Tracing.Type; t {
@@ -136,8 +135,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			{
 				server, err := http.Server(
+					http.Name("onlyoffice"),
 					http.Logger(logger),
-					http.Namespace(httpNamespace),
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),

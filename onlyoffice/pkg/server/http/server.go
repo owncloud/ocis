@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis-pkg/v2/middleware"
 	"github.com/owncloud/ocis-pkg/v2/service/http"
 	"github.com/owncloud/ocis/onlyoffice/pkg/assets"
@@ -14,8 +13,8 @@ func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
 	service := http.NewService(
+		http.Name(options.Name),
 		http.Logger(options.Logger),
-		http.Name("onlyoffice"),
 		http.Version(version.String),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Address(options.Config.HTTP.Addr),
@@ -33,11 +32,18 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(
-				"onlyoffice",
+				options.Name,
 				version.String,
 			),
 			middleware.Logger(
 				options.Logger,
+			),
+			middleware.Static(
+				options.Config.HTTP.Root,
+				assets.New(
+					assets.Logger(options.Logger),
+					assets.Config(options.Config),
+				),
 			),
 		),
 	)
@@ -48,21 +54,9 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewTracing(handle)
 	}
 
-	mux := chi.NewMux()
-
-	mux.Use(middleware.Static(
-		options.Config.HTTP.Root,
-		assets.New(
-			assets.Logger(options.Logger),
-			assets.Config(options.Config),
-		),
-	))
-
-	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {})
-
 	service.Handle(
 		"/",
-		mux,
+		handle,
 	)
 
 	service.Init()

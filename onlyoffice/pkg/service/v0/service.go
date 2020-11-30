@@ -24,6 +24,8 @@ func NewService(opts ...Option) Service {
 		mux:    m,
 	}
 
+	m.Route(options.Config.HTTP.Root, func(r chi.Router) {})
+
 	return svc
 }
 

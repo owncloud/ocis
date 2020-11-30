@@ -14,12 +14,12 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Namespace string
-	Logger    log.Logger
-	Context   context.Context
-	Config    *config.Config
-	Metrics   *metrics.Metrics
-	Flags     []cli.Flag
+	Name    string
+	Logger  log.Logger
+	Context context.Context
+	Config  *config.Config
+	Metrics *metrics.Metrics
+	Flags   []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -68,9 +68,9 @@ func Flags(val []cli.Flag) Option {
 	}
 }
 
-// Namespace provides a function to set the Namespace option.
-func Namespace(val string) Option {
+// Name provides a function to set the Name option.
+func Name(val string) Option {
 	return func(o *Options) {
-		o.Namespace = val
+		o.Name = val
 	}
 }
