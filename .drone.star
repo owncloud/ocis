@@ -14,8 +14,8 @@ config = {
     'webdav':'',
   },
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': '31105a0d3e6e6ef0a0da2c16c66d4261fd91c069',
+    'coreBranch': 'upload-to-share-tusTests',
+    'coreCommit': '9721752b0965c3e1c9bf4458e0f0eca5e608490c',
     'numberOfParts': 10
   },
   'uiTests': {
