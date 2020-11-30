@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	"net/http"
-	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -38,6 +39,8 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				account, ok := h.getAccount(req)
 
 				if !ok {
+					// TODO need correct hostname
+					w.Header().Add("WWW-Authenticate", "Basic realm=\"Access to localhost\", charset=\"UTF-8\"")
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}

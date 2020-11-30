@@ -2,8 +2,11 @@ package command
 
 import (
 	"context"
+	gohttp "net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 
 	"github.com/micro/cli/v2"
@@ -109,6 +112,11 @@ func Server(cfg *config.Config) *cli.Command {
 					cancel()
 				})
 			}
+			runtime.SetBlockProfileRate(1)
+			runtime.SetMutexProfileFraction(1)
+			go func() {
+				gohttp.ListenAndServe(":8887", nil)
+			}()
 
 			return gr.Run()
 		},

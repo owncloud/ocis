@@ -1,7 +1,12 @@
 package http
 
 import (
+	_ "net/http/pprof"
+
+	ghttp "net/http"
+
 	"github.com/go-chi/chi"
+	cmw "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/version"
@@ -27,6 +32,9 @@ func Server(opts ...Option) http.Service {
 
 	mux := chi.NewMux()
 
+	mux.Use(func(next ghttp.Handler) ghttp.Handler {
+		return cmw.Profiler()
+	})
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.NoCache)

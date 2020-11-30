@@ -268,8 +268,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	return alice.New(
 		middleware.HTTPSRedirect,
-		middleware.OIDCAuth(
-			middleware.Logger(l),
+		middleware.Authentication(
+			// OIDC Options
 			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
 				// Initialize a provider by specifying the issuer URL.
 				// it will fetch the keys from the issuer using the .well-known
@@ -280,13 +280,12 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 				)
 			}),
 			middleware.HTTPClient(oidcHTTPClient),
-			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
 			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
-		),
-		middleware.BasicAuth(
+
+			// basic Options
 			middleware.Logger(l),
-			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
+			middleware.EnableBasicAuth(true),
 			middleware.AccountsClient(accountsClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 		),

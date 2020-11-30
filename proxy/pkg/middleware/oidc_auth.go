@@ -38,7 +38,10 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if !h.shouldServe(req) {
-				next.ServeHTTP(w, req)
+				// TODO need correct hostname
+				w.Header().Add("WWW-Authenticate", "Bearer realm=\"Access to localhost\", charset=\"UTF-8\"")
+				//w.WriteHeader(http.StatusUnauthorized)
+				//next.ServeHTTP(w, req)
 				return
 			}
 
