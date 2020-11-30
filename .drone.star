@@ -1636,7 +1636,7 @@ def genericCachePurge(ctx, name, cache_key):
           }
         },
         'commands': [
-          'mc rm --recursive --force %s/%s' % (ctx.repo.name, cache_key),
+          'mc rm --recursive --force cache/cache/%s/%s' % (ctx.repo.name, cache_key),
         ]
       },
     ],
