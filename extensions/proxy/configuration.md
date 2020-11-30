@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-11-30T12:55:22+0000"
+date: "2020-11-30T17:13:13+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -36,42 +36,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### proxy version
-
-Print the versions of the running instances
-
-Usage: `proxy version [command options] [arguments...]`
-
---service-namespace | $PROXY_SERVICE_NAMESPACE  
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name | $PROXY_SERVICE_NAME  
-: Service name. Default: `proxy`.
-
-### proxy health
-
-Check health status
-
-Usage: `proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
-
-### proxy ocis-proxy
-
-proxy for Reva/oCIS
-
-Usage: `proxy ocis-proxy [command options] [arguments...]`
-
---log-level | $PROXY_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $PROXY_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $PROXY_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### proxy server
 
@@ -153,4 +117,40 @@ Usage: `proxy server [command options] [arguments...]`
 
 --enable-basic-auth | $PROXY_ENABLE_BASIC_AUTH  
 : enable basic authentication. Default: `false`.
+
+### proxy version
+
+Print the versions of the running instances
+
+Usage: `proxy version [command options] [arguments...]`
+
+--service-namespace | $PROXY_SERVICE_NAMESPACE  
+: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
+
+--service-name | $PROXY_SERVICE_NAME  
+: Service name. Default: `proxy`.
+
+### proxy health
+
+Check health status
+
+Usage: `proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
+
+### proxy ocis-proxy
+
+proxy for Reva/oCIS
+
+Usage: `proxy ocis-proxy [command options] [arguments...]`
+
+--log-level | $PROXY_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $PROXY_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $PROXY_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
