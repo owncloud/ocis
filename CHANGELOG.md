@@ -89,6 +89,7 @@
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
 * Enhancement - Update konnectd to v0.33.8: [#744](https://github.com/owncloud/ocis/pull/744)
 * Enhancement - Update reva to v1.4.1-0.20201123062044-b2c4af4e897d: [#823](https://github.com/owncloud/ocis/pull/823)
+* Enhancement - Update reva to v1.4.1-0.20201130061320-ac85e68e0600: [#980](https://github.com/owncloud/ocis/pull/980)
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 * Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#1331](https://github.com/cs3org/reva/pull/1331)
@@ -1780,6 +1781,14 @@
    https://github.com/cs3org/reva/pull/1323
    https://github.com/cs3org/reva/pull/1324
    https://github.com/cs3org/reva/pull/1326
+
+* Enhancement - Update reva to v1.4.1-0.20201130061320-ac85e68e0600: [#980](https://github.com/owncloud/ocis/pull/980)
+
+  * Fix move operation in ocis storage driver [csorg/reva#1343](https://github.com/cs3org/reva/pull/1343)
+
+   https://github.com/owncloud/ocis/issues/975
+   https://github.com/owncloud/ocis/pull/980
+   https://github.com/cs3org/reva/pull/1343
 
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 
