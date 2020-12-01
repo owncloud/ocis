@@ -330,6 +330,10 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/hello.js",
 					Backend:  "http://localhost:9105",
 				},
+				{
+					Endpoint: "/onlyoffice.js",
+					Backend:  "http://localhost:9220",
+				},
 			},
 		},
 		{
