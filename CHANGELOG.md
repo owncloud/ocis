@@ -76,6 +76,7 @@
 * Enhancement - Add the webdav service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Better adopt Go-Micro: [#840](https://github.com/owncloud/ocis/pull/840)
 * Enhancement - Add permission check when assigning and removing roles: [#879](https://github.com/owncloud/ocis/issues/879)
+* Enhancement - Create OnlyOffice extension: [#857](https://github.com/owncloud/ocis/pull/857)
 * Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
 * Enhancement - Add glauth fallback backend: [#649](https://github.com/owncloud/ocis/pull/649)
 * Enhancement - Tidy dependencies: [#845](https://github.com/owncloud/ocis/pull/845)
@@ -1644,6 +1645,15 @@
    users with the role management permissions can assign and unassign roles.
 
    https://github.com/owncloud/ocis/issues/879
+
+* Enhancement - Create OnlyOffice extension: [#857](https://github.com/owncloud/ocis/pull/857)
+
+   Tags: OnlyOffice
+
+   We've created an OnlyOffice extension which enables users to create and edit docx documents
+   and open spreadsheets and presentations.
+
+   https://github.com/owncloud/ocis/pull/857
 
 * Enhancement - Show basic-auth warning only once: [#886](https://github.com/owncloud/ocis/pull/886)
 
