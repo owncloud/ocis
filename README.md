@@ -8,7 +8,7 @@
 [![Go Report](https://goreportcard.com/badge/github.com/owncloud/ocis)](https://goreportcard.com/report/github.com/owncloud/ocis)
 [![](https://images.microbadger.com/badges/image/owncloud/ocis.svg)](https://hub.docker.com/r/owncloud/ocis "oCIS docker image")
 
-**ownCloud Infinite Scale is currently on its way to production readiness and therefore still subject to a lot of changes**
+**ownCloud Infinite Scale is currently in a technical preview state. It will be subject a lot of changes and is not yet ready for general production deployments.**
 
 ## Run ownCloud Infinite Scale
 
