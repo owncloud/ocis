@@ -47,7 +47,12 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				// this means that requests such as:
 				// curl -v -k -u admin:admin -H "depth: 0" -X PROPFIND https://localhost:9200/remote.php/dav/files | xmllint --format -
 				// even when succeeding, will contain a Www-Authenticate header.
-				w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Bearer", req.Host))
+
+				for i := 0; i < len(ProxyWwwAuthenticate); i++ {
+					if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
+						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Bearer", req.Host))
+					}
+				}
 				next.ServeHTTP(w, req)
 				return
 			}

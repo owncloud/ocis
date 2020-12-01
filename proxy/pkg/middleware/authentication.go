@@ -9,6 +9,11 @@ import (
 
 var SupportedAuthStrategies []string
 
+// ProxyWwwAuthenticate is a list of endpoints that do not rely on reva underlying authentication, such as ocs.
+// services that fallback to reva authentication are declared in the "frontend" command on OCIS.
+// TODO this should be a regexp, or it can be confused with routes that contain "/ocs" somewhere along the URI
+var ProxyWwwAuthenticate = []string{"ocs"}
+
 type statusRecorder struct {
 	http.ResponseWriter
 	status int

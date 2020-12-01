@@ -35,7 +35,11 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 					// if we want to prevent duplicated Www-Authenticate headers coming from Reva consider using w.Header().Del("Www-Authenticate")
 					// but this will require the proxy being aware of endpoints which authentication fallback to Reva.
 					if !h.isPublicLink(req) {
-						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
+						for i := 0; i < len(ProxyWwwAuthenticate); i++ {
+							if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
+								w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
+							}
+						}
 					}
 					next.ServeHTTP(w, req)
 					return
@@ -43,7 +47,11 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 				account, ok := h.getAccount(req)
 				if !ok {
-					w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
+					for i := 0; i < len(ProxyWwwAuthenticate); i++ {
+						if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
+							w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
+						}
+					}
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
