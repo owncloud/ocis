@@ -25,6 +25,7 @@ cd ocis
 The oCIS binary source is in the `ocis` folder inside the oCIS repository. In this folder you can build the oCIS binary:
 
 {{< highlight txt >}}
+cd ocis
 make generate
 make build
 {{< / highlight >}}

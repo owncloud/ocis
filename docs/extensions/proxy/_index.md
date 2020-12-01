@@ -6,4 +6,4 @@ geekdocEditPath: edit/master/docs/extensions/proxy
 geekdocFilePath: _index.md
 ---
 
-This service provides an proxy service that routes requests to the correct extensions.
+This service provides a proxy service that routes requests to the correct extensions.

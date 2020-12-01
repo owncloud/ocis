@@ -12,9 +12,9 @@ geekdocFilePath: getting-started.md
 ## Requirements
 
 We want contribution to oCIS and the creation of extensions to be as easy as possible.
-So we are trying to reflect this the used tooling. It should be kept simple and quick to be set up.
+So we are trying to reflect this in the tooling. It should be kept simple and quick to be set up.
 
-Besides of standard development tools like git and a text editor, you need following software for development:
+Besides standard development tools like git and a text editor, you need the following software for development:
 
 - Go >= v1.13 ([install instructions](https://golang.org/doc/install))
 - Yarn ([install instructions](https://classic.yarnpkg.com/en/docs/install))
@@ -41,7 +41,7 @@ The `scripts` folder contains scripts to perform various build, install, analysi
 
 ## Starting points
 
-Depending on what you want do develop there are different starting points. These will be described below.
+Depending on what you want to develop there are different starting points. These will be described below.
 
 ### Developing oCIS
 
@@ -49,7 +49,7 @@ If you want to contribute to oCIS:
 
 - see [contribution guidelines](https://github.com/owncloud/ocis#contributing)
 - make sure the tooling is set up by [building oCIS]({{< relref "build.md" >}}) and [building the docs]({{< relref "build-docs.md" >}})
-- create or pick an [open issue](https://github.com/owncloud/ocis/issues) to develop on
+- create or pick an [open issue](https://github.com/owncloud/ocis/issues) to develop on and mention in the issue that you are working on it
 - open a PR and get things done
 
 ### Developing extensions
