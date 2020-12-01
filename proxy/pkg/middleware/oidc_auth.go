@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -37,11 +38,17 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			// there is no bearer token on the request,
 			if !h.shouldServe(req) {
-				// TODO need correct hostname
-				w.Header().Add("WWW-Authenticate", "Bearer realm=\"Access to localhost\", charset=\"UTF-8\"")
-				//w.WriteHeader(http.StatusUnauthorized)
-				//next.ServeHTTP(w, req)
+				// oidc supported but token not present, add header and handover to the next middleware.
+
+				// TODO for this logic to work and we don't return superfluous Www-Authenticate headers we would need to
+				// add Www-Authenticate only on selected endpoints, because Reva won't cleanup already written headers.
+				// this means that requests such as:
+				// curl -v -k -u admin:admin -H "depth: 0" -X PROPFIND https://localhost:9200/remote.php/dav/files | xmllint --format -
+				// even when succeeding, will contain a Www-Authenticate header.
+				w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Bearer", req.Host))
+				next.ServeHTTP(w, req)
 				return
 			}
 

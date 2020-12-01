@@ -32,15 +32,18 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
 				if h.isPublicLink(req) || !h.isBasicAuth(req) {
+					// if we want to prevent duplicated Www-Authenticate headers coming from Reva consider using w.Header().Del("Www-Authenticate")
+					// but this will require the proxy being aware of endpoints which authentication fallback to Reva.
+					if !h.isPublicLink(req) {
+						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
+					}
 					next.ServeHTTP(w, req)
 					return
 				}
 
 				account, ok := h.getAccount(req)
-
 				if !ok {
-					// TODO need correct hostname
-					w.Header().Add("WWW-Authenticate", "Basic realm=\"Access to localhost\", charset=\"UTF-8\"")
+					w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
@@ -49,6 +52,8 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 					OcisID: account.Id,
 					Iss:    oidcIss,
 				}
+
+				fmt.Printf("\n\nHGAHAHAHA\n\n")
 
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 			},

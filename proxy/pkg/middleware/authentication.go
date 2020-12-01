@@ -3,12 +3,32 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
-// Authentication is a higher level authentication middleware.
+var SupportedAuthStrategies []string
+
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (rec *statusRecorder) WriteHeader(code int) {
+	rec.status = code
+	rec.ResponseWriter.WriteHeader(code)
+}
+
+// Authentication is a higher order authentication middleware.
 func Authentication(opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
+	if options.OIDCIss != "" {
+		SupportedAuthStrategies = append(SupportedAuthStrategies, "bearer")
+	}
+
+	if options.EnableBasicAuth {
+		SupportedAuthStrategies = append(SupportedAuthStrategies, "basic")
+	}
 
 	oidc := OIDCAuth(
 		Logger(options.Logger),
@@ -28,21 +48,24 @@ func Authentication(opts ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// here we multiplex depending on the use agent
-			userAgent := r.Header.Get("User-Agent")
-			fmt.Printf("\n\nUser-Agent:\t%s\n\n", userAgent)
-			switch userAgent {
-			case "a":
-				oidc(next).ServeHTTP(w, r)
-				return
-			case "b":
-				basic(next).ServeHTTP(w, r)
-				return
-			default:
-				oidc(next).ServeHTTP(w, r)
-				basic(next).ServeHTTP(w, r)
-				return
+			if options.OIDCIss != "" && options.EnableBasicAuth {
+				oidc(basic(next)).ServeHTTP(w, r)
 			}
+
+			if options.OIDCIss != "" && !options.EnableBasicAuth {
+				oidc(next).ServeHTTP(w, r)
+			}
+
+			if options.OIDCIss == "" && options.EnableBasicAuth {
+				basic(next).ServeHTTP(w, r)
+			}
+
 		})
+	}
+}
+
+func writeSupportedAuthenticateHeader(w http.ResponseWriter, r *http.Request) {
+	for i := 0; i < len(SupportedAuthStrategies); i++ {
+		w.Header().Add("WWW-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(SupportedAuthStrategies[i]), r.Host))
 	}
 }

@@ -115,6 +115,11 @@ func Frontend(cfg *config.Config) *cli.Command {
 							"cors": map[string]interface{}{
 								"allow_credentials": true,
 							},
+							"auth": map[string]interface{}{
+								"credentials_by_user_agent": map[string]string{
+									"mirall": "basic",
+								},
+							},
 						},
 						// TODO build services dynamically
 						"services": map[string]interface{}{

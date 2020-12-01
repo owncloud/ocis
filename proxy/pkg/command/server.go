@@ -285,7 +285,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 			// basic Options
 			middleware.Logger(l),
-			middleware.EnableBasicAuth(true),
+			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 			middleware.AccountsClient(accountsClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 		),
