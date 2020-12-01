@@ -1,32 +1,36 @@
 ---
-title: "oCIS with Traefik"
+title: "oCIS with Keycloak"
 date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_traefik.md
+geekdocFilePath: ocis_keycloak.md
 ---
 
 {{< toc >}}
 
 ## Overview
 
-* oCIS running behind Traefik as reverse proxy
+* oCIS and Keycloak running behind Traefik as reverse proxy
+* Keycloak acting as the IDP for oCIS
 * Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
-[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_traefik)
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak)
 
-The docker stack consists two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses it's internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}})
+
+The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
 
 ## Server Deployment
 
 ### Requirements
 
 * Linux server with docker and docker-compose installed
-* Two domains set up and pointing to your server
+* Three domains set up and pointing to your server
   - ocis.* for serving oCIS
+  - keycloak.* for serving Keycloak
   - traefik.* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server.md" >}})
@@ -40,7 +44,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_traefik`
+  `cd ocis/deployment/examples/ocis_keycloak`
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
@@ -62,6 +66,19 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
+  # oCIS web openid connect client id. Defaults to "ocis-phoenix"
+  OCIS_OIDC_CLIENT_ID=
+
+  ### Keycloak ###
+  # Domain of Keycloak, where you can find the managment and authentication frontend. Defaults to "keycloak.owncloud.test"
+  KEYCLOAK_DOMAIN=
+  # Realm which to be used with oCIS. Defaults to "master"
+  KEYCLOAK_REALM=
+  # Admin user login name. Defaults to "admin"
+  KEYCLOAK_ADMIN_USER=
+  # Admin user login password. Defaults to "admin"
+  KEYCLOAK_ADMIN_PASSWORD=
+
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -76,11 +93,23 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
+  If you want to change the OIDC client id of th oCIS web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
+
+  Set your domain for the Keycloak adminstration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
+
+  Changing the used Keycloak realm can be done by setting `KEYCLOAK_REALM=`. This defaults to the master realm `KEYCLOAK_REALM=master`.
+
+  You probably should secure your Keycloak admin account by setting `KEYCLOAK_ADMIN_USER=` and `KEYCLOAK_ADMIN_PASSWORD=` to values other than `admin`.
+
   Now you have configured everything and can save the file.
 
 * Start the docker stack
 
   `docker-compose up -d`
+
+* Visit the Keycloak administration console on your configured domain. Go to clients settings and add a client. The client id is `ocis-phoenix` or the one you changed it to. The client protocol is openid-connect. The root url for the client is the url you selected for oCIS. Then save the client.
+
+* You may also add users to Keycloak
 
 * You now can visit oCIS and Traefik dashboard on your configured domains
 
@@ -93,10 +122,16 @@ On Linux you can add them to your `/etc/hosts` files like this:
 ```
 127.0.0.1 ocis.owncloud.test
 127.0.0.1 traefik.owncloud.test
+127.0.0.1 keycloak.owncloud.test
 ```
 
 After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the default users, which also can be found here: [Getting started]({{< ref "../getting-started.md#login-to-ocis-web" >}}) 
+Open https://keycloak.owncloud.test in your browser and accept the invalid certificate warning.
+Go to clients settings and add a client. The client id is `ocis-phoenix` or the one you changed it to. The client protocol is openid-connect. THe root url for the client is `https://ocis.owncloud.test`. Then save the client.
+
+* You may also add users to Keycloak
+
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the admin user of keycloak and additional users you created.
