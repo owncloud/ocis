@@ -15,7 +15,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '26322d3bbedb5afe9a78ed5bcf88cfbf4ab2fd79',
+    'coreCommit': 'a5df08ca512c3c8e65a01d018c9eec81b9cfccaa',
     'numberOfParts': 10
   },
   'uiTests': {
@@ -1485,6 +1485,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'KONNECTD_ISS': 'https://ocis-server:9200',
     'KONNECTD_TLS': 'true',
+    'OCIS_LOG_LEVEL': 'warn',
   }
 
   # Pass in "default" accounts_hash_difficulty to not set this environment variable.
