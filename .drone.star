@@ -1284,14 +1284,6 @@ def docs(ctx):
         ],
       },
       {
-        'name': 'list and remove temporary files',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'tree hugo/public',
-          'rm -rf docs/hugo',
-        ],
-      },
-      {
         'name': 'publish',
         'image': 'plugins/gh-pages:1',
         'pull': 'always',
@@ -1302,7 +1294,7 @@ def docs(ctx):
           'password': {
             'from_secret': 'github_token',
           },
-          'pages_directory': 'docs/',
+          'pages_directory': 'docs/hugo/content',
           'target_branch': 'docs',
         },
         'when': {
@@ -1312,6 +1304,14 @@ def docs(ctx):
             ],
           },
         },
+      },
+      {
+        'name': 'list and remove temporary files',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'tree hugo/public',
+          'rm -rf docs/hugo',
+        ],
       },
       {
         'name': 'downstream',
