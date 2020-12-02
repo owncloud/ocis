@@ -61,8 +61,6 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 					Iss:    oidcIss,
 				}
 
-				fmt.Printf("\n\nHGAHAHAHA\n\n")
-
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 			},
 		)

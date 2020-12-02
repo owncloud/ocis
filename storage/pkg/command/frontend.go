@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -25,6 +26,17 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
+
+			cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
+			uaw := c.StringSlice("user-agent-whitelist")
+			for _, v := range uaw {
+				parts := strings.Split(v, ":")
+				if len(parts) != 2 {
+					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is user-agent:challenge", v) // TODO wording + error wrapping?
+				}
+
+				cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[parts[0]] = parts[1]
+			}
 
 			return nil
 		},
@@ -116,9 +128,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"allow_credentials": true,
 							},
 							"auth": map[string]interface{}{
-								"credentials_by_user_agent": map[string]string{
-									"mirall": "basic",
-								},
+								"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
 							},
 						},
 						// TODO build services dynamically

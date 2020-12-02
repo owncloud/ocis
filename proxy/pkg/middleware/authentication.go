@@ -64,7 +64,6 @@ func Authentication(opts ...Option) func(next http.Handler) http.Handler {
 			if options.OIDCIss == "" && options.EnableBasicAuth {
 				basic(next).ServeHTTP(w, r)
 			}
-
 		})
 	}
 }

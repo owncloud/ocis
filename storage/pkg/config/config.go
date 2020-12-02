@@ -83,6 +83,15 @@ type FrontendPort struct {
 	OCDavPrefix       string
 	OCSPrefix         string
 	PublicURL         string
+	Middleware        Middleware
+}
+
+type Middleware struct {
+	Auth Auth
+}
+
+type Auth struct {
+	CredentialsByUserAgent map[string]string
 }
 
 // DataGatewayPort has a public url

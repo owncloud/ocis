@@ -133,6 +133,14 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE"},
 			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
+
+		// Middlewares
+		&cli.StringSliceFlag{
+			Name:    "user-agent-whitelist", // TODO naming?
+			Value:   cli.NewStringSlice("test"),
+			Usage:   "TODO",
+			EnvVars: []string{"STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)
