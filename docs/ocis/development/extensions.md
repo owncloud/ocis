@@ -1,9 +1,9 @@
 ---
-title: "Extension"
+title: "Extensions"
 date: 2020-02-27T20:35:00+01:00
 weight: 40
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis
+geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: extensions.md
 ---
 
@@ -119,11 +119,7 @@ PHOENIX_ASSET_PATH="`pwd`/../phoenix/dist" bin/ocis phoenix
 
 ## The ownCloud design system
 
-The owncloud design system contains a set of ownCloud vue components for phoenix or your own ocis extensions. Use it for a consistent look and feel.
-
-Point your browser to https://owncloud.github.io/owncloud-design-system and check the available components. Live editing the examples in the browser is supported.
-
-note: There is a bug with navigation sub items: either click a nav item twice or refresh the page
+The [ownCloud design system](https://owncloud.design/) contains a set of ownCloud vue components for phoenix or your own ocis extensions. Please use it for a consistent look and feel.
 
 ## External phoenix apps
 
