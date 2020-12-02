@@ -42,6 +42,7 @@ func Authentication(opts ...Option) func(next http.Handler) http.Handler {
 		OIDCIss(options.OIDCIss),
 		TokenCacheSize(options.UserinfoCacheSize),
 		TokenCacheTTL(time.Second*time.Duration(options.UserinfoCacheTTL)),
+		CredentialsByUserAgent(options.CredentialsByUserAgent),
 	)
 
 	basic := BasicAuth(
@@ -49,6 +50,7 @@ func Authentication(opts ...Option) func(next http.Handler) http.Handler {
 		EnableBasicAuth(options.EnableBasicAuth),
 		AccountsClient(options.AccountsClient),
 		OIDCIss(options.OIDCIss),
+		CredentialsByUserAgent(options.CredentialsByUserAgent),
 	)
 
 	return func(next http.Handler) http.Handler {

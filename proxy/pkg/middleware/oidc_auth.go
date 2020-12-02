@@ -41,18 +41,19 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			// there is no bearer token on the request,
 			if !h.shouldServe(req) {
 				// oidc supported but token not present, add header and handover to the next middleware.
-
-				// TODO for this logic to work and we don't return superfluous Www-Authenticate headers we would need to
-				// add Www-Authenticate only on selected endpoints, because Reva won't cleanup already written headers.
-				// this means that requests such as:
-				// curl -v -k -u admin:admin -H "depth: 0" -X PROPFIND https://localhost:9200/remote.php/dav/files | xmllint --format -
-				// even when succeeding, will contain a Www-Authenticate header.
-
 				for i := 0; i < len(ProxyWwwAuthenticate); i++ {
 					if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
+						for k, v := range options.CredentialsByUserAgent {
+							if strings.Contains(k, req.UserAgent()) {
+								w.Header().Del("Www-Authenticate")
+								w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
+								goto OUT
+							}
+						}
 						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Bearer", req.Host))
 					}
 				}
+			OUT:
 				next.ServeHTTP(w, req)
 				return
 			}

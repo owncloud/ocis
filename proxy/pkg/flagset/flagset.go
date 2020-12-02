@@ -248,8 +248,15 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,
 		},
-	}
 
+		// Reva Middlewares Config
+		&cli.StringSliceFlag{
+			Name:    "proxy-user-agent-whitelist", // TODO naming?
+			Value:   cli.NewStringSlice(""),
+			Usage:   "TODO",
+			EnvVars: []string{"PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
+		},
+	}
 }
 
 // ListProxyWithConfig applies the config to the list commands flags.

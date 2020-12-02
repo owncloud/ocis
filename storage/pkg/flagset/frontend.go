@@ -134,7 +134,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
 
-		// Middlewares
+		// Reva Middlewares Config
 		&cli.StringSliceFlag{
 			Name:    "user-agent-whitelist", // TODO naming?
 			Value:   cli.NewStringSlice("test"),

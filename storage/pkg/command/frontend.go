@@ -32,7 +32,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 			for _, v := range uaw {
 				parts := strings.Split(v, ":")
 				if len(parts) != 2 {
-					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is user-agent:challenge", v) // TODO wording + error wrapping?
+					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is user-agent:challenge", v)
 				}
 
 				cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[parts[0]] = parts[1]

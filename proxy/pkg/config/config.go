@@ -80,7 +80,16 @@ var (
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string
+	Address    string
+	Middleware Middleware
+}
+
+type Middleware struct {
+	Auth Auth
+}
+
+type Auth struct {
+	CredentialsByUserAgent map[string]string
 }
 
 // Cache is a TTL cache configuration.

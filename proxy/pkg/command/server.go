@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -48,8 +49,17 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
 
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
+			cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
+			uaw := ctx.StringSlice("proxy-user-agent-whitelist")
+			for _, v := range uaw {
+				parts := strings.Split(v, ":")
+				if len(parts) != 2 {
+					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is userAgent:challenge", v)
+				}
+
+				cfg.Reva.Middleware.Auth.CredentialsByUserAgent[parts[0]] = parts[1]
+			}
+
 			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -288,6 +298,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 			middleware.AccountsClient(accountsClient),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
+			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
 		),
 		middleware.SignedURLAuth(
 			middleware.Logger(l),
