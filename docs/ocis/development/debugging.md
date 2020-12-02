@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: debugging.md
 ---
 
+{{< toc >}}
+
 ## Debugging
 
 As a single binary for easy deployment running `ocis server` just forks itself to start all the services, which makes debugging those processes a little harder.
@@ -52,22 +54,23 @@ Then you can set a breakpoint in the service you need and attach to the process 
 
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "ocis attach",
-            "type": "go",
-            "request": "attach",
-            "mode": "local",
-            "processId": 12897,
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ocis attach",
+      "type": "go",
+      "request": "attach",
+      "mode": "local",
+      "processId": 12897
+    }
+  ]
 }
 ```
 
 #### Start all services independently to replace one of them with a debug process
 
 1. You can use this `./ocis.sh` script to start all services independently, so they don't get restrarted by the runtime when you kill them:
+
 ```bash
 #/bin/sh
 LOG_LEVEL="debug"
@@ -127,7 +130,6 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 ```
 
 3. Kill the service you want to start in debug mode:
-
 
 ```console
 # kill 17628
@@ -203,15 +205,16 @@ Debug wherever the call trace leads you to ... good luck!
 You can either run and manage the services independently, or you can update the `go.mod` file and replace dependencies with your local version.
 
 To debug the reva frontend we need to add two replacements:
+
 ```
 // use the local ocis-reva repo
 replace github.com/owncloud/ocis-reva => ../ocis-reva
 // also use the local reva repo
 replace github.com/cs3org/reva => ../reva
 ```
+
 {{< hint info >}}
 The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
 {{< /hint >}}
 
 Rebuild ocis to make sure the dependency is used. It should be sufficient to just restart the service you want to debug.
-

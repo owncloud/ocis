@@ -2,6 +2,10 @@
 
 Image is based on [owncloud/eos-base](https://hub.docker.com/r/owncloud/eos-base) from [eos-stack](https://github.com/owncloud-docker/eos-stack)
 
+{{< hint info >}}
+On MacOS do not mount a local folder to the `/var/tmp/reva/` path. The fuse driver used by docker [does not support extended attributes](https://docs.docker.com/v18.09/docker-for-mac/osxfs/). See [#182](https://github.com/owncloud/ocis/issues/182) for more details.
+{{< /hint >}}
+
 ## Build
 ```shell
 docker build -t owncloud/eos-ocis-dev:latest .

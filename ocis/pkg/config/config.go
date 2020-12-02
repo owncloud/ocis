@@ -9,6 +9,7 @@ import (
 	konnectd "github.com/owncloud/ocis/konnectd/pkg/config"
 	phoenix "github.com/owncloud/ocis/ocis-phoenix/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
 	storage "github.com/owncloud/ocis/storage/pkg/config"
@@ -70,19 +71,20 @@ type Config struct {
 	TokenManager TokenManager
 
 	Accounts      *accounts.Config
+	GLAuth        *glauth.Config
 	Graph         *graph.Config
 	GraphExplorer *graphExplorer.Config
-	GLAuth        *glauth.Config
 	Hello         *hello.Config
 	Konnectd      *konnectd.Config
 	OCS           *ocs.Config
+	Onlyoffice    *onlyoffice.Config
 	Phoenix       *phoenix.Config
 	Proxy         *proxy.Config
+	Settings      *settings.Config
 	Storage       *storage.Config
+	Store         *store.Config
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
-	Settings      *settings.Config
-	Store         *store.Config
 	Runtime       *pman.Config
 }
 
@@ -90,19 +92,20 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Accounts:      accounts.New(),
+		GLAuth:        glauth.New(),
 		Graph:         graph.New(),
 		GraphExplorer: graphExplorer.New(),
 		Hello:         hello.New(),
 		Konnectd:      konnectd.New(),
 		OCS:           ocs.New(),
+		Onlyoffice:    onlyoffice.New(),
 		Phoenix:       phoenix.New(),
-		WebDAV:        webdav.New(),
-		Storage:       storage.New(),
-		GLAuth:        glauth.New(),
 		Proxy:         proxy.New(),
-		Thumbnails:    thumbnails.New(),
 		Settings:      settings.New(),
+		Storage:       storage.New(),
 		Store:         store.New(),
+		Thumbnails:    thumbnails.New(),
+		WebDAV:        webdav.New(),
 		Runtime:       pman.NewConfig(),
 	}
 }
