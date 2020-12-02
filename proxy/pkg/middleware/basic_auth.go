@@ -32,29 +32,14 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
 				if h.isPublicLink(req) || !h.isBasicAuth(req) {
-					// if we want to prevent duplicated Www-Authenticate headers coming from Reva consider using w.Header().Del("Www-Authenticate")
-					// but this will require the proxy being aware of endpoints which authentication fallback to Reva.
 					if !h.isPublicLink(req) {
-						for i := 0; i < len(ProxyWwwAuthenticate); i++ {
-							if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
-								for k, v := range options.CredentialsByUserAgent {
-									if strings.Contains(k, req.UserAgent()) {
-										w.Header().Del("Www-Authenticate")
-										w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
-										goto OUT
-									}
-								}
-								w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Basic", req.Host))
-							}
-						}
+						userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "basic")
 					}
-				OUT:
 					next.ServeHTTP(w, req)
 					return
 				}
 
-				w.Header().Del("Www-Authenticate")
-
+				removeSuperfluousAuthenticate(w)
 				account, ok := h.getAccount(req)
 
 				// touch is a user agent locking guard, when touched changes to true it indicates the User-Agent on the
@@ -63,10 +48,9 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				touch := false
 
 				if !ok {
-					// if the request is bound to a user agent the locked write Www-Authenticate for such user
 					for k, v := range options.CredentialsByUserAgent {
 						if strings.Contains(k, req.UserAgent()) {
-							w.Header().Del("Www-Authenticate")
+							removeSuperfluousAuthenticate(w)
 							w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
 							touch = true
 							break

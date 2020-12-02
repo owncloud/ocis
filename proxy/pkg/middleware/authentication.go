@@ -75,3 +75,25 @@ func writeSupportedAuthenticateHeader(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("WWW-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(SupportedAuthStrategies[i]), r.Host))
 	}
 }
+
+func removeSuperfluousAuthenticate(w http.ResponseWriter) {
+	w.Header().Del("Www-Authenticate")
+}
+
+// userAgentAuthenticateLockIn sets Www-Authenticate according to configured user agents. This is useful for the case of
+// legacy clients that do not support protocols like OIDC or OAuth and want to lock a given user agent to a challenge,
+// such as basic. More info in https://github.com/cs3org/reva/pull/1350
+func userAgentAuthenticateLockIn(w http.ResponseWriter, req *http.Request, creds map[string]string, fallback string) {
+	for i := 0; i < len(ProxyWwwAuthenticate); i++ {
+		if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
+			for k, v := range creds {
+				if strings.Contains(k, req.UserAgent()) {
+					removeSuperfluousAuthenticate(w)
+					w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
+					return
+				}
+			}
+			w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(fallback), req.Host))
+		}
+	}
+}

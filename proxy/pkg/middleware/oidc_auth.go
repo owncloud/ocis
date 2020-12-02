@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -41,19 +40,7 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			// there is no bearer token on the request,
 			if !h.shouldServe(req) {
 				// oidc supported but token not present, add header and handover to the next middleware.
-				for i := 0; i < len(ProxyWwwAuthenticate); i++ {
-					if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
-						for k, v := range options.CredentialsByUserAgent {
-							if strings.Contains(k, req.UserAgent()) {
-								w.Header().Del("Www-Authenticate")
-								w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
-								goto OUT
-							}
-						}
-						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", "Bearer", req.Host))
-					}
-				}
-			OUT:
+				userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "bearer")
 				next.ServeHTTP(w, req)
 				return
 			}
