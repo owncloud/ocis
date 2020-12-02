@@ -2,8 +2,8 @@
 title: "License"
 date: 2018-05-02T00:00:00+00:00
 weight: 40
-geekdocRepo: https://github.com/owncloud/ocis/onlyoffice
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/extensions/onlyoffice
 geekdocFilePath: license.md
 ---
 
