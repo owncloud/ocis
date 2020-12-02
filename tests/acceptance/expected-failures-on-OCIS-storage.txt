@@ -2496,11 +2496,9 @@ apiWebdavUploadTUS/uploadToShare.feature:23
 apiWebdavUploadTUS/uploadToShare.feature:24
 apiWebdavUploadTUS/uploadToShare.feature:37
 apiWebdavUploadTUS/uploadToShare.feature:38
+apiWebdavUploadTUS/uploadToShare.feature:66
+apiWebdavUploadTUS/uploadToShare.feature:67
 
 # https://github.com/owncloud/product/issues/293 sharing with group not available
 apiWebdavUploadTUS/uploadToShare.feature:52
 apiWebdavUploadTUS/uploadToShare.feature:53
-
-# https://github.com/owncloud/ocis/issues/968 [ocis-storage] PROPFIND on a file uploaded by share receiver is not possible
-apiWebdavUploadTUS/uploadToShare.feature:66
-apiWebdavUploadTUS/uploadToShare.feature:67
