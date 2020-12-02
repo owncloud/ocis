@@ -21,8 +21,8 @@ config = {
     'numberOfParts': 10
   },
   'uiTests': {
-    'phoenixBranch': 'master',
-    'phoenixCommit': 'fd281418cc30af9c9795e627692caf45c0d3bf30',
+    'phoenixBranch': 'ocis-shares-tests',
+    'phoenixCommit': '383737c4c58da4982f539f76cf68b8a85dbffe71',
       'suites': {
         'webUIBasic': [
           'webUILogin',
