@@ -2496,6 +2496,8 @@ apiWebdavUploadTUS/uploadToShare.feature:23
 apiWebdavUploadTUS/uploadToShare.feature:24
 apiWebdavUploadTUS/uploadToShare.feature:37
 apiWebdavUploadTUS/uploadToShare.feature:38
+apiWebdavUploadTUS/uploadToShare.feature:66
+apiWebdavUploadTUS/uploadToShare.feature:67
 
 # https://github.com/owncloud/product/issues/293 sharing with group not available
 apiWebdavUploadTUS/uploadToShare.feature:52
