@@ -10,20 +10,20 @@ const files: {
 }[] = times(1000, () => ({size: 1, unit: 'KB'}))
 const authFactory = new auth.default(utils.buildAccount({login: defaults.ACCOUNTS.EINSTEIN}));
 const plays = {
-    fileUpload: playbook.dav.fileUpload({}),
-    propfind: playbook.dav.propfind({}),
-    folderCreate: playbook.dav.folderCreate({}),
-    folderDelete: playbook.dav.folderDelete({}),
+    davUpload: new playbook.dav.Upload({}),
+    davPropfind: new playbook.dav.Propfind({}),
+    davCreate: new playbook.dav.Create({}),
+    davDelete: new playbook.dav.Delete({}),
 }
 export const options: Options = {
     insecureSkipTLSVerify: true,
     iterations: 3,
     vus: 1,
     thresholds: files.reduce((acc: any, c) => {
-        acc[`${plays.fileUpload.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
-        acc[`${plays.propfind.metricTrendName}`] = []
-        acc[`${plays.folderCreate.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
-        acc[`${plays.folderDelete.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
+        acc[`${plays.davUpload.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
+        acc[`${plays.davPropfind.metricTrendName}`] = []
+        acc[`${plays.davCreate.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
+        acc[`${plays.davDelete.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
         return acc
     }, {}),
 };
@@ -43,7 +43,7 @@ export default (): void => {
         const folder = times(utils.randomNumber({min: 1, max: 10}), () => utils.randomString()).reduce((acc: string[], c) => {
             acc.push(c)
 
-            plays.folderCreate.exec({
+            plays.davCreate.exec({
                 credential,
                 path: acc.join('/'),
                 userName: account.login,
@@ -54,7 +54,7 @@ export default (): void => {
         }, []).join('/')
 
 
-        plays.fileUpload.exec({
+        plays.davUpload.exec({
             credential,
             asset,
             path: folder,
@@ -65,13 +65,13 @@ export default (): void => {
         filesUploaded.push({id, name: asset.name, folder})
     })
 
-    plays.propfind.exec({
+    plays.davPropfind.exec({
         credential,
         userName: account.login,
     })
 
     filesUploaded.forEach(f => {
-        plays.folderDelete.exec({
+        plays.davDelete.exec({
             credential,
             userName: account.login,
             path: f.folder.split('/')[0],

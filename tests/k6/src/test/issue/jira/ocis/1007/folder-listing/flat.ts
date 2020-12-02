@@ -10,18 +10,18 @@ const files: {
 }[] = times(1000, () => ({size: 1, unit: 'KB'}))
 const authFactory = new auth.default(utils.buildAccount({login: defaults.ACCOUNTS.EINSTEIN}));
 const plays = {
-    fileUpload: playbook.dav.fileUpload({}),
-    propfind: playbook.dav.propfind({}),
-    fileDelete: playbook.dav.fileDelete({}),
+    davUpload: new playbook.dav.Upload({}),
+    davPropfind: new playbook.dav.Propfind({}),
+    davDelete: new playbook.dav.Delete({}),
 }
 export const options: Options = {
     insecureSkipTLSVerify: true,
     iterations: 3,
     vus: 1,
     thresholds: files.reduce((acc: any, c) => {
-        acc[`${plays.fileUpload.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
-        acc[`${plays.propfind.metricTrendName}`] = []
-        acc[`${plays.fileDelete.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
+        acc[`${plays.davUpload.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
+        acc[`${plays.davPropfind.metricTrendName}`] = []
+        acc[`${plays.davDelete.metricTrendName}{asset:${c.unit + c.size.toString()}`] = []
         return acc
     }, {}),
 };
@@ -38,7 +38,7 @@ export default (): void => {
             size: f.size,
         })
 
-        plays.fileUpload.exec({
+        plays.davUpload.exec({
             credential,
             asset,
             userName: account.login,
@@ -48,13 +48,13 @@ export default (): void => {
         filesUploaded.push({id, name: asset.name})
     })
 
-    plays.propfind.exec({
+    plays.davPropfind.exec({
         credential,
         userName: account.login,
     })
 
     filesUploaded.forEach(f => {
-        plays.fileDelete.exec({
+        plays.davDelete.exec({
             credential,
             userName: account.login,
             path: f.name,

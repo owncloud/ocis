@@ -24,3 +24,5 @@ export interface AuthProvider {
 }
 
 export type AssetUnit = 'KB' | 'MB' | 'GB'
+
+export type Tags = { [key: string]: string }

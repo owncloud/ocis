@@ -1,150 +1,59 @@
-import http, {RefinedResponse, ResponseType} from 'k6/http';
+import {RefinedResponse, ResponseType} from 'k6/http';
 import * as api from './api'
-import * as defaults from '../defaults';
 import * as types from '../types';
 
-export const fileUpload = (
-    {
-        credential,
-        userName,
-        path = '',
-        asset,
-        tags,
-    }: {
+export class Upload {
+    public static exec({credential, userName, path = '', asset, tags}: {
         credential: types.Credential;
         userName: string;
         asset: types.Asset;
         path?: string;
-        tags?: { [key: string]: string };
+        tags?: types.Tags;
+    }): RefinedResponse<ResponseType> {
+        return api.request({method: 'PUT', credential, path: `/remote.php/dav/files/${userName}/${path}/${asset.name}`, params: {tags}, body: asset.bytes as any})
     }
-): RefinedResponse<ResponseType> => {
-
-    return http.put(
-        [
-            defaults.ENV.HOST,
-            ...`/remote.php/dav/files/${userName}/${path}/${asset.name}`.split('/').filter(Boolean)
-        ].join('/'),
-        asset.bytes as any,
-        {
-            tags,
-            headers: {
-                ...api.headersDefault({credential})
-            }
-        }
-    );
 }
 
-export const fileDownload = (
-    {
-        credential,
-        userName,
-        path,
-        tags,
-    }: {
+export class Download {
+    public static exec({credential, userName, path, tags}: {
         credential: types.Credential;
         userName: string;
         path: string;
-        tags?: { [key: string]: string };
+        tags?: types.Tags;
+    }): RefinedResponse<ResponseType> {
+        return api.request({method: 'GET', credential, path: `/remote.php/dav/files/${userName}/${path}`, params: {tags}})
     }
-): RefinedResponse<ResponseType> => {
-    return http.get(
-        [
-            defaults.ENV.HOST,
-            ...`/remote.php/dav/files/${userName}/${path}`.split('/').filter(Boolean)
-        ].join('/'),
-        {
-            tags,
-            headers: {
-                ...api.headersDefault({credential})
-            }
-        }
-    );
 }
 
-export const fileDelete = (
-    {
-        credential,
-        userName,
-        path,
-        tags,
-    }: {
+export class Delete {
+    public static exec({credential, userName, path, tags}: {
         credential: types.Credential;
         userName: string;
         path: string;
-        tags?: { [key: string]: string };
+        tags?: types.Tags;
+    }): RefinedResponse<ResponseType> {
+        return api.request({method: 'DELETE', credential, path: `/remote.php/dav/files/${userName}/${path}`, params: {tags}})
     }
-): RefinedResponse<ResponseType> => {
-    return http.del(
-        [
-            defaults.ENV.HOST,
-            ...`/remote.php/dav/files/${userName}/${path}`.split('/').filter(Boolean)
-        ].join('/'),
-        {},
-        {
-            tags,
-            headers: {
-                ...api.headersDefault({credential})
-            }
-        }
-    );
 }
 
-export const folderCreate = (
-    {
-        credential,
-        userName,
-        path,
-        tags,
-    }: {
+export class Create {
+    public static exec({credential, userName, path, tags}: {
         credential: types.Credential;
         userName: string;
         path: string;
-        tags?: { [key: string]: string };
+        tags?: types.Tags;
+    }): RefinedResponse<ResponseType> {
+        return api.request({method: 'MKCOL', credential, path: `/remote.php/dav/files/${userName}/${path}`, params: {tags}})
     }
-): RefinedResponse<ResponseType> => {
-    return http.request(
-        'MKCOL',
-        [
-            defaults.ENV.HOST,
-            ...`/remote.php/dav/files/${userName}/${path}`.split('/').filter(Boolean)
-        ].join('/'),
-        {},
-        {
-            tags,
-            headers: {
-                ...api.headersDefault({credential})
-            }
-        }
-    );
 }
 
-export const folderDelete = fileDelete
-
-export const propfind = (
-    {
-        credential,
-        userName,
-        path = '',
-        tags,
-    }: {
+export class Propfind {
+    public static exec({credential, userName, path = '', tags}: {
         credential: types.Credential;
         userName: string;
         path?: string;
-        tags?: { [key: string]: string };
+        tags?: types.Tags;
+    }): RefinedResponse<ResponseType> {
+        return api.request({method: 'PROPFIND', credential, path: `/remote.php/dav/files/${userName}/${path}`, params: {tags}})
     }
-): RefinedResponse<ResponseType> => {
-    return http.request(
-        'PROPFIND',
-        [
-            defaults.ENV.HOST,
-            ...`/remote.php/dav/files/${userName}/${path}`.split('/').filter(Boolean)
-        ].join('/'),
-        {},
-        {
-            tags,
-            headers: {
-                ...api.headersDefault({credential})
-            }
-        }
-    );
 }
