@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-01T11:18:35+0000"
+date: "2020-12-02T10:08:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -10,10 +10,6 @@ geekdocFilePath: CONFIGURATION.tmpl
 {{< toc >}}
 
 ## Configuration
-
-oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
-
-Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/proxy/configuration/) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
 ### Configuration using config files
 

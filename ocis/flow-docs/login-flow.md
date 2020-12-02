@@ -3,7 +3,7 @@ title: "Login Flow"
 date: 2020-05-04T20:47:00+01:00
 weight: 43
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis
+geekdocEditPath: edit/master/docs/ocis/flow-docs
 geekdocFilePath: login-flow.md
 ---
 
