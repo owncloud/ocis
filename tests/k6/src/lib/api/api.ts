@@ -1,5 +1,5 @@
 import encoding from 'k6/encoding';
-import * as types from "../types";
+import * as types from '../types';
 
 export const headersDefault = ({credential}: { credential: types.Credential }): { [key: string]: string } => {
     const isOIDCGuard = (credential as types.Token).tokenType !== undefined;

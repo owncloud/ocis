@@ -26,7 +26,7 @@ export default [
     ],
     plugins: [
       multiInput({
-        transformOutputPath: (output, input) => `tests/${output.split('/').join('-')}`,
+        transformOutputPath: (output, input) => `${output.split('/').join('-')}`,
       }),
       json(),
       resolve(

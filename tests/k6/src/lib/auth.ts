@@ -1,7 +1,7 @@
-import * as defaults from "./defaults";
-import http from "k6/http";
-import queryString from "query-string";
-import * as types from "./types";
+import * as defaults from './defaults';
+import http from 'k6/http';
+import queryString from 'query-string';
+import * as types from './types';
 import {fail} from 'k6';
 import {get} from 'lodash'
 

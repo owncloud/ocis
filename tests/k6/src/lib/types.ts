@@ -1,8 +1,8 @@
-import {bytes} from "k6";
+import {bytes} from 'k6';
 
 export interface Asset {
     bytes: bytes;
-    fileName: string;
+    name: string;
 }
 
 export interface Token {
@@ -22,3 +22,5 @@ export type Credential = Token | Account
 export interface AuthProvider {
     credential: Credential
 }
+
+export type AssetUnit = 'KB' | 'MB' | 'GB'

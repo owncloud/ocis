@@ -1,0 +1,168 @@
+{
+    "metrics": {
+        "checks": {
+            "fails": 0,
+            "passes": 6003,
+            "value": 0
+        },
+        "data_received": {
+            "count": 5232948,
+            "rate": 35275.75112278176
+        },
+        "data_sent": {
+            "count": 4637493,
+            "rate": 31261.737915538728
+        },
+        "http_req_blocked": {
+            "avg": 0.004372313843078474,
+            "max": 4.63,
+            "med": 0.003,
+            "min": 0.002,
+            "p(90)": 0.005,
+            "p(95)": 0.007
+        },
+        "http_req_connecting": {
+            "avg": 0.000056305180742961854,
+            "max": 0.338,
+            "med": 0,
+            "min": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_duration": {
+            "avg": 24.326444277861146,
+            "max": 493.144,
+            "med": 21.826,
+            "min": 10.256,
+            "p(90)": 38.041000000000004,
+            "p(95)": 43.9535
+        },
+        "http_req_receiving": {
+            "avg": 0.05978927203065133,
+            "max": 1.579,
+            "med": 0.05,
+            "min": 0.036,
+            "p(90)": 0.085,
+            "p(95)": 0.104
+        },
+        "http_req_sending": {
+            "avg": 0.03032550391470921,
+            "max": 0.223,
+            "med": 0.025,
+            "min": 0.018,
+            "p(90)": 0.043,
+            "p(95)": 0.056
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0.0005380643011827419,
+            "max": 3.23,
+            "med": 0,
+            "min": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_waiting": {
+            "avg": 24.23632950191566,
+            "max": 492.043,
+            "med": 21.741,
+            "min": 10.192,
+            "p(90)": 37.92360000000001,
+            "p(95)": 43.8319
+        },
+        "http_reqs": {
+            "count": 6003,
+            "rate": 40.46673767636501
+        },
+        "iteration_duration": {
+            "avg": 49429.791962999996,
+            "max": 50603.792868,
+            "med": 49213.89341,
+            "min": 48471.689611,
+            "p(90)": 50325.8129764,
+            "p(95)": 50464.8029222
+        },
+        "iterations": {
+            "count": 3,
+            "rate": 0.020223257209577714
+        },
+        "oc_default_play_dav_file_delete_trend": {
+            "avg": 16.629310000000025,
+            "max": 75.491,
+            "med": 15.1365,
+            "min": 10.256,
+            "p(90)": 23.539,
+            "p(95)": 27.27049999999999
+        },
+        "oc_default_play_dav_file_delete_trend{asset:KB1": {
+            "avg": 16.629310000000025,
+            "max": 75.491,
+            "med": 15.1365,
+            "min": 10.256,
+            "p(90)": 23.539,
+            "p(95)": 27.27049999999999
+        },
+        "oc_default_play_dav_file_upload_trend": {
+            "avg": 31.677708999999993,
+            "max": 267.948,
+            "med": 29.3345,
+            "min": 19.082,
+            "p(90)": 43.212199999999996,
+            "p(95)": 50.722699999999996
+        },
+        "oc_default_play_dav_file_upload_trend{asset:KB1": {
+            "avg": 31.677708999999993,
+            "max": 267.948,
+            "med": 29.3345,
+            "min": 19.082,
+            "p(90)": 43.212199999999996,
+            "p(95)": 50.722699999999996
+        },
+        "oc_default_play_dav_propfind_trend": {
+            "avg": 370.19599999999997,
+            "max": 493.144,
+            "med": 310.431,
+            "min": 307.013,
+            "p(90)": 456.6014,
+            "p(95)": 474.8727
+        },
+        "vus": {
+            "max": 1,
+            "min": 1,
+            "value": 1
+        },
+        "vus_max": {
+            "max": 1,
+            "min": 1,
+            "value": 1
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+            "file delete status is 204": {
+                "name": "file delete status is 204",
+                "path": "::file delete status is 204",
+                "id": "18e4ac556fd01961812afd85e16bb9d9",
+                "passes": 3000,
+                "fails": 0
+            },
+            "file upload status is 201": {
+                "name": "file upload status is 201",
+                "path": "::file upload status is 201",
+                "id": "d530d65df94c4e70b68aac6f2f054f1f",
+                "passes": 3000,
+                "fails": 0
+            },
+            "propfind status is 207": {
+                "name": "propfind status is 207",
+                "path": "::propfind status is 207",
+                "id": "6cbc0cbc7ef202f356106cf063105452",
+                "passes": 3,
+                "fails": 0
+            }
+        }
+    }
+}

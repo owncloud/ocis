@@ -1,0 +1,224 @@
+{
+  "metrics": {
+    "checks": {
+      "fails": 0,
+      "passes": 1440,
+      "value": 0
+    },
+    "data_received": {
+      "count": 1729675379,
+      "rate": 33808868.65162363
+    },
+    "data_sent": {
+      "count": 1736098107,
+      "rate": 33934409.646178715
+    },
+    "http_req_blocked": {
+      "avg": 0.006793055555555532,
+      "max": 4.046,
+      "med": 0.003,
+      "min": 0.002,
+      "p(90)": 0.006,
+      "p(95)": 0.008
+    },
+    "http_req_connecting": {
+      "avg": 0.00018055555555555557,
+      "max": 0.26,
+      "med": 0,
+      "min": 0,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "http_req_duration": {
+      "avg": 32.08864027777775,
+      "max": 253.272,
+      "med": 26.4905,
+      "min": 10.372,
+      "p(90)": 50.71580000000001,
+      "p(95)": 64.83449999999998
+    },
+    "http_req_receiving": {
+      "avg": 4.024194444444447,
+      "max": 128.777,
+      "med": 0.064,
+      "min": 0.037,
+      "p(90)": 14.537700000000015,
+      "p(95)": 19.81769999999999
+    },
+    "http_req_sending": {
+      "avg": 5.342373611111132,
+      "max": 132.051,
+      "med": 0.03,
+      "min": 0.017,
+      "p(90)": 22.215200000000003,
+      "p(95)": 30.02865
+    },
+    "http_req_tls_handshaking": {
+      "avg": 0.00218125,
+      "max": 3.141,
+      "med": 0,
+      "min": 0,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "http_req_waiting": {
+      "avg": 22.72207222222226,
+      "max": 251.256,
+      "med": 21.123,
+      "min": 8.077,
+      "p(90)": 34.120799999999996,
+      "p(95)": 37.62935
+    },
+    "http_reqs": {
+      "count": 1440,
+      "rate": 28.146767566573555
+    },
+    "iteration_duration": {
+      "avg": 17041.291093666667,
+      "max": 17397.314603,
+      "med": 16968.823006,
+      "min": 16757.735672,
+      "p(90)": 17311.6162836,
+      "p(95)": 17354.4654433
+    },
+    "iterations": {
+      "count": 3,
+      "rate": 0.05863909909702824
+    },
+    "oc_default_play_dav_file_delete_trend": {
+      "avg": 15.769127083333343,
+      "max": 49.32,
+      "med": 14.7855,
+      "min": 10.372,
+      "p(90)": 21.6302,
+      "p(95)": 24.0062
+    },
+    "oc_default_play_dav_file_delete_trend{asset:KB500": {
+      "avg": 16.38810000000001,
+      "max": 49.32,
+      "med": 15.4255,
+      "min": 10.372,
+      "p(90)": 23.0987,
+      "p(95)": 24.657150000000005
+    },
+    "oc_default_play_dav_file_delete_trend{asset:MB25": {
+      "avg": 14.155766666666667,
+      "max": 19.967,
+      "med": 13.262,
+      "min": 10.793,
+      "p(90)": 18.776000000000003,
+      "p(95)": 19.580849999999998
+    },
+    "oc_default_play_dav_file_delete_trend{asset:MB5": {
+      "avg": 14.853853333333339,
+      "max": 26.691,
+      "med": 14.0415,
+      "min": 10.496,
+      "p(90)": 18.943699999999996,
+      "p(95)": 20.62044999999999
+    },
+    "oc_default_play_dav_file_download_trend": {
+      "avg": 37.784668749999994,
+      "max": 183.499,
+      "med": 32.0055,
+      "min": 19.14,
+      "p(90)": 55.628600000000006,
+      "p(95)": 93.45874999999992
+    },
+    "oc_default_play_dav_file_download_trend{asset:KB500": {
+      "avg": 26.680456666666657,
+      "max": 55.922,
+      "med": 24.979,
+      "min": 19.14,
+      "p(90)": 34.91720000000001,
+      "p(95)": 37.47365
+    },
+    "oc_default_play_dav_file_download_trend{asset:MB25": {
+      "avg": 113.08066666666669,
+      "max": 183.499,
+      "med": 103.05799999999999,
+      "min": 83.728,
+      "p(90)": 148.6112,
+      "p(95)": 162.21334999999996
+    },
+    "oc_default_play_dav_file_download_trend{asset:MB5": {
+      "avg": 44.93389333333334,
+      "max": 75.914,
+      "med": 43.920500000000004,
+      "min": 31.472,
+      "p(90)": 56.58899999999999,
+      "p(95)": 60.417399999999994
+    },
+    "oc_default_play_dav_file_upload_trend": {
+      "avg": 42.71212500000003,
+      "max": 253.272,
+      "med": 36.876999999999995,
+      "min": 21.145,
+      "p(90)": 56.78170000000001,
+      "p(95)": 114.79089999999997
+    },
+    "oc_default_play_dav_file_upload_trend{asset:KB500": {
+      "avg": 32.439143333333334,
+      "max": 253.272,
+      "med": 30.240000000000002,
+      "min": 21.145,
+      "p(90)": 40.75260000000001,
+      "p(95)": 45.08695000000001
+    },
+    "oc_default_play_dav_file_upload_trend{asset:MB25": {
+      "avg": 121.4088,
+      "max": 146.226,
+      "med": 119.23599999999999,
+      "min": 100.77,
+      "p(90)": 138.50189999999998,
+      "p(95)": 142.34375
+    },
+    "oc_default_play_dav_file_upload_trend{asset:MB5": {
+      "avg": 47.518753333333365,
+      "max": 77.615,
+      "med": 46.457,
+      "min": 35.46,
+      "p(90)": 56.623099999999994,
+      "p(95)": 61.826049999999974
+    },
+    "vus": {
+      "max": 1,
+      "min": 1,
+      "value": 1
+    },
+    "vus_max": {
+      "max": 1,
+      "min": 1,
+      "value": 1
+    }
+  },
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": {},
+    "checks": {
+      "file delete status is 204": {
+        "name": "file delete status is 204",
+        "path": "::file delete status is 204",
+        "id": "18e4ac556fd01961812afd85e16bb9d9",
+        "passes": 480,
+        "fails": 0
+      },
+      "file download status is 200": {
+        "name": "file download status is 200",
+        "path": "::file download status is 200",
+        "id": "52b41fab3137d895e8ec58fd9dccd86e",
+        "passes": 480,
+        "fails": 0
+      },
+      "file upload status is 201": {
+        "name": "file upload status is 201",
+        "path": "::file upload status is 201",
+        "id": "d530d65df94c4e70b68aac6f2f054f1f",
+        "passes": 480,
+        "fails": 0
+      }
+    }
+  }
+}

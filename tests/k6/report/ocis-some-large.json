@@ -1,0 +1,296 @@
+{
+    "metrics": {
+        "checks": {
+            "fails": 0,
+            "passes": 54,
+            "value": 0
+        },
+        "data_received": {
+            "count": 4975515490,
+            "rate": 54283776.21668842
+        },
+        "data_sent": {
+            "count": 4995495858,
+            "rate": 54501765.65465097
+        },
+        "http_req_blocked": {
+            "avg": 0.07648148148148148,
+            "max": 3.614,
+            "med": 0.005,
+            "min": 0.003,
+            "p(90)": 0.024,
+            "p(95)": 0.03684999999999994
+        },
+        "http_req_connecting": {
+            "avg": 0.004203703703703703,
+            "max": 0.227,
+            "med": 0,
+            "min": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_duration": {
+            "avg": 1199.7894444444446,
+            "max": 11778.61,
+            "med": 81.80799999999999,
+            "min": 17.916,
+            "p(90)": 4263.4364000000005,
+            "p(95)": 7307.079449999999
+        },
+        "http_req_receiving": {
+            "avg": 586.4966296296295,
+            "max": 7419.291,
+            "med": 0.13,
+            "min": 0.04,
+            "p(90)": 1447.7991000000025,
+            "p(95)": 5254.929599999983
+        },
+        "http_req_sending": {
+            "avg": 555.0930740740743,
+            "max": 11707.466,
+            "med": 0.0775,
+            "min": 0.018,
+            "p(90)": 1635.9796000000044,
+            "p(95)": 3495.4676999999942
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0.052833333333333336,
+            "max": 2.853,
+            "med": 0,
+            "min": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_waiting": {
+            "avg": 58.199740740740744,
+            "max": 305.282,
+            "med": 37.3425,
+            "min": 14.057,
+            "p(90)": 105.61020000000003,
+            "p(95)": 155.87789999999998
+        },
+        "http_reqs": {
+            "count": 54,
+            "rate": 0.5891497919346593
+        },
+        "iteration_duration": {
+            "avg": 30521.018089,
+            "max": 42157.485685,
+            "med": 26262.18445,
+            "min": 23143.384132,
+            "p(90)": 38978.425438,
+            "p(95)": 40567.9555615
+        },
+        "iterations": {
+            "count": 3,
+            "rate": 0.03273054399636997
+        },
+        "oc_default_play_dav_file_delete_trend": {
+            "avg": 42.30277777777778,
+            "max": 91.667,
+            "med": 33.669,
+            "min": 17.916,
+            "p(90)": 73.0931,
+            "p(95)": 86.0162
+        },
+        "oc_default_play_dav_file_delete_trend{asset:GB1": {
+            "avg": 36.54533333333333,
+            "max": 45.724,
+            "med": 33.698,
+            "min": 30.214,
+            "p(90)": 43.318799999999996,
+            "p(95)": 44.5214
+        },
+        "oc_default_play_dav_file_delete_trend{asset:KB50": {
+            "avg": 58.788333333333334,
+            "max": 85.019,
+            "med": 62.125,
+            "min": 29.221,
+            "p(90)": 80.4402,
+            "p(95)": 82.7296
+        },
+        "oc_default_play_dav_file_delete_trend{asset:KB500": {
+            "avg": 41.721333333333334,
+            "max": 67.982,
+            "med": 32.438,
+            "min": 24.744,
+            "p(90)": 60.8732,
+            "p(95)": 64.4276
+        },
+        "oc_default_play_dav_file_delete_trend{asset:MB5": {
+            "avg": 30.743666666666666,
+            "max": 56.309,
+            "med": 18.006,
+            "min": 17.916,
+            "p(90)": 48.648399999999995,
+            "p(95)": 52.478699999999996
+        },
+        "oc_default_play_dav_file_delete_trend{asset:MB50": {
+            "avg": 45.24466666666667,
+            "max": 91.667,
+            "med": 22.681,
+            "min": 21.386,
+            "p(90)": 77.86980000000001,
+            "p(95)": 84.7684
+        },
+        "oc_default_play_dav_file_delete_trend{asset:MB500": {
+            "avg": 40.77333333333333,
+            "max": 45.129,
+            "med": 43.551,
+            "min": 33.64,
+            "p(90)": 44.8134,
+            "p(95)": 44.971199999999996
+        },
+        "oc_default_play_dav_file_download_trend": {
+            "avg": 1815.5790555555557,
+            "max": 7454.559,
+            "med": 190.0605,
+            "min": 27.771,
+            "p(90)": 7302.4101,
+            "p(95)": 7380.7977
+        },
+        "oc_default_play_dav_file_download_trend{asset:GB1": {
+            "avg": 7365.578,
+            "max": 7454.559,
+            "med": 7367.781,
+            "min": 7274.394,
+            "p(90)": 7437.2034,
+            "p(95)": 7445.8812
+        },
+        "oc_default_play_dav_file_download_trend{asset:KB50": {
+            "avg": 77.559,
+            "max": 144.171,
+            "med": 60.735,
+            "min": 27.771,
+            "p(90)": 127.4838,
+            "p(95)": 135.82739999999998
+        },
+        "oc_default_play_dav_file_download_trend{asset:KB500": {
+            "avg": 64.77866666666667,
+            "max": 118.418,
+            "med": 47.796,
+            "min": 28.122,
+            "p(90)": 104.29360000000001,
+            "p(95)": 111.35580000000002
+        },
+        "oc_default_play_dav_file_download_trend{asset:MB5": {
+            "avg": 87.07633333333332,
+            "max": 132.468,
+            "med": 64.708,
+            "min": 64.053,
+            "p(90)": 118.916,
+            "p(95)": 125.69199999999998
+        },
+        "oc_default_play_dav_file_download_trend{asset:MB50": {
+            "avg": 465.49199999999996,
+            "max": 920.853,
+            "med": 239.673,
+            "min": 235.95,
+            "p(90)": 784.617,
+            "p(95)": 852.7349999999999
+        },
+        "oc_default_play_dav_file_download_trend{asset:MB500": {
+            "avg": 2832.990333333333,
+            "max": 4296.326,
+            "med": 2461.95,
+            "min": 1740.695,
+            "p(90)": 3929.4508,
+            "p(95)": 4112.8884
+        },
+        "oc_default_play_dav_file_upload_trend": {
+            "avg": 1741.4865,
+            "max": 11778.61,
+            "med": 277.241,
+            "min": 22.627,
+            "p(90)": 4528.384400000001,
+            "p(95)": 6293.604199999991
+        },
+        "oc_default_play_dav_file_upload_trend{asset:GB1": {
+            "avg": 7096.988666666667,
+            "max": 11778.61,
+            "med": 5325.662,
+            "min": 4186.694,
+            "p(90)": 10488.020400000001,
+            "p(95)": 11133.315200000001
+        },
+        "oc_default_play_dav_file_upload_trend{asset:KB50": {
+            "avg": 126.274,
+            "max": 243.95,
+            "med": 90.139,
+            "min": 44.733,
+            "p(90)": 213.18779999999998,
+            "p(95)": 228.56889999999999
+        },
+        "oc_default_play_dav_file_upload_trend{asset:KB500": {
+            "avg": 136.278,
+            "max": 307.61,
+            "med": 78.597,
+            "min": 22.627,
+            "p(90)": 261.80740000000003,
+            "p(95)": 284.7087
+        },
+        "oc_default_play_dav_file_upload_trend{asset:MB5": {
+            "avg": 105.57533333333333,
+            "max": 201.903,
+            "med": 61.229,
+            "min": 53.594,
+            "p(90)": 173.76819999999998,
+            "p(95)": 187.83559999999997
+        },
+        "oc_default_play_dav_file_upload_trend{asset:MB50": {
+            "avg": 426.2540000000001,
+            "max": 598.362,
+            "med": 433.528,
+            "min": 246.872,
+            "p(90)": 565.3951999999999,
+            "p(95)": 581.8786
+        },
+        "oc_default_play_dav_file_upload_trend{asset:MB500": {
+            "avg": 2557.549,
+            "max": 3159.682,
+            "med": 2397.078,
+            "min": 2115.887,
+            "p(90)": 3007.1612,
+            "p(95)": 3083.4215999999997
+        },
+        "vus": {
+            "max": 1,
+            "min": 1,
+            "value": 1
+        },
+        "vus_max": {
+            "max": 1,
+            "min": 1,
+            "value": 1
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+            "file delete status is 204": {
+                "name": "file delete status is 204",
+                "path": "::file delete status is 204",
+                "id": "18e4ac556fd01961812afd85e16bb9d9",
+                "passes": 18,
+                "fails": 0
+            },
+            "file download status is 200": {
+                "name": "file download status is 200",
+                "path": "::file download status is 200",
+                "id": "52b41fab3137d895e8ec58fd9dccd86e",
+                "passes": 18,
+                "fails": 0
+            },
+            "file upload status is 201": {
+                "name": "file upload status is 201",
+                "path": "::file upload status is 201",
+                "id": "d530d65df94c4e70b68aac6f2f054f1f",
+                "passes": 18,
+                "fails": 0
+            }
+        }
+    }
+}
