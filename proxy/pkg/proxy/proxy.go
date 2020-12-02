@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -36,6 +37,12 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		config:    options.Config,
 	}
 	rp.Director = rp.directorSelectionDirector
+
+	rp.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: options.Config.Insecure,
+		},
+	}
 
 	if options.Config.Policies == nil {
 		rp.logger.Info().Str("source", "runtime").Msg("Policies")
