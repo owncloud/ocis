@@ -20,6 +20,7 @@ import (
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -49,15 +50,8 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
 
-			cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
-			uaw := ctx.StringSlice("proxy-user-agent-whitelist")
-			for _, v := range uaw {
-				parts := strings.Split(v, ":")
-				if len(parts) != 2 {
-					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is userAgent:challenge", v)
-				}
-
-				cfg.Reva.Middleware.Auth.CredentialsByUserAgent[parts[0]] = parts[1]
+			if err := loadUserAgent(ctx, cfg); err != nil {
+				return err
 			}
 
 			return ParseConfig(ctx, cfg)
@@ -321,4 +315,25 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)
+}
+
+// loadUserAgent reads the proxy-user-agent-whitelist, since it is a string flag, and attempts to construct a map of
+// "user-agent":"challenge" locks in for Reva.
+// Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it. User agents with spaces are valid. i.e:
+// Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0
+func loadUserAgent(c *cli.Context, cfg *config.Config) error {
+	cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
+	locks := c.StringSlice("proxy-user-agent-whitelist")
+
+	for _, v := range locks {
+		vv := conversions.Reverse(v)
+		parts := strings.SplitN(vv, ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
+		}
+
+		cfg.Reva.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
+	}
+
+	return nil
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -26,20 +27,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
-
-			cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
-			uaw := c.StringSlice("user-agent-whitelist")
-			fmt.Printf("\n\n%v\n\n", uaw)
-			for _, v := range uaw {
-				parts := strings.Split(v, ":")
-				if len(parts) != 2 {
-					return fmt.Errorf("unexpected config value for user-agent whitelist: %v, expected format is user-agent:challenge", v)
-				}
-
-				cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[parts[0]] = parts[1]
-			}
-
-			return nil
+			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -312,4 +300,24 @@ func Frontend(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// loadUserAgent reads the user-agent-whitelist, since it is a string flag, and attempts to construct a map of
+// "user-agent":"challenge" locks in for Reva.
+// Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it.
+func loadUserAgent(c *cli.Context, cfg *config.Config) error {
+	cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
+	locks := c.StringSlice("user-agent-whitelist")
+
+	for _, v := range locks {
+		vv := conversions.Reverse(v)
+		parts := strings.SplitN(vv, ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
+		}
+
+		cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
+	}
+
+	return nil
 }
