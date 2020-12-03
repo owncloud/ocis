@@ -225,7 +225,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.AutoprovisionAccounts,
 		},
 
-		// Presigned URLs
+		// Pre Signed URLs
 		&cli.StringSliceFlag{
 			Name:    "presignedurl-allow-method",
 			Value:   cli.NewStringSlice("GET"),
@@ -251,9 +251,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
-			Name:    "proxy-user-agent-whitelist", // TODO naming?
-			Value:   cli.NewStringSlice(""),
-			Usage:   "TODO",
+			Name:    "proxy-user-agent-whitelist",
+			Usage:   "--user-agent-whitelist=mirall:basic,foo:bearer Given a tuple of [UserAgent:challenge] it locks a given user agent to the authentication challenge. Particularly useful for old clients whose USer-Agent is known and only support one authentication challenge. When this flag is set in the proxy it configures the authentication middlewares.",
 			EnvVars: []string{"PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
 		},
 	}

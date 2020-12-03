@@ -29,6 +29,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 
 			cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
 			uaw := c.StringSlice("user-agent-whitelist")
+			fmt.Printf("\n\n%v\n\n", uaw)
 			for _, v := range uaw {
 				parts := strings.Split(v, ":")
 				if len(parts) != 2 {

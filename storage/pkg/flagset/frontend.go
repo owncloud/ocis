@@ -136,9 +136,8 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
-			Name:    "user-agent-whitelist", // TODO naming?
-			Value:   cli.NewStringSlice("test"),
-			Usage:   "TODO",
+			Name:    "user-agent-whitelist",
+			Usage:   "--user-agent-whitelist=mirall:basic,foo:bearer Given a tuple of comma separated [UserAgent:challenge] values, it locks a given user agent to the authentication challenge. Particularly useful for old clients whose USer-Agent is known and only support one authentication challenge. When this flag is set in the storage-frontend it configures Reva.",
 			EnvVars: []string{"STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
 		},
 	}
