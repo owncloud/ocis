@@ -100,7 +100,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_PREFIX"},
 			Destination: &cfg.Reva.Frontend.OCSPrefix,
 		},
-
+		&cli.StringFlag{
+			Name:        "ocs-share-prefix",
+			Value:       "/Shares",
+			Usage:       "the prefix prepended to the path of shared files",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_Share_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCSSharePrefix,
+		},
 		// Gateway
 
 		&cli.StringFlag{

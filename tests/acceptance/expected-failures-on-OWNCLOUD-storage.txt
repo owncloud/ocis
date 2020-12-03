@@ -2410,3 +2410,7 @@ apiVersions/fileVersionsSharingToShares.feature:279
 # https://github.com/owncloud/ocis/issues/719 when a share exists its impossible to share a renamed folder
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:611
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:612
+
+# https://github.com/owncloud/ocis/issues/1012 TUS OPTIONS requests does not reply with TUS headers when invalid password
+apiWebdavUploadTUS/optionsRequest.feature:29
+apiWebdavUploadTUS/optionsRequest.feature:40

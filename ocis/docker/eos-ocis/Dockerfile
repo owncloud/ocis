@@ -25,7 +25,7 @@ COPY user.go /build/user.go
 RUN cd /build && go build -o user user.go
 
 
-FROM owncloud/eos-base:4.6.5
+FROM owncloud/eos-base:4.8.26
 RUN mkdir -p /usr/local/bin
 COPY --from=build ocis/bin/ocis /usr/local/bin/
 RUN chmod +x /usr/local/bin/ocis

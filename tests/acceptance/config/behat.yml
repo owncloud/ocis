@@ -44,6 +44,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - TUSContext:
 
   extensions:
     jarnaiz\JUnitFormatter\JUnitFormatterExtension:
