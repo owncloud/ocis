@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-02T13:20:15+0000"
+date: "2020-12-03T07:39:45+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -75,12 +75,6 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
 ### ocis server
 
 Start fullstack server
@@ -129,95 +123,101 @@ Usage: `ocis health [command options] [arguments...]`
 --debug-addr | $OCIS_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9010`.
 
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis ocs
+#### ocis accounts
 
-Start ocs server
-
-#### ocis konnectd
-
-Start konnectd server
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-frontend
-
-Start storage frontend
+Start accounts server
 
 #### ocis glauth
 
 Start glauth server
 
-#### ocis version
+#### ocis storage-auth-basic
 
-Lists running services with version
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis phoenix
-
-Start phoenix server
-
-#### ocis settings
-
-Start settings server
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis onlyoffice
-
-Start onlyoffice server
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
+Start storage auth-basic service
 
 #### ocis storage-home
 
 Start storage and data provider for /home mount
 
+#### ocis store
+
+Start a go-micro store
+
 #### ocis storage-gateway
 
 Start storage gateway
 
-#### ocis storage-sharing
+#### ocis settings
 
-Start storage sharing service
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis proxy
-
-Start proxy server
+Start settings server
 
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
 
-#### ocis accounts
+#### ocis ocs
 
-Start accounts server
+Start ocs server
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis phoenix
+
+Start phoenix server
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis konnectd
+
+Start konnectd server
+
+#### ocis storage-sharing
+
+Start storage sharing service
 

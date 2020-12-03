@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-02T13:20:09+0000"
+date: "2020-12-03T07:39:40+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -33,26 +33,41 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts ocis-accounts
+### accounts list
 
-Provide accounts and groups for oCIS
+List existing accounts
 
-Usage: `accounts ocis-accounts [command options] [arguments...]`
+Usage: `accounts list [command options] [arguments...]`
 
---log-level | $ACCOUNTS_LOG_LEVEL  
-: Set logging level. Default: `info`.
+--grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
---log-pretty | $ACCOUNTS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
+--name | $ACCOUNTS_NAME  
+: service name. Default: `accounts`.
 
---log-color | $ACCOUNTS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
+### accounts add
+
+Create a new account
+
+Usage: `accounts add [command options] [arguments...]`
 
 ### accounts remove
 
 Removes an existing account
 
 Usage: `accounts remove [command options] [arguments...]`
+
+--grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $ACCOUNTS_NAME  
+: service name. Default: `accounts`.
+
+### accounts inspect
+
+Show detailed data on an existing account
+
+Usage: `accounts inspect [command options] [arguments...]`
 
 --grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
@@ -126,29 +141,20 @@ Usage: `accounts version [command options] [arguments...]`
 --name | $ACCOUNTS_NAME  
 : service name. Default: `accounts`.
 
-### accounts list
+### accounts ocis-accounts
 
-List existing accounts
+Provide accounts and groups for oCIS
 
-Usage: `accounts list [command options] [arguments...]`
+Usage: `accounts ocis-accounts [command options] [arguments...]`
 
---grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+--log-level | $ACCOUNTS_LOG_LEVEL  
+: Set logging level. Default: `info`.
 
---name | $ACCOUNTS_NAME  
-: service name. Default: `accounts`.
+--log-pretty | $ACCOUNTS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
 
-### accounts inspect
-
-Show detailed data on an existing account
-
-Usage: `accounts inspect [command options] [arguments...]`
-
---grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $ACCOUNTS_NAME  
-: service name. Default: `accounts`.
+--log-color | $ACCOUNTS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### accounts rebuildIndex
 
@@ -161,10 +167,4 @@ Usage: `accounts rebuildIndex [command options] [arguments...]`
 Make changes to an existing account
 
 Usage: `accounts update [command options] [arguments...]`
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
 
