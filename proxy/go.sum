@@ -210,6 +210,8 @@ github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3 h1:H3QnP+eApE2LDJrYj
 github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
 github.com/cs3org/reva v1.4.1-0.20201203075131-783e35cbff51 h1:WguydLVNj9tDRAw5cz+TnkY3shiTmbpfBPX2NpDHU2c=
 github.com/cs3org/reva v1.4.1-0.20201203075131-783e35cbff51/go.mod h1:UUIurLdFYag/W+3YlAqwFuVvfzF3Ps1Elq1NzsE9kvo=
+github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f h1:3Y1TbQCN9s8+eWjfnUVlnVA7YlZJdxMTffmMVxZwMP8=
+github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f/go.mod h1:3Bz9oExBSgKjDspq3pBso31HlLSD98SlcURV54N3yPs=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548/go.mod h1:e6NPNENfs9mPDVNRekM7lKScauxd5kXTr1Mfyig6TDM=
 github.com/cznic/strutil v0.0.0-20181122101858-275e90344537/go.mod h1:AHHPPPXTw0h6pVabbcbyGRK1DckRn7r/STdZEeIDzZc=
