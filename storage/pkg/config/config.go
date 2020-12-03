@@ -86,10 +86,12 @@ type FrontendPort struct {
 	Middleware        Middleware
 }
 
+// Middleware configures reva middlewares.
 type Middleware struct {
 	Auth Auth
 }
 
+// Auth configures reva http auth middleware.
 type Auth struct {
 	CredentialsByUserAgent map[string]string
 }

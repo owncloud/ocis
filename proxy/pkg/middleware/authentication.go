@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// SupportedAuthStrategies stores configured challenges.
 var SupportedAuthStrategies []string
 
 // ProxyWwwAuthenticate is a list of endpoints that do not rely on reva underlying authentication, such as ocs.
