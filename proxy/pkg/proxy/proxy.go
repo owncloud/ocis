@@ -3,11 +3,13 @@ package proxy
 import (
 	"context"
 	"crypto/tls"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
 	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
@@ -38,7 +40,19 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	}
 	rp.Director = rp.directorSelectionDirector
 
+	// equals http.DefaultTransport except TLSClientConfig
 	rp.Transport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: options.Config.Insecure,
 		},
