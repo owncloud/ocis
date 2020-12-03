@@ -1,4 +1,4 @@
-FROM owncloud/eos-base:4.6.5
+FROM owncloud/eos-base:4.8.26
 
 ENV CGO_ENABLED=1
 ENV GOOS=linux
