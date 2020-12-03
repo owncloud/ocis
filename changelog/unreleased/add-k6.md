@@ -1,5 +1,8 @@
-Change: Add k6 
+Enhancement: Add k6
 
-add k6 as a load testing framework
+Tags: tests
+
+add k6 as a performance testing framework
 
 https://github.com/owncloud/ocis/pull/941
+https://github.com/owncloud/ocis/pull/983
