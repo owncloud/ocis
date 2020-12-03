@@ -53,4 +53,5 @@ replace (
 	github.com/owncloud/ocis/thumbnails => ../thumbnails
 	github.com/owncloud/ocis/webdav => ../webdav
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	github.com/cs3org/reva => ../../../cs3org/reva
 )

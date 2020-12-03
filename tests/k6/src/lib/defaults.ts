@@ -9,9 +9,14 @@ export class ENV {
 }
 
 export class ACCOUNTS {
+    public static readonly ADMIN = 'admin';
     public static readonly EINSTEIN = 'einstein';
     public static readonly RICHARD = 'richard';
-    public static readonly ALL: { [key: string]: types.Account; } = {
+    public static readonly ALL: { [key: string]: types.Account } = {
+        admin: {
+            login: 'admin',
+            password: 'admin',
+        },
         einstein: {
             login: 'einstein',
             password: 'relativity',
@@ -20,5 +25,5 @@ export class ACCOUNTS {
             login: 'richard',
             password: 'superfluidity',
         },
-    }
+    };
 }

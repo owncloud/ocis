@@ -1,4 +1,4 @@
-import {bytes} from 'k6';
+import { bytes } from 'k6';
 
 export interface Asset {
     bytes: bytes;
@@ -13,16 +13,16 @@ export interface Token {
 }
 
 export interface Account {
-    login: string
-    password: string
+    login: string;
+    password: string;
 }
 
-export type Credential = Token | Account
+export type Credential = Token | Account;
 
 export interface AuthProvider {
-    credential: Credential
+    credential: Credential;
 }
 
-export type AssetUnit = 'KB' | 'MB' | 'GB'
+export type Tags = { [key: string]: string };
 
-export type Tags = { [key: string]: string }
+export declare type AssetUnit = 'KB' | 'MB' | 'GB';

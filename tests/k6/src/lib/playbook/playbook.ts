@@ -1,4 +1,4 @@
-import {Gauge, Trend} from "k6/metrics";
+import { Gauge, Trend } from 'k6/metrics';
 
 export class Play {
     public readonly name: string;
@@ -8,12 +8,12 @@ export class Play {
     public readonly metricErrorRate: Gauge;
     protected tags: { [key: string]: string };
 
-    constructor({name}: { name: string; }) {
+    constructor({ name }: { name: string }) {
         this.name = name;
         this.metricTrendName = `${this.name}_trend`;
         this.metricErrorRateName = `${this.name}_error_rate`;
         this.metricTrend = new Trend(this.metricTrendName, true);
         this.metricErrorRate = new Gauge(this.metricErrorRateName);
-        this.tags = {play: this.name}
+        this.tags = { play: this.name };
     }
 }
