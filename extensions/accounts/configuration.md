@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-03T12:49:44+0000"
+date: "2020-12-03T16:10:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -50,6 +50,33 @@ Usage: `accounts list [command options] [arguments...]`
 Create a new account
 
 Usage: `accounts add [command options] [arguments...]`
+
+### accounts remove
+
+Removes an existing account
+
+Usage: `accounts remove [command options] [arguments...]`
+
+--grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $ACCOUNTS_NAME  
+: service name. Default: `accounts`.
+
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+--log-level | $ACCOUNTS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $ACCOUNTS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $ACCOUNTS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### accounts server
 
@@ -104,33 +131,6 @@ Usage: `accounts server [command options] [arguments...]`
 
 --service-user-username | $ACCOUNTS_SERVICE_USER_USERNAME  
 : username of the internal service user (required on EOS).
-
-### accounts ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
---log-level | $ACCOUNTS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $ACCOUNTS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $ACCOUNTS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
-### accounts remove
-
-Removes an existing account
-
-Usage: `accounts remove [command options] [arguments...]`
-
---grpc-namespace | $ACCOUNTS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $ACCOUNTS_NAME  
-: service name. Default: `accounts`.
 
 ### accounts version
 
