@@ -124,7 +124,8 @@ def main(ctx):
   before = \
     [ buildOcisBinaryForTesting(ctx) ] + \
     testOcisModules(ctx) + \
-    testPipelines(ctx)
+    testPipelines(ctx) + \
+    [benchmark(ctx)]
 
   stages = [
     docker(ctx, 'amd64'),
@@ -141,7 +142,6 @@ def main(ctx):
   purge['depends_on'] = getPipelineNames(testPipelines(ctx) + [benchmark(ctx)])
 
   after = [
-    benchmark(ctx),
     manifest(ctx),
     changelog(ctx),
     readme(ctx),
