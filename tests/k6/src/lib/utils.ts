@@ -1,5 +1,6 @@
 import { bytes } from 'k6';
 import { randomBytes as k6_randomBytes } from 'k6/crypto';
+
 import * as defaults from './defaults';
 import * as types from './types';
 

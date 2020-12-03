@@ -1,6 +1,7 @@
 import { RefinedResponse, ResponseType } from 'k6/http';
-import * as api from './api';
+
 import * as types from '../types';
+import * as api from './api';
 
 export class Upload {
     public static exec({

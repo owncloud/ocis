@@ -1,7 +1,8 @@
-import * as api from '../api';
 import { check } from 'k6';
-import * as types from '../types';
 import { RefinedResponse, ResponseType } from 'k6/http';
+
+import * as api from '../api';
+import * as types from '../types';
 import { Play } from './playbook';
 
 export class Upload extends Play {

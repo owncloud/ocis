@@ -1,9 +1,10 @@
-import encoding from 'k6/encoding';
-import * as types from '../types';
-import * as defaults from '../defaults';
-import { merge } from 'lodash';
-import http, { RefinedParams, RefinedResponse, RequestBody, ResponseType } from 'k6/http';
 import { bytes } from 'k6';
+import encoding from 'k6/encoding';
+import http, { RefinedParams, RefinedResponse, RequestBody, ResponseType } from 'k6/http';
+import { merge } from 'lodash';
+
+import * as defaults from '../defaults';
+import * as types from '../types';
 
 export const buildHeaders = ({ credential }: { credential?: types.Credential }): { [key: string]: string } => {
     const isOIDCGuard = (credential as types.Token).tokenType !== undefined;

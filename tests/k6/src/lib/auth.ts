@@ -1,9 +1,10 @@
-import * as defaults from './defaults';
-import http from 'k6/http';
-import queryString from 'query-string';
-import * as types from './types';
 import { fail } from 'k6';
+import http from 'k6/http';
 import { get } from 'lodash';
+import queryString from 'query-string';
+
+import * as defaults from './defaults';
+import * as types from './types';
 
 export default class Factory {
     private provider!: types.AuthProvider;

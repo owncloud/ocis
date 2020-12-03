@@ -1,34 +1,43 @@
 import { Options, Threshold } from 'k6/options';
-import { utils, auth, defaults, playbook, types } from '../../../../../../lib';
 import { times } from 'lodash';
 
-// Unpack standard data tarball, run PROPFIND on each dir
+import { playbook, types, utils } from '../../../../../../lib';
 
-const files: {
+interface File {
     size: number;
     unit: types.AssetUnit;
-}[] = times(1000, () => ({ size: 1, unit: 'KB' }));
-const authFactory = new auth.default(utils.buildAccount({ login: defaults.ACCOUNTS.EINSTEIN }));
-const plays = {
-    davUpload: new playbook.dav.Upload(),
-    davPropfind: new playbook.dav.Propfind(),
-    davCreate: new playbook.dav.Create(),
-    davDelete: new playbook.dav.Delete(),
+}
+
+interface Plays {
+    davUpload: playbook.dav.Upload;
+    davPropfind: playbook.dav.Propfind;
+    davCreate: playbook.dav.Create;
+    davDelete: playbook.dav.Delete;
+}
+
+export const options = ({ files, plays }: { files: File[]; plays: Plays }): Options => {
+    return {
+        thresholds: files.reduce((acc: { [name: string]: Threshold[] }, c) => {
+            acc[`${plays.davUpload.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
+            acc[`${plays.davCreate.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
+            acc[`${plays.davDelete.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
+            return acc;
+        }, {}),
+    };
 };
-export const options: Options = {
-    insecureSkipTLSVerify: true,
-    iterations: 3,
-    vus: 1,
-    thresholds: files.reduce((acc: { [name: string]: Threshold[] }, c) => {
-        acc[`${plays.davUpload.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
-        acc[`${plays.davCreate.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
-        acc[`${plays.davDelete.metricTrendName}{asset:${c.unit + c.size.toString()}}`] = [];
-        return acc;
-    }, {}),
-};
-export default (): void => {
+
+export default ({
+    files,
+    account,
+    credential,
+    plays,
+}: {
+    plays: Plays;
+    files: File[];
+    account: types.Account;
+    credential: types.Credential;
+}): void => {
     const filesUploaded: { id: string; name: string; folder: string }[] = [];
-    const { account, credential } = authFactory;
 
     files.forEach((f) => {
         const id = f.unit + f.size.toString();
