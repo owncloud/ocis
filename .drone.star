@@ -123,7 +123,6 @@ def main(ctx):
 
   before = \
     [ buildOcisBinaryForTesting(ctx) ] + \
-    [benchmark(ctx)] + \
     testOcisModules(ctx) + \
     testPipelines(ctx)
 
@@ -142,6 +141,7 @@ def main(ctx):
   purge['depends_on'] = getPipelineNames(testPipelines(ctx) + [benchmark(ctx)])
 
   after = [
+    benchmark(ctx),
     manifest(ctx),
     changelog(ctx),
     readme(ctx),
@@ -557,7 +557,7 @@ def benchmark(ctx):
         },
         'commands': [
           'cd tests/k6',
-          'for f in ./dist/test-* ; do k6 run "$f" ; done',
+          'for f in ./dist/test-* ; do k6 run "$f" -q; done',
         ],
       },
     ],
