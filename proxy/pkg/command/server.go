@@ -326,7 +326,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 // have the indexes reversed and the tuple is in the format of [challenge:user-agent], then the same process is applied
 // in reverse for each individual part
 func loadUserAgent(c *cli.Context, cfg *config.Config) error {
-	cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
+	cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
 	locks := c.StringSlice("proxy-user-agent-lock-in")
 
 	for _, v := range locks {
