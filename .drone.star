@@ -123,6 +123,7 @@ def main(ctx):
 
   before = \
     [ buildOcisBinaryForTesting(ctx) ] + \
+    [benchmark(ctx)] + \
     testOcisModules(ctx) + \
     testPipelines(ctx)
 
@@ -138,7 +139,7 @@ def main(ctx):
   ]
 
   purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
-  purge['depends_on'] = getPipelineNames(testPipelines(ctx))
+  purge['depends_on'] = getPipelineNames(testPipelines(ctx) + [benchmark(ctx)])
 
   after = [
     manifest(ctx),
@@ -513,6 +514,51 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
       {
         'name': 'gopath',
         'temp': {},
+      },
+    ],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def benchmark(ctx):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'benchmark',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
+      ocisServer('ocis') + [
+      {
+        'name': 'build benchmarks',
+        'image': 'node',
+        'pull': 'always',
+        'commands': [
+          'cd tests/k6',
+          'yarn',
+          'yarn build',
+        ],
+      },
+      {
+        'name': 'run benchmarks',
+        'image': 'loadimpact/k6',
+        'pull': 'always',
+        'environment': {
+          'OC_HOST': 'https://ocis-server:9200',
+        },
+        'commands': [
+          'cd tests/k6',
+          'for f in ./dist/test-* ; do k6 run "$f" ; done',
+        ],
       },
     ],
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
