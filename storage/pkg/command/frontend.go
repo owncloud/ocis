@@ -302,7 +302,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 	}
 }
 
-// loadUserAgent reads the user-agent-whitelist, since it is a string flag, and attempts to construct a map of
+// loadUserAgent reads the user-agent-whitelist-lock-in, since it is a string flag, and attempts to construct a map of
 // "user-agent":"challenge" locks in for Reva.
 // Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it. User agents with spaces are valid. i.e:
 // Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0
@@ -312,7 +312,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 // in reverse for each individual part
 func loadUserAgent(c *cli.Context, cfg *config.Config) error {
 	cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string, 0)
-	locks := c.StringSlice("user-agent-whitelist")
+	locks := c.StringSlice("user-agent-whitelist-lock-in")
 
 	for _, v := range locks {
 		vv := conversions.Reverse(v)
