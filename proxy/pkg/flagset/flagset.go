@@ -189,8 +189,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "insecure",
 			Value:       false,
 			Usage:       "allow insecure communication to upstream servers",
-			EnvVars:     []string{"PROXY_INSECURE"},
-			Destination: &cfg.Insecure,
+			EnvVars:     []string{"PROXY_INSECURE_BACKENDS"},
+			Destination: &cfg.InsecureBackends,
 		},
 
 		// OIDC
