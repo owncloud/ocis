@@ -37,6 +37,8 @@ You may add flags to your commit message or PR title in order to speed up pipeli
 
 - `[tests-only]`: please add this flag, if you only changed tests or test-related tooling. You do not need to add a changelog for tests-only changes.
 
+- `[with-benchmarks]`: please add this flag, if you want benchmarks to be run in CI.
+
 ### Knowledge base
 
 - My pipeline fails because some CI related files or commands are missing.
