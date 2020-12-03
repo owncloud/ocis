@@ -24,7 +24,6 @@
 * Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
-* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
@@ -64,6 +63,7 @@
 * Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Add the glauth service: [#244](https://github.com/owncloud/product/issues/244)
+* Enhancement - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Enhancement - Add the konnectd service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add the ocis-phoenix service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add the ocis-pkg package: [#244](https://github.com/owncloud/product/issues/244)
@@ -299,12 +299,6 @@
    storage for loading all existing documents.
 
    https://github.com/owncloud/ocis/pull/748
-
-* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
-
-   Add k6 as a load testing framework
-
-   https://github.com/owncloud/ocis/pull/941
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -739,6 +733,15 @@
   * Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
 
    https://github.com/owncloud/product/issues/244
+
+* Enhancement - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
+
+   Tags: tests
+
+   Add k6 as a performance testing framework
+
+   https://github.com/owncloud/ocis/pull/941
+   https://github.com/owncloud/ocis/pull/983
 
 * Enhancement - Add the konnectd service: [#244](https://github.com/owncloud/product/issues/244)
 
