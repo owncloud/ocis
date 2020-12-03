@@ -106,6 +106,7 @@ github.com/aws/aws-sdk-go v1.34.12/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZve
 github.com/aws/aws-sdk-go v1.35.9 h1:b1HiUpdkFLJyoOQ7zas36YHzjNHH0ivHx/G5lWBeg+U=
 github.com/aws/aws-sdk-go v1.35.9/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
 github.com/aws/aws-sdk-go v1.35.23/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
+github.com/aws/aws-sdk-go v1.35.27/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
 github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f/go.mod h1:AuiFmCCPBSrqvVMvuqFuk0qogytodnVFVSN5CeJB8Gc=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
@@ -198,6 +199,12 @@ github.com/cs3org/reva v1.4.1-0.20201127111856-e6a6212c1b7b h1:Bypxdf3vXwyEeL86M
 github.com/cs3org/reva v1.4.1-0.20201127111856-e6a6212c1b7b/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
 github.com/cs3org/reva v1.4.1-0.20201130061320-ac85e68e0600 h1:4CKU+R4UNvILzsPrcAFwEbk/8Hc6vJqwO7SxK0gAm4I=
 github.com/cs3org/reva v1.4.1-0.20201130061320-ac85e68e0600/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
+github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3 h1:H3QnP+eApE2LDJrYjJrIBmJ04KGVdpR2QP+ipdPp3jE=
+github.com/cs3org/reva v1.4.1-0.20201130150257-7e3efcbd0fc3/go.mod h1:MTBlfobTE8W2hgXQ9+r+75jpJa1TxD04IZm5TpS9H48=
+github.com/cs3org/reva v1.4.1-0.20201203075131-783e35cbff51 h1:WguydLVNj9tDRAw5cz+TnkY3shiTmbpfBPX2NpDHU2c=
+github.com/cs3org/reva v1.4.1-0.20201203075131-783e35cbff51/go.mod h1:UUIurLdFYag/W+3YlAqwFuVvfzF3Ps1Elq1NzsE9kvo=
+github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f h1:3Y1TbQCN9s8+eWjfnUVlnVA7YlZJdxMTffmMVxZwMP8=
+github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f/go.mod h1:3Bz9oExBSgKjDspq3pBso31HlLSD98SlcURV54N3yPs=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

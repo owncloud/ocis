@@ -82,6 +82,7 @@ type FrontendPort struct {
 	DatagatewayPrefix string
 	OCDavPrefix       string
 	OCSPrefix         string
+	OCSSharePrefix	  string
 	PublicURL         string
 	Middleware        Middleware
 }
