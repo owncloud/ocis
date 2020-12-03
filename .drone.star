@@ -148,7 +148,7 @@ def main(ctx):
 
   if ctx.build.event == "cron":
     before.append(benchmark(ctx))
-    
+
     purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
     purge['depends_on'] = getPipelineNames(before)
 
@@ -181,11 +181,11 @@ def main(ctx):
 
     if '[with-benchmarks]' in (ctx.build.title + ctx.build.message):
       before.append(benchmark(ctx))
-      purge_dependencies.append(benchmark(ctx))      
+      purge_dependencies.append(benchmark(ctx))
 
     purge = purgeBuildArtifactCache(ctx, 'ocis-binary-amd64')
     purge['depends_on'] = getPipelineNames(purge_dependencies)
-    
+
     pipelines = before + stages + after + [purge]
 
     notify_pipeline = notify(ctx)
