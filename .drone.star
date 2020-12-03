@@ -3,12 +3,13 @@ config = {
     'accounts': 'frontend',
     'glauth':'',
     'konnectd':'',
+    'ocis': '',
     'ocis-phoenix':'',
     'ocis-pkg':'',
-    'storage':'',
     'ocs':'',
     'proxy':'',
     'settings':'frontend',
+    'storage':'',
     'store':'',
     'thumbnails':'',
     'webdav':'',
@@ -16,7 +17,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': 'a5df08ca512c3c8e65a01d018c9eec81b9cfccaa',
+    'coreCommit': '592d76b63254767ac17414475c37b48668a517b8',
     'numberOfParts': 10
   },
   'uiTests': {
@@ -1257,13 +1258,6 @@ def docs(ctx):
     },
     'steps': [
       {
-        'name': 'prepare',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'make -C docs docs-copy'
-        ],
-      },
-      {
         'name': 'generate-config-docs',
         'image': 'webhippie/golang:1.14',
         'commands': generateConfigDocs,
@@ -1275,19 +1269,18 @@ def docs(ctx):
         ],
       },
       {
+        'name': 'prepare',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'make -C docs docs-copy'
+        ],
+      },
+      {
         'name': 'test',
         'image': 'owncloudci/hugo:0.71.0',
         'commands': [
           'cd docs/hugo',
           'hugo',
-        ],
-      },
-      {
-        'name': 'list and remove temporary files',
-        'image': 'owncloudci/alpine:latest',
-        'commands': [
-          'tree hugo/public',
-          'rm -rf docs/hugo',
         ],
       },
       {
@@ -1301,7 +1294,7 @@ def docs(ctx):
           'password': {
             'from_secret': 'github_token',
           },
-          'pages_directory': 'docs/',
+          'pages_directory': 'docs/hugo/content',
           'target_branch': 'docs',
         },
         'when': {
@@ -1311,6 +1304,14 @@ def docs(ctx):
             ],
           },
         },
+      },
+      {
+        'name': 'list and remove temporary files',
+        'image': 'owncloudci/alpine:latest',
+        'commands': [
+          'tree hugo/public',
+          'rm -rf docs/hugo',
+        ],
       },
       {
         'name': 'downstream',

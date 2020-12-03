@@ -14,7 +14,7 @@ provided by this service.
 ## Identifying settings values
 
 A *settings value* is uniquely identified by four attributes. Three of them are coming from the definition of
-the setting within it's settings bundle (see [Settings Bundles](https://owncloud.github.io/extensions/ocis_settings/bundles/)
+the setting within it's settings bundle (see [Settings Bundles]({{< relref "bundles.md" >}})
 for an example). The fourth identifies the user.
 - extension: Key of the extension that registered the settings bundle,
 - bundleKey: Key of the settings bundle,

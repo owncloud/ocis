@@ -7,6 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: testing.md
 ---
 
+{{< toc >}}
 
 ## Acceptance tests
 
@@ -15,6 +16,7 @@ We are using the ownCloud 10 acceptance test suite against oCIS. To set this up 
 ### Getting the tests
 
 All you need to do to get the acceptance tests is check out the core repo:
+
 ```
 git clone https://github.com/owncloud/core.git
 ```
@@ -28,6 +30,7 @@ File versions need a redis server. Start one with docker by using:
 ### Run ocis
 
 To start ocis:
+
 ```
 PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 ```
@@ -35,6 +38,7 @@ PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
 ### Run the acceptance tests
+
 First we will need to clone the testing app in owncloud which contains the skeleton files required for running the tests.
 In the ownCloud 10 core clone the testing app with the following command:
 
@@ -42,7 +46,7 @@ In the ownCloud 10 core clone the testing app with the following command:
 git clone https://github.com/owncloud/testing apps/testing
 ```
 
-Then run the api acceptance tests with the following command from the root of the OCIS repo:
+Then run the api acceptance tests with the following command from the root of the oCIS repository:
 ```
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
@@ -87,6 +91,7 @@ If you want to work on a specific issue
 2.  locally run each of the tests marked with that issue in the expected failures file.
 
     E.g.:
+
     ```
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
