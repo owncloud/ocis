@@ -124,8 +124,7 @@ def main(ctx):
   before = \
     [ buildOcisBinaryForTesting(ctx) ] + \
     testOcisModules(ctx) + \
-    testPipelines(ctx) + \
-    [benchmark(ctx)]
+    testPipelines(ctx)
 
   stages = [
     docker(ctx, 'amd64'),
@@ -152,6 +151,7 @@ def main(ctx):
   ]
 
   if ctx.build.event == "cron":
+    before.append(benchmark(ctx))
     notify_pipeline = notify(ctx)
     notify_pipeline['depends_on'] = \
       getPipelineNames(before)
@@ -173,6 +173,9 @@ def main(ctx):
       getPipelineNames(docs_pipelines)
 
     pipelines = docs_pipelines + [ notify_pipeline ]
+
+  elif '[with-benchmarks]' in (ctx.build.title + ctx.build.message):
+    before.append(benchmark(ctx))
 
   else:
     pipelines = before + stages + after
@@ -531,6 +534,7 @@ def benchmark(ctx):
     'kind': 'pipeline',
     'type': 'docker',
     'name': 'benchmark',
+    'failure': 'ignore',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
