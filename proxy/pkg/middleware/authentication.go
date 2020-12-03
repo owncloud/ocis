@@ -15,12 +15,14 @@ var SupportedAuthStrategies []string
 // TODO this should be a regexp, or it can be confused with routes that contain "/ocs" somewhere along the URI
 var ProxyWwwAuthenticate = []string{"ocs"}
 
-type statusRecorder struct {
+// StatusRecorder implements the http.ResponseWriter interface to record a response a-posteriori
+type StatusRecorder struct {
 	http.ResponseWriter
 	status int
 }
 
-func (rec *statusRecorder) WriteHeader(code int) {
+// WriteHeader implements the http.ResponseWriter interface
+func (rec *StatusRecorder) WriteHeader(code int) {
 	rec.status = code
 	rec.ResponseWriter.WriteHeader(code)
 }
