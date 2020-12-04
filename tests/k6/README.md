@@ -11,5 +11,13 @@ $ yarn build
 
 ## How to run
 ```console
-k6 run ./dist/TESTNAME.js
+k6 run ./dist/NAME_OF_TEST.js
+```
+
+## Environment variables
+```console
+$ OC_LOGIN=USERNAME OC_PASSWORD=PASSWORD k6 run ...
+$ OC_HOST=URL k6 run ...
+$ OC_OIDC_HOST=URL k6 run ...
+$ OC_OIDC_ENABLED=BOOL k6 run ...
 ```

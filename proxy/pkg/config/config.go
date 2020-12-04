@@ -117,6 +117,7 @@ type Config struct {
 	PreSignedURL          PreSignedURL
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
+	InsecureBackends      bool
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request

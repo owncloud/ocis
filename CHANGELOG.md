@@ -12,6 +12,7 @@
 * Bugfix - Fix choose account dialogue: [#846](https://github.com/owncloud/ocis/pull/846)
 * Bugfix - Fix id or username query handling: [#745](https://github.com/owncloud/ocis/pull/745)
 * Bugfix - Fix konnectd build: [#809](https://github.com/owncloud/ocis/pull/809)
+* Bugfix - Fix path of files shared with me in ocs api: [#204](https://github.com/owncloud/product/issues/204)
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 * Bugfix - Allow consent-prompt with switch-account: [#788](https://github.com/owncloud/ocis/pull/788)
 * Bugfix - Mint token with uid and gid: [#737](https://github.com/owncloud/ocis/pull/737)
@@ -23,7 +24,6 @@
 * Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
-* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
@@ -42,6 +42,7 @@
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
 * Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
+* Change - Proxy allow insecure upstreams: [#1007](https://github.com/owncloud/ocis/pull/1007)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Theme welcome and choose account pages: [#887](https://github.com/owncloud/ocis/pull/887)
@@ -63,6 +64,7 @@
 * Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
 * Enhancement - Add the glauth service: [#244](https://github.com/owncloud/product/issues/244)
+* Enhancement - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
 * Enhancement - Add the konnectd service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add the ocis-phoenix service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add the ocis-pkg package: [#244](https://github.com/owncloud/product/issues/244)
@@ -184,6 +186,13 @@
 
    https://github.com/owncloud/ocis/pull/809
 
+* Bugfix - Fix path of files shared with me in ocs api: [#204](https://github.com/owncloud/product/issues/204)
+
+   The path of files shared with me using the ocs api was pointing to an incorrect location.
+
+   https://github.com/owncloud/product/issues/204
+   https://github.com/owncloud/ocis/pull/994
+
 * Bugfix - Use micro default client: [#718](https://github.com/owncloud/ocis/pull/718)
 
    Tags: glauth
@@ -291,12 +300,6 @@
    storage for loading all existing documents.
 
    https://github.com/owncloud/ocis/pull/748
-
-* Change - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
-
-   Add k6 as a load testing framework
-
-   https://github.com/owncloud/ocis/pull/941
 
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
 
@@ -479,6 +482,15 @@
    Markdown-editor and draw-io have been removed as defaults.
 
    https://github.com/owncloud/ocis/pull/688
+
+* Change - Proxy allow insecure upstreams: [#1007](https://github.com/owncloud/ocis/pull/1007)
+
+   Tags: proxy
+
+   We can now configure the proxy if insecure upstream servers are allowed. This was added since
+   you need to disable certificate checks fore some situations like testing.
+
+   https://github.com/owncloud/ocis/pull/1007
 
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 
@@ -731,6 +743,15 @@
   * Change - Default to config based user backend: [#6](https://github.com/owncloud/ocis-glauth/pull/6)
 
    https://github.com/owncloud/product/issues/244
+
+* Enhancement - Add k6: [#941](https://github.com/owncloud/ocis/pull/941)
+
+   Tags: tests
+
+   Add k6 as a performance testing framework
+
+   https://github.com/owncloud/ocis/pull/941
+   https://github.com/owncloud/ocis/pull/983
 
 * Enhancement - Add the konnectd service: [#244](https://github.com/owncloud/product/issues/244)
 
