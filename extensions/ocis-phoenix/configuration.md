@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T07:51:00+0000"
+date: "2020-12-04T15:03:53+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/phoenix/templates
@@ -32,21 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### phoenix ocis-phoenix
-
-Serve Phoenix for oCIS
-
-Usage: `phoenix ocis-phoenix [command options] [arguments...]`
-
---log-level | $PHOENIX_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $PHOENIX_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $PHOENIX_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### phoenix server
 
@@ -131,4 +116,19 @@ Usage: `phoenix health [command options] [arguments...]`
 
 --debug-addr | $PHOENIX_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9104`.
+
+### phoenix ocis-phoenix
+
+Serve Phoenix for oCIS
+
+Usage: `phoenix ocis-phoenix [command options] [arguments...]`
+
+--log-level | $PHOENIX_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $PHOENIX_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $PHOENIX_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
