@@ -115,6 +115,7 @@ type Config struct {
 	PolicySelector        *PolicySelector `mapstructure:"policy_selector"`
 	Reva                  Reva
 	PreSignedURL          PreSignedURL
+	AccountBackend        string
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool

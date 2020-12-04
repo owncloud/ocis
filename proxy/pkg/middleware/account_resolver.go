@@ -1,21 +1,14 @@
 package middleware
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
-	"strconv"
-	"strings"
 
-	revaUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	tokenPkg "github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	revauser "github.com/cs3org/reva/pkg/user"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based
@@ -37,117 +30,68 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			next:                  next,
 			logger:                logger,
 			tokenManager:          tokenManager,
-			accountsClient:        options.AccountsClient,
-			oidcIss:               options.OIDCIss,
-			autoprovisionAccounts: options.AutoprovisionAccounts,
-			settingsRoleService:   options.SettingsRoleService,
+			userProvider:          options.UserProvider,
+			autoProvisionAccounts: options.AutoprovisionAccounts,
 		}
 	}
 }
 
 type accountResolver struct {
-	oidcIss               string
-	autoprovisionAccounts bool
 	next                  http.Handler
 	logger                log.Logger
 	tokenManager          tokenPkg.Manager
-	accountsClient        accounts.AccountsService
-	settingsRoleService   settings.RoleService
+	userProvider          backend.UserBackend
+	autoProvisionAccounts bool
 }
 
 func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var account *accounts.Account
-	var status int
-
 	claims := oidc.FromContext(req.Context())
+	u, ok := revauser.ContextGetUser(req.Context())
 
-	if claims == nil {
+	if claims == nil && !ok {
 		m.next.ServeHTTP(w, req)
 		return
 	}
 
-	switch {
-	case claims.Email != "":
-		account, status = getAccount(m.logger, m.accountsClient, fmt.Sprintf("mail eq '%s'", strings.ReplaceAll(claims.Email, "'", "''")))
-	case claims.PreferredUsername != "":
-		account, status = getAccount(m.logger, m.accountsClient, fmt.Sprintf("preferred_name eq '%s'", strings.ReplaceAll(claims.PreferredUsername, "'", "''")))
-	case claims.OcisID != "":
-		account, status = getAccount(m.logger, m.accountsClient, fmt.Sprintf("id eq '%s'", strings.ReplaceAll(claims.OcisID, "'", "''")))
-	default:
-		// TODO allow lookup by custom claim, eg an id ... or sub
-		m.logger.Error().Msg("Could not lookup account, no mail or preferred_username claim set")
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	if m.autoprovisionAccounts && status == http.StatusNotFound {
-		account, status = createAccount(m.logger, claims, m.accountsClient)
-	}
-
-	if status != 0 || account == nil {
-		w.WriteHeader(status)
-		return
-	}
-
-	if !account.AccountEnabled {
-		m.logger.Debug().Interface("account", account).Msg("account is disabled")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	groups := make([]string, len(account.MemberOf))
-	for i := range account.MemberOf {
-		// reva needs the unix group name
-		groups[i] = account.MemberOf[i].OnPremisesSamAccountName
-	}
-
-	// fetch active roles from ocis-settings
-	assignmentResponse, err := m.settingsRoleService.ListRoleAssignments(req.Context(), &settings.ListRoleAssignmentsRequest{AccountUuid: account.Id})
-	roleIDs := make([]string, 0)
-	if err != nil {
-		m.logger.Err(err).Str("accountID", account.Id).Msg("failed to fetch role assignments")
-	} else {
-		for _, assignment := range assignmentResponse.Assignments {
-			roleIDs = append(roleIDs, assignment.RoleId)
+	if u == nil && claims != nil {
+		var claim, value string
+		switch {
+		case claims.Email != "":
+			claim, value = "mail", claims.Email
+		case claims.PreferredUsername != "":
+			claim, value = "username", claims.PreferredUsername
+		case claims.OcisID != "":
+			//claim, value = "id", claims.OcisID
+		default:
+			// TODO allow lookup by custom claim, eg an id ... or sub
+			m.logger.Error().Msg("Could not lookup account, no mail or preferred_username claim set")
+			w.WriteHeader(http.StatusInternalServerError)
 		}
-	}
 
-	m.logger.Debug().Interface("claims", claims).Interface("account", account).Msgf("associated claims with uuid")
+		var err error
+		u, err = m.userProvider.GetUserByClaims(req.Context(), claim, value, true)
 
-	user := &revaUser.User{
-		Id: &revaUser.UserId{
-			OpaqueId: account.Id,
-			Idp:      claims.Iss,
-		},
-		Username:     account.OnPremisesSamAccountName,
-		DisplayName:  account.DisplayName,
-		Mail:         account.Mail,
-		MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
-		Groups:       groups,
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{},
-		},
-	}
-	user.Opaque.Map["uid"] = &types.OpaqueEntry{
-		Decoder: "plain",
-		Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-	}
-	user.Opaque.Map["gid"] = &types.OpaqueEntry{
-		Decoder: "plain",
-		Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
-	}
-
-	// encode roleIDs as json string
-	roleIDsJSON, jsonErr := json.Marshal(roleIDs)
-	if jsonErr != nil {
-		m.logger.Err(jsonErr).Str("accountID", account.Id).Msg("failed to marshal roleIDs into json")
-	} else {
-		user.Opaque.Map["roles"] = &types.OpaqueEntry{
-			Decoder: "json",
-			Value:   roleIDsJSON,
+		if m.autoProvisionAccounts && err == backend.ErrAccountNotFound {
+			m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("User by claim not found... autoprovisioning.")
+			u, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
 		}
+
+		if err == backend.ErrAccountNotFound || err == backend.ErrAccountDisabled {
+			m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("Unautorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		if err != nil {
+			m.logger.Error().Err(err).Msg("Could not get user by claim")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("associated claims with uuid")
 	}
 
-	token, err := m.tokenManager.MintToken(req.Context(), user)
+	token, err := m.tokenManager.MintToken(req.Context(), u)
 
 	if err != nil {
 		m.logger.Error().Err(err).Msgf("could not mint token")
@@ -158,53 +102,4 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	req.Header.Set("x-access-token", token)
 
 	m.next.ServeHTTP(w, req)
-}
-
-func getAccount(logger log.Logger, ac accounts.AccountsService, query string) (account *accounts.Account, status int) {
-	resp, err := ac.ListAccounts(context.Background(), &accounts.ListAccountsRequest{
-		Query:    query,
-		PageSize: 2,
-	})
-
-	if err != nil {
-		logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service")
-		status = http.StatusInternalServerError
-		return
-	}
-
-	if len(resp.Accounts) <= 0 {
-		logger.Error().Str("query", query).Msgf("account not found")
-		status = http.StatusNotFound
-		return
-	}
-
-	if len(resp.Accounts) > 1 {
-		logger.Error().Str("query", query).Msgf("more than one account found, aborting")
-		status = http.StatusForbidden
-		return
-	}
-
-	account = resp.Accounts[0]
-	return
-}
-
-func createAccount(l log.Logger, claims *oidc.StandardClaims, ac accounts.AccountsService) (*accounts.Account, int) {
-	// TODO check if fields are missing.
-	req := &accounts.CreateAccountRequest{
-		Account: &accounts.Account{
-			DisplayName:              claims.DisplayName,
-			PreferredName:            claims.PreferredUsername,
-			OnPremisesSamAccountName: claims.PreferredUsername,
-			Mail:                     claims.Email,
-			CreationType:             "LocalAccount",
-			AccountEnabled:           true,
-		},
-	}
-	created, err := ac.CreateAccount(context.Background(), req)
-	if err != nil {
-		l.Error().Err(err).Interface("account", req.Account).Msg("could not create account")
-		return nil, http.StatusInternalServerError
-	}
-
-	return created, 0
 }

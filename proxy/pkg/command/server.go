@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"os"
 	"os/signal"
@@ -250,10 +251,24 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
-	accountsClient := acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient)
 	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
-	storeClient := storepb.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
+	var userProvider backend.UserBackend
+	switch cfg.AccountBackend {
+	case "accounts":
+		userProvider = backend.NewAccountsServiceUserBackend(
+			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
+			rolesClient,
+			cfg.OIDC.Issuer,
+			l,
+		)
+	case "cs3":
+		userProvider = backend.NewCS3UserBackend(revaClient, rolesClient, revaClient, l)
+	default:
+		l.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
+	}
+
+	storeClient := storepb.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	if err != nil {
 		l.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
@@ -290,27 +305,24 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			// basic Options
 			middleware.Logger(l),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
-			middleware.AccountsClient(accountsClient),
+			middleware.UserProvider(userProvider),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
 		),
 		middleware.SignedURLAuth(
 			middleware.Logger(l),
 			middleware.PreSignedURLConfig(cfg.PreSignedURL),
-			middleware.AccountsClient(accountsClient),
+			middleware.UserProvider(userProvider),
 			middleware.Store(storeClient),
 		),
 		middleware.AccountResolver(
 			middleware.Logger(l),
-			middleware.AccountsClient(accountsClient),
-			middleware.OIDCIss(cfg.OIDC.Issuer),
+			middleware.UserProvider(userProvider),
 			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
-			middleware.SettingsRoleService(rolesClient),
 		),
 		middleware.CreateHome(
 			middleware.Logger(l),
-			middleware.AccountsClient(accountsClient),
 			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),

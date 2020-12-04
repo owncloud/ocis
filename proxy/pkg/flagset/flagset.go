@@ -256,6 +256,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.EnableBasicAuth,
 		},
 
+		&cli.StringFlag{
+			Name:        "account-backend-type",
+			Value:       "accounts",
+			Usage:       "account-backend-type",
+			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
+			Destination: &cfg.AccountBackend,
+		},
+
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
 			Name:    "proxy-user-agent-lock-in",
