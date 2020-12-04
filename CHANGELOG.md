@@ -60,6 +60,7 @@
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
+* Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
 * Enhancement - Document how to run OCIS on top of EOS: [#172](https://github.com/owncloud/ocis/pull/172)
@@ -656,6 +657,12 @@
 
    https://github.com/owncloud/ocis/pull/866
    https://github.com/owncloud/ocis/pull/934
+
+* Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
+
+   Added tracing to the accounts service.
+
+   https://github.com/owncloud/ocis/issues/1016
 
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 
