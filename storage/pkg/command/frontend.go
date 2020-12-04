@@ -6,12 +6,14 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -25,8 +27,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
-
-			return nil
+			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -114,6 +115,9 @@ func Frontend(cfg *config.Config) *cli.Command {
 						"middlewares": map[string]interface{}{
 							"cors": map[string]interface{}{
 								"allow_credentials": true,
+							},
+							"auth": map[string]interface{}{
+								"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
 							},
 						},
 						// TODO build services dynamically
@@ -297,4 +301,29 @@ func Frontend(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// loadUserAgent reads the user-agent-whitelist-lock-in, since it is a string flag, and attempts to construct a map of
+// "user-agent":"challenge" locks in for Reva.
+// Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it. User agents with spaces are valid. i.e:
+// Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0
+// This function works by relying in our format of specifying [user-agent:challenge] and the fact that the user agent
+// might contain ":" (colon), so the original string is reversed, split in two parts, by the time it is split we
+// have the indexes reversed and the tuple is in the format of [challenge:user-agent], then the same process is applied
+// in reverse for each individual part
+func loadUserAgent(c *cli.Context, cfg *config.Config) error {
+	cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
+	locks := c.StringSlice("user-agent-whitelist-lock-in")
+
+	for _, v := range locks {
+		vv := conversions.Reverse(v)
+		parts := strings.SplitN(vv, ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
+		}
+
+		cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
+	}
+
+	return nil
 }

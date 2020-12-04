@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	"net/http"
-	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -31,13 +32,36 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
 				if h.isPublicLink(req) || !h.isBasicAuth(req) {
+					if !h.isPublicLink(req) {
+						userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "basic")
+					}
 					next.ServeHTTP(w, req)
 					return
 				}
 
+				removeSuperfluousAuthenticate(w)
 				account, ok := h.getAccount(req)
 
+				// touch is a user agent locking guard, when touched changes to true it indicates the User-Agent on the
+				// request is configured to support only one challenge, it it remains untouched, there are no considera-
+				// tions and we should write all available authentication challenges to the response.
+				touch := false
+
 				if !ok {
+					for k, v := range options.CredentialsByUserAgent {
+						if strings.Contains(k, req.UserAgent()) {
+							removeSuperfluousAuthenticate(w)
+							w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
+							touch = true
+							break
+						}
+					}
+
+					// if the request is not bound to any user agent, write all available challenges
+					if !touch {
+						writeSupportedAuthenticateHeader(w, req)
+					}
+
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}

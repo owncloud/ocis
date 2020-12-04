@@ -37,7 +37,10 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			// there is no bearer token on the request,
 			if !h.shouldServe(req) {
+				// oidc supported but token not present, add header and handover to the next middleware.
+				userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "bearer")
 				next.ServeHTTP(w, req)
 				return
 			}

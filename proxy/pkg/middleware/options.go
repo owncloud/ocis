@@ -46,6 +46,8 @@ type Options struct {
 	UserinfoCacheSize int
 	// UserinfoCacheTTL sets the max cache duration for the userinfo cache, intended for the oidc_auth middleware
 	UserinfoCacheTTL time.Duration
+	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
+	CredentialsByUserAgent map[string]string
 }
 
 // newOptions initializes the available default options.
@@ -105,6 +107,13 @@ func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
 func OIDCIss(iss string) Option {
 	return func(o *Options) {
 		o.OIDCIss = iss
+	}
+}
+
+// CredentialsByUserAgent sets UserAgentChallenges.
+func CredentialsByUserAgent(v map[string]string) Option {
+	return func(o *Options) {
+		o.CredentialsByUserAgent = v
 	}
 }
 

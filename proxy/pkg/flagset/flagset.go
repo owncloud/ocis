@@ -232,7 +232,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.AutoprovisionAccounts,
 		},
 
-		// Presigned URLs
+		// Pre Signed URLs
 		&cli.StringSliceFlag{
 			Name:    "presignedurl-allow-method",
 			Value:   cli.NewStringSlice("GET"),
@@ -255,8 +255,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,
 		},
-	}
 
+		// Reva Middlewares Config
+		&cli.StringSliceFlag{
+			Name:    "proxy-user-agent-lock-in",
+			Usage:   "--user-agent-whitelist-lock-in=mirall:basic,foo:bearer Given a tuple of [UserAgent:challenge] it locks a given user agent to the authentication challenge. Particularly useful for old clients whose USer-Agent is known and only support one authentication challenge. When this flag is set in the proxy it configures the authentication middlewares.",
+			EnvVars: []string{"PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
+		},
+	}
 }
 
 // ListProxyWithConfig applies the config to the list commands flags.
