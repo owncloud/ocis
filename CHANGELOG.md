@@ -42,6 +42,7 @@
 * Change - Account management permissions for Admin role: [#124](https://github.com/owncloud/product/issues/124)
 * Change - Update phoenix to v0.18.0: [#651](https://github.com/owncloud/ocis/pull/651)
 * Change - Default apps in ownCloud Web: [#688](https://github.com/owncloud/ocis/pull/688)
+* Change - Proxy allow insecure upstreams: [#1007](https://github.com/owncloud/ocis/pull/1007)
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Start ocis-proxy with the ocis server command: [#119](https://github.com/owncloud/ocis/issues/119)
 * Change - Theme welcome and choose account pages: [#887](https://github.com/owncloud/ocis/pull/887)
@@ -481,6 +482,15 @@
    Markdown-editor and draw-io have been removed as defaults.
 
    https://github.com/owncloud/ocis/pull/688
+
+* Change - Proxy allow insecure upstreams: [#1007](https://github.com/owncloud/ocis/pull/1007)
+
+   Tags: proxy
+
+   We can now configure the proxy if insecure upstream servers are allowed. This was added since
+   you need to disable certificate checks fore some situations like testing.
+
+   https://github.com/owncloud/ocis/pull/1007
 
 * Change - Make ocis-settings available: [#287](https://github.com/owncloud/ocis/pull/287)
 
