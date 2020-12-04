@@ -17,12 +17,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': 'ed326fd54c7f9142389e49aad87653a905c6ddb7',
+    'coreCommit': '027bc8b5fe8ad29967184eab200abd4211ef9006',
     'numberOfParts': 10
   },
   'uiTests': {
     'phoenixBranch': 'master',
-    'phoenixCommit': 'bed4effca2eb492d0ee20eee48575ea1eb92cd35',
+    'phoenixCommit': 'c548282ab652b78e8c077d8bdf32b25060414047',
       'suites': {
         'webUIBasic': [
           'webUILogin',
@@ -1667,7 +1667,7 @@ def genericCache(name, action, mounts, cache_key):
             'from_secret': 'cache_s3_endpoint'
           },
         'bucket': 'cache',
-        'region': 'us-east-1', # not used at all, but failes if not given!
+        'region': 'us-east-1', # not used at all, but fails if not given!
         'path_style': 'true',
         'cache_key': cache_key,
         'rebuild': rebuild,
