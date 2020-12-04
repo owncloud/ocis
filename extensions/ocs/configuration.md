@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T17:44:38+0000"
+date: "2020-12-04T18:13:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -32,6 +32,27 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+--http-namespace | $OCS_NAMESPACE  
+: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+
+--name | $OCS_NAME  
+: Service name. Default: `ocs`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+--debug-addr | $OCS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9114`.
 
 ### ocs ocis-ocs
 
@@ -98,25 +119,4 @@ Usage: `ocs server [command options] [arguments...]`
 
 --jwt-secret | $OCS_JWT_SECRET  
 : Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
-
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
---http-namespace | $OCS_NAMESPACE  
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
-
---name | $OCS_NAME  
-: Service name. Default: `ocs`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
---debug-addr | $OCS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9114`.
 

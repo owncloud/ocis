@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T17:44:42+0000"
+date: "2020-12-04T18:13:40+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -32,18 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
---grpc-namespace | $STORE_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $STORE_NAME  
-: Service name. Default: `store`.
 
 ### store health
 
@@ -113,4 +101,16 @@ Usage: `store server [command options] [arguments...]`
 
 --data-path | $STORE_DATA_PATH  
 : location of the store data path. Default: `/var/tmp/ocis-store`.
+
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+--grpc-namespace | $STORE_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $STORE_NAME  
+: Service name. Default: `store`.
 

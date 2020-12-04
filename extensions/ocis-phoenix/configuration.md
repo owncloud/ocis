@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T17:44:37+0000"
+date: "2020-12-04T18:13:35+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/phoenix/templates
@@ -32,6 +32,30 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### phoenix health
+
+Check health status
+
+Usage: `phoenix health [command options] [arguments...]`
+
+--debug-addr | $PHOENIX_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9104`.
+
+### phoenix ocis-phoenix
+
+Serve Phoenix for oCIS
+
+Usage: `phoenix ocis-phoenix [command options] [arguments...]`
+
+--log-level | $PHOENIX_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $PHOENIX_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $PHOENIX_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### phoenix server
 
@@ -107,28 +131,4 @@ Usage: `phoenix server [command options] [arguments...]`
 
 --oidc-scope | $PHOENIX_OIDC_SCOPE  
 : OpenID Connect scope. Default: `openid profile email`.
-
-### phoenix health
-
-Check health status
-
-Usage: `phoenix health [command options] [arguments...]`
-
---debug-addr | $PHOENIX_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9104`.
-
-### phoenix ocis-phoenix
-
-Serve Phoenix for oCIS
-
-Usage: `phoenix ocis-phoenix [command options] [arguments...]`
-
---log-level | $PHOENIX_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $PHOENIX_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $PHOENIX_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
