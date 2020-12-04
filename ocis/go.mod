@@ -7,7 +7,6 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/cs3org/reva v1.4.1-0.20201203075131-783e35cbff51 // indirect
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/micro/cli/v2 v2.1.2

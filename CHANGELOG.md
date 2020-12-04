@@ -56,6 +56,7 @@
 * Change - Update phoenix to v0.25.0: [#868](https://github.com/owncloud/ocis/pull/868)
 * Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
 * Change - Update phoenix to v0.27.0: [#943](https://github.com/owncloud/ocis/pull/943)
+* Change - Update phoenix to v0.28.0: [#1027](https://github.com/owncloud/ocis/pull/1027)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -97,6 +98,7 @@
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 * Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
+* Enhancement - Add www-authenticate based on user agent: [#1009](https://github.com/owncloud/ocis/pull/1009)
 
 ## Details
 
@@ -619,6 +621,16 @@
 
    https://github.com/owncloud/ocis/pull/943
    https://github.com/owncloud/phoenix/releases/tag/v0.27.0
+
+* Change - Update phoenix to v0.28.0: [#1027](https://github.com/owncloud/ocis/pull/1027)
+
+   Tags: web
+
+   We updated phoenix to v0.28.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/1027
+   https://github.com/owncloud/phoenix/releases/tag/v0.28.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
@@ -1852,3 +1864,29 @@
    https://github.com/owncloud/ocis/pull/971
    https://github.com/cs3org/reva/pull/1331
    https://github.com/cs3org/reva/pull/1342
+
+* Enhancement - Add www-authenticate based on user agent: [#1009](https://github.com/owncloud/ocis/pull/1009)
+
+   Tags: reva, proxy
+
+   We now comply with HTTP spec by adding Www-Authenticate headers on every `401` request.
+   Furthermore, we not only take care of such a thing at the Proxy but also Reva will take care of it.
+   In addition, we now are able to lock-in a set of User-Agent to specific challenges.
+
+   Admins can use this feature by configuring OCIS + Reva following this approach:
+
+   ``` STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT="mirall:basic,
+   Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101
+   Firefox/83.0:bearer" \
+   PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT="mirall:basic, Mozilla/5.0
+   (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0:bearer" \
+   PROXY_ENABLE_BASIC_AUTH=true \ go run cmd/ocis/main.go server ```
+
+   We introduced two new environment variables:
+
+   `STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT` as well as
+   `PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT`, The reason they have the same value
+   is not to rely on the os env on a distributed environment, so in redundancy we trust. They both
+   configure the same on the backend storage and OCIS Proxy.
+
+   https://github.com/owncloud/ocis/pull/1009
