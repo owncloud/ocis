@@ -9,8 +9,6 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/status"
 	tokenPkg "github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	microErrors "github.com/micro/go-micro/v2/errors"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
@@ -31,7 +29,6 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 		return &createHome{
 			next:              next,
 			logger:            logger,
-			accountsClient:    options.AccountsClient,
 			tokenManager:      tokenManager,
 			revaGatewayClient: options.RevaGatewayClient,
 		}
@@ -41,7 +38,6 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 type createHome struct {
 	next              http.Handler
 	logger            log.Logger
-	accountsClient    accounts.AccountsService
 	tokenManager      tokenPkg.Manager
 	revaGatewayClient gateway.GatewayAPIClient
 }
@@ -53,31 +49,6 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	token := req.Header.Get("x-access-token")
-
-	user, err := m.tokenManager.DismantleToken(req.Context(), token)
-	if err != nil {
-		m.logger.Logger.Err(err).Msg("error getting user from access token")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	_, err = m.accountsClient.GetAccount(req.Context(), &accounts.GetAccountRequest{
-		Id: user.Id.OpaqueId,
-	})
-
-	if err != nil {
-		e := microErrors.Parse(err.Error())
-
-		if e.Code == http.StatusNotFound {
-			m.logger.Debug().Msgf("account with id %s not found", user.Id.OpaqueId)
-			m.next.ServeHTTP(w, req)
-			return
-		}
-
-		m.logger.Err(err).Msgf("error getting user with id %s from accounts service", user.Id.OpaqueId)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 
 	// we need to pass the token to authenticate the CreateHome request.
 	//ctx := tokenpkg.ContextSetToken(r.Context(), token)

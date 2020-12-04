@@ -2,12 +2,11 @@ package middleware
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
+	"net/http"
+	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -16,16 +15,15 @@ const publicFilesEndpoint = "/remote.php/dav/public-files/"
 func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	logger := options.Logger
-	oidcIss := options.OIDCIss
 
 	if options.EnableBasicAuth {
 		options.Logger.Warn().Msg("basic auth enabled, use only for testing or development")
 	}
 
 	h := basicAuth{
-		logger:         logger,
-		enabled:        options.EnableBasicAuth,
-		accountsClient: options.AccountsClient,
+		logger:       logger,
+		enabled:      options.EnableBasicAuth,
+		userProvider: options.UserProvider,
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -40,14 +38,15 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				}
 
 				removeSuperfluousAuthenticate(w)
-				account, ok := h.getAccount(req)
+				login, password, _ := req.BasicAuth()
+				user, err := h.userProvider.Authenticate(req.Context(), login, password)
 
 				// touch is a user agent locking guard, when touched changes to true it indicates the User-Agent on the
 				// request is configured to support only one challenge, it it remains untouched, there are no considera-
 				// tions and we should write all available authentication challenges to the response.
 				touch := false
 
-				if !ok {
+				if err != nil {
 					for k, v := range options.CredentialsByUserAgent {
 						if strings.Contains(k, req.UserAgent()) {
 							removeSuperfluousAuthenticate(w)
@@ -67,8 +66,10 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				}
 
 				claims := &oidc.StandardClaims{
-					OcisID: account.Id,
-					Iss:    oidcIss,
+					OcisID:            user.Id.OpaqueId,
+					Iss:               user.Id.Idp,
+					PreferredUsername: user.Username,
+					Email:             user.Mail,
 				}
 
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
@@ -78,35 +79,17 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 }
 
 type basicAuth struct {
-	logger         log.Logger
-	enabled        bool
-	accountsClient accounts.AccountsService
+	logger       log.Logger
+	enabled      bool
+	userProvider backend.UserBackend
 }
 
 func (m basicAuth) isPublicLink(req *http.Request) bool {
 	login, _, ok := req.BasicAuth()
-
 	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
 }
 
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
 	login, password, ok := req.BasicAuth()
-
 	return m.enabled && ok && login != "" && password != ""
-}
-
-func (m basicAuth) getAccount(req *http.Request) (*accounts.Account, bool) {
-	login, password, _ := req.BasicAuth()
-
-	account, status := getAccount(
-		m.logger,
-		m.accountsClient,
-		fmt.Sprintf(
-			"login eq '%s' and password eq '%s'",
-			strings.ReplaceAll(login, "'", "''"),
-			strings.ReplaceAll(password, "'", "''"),
-		),
-	)
-
-	return account, status == 0
 }

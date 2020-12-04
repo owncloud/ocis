@@ -6,15 +6,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	revauser "github.com/cs3org/reva/pkg/user"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	ocisoidc "github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
@@ -29,8 +28,8 @@ func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler
 			next:               next,
 			logger:             options.Logger,
 			preSignedURLConfig: options.PreSignedURLConfig,
-			accountsClient:     options.AccountsClient,
 			store:              options.Store,
+			userProvider:       options.UserProvider,
 		}
 	}
 }
@@ -39,7 +38,7 @@ type signedURLAuth struct {
 	next               http.Handler
 	logger             log.Logger
 	preSignedURLConfig config.PreSignedURL
-	accountsClient     accounts.AccountsService
+	userProvider       backend.UserBackend
 	store              store.StoreService
 }
 
@@ -49,51 +48,22 @@ func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	user, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
+	if err != nil {
+		m.logger.Error().Err(err).Msg("Could not get user by claim")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	ctx := revauser.ContextSetUser(req.Context(), user)
+
+	req = req.WithContext(ctx)
+
 	if err := m.validate(req); err != nil {
 		http.Error(w, "Invalid url signature", http.StatusUnauthorized)
 		return
 	}
 
-	claims, err := m.claims(req.URL.Query().Get("OC-Credential"))
-	if err != nil {
-		http.Error(w, "Invalid url signature", http.StatusUnauthorized)
-		return
-	}
-
-	m.next.ServeHTTP(w, req.WithContext(ocisoidc.NewContext(req.Context(), claims)))
-}
-
-func (m signedURLAuth) claims(credential string) (*ocisoidc.StandardClaims, error) {
-	// use openid claims to let the account_uuid middleware do a lookup by username
-	claims := ocisoidc.StandardClaims{
-		OcisID: credential,
-	}
-
-	// OC10 username is handled as id, if we get a credantial that is not of type uuid we expect
-	// that it is a PreferredUsername und we need to get the corresponding uuid
-	if _, err := uuid.Parse(claims.OcisID); err != nil {
-		// todo caching
-		account, status := getAccount(
-			m.logger,
-			m.accountsClient,
-			fmt.Sprintf(
-				"preferred_name eq '%s'",
-				strings.ReplaceAll(
-					claims.OcisID,
-					"'",
-					"''",
-				),
-			),
-		)
-
-		if status != 0 || account == nil {
-			return nil, fmt.Errorf("no oc-credential found for %v", claims.OcisID)
-		}
-
-		claims.OcisID = account.Id
-	}
-
-	return &claims, nil
+	m.next.ServeHTTP(w, req)
 }
 
 func (m signedURLAuth) shouldServe(req *http.Request) bool {
@@ -194,7 +164,8 @@ func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (exp
 }
 
 func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
-	signingKey, err := m.getSigningKey(req.Context(), req.URL.Query().Get("OC-Credential"))
+	u := revauser.ContextMustGetUser(req.Context())
+	signingKey, err := m.getSigningKey(req.Context(), u.Id.OpaqueId)
 	if err != nil {
 		m.logger.Error().Err(err).Msg("could not retrieve signing key")
 		return false, err
@@ -225,18 +196,13 @@ func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
 	return hex.EncodeToString(hash)
 }
 
-func (m signedURLAuth) getSigningKey(ctx context.Context, credential string) ([]byte, error) {
-	claims, err := m.claims(credential)
-	if err != nil {
-		return []byte{}, err
-	}
-
+func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
 	res, err := m.store.Read(ctx, &store.ReadRequest{
 		Options: &store.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Key: claims.OcisID,
+		Key: ocisID,
 	})
 	if err != nil || len(res.Records) < 1 {
 		return []byte{}, err
