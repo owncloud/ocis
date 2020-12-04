@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -11,21 +12,9 @@ import (
 var SupportedAuthStrategies []string
 
 // ProxyWwwAuthenticate is a list of endpoints that do not rely on reva underlying authentication, such as ocs.
-// services that fallback to reva authentication are declared in the "frontend" command on OCIS.
-// TODO this should be a regexp, or it can be confused with routes that contain "/ocs" somewhere along the URI
-var ProxyWwwAuthenticate = []string{"ocs"}
-
-// StatusRecorder implements the http.ResponseWriter interface to record a response a-posteriori
-type StatusRecorder struct {
-	http.ResponseWriter
-	status int
-}
-
-// WriteHeader implements the http.ResponseWriter interface
-func (rec *StatusRecorder) WriteHeader(code int) {
-	rec.status = code
-	rec.ResponseWriter.WriteHeader(code)
-}
+// services that fallback to reva authentication are declared in the "frontend" command on OCIS. It is a list of strings
+// to be regexp compiled.
+var ProxyWwwAuthenticate = []string{"/ocs/v[12].php/cloud/"}
 
 // Authentication is a higher order authentication middleware.
 func Authentication(opts ...Option) func(next http.Handler) http.Handler {
@@ -84,19 +73,23 @@ func removeSuperfluousAuthenticate(w http.ResponseWriter) {
 }
 
 // userAgentAuthenticateLockIn sets Www-Authenticate according to configured user agents. This is useful for the case of
-// legacy clients that do not support protocols like OIDC or OAuth and want to lock a given user agent to a challenge,
-// such as basic. More info in https://github.com/cs3org/reva/pull/1350
+// legacy clients that do not support protocols like OIDC or OAuth and want to lock a given user agent to a challenge
+// such as basic. For more context check https://github.com/cs3org/reva/pull/1350
 func userAgentAuthenticateLockIn(w http.ResponseWriter, req *http.Request, creds map[string]string, fallback string) {
 	for i := 0; i < len(ProxyWwwAuthenticate); i++ {
-		if strings.Contains(req.RequestURI, fmt.Sprintf("/%v/", ProxyWwwAuthenticate[i])) {
-			for k, v := range creds {
-				if strings.Contains(k, req.UserAgent()) {
-					removeSuperfluousAuthenticate(w)
-					w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
-					return
+		if r, err := regexp.Compile(ProxyWwwAuthenticate[i]); err == nil {
+			if r.Match([]byte(req.RequestURI)) {
+				for k, v := range creds {
+					if strings.Contains(k, req.UserAgent()) {
+						removeSuperfluousAuthenticate(w)
+						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), req.Host))
+						return
+					}
 				}
+				w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(fallback), req.Host))
 			}
-			w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(fallback), req.Host))
+		} else {
+			// deal with err
 		}
 	}
 }
