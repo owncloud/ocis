@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T15:03:52+0000"
+date: "2020-12-04T17:44:36+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -81,21 +81,6 @@ Lists running ocis extensions
 
 Usage: `ocis list [command options] [arguments...]`
 
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
---debug-addr | $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
 ### ocis kill
 
 Kill an extension by name
@@ -129,41 +114,36 @@ Usage: `ocis server [command options] [arguments...]`
 --grpc-addr | $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
+### ocis run
+
+Runs an extension
+
+Usage: `ocis run [command options] [arguments...]`
+
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+--debug-addr | $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis version
-
-Lists running services with version
 
 #### ocis proxy
 
 Start proxy server
 
-#### ocis storage-userprovider
+#### ocis phoenix
 
-Start storage userprovider service
+Start phoenix server
 
-#### ocis onlyoffice
+#### ocis storage-metadata
 
-Start onlyoffice server
+Start storage and data service for metadata
 
 #### ocis konnectd
 
@@ -173,51 +153,71 @@ Start konnectd server
 
 Start storage and data provider for /home mount
 
-#### ocis settings
-
-Start settings server
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis phoenix
-
-Start phoenix server
-
-#### ocis store
-
-Start a go-micro store
-
 #### ocis glauth
 
 Start glauth server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
 
 #### ocis webdav
 
 Start webdav server
 
+#### ocis settings
+
+Start settings server
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
 #### ocis storage-gateway
 
 Start storage gateway
 
+#### ocis accounts
+
+Start accounts server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis store
+
+Start a go-micro store
+
 #### ocis storage-public-link
 
 Start storage public link storage
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
 
