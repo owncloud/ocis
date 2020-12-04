@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"time"
 
@@ -26,6 +27,8 @@ type Options struct {
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
 	AccountsClient acc.AccountsService
+	// UP
+	UserProvider backend.UserBackend
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settings.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
@@ -163,5 +166,12 @@ func TokenCacheSize(size int) Option {
 func TokenCacheTTL(ttl time.Duration) Option {
 	return func(o *Options) {
 		o.UserinfoCacheTTL = ttl
+	}
+}
+
+// UserProvider sets the accounts user provider
+func UserProvider(up backend.UserBackend) Option {
+	return func(o *Options) {
+		o.UserProvider = up
 	}
 }
