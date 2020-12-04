@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-03T16:53:45+0000"
+date: "2020-12-04T07:51:02+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -32,15 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### proxy health
-
-Check health status
-
-Usage: `proxy health [command options] [arguments...]`
-
---debug-addr | $PROXY_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
 ### proxy ocis-proxy
 
@@ -123,6 +114,9 @@ Usage: `proxy server [command options] [arguments...]`
 --reva-gateway-addr | $PROXY_REVA_GATEWAY_ADDR  
 : REVA Gateway Endpoint. Default: `127.0.0.1:9142`.
 
+--insecure | $PROXY_INSECURE_BACKENDS  
+: allow insecure communication to upstream servers. Default: `false`.
+
 --oidc-issuer | $PROXY_OIDC_ISSUER  
 : OIDC issuer. Default: `https://localhost:9200`.
 
@@ -149,4 +143,13 @@ Usage: `proxy version [command options] [arguments...]`
 
 --service-name | $PROXY_SERVICE_NAME  
 : Service name. Default: `proxy`.
+
+### proxy health
+
+Check health status
+
+Usage: `proxy health [command options] [arguments...]`
+
+--debug-addr | $PROXY_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
