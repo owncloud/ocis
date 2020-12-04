@@ -119,7 +119,7 @@ func newOIDCAuth(options Options) func(http.Handler) http.Handler {
 	)
 }
 
-// newBasicAuth returns a configured oidc middleware
+// newBasicAuth returns a configured basic middleware
 func newBasicAuth(options Options) func(http.Handler) http.Handler {
 	return BasicAuth(
 		Logger(options.Logger),
