@@ -100,6 +100,15 @@ type Bound struct {
 	Lower, Upper int64
 }
 
+// Tracing defines the available tracing configuration.
+type Tracing struct {
+	Enabled   bool
+	Type      string
+	Endpoint  string
+	Collector string
+	Service   string
+}
+
 // Config merges all Account config parameters.
 type Config struct {
 	LDAP         LDAP
@@ -112,6 +121,7 @@ type Config struct {
 	Repo         Repo
 	Index        Index
 	ServiceUser  ServiceUser
+	Tracing      Tracing
 }
 
 // New returns a new config.

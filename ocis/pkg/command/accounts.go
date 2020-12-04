@@ -44,7 +44,12 @@ func configureAccounts(cfg *config.Config) *svcconfig.Config {
 	cfg.Accounts.Log.Color = cfg.Log.Color
 	cfg.Accounts.Server.Version = version.String
 
-	// TODO: we need tracing on the accounts service as well. when we have it, apply default config from OCIS here.
+	if cfg.Tracing.Enabled {
+		cfg.Accounts.Tracing.Enabled = cfg.Tracing.Enabled
+		cfg.Accounts.Tracing.Type = cfg.Tracing.Type
+		cfg.Accounts.Tracing.Endpoint = cfg.Tracing.Endpoint
+		cfg.Accounts.Tracing.Collector = cfg.Tracing.Collector
+	}
 
 	if cfg.TokenManager.JWTSecret != "" {
 		cfg.Accounts.TokenManager.JWTSecret = cfg.TokenManager.JWTSecret
