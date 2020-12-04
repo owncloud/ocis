@@ -1667,7 +1667,7 @@ def genericCache(name, action, mounts, cache_key):
             'from_secret': 'cache_s3_endpoint'
           },
         'bucket': 'cache',
-        'region': 'us-east-1', # not used at all, but failes if not given!
+        'region': 'us-east-1', # not used at all, but fails if not given!
         'path_style': 'true',
         'cache_key': cache_key,
         'rebuild': rebuild,
