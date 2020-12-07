@@ -54,7 +54,7 @@ In this example we do not change the default port (`9200`). But this could be ch
 
 ### Start the ocis fullstack server
 
-You need to configure `your-host` in some services to provide the needed public resources. When using the owncloud storage driver (which is the default) oCIS currently needs a running Redis Server reachable locally on the machine at the default port (`localhost:6379`). You can change this using the following option `STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR=some-host:6379`.
+You need to configure `your-host` in some services to provide the needed public resources. 
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
@@ -97,8 +97,6 @@ OCIS_BASE_URL=192.168.103.195
 OCIS_HTTP_PORT=9200
 OCIS_DOCKER_TAG=latest
 EOF
-
-docker-compose -f ocis.yml -f ../cache/redis-ocis.yml up -d
 
 curl -k https://192.168.103.195:9200/status.php
 ```

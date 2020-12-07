@@ -45,7 +45,7 @@ docker run --rm -ti -p 9200:9200 owncloud/ocis
 
 ## Usage
 
-### Login to oCIS Web
+### Login to ownCloud Web
 
 Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
 
