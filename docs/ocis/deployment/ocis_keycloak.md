@@ -66,7 +66,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
-  # oCIS web openid connect client id. Defaults to "ocis-phoenix"
+  # ownCloud Web openid connect client id. Defaults to "ocis-phoenix"
   OCIS_OIDC_CLIENT_ID=
 
   ### Keycloak ###
@@ -89,11 +89,11 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  oCIS will by default started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default ocis will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  If you want to change the OIDC client id of th oCIS web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
+  If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
 
   Set your domain for the Keycloak adminstration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
@@ -118,7 +118,7 @@ For a more simple local ocis setup see [Getting started]({{< ref "../getting-sta
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
-On Linux you can add them to your `/etc/hosts` files like this:
+On Linux and macOS you can add them to your `/etc/hosts` files like this:
 ```
 127.0.0.1 ocis.owncloud.test
 127.0.0.1 traefik.owncloud.test

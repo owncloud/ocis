@@ -22,6 +22,6 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 ### Migrate an existing ownCloud 10
 You can run ownCloud 10 and oCIS together. This allows you to use new parts of oCIS already with ownCloud 10 and also to have a smooth transition for users from ownCloud 10 to oCIS.
 
-- [ownCloud 10 setup with oCIS serving oCIS web and acting as OIDC provider]({{< ref "owncloud10_with_ocis_web.md" >}}) - This allows you to switch between the traditional ownCloud 10 frontend and the new oCIS web frontend
+- [ownCloud 10 setup with oCIS serving ownCloud Web and acting as OIDC provider]({{< ref "owncloud10_with_oc_web.md" >}}) - This allows you to switch between the traditional ownCloud 10 frontend and the new ownCloud Web frontend
 - Run ownCloud 10 and oCIS in parallel - together
 - Migrate users from ownCloud 10 to oCIS

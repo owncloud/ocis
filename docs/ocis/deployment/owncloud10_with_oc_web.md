@@ -1,15 +1,15 @@
 ---
-title: "ownCloud 10 with oCIS Web"
+title: "ownCloud 10 with ownCloud Web"
 date: 2020-10-12T14:04:00+01:00
 weight: 25
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: owncloud10_with_ocis_web.md
+geekdocFilePath: owncloud10_with_oc_web.md
 ---
 
 {{< toc >}}
 
-This deployment scenario shows how to use oCIS Web as frontend for an existing ownCloud 10 production installation. It enables ownCloud 10 users to log in and work with their files using the new ownCloud Web. While the scenario includes an ownCloud 10 instance, it only exists to show the necessary configuration for your already existing ownCloud 10 installation.
+This deployment scenario shows how to use ownCloud Web as frontend for an existing ownCloud 10 production installation. It enables ownCloud 10 users to log in and work with their files using the new ownCloud Web. While the scenario includes an ownCloud 10 instance, it only exists to show the necessary configuration for your already existing ownCloud 10 installation.
 
 ## Overview
 
@@ -19,7 +19,7 @@ This deployment scenario shows how to use oCIS Web as frontend for an existing o
 * DNS is resolving one domain for ocis and one for oc10
 * Valid ssl certificates for the domains for ssl termination
 
-[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_external_konnectd)
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/owncloud10_with_oc_web)
 
 {{< hint info >}}
 In this setup it's mandatory that the users in ownCloud 10 are assigned to at least one group.
@@ -116,4 +116,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://oc10.owncloud.test in your browser and accept the invalid certificate warning. You now can login with the ownCloud 10 default user "admin" and password "admin". As you might have noticed, you did not see the login prompt of ownCloud 10. This was the login prompt of oCIS. When you go to application you can both in oCIS web and ownCloud 10 see a switch to switch vice versa.
+Open https://oc10.owncloud.test in your browser and accept the invalid certificate warning. You now can login with the ownCloud 10 default user "admin" and password "admin". As you might have noticed, you did not see the login prompt of ownCloud 10. This was the login prompt of oCIS. When you go to application you can both in ownCloud Web and ownCloud 10 see a switch to switch vice versa.
