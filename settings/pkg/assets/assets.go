@@ -1,12 +1,11 @@
 package assets
 
 import (
-	"net/http"
-	"os"
-	"path/filepath"
-
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/settings/pkg/config"
+	"net/http"
+	"os"
+	"path"
 
 	// Fake the import to make the dep tree happy.
 	_ "golang.org/x/net/context"
@@ -27,7 +26,7 @@ type assets struct {
 func (a assets) Open(original string) (http.File, error) {
 	if a.config.Asset.Path != "" {
 		if stat, err := os.Stat(a.config.Asset.Path); err == nil && stat.IsDir() {
-			custom := filepath.Join(
+			custom := path.Join(
 				a.config.Asset.Path,
 				original,
 			)
@@ -42,9 +41,9 @@ func (a assets) Open(original string) (http.File, error) {
 				return f, nil
 			}
 		} else {
-			a.logger.Warn().
+			a.logger.Fatal().
 				Str("path", a.config.Asset.Path).
-				Msg("Assets directory doesn't exist")
+				Msg("assets directory doesn't exist")
 		}
 	}
 
