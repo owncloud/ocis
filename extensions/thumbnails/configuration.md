@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T18:13:41+0000"
+date: "2020-12-07T04:07:02+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -32,6 +32,21 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
+--log-level | $THUMBNAILS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $THUMBNAILS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $THUMBNAILS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### thumbnails server
 
@@ -107,19 +122,4 @@ Usage: `thumbnails health [command options] [arguments...]`
 
 --debug-addr | $THUMBNAILS_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9189`.
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
-
---log-level | $THUMBNAILS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $THUMBNAILS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $THUMBNAILS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 

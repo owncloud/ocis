@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-04T18:13:32+0000"
+date: "2020-12-07T04:06:52+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -32,6 +32,21 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### konnectd ocis-konnectd
+
+Serve Konnectd API for oCIS
+
+Usage: `konnectd ocis-konnectd [command options] [arguments...]`
+
+--log-level | $KONNECTD_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $KONNECTD_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $KONNECTD_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### konnectd server
 
@@ -167,19 +182,4 @@ Usage: `konnectd health [command options] [arguments...]`
 
 --debug-addr | $KONNECTD_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9134`.
-
-### konnectd ocis-konnectd
-
-Serve Konnectd API for oCIS
-
-Usage: `konnectd ocis-konnectd [command options] [arguments...]`
-
---log-level | $KONNECTD_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $KONNECTD_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $KONNECTD_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
