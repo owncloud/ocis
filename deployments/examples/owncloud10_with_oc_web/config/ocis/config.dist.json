@@ -1,10 +1,10 @@
 {
-  "server": "https://ocis.example.org",
+  "server": "https://ocis.owncloud.test",
   "theme": "owncloud",
   "version": "0.1.0",
   "openIdConnect": {
-    "metadata_url": "https://ocis.example.org/.well-known/openid-configuration",
-    "authority": "https://ocis.example.org",
+    "metadata_url": "https://ocis.owncloud.test/.well-known/openid-configuration",
+    "authority": "https://ocis.owncloud.test",
     "client_id": "phoenix",
     "response_type": "code",
     "scope": "openid profile email"
@@ -16,7 +16,7 @@
         "de": "Klassisches ownCloud"
       },
       "icon": "switch_ui",
-      "url": "https://oc10.example.org",
+      "url": "https://oc10.owncloud.test",
       "target": "_self"
     },
     {
@@ -25,15 +25,10 @@
         "de": "Einstellungen"
       },
       "icon": "application",
-      "url": "https://oc10.example.org/index.php/settings/personal",
+      "url": "https://oc10.owncloud.test/index.php/settings/personal",
       "target": "_self",
       "menu": "user"
     }
   ],
-  "apps": [
-    "files",
-    "draw-io",
-    "markdown-editor",
-    "media-viewer"
-  ]
+  "apps": ["files", "draw-io", "markdown-editor", "media-viewer"]
 }

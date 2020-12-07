@@ -1,15 +1,15 @@
 {
   "HTTP": {
-    "Namespace": "works.owncloud"
+    "Namespace": "ocis_oc10_backend"
   },
   "policy_selector": {
     "static": {
-      "policy": "oc10"
+      "policy": "ocis_oc10_backend"
     }
   },
   "policies": [
     {
-      "name": "oc10",
+      "name": "ocis_oc10_backend",
       "routes": [
         {
           "endpoint": "/",
@@ -29,31 +29,33 @@
         },
         {
           "endpoint": "/ocs/",
-          "backend": "http://owncloud:8080",
+          "backend": "https://oc10.owncloud.test",
           "apache-vhost": true
         },
         {
           "endpoint": "/remote.php/",
-          "backend": "http://owncloud:8080",
+          "backend": "https://oc10.owncloud.test",
           "apache-vhost": true
         },
         {
           "endpoint": "/dav/",
-          "backend": "http://owncloud:8080",
+          "backend": "https://oc10.owncloud.test",
           "apache-vhost": true
         },
         {
           "endpoint": "/webdav/",
-          "backend": "http://owncloud:8080",
+          "backend": "https://oc10.owncloud.test",
           "apache-vhost": true
         },
         {
           "endpoint": "/status.php",
-          "backend": "http://owncloud:8080"
+          "backend": "https://oc10.owncloud.test",
+          "apache-vhost": true
         },
         {
           "endpoint": "/index.php/",
-          "backend": "http://owncloud:8080"
+          "backend": "https://oc10.owncloud.test",
+          "apache-vhost": true
         }
       ]
     }

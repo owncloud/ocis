@@ -1,36 +1,45 @@
 ---
-title: "oCIS with Traefik"
+title: "ownCloud 10 with ownCloud Web"
 date: 2020-10-12T14:04:00+01:00
-weight: 24
+weight: 25
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_traefik.md
+geekdocFilePath: owncloud10_with_oc_web.md
 ---
 
 {{< toc >}}
 
+This deployment scenario shows how to use ownCloud Web as frontend for an existing ownCloud 10 production installation. It enables ownCloud 10 users to log in and work with their files using the new ownCloud Web. While the scenario includes an ownCloud 10 instance, it only exists to show the necessary configuration for your already existing ownCloud 10 installation.
+
 ## Overview
 
-* oCIS running behind Traefik as reverse proxy
-* Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
+* oCIS setup serving ownCloud Web
+* oCIS acting as OIDC IDP on the ownCloud 10 user database
+* ownCloud 10 setup connected to oCIS
+* DNS is resolving one domain for ocis and one for oc10
+* Valid ssl certificates for the domains for ssl termination
 
-[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_traefik)
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/owncloud10_with_oc_web)
 
-The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+{{< hint info >}}
+In this setup it's mandatory that the users in ownCloud 10 are assigned to at least one group.
+{{< /hint >}}
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+{{< hint info >}}
+In this setup relies on graph-api app to be installed in ownCloud 10. This app is included by default beginning with ownCloud 10.6. If you are on a lower version, please install it manually. 
+{{< /hint >}}
 
 ## Server Deployment
 
 ### Requirements
 
 * Linux server with docker and docker-compose installed
-* Two domains set up and pointing to your server
+* Three domains set up and pointing to your server
   - ocis.* for serving oCIS
+  - oc10.* for serving 
   - traefik.* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server.md" >}})
-
 
 ### Install oCIS and Traefik
 
@@ -40,7 +49,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_traefik`
+  `cd ocis/deployment/examples/ocis_oc10_backend`
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
@@ -62,6 +71,10 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
+
+  ### oC10 ###
+  # Domain of ownCloud 10, where you can find the frontend. Defaults to "oc10.owncloud.test"
+  #OC10_DOMAIN=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -76,6 +89,8 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
+  Set your domain for the ownCloud 10 frontend in `OC10_DOMAIN=` eg. `OC10_DOMAIN=oc10.owncloud.test`.
+
   Now you have configured everything and can save the file.
 
 * Start the docker stack
@@ -83,6 +98,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   `docker-compose up -d`
 
 * You now can visit oCIS and Traefik dashboard on your configured domains
+
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
@@ -92,6 +108,7 @@ This docker stack can also be run locally. One downside is that Traefik can not 
 On Linux and macOS you can add them to your `/etc/hosts` files like this:
 ```
 127.0.0.1 ocis.owncloud.test
+127.0.0.1 oc10.owncloud.test
 127.0.0.1 traefik.owncloud.test
 ```
 
@@ -99,4 +116,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the default users, which also can be found here: [Getting started]({{< ref "../getting-started.md#login-to-ocis-web" >}}) 
+Open https://oc10.owncloud.test in your browser and accept the invalid certificate warning. You now can login with the ownCloud 10 default user "admin" and password "admin". As you might have noticed, you did not see the login prompt of ownCloud 10. This was the login prompt of oCIS. When you go to application you can both in ownCloud Web and ownCloud 10 see a switch to switch vice versa.

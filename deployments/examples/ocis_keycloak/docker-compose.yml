@@ -8,6 +8,7 @@ services:
       default:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
     command:
       #- "--log.level=DEBUG"
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-'example@example.org'}"
@@ -41,13 +42,6 @@ services:
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - | # as long as https://github.com/owncloud/product/issues/15 is open we need this step to template konnectd config
-        cp /config/identifier-registration.dist.yaml /config/identifier-registration.yaml
-        sed -i 's/ocis.owncloud.test/${OCIS_DOMAIN:-ocis.owncloud.test}/g' /config/identifier-registration.yaml
-        ocis server
     networks:
       default:
     environment:
@@ -57,28 +51,25 @@ services:
       # proxy config
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
-      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
       PROXY_TLS: "false"
       # phoenix config
-      PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/.well-known/openid-configuration
+      PHOENIX_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
+      PHOENIX_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-ocis-phoenix}
+      PHOENIX_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
       PHOENIX_WEB_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
       PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # storage config
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
-      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       STORAGE_METADATA_ROOT:  /opt/ocis-metadata
       STORAGE_DRIVER_OCIS_ROOT: /opt/ocis-storage
       # store config
       STORE_DATA_PATH: /opt/ocis-store
       # settings config
       SETTINGS_DATA_PATH: /opt/ocis-settings
-      # idp config
-      KONNECTD_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      KONNECTD_TLS: 'false'
     volumes:
-      - ./config:/config
       - ocis-storage:/opt/ocis-storage
       - ocis-metadata:/opt/ocis-metadata
       - ocis-store:/opt/ocis-store
@@ -97,9 +88,49 @@ services:
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     restart: always
 
+  postgres:
+    image: postgres:alpine
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: keycloak
+      KEYCLOAK_USER: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      PROXY_ADDRESS_FORWARDING: "true"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.entrypoints=http"
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
+      - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.keycloak.middlewares=keycloak-https-redirect"
+      - "traefik.http.routers.keycloak-secure.entrypoints=https"
+      - "traefik.http.routers.keycloak-secure.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
+      - "traefik.http.routers.keycloak-secure.tls=true"
+      - "traefik.http.routers.keycloak-secure.tls.certresolver=http"
+      - "traefik.http.routers.keycloak-secure.service=keycloak"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
+    depends_on:
+      - postgres
+    restart: always
+
 volumes:
   certs:
   ocis-storage:
   ocis-metadata:
   ocis-store:
   ocis-settings:
+  keycloak_postgres_data:
