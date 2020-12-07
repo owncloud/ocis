@@ -16,9 +16,9 @@ geekdocFilePath: ocis_traefik.md
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_traefik)
 
-The docker stack consists two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses it's internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
 
 ## Server Deployment
 
@@ -72,7 +72,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
-  oCIS will by default started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
+  By default ocis will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
@@ -89,7 +89,7 @@ For a more simple local ocis setup see [Getting started]({{< ref "../getting-sta
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
-On Linux you can add them to your `/etc/hosts` files like this:
+On Linux and macOS you can add them to your `/etc/hosts` files like this:
 ```
 127.0.0.1 ocis.owncloud.test
 127.0.0.1 traefik.owncloud.test

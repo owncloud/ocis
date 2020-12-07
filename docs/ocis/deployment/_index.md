@@ -10,7 +10,7 @@ geekdocFilePath: _index.md
 {{< toc >}}
 
 ## Deployments scenarios and examples
-This section handles deployments and operations for admins and people who are interested in how versatile oCIS is. If want to just try oCIS you may also follow [Getting started]({{< ref "../getting-started.md" >}}).
+This section handles deployments and operations for admins and people who are interested in how versatile oCIS is. If you want to just try oCIS you may also follow [Getting started]({{< ref "../getting-started.md" >}}).
 
 ### Setup oCIS on your server
 oCIS deployments are super simple, yet there are many configurations possible for advanced setups.
