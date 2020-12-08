@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-07T10:59:42+0000"
+date: "2020-12-08T16:03:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -47,6 +47,15 @@ Usage: `glauth ocis-glauth [command options] [arguments...]`
 
 --log-color | $GLAUTH_LOG_COLOR  
 : Enable colored logging. Default: `true`.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+--debug-addr | $GLAUTH_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9129`.
 
 ### glauth server
 
@@ -146,13 +155,4 @@ Usage: `glauth server [command options] [arguments...]`
 
 --fallback-use-graphapi | $GLAUTH_FALLBACK_USE_GRAPHAPI  
 : use Graph API, only for owncloud datastore. Default: `true`.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
---debug-addr | $GLAUTH_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9129`.
 

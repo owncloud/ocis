@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-07T10:59:49+0000"
+date: "2020-12-08T16:03:32+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -33,20 +33,26 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### ocs ocis-ocs
+### ocs version
 
-Serve OCS API for oCIS
+Print the versions of the running instances
 
-Usage: `ocs ocis-ocs [command options] [arguments...]`
+Usage: `ocs version [command options] [arguments...]`
 
---log-level | $OCS_LOG_LEVEL  
-: Set logging level. Default: `info`.
+--http-namespace | $OCS_NAMESPACE  
+: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
 
---log-pretty | $OCS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
+--name | $OCS_NAME  
+: Service name. Default: `ocs`.
 
---log-color | $OCS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+--debug-addr | $OCS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9114`.
 
 ### ocs server
 
@@ -99,24 +105,18 @@ Usage: `ocs server [command options] [arguments...]`
 --jwt-secret | $OCS_JWT_SECRET  
 : Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
-### ocs version
+### ocs ocis-ocs
 
-Print the versions of the running instances
+Serve OCS API for oCIS
 
-Usage: `ocs version [command options] [arguments...]`
+Usage: `ocs ocis-ocs [command options] [arguments...]`
 
---http-namespace | $OCS_NAMESPACE  
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+--log-level | $OCS_LOG_LEVEL  
+: Set logging level. Default: `info`.
 
---name | $OCS_NAME  
-: Service name. Default: `ocs`.
+--log-pretty | $OCS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
 
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
---debug-addr | $OCS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9114`.
+--log-color | $OCS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 

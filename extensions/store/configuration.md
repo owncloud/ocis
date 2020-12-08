@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-07T10:59:53+0000"
+date: "2020-12-08T16:03:35+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -51,6 +51,27 @@ Usage: `store ocis-store [command options] [arguments...]`
 --log-color | $STORE_LOG_COLOR  
 : Enable colored logging. Default: `true`.
 
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+--grpc-namespace | $STORE_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $STORE_NAME  
+: Service name. Default: `store`.
+
+### store health
+
+Check health status
+
+Usage: `store health [command options] [arguments...]`
+
+--debug-addr | $STORE_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9460`.
+
 ### store server
 
 Start integrated server
@@ -92,25 +113,4 @@ Usage: `store server [command options] [arguments...]`
 
 --data-path | $STORE_DATA_PATH  
 : location of the store data path. Default: `/var/tmp/ocis-store`.
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
---grpc-namespace | $STORE_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $STORE_NAME  
-: Service name. Default: `store`.
-
-### store health
-
-Check health status
-
-Usage: `store health [command options] [arguments...]`
-
---debug-addr | $STORE_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9460`.
 

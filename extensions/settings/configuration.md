@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-07T10:59:51+0000"
+date: "2020-12-08T16:03:34+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -33,20 +33,26 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### settings ocis-settings
+### settings version
 
-Provide settings and permissions for oCIS
+Print the versions of the running instances
 
-Usage: `settings ocis-settings [command options] [arguments...]`
+Usage: `settings version [command options] [arguments...]`
 
---log-level | $SETTINGS_LOG_LEVEL  
-: Set logging level. Default: `info`.
+--grpc-namespace | $SETTINGS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
---log-pretty | $SETTINGS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
+--name | $SETTINGS_NAME  
+: service name. Default: `settings`.
 
---log-color | $SETTINGS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+--debug-addr | $SETTINGS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9194`.
 
 ### settings server
 
@@ -111,24 +117,18 @@ Usage: `settings server [command options] [arguments...]`
 --jwt-secret | $SETTINGS_JWT_SECRET  
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
-### settings version
+### settings ocis-settings
 
-Print the versions of the running instances
+Provide settings and permissions for oCIS
 
-Usage: `settings version [command options] [arguments...]`
+Usage: `settings ocis-settings [command options] [arguments...]`
 
---grpc-namespace | $SETTINGS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+--log-level | $SETTINGS_LOG_LEVEL  
+: Set logging level. Default: `info`.
 
---name | $SETTINGS_NAME  
-: service name. Default: `settings`.
+--log-pretty | $SETTINGS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
 
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
---debug-addr | $SETTINGS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9194`.
+--log-color | $SETTINGS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 

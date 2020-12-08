@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-07T10:59:44+0000"
+date: "2020-12-08T16:03:27+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -33,20 +33,26 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### konnectd ocis-konnectd
+### konnectd version
 
-Serve Konnectd API for oCIS
+Print the versions of the running instances
 
-Usage: `konnectd ocis-konnectd [command options] [arguments...]`
+Usage: `konnectd version [command options] [arguments...]`
 
---log-level | $KONNECTD_LOG_LEVEL  
-: Set logging level. Default: `info`.
+--http-namespace | $KONNECTD_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
---log-pretty | $KONNECTD_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
 
---log-color | $KONNECTD_LOG_COLOR  
-: Enable colored logging. Default: `true`.
+### konnectd health
+
+Check health status
+
+Usage: `konnectd health [command options] [arguments...]`
+
+--debug-addr | $KONNECTD_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
 
 ### konnectd server
 
@@ -162,24 +168,18 @@ Usage: `konnectd server [command options] [arguments...]`
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
 
-### konnectd version
+### konnectd ocis-konnectd
 
-Print the versions of the running instances
+Serve Konnectd API for oCIS
 
-Usage: `konnectd version [command options] [arguments...]`
+Usage: `konnectd ocis-konnectd [command options] [arguments...]`
 
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+--log-level | $KONNECTD_LOG_LEVEL  
+: Set logging level. Default: `info`.
 
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
+--log-pretty | $KONNECTD_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
 
-### konnectd health
-
-Check health status
-
-Usage: `konnectd health [command options] [arguments...]`
-
---debug-addr | $KONNECTD_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
+--log-color | $KONNECTD_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
