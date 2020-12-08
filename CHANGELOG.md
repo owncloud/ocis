@@ -57,6 +57,7 @@
 * Change - Update phoenix to v0.26.0: [#935](https://github.com/owncloud/ocis/pull/935)
 * Change - Update phoenix to v0.27.0: [#943](https://github.com/owncloud/ocis/pull/943)
 * Change - Update phoenix to v0.28.0: [#1027](https://github.com/owncloud/ocis/pull/1027)
+* Change - Update phoenix to v0.29.0: [#1034](https://github.com/owncloud/ocis/pull/1034)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -631,6 +632,16 @@
 
    https://github.com/owncloud/ocis/pull/1027
    https://github.com/owncloud/phoenix/releases/tag/v0.28.0
+
+* Change - Update phoenix to v0.29.0: [#1034](https://github.com/owncloud/ocis/pull/1034)
+
+   Tags: web
+
+   We updated phoenix to v0.29.0. Please refer to the changelog (linked) for details on the
+   phoenix release.
+
+   https://github.com/owncloud/ocis/pull/1034
+   https://github.com/owncloud/phoenix/releases/tag/v0.29.0
 
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 
