@@ -610,7 +610,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'webUITests',
-        'image': 'owncloudci/nodejs:11',
+        'image': 'webhippie/nodejs:latest',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
@@ -682,7 +682,7 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', acc
       ocisServer(storage, accounts_hash_difficulty) + [
       {
         'name': 'WebUIAcceptanceTests',
-        'image': 'owncloudci/nodejs:11',
+        'image': 'webhippie/nodejs:latest',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
