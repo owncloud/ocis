@@ -97,7 +97,7 @@ services:
       # graph
       GRAPH_OIDC_ENDPOINT: https://${OC10_DOMAIN:-oc10.owncloud.test}/apps/graphapi/v1.0
       # web ui
-      PHOENIX_WEB_CONFIG: "/config/config.json"
+      WEB_CONFIG: "/config/config.json"
       # storage - although not used, yet
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       STORAGE_OIDC_INSECURE: "${INSECURE:-false}"

@@ -24,7 +24,7 @@ We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), 
 {{< mermaid class="text-center">}}
 graph TD
 proxy -->
-    konnectd & ocis-phoenix & thumbnails & ocs & webdav & storage & accounts & store & settings
+    konnectd & web & thumbnails & ocs & webdav & storage & accounts & store & settings
 
 konnectd --> glauth
 

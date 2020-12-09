@@ -5,7 +5,7 @@
   "openIdConnect": {
     "metadata_url": "https://ocis.owncloud.test/.well-known/openid-configuration",
     "authority": "https://ocis.owncloud.test",
-    "client_id": "phoenix",
+    "client_id": "web",
     "response_type": "code",
     "scope": "openid profile email"
   },

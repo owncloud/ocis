@@ -53,12 +53,12 @@ services:
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
       PROXY_TLS: "false"
-      # phoenix config
-      PHOENIX_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
-      PHOENIX_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-ocis-phoenix}
-      PHOENIX_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
-      PHOENIX_WEB_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      # ownCloud Web config
+      WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
+      WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
+      WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
+      WEB_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
+      WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # storage config
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/

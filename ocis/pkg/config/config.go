@@ -7,7 +7,6 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	konnectd "github.com/owncloud/ocis/konnectd/pkg/config"
-	phoenix "github.com/owncloud/ocis/ocis-phoenix/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
@@ -15,6 +14,7 @@ import (
 	storage "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
+	web "github.com/owncloud/ocis/web/pkg/config"
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
 	pman "github.com/refs/pman/pkg/config"
 )
@@ -78,7 +78,7 @@ type Config struct {
 	Konnectd      *konnectd.Config
 	OCS           *ocs.Config
 	Onlyoffice    *onlyoffice.Config
-	Phoenix       *phoenix.Config
+	Web           *web.Config
 	Proxy         *proxy.Config
 	Settings      *settings.Config
 	Storage       *storage.Config
@@ -99,7 +99,7 @@ func New() *Config {
 		Konnectd:      konnectd.New(),
 		OCS:           ocs.New(),
 		Onlyoffice:    onlyoffice.New(),
-		Phoenix:       phoenix.New(),
+		Web:           web.New(),
 		Proxy:         proxy.New(),
 		Settings:      settings.New(),
 		Storage:       storage.New(),

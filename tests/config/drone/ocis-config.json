@@ -5,7 +5,7 @@
     "openIdConnect": {
         "metadata_url": "https://ocis-server:9200/.well-known/openid-configuration",
         "authority": "https://ocis-server:9200",
-        "client_id": "phoenix",
+        "client_id": "web",
         "response_type": "code",
         "scope": "openid profile email"
     },
