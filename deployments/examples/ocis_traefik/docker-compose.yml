@@ -61,8 +61,8 @@ services:
       # web config
       WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/.well-known/openid-configuration
-      WEB_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      WEB_UI_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
+      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # storage config
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
