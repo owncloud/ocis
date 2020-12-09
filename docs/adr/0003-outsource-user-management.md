@@ -1,7 +1,7 @@
 # 3. Outsource User Management
 
 * Status: accepted <!-- optional -->
-* Deciders: @butonic, @mbarz, @kfreitag, @hd, @pmaier1 <!-- optional -->
+* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1 <!-- optional -->
 * Date: 2020-12-09 <!-- optional -->
 
 Technical Story: [Skip account-service by talking to CS3 user-api](https://github.com/owncloud/ocis/pull/1020) <!-- optional -->
