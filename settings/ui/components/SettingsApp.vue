@@ -96,7 +96,8 @@ export default {
           route: {
             name: 'settings',
             path: `/settings/${extension}`
-          }
+          },
+          menu: 'user'
         }
         this.ADD_NAV_ITEM({
           extension: 'settings',
@@ -107,8 +108,8 @@ export default {
     getExtensionName (extension) {
       extension = extension || ''
       switch (extension) {
-        case 'ocis-accounts': return this.$gettext('Account')
-        case 'ocis-hello': return this.$gettext('Hello')
+        case 'ocis-accounts': return 'Account'
+        case 'ocis-hello': return 'Hello'
         default: {
           const shortenedName = extension.replace('ocis-', '')
           return shortenedName.charAt(0).toUpperCase() + shortenedName.slice(1)
