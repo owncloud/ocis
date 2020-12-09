@@ -8,7 +8,7 @@ Technical Story: [Skip account-service by talking to CS3 user-api](https://githu
 
 ## Context and Problem Statement
 
-To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email und username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party such as ownCloud should should behave, it still requires the RP to maintain its own user identifiers.
+To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email and username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party such as ownCloud should should behave, it still requires the RP to maintain its own user identifiers.
 
 ## Decision Drivers <!-- optional -->
 
@@ -31,7 +31,7 @@ Chosen option: "Move accounts functionality to GLauth and name it accounts", by 
 
 ### Resulting deployment options
 - Single binary: admin can manage users, groups and roles using the built in web ui (glauth)
-- External LDAP: OCIS admin needs do use existing tool to manage users
+- External LDAP: OCIS admin needs to use existing tool to manage users
 - Separate OCIS and LDAP admin: OCIS admin relies on the LDAP admin to manage users
 
 ### Resulting technical implications
@@ -65,8 +65,8 @@ Currently, the accounts service is the source of truth and we use it to implemen
 We should use an existing ldap server and make GLauth a drop in replacement for it. <!-- optional -->
 
 * Good, because we can use an existing user repository (an LDAP server), no need to sync or learn users.
-* Good, because admins can rely on existing user managemen tools.
-* Good, because we would have a clear seperation of concerns:
+* Good, because admins can rely on existing user management tools.
+* Good, because we would have a clear separation of concerns:
   - users reside in whatever repository, typically an LDAP server
     - could be an existing LDAP server or AD
     - could be our embeddable drop in glauth server
@@ -84,6 +84,6 @@ We should use an existing ldap server and make GLauth a drop in replacement for 
   - introduce a new guest provisioning api to CS3 which properly captures our requirement to have them in the user repository
     - guests need to be made available to the firewall
     - storages like eos that integrate with the os for acl based file permissions need a numeric user and group id
-* Good, because we can use the CS3 user proviter with the existing ldap / rest driver.
+* Good, because we can use the CS3 user provider with the existing ldap / rest driver.
 * Bad, because OCIS admins may not have the rights to manage role assignments. (But this is handled at a different department.) 
 * Bad, because OCIS admins may not have the rights to disable users if an external LDAP is used instead of the drop in GLauth.

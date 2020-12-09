@@ -15,8 +15,8 @@ To attach metadata like shares to users ownCloud relies on persistent, non-reass
 * OCIS should be a single binary that can run out of the box without external dependencies like an LDAP server.
 * Time: we want to build a release candidate asap.
 * Firewalls need access to guests, typically via LDAP.
-* Not all external LDAPs are writebale for us to provision Guest accounts.
-* We see multiple LDAP servers in deployments. Being able to handle them is important and should be coveredy by using OIDC + being able to query multiple LDAP servers.
+* Not all external LDAPs are writeable for us to provision Guest accounts.
+* We see multiple LDAP servers in deployments. Being able to handle them is important and should be covered by using OIDC + being able to query multiple LDAP servers.
 
 ## Considered Options
 
@@ -40,4 +40,4 @@ Chosen option: "GLauth wraps accounts service", because we need write access to 
 
 ### Accounts service wraps LDAP
 
-* Bad, because not all external LDAPs are writebale for us to provision Guest accounts.
+* Bad, because not all external LDAPs are writeable for us to provision Guest accounts.
