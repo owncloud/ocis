@@ -1534,7 +1534,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
     'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
     'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
-    'WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+    'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'KONNECTD_ISS': 'https://ocis-server:9200',
     'KONNECTD_TLS': 'true',
