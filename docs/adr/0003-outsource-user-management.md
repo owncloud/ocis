@@ -1,4 +1,4 @@
-# 3. Outsource Usermanagement
+# 3. Outsource User Management
 
 * Status: accepted <!-- optional -->
 * Deciders: @butonic, @mbarz, @kfreitag, @hd, @pmaier1 <!-- optional -->
@@ -13,7 +13,7 @@ To attach metadata like shares to users ownCloud relies on persistent, non-reass
 ## Decision Drivers <!-- optional -->
 
 * OCIS should be a single binary that can run out of the box without external dependencies like an LDAP server.
-* Time: we want to build a release candiddate asap.
+* Time: we want to build a release candidate asap.
 
 ## Considered Options
 
@@ -59,7 +59,6 @@ Currently, the accounts service is the source of truth and we use it to implemen
 * Good, because we can manage users out of the box
 * Good, because we can persist accounts in a CS3 storage provider
 * Bad, because it maintains a separate user repository: it needs to either learn or sync users.
-* … <!-- numbers of pros and cons can vary -->
 
 ### Move accounts functionality to GLauth and name it accounts
 
@@ -88,4 +87,3 @@ We should use an existing ldap server and make GLauth a drop in replacement for 
 * Good, because we can use the CS3 user proviter with the existing ldap / rest driver.
 * Bad, because OCIS admins may not have the rights to manage role assignments. (But this is handled at a different department.) 
 * Bad, because OCIS admins may not have the rights to disable users if an external LDAP is used instead of the drop in GLauth.
-* … <!-- numbers of pros and cons can vary -->

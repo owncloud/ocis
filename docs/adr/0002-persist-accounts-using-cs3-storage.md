@@ -8,7 +8,7 @@ Technical Story: [File system based indexing](https://github.com/owncloud/ocis-a
 
 ## Context and Problem Statement
 
-To set up HA or a geo replicated setup we need to persist accounts in a distributed way. Furthermore, the bleve index makes the accounts service stateful, which we wand to avoid for a scale out deployment.
+To set up High Availability (HA) or a geo-replicated setup we need to persist accounts in a distributed way. Furthermore, the [bleve](https://github.com/blevesearch/bleve) index makes the accounts service stateful, which we want to avoid for a scale out deployment.
 
 ## Considered Options
 
@@ -17,7 +17,7 @@ To set up HA or a geo replicated setup we need to persist accounts in a distribu
 
 ## Decision Outcome
 
-Chosen option: "Persist users in a CS3 storage", because we have one service less running and can rely on the filesystem for geo replication and HA.
+Chosen option: "Persist users in a CS3 storage", because we have one service less running and can rely on the filesystem for geo-replication and HA.
 
 ### Positive Consequences <!-- optional -->
 
