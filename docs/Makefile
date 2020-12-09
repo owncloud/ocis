@@ -3,7 +3,7 @@ config-docs-generate:
 	make -C ../glauth config-docs-generate
 	make -C ../konnectd config-docs-generate
 	make -C ../ocis config-docs-generate
-	make -C ../ocis-phoenix config-docs-generate
+	make -C ../web config-docs-generate
 	make -C ../ocis-pkg config-docs-generate
 	make -C ../ocs config-docs-generate
 	make -C ../proxy config-docs-generate

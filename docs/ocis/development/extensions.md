@@ -26,8 +26,8 @@ cd ocis
 TAGS=simple make generate build
 ```
 
-*Q: Can you specify which version of phoenix to use?*
-*A: No, the phoenix that is used is compiled into the [assets of ocis-phoenix](https://github.com/owncloud/ocis-phoenix/blob/master/pkg/assets/embed.go) which is currently not automatically updated. We'll see how to use a custom phoenix later.*
+*Q: Can you specify which version of ownCloud Web to use?*
+*A: No, the ownCloud Web that is used is compiled into the [assets of ocis-web](https://github.com/owncloud/ocis/blob/master/web/pkg/assets/embed.go) which is currently not automatically updated. We'll see how to use a custom ownCloud Web later.*
 
 `bin/ocis server`
 
@@ -84,7 +84,7 @@ In order to be able to manage the processes ourselves we need to start them inde
 
 ```
 bin/ocis micro &
-bin/ocis phoenix &
+bin/ocis web &
 bin/ocis hello &
 bin/ocis reva &
 ```
@@ -96,13 +96,13 @@ cd ../ocis-hello
 bin/ocis-hello server
 ```
 
-## Hacking phoenix (and ocis-phoenix)
+## Hacking ownCloud Web (and ocis-web)
 
-Following https://github.com/owncloud/phoenix we are going to build the current phoenix
+Following https://github.com/owncloud/web we are going to build the current ownCloud Web
 
 ```
-git clone https://github.com/owncloud/phoenix.git
-cd phoenix
+git clone https://github.com/owncloud/web.git
+cd web
 
 yarn install
 yarn dist
@@ -110,25 +110,25 @@ yarn dist
 
 We can tell ocis to use the compiled assets:
 
-Kill `ocis phoenix`, then use the compiled assets when starting phoenix.
+Kill `ocis web`, then use the compiled assets when starting ownCloud Web.
 
 ```console
 cd ../ocis
-PHOENIX_ASSET_PATH="`pwd`/../phoenix/dist" bin/ocis phoenix
+WEB_ASSET_PATH="`pwd`/../web/dist" bin/ocis web
 ```
 
 ## The ownCloud design system
 
-The [ownCloud design system](https://owncloud.design/) contains a set of ownCloud vue components for phoenix or your own ocis extensions. Please use it for a consistent look and feel.
+The [ownCloud design system](https://owncloud.design/) contains a set of ownCloud vue components for ownCloud Web or your own ocis extensions. Please use it for a consistent look and feel.
 
-## External phoenix apps
+## External ownCloud Web apps
 
 This is what hello is: copy and extend!
 
-1. Phoenix is configured using the config.json which is served by the phoenix service (either `bin/ocis phoenix` or `bin/ocis-phoenix server`)
+1. ownCloud Web is configured using the config.json which is served by the ocis-web service (either `bin/ocis web` or `bin/ocis-web server`)
 
-2. point ocis phoenix to the web config which you extended with an external app:
-`PHOENIX_WEB_CONFIG="`pwd`/../phoenix/config.json" PHOENIX_ASSET_PATH="`pwd`/../phoenix/dist" bin/ocis phoenix`
+2. point ocis-web to the web config which you extended with an external app:
+`WEB_CONFIG="`pwd`/../web/config.json" ASSET_PATH="`pwd`/../web/dist" bin/ocis web`
 
 ```json
 {
@@ -138,7 +138,7 @@ This is what hello is: copy and extend!
   "openIdConnect": {
     "metadata_url": "http://localhost:9140/.well-known/openid-configuration",
     "authority": "http://localhost:9140",
-    "client_id": "phoenix",
+    "client_id": "web",
     "response_type": "code",
     "scope": "openid profile email"
   },
@@ -163,15 +163,15 @@ This is what hello is: copy and extend!
 }
 ```
 
-## Phoenix extension points
+## ownCloud Web extension points
 
 {{< hint info >}}
-For an up to date list check out [the phoenix documentation](https://github.com/owncloud/phoenix/issues/2423).
+For an up to date list check out [the ownCloud Web documentation](https://github.com/owncloud/web/issues/2423).
 {{< /hint >}}
 
 Several ones available:
 
-### Phoenix core
+### ownCloud Web
 - App switcher (defined in config.json)
 - App container (loads UI of your extension)
 
@@ -226,7 +226,7 @@ Long answer: micro and ocis-hello follow a protocol driven development:
 - ocis uses go-micro, which provides http and grpc gateways
 - the gateways and protocols are optional
 
-- owncloud and kopano are looking into a [MS graph](https://developer.microsoft.com/de-de/graph) like api to handle phoenix requests.
+- owncloud and kopano are looking into a [MS graph](https://developer.microsoft.com/de-de/graph) like api to handle ownCloud Web requests.
   - they might be about user, contacrs, calendars ... which is covered by the graph api
   - we want to integrate with eg. kopano and provide a commen api (file sync and share is covered as well)
 

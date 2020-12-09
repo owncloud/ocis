@@ -21,7 +21,7 @@ import { mapGetters } from 'vuex'
 
 export default {
   /**
-   * FIXME: this component has been copied over from phoenix. It should be moved over to ODS, then we can reuse it in
+   * FIXME: this component has been copied over from ownCloud Web. It should be moved over to ODS, then we can reuse it in
    * this extension.
    */
   name: 'Avatar',

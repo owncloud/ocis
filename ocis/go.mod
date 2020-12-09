@@ -21,7 +21,7 @@ require (
 	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
-	github.com/owncloud/ocis/ocis-phoenix v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-pkg v0.1.0
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/onlyoffice v0.0.0-00010101000000-000000000000
@@ -42,7 +42,7 @@ replace (
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/konnectd => ../konnectd
-	github.com/owncloud/ocis/ocis-phoenix => ../ocis-phoenix
+	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/ocs => ../ocs
 	github.com/owncloud/ocis/onlyoffice => ../onlyoffice

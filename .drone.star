@@ -4,7 +4,7 @@ config = {
     'glauth':'',
     'konnectd':'',
     'ocis': '',
-    'ocis-phoenix':'',
+    'web':'',
     'ocis-pkg':'',
     'ocs':'',
     'proxy':'',
@@ -21,8 +21,8 @@ config = {
     'numberOfParts': 10
   },
   'uiTests': {
-    'phoenixBranch': 'master',
-    'phoenixCommit': '262cec1536156dae3281099aca2fde0febeec6e5',
+    'webBranch': 'master',
+    'webCommit': '262cec1536156dae3281099aca2fde0febeec6e5',
       'suites': {
         'webUIBasic': [
           'webUILogin',
@@ -224,8 +224,8 @@ def testPipelines(ctx):
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
     pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
-  pipelines += uiTests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit'])
-  pipelines.append(accountsUITests(ctx, config['uiTests']['phoenixBranch'], config['uiTests']['phoenixCommit']))
+  pipelines += uiTests(ctx, config['uiTests']['webBranch'], config['uiTests']['webCommit'])
+  pipelines.append(accountsUITests(ctx, config['uiTests']['webBranch'], config['uiTests']['webCommit']))
   return pipelines
 
 def testOcisModule(ctx, module):
@@ -589,11 +589,11 @@ def benchmark(ctx):
     },
   }
 
-def uiTests(ctx, phoenixBranch, phoenixCommit):
+def uiTests(ctx, webBranch, webCommit):
   suiteNames = config['uiTests']['suites'].keys()
-  return [uiTestPipeline(ctx, suiteName, phoenixBranch, phoenixCommit) for suiteName in suiteNames]
+  return [uiTestPipeline(ctx, suiteName, webBranch, webCommit) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = config['uiTests']['suites']
   paths = ""
   suite = suites[suiteName]
@@ -624,7 +624,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
-          'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
@@ -632,12 +632,12 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/phoenix.git /srv/app/phoenix' % (phoenixBranch),
-          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
-          'cd /srv/app/phoenix',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
+          'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/web',
         ] + ([
-          'git checkout %s' % (phoenixCommit)
-        ] if phoenixCommit != '' else []) + [
+          'git checkout %s' % (webCommit)
+        ] if webCommit != '' else []) + [
           'yarn install-all',
           'yarn run acceptance-tests-drone'
         ],
@@ -674,7 +674,7 @@ def uiTestPipeline(ctx, suiteName, phoenixBranch = 'master', phoenixCommit = '',
     },
   }
 
-def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', accounts_hash_difficulty = 4):
+def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -696,21 +696,21 @@ def accountsUITests(ctx, phoenixBranch, phoenixCommit, storage = 'owncloud', acc
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
           'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
-          'PHOENIX_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
-          'PHOENIX_PATH': '/srv/app/phoenix',
+          'WEB_PATH': '/srv/app/web',
           'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
         },
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/phoenix.git /srv/app/phoenix' % (phoenixBranch),
-          'cp -r /srv/app/phoenix/tests/acceptance/filesForUpload/* /uploads',
-          'cd /srv/app/phoenix',
+          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
+          'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/web',
         ] + ([
-          'git checkout %s' % (phoenixCommit)
-        ] if phoenixCommit != '' else []) + [
+          'git checkout %s' % (webCommit)
+        ] if webCommit != '' else []) + [
           'yarn install-all',
           'cd /drone/src/accounts',
           'yarn install --all',
@@ -1534,7 +1534,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4):
     'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
     'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
-    'PHOENIX_WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+    'WEB_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'KONNECTD_ISS': 'https://ocis-server:9200',
     'KONNECTD_TLS': 'true',
