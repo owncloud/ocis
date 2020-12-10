@@ -16,14 +16,14 @@ import (
 
 // NonUnique is able to index an document by a key which might contain non-unique values
 //
-// /var/tmp/testfiles-395764020/index.disk/PetByColor/
+// /tmp/testfiles-395764020/index.disk/PetByColor/
 // ├── Brown
-// │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
+// │   └── rebef-123 -> /tmp/testfiles-395764020/pets/rebef-123
 // ├── Green
-// │    ├── goefe-789 -> /var/tmp/testfiles-395764020/pets/goefe-789
-// │    └── xadaf-189 -> /var/tmp/testfiles-395764020/pets/xadaf-189
+// │    ├── goefe-789 -> /tmp/testfiles-395764020/pets/goefe-789
+// │    └── xadaf-189 -> /tmp/testfiles-395764020/pets/xadaf-189
 // └── White
-//     └── wefwe-456 -> /var/tmp/testfiles-395764020/pets/wefwe-456
+//     └── wefwe-456 -> /tmp/testfiles-395764020/pets/wefwe-456
 type NonUnique struct {
 	caseInsensitive bool
 	indexBy         string

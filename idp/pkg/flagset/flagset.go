@@ -328,7 +328,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "identifier-client-path",
 			Usage:       "Path to the identifier web client base folder",
 			EnvVars:     []string{"IDP_IDENTIFIER_CLIENT_PATH"},
-			Value:       "/var/tmp/ocis/idp",
+			Value:       "./data/idp",
 			Destination: &cfg.IDP.IdentifierClientPath,
 		},
 		&cli.StringFlag{

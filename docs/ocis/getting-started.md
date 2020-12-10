@@ -33,7 +33,7 @@ chmod +x ocis
 ./ocis server
 ```
 
-The default primary storage location is `/var/tmp/ocis`. You can change that value by configuration.
+The default primary storage location is `./data/`. You can change that value by configuration.
 
 
 ### Docker

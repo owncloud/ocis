@@ -10,7 +10,7 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-ocis-root",
-			Value:       "/var/tmp/ocis/storage/users",
+			Value:       "./data/storage/ocis/users",
 			Usage:       "the path to the local storage root",
 			EnvVars:     []string{"STORAGE_DRIVER_OCIS_ROOT"},
 			Destination: &cfg.Reva.Storages.Common.Root,

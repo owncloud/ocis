@@ -29,4 +29,7 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
 ENTRYPOINT ["/usr/bin/ocis"]
 CMD ["server"]
 
+RUN mkdir -p /var/lib/ocis/data
+WORKDIR /var/lib/ocis
+
 COPY --from=build /ocis/ocis/bin/ocis /usr/bin/ocis

@@ -167,7 +167,7 @@ var (
 	}
 )
 
-const dataPath = "/var/tmp/grpc-tests-ocis-settings"
+const dataPath = "/tmp/grpc-tests-ocis-settings"
 
 func init() {
 	service = grpc.NewService(

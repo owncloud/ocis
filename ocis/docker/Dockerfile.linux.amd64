@@ -26,6 +26,9 @@ EXPOSE 9200/tcp
 ENTRYPOINT ["/usr/bin/ocis"]
 CMD ["server"]
 
+RUN mkdir -p /var/lib/ocis/data
+WORKDIR /var/lib/ocis
+
 COPY bin/ocis /usr/bin/ocis
 
 VOLUME [ "/var/tmp/ocis" ]
