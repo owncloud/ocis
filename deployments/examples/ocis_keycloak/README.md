@@ -1,5 +1,5 @@
 ---
-document this deployment example in docs/ocis/deployment/ocis_keycloak.md
+document this deployment example in: docs/ocis/deployment/ocis_keycloak.md
 ---
 
 Please refer to [our documentation](https://owncloud.github.io/ocis/deployment/ocis_keycloak/)

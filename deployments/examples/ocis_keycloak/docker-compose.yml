@@ -63,17 +63,8 @@ services:
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
       STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
-      STORAGE_METADATA_ROOT:  /opt/ocis-metadata
-      STORAGE_DRIVER_OCIS_ROOT: /opt/ocis-storage
-      # store config
-      STORE_DATA_PATH: /opt/ocis-store
-      # settings config
-      SETTINGS_DATA_PATH: /opt/ocis-settings
     volumes:
-      - ocis-storage:/opt/ocis-storage
-      - ocis-metadata:/opt/ocis-metadata
-      - ocis-store:/opt/ocis-store
-      - ocis-settings:/opt/ocis-settings
+      - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=http"
@@ -129,8 +120,4 @@ services:
 
 volumes:
   certs:
-  ocis-storage:
-  ocis-metadata:
-  ocis-store:
-  ocis-settings:
-  keycloak_postgres_data:
+  ocis-data:
