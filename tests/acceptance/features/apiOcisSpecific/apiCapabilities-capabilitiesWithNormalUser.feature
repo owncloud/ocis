@@ -31,7 +31,7 @@ Feature: default capabilities for normal user
       | files_sharing | public@@@enforced_for@@@read_write        | EMPTY             |
       | files_sharing | public@@@enforced_for@@@upload_only       | EMPTY             |
       | files_sharing | public@@@enforced_for@@@read_write_delete | EMPTY             |
-      | files_sharing | public@@@expire_date@@@enabled            | 1                 |
+      | files_sharing | public@@@expire_date@@@enabled            | 0                 |
       | files_sharing | public@@@defaultPublicLinkShareName       | EMPTY             |
       | files_sharing | resharing                                 | 1                 |
       | files_sharing | federation@@@outgoing                     | 1                 |
