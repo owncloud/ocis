@@ -139,7 +139,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 							},
 							"ocs": map[string]interface{}{
 								"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
-								"prefix": cfg.Reva.Frontend.OCSPrefix,
+								"prefix":       cfg.Reva.Frontend.OCSPrefix,
 								"config": map[string]interface{}{
 									"version": "1.8",
 									"website": "reva",
@@ -196,7 +196,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 													},
 												},
 												"expire_date": map[string]interface{}{
-													"enabled": true,
+													"enabled": false,
 												},
 											},
 											"user": map[string]interface{}{
