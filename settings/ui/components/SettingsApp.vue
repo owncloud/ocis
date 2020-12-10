@@ -4,7 +4,7 @@
       <template v-if="initialized">
         <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
           <p class="uk-flex uk-flex-middle">
-            <oc-icon name="info" class="oc-mr-s" />
+            <oc-icon name="info" class="oc-mr-s"/>
             <translate>No settings available</translate>
           </p>
         </oc-alert>
@@ -15,25 +15,25 @@
                 {{ selectedExtensionName }}
               </h1>
             </div>
-            <hr />
+            <hr/>
           </template>
           <template v-if="settingsValuesLoaded">
             <settings-bundle
-              v-for="bundle in selectedBundles"
-              :key="'bundle-' + bundle.id"
-              :bundle="bundle"
-              class="oc-mt"
+                v-for="bundle in selectedBundles"
+                :key="'bundle-' + bundle.id"
+                :bundle="bundle"
+                class="oc-mt"
             />
           </template>
           <div class="oc-mt" v-else>
-            <oc-loader :aria-label="$gettext('Loading personal settings')" />
+            <oc-loader :aria-label="$gettext('Loading personal settings')"/>
             <oc-alert :aria-hidden="true" varition="primary" no-close>
               <p v-translate>Loading personal settings...</p>
             </oc-alert>
           </div>
         </template>
       </template>
-      <oc-loader v-else />
+      <oc-loader v-else/>
     </div>
   </div>
 </template>
@@ -41,6 +41,7 @@
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 import SettingsBundle from './SettingsBundle.vue'
+
 export default {
   name: 'SettingsApp',
   components: { SettingsBundle },
@@ -108,8 +109,10 @@ export default {
     getExtensionName (extension) {
       extension = extension || ''
       switch (extension) {
-        case 'ocis-accounts': return 'Account'
-        case 'ocis-hello': return 'Hello'
+        case 'ocis-accounts':
+          return this.$gettext('Account')
+        case 'ocis-hello':
+          return this.$gettext('Hello')
         default: {
           const shortenedName = extension.replace('ocis-', '')
           return shortenedName.charAt(0).toUpperCase() + shortenedName.slice(1)
@@ -119,21 +122,30 @@ export default {
     getExtensionIcon (extension) {
       extension = extension || ''
       switch (extension) {
-        case 'ocis-accounts': return 'account_circle'
-        case 'ocis-hello': return 'tag_faces'
-        default: return 'application'
+        case 'ocis-accounts':
+          return 'account_circle'
+        case 'ocis-hello':
+          return 'tag_faces'
+        default:
+          return 'application'
       }
     }
   },
-  async created () {
-    await this.initialize()
-    this.resetMenuItems()
-    this.resetSelectedExtension()
+  created () {
+    this.initialize()
   },
   watch: {
-    initialized () {
-      this.resetMenuItems()
-      this.resetSelectedExtension()
+    '$language.current': {
+      handler () {
+        this.resetMenuItems()
+      }
+    },
+    initialized: {
+      handler () {
+        this.resetMenuItems()
+        this.resetSelectedExtension()
+      },
+      immediate: true
     },
     extensionRouteParam () {
       this.resetSelectedExtension()
