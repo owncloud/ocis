@@ -5,4 +5,5 @@ weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
