@@ -13,7 +13,7 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
 
 EXPOSE 9100 9104
 
-ENTRYPOINT ["/usr/bin/ocis-web"]
+ENTRYPOINT ["/usr/bin/web"]
 CMD ["server"]
 
-COPY bin/ocis-web /usr/bin/ocis-web
+COPY bin/web /usr/bin/web
