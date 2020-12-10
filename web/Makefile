@@ -180,4 +180,4 @@ watch:
 
 .PHONY: pull-assets
 pull-assets:
-	rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xvzf - -C assets/
+	rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/phoenix.tar.gz | tar xvzf - -C assets/
