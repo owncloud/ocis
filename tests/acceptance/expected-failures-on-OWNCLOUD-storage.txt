@@ -897,6 +897,7 @@ apiShareReshareToShares3/reShareWithExpiryDate.feature:273
 #
 # https://github.com/owncloud/product/issues/254 empty trashbin does not work
 # https://github.com/owncloud/ocis/issues/551 delete from trashbin does not work
+# https://github.com/owncloud/product/issues/256 deleting multiple elements concurrently will not delete all the items.
 #
 apiTrashbin/trashbinDelete.feature:31
 apiTrashbin/trashbinDelete.feature:32
@@ -918,7 +919,8 @@ apiTrashbin/trashbinFilesFolders.feature:61
 apiTrashbin/trashbinFilesFolders.feature:105
 apiTrashbin/trashbinFilesFolders.feature:106
 #
-# https://github.com/owncloud/product/issues/273 invalid webdav responses for unauthorized requests.
+# https://github.com/owncloud/product/issues/257
+# trying to list the trashbin of another user gives 405
 #
 apiTrashbin/trashbinFilesFolders.feature:154
 apiTrashbin/trashbinFilesFolders.feature:155
@@ -926,6 +928,9 @@ apiTrashbin/trashbinFilesFolders.feature:172
 apiTrashbin/trashbinFilesFolders.feature:173
 apiTrashbin/trashbinFilesFolders.feature:196
 apiTrashbin/trashbinFilesFolders.feature:197
+#
+# https://github.com/owncloud/product/issues/273 invalid webdav responses for unauthorized requests.
+#
 apiTrashbin/trashbinFilesFolders.feature:210
 apiTrashbin/trashbinFilesFolders.feature:211
 apiTrashbin/trashbinFilesFolders.feature:224
