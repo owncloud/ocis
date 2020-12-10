@@ -19,6 +19,7 @@
 * Bugfix - Serve index.html for directories: [#912](https://github.com/owncloud/ocis/pull/912)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+* Bugfix - Disable public link expiration by default: [#987](https://github.com/owncloud/ocis/issues/987)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Cache password validation: [#958](https://github.com/owncloud/ocis/pull/958)
@@ -250,6 +251,17 @@
 
    https://github.com/owncloud/ocis/pull/521
    https://github.com/owncloud/ocis-proxy/pull/99
+
+* Bugfix - Disable public link expiration by default: [#987](https://github.com/owncloud/ocis/issues/987)
+
+   Tags: storage
+
+   The public link expiration was enabled by default and didn't have a default expiration span by
+   default, which resulted in already expired public links coming from the public link quick
+   action. We fixed this by disabling the public link expiration by default.
+
+   https://github.com/owncloud/ocis/issues/987
+   https://github.com/owncloud/ocis/pull/1035
 
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 
