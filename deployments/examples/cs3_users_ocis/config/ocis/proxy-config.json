@@ -1,0 +1,82 @@
+{
+  "HTTP": {
+    "Namespace": "com.owncloud"
+  },
+  "policy_selector": {
+    "static": {
+      "policy": "ocis"
+    }
+  },
+  "policies": [
+    {
+      "name": "ocis",
+      "routes": [
+        {
+          "endpoint": "/",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/.well-known/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/konnect/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "endpoint": "/signin/",
+          "backend": "http://localhost:9130"
+        },
+        {
+          "type": "regex",
+          "endpoint": "/ocs/v[12].php/cloud/user/signing-key",
+          "backend": "http://localhost:9110"
+        },
+        {
+          "endpoint": "/ocs/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/remote.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/dav/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/webdav/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/status.php",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/index.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/data",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/api/v0/settings",
+          "backend":  "http://localhost:9190"
+        },
+        {
+          "endpoint": "/settings.js",
+          "backend":  "http://localhost:9190"
+	},
+	{
+          "endpoint": "/api/v0/greet",
+          "backend": "http://localhost:9105"
+        },
+        {
+          "endpoint": "/hello.js",
+          "backend": "http://localhost:9105"
+        }
+      ]
+    }
+  ]
+}
