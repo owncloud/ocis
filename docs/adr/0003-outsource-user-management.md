@@ -18,19 +18,19 @@ To attach metadata like shares to users ownCloud relies on persistent, non-reass
 ## Considered Options
 
 * Accounts service wraps LDAP
-* GLauth wraps accounts service
+* [GLauth](https://github.com/glauth/glauth) wraps accounts service
 
 ## Decision Outcome
 
-Chosen option: "Move accounts functionality to GLauth and name it accounts", by moving the existing accounts service file based persistence to glauth and use it as a drop in replacement for an LDAP server. The reverse index and web ui existing in the accounts service will move as well in order to make glauth a standalone, small scale user management with write capabilities.
+Chosen option: "Move accounts functionality to GLAuth and name it accounts", by moving the existing accounts service file based persistence to GLAuth and use it as a drop in replacement for an LDAP server. The reverse index and web ui existing in the accounts service will move as well in order to make GLAuth a standalone, small scale user management with write capabilities.
 
 ### Product summary
-- GLauth is a drop in user management for small scale deployments.
-- OCIS admins can either use the web ui to manage users in glauth or use existing tools in their IDM.
-- We hide the complexity by embedding OpenID Provider, an LDAP server and a user management web ui.
+- GLAuth is a drop in user management for small scale deployments that don't rely on an actual LDAP.
+- OCIS admins can either use the web ui to manage users in GLAuth or use existing tools in their IDM.
+- We hide the complexity by embedding an OpenID Provider, an LDAP server and a user management web ui.
 
 ### Resulting deployment options
-- Single binary: admin can manage users, groups and roles using the built in web ui (glauth)
+- Single binary: admin can manage users, groups and roles using the built in web ui (GLAuth)
 - External LDAP: OCIS admin needs to use existing tool to manage users
 - Separate OCIS and LDAP admin: OCIS admin relies on the LDAP admin to manage users
 
@@ -51,7 +51,7 @@ Chosen option: "Move accounts functionality to GLauth and name it accounts", by 
 
 ## Pros and Cons of the Options <!-- optional -->
 
-### GLauth wraps accounts service
+### GLAuth wraps accounts service
 
 Currently, the accounts service is the source of truth and we use it to implement user management. <!-- optional -->
 

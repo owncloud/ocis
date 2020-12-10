@@ -1,7 +1,7 @@
 # 1. Introduce an accounts service
 
 * Status: superseded by [ADR-0003](0003-outsource-user-management.md) <!-- optional -->
-* Deciders: @butonic, @felixboehm, @mbarz, @pmaier1 <!-- optional -->
+* Deciders: @butonic, @felixboehm, @micbar, @pmaier1 <!-- optional -->
 * Date: [2020-06-15](https://github.com/owncloud/ocis-accounts/pull/34/commits/2fd05e2b6fe2a47c687bd0c0bc5e1b5c48a585b2) <!-- optional -->
 
 Technical Story: [persist accounts](https://github.com/owncloud/ocis-accounts/pull/34) <!-- optional -->
@@ -21,16 +21,16 @@ To attach metadata like shares to users ownCloud relies on persistent, non-reass
 ## Considered Options
 
 * Accounts service wraps LDAP
-* GLauth wraps accounts service
+* [GLAuth](https://github.com/glauth/glauth) wraps accounts service
 
 ## Decision Outcome
 
-Chosen option: "GLauth wraps accounts service", because we need write access to provision guest accounts and [GLauth](https://github.com/glauth/glauth) currently has no write support.
+Chosen option: "GLAuth wraps accounts service", because we need write access to provision guest accounts and GLAuth currently has no write support.
 
 ### Positive Consequences <!-- optional -->
 
 * We can build a self contained user management in the accounts service and can adjust it to our requirements.
-* We do not rely on an LDAP server which would only be possible by implementing write support in the LDAP libraries used by GLauth which (hard to estimate effort, when will that be merged upstream).
+* We do not rely on an LDAP server which would only be possible by implementing write support in the LDAP libraries used by GLAuth (hard to estimate effort, when will that be merged upstream).
 
 ### Negative Consequences <!-- optional -->
 
