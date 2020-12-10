@@ -125,7 +125,7 @@ The [ownCloud design system](https://owncloud.design/) contains a set of ownClou
 
 This is what hello is: copy and extend!
 
-1. ownCloud Web is configured using the config.json which is served by the ocis-web service (either `bin/ocis web` or `bin/ocis-web server`)
+1. ownCloud Web is configured using the config.json which is served by the ocis-web service (either `bin/ocis web` or `bin/web server`)
 
 2. point ocis-web to the web config which you extended with an external app:
 `WEB_UI_CONFIG="`pwd`/../web/config.json" ASSET_PATH="`pwd`/../web/dist" bin/ocis web`

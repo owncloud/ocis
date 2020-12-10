@@ -113,13 +113,13 @@ $ git clone git@github.com:owncloud/ocis.git
 $ cd web
 $ make
 ```
-This should give you a `bin/ocis-web` binary. Try listing the help with `bin/ocis-web --help`.
+This should give you a `bin/web` binary. Try listing the help with `bin/web --help`.
 
 #### Run it!
 
 Point `ocis-web` to your owncloud domain and tell it where to find the openid connect issuing authority:
 ```console
-$ bin/ocis-web server --web-config-server https://cloud.example.com --oidc-authority https://192.168.1.100:9130 --oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration --oidc-client-id ocis
+$ bin/web server --web-config-server https://cloud.example.com --oidc-authority https://192.168.1.100:9130 --oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration --oidc-client-id ocis
 ```
 
 `ocis-web` needs to know
