@@ -68,9 +68,13 @@ services:
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      STORAGE_OIDC_INSECURE: "${INSECURE:-false}"
+      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # idp config
       KONNECTD_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       KONNECTD_TLS: 'false'
+      # thumbnail config
+      THUMBNAILS_WEBDAVSOURCE_BASEURL: http://localhost:9200/remote.php/webdav/
     volumes:
       - ./config:/config
       - ocis-data:/var/tmp/ocis
