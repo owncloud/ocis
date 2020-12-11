@@ -78,7 +78,6 @@ func init() {
 	)
 
 	cfg := config.New()
-	cfg.Server.AccountsDataPath = dataPath
 	cfg.Repo.Disk.Path = dataPath
 	var hdlr *svc.Service
 	var err error
