@@ -34,8 +34,6 @@ var (
 	// Extensions are ocis extension services
 	Extensions = []string{
 		"glauth",
-		"graph",
-		"graph-explorer",
 		"konnectd",
 		"ocs",
 		"onlyoffice",
@@ -54,6 +52,8 @@ var (
 		"storage-public-link",
 		"thumbnails",
 		"webdav",
+		//"graph",
+		//"graph-explorer",
 	}
 
 	// There seem to be a race condition when reva-sharing needs to read the sharing.json file and the parent folder is not present.
@@ -129,6 +129,11 @@ OUT:
 func RunService(client *rpc.Client, service string) int {
 	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
 
+	all := append(Extensions, append(dependants, MicroServices...)...)
+	if !contains(all, service) {
+		return 1
+	}
+
 	var reply int
 	if err := client.Call("Service.Start", args, &reply); err != nil {
 		golog.Fatal(err)
@@ -158,4 +163,13 @@ func setDefaults() {
 
 	// registry
 	registry.Name = OwncloudNamespace + "registry"
+}
+
+func contains(a []string, b string) bool {
+	for i := range a {
+		if a[i] == b {
+			return true
+		}
+	}
+	return false
 }
