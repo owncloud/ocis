@@ -81,7 +81,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if err := viper.ReadInConfig(); err != nil {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
-			logger.Info().
+			logger.Debug().
 				Msg("no config found on preconfigured location")
 		case viper.UnsupportedConfigError:
 			logger.Fatal().
