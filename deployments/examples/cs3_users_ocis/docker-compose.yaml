@@ -76,7 +76,6 @@ services:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: error
       # proxy config
-      PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       PROXY_TLS: "false"
