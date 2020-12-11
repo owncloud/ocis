@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"path"
-	"path/filepath"
 	"strconv"
 
 	"github.com/gofrs/uuid"
@@ -182,7 +181,6 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
 	}
-	path := filepath.Join(s.Config.Server.AccountsDataPath, "groups", id)
 
 	g := &proto.Group{}
 	if err = s.repo.LoadGroup(c, id, g); err != nil {
@@ -212,7 +210,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 	}
 
 	if err = s.index.Delete(g); err != nil {
-		s.log.Error().Err(err).Str("id", id).Str("path", path).Msg("could not remove group from index")
+		s.log.Error().Err(err).Str("id", id).Msg("could not remove group from index")
 		return merrors.InternalServerError(s.id, "could not remove group from index: %v", err.Error())
 	}
 

@@ -119,13 +119,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_NAME"},
 			Destination: &cfg.Server.Name,
 		},
-		&cli.StringFlag{
-			Name:        "accounts-data-path",
-			Value:       "/var/tmp/ocis-accounts",
-			Usage:       "accounts folder",
-			EnvVars:     []string{"ACCOUNTS_DATA_PATH"},
-			Destination: &cfg.Server.AccountsDataPath,
-		},
 		&cli.IntFlag{
 			Name:        "accounts-hash-difficulty",
 			Value:       11,
