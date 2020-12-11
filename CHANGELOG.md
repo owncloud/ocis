@@ -19,6 +19,7 @@
 * Bugfix - Serve index.html for directories: [#912](https://github.com/owncloud/ocis/pull/912)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+* Bugfix - Fix minor ui bugs: [#1043](https://github.com/owncloud/ocis/issues/1043)
 * Bugfix - Disable public link expiration by default: [#987](https://github.com/owncloud/ocis/issues/987)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
 * Change - Accounts UI shows message when no permissions: [#656](https://github.com/owncloud/ocis/pull/656)
@@ -26,6 +27,7 @@
 * Change - Filesystem based index: [#709](https://github.com/owncloud/ocis/pull/709)
 * Change - Rebuild index command for accounts: [#748](https://github.com/owncloud/ocis/pull/748)
 * Change - Add the thumbnails command: [#156](https://github.com/owncloud/ocis/issues/156)
+* Change - CS3 can be used as accounts-backend: [#1020](https://github.com/owncloud/ocis/pull/1020)
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 * Change - Replace the library which scales the images: [#910](https://github.com/owncloud/ocis/pull/910)
 * Change - Choose disk or cs3 storage for accounts and groups: [#623](https://github.com/owncloud/ocis/pull/623)
@@ -91,6 +93,7 @@
 * Enhancement - Create a proxy access-log: [#889](https://github.com/owncloud/ocis/pull/889)
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 * Enhancement - Update reva to v1.4.1-0.20201125144025-57da0c27434c: [#1320](https://github.com/cs3org/reva/pull/1320)
+* Enhancement - Runtime Cleanup: [#1066](https://github.com/owncloud/ocis/pull/1066)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
@@ -252,6 +255,14 @@
    https://github.com/owncloud/ocis/pull/521
    https://github.com/owncloud/ocis-proxy/pull/99
 
+* Bugfix - Fix minor ui bugs: [#1043](https://github.com/owncloud/ocis/issues/1043)
+
+   - the ui haven't updated the language of the items in the settings view menu. Now we listen to the
+   selected language and update the ui - deduplicate resetMenuItems call
+
+   https://github.com/owncloud/ocis/issues/1043
+   https://github.com/owncloud/ocis/pull/1044
+
 * Bugfix - Disable public link expiration by default: [#987](https://github.com/owncloud/ocis/issues/987)
 
    Tags: storage
@@ -324,6 +335,17 @@
    Added the thumbnails command so that the thumbnails service can get started via ocis.
 
    https://github.com/owncloud/ocis/issues/156
+
+* Change - CS3 can be used as accounts-backend: [#1020](https://github.com/owncloud/ocis/pull/1020)
+
+   Tags: proxy
+
+   PROXY_ACCOUNT_BACKEND_TYPE=cs3 PROXY_ACCOUNT_BACKEND_TYPE=accounts (default)
+
+   By using a backend which implements the CS3 user-api (currently provided by reva/storage) it
+   is possible to bypass the ocis-accounts service and for example use ldap directly.
+
+   https://github.com/owncloud/ocis/pull/1020
 
 * Change - Use bcrypt to hash the user passwords: [#510](https://github.com/owncloud/ocis/issues/510)
 
@@ -1787,6 +1809,12 @@
 
    https://github.com/cs3org/reva/pull/1320
    https://github.com/cs3org/reva/pull/1338
+
+* Enhancement - Runtime Cleanup: [#1066](https://github.com/owncloud/ocis/pull/1066)
+
+   Small runtime cleanup prior to Tech Preview release
+
+   https://github.com/owncloud/ocis/pull/1066
 
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 
