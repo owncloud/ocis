@@ -4,7 +4,7 @@
       <template v-if="initialized">
         <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
           <p class="uk-flex uk-flex-middle">
-            <oc-icon name="info" class="oc-mr-s"/>
+            <oc-icon name="info" class="oc-mr-s" />
             <translate>No settings available</translate>
           </p>
         </oc-alert>
@@ -15,25 +15,25 @@
                 {{ selectedExtensionName }}
               </h1>
             </div>
-            <hr/>
+            <hr />
           </template>
           <template v-if="settingsValuesLoaded">
             <settings-bundle
-                v-for="bundle in selectedBundles"
-                :key="'bundle-' + bundle.id"
-                :bundle="bundle"
-                class="oc-mt"
+              v-for="bundle in selectedBundles"
+              :key="'bundle-' + bundle.id"
+              :bundle="bundle"
+              class="oc-mt"
             />
           </template>
           <div class="oc-mt" v-else>
-            <oc-loader :aria-label="$gettext('Loading personal settings')"/>
+            <oc-loader :aria-label="$gettext('Loading personal settings')" />
             <oc-alert :aria-hidden="true" varition="primary" no-close>
               <p v-translate>Loading personal settings...</p>
             </oc-alert>
           </div>
         </template>
       </template>
-      <oc-loader v-else/>
+      <oc-loader v-else />
     </div>
   </div>
 </template>
@@ -76,7 +76,10 @@ export default {
     ...mapMutations(['ADD_NAV_ITEM']),
     resetSelectedExtension () {
       if (this.extensions.length > 0) {
-        if (this.extensionRouteParam && this.extensions.includes(this.extensionRouteParam)) {
+        if (
+          this.extensionRouteParam &&
+          this.extensions.includes(this.extensionRouteParam)
+        ) {
           this.selectedExtension = this.extensionRouteParam
         } else {
           this.selectedExtension = this.extensions[0]
@@ -84,7 +87,7 @@ export default {
       }
     },
     resetMenuItems () {
-      this.extensions.forEach(extension => {
+      this.extensions.forEach((extension) => {
         /*
          * TODO:
          * a) set up a map with possible extensions and icons?
