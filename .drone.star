@@ -907,44 +907,31 @@ def dockerEos(ctx):
   }
 
 def binary(ctx, name):
+  # uploads binary to https://download.owncloud.com/ocis/ocis/testing/
+  target = '/ocis/%s/testing' % (ctx.repo.name.replace("ocis-", ""))
   if ctx.build.event == "tag":
-    settings = {
-      'endpoint': {
-        'from_secret': 's3_endpoint',
-      },
-      'access_key': {
-        'from_secret': 'aws_access_key_id',
-      },
-      'secret_key': {
-        'from_secret': 'aws_secret_access_key',
-      },
-      'bucket': {
-        'from_secret': 's3_bucket',
-      },
-      'path_style': True,
-      'strip_prefix': 'ocis/dist/release/',
-      'source': 'ocis/dist/release/*',
-      'target': '/ocis/%s/%s' % (ctx.repo.name.replace("ocis-", ""), ctx.build.ref.replace("refs/tags/v", "")),
-    }
-  else:
-    settings = {
-      'endpoint': {
-        'from_secret': 's3_endpoint',
-      },
-      'access_key': {
-        'from_secret': 'aws_access_key_id',
-      },
-      'secret_key': {
-        'from_secret': 'aws_secret_access_key',
-      },
-      'bucket': {
-        'from_secret': 's3_bucket',
-      },
-      'path_style': True,
-      'strip_prefix': 'dist/release/',
-      'source': 'ocis/dist/release/*',
-      'target': '/ocis/%s/testing' % (ctx.repo.name.replace("ocis-", "")),
-    }
+    # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
+    target = '/ocis/%s/%s' % (ctx.repo.name.replace("ocis-", ""), ctx.build.ref.replace("refs/tags/v", ""))
+
+  settings = {
+    'endpoint': {
+      'from_secret': 's3_endpoint',
+    },
+    'access_key': {
+      'from_secret': 'aws_access_key_id',
+    },
+    'secret_key': {
+      'from_secret': 'aws_secret_access_key',
+    },
+    'bucket': {
+      'from_secret': 's3_bucket',
+    },
+    'path_style': True,
+    'strip_prefix': 'ocis/dist/release/',
+    'source': 'ocis/dist/release/*',
+    'target': target,
+  }
+
 
   return {
     'kind': 'pipeline',
