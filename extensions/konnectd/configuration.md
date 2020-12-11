@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-11T18:03:27+0000"
+date: "2020-12-11T22:46:53+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -32,6 +32,15 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### konnectd health
+
+Check health status
+
+Usage: `konnectd health [command options] [arguments...]`
+
+--debug-addr | $KONNECTD_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
 
 ### konnectd server
 
@@ -173,13 +182,4 @@ Usage: `konnectd version [command options] [arguments...]`
 
 --name | $KONNECTD_NAME  
 : Service name. Default: `konnectd`.
-
-### konnectd health
-
-Check health status
-
-Usage: `konnectd health [command options] [arguments...]`
-
---debug-addr | $KONNECTD_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
 
