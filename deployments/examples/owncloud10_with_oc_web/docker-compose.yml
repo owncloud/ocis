@@ -11,7 +11,7 @@ services:
           - ${OC10_DOMAIN:-oc10.owncloud.test}
     command:
       #- "--log.level=DEBUG"
-      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-'example@example.org'}"
+      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       - "--api.dashboard=true"
