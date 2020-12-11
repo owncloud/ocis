@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-11T08:31:03+0000"
+date: "2020-12-11T09:57:31+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -32,21 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
-
---log-level | $THUMBNAILS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $THUMBNAILS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $THUMBNAILS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### thumbnails version
 
@@ -122,4 +107,19 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 --webdavsource-insecure | $THUMBNAILS_WEBDAVSOURCE_INSECURE  
 : Whether to skip certificate checks. Default: `true`.
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
+--log-level | $THUMBNAILS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $THUMBNAILS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $THUMBNAILS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 

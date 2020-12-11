@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-11T08:30:55+0000"
+date: "2020-12-11T09:57:24+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -102,11 +102,11 @@ Usage: `ocis server [command options] [arguments...]`
 --grpc-addr | $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
-### ocis list
+### ocis run
 
-Lists running ocis extensions
+Runs an extension
 
-Usage: `ocis list [command options] [arguments...]`
+Usage: `ocis run [command options] [arguments...]`
 
 ### ocis health
 
@@ -117,29 +117,53 @@ Usage: `ocis health [command options] [arguments...]`
 --debug-addr | $OCIS_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9010`.
 
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
 ### ocis kill
 
 Kill an extension by name
 
 Usage: `ocis kill [command options] [arguments...]`
 
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis phoenix
+#### ocis thumbnails
 
-Start phoenix server
+Start thumbnails server
 
-#### ocis onlyoffice
+#### ocis storage-auth-bearer
 
-Start onlyoffice server
+Start storage auth-bearer service
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
 
 #### ocis storage-sharing
 
@@ -149,14 +173,6 @@ Start storage sharing service
 
 Lists running services with version
 
-#### ocis glauth
-
-Start glauth server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
 #### ocis settings
 
 Start settings server
@@ -165,57 +181,41 @@ Start settings server
 
 Start konnectd server
 
-#### ocis webdav
+#### ocis phoenix
 
-Start webdav server
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis proxy
-
-Start proxy server
+Start phoenix server
 
 #### ocis storage-auth-basic
 
 Start storage auth-basic service
 
+#### ocis accounts
+
+Start accounts server
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
 #### ocis store
 
 Start a go-micro store
 
-#### ocis thumbnails
+#### ocis onlyoffice
 
-Start thumbnails server
+Start onlyoffice server
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
+
+#### ocis webdav
+
+Start webdav server
 
 #### ocis storage-users
 
