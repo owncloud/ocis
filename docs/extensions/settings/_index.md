@@ -5,6 +5,7 @@ weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/settings
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
 
 ## Abstract

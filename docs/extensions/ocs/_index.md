@@ -5,6 +5,7 @@ weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/ocs
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
 
 This service provides the OCS API which is required by some ownCloud clients.

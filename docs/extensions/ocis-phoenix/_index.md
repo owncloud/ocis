@@ -5,6 +5,7 @@ weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/ocis-phoenix
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
 
 Note: Work in progress to rename Phoenix to ownCloud Web.

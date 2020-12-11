@@ -5,4 +5,5 @@ weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/flow-docs
 geekdocFilePath: _index.md
+geekdocCollapseSection: true
 ---
