@@ -53,7 +53,7 @@ services:
     environment:
       # general config
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: error
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error}
       # proxy config
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
