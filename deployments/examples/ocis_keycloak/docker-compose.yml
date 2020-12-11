@@ -63,6 +63,9 @@ services:
       STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
       STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      # thumbnail config
+      THUMBNAILS_WEBDAVSOURCE_BASEURL: http://localhost:9200/remote.php/webdav/
     volumes:
       - ocis-data:/var/tmp/ocis
     labels:
@@ -121,3 +124,4 @@ services:
 volumes:
   certs:
   ocis-data:
+  keycloak_postgres_data:
