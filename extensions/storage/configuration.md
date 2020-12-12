@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-11T22:47:02+0000"
+date: "2020-12-12T09:05:31+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/storage/templates
@@ -152,35 +152,23 @@ Usage: `storage frontend [command options] [arguments...]`
 --upload-http-method-override | $STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE
 : Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
 
-### storage auth-bearer
+### storage storage
 
-Start authprovider for bearer auth
+Storage service for oCIS
 
-Usage: `storage auth-bearer [command options] [arguments...]`
+Usage: `storage storage [command options] [arguments...]`
 
---debug-addr | $STORAGE_AUTH_BEARER_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9149`.
+--config-file | $STORAGE_CONFIG_FILE
+: Path to config file.
 
---oidc-issuer | $STORAGE_OIDC_ISSUER
-: OIDC issuer. Default: `https://localhost:9200`.
+--log-level | $STORAGE_LOG_LEVEL
+: Set logging level. Default: `info`.
 
---oidc-insecure | $STORAGE_OIDC_INSECURE
-: OIDC allow insecure communication. Default: `true`.
+--log-pretty | $STORAGE_LOG_PRETTY
+: Enable pretty logging.
 
---oidc-id-claim | $STORAGE_OIDC_ID_CLAIM
-: OIDC id claim. Default: `preferred_username`.
-
---oidc-uid-claim | $STORAGE_OIDC_UID_CLAIM
-: OIDC uid claim.
-
---oidc-gid-claim | $STORAGE_OIDC_GID_CLAIM
-: OIDC gid claim.
-
---network | $STORAGE_AUTH_BEARER_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
---addr | $STORAGE_AUTH_BEARER_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9148`.
+--log-color | $STORAGE_LOG_COLOR
+: Enable colored logging.
 
 ### storage storage-home
 
@@ -386,47 +374,35 @@ Usage: `storage auth-basic [command options] [arguments...]`
 --addr | $STORAGE_AUTH_BASIC_GRPC_ADDR
 : Address to bind storage service. Default: `0.0.0.0:9146`.
 
-### storage sharing
+### storage auth-bearer
 
-Start sharing service
+Start authprovider for bearer auth
 
-Usage: `storage sharing [command options] [arguments...]`
+Usage: `storage auth-bearer [command options] [arguments...]`
 
---debug-addr | $STORAGE_SHARING_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9151`.
+--debug-addr | $STORAGE_AUTH_BEARER_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9149`.
 
---network | $STORAGE_SHARING_GRPC_NETWORK
+--oidc-issuer | $STORAGE_OIDC_ISSUER
+: OIDC issuer. Default: `https://localhost:9200`.
+
+--oidc-insecure | $STORAGE_OIDC_INSECURE
+: OIDC allow insecure communication. Default: `true`.
+
+--oidc-id-claim | $STORAGE_OIDC_ID_CLAIM
+: OIDC id claim. Default: `preferred_username`.
+
+--oidc-uid-claim | $STORAGE_OIDC_UID_CLAIM
+: OIDC uid claim.
+
+--oidc-gid-claim | $STORAGE_OIDC_GID_CLAIM
+: OIDC gid claim.
+
+--network | $STORAGE_AUTH_BEARER_GRPC_NETWORK
 : Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
---addr | $STORAGE_SHARING_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9150`.
-
---user-driver | $STORAGE_SHARING_USER_DRIVER
-: driver to use for the UserShareProvider. Default: `json`.
-
---user-json-file | $STORAGE_SHARING_USER_JSON_FILE
-: file used to persist shares for the UserShareProvider. Default: `/var/tmp/ocis/shares.json`.
-
---public-driver | $STORAGE_SHARING_PUBLIC_DRIVER
-: driver to use for the PublicShareProvider. Default: `json`.
-
-### storage storage
-
-Storage service for oCIS
-
-Usage: `storage storage [command options] [arguments...]`
-
---config-file | $STORAGE_CONFIG_FILE
-: Path to config file.
-
---log-level | $STORAGE_LOG_LEVEL
-: Set logging level. Default: `info`.
-
---log-pretty | $STORAGE_LOG_PRETTY
-: Enable pretty logging.
-
---log-color | $STORAGE_LOG_COLOR
-: Enable colored logging.
+--addr | $STORAGE_AUTH_BEARER_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9148`.
 
 ### storage storage-metadata
 
@@ -484,6 +460,30 @@ Usage: `storage storage-public-link [command options] [arguments...]`
 
 --gateway-endpoint | $STORAGE_GATEWAY_ENDPOINT
 : endpoint to use for the storage gateway service. Default: `localhost:9142`.
+
+### storage sharing
+
+Start sharing service
+
+Usage: `storage sharing [command options] [arguments...]`
+
+--debug-addr | $STORAGE_SHARING_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9151`.
+
+--network | $STORAGE_SHARING_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+--addr | $STORAGE_SHARING_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9150`.
+
+--user-driver | $STORAGE_SHARING_USER_DRIVER
+: driver to use for the UserShareProvider. Default: `json`.
+
+--user-json-file | $STORAGE_SHARING_USER_JSON_FILE
+: file used to persist shares for the UserShareProvider. Default: `/var/tmp/ocis/shares.json`.
+
+--public-driver | $STORAGE_SHARING_PUBLIC_DRIVER
+: driver to use for the PublicShareProvider. Default: `json`.
 
 ## Config for the different Storage Drivers
 
