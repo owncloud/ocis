@@ -97,6 +97,11 @@ func Sharing(cfg *config.Config) *cli.Command {
 							},
 							"publicshareprovider": map[string]interface{}{
 								"driver": cfg.Reva.Sharing.PublicDriver,
+								"drivers": map[string]interface{}{
+									"json": map[string]interface{}{
+										"file": cfg.Reva.Sharing.PublicJSONFile,
+									},
+								},
 							},
 						},
 					},

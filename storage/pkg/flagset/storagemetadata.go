@@ -51,6 +51,13 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageMetadata.HTTPAddr,
 		},
 		&cli.StringFlag{
+			Name:        "tmp-folder",
+			Value:       "/var/tmp/ocis/tmp/metadata",
+			Usage:       "path to tmp folder",
+			EnvVars:     []string{"STORAGE_METADATA_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageMetadata.TempFolder,
+		},
+		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "ocis",
 			Usage:       "storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3",
@@ -91,7 +98,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	flags = append(flags,
 		&cli.StringFlag{
 			Name:        "storage-root",
-			Value:       "/var/tmp/ocis/metadata",
+			Value:       "/var/tmp/ocis/storage/metadata",
 			Usage:       "the path to the metadata storage root",
 			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
 			Destination: &cfg.Reva.Storages.Common.Root,

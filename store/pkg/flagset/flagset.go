@@ -131,7 +131,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
-			Value:       "/var/tmp/ocis-store",
+			Value:       "/var/tmp/ocis/store",
 			Usage:       "location of the store data path",
 			EnvVars:     []string{"STORE_DATA_PATH"},
 			Destination: &cfg.Datapath,

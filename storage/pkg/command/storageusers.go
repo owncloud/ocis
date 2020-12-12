@@ -102,6 +102,7 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageUsers.MountID,
 								"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
 								"data_server_url":    cfg.Reva.StorageUsers.DataServerURL,
+								"tmp_folder":         cfg.Reva.StorageUsers.TempFolder,
 							},
 						},
 					},

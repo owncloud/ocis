@@ -102,6 +102,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 								"mount_id":           cfg.Reva.StorageHome.MountID,
 								"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
 								"data_server_url":    cfg.Reva.StorageHome.DataServerURL,
+								"tmp_folder":         cfg.Reva.StorageHome.TempFolder,
 							},
 						},
 					},

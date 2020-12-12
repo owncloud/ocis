@@ -111,6 +111,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_HOME_HTTP_PREFIX"},
 			Destination: &cfg.Reva.StorageHome.HTTPPrefix,
 		},
+		&cli.StringFlag{
+			Name:        "tmp-folder",
+			Value:       "/var/tmp/ocis/tmp/home",
+			Usage:       "path to tmp folder",
+			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageHome.TempFolder,
+		},
 		&cli.BoolFlag{
 			Name:        "enable-home",
 			Value:       true,

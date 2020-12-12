@@ -45,7 +45,7 @@ type NonUnique struct {
 }
 
 // NewNonUniqueIndexWithOptions instantiates a new NonUniqueIndex instance.
-// /var/tmp/ocis-accounts/index.cs3/Pets/Bro*
+// /var/tmp/ocis/accounts/index.cs3/Pets/Bro*
 // ├── Brown/
 // │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
 // ├── Green/

@@ -143,7 +143,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "storage-disk-path",
 			Value:       "",
-			Usage:       "Path on the local disk, e.g. /var/tmp/ocis-accounts",
+			Usage:       "Path on the local disk, e.g. /var/tmp/ocis/accounts",
 			EnvVars:     []string{"ACCOUNTS_STORAGE_DISK_PATH"},
 			Destination: &cfg.Repo.Disk.Path,
 		},

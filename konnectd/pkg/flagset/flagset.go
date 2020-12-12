@@ -251,7 +251,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "identifier-client-path",
 			Usage:       "Path to the identifier web client base folder",
 			EnvVars:     []string{"KONNECTD_IDENTIFIER_CLIENT_PATH"},
-			Value:       "/var/tmp/konnectd",
+			Value:       "/var/tmp/ocis/konnectd",
 			Destination: &cfg.Konnectd.IdentifierClientPath,
 		},
 		&cli.StringFlag{
