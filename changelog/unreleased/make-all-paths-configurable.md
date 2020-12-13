@@ -1,5 +1,5 @@
-Change: Make all paths configurable and default to `/var/tmp/ocis/<service>/...`
+Change: Make all paths configurable and default to a common temp dir
 
-Aligned all services to use a subdir of `/var/tmp/ocis/` by default. Also made some missing temp paths configurable via env vars and config flags.
+Aligned all services to use a dir following`/var/tmp/ocis/<service>/...` by default. Also made some missing temp paths configurable via env vars and config flags.
 
-https://github.com/owncloud/ocis/pulls/1080
+https://github.com/owncloud/ocis/pull/1080
