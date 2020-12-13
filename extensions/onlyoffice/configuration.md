@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-13T11:06:21+0000"
+date: "2020-12-13T16:58:02+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -57,6 +57,15 @@ Usage: `onlyoffice [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### onlyoffice health
+
+Check health status
+
+Usage: `onlyoffice health [command options] [arguments...]`
+
+--debug-addr | $ONLYOFFICE_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9224`.
+
 ### onlyoffice server
 
 Start integrated server
@@ -101,13 +110,4 @@ Usage: `onlyoffice server [command options] [arguments...]`
 
 --asset-path | $ONLYOFFICE_ASSET_PATH  
 : Path to custom assets.
-
-### onlyoffice health
-
-Check health status
-
-Usage: `onlyoffice health [command options] [arguments...]`
-
---debug-addr | $ONLYOFFICE_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9224`.
 
