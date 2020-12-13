@@ -12,9 +12,9 @@ then
 	exit 1
 fi
 
-if [ -z "$WEB_CONFIG" ]
+if [ -z "$WEB_UI_CONFIG" ]
 then
-	echo "WEB_CONFIG env variable is not set, cannot find web config file"
+	echo "WEB_UI_CONFIG env variable is not set, cannot find web config file"
 	exit 1
 fi
 
