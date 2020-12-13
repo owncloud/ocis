@@ -33,9 +33,9 @@ services:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       KONNECTD_ISS: https://${OCIS_DOMAIN:-localhost}:9200
-      PHOENIX_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-localhost}:9200
-      PHOENIX_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-localhost}:9200/.well-known/openid-configuration
-      PHOENIX_WEB_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
+      WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-localhost}:9200
+      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-localhost}:9200/.well-known/openid-configuration
+      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
       STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-localhost}:9200
       # make home and users storages use eos

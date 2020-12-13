@@ -11,7 +11,7 @@ Welcome to our developer documentation. Here you can find developer documentatio
 - [oCIS](https://owncloud.github.io/ocis/) server
 - oCIS extensions
 - Clients, like:
-    - [Phoenix](https://github.com/owncloud/phoenix) - the new web frontend for oCIS and ownCloud
+    - [ownCloud Web](https://github.com/owncloud/web) - the new web frontend for oCIS and ownCloud
     - [ownCloud Android app](https://github.com/owncloud/android)
     - [ownCloud iOS app](https://github.com/owncloud/ios-app)
     - [ownCloud Desktop Syncing Client](https://github.com/owncloud/client)

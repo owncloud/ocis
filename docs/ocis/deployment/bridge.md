@@ -103,26 +103,26 @@ $ ldapsearch -x -H ldap://localhost:9125 -b dc=example,dc=com -D "cn=admin,dc=ex
 
 > Note: This is currently a readonly implementation and minimal to the usecase of authenticating users with konnectd.
 
-### Start ocis-phoenix
+### Start ocis-web
 
 #### Get it!
 
 In an `ocis` folder
 ```
-$ git clone git@github.com:owncloud/ocis-phoenix.git
-$ cd ocis-phoenix
+$ git clone git@github.com:owncloud/ocis.git
+$ cd web
 $ make
 ```
-This should give you a `bin/ocis-phoenix` binary. Try listing the help with `bin/ocis-phoenix --help`.
+This should give you a `bin/web` binary. Try listing the help with `bin/web --help`.
 
 #### Run it!
 
-Point `ocis-phoenix` to your owncloud domain and tell it where to find the openid connect issuing authority:
+Point `ocis-web` to your owncloud domain and tell it where to find the openid connect issuing authority:
 ```console
-$ bin/ocis-phoenix server --web-config-server https://cloud.example.com --oidc-authority https://192.168.1.100:9130 --oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration --oidc-client-id ocis
+$ bin/web server --web-config-server https://cloud.example.com --oidc-authority https://192.168.1.100:9130 --oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration --oidc-client-id ocis
 ```
 
-`ocis-phoenix` needs to know
+`ocis-web` needs to know
 - `--web-config-server https://cloud.example.com` is ownCloud url with webdav and ocs endpoints (oc10 or ocis)
 - `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-konnectd`, running on port 9130
 - `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, eg. ping identity provides multiple endpoints to separate domains
@@ -179,11 +179,11 @@ clients:
 You will need the `insecure: yes` if you are using self signed certificates.
 
 Replace `cloud.example.com` in the redirect URI with your ownCloud 10 host and port.
-Replace `localhost:9100` in the redirect URIs with your the `ocis-phoenix` host and port.
+Replace `localhost:9100` in the redirect URIs with your `ocis-web` host and port.
 
 #### Run it!
 
-You can now bring up `ocis-connectd` with:
+You can now bring up `ocis-konnectd` with:
 ```console
 $ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
 ```
@@ -243,7 +243,7 @@ $CONFIG = [
 In the above configuration replace
 - `provider-url` with the URL to your `ocis-konnectd` issuer
 - `https://cloud.example.com` with the URL to your ownCloud 10 instance
-- `http://localhost:9100` with the URL to your phoenix instance
+- `http://localhost:9100` with the URL to your ownCloud Web instance
 
 > Note: By default the openidconnect app will use the email of the user to match the user from the oidc userinfo endpoint with the ownCloud account. So make sure your users have a unique primary email.
 
@@ -251,4 +251,4 @@ In the above configuration replace
 
 Aside from the above todos these are the next stepo
 - tie it all together behind `ocis-proxy`
-- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `phoenix` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
+- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.

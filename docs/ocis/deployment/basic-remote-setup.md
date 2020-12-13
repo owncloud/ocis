@@ -29,7 +29,7 @@ Let us assume `your-host` is your remote domain name or IP adress. Add your host
 ```yaml {linenos=table,hl_lines=["15-17",21]}
 # OpenID Connect client registry.
 clients:
-  - id: phoenix
+  - id: web
     name: ownCloud web app
     application_type: web
     insecure: yes
@@ -60,9 +60,9 @@ You need to configure `your-host` in some services to provide the needed public 
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 KONNECTD_ISS=https://your-server:9200 \
 REVA_OIDC_ISSUER=https://your-server:9200 \
-PHOENIX_OIDC_AUTHORITY=https://your-server:9200 \
-PHOENIX_WEB_CONFIG_SERVER=https://your-server:9200 \
-PHOENIX_OIDC_METADATA_URL=https://your-server:9200/.well-known/openid-configuration \
+WEB_OIDC_AUTHORITY=https://your-server:9200 \
+WEB_UI_CONFIG_SERVER=https://your-server:9200 \
+WEB_OIDC_METADATA_URL=https://your-server:9200/.well-known/openid-configuration \
 REVA_DATAGATEWAY_URL=https://your-server:9200/data \
 REVA_FRONTEND_URL=https://your-server:9200 \
 PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \

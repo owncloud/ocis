@@ -81,7 +81,7 @@ class OIDCProvider implements types.AuthProvider {
                 params: [this.account.login, this.account.password, '1'],
                 hello: {
                     scope: 'openid profile email',
-                    client_id: 'phoenix',
+                    client_id: 'web',
                     redirect_uri: this.redirectUri,
                     flow: 'oidc',
                 },
@@ -106,7 +106,7 @@ class OIDCProvider implements types.AuthProvider {
 
     private getCode(continueURI: string): string {
         const authorizeUri = `${continueURI}?${queryString.stringify({
-            client_id: 'phoenix',
+            client_id: 'web',
             prompt: 'none',
             redirect_uri: this.redirectUri,
             response_mode: 'query',
@@ -128,7 +128,7 @@ class OIDCProvider implements types.AuthProvider {
 
     private getToken(code: string): types.Token {
         const tokenResponse = http.post(this.tokenUrl, {
-            client_id: 'phoenix',
+            client_id: 'web',
             code,
             redirect_uri: this.redirectUri,
             grant_type: 'authorization_code',

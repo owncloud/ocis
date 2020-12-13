@@ -50,7 +50,7 @@ function getConfigFromEnv() {
     'dbpassword' => getenv('OWNCLOUD_DB_PASSWORD'),
     'dbtableprefix' => getenv('OWNCLOUD_DB_PREFIX'),
 
-    'phoenix.baseUrl' => getenv('OCIS_DOMAIN'),
+    'web.baseUrl' => getenv('OCIS_DOMAIN'),
     'cors.allowed-domains' => [getenv('OCIS_DOMAIN')],
 
     'log_type' => 'owncloud',

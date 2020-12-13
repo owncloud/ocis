@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ -z "$PHOENIX_PATH" ]
+if [ -z "$WEB_PATH" ]
 then
-	echo "PHOENIX_PATH env variable is not set, cannot find files for tests infrastructure"
+	echo "WEB_PATH env variable is not set, cannot find files for tests infrastructure"
 	exit 1
 fi
 
@@ -12,9 +12,9 @@ then
 	exit 1
 fi
 
-if [ -z "$PHOENIX_CONFIG" ]
+if [ -z "$WEB_UI_CONFIG" ]
 then
-	echo "PHOENIX_CONFIG env variable is not set, cannot find phoenix config file"
+	echo "WEB_UI_CONFIG env variable is not set, cannot find web config file"
 	exit 1
 fi
 
@@ -46,7 +46,7 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$PHOENIX_PATH"/tests ./"$testFolder"
+cp -r "$WEB_PATH"/tests ./"$testFolder"
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}

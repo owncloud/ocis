@@ -1,0 +1,24 @@
+---
+debug:
+  addr: 0.0.0.0:9104
+  token:
+  pprof: false
+  zpages: false
+
+http:
+  addr: 0.0.0.0:9100
+
+tracing:
+  enabled: false
+  type: jaeger
+  endpoint: localhost:6831
+  collector: http://localhost:14268/api/traces
+  service: web
+
+asset:
+  path:
+
+config:
+  file:
+
+...
