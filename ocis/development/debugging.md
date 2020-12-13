@@ -13,7 +13,7 @@ geekdocFilePath: debugging.md
 
 As a single binary for easy deployment running `ocis server` just forks itself to start all the services, which makes debugging those processes a little harder.
 
-Ultimately, we want to be able to stop a single service using eg. `ocis kill phoenix` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
+Ultimately, we want to be able to stop a single service using eg. `ocis kill web` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
 
 ### Start ocis
 
@@ -46,7 +46,7 @@ Run the debug binary with `OCIS_LOG_LEVEL=debug bin/ocis-debug server` and then 
 12981 pts/1    Sl     0:00 bin/ocis-debug web
 12993 pts/1    Sl     0:00 bin/ocis-debug api
 12998 pts/1    Sl     0:00 bin/ocis-debug registry
-13004 pts/1    Sl     0:00 bin/ocis-debug phoenix
+13004 pts/1    Sl     0:00 bin/ocis-debug web
 13015 pts/1    Sl     0:00 bin/ocis-debug reva-auth-basic
 ```
 
@@ -83,7 +83,7 @@ bin/ocis --log-level=$LOG_LEVEL graph &
 #bin/ocis --log-level=$LOG_LEVEL hello &
 bin/ocis --log-level=$LOG_LEVEL konnectd &
 #bin/ocis --log-level=$LOG_LEVEL ocs &
-bin/ocis --log-level=$LOG_LEVEL phoenix &
+bin/ocis --log-level=$LOG_LEVEL web &
 bin/ocis --log-level=$LOG_LEVEL reva-auth-basic &
 bin/ocis --log-level=$LOG_LEVEL reva-auth-bearer &
 bin/ocis --log-level=$LOG_LEVEL reva-frontend &
@@ -125,7 +125,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 12981 pts/1    Sl     0:00 bin/ocis-debug web
 12993 pts/1    Sl     0:00 bin/ocis-debug api
 12998 pts/1    Sl     0:00 bin/ocis-debug registry
-13004 pts/1    Sl     0:00 bin/ocis-debug phoenix
+13004 pts/1    Sl     0:00 bin/ocis-debug web
 13015 pts/1    Sl     0:00 bin/ocis-debug reva-auth-basic
 ```
 
@@ -144,7 +144,7 @@ We recommend you collect all related information in a single file or in a github
 > Error while sharing.
 > error sending a grpc stat request
 
-This popped up when I tried to add `marie` as a collaborator in phoenix. That triggers a request to the server which I copied as curl. We can strip a lot of headers and the gist of it is:
+This popped up when I tried to add `marie` as a collaborator in ownCloud Web. That triggers a request to the server which I copied as curl. We can strip a lot of headers and the gist of it is:
 
 ```console
 # curl 'https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares' -d 'shareType=0&shareWith=marie&path=%2FNeuer+Ordner&permissions=1' -u einstein:relativity -k -v | xmllint -format -

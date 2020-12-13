@@ -66,7 +66,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
-  # ownCloud Web openid connect client id. Defaults to "ocis-phoenix"
+  # ownCloud Web openid connect client id. Defaults to "ocis-web"
   OCIS_OIDC_CLIENT_ID=
 
   ### Keycloak ###
@@ -107,7 +107,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   `docker-compose up -d`
 
-* Visit the Keycloak administration console on your configured domain. Go to clients settings and add a client. The client id is `ocis-phoenix` or the one you changed it to. The client protocol is openid-connect. The root url for the client is the url you selected for oCIS. Then save the client.
+* Visit the Keycloak administration console on your configured domain. Go to clients settings and add a client. The client id is `ocis-web` or the one you changed it to. The client protocol is openid-connect. The root url for the client is the url you selected for oCIS. Then save the client.
 
 * You may also add users to Keycloak
 
@@ -130,7 +130,7 @@ After that you're ready to start the application stack:
 `docker-compose up -d`
 
 Open https://keycloak.owncloud.test in your browser and accept the invalid certificate warning.
-Go to clients settings and add a client. The client id is `ocis-phoenix` or the one you changed it to. The client protocol is openid-connect. THe root url for the client is `https://ocis.owncloud.test`. Then save the client.
+Go to clients settings and add a client. The client id is `ocis-web` or the one you changed it to. The client protocol is openid-connect. THe root url for the client is `https://ocis.owncloud.test`. Then save the client.
 
 * You may also add users to Keycloak
 

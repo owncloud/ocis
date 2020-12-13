@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-13T16:57:57+0000"
+date: "2020-12-13T19:43:32+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -32,6 +32,21 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings ocis-settings
+
+Provide settings and permissions for oCIS
+
+Usage: `settings ocis-settings [command options] [arguments...]`
+
+--log-level | $SETTINGS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $SETTINGS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $SETTINGS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### settings version
 
@@ -116,19 +131,4 @@ Usage: `settings server [command options] [arguments...]`
 
 --jwt-secret | $SETTINGS_JWT_SECRET  
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
-
-### settings ocis-settings
-
-Provide settings and permissions for oCIS
-
-Usage: `settings ocis-settings [command options] [arguments...]`
-
---log-level | $SETTINGS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $SETTINGS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $SETTINGS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
