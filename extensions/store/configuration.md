@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-13T19:43:33+0000"
+date: "2020-12-14T11:55:10+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -32,36 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store ocis-store
-
-Service to store values for ocis extensions
-
-Usage: `store ocis-store [command options] [arguments...]`
-
---config-file | $STORE_CONFIG_FILE  
-: Path to config file.
-
---log-level | $STORE_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $STORE_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $STORE_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
---grpc-namespace | $STORE_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $STORE_NAME  
-: Service name. Default: `store`.
 
 ### store health
 
@@ -112,5 +82,35 @@ Usage: `store server [command options] [arguments...]`
 : Service name. Default: `store`.
 
 --data-path | $STORE_DATA_PATH  
-: location of the store data path. Default: `/var/tmp/ocis-store`.
+: location of the store data path. Default: `/var/tmp/ocis/store`.
+
+### store ocis-store
+
+Service to store values for ocis extensions
+
+Usage: `store ocis-store [command options] [arguments...]`
+
+--config-file | $STORE_CONFIG_FILE  
+: Path to config file.
+
+--log-level | $STORE_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $STORE_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $STORE_LOG_COLOR  
+: Enable colored logging. Default: `true`.
+
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+--grpc-namespace | $STORE_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $STORE_NAME  
+: Service name. Default: `store`.
 

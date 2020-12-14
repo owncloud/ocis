@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-13T19:43:24+0000"
+date: "2020-12-14T11:55:00+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -32,21 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### glauth ocis-glauth
-
-Serve GLAuth API for oCIS
-
-Usage: `glauth ocis-glauth [command options] [arguments...]`
-
---log-level | $GLAUTH_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $GLAUTH_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $GLAUTH_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### glauth health
 
@@ -155,4 +140,19 @@ Usage: `glauth server [command options] [arguments...]`
 
 --fallback-use-graphapi | $GLAUTH_FALLBACK_USE_GRAPHAPI  
 : use Graph API, only for owncloud datastore. Default: `true`.
+
+### glauth ocis-glauth
+
+Serve GLAuth API for oCIS
+
+Usage: `glauth ocis-glauth [command options] [arguments...]`
+
+--log-level | $GLAUTH_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $GLAUTH_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $GLAUTH_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
