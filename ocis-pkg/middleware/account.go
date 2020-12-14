@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -46,7 +47,8 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token := r.Header.Get("x-access-token")
 			if len(token) == 0 {
-				ctx := metadata.Set(r.Context(), RoleIDs, "")
+				roleIDsJSON, _ := json.Marshal([]string{})
+				ctx := metadata.Set(r.Context(), RoleIDs, string(roleIDsJSON))
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
