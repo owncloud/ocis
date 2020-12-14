@@ -66,7 +66,6 @@
 * Change - Update reva to v1.4.1-0.20201209113234-e791b5599a89: [#1089](https://github.com/owncloud/ocis/pull/1089)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
-* Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
 * Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
 * Enhancement - Add basic auth option: [#627](https://github.com/owncloud/ocis/pull/627)
@@ -717,18 +716,6 @@
    We moved settings and accounts to the user menu.
 
    https://github.com/owncloud/ocis/pull/656
-
-* Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
-
-   Tags: accounts, settings, web
-
-   We now set http caching headers for static web assets, so that they don't get force-reloaded on
-   each request. The max-age for the caching is configurable and defaults to 7 days. The last
-   modified date of the assets is set to the service start date, so that a service restart results in
-   cache invalidation.
-
-   https://github.com/owncloud/ocis/pull/866
-   https://github.com/owncloud/ocis/pull/934
 
 * Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
 
