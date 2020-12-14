@@ -2,7 +2,7 @@
 
 # OpenID Connect client registry.
 clients:
-  - id: phoenix
+  - id: web
     name: ownCloud web app
     trusted: yes
     insecure: yes
