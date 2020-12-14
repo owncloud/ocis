@@ -13,7 +13,6 @@ import (
 	cli "github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
-	"github.com/micro/micro/v2/client/web"
 	"github.com/micro/micro/v2/service/registry"
 
 	"github.com/refs/pman/pkg/process"
@@ -26,8 +25,8 @@ var (
 
 	// MicroServices to start as part of the fullstack option
 	MicroServices = []string{
-		"api",      // :8080
-		"web",      // :8082
+		"api", // :8080
+		//"web",      // :8082
 		"registry", // :8000
 	}
 
@@ -146,7 +145,7 @@ func AddMicroPlatform(app *cli.App, opts micro.Options) {
 	setDefaults()
 
 	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
-	app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
+	//app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
 	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
 }
 
@@ -158,8 +157,8 @@ func setDefaults() {
 	api.HeaderPrefix = "X-Micro-Owncloud-"
 
 	// web
-	web.Name = OwncloudNamespace + "web"
-	web.Namespace = OwncloudNamespace + "web"
+	//web.Name = OwncloudNamespace + "web"
+	//web.Namespace = OwncloudNamespace + "web"
 
 	// registry
 	registry.Name = OwncloudNamespace + "registry"
