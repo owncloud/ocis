@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-14T13:41:15+0000"
+date: "2020-12-14T14:45:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -32,18 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### konnectd version
-
-Print the versions of the running instances
-
-Usage: `konnectd version [command options] [arguments...]`
-
---http-namespace | $KONNECTD_HTTP_NAMESPACE  
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
---name | $KONNECTD_NAME  
-: Service name. Default: `konnectd`.
 
 ### konnectd health
 
@@ -182,4 +170,16 @@ Usage: `konnectd ocis-konnectd [command options] [arguments...]`
 
 --log-color | $KONNECTD_LOG_COLOR  
 : Enable colored logging. Default: `true`.
+
+### konnectd version
+
+Print the versions of the running instances
+
+Usage: `konnectd version [command options] [arguments...]`
+
+--http-namespace | $KONNECTD_HTTP_NAMESPACE  
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+--name | $KONNECTD_NAME  
+: Service name. Default: `konnectd`.
 
