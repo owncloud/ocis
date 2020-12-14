@@ -63,6 +63,7 @@
 * Change - Update phoenix to v0.28.0: [#1027](https://github.com/owncloud/ocis/pull/1027)
 * Change - Update phoenix to v0.29.0: [#1034](https://github.com/owncloud/ocis/pull/1034)
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
+* Change - Update reva to v1.4.1-0.20201209113234-e791b5599a89: [#1089](https://github.com/owncloud/ocis/pull/1089)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Change - Caching for static web assets: [#866](https://github.com/owncloud/ocis/pull/866)
@@ -694,6 +695,12 @@
    https://github.com/owncloud/ocis/pull/337
    https://github.com/owncloud/ocis/pull/338
    https://github.com/owncloud/ocis-reva/pull/891
+
+* Change - Update reva to v1.4.1-0.20201209113234-e791b5599a89: [#1089](https://github.com/owncloud/ocis/pull/1089)
+
+   Updated reva to v1.4.1-0.20201209113234-e791b5599a89
+
+   https://github.com/owncloud/ocis/pull/1089
 
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 
