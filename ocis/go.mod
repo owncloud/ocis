@@ -21,7 +21,6 @@ require (
 	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
-	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-pkg v0.1.0
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/onlyoffice v0.0.0-00010101000000-000000000000
@@ -30,6 +29,7 @@ require (
 	github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df
 	github.com/owncloud/ocis/store v0.0.0-20200918125107-fcca9faa81c8
 	github.com/owncloud/ocis/thumbnails v0.1.6
+	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
 	github.com/refs/pman v0.0.0-20200701173654-f05b8833071a
 	github.com/restic/calens v0.2.0
@@ -42,7 +42,6 @@ replace (
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/konnectd => ../konnectd
-	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/ocs => ../ocs
 	github.com/owncloud/ocis/onlyoffice => ../onlyoffice
@@ -51,6 +50,7 @@ replace (
 	github.com/owncloud/ocis/storage => ../storage
 	github.com/owncloud/ocis/store => ../store
 	github.com/owncloud/ocis/thumbnails => ../thumbnails
+	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/webdav => ../webdav
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 )

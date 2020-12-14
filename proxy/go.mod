@@ -8,9 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f
+	github.com/cs3org/reva v1.4.1-0.20201209113234-e791b5599a89
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/google/uuid v1.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
