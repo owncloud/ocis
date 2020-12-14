@@ -2,11 +2,9 @@ package svc
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -144,9 +142,10 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 		),
 	)
 
+	// TODO: investigate broken caching - https://github.com/owncloud/ocis/issues/1094
 	// we don't have a last modification date of the static assets, so we use the service start date
-	lastModified := time.Now().UTC().Format(http.TimeFormat)
-	expires := time.Now().Add(time.Second * time.Duration(ttl)).UTC().Format(http.TimeFormat)
+	//lastModified := time.Now().UTC().Format(http.TimeFormat)
+	//expires := time.Now().Add(time.Second * time.Duration(ttl)).UTC().Format(http.TimeFormat)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if rootWithSlash != "/" && r.URL.Path == p.config.HTTP.Root {
@@ -169,9 +168,13 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
-		w.Header().Set("Expires", expires)
-		w.Header().Set("Last-Modified", lastModified)
+		// TODO: investigate broken caching - https://github.com/owncloud/ocis/issues/1094
+		//w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
+		//w.Header().Set("Expires", expires)
+		//w.Header().Set("Last-Modified", lastModified)
+		w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate, value")
+		w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
+		w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
 
 		static.ServeHTTP(w, r)
 	}
