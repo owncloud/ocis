@@ -72,9 +72,13 @@ func (g Service) RegisterDefaultRoles() {
 // SaveBundle implements the BundleServiceHandler interface
 func (g Service) SaveBundle(ctx context.Context, req *proto.SaveBundleRequest, res *proto.SaveBundleResponse) error {
 	cleanUpResource(ctx, req.Bundle.Resource)
+	if err := g.checkStaticPermissionsByBundleType(ctx, req.Bundle.Type); err != nil {
+		return err
+	}
 	if validationError := validateSaveBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
+
 	r, err := g.manager.WriteBundle(req.Bundle)
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
@@ -164,9 +168,13 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *proto.Bundle) *prot
 // AddSettingToBundle implements the BundleServiceHandler interface
 func (g Service) AddSettingToBundle(ctx context.Context, req *proto.AddSettingToBundleRequest, res *proto.AddSettingToBundleResponse) error {
 	cleanUpResource(ctx, req.Setting.Resource)
+	if err := g.checkStaticPermissionsByBundleID(ctx, req.BundleId); err != nil {
+		return err
+	}
 	if validationError := validateAddSettingToBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
+
 	r, err := g.manager.AddSettingToBundle(req.BundleId, req.Setting)
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
@@ -177,9 +185,13 @@ func (g Service) AddSettingToBundle(ctx context.Context, req *proto.AddSettingTo
 
 // RemoveSettingFromBundle implements the BundleServiceHandler interface
 func (g Service) RemoveSettingFromBundle(ctx context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
+	if err := g.checkStaticPermissionsByBundleID(ctx, req.BundleId); err != nil {
+		return err
+	}
 	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
+
 	if err := g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId); err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -297,8 +309,8 @@ func (g Service) ListRoleAssignments(ctx context.Context, req *proto.ListRoleAss
 
 // AssignRoleToUser implements the RoleServiceHandler interface
 func (g Service) AssignRoleToUser(ctx context.Context, req *proto.AssignRoleToUserRequest, res *proto.AssignRoleToUserResponse) error {
-	if !g.hasRoleManagementPermission(ctx) {
-		return merrors.Forbidden(g.id, "the user is not allowed to assign roles")
+	if err := g.checkStaticPermissionsByBundleType(ctx, proto.Bundle_TYPE_ROLE); err != nil {
+		return err
 	}
 
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
@@ -315,8 +327,8 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *proto.AssignRoleToUs
 
 // RemoveRoleFromUser implements the RoleServiceHandler interface
 func (g Service) RemoveRoleFromUser(ctx context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
-	if !g.hasRoleManagementPermission(ctx) {
-		return merrors.Forbidden(g.id, "the user is not allowed to assign roles")
+	if err := g.checkStaticPermissionsByBundleType(ctx, proto.Bundle_TYPE_ROLE); err != nil {
+		return err
 	}
 
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
@@ -406,7 +418,7 @@ func (g Service) getValueWithIdentifier(value *proto.Value) (*proto.ValueWithIde
 	}, nil
 }
 
-func (g Service) hasRoleManagementPermission(ctx context.Context) bool {
+func (g Service) hasStaticPermission(ctx context.Context, permissionID string) bool {
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
 		/**
@@ -420,6 +432,27 @@ func (g Service) hasRoleManagementPermission(ctx context.Context) bool {
 		// tracked as OCIS-454
 		return true
 	}
-	p, err := g.manager.ReadPermissionByID(RoleManagementPermissionID, roleIDs)
+	p, err := g.manager.ReadPermissionByID(permissionID, roleIDs)
 	return err == nil && p != nil
+}
+
+func (g Service) checkStaticPermissionsByBundleID(ctx context.Context, bundleID string) error {
+	bundle, err := g.manager.ReadBundle(bundleID)
+	if err != nil {
+		return merrors.NotFound(g.id, "bundle not found: %s", err)
+	}
+	return g.checkStaticPermissionsByBundleType(ctx, bundle.Type)
+}
+
+func (g Service) checkStaticPermissionsByBundleType(ctx context.Context, bundleType proto.Bundle_Type) error {
+	if bundleType == proto.Bundle_TYPE_ROLE {
+		if !g.hasStaticPermission(ctx, RoleManagementPermissionID) {
+			return merrors.Forbidden(g.id, "user has no role management permission")
+		}
+		return nil
+	}
+	if !g.hasStaticPermission(ctx, SettingsManagementPermissionID) {
+		return merrors.Forbidden(g.id, "user has no settings management permission")
+	}
+	return nil
 }

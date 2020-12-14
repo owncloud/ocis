@@ -46,7 +46,8 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token := r.Header.Get("x-access-token")
 			if len(token) == 0 {
-				next.ServeHTTP(w, r)
+				ctx := metadata.Set(r.Context(), RoleIDs, "")
+				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
 
