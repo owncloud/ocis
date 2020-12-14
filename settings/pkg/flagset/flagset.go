@@ -173,7 +173,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
-			Value:       "/var/tmp/ocis-settings",
+			Value:       "/var/tmp/ocis/settings",
 			Usage:       "Mount path for the storage",
 			EnvVars:     []string{"SETTINGS_DATA_PATH"},
 			Destination: &cfg.Service.DataPath,

@@ -51,7 +51,7 @@ cp -r "$WEB_PATH/tests" "./$testFolder"
 export NODE_TLS_REJECT_UNAUTHORIZED='0'
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
-export OCIS_SETTINGS_STORE=${OCIS_SETTINGS_STORE:-"/var/tmp/ocis-settings"}
+export OCIS_SETTINGS_STORE=${OCIS_SETTINGS_STORE:-"/var/tmp/ocis/settings"}
 export RUN_ON_OCIS=true
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 

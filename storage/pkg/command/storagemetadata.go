@@ -111,6 +111,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 								"driver":          cfg.Reva.StorageMetadata.Driver,
 								"drivers":         drivers(cfg),
 								"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
+								"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
 							},
 						},
 					},

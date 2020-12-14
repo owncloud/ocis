@@ -44,7 +44,7 @@ services:
       # make accounts use ocis storage driver
       # TODO provision metadata storage in eos and switch to cs3 backend for accounts
       ACCOUNTS_LOG_LEVEL: debug
-      ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis-accounts
+      ACCOUNTS_STORAGE_DISK_PATH: /var/tmp/ocis/accounts
       # TODO make id the default in ocis-storage
       STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-localhost}:9200

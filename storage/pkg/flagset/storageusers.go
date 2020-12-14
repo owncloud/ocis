@@ -108,6 +108,13 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_HTTP_PREFIX"},
 			Destination: &cfg.Reva.StorageUsers.HTTPPrefix,
 		},
+		&cli.StringFlag{
+			Name:        "tmp-folder",
+			Value:       "/var/tmp/ocis/tmp/users",
+			Usage:       "path to tmp folder",
+			EnvVars:     []string{"STORAGE_USERS_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageUsers.TempFolder,
+		},
 
 		// some drivers need to look up users at the gateway
 

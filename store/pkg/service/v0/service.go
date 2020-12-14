@@ -242,7 +242,7 @@ func (s *Service) Tables(ctx context.Context, in *proto.TablesRequest, out *prot
 }
 
 // TODO sanitize key. As it may contain invalid characters, such as slashes.
-// file: /var/tmp/ocis-store/databases/{database}/{table}/{record.key}.
+// file: /var/tmp/ocis/store/databases/{database}/{table}/{record.key}.
 func getID(database string, table string, key string) string {
 	// TODO sanitize input.
 	return filepath.Join(database, table, key)

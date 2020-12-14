@@ -36,9 +36,10 @@ type StorageRegistry struct {
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver   string
-	UserJSONFile string
-	PublicDriver string
+	UserDriver     string
+	UserJSONFile   string
+	PublicDriver   string
+	PublicJSONFile string
 }
 
 // Port defines the available port configuration.
@@ -82,7 +83,7 @@ type FrontendPort struct {
 	DatagatewayPrefix string
 	OCDavPrefix       string
 	OCSPrefix         string
-	OCSSharePrefix	  string
+	OCSSharePrefix    string
 	PublicURL         string
 	Middleware        Middleware
 }
@@ -282,6 +283,7 @@ type LDAPSchema struct {
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
+	ChunkFolder       string
 	WebdavNamespace   string
 	DavFilesNamespace string
 }
