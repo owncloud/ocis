@@ -38,6 +38,7 @@
 * Change - Add cli-commands to manage accounts: [#115](https://github.com/owncloud/product/issues/115)
 * Change - Start ocis-accounts with the ocis server command: [#25](https://github.com/owncloud/product/issues/25)
 * Change - Properly style konnectd consent page: [#754](https://github.com/owncloud/ocis/pull/754)
+* Change - Make all paths configurable and default to a common temp dir: [#1080](https://github.com/owncloud/ocis/pull/1080)
 * Change - Move the indexer package from ocis/accounts to ocis/ocis-pkg: [#794](https://github.com/owncloud/ocis/pull/794)
 * Change - Switch over to a new custom-built runtime: [#287](https://github.com/owncloud/ocis/pull/287)
 * Change - Move ocis default config to root level: [#842](https://github.com/owncloud/ocis/pull/842)
@@ -434,6 +435,13 @@
    text is visible and button reflects our theme.
 
    https://github.com/owncloud/ocis/pull/754
+
+* Change - Make all paths configurable and default to a common temp dir: [#1080](https://github.com/owncloud/ocis/pull/1080)
+
+   Aligned all services to use a dir following`/var/tmp/ocis/<service>/...` by default. Also
+   made some missing temp paths configurable via env vars and config flags.
+
+   https://github.com/owncloud/ocis/pull/1080
 
 * Change - Move the indexer package from ocis/accounts to ocis/ocis-pkg: [#794](https://github.com/owncloud/ocis/pull/794)
 
