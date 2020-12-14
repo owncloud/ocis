@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-14T14:45:58+0000"
+date: "2020-12-14T14:53:39+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -32,15 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
---debug-addr | $SETTINGS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9194`.
 
 ### settings server
 
@@ -131,4 +122,13 @@ Usage: `settings version [command options] [arguments...]`
 
 --name | $SETTINGS_NAME  
 : service name. Default: `settings`.
+
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+--debug-addr | $SETTINGS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9194`.
 
