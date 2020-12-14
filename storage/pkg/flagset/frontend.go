@@ -73,6 +73,9 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_HTTP_ADDR"},
 			Destination: &cfg.Reva.Frontend.HTTPAddr,
 		},
+		// please note that STORAGE_FRONTEND_PUBLIC_URL is also defined in
+		// storage/pkg/flagset/gateway.go because this setting may be consumed
+		// by both the gateway and frontend service
 		&cli.StringFlag{
 			Name:        "public-url",
 			Value:       "https://localhost:9200",
