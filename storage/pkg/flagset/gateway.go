@@ -139,6 +139,9 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageRegistry.HomeProvider,
 		},
 
+		// please note that STORAGE_FRONTEND_PUBLIC_URL is also defined in
+		// storage/pkg/flagset/frontend.go because this setting may be consumed
+		// by both the gateway and frontend service
 		&cli.StringFlag{
 			Name:        "public-url",
 			Value:       "https://localhost:9200",
