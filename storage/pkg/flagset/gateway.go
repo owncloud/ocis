@@ -140,6 +140,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		&cli.StringFlag{
+			Name:        "public-url",
+			Value:       "https://localhost:9200",
+			Usage:       "URL to use for the storage service",
+			EnvVars:     []string{"STORAGE_FRONTEND_PUBLIC_URL"},
+			Destination: &cfg.Reva.Frontend.PublicURL,
+		},
+		&cli.StringFlag{
 			Name:        "datagateway-url",
 			Value:       "https://localhost:9200/data",
 			Usage:       "URL to use for the storage datagateway",
