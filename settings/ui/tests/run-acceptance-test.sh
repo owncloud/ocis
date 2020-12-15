@@ -14,7 +14,7 @@ fi
 
 if [ -z "$WEB_UI_CONFIG" ]
 then
-	echo "WEB_UI_CONFIG env variable is not set, cannot find ownCloud Web config file"
+	echo "WEB_UI_CONFIG env variable is not set, cannot find web config file"
 	exit 1
 fi
 
@@ -29,7 +29,7 @@ trap clean_up SIGHUP SIGINT SIGTERM
 if [ -z "$TEST_INFRA_DIRECTORY" ]
 then
 	cleanup=true
-	testFolder=$(cat < /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+	testFolder=$(mktemp -d)
 	printf "creating folder $testFolder for Test infrastructure setup\n\n"
 	export TEST_INFRA_DIRECTORY=$testFolder
 fi
@@ -46,13 +46,10 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$WEB_PATH/tests" "./$testFolder"
+cp -r "$WEB_PATH"/tests "$testFolder"
 
-export NODE_TLS_REJECT_UNAUTHORIZED='0'
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
-export OCIS_SETTINGS_STORE=${OCIS_SETTINGS_STORE:-"/var/tmp/ocis/settings"}
-export RUN_ON_OCIS=true
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 
 yarn run acceptance-tests "$1"

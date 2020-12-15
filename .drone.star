@@ -1410,6 +1410,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'OCIS_LOG_LEVEL': 'warn',
+    'SETTINGS_DATA_PATH': '/srv/app/tmp/ocis/settings',
   }
 
   # Pass in "default" accounts_hash_difficulty to not set this environment variable.

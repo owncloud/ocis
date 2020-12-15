@@ -32,7 +32,7 @@ const accountMenu = {
     'Log out'
   ],
   Deutsch: [
-    'Profile',
+    'Profil',
     'Settings',
     'Abmelden'
   ],
