@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-15T11:32:31+0000"
+date: "2020-12-15T11:39:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
