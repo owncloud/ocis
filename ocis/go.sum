@@ -1287,6 +1287,8 @@ github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqn
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/refs/pman v0.0.0-20200701173654-f05b8833071a h1:GCYFb7layULUl1HvZG97ur0zyqtEPo3VHcJCcBSvk7M=
 github.com/refs/pman v0.0.0-20200701173654-f05b8833071a/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
+github.com/refs/pman v0.0.0-20201214134707-9ce4dcebbbf8 h1:7Pz7RrqgDeEp/nTGK55clOWODZ4+2D7J5K0VFOiYHU0=
+github.com/refs/pman v0.0.0-20201214134707-9ce4dcebbbf8/go.mod h1:EHI7tmxO5Ct3xBLHU43j51o5/U6VQz0TM6ik8RPE570=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/restic/calens v0.1.0/go.mod h1:u67f5msOjCTDYNzOf/NoAUSdmXP03YXPCwIQLYADy5M=
