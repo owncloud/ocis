@@ -709,27 +709,9 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
           }]
       },
     ],
-    'services': [
-      {
-        'name': 'redis',
-        'image': 'webhippie/redis',
-        'pull': 'always',
-        'environment': {
-          'REDIS_DATABASES': 1
-        },
-      },
-      {
-        'name': 'selenium',
-        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
-        'pull': 'always',
-        'volumes': [
-          {
-            'name': 'uploads',
-            'path': '/uploads'
-          }
-        ],
-      },
-    ],
+    'services':
+      redis() +
+      selenium(),
     'volumes':
       [stepVolumeOC10Tests] +
       [{
