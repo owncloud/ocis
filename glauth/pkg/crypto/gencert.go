@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"net"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -45,6 +46,14 @@ func pemBlockForKey(priv interface{}, l log.Logger) *pem.Block {
 func GenCert(certName string, keyName string, l log.Logger) error {
 	var priv interface{}
 	var err error
+
+	_, certErr := os.Stat(certName)
+	_, keyErr := os.Stat(keyName)
+
+	if certErr == nil || keyErr == nil {
+		l.Debug().Msg("LDAPS certificate or key already present, using these")
+		return nil
+	}
 
 	priv, err = rsa.GenerateKey(rand.Reader, 2048)
 
@@ -92,6 +101,14 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 		l.Fatal().Err(err).Msg("Failed to create certificate")
 	}
 
+	certPath := filepath.Dir(certName)
+	if _, err := os.Stat(certPath); os.IsNotExist(err) {
+		err = os.MkdirAll(certPath, 0700)
+		if err != nil {
+			l.Fatal().Err(err).Msg("Failed to create path " + certPath)
+		}
+	}
+
 	certOut, err := os.Create(certName)
 	if err != nil {
 		l.Fatal().Err(err).Msgf("Failed to open %v for writing", certName)
@@ -105,6 +122,14 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 		l.Fatal().Err(err).Msg("Failed to write cert")
 	}
 	l.Info().Msg("Written server.crt")
+
+	keyPath := filepath.Dir(keyName)
+	if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+		err = os.MkdirAll(keyPath, 0700)
+		if err != nil {
+			l.Fatal().Err(err).Msg("Failed to create path " + keyPath)
+		}
+	}
 
 	keyOut, err := os.OpenFile(keyName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
