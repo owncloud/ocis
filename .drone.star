@@ -1456,6 +1456,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       ],
       'volumes': volumes,
     },
+    {
+      'name': 'wait-for-ocis-server',
+      'image': 'thegeeklab/wait-for:latest',
+      'pull': 'always',
+      'commands': [
+        'wait-for ocis-server:9200 -t 60',
+      ],
+    },
   ]
 
 def cloneCoreRepos(coreBranch, coreCommit):
