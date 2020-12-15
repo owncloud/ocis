@@ -2414,3 +2414,11 @@ apiShareManagementBasicToShares/createShareToSharesFolder.feature:612
 # https://github.com/owncloud/ocis/issues/1012 TUS OPTIONS requests does not reply with TUS headers when invalid password
 apiWebdavUploadTUS/optionsRequest.feature:29
 apiWebdavUploadTUS/optionsRequest.feature:40
+
+# https://github.com/owncloud/ocis/issues/1047 500 Internal Server Error on Post request for TUS upload
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:29
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:30
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:43
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:44
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:57
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:58
