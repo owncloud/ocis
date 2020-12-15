@@ -1475,10 +1475,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       'volumes': volumes,
     },
     {
-      'name': 'wait-for-oCIS',
-      'image': 'owncloud/ubuntu:18.04',
+      'name': 'wait-for-ocis-server',
+      'image': 'thegeeklab/wait-for:latest',
       'pull': 'always',
-      'commands': ['wait-for-it -t 60 ocis-server:9200'],
+      'commands': [
+        'wait-for ocis-server:9200 -t 60',
+      ],
     },
   ]
 
