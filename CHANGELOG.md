@@ -19,6 +19,7 @@
 * Bugfix - Serve index.html for directories: [#912](https://github.com/owncloud/ocis/pull/912)
 * Bugfix - Don't create account if id/mail/username already taken: [#709](https://github.com/owncloud/ocis/pull/709)
 * Bugfix - Fix director selection in proxy: [#521](https://github.com/owncloud/ocis/pull/521)
+* Bugfix - Permission checks for settings write access: [#1092](https://github.com/owncloud/ocis/pull/1092)
 * Bugfix - Fix minor ui bugs: [#1043](https://github.com/owncloud/ocis/issues/1043)
 * Bugfix - Disable public link expiration by default: [#987](https://github.com/owncloud/ocis/issues/987)
 * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#416](https://github.com/owncloud/ocis/pull/416)
@@ -255,6 +256,16 @@
 
    https://github.com/owncloud/ocis/pull/521
    https://github.com/owncloud/ocis-proxy/pull/99
+
+* Bugfix - Permission checks for settings write access: [#1092](https://github.com/owncloud/ocis/pull/1092)
+
+   Tags: settings
+
+   There were several endpoints with write access to the settings service that were not protected
+   by permission checks. We introduced a generic settings management permission to fix this for
+   now. Will be more fine grained later on.
+
+   https://github.com/owncloud/ocis/pull/1092
 
 * Bugfix - Fix minor ui bugs: [#1043](https://github.com/owncloud/ocis/issues/1043)
 
