@@ -473,8 +473,6 @@ apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:80
 #
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:23
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:24
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:142
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 #
@@ -577,6 +575,8 @@ apiSharePublicLink1/createPublicLinkShare.feature:537
 apiSharePublicLink1/createPublicLinkShare.feature:538
 apiSharePublicLink1/createPublicLinkShare.feature:574
 apiSharePublicLink1/createPublicLinkShare.feature:575
+apiSharePublicLink1/createPublicLinkShare.feature:592
+apiSharePublicLink1/createPublicLinkShare.feature:593
 apiSharePublicLink1/createPublicLinkShare.feature:635
 apiSharePublicLink1/createPublicLinkShare.feature:636
 apiSharePublicLink1/createPublicLinkShare.feature:649
@@ -1566,8 +1566,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:244
 apiWebdavEtagPropagation1/moveFileFolder.feature:245
 apiWebdavEtagPropagation1/moveFileFolder.feature:314
 apiWebdavEtagPropagation1/moveFileFolder.feature:315
-apiWebdavEtagPropagation2/copyFileFolder.feature:158
-apiWebdavEtagPropagation2/copyFileFolder.feature:159
 #
 # https://github.com/owncloud/product/issues/209 Implement Trashbin Feature for ocis storage
 #
@@ -2018,8 +2016,6 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:108
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:109
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:129
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:130
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:157
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:158
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:177
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:178
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:191

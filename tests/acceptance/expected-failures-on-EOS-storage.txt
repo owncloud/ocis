@@ -516,6 +516,9 @@ apiSharePublicLink1/createPublicLinkShare.feature:554
 apiSharePublicLink1/createPublicLinkShare.feature:590
 apiSharePublicLink1/createPublicLinkShare.feature:591
 #
+apiSharePublicLink1/createPublicLinkShare.feature:592
+apiSharePublicLink1/createPublicLinkShare.feature:593
+#
 # https://github.com/owncloud/ocis-reva/issues/283 Prevent creating public share for the home root folder
 apiSharePublicLink1/createPublicLinkShare.feature:620
 apiSharePublicLink1/createPublicLinkShare.feature:621

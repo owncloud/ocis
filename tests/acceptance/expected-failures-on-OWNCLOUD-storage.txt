@@ -449,8 +449,6 @@ apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:80
 #
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:23
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:24
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:142
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
 #
 # https://github.com/owncloud/ocis-reva/issues/282 Split old public API webdav tests from new public webdav tests
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
@@ -539,6 +537,8 @@ apiSharePublicLink1/createPublicLinkShare.feature:537
 apiSharePublicLink1/createPublicLinkShare.feature:538
 apiSharePublicLink1/createPublicLinkShare.feature:574
 apiSharePublicLink1/createPublicLinkShare.feature:575
+apiSharePublicLink1/createPublicLinkShare.feature:592
+apiSharePublicLink1/createPublicLinkShare.feature:593
 apiSharePublicLink1/createPublicLinkShare.feature:635
 apiSharePublicLink1/createPublicLinkShare.feature:636
 apiSharePublicLink1/createPublicLinkShare.feature:649
@@ -1990,8 +1990,6 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:108
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:109
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:129
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:130
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:157
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:158
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:177
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:178
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:191

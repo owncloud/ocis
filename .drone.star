@@ -19,6 +19,8 @@ config = {
     'numberOfParts': 10
   },
   'uiTests': {
+    'webBranch': 'sharing-permission-tests',
+    'webCommit': 'fdbd64dabbebf32cdc013fe74880e7e174c0eff6',
       'suites': {
         'webUIBasic': [
           'webUILogin',
