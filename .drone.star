@@ -20,7 +20,7 @@ config = {
   },
   'uiTests': {
     'webBranch': 'sharing-permission-tests',
-    'webCommit': 'fdbd64dabbebf32cdc013fe74880e7e174c0eff6',
+    'webCommit': 'fab393332ed683e73f87614dc83c9d6a5772b816',
       'suites': {
         'webUIBasic': [
           'webUILogin',
