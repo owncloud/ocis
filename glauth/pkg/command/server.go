@@ -188,7 +188,6 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				if lscfg.Enabled {
-					// GenCert has side effects as it writes 2 files to the binary running location
 					if err := crypto.GenCert(cfg.Ldaps.Cert, cfg.Ldaps.Key, logger); err != nil {
 						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
 					}

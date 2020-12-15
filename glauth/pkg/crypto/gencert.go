@@ -47,6 +47,14 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	var priv interface{}
 	var err error
 
+	_, certErr := os.Stat(certName)
+	_, keyErr := os.Stat(keyName)
+
+	if certErr == nil && keyErr == nil {
+		l.Debug().Msg("LDAPS certificate and key already present, using these")
+		return nil
+	}
+
 	priv, err = rsa.GenerateKey(rand.Reader, 2048)
 
 	if err != nil {
@@ -94,9 +102,6 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	}
 
 	certPath := filepath.Dir(certName)
-	l.Error().Msg("certPath: " + certPath)
-	l.Error().Msg("certName: " + certName)
-
 	if _, err := os.Stat(certPath); os.IsNotExist(err) {
 		err = os.MkdirAll(certPath, 0700)
 		if err != nil {
