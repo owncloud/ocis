@@ -620,14 +620,8 @@ apiSharePublicLink2/updatePublicLinkShare.feature:285
 #
 # https://github.com/owncloud/product/issues/270 [OCIS] share permissions not enforced
 #
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:25
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:26
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:62
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:63
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:77
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:78
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:136
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:137
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:157
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:158
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:179
