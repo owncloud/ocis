@@ -31,6 +31,8 @@ require (
 )
 
 replace (
+	// pr https://github.com/cs3org/reva/pull/1368
+	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201214153639-b976591161c9
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/storage => ../storage
