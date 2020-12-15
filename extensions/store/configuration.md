@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-15T16:21:43+0000"
+date: "2020-12-15T17:00:48+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -32,15 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store health
-
-Check health status
-
-Usage: `store health [command options] [arguments...]`
-
---debug-addr | $STORE_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9460`.
 
 ### store server
 
@@ -113,4 +104,13 @@ Usage: `store version [command options] [arguments...]`
 
 --name | $STORE_NAME  
 : Service name. Default: `store`.
+
+### store health
+
+Check health status
+
+Usage: `store health [command options] [arguments...]`
+
+--debug-addr | $STORE_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9460`.
 
