@@ -1,5 +1,7 @@
-Enhancement: Update reva to github.com/cs3org/reva unsafe => v1.4.1-0.20201214141740-063b3db9162b
+Enhancement: Update reva to unsafe tip
 
-Bring public link removal changes to OCIS.
+- bring public link removal changes to OCIS.
+- fix subcommand name collision from renaming phoenix -> web.
 
 https://github.com/owncloud/ocis/pull/1091
+https://github.com/owncloud/ocis/issues/1098
