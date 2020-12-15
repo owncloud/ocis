@@ -3,7 +3,7 @@ NAME := web
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
-WEB_ASSETS_VERSION = v1.0.0-beta1
+WEB_ASSETS_VERSION = v1.0.0-beta3
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
