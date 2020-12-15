@@ -1,0 +1,27 @@
+services:
+  acceptance-tests:
+    image: owncloudci/php:7.4
+    command: /bin/bash /test/run-tests.sh
+    environment:
+      OCIS_ROOT: /drone/src
+      PATH_TO_CORE: /srv/app/testrunner
+      SKELETON_DIR: /srv/app/tmp/testing/data/apiSkeleton
+      TEST_OCIS: "true"
+      TEST_SERVER_URL: https://ocis-server:9200
+      TESTING_DIR: /srv/app/tmp/testing
+
+      CORE_BRANCH: $CORE_BRANCH
+      CORE_COMMIT: $CORE_COMMIT
+      STORAGE: $STORAGE
+      TEST_SOURCE: $TEST_SOURCE
+      BEHAT_SUITE: ${BEHAT_SUITE:-}
+      BEHAT_FEATURE: ${BEHAT_FEATURE:-}
+      DIVIDE_INTO_NUM_PARTS: $DIVIDE_INTO_NUM_PARTS
+      RUN_PART: $RUN_PART
+    volumes:
+      - ./run-tests.sh:/test/run-tests.sh
+      - oCISownCloud10testsuite:/srv
+      - ../../../../:/drone/src
+
+volumes:
+  oCISownCloud10testsuite:
