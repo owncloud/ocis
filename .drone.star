@@ -1474,6 +1474,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       ],
       'volumes': volumes,
     },
+    {
+      'name': 'wait-for-oCIS',
+      'image': 'owncloud/ubuntu:18.04',
+      'pull': 'always',
+      'commands': ['wait-for-it -t 60 ocis-server:9200'],
+    },
   ]
 
 def cloneCoreRepos(coreBranch, coreCommit):
