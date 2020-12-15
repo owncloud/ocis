@@ -50,8 +50,8 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	_, certErr := os.Stat(certName)
 	_, keyErr := os.Stat(keyName)
 
-	if certErr == nil && keyErr == nil {
-		l.Debug().Msg("LDAPS certificate and key already present, using these")
+	if certErr == nil || keyErr == nil {
+		l.Debug().Msg("LDAPS certificate or key already present, using these")
 		return nil
 	}
 
