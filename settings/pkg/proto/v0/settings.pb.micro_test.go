@@ -382,7 +382,7 @@ func TestGetBundleHavingFullPermissionsOnAnotherRole(t *testing.T) {
 	defer teardown()
 
 	ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
-	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleUser))
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
 
 	saveRequest := proto.SaveBundleRequest{
 		Bundle: &bundleStub,
@@ -392,6 +392,8 @@ func TestGetBundleHavingFullPermissionsOnAnotherRole(t *testing.T) {
 	assert.Equal(t, bundleStub.Id, saveResponse.Bundle.Id)
 
 	setFullReadWriteOnBundleForAdmin(ctx, t, bundleStub.Id)
+
+	ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleUser))
 	getRequest := proto.GetBundleRequest{BundleId: bundleStub.Id}
 	getResponse, err := bundleService.GetBundle(ctx, &getRequest)
 	assert.Empty(t, getResponse)

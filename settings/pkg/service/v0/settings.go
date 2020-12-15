@@ -16,6 +16,11 @@ const (
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
 	// RoleManagementPermissionName is the hardcoded setting name for the role management permission
 	RoleManagementPermissionName string = "role-management"
+
+	// SettingsManagementPermissionID is the hardcoded setting UUID for the settings management permission
+	SettingsManagementPermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
+	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
+	SettingsManagementPermissionName string = "settings-management"
 )
 
 // generateBundlesDefaultRoles bootstraps the default roles.
@@ -78,6 +83,25 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 				Name:        RoleManagementPermissionName,
 				DisplayName: "Role Management",
 				Description: "This permission gives full access to everything that is related to role management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+					Id:   "all",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          SettingsManagementPermissionID,
+				Name:        SettingsManagementPermissionName,
+				DisplayName: "Settings Management",
+				Description: "This permission gives full access to everything that is related to settings management.",
 				Resource: &settings.Resource{
 					Type: settings.Resource_TYPE_USER,
 					Id:   "all",
