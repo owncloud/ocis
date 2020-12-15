@@ -26,8 +26,8 @@ var (
 
 	// MicroServices to start as part of the fullstack option
 	MicroServices = []string{
-		"api",      // :8080
-		"web",      // :8082
+		"api", // :8080
+		//"web",      // :8082
 		"registry", // :8000
 	}
 
@@ -158,8 +158,8 @@ func setDefaults() {
 	api.HeaderPrefix = "X-Micro-Owncloud-"
 
 	// web
-	web.Name = OwncloudNamespace + "web"
-	web.Namespace = OwncloudNamespace + "web"
+	//web.Name = OwncloudNamespace + "web"
+	//web.Namespace = OwncloudNamespace + "web"
 
 	// registry
 	registry.Name = OwncloudNamespace + "registry"
