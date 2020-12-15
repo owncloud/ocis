@@ -730,12 +730,6 @@ apiShareReshareToShares1/reShare.feature:122
 apiShareReshareToShares1/reShare.feature:123
 apiShareReshareToShares1/reShare.feature:124
 apiShareReshareToShares1/reShare.feature:125
-apiShareReshareToShares1/reShare.feature:127
-apiShareReshareToShares1/reShare.feature:128
-apiShareReshareToShares1/reShare.feature:129
-apiShareReshareToShares1/reShare.feature:130
-apiShareReshareToShares1/reShare.feature:131
-apiShareReshareToShares1/reShare.feature:132
 apiShareReshareToShares1/reShare.feature:159
 apiShareReshareToShares1/reShare.feature:160
 apiShareReshareToShares1/reShare.feature:161
@@ -764,14 +758,6 @@ apiShareReshareToShares1/reShare.feature:197
 apiShareReshareToShares1/reShare.feature:198
 apiShareReshareToShares1/reShare.feature:199
 apiShareReshareToShares1/reShare.feature:200
-apiShareReshareToShares1/reShare.feature:202
-apiShareReshareToShares1/reShare.feature:203
-apiShareReshareToShares1/reShare.feature:204
-apiShareReshareToShares1/reShare.feature:205
-apiShareReshareToShares1/reShare.feature:206
-apiShareReshareToShares1/reShare.feature:207
-apiShareReshareToShares1/reShare.feature:208
-apiShareReshareToShares1/reShare.feature:209
 apiShareReshareToShares1/reShare.feature:210
 apiShareReshareToShares1/reShare.feature:211
 apiShareReshareToShares1/reShare.feature:212
@@ -782,8 +768,6 @@ apiShareReshareToShares1/reShare.feature:230
 apiShareReshareToShares1/reShare.feature:231
 apiShareReshareToShares1/reShare.feature:232
 apiShareReshareToShares1/reShare.feature:233
-apiShareReshareToShares1/reShare.feature:235
-apiShareReshareToShares1/reShare.feature:236
 apiShareReshareToShares1/reShare.feature:237
 apiShareReshareToShares1/reShare.feature:238
 apiShareReshareToShares1/reShare.feature:239
@@ -848,14 +832,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:55
 apiShareReshareToShares2/reShareSubfolder.feature:56
 apiShareReshareToShares2/reShareSubfolder.feature:57
 apiShareReshareToShares2/reShareSubfolder.feature:58
-apiShareReshareToShares2/reShareSubfolder.feature:60
-apiShareReshareToShares2/reShareSubfolder.feature:61
-apiShareReshareToShares2/reShareSubfolder.feature:62
-apiShareReshareToShares2/reShareSubfolder.feature:63
-apiShareReshareToShares2/reShareSubfolder.feature:64
-apiShareReshareToShares2/reShareSubfolder.feature:65
-apiShareReshareToShares2/reShareSubfolder.feature:66
-apiShareReshareToShares2/reShareSubfolder.feature:67
 apiShareReshareToShares2/reShareSubfolder.feature:68
 apiShareReshareToShares2/reShareSubfolder.feature:69
 apiShareReshareToShares2/reShareSubfolder.feature:70
@@ -866,8 +842,6 @@ apiShareReshareToShares2/reShareSubfolder.feature:75
 apiShareReshareToShares2/reShareSubfolder.feature:76
 apiShareReshareToShares2/reShareSubfolder.feature:77
 apiShareReshareToShares2/reShareSubfolder.feature:78
-apiShareReshareToShares2/reShareSubfolder.feature:80
-apiShareReshareToShares2/reShareSubfolder.feature:81
 apiShareReshareToShares2/reShareSubfolder.feature:82
 apiShareReshareToShares2/reShareSubfolder.feature:83
 apiShareReshareToShares2/reShareSubfolder.feature:84
@@ -876,12 +850,33 @@ apiShareManagementToShares/mergeShare.feature:24
 apiShareManagementToShares/mergeShare.feature:52
 apiShareManagementToShares/mergeShare.feature:79
 apiShareManagementToShares/mergeShare.feature:99
-
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of reshare can reduce permissions
+# fails because the api request fails
+#
+apiShareReshareToShares3/reShareUpdate.feature:25
+apiShareReshareToShares3/reShareUpdate.feature:26
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of reshare can increase permissions to the maximum allowed
+# fails because the api request fails
+#
+apiShareReshareToShares3/reShareUpdate.feature:42
+apiShareReshareToShares3/reShareUpdate.feature:43
 #
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of user reshare by the original share owner can increase permissions up to the permissions of the top-level share
+#
+apiShareReshareToShares3/reShareUpdate.feature:76
+apiShareReshareToShares3/reShareUpdate.feature:77
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of user reshare by the original share owner can increase permissions to more than the permissions of the top-level share
+#
+apiShareReshareToShares3/reShareUpdate.feature:93
+apiShareReshareToShares3/reShareUpdate.feature:94
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 #

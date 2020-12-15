@@ -759,10 +759,32 @@ apiShareManagementToShares/mergeShare.feature:52
 apiShareManagementToShares/mergeShare.feature:79
 apiShareManagementToShares/mergeShare.feature:99
 #
+# https://github.com/owncloud/ocis-reva/issues/243 Update of reshare can reduce permissions
+# fails because the api request fails
+#
+apiShareReshareToShares3/reShareUpdate.feature:25
+apiShareReshareToShares3/reShareUpdate.feature:26
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of reshare can increase permissions to the maximum allowed
+# fails because the api request fails
+#
+apiShareReshareToShares3/reShareUpdate.feature:42
+apiShareReshareToShares3/reShareUpdate.feature:43
+#
 # https://github.com/owncloud/product/issues/270 share permissions are not enforced
 #
 apiShareReshareToShares3/reShareUpdate.feature:59
 apiShareReshareToShares3/reShareUpdate.feature:60
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of user reshare by the original share owner can increase permissions up to the permissions of the top-level share
+#
+apiShareReshareToShares3/reShareUpdate.feature:76
+apiShareReshareToShares3/reShareUpdate.feature:77
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Update of user reshare by the original share owner can increase permissions to more than the permissions of the top-level share
+#
+apiShareReshareToShares3/reShareUpdate.feature:93
+apiShareReshareToShares3/reShareUpdate.feature:94
 #
 # https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
 #
