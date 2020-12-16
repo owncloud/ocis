@@ -1,4 +1,4 @@
-Enhancement: Update reva to unsafe tip
+Enhancement: Update reva to 063b3db9162b
 
 - bring public link removal changes to OCIS.
 - fix subcommand name collision from renaming phoenix -> web.
