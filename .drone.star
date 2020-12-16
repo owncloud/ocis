@@ -624,11 +624,11 @@ def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
-          'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
           'cd /srv/app/web',
         ] + ([
           'git checkout %s' % (webCommit)
         ] if webCommit != '' else []) + [
+          'cp -r tests/acceptance/filesForUpload/* /uploads',
           'yarn install-all',
           'yarn run acceptance-tests-drone'
         ],
@@ -691,11 +691,11 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
         'commands': [
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
-          'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
           'cd /srv/app/web',
         ] + ([
           'git checkout %s' % (webCommit)
         ] if webCommit != '' else []) + [
+          'cp -r tests/acceptance/filesForUpload/* /uploads',
           'yarn install-all',
           'cd /drone/src/accounts',
           'yarn install --all',
