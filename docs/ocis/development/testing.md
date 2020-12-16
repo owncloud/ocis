@@ -112,7 +112,7 @@ In the ownCloud 10 core clone the testing app with the following command:
 git clone https://github.com/owncloud/testing apps/testing
 ```
 
-Then run the api acceptance tests with the following command from the root of the oCIS repository:
+Then run the api acceptance tests with the following command from the root of the ownCloud 10 core repository:
 ```
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
