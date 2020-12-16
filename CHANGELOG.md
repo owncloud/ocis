@@ -66,6 +66,8 @@
 * Change - Update reva config: [#336](https://github.com/owncloud/ocis/pull/336)
 * Change - Update reva to v1.4.1-0.20201209113234-e791b5599a89: [#1089](https://github.com/owncloud/ocis/pull/1089)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
+* Change - Update ownCloud Web to v1.0.0-beta3: [#1105](https://github.com/owncloud/ocis/pull/1105)
+* Change - Update ownCloud Web to v1.0.0-beta4: [#1110](https://github.com/owncloud/ocis/pull/1110)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -96,6 +98,7 @@
 * Enhancement - Cache userinfo in proxy: [#877](https://github.com/owncloud/ocis/pull/877)
 * Enhancement - Update reva to v1.4.1-0.20201125144025-57da0c27434c: [#1320](https://github.com/cs3org/reva/pull/1320)
 * Enhancement - Runtime Cleanup: [#1066](https://github.com/owncloud/ocis/pull/1066)
+* Enhancement - Update OCIS Runtime: [#1108](https://github.com/owncloud/ocis/pull/1108)
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 * Enhancement - Update glauth to dev fd3ac7e4bbdc93578655d9a08d8e23f105aaa5b2: [#834](https://github.com/owncloud/ocis/pull/834)
 * Enhancement - Update glauth to dev 4f029234b2308: [#786](https://github.com/owncloud/ocis/pull/786)
@@ -721,6 +724,26 @@
    `STORAGE_DRIVER_EOS_LAYOUT=...` less confusing.
 
    https://github.com/owncloud/ocis/pull/729
+
+* Change - Update ownCloud Web to v1.0.0-beta3: [#1105](https://github.com/owncloud/ocis/pull/1105)
+
+   Tags: web
+
+   We updated ownCloud Web to v1.0.0-beta3. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/ocis/pull/1105
+   https://github.com/owncloud/phoenix/releases/tag/v1.0.0-beta3
+
+* Change - Update ownCloud Web to v1.0.0-beta4: [#1110](https://github.com/owncloud/ocis/pull/1110)
+
+   Tags: web
+
+   We updated ownCloud Web to v1.0.0-beta4. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/ocis/pull/1110
+   https://github.com/owncloud/phoenix/releases/tag/v1.0.0-beta4
 
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
@@ -1828,6 +1851,16 @@
    Small runtime cleanup prior to Tech Preview release
 
    https://github.com/owncloud/ocis/pull/1066
+
+* Enhancement - Update OCIS Runtime: [#1108](https://github.com/owncloud/ocis/pull/1108)
+
+   - enhances the overall behavior of our runtime - runtime `db` file configurable - two new env
+   variables to deal with the runtime - `RUNTIME_DB_FILE` and `RUNTIME_KEEP_ALIVE` -
+   `RUNTIME_KEEP_ALIVE` defaults to `false` to provide backwards compatibility - if
+   `RUNTIME_KEEP_ALIVE` is set to `true`, if a supervised process terminates the runtime will
+   attempt to start with the same environment provided.
+
+   https://github.com/owncloud/ocis/pull/1108
 
 * Enhancement - Simplify tracing config: [#92](https://github.com/owncloud/product/issues/92)
 

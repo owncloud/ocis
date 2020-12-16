@@ -50,11 +50,15 @@ LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/
 DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
 GCFLAGS += all=-N -l
 
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
 .PHONY: all
-all: build
+all: build ## build oCIS
 
 .PHONY: sync
-sync:
+sync: ## download go dependencies
 	go mod download
 
 .PHONY: clean
@@ -67,31 +71,31 @@ clean-config:
 	rm -rf $(CONFIG)
 
 .PHONY: fmt
-fmt:
+fmt: ## fmt
 	gofmt -s -w $(SOURCES)
 
 .PHONY: vet
-vet:
+vet: ## vet
 	go vet $(PACKAGES)
 
 .PHONY: lint
-lint:
+lint: ## lint
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate:
+generate: ## generate
 	go generate $(GENERATE)
 
 .PHONY: changelog
-changelog:
+changelog: ## generate changelog
 	go run github.com/restic/calens -i ../changelog -t ../changelog/CHANGELOG.tmpl >| ../CHANGELOG.md
 
 .PHONY: test
-test:
+test: ## run tests
 	go run github.com/haya14busa/goverage -v -coverprofile coverage.out $(PACKAGES)
 
 .PHONY: install
-install: $(SOURCES)
+install: $(SOURCES) ## install
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)
 
 .PHONY: build
@@ -107,7 +111,7 @@ $(BIN)/$(EXECUTABLE)-linux: $(SOURCES)
 	GOOS=linux GOARCH=amd64 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: staticcheck
-staticcheck:
+staticcheck: ## static check
 	go run honnef.co/go/tools/cmd/staticcheck -tags '$(TAGS)' $(PACKAGES)
 
 .PHONY: release
@@ -141,7 +145,7 @@ release-check:
 release-finish: release-copy release-check
 
 .PHONY: config-docs-generate
-config-docs-generate:
+config-docs-generate: ## generate configuration documentation
 	go run github.com/owncloud/flaex >| ../docs/ocis/configuration.md
 
 .PHONY: watch

@@ -17,12 +17,12 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '52105a981c0c74fc81c84218e9076d443b06f074',
+    'coreCommit': '27eaa32d777052d1d210647cd38895e647c48fed',
     'numberOfParts': 10
   },
   'uiTests': {
     'webBranch': 'master',
-    'webCommit': '1b7963eeb52999629682ccef6bff713c0df1729b',
+    'webCommit': 'a96ce8dfa86dc668b620b609830b75dfa4c07a3d',
       'suites': {
         'webUIBasic': [
           'webUILogin',

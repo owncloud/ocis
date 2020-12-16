@@ -1,0 +1,5 @@
+services:
+  redis:
+    image: webhippie/redis
+    environment:
+      REDIS_DATABASES: 1

@@ -202,6 +202,12 @@ apiProvisioning-v2/getUsers.feature:36
 apiProvisioning-v2/resetUserPassword.feature:21
 apiProvisioning-v2/resetUserPassword.feature:55
 #
+# https://github.com/owncloud/product/issues/271 Cannot set mtime on upload
+#
+apiSharePublicLink1/createPublicLinkShare.feature:776
+apiSharePublicLink1/createPublicLinkShare.feature:789
+apiSharePublicLink1/createPublicLinkShare.feature:790
+#
 # https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
 apiSharees/sharees.feature:32
 apiSharees/sharees.feature:33
