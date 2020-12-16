@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-16T02:35:41+0000"
+date: "2020-12-16T10:18:19+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -49,6 +49,15 @@ Usage: `web [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
+
+### web health
+
+Check health status
+
+Usage: `web health [command options] [arguments...]`
+
+--debug-addr | $WEB_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9104`.
 
 ### web server
 
@@ -124,13 +133,4 @@ Usage: `web server [command options] [arguments...]`
 
 --oidc-scope | $WEB_OIDC_SCOPE  
 : OpenID Connect scope. Default: `openid profile email`.
-
-### web health
-
-Check health status
-
-Usage: `web health [command options] [arguments...]`
-
---debug-addr | $WEB_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9104`.
 
