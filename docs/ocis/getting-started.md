@@ -78,12 +78,12 @@ ocis list
 
 To stop a particular extension:
 {{< highlight txt >}}
-ocis server kill web
+ocis kill web
 {{< / highlight >}}
 
 To start a particular extension:
 {{< highlight txt >}}
-ocis server run web
+ocis run web
 {{< / highlight >}}
 
 The version command prints the version of your installed oCIS.
