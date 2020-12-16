@@ -22,7 +22,7 @@ config = {
   },
   'uiTests': {
     'webBranch': 'master',
-    'webCommit': '900bbf51b4d903e2a9ab3f6bddc5de1166bee877',
+    'webCommit': 'a96ce8dfa86dc668b620b609830b75dfa4c07a3d',
       'suites': {
         'webUIBasic': [
           'webUILogin',
