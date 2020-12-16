@@ -7,7 +7,7 @@ require (
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.4.1-0.20201209113234-e791b5599a89
+	github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/iancoleman/strcase v0.1.2
