@@ -67,6 +67,7 @@
 * Change - Update reva to v1.4.1-0.20201209113234-e791b5599a89: [#1089](https://github.com/owncloud/ocis/pull/1089)
 * Change - Clarify storage driver env vars: [#729](https://github.com/owncloud/ocis/pull/729)
 * Change - Update ownCloud Web to v1.0.0-beta3: [#1105](https://github.com/owncloud/ocis/pull/1105)
+* Change - Update ownCloud Web to v1.0.0-beta4: [#1110](https://github.com/owncloud/ocis/pull/1110)
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 * Enhancement - Add tracing to the accounts service: [#1016](https://github.com/owncloud/ocis/issues/1016)
 * Enhancement - Add the accounts service: [#244](https://github.com/owncloud/product/issues/244)
@@ -733,6 +734,16 @@
 
    https://github.com/owncloud/ocis/pull/1105
    https://github.com/owncloud/phoenix/releases/tag/v1.0.0-beta3
+
+* Change - Update ownCloud Web to v1.0.0-beta4: [#1110](https://github.com/owncloud/ocis/pull/1110)
+
+   Tags: web
+
+   We updated ownCloud Web to v1.0.0-beta4. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/ocis/pull/1110
+   https://github.com/owncloud/phoenix/releases/tag/v1.0.0-beta4
 
 * Change - Settings and accounts appear in the user menu: [#656](https://github.com/owncloud/ocis/pull/656)
 
