@@ -13,7 +13,6 @@ import (
 	cli "github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
-	"github.com/micro/micro/v2/client/web"
 	"github.com/micro/micro/v2/service/registry"
 
 	"github.com/refs/pman/pkg/process"
@@ -146,7 +145,7 @@ func AddMicroPlatform(app *cli.App, opts micro.Options) {
 	setDefaults()
 
 	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
-	app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
+	//app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
 	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
 }
 
