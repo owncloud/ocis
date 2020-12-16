@@ -83,7 +83,7 @@ make -C tests/acceptance/docker clean
 
 ## Testing with test suite natively installed
 
-We are using the ownCloud 10 acceptance test suite against oCIS. To set this up you need the ownCloud 10 core repo, a LDAP server that the acceptance tests can use to manage users, a redis server for file-versions and the oCIS code.
+We are using the ownCloud 10 acceptance test suite against oCIS.
 
 ### Getting the tests
 
@@ -92,12 +92,6 @@ All you need to do to get the acceptance tests is check out the core repo:
 ```
 git clone https://github.com/owncloud/core.git
 ```
-
-### Run a redis server in a docker container
-
-File versions need a redis server. Start one with docker by using:
-
-`docker run -e REDIS_DATABASES=1 -p 6379:6379 -d webhippie/redis:latest`
 
 ### Run ocis
 
@@ -118,7 +112,7 @@ In the ownCloud 10 core clone the testing app with the following command:
 git clone https://github.com/owncloud/testing apps/testing
 ```
 
-Then run the api acceptance tests with the following command from the root of the oCIS repository:
+Then run the api acceptance tests with the following command from the root of the ownCloud 10 core repository:
 ```
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
