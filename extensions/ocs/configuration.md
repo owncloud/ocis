@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-16T10:22:31+0000"
+date: "2020-12-16T12:06:16+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -32,6 +32,18 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+--http-namespace | $OCS_NAMESPACE  
+: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+
+--name | $OCS_NAME  
+: Service name. Default: `ocs`.
 
 ### ocs health
 
@@ -107,16 +119,4 @@ Usage: `ocs ocis-ocs [command options] [arguments...]`
 
 --log-color | $OCS_LOG_COLOR  
 : Enable colored logging. Default: `true`.
-
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
---http-namespace | $OCS_NAMESPACE  
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
-
---name | $OCS_NAME  
-: Service name. Default: `ocs`.
 
