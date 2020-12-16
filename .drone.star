@@ -207,7 +207,7 @@ def main(ctx):
   or \
   (ctx.build.event != "pull" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
   # [docs-only] is not taken from PR messages, but from commit messages
-    pipelines = docs(ctx)
+    pipelines = [docs(ctx)]
 
   else:
     if '[with-benchmarks]' in (ctx.build.title + ctx.build.message):
