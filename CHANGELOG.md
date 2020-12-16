@@ -108,6 +108,7 @@
 * Enhancement - Update reva to cdb3d6688da5: [#748](https://github.com/owncloud/ocis/pull/748)
 * Enhancement - Update reva to dd3a8c0f38: [#725](https://github.com/owncloud/ocis/pull/725)
 * Enhancement - Update reva to v1.4.1-0.20201127111856-e6a6212c1b7b: [#971](https://github.com/owncloud/ocis/pull/971)
+* Enhancement - Update reva to 063b3db9162b: [#1091](https://github.com/owncloud/ocis/pull/1091)
 * Enhancement - Add www-authenticate based on user agent: [#1009](https://github.com/owncloud/ocis/pull/1009)
 
 ## Details
@@ -1961,6 +1962,14 @@
    https://github.com/owncloud/ocis/pull/971
    https://github.com/cs3org/reva/pull/1331
    https://github.com/cs3org/reva/pull/1342
+
+* Enhancement - Update reva to 063b3db9162b: [#1091](https://github.com/owncloud/ocis/pull/1091)
+
+   - bring public link removal changes to OCIS. - fix subcommand name collision from renaming
+   phoenix -> web.
+
+   https://github.com/owncloud/ocis/issues/1098
+   https://github.com/owncloud/ocis/pull/1091
 
 * Enhancement - Add www-authenticate based on user agent: [#1009](https://github.com/owncloud/ocis/pull/1009)
 
