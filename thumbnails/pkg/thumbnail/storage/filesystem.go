@@ -41,7 +41,7 @@ func (s *FileSystem) Get(username string, key string) []byte {
 	img := filepath.Join(userDir, key)
 	content, err := ioutil.ReadFile(img)
 	if err != nil {
-		s.logger.Warn().Err(err).Msgf("could not read file %s", key)
+		s.logger.Debug().Str("err", err.Error()).Str("key", key).Msg("could not load thumbnail from store")
 		return nil
 	}
 	return content
