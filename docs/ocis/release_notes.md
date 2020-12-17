@@ -13,11 +13,11 @@ We are pleased to annouce the availability of ownCloud Infinite Scale 1.0.0 Tech
 
 ### Microservice architecture
 
-ownCloud Infinite Scale is following the microservices architectual pattern. It is implemented as a set of microservices which are independent of each other. They are coupled with very well-defined APIs and communicate via HTTP. This architecture fosters a lot of benefits that we were going for with the new design for oCIS:
+ownCloud Infinite Scale is following the microservices architectural pattern. It is implemented as a set of microservices which are independent of each other. They are coupled with very well-defined APIs and communicate via HTTP. This architecture fosters a lot of benefits that we were going for with the new design for oCIS:
 
-- Independent services: Every service is independant, comparably small and brings it's own webserver, backend/APIs and frontend components.
+- Independent services: Every service is independent, comparably small and brings it's own webserver, backend/APIs and frontend components.
 - Each service runs as a separate service on the system, increasing security and stability
-- Scalability:  High performance demands can be fulfilled by scaling the amount of services
+- Scalability:  High performance demands can be fulfilled by scaling the distribution of services
 - Testability: Each service can be tested on its own due to well-defined APIs and functionality
 - Protocol-driven development
 - High-performance communication between services through technologies like GRPC
@@ -34,7 +34,7 @@ ownCloud Infinite Scale is following the microservices architectual pattern. It 
 - Database-less architecture - metadata and data are kept together in the storage as a single source of truth
 - Native storage capabilities are used where possible
 - Public ownCloud APIs like WebDAV and OCS have been kept compatible to ownCloud 10
-- A secure and flexible framework to create extensions for ownCloud. It allows to integrate with ownCloud data in a very easy yet powerful way.
+- A secure and flexible framework to create extensions for ownCloud. It allows integration with ownCloud data in a very easy yet powerful way.
 
 #### Supported platforms
 
@@ -45,7 +45,7 @@ ownCloud Infinite Scale is following the microservices architectual pattern. It 
 #### Client support
 
 All official ownCloud Clients support the Infinite Scale server with the following versions:
-- Desktop >= 2.7.0
+- Desktop >= 2.7
 - Android >= 2.15
 - iOS >= 1.2
 
@@ -72,7 +72,7 @@ These components can be deployed in a multi-tier deployment architecture. See th
 
 #### Bridge mode with ownCloud 10 backend
 
-For the product transition phase, ownCloud Infinite Scale comes with an operation mode ("bridge mode") that allows to create a hybrid deployment between both server generations to operate the new web frontend with ownCloud 10 and Infinite Scale in parallel. This setup allows to operate the ownCloud Web frontend with both server generations and provides the foundation to migrate users gradually to the new backend.
+For the product transition phase, ownCloud Infinite Scale comes with an operation mode ("bridge mode") that allows a hybrid deployment to be created between both server generations to operate the new web frontend with ownCloud 10 and Infinite Scale in parallel. This setup allows the ownCloud Web frontend to operate with both server generations and provides the foundation to migrate users gradually to the new backend.
 
 **Requirements for the bridge mode**
 - ownCloud Server >= 10.6
@@ -85,14 +85,14 @@ See the [Documentation](<https://owncloud.github.io/ocis/deployment/owncloud10_w
 {{< hint "warning" >}}
 **Technology Preview**
 
-ownCloud Infinite Scale is currently in Technology Preview. The bridge mode should only be used in non-productive environments.
+ownCloud Infinite Scale is currently in Technology Preview. The bridge mode should only be used in non-production environments.
 {{< /hint >}}
 
 ### What to expect?
 
-This is the first promoted public release of ownCloud Infinite Scale, released as "Technical Preview". Infinite Scale is not yet ready for production installations. Technical audience will get a good impression of the potential of ownClouds new platform.
+This is the first promoted public release of ownCloud Infinite Scale, released as "Technical Preview". Infinite Scale is not yet ready for production installations. Technical audiences will be able to get a good understanding of the potential of ownCloud's new platform.
 
-Version 1.0.0 comes with the base functionality for sync and share on a much higher performance-, stability- and security-level compared to all available platforms. Based on ten years of experience in enterprise sync and share and a long standing collaboration with the biggest global science organizations this new platform will exceed what content collaboration is today.
+Version 1.0.0 comes with the base functionality for sync and share with a much higher performance-, stability- and security-level compared to all available platforms. Based on ten years of experience in enterprise sync and share and a long standing collaboration with the biggest global science organizations this new platform will exceed what content collaboration is today.
 
 ### How to get started?
 
@@ -124,12 +124,12 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
 
 4. Navigate to <http://localhost:9200> and log in to ownCloud Web (admin:admin)
 
-oCIS environments to last should use more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
+oCIS environments to last should use a more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
 {{< /tab >}}
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated and production setups we recommend to use one of our proposed docker setups. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with Traefik as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+For more sophisticated and production setups we recommend using one of our proposed docker setups. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with Traefik as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
 {{< /tab >}}
 {{< /tabs >}}
@@ -251,10 +251,10 @@ For more sophisticated and production setups we recommend to use one of our prop
 - Extensions?
 
 ##### Roles & Permissions System
-Infinite Scale follows a role-based access control model. Based on permissions for actions which are provided by the system and by extensions, roles can be composed. Ultimately, these roles can be assigned to users to define what users are permitted to do. This model allows to realize a segregation of duties for administration and allows to control granularly how different types of users (e.g., Guests) can use the platform.
+Infinite Scale follows a role-based access control model. Based on permissions for actions which are provided by the system and by extensions, roles can be composed. Ultimately, these roles can be assigned to users to define what users are permitted to do. This model allows a segregation of duties for administration and allows granular control of how different types of users (e.g., Guests) can use the platform.
 
 - Currently available permissions: Manage accounts (gives access to the internal user management)
-- The current roles are exemplary default roles which defined in config files
+- The current roles are exemplary default roles which are defined in config files
   - "Admin": Has the permission to "manage accounts"
   - "User": Does not have any dedicated permission
   - "Guest": Does not have any dedicated permission
@@ -271,7 +271,7 @@ Infinite Scale follows a role-based access control model. Based on permissions f
 {{< /tabs >}}
 
 ### Known issues for OCIS standalone
-- There are feature differences depending on the operation  mode, e.g., no user management with ownCloud Web and oC 10 backend
+- There are feature differences depending on the operation mode, e.g., no user management with ownCloud Web and oC 10 backend
 - Public links do not yet respect the given role (a recipient has full permissions no matter which role has been set)
 - Resharing works but does not have necessary restrictions in place
   - Share recipients can add more people or create public links with higher permissions than they originally had
