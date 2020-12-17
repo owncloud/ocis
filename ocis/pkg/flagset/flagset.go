@@ -51,14 +51,14 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "localhost:6831",
+			Value:       "",
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "http://localhost:14268/api/traces",
+			Value:       "",
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
