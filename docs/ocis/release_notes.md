@@ -261,9 +261,9 @@ The settings service provides APIs for other services for registering a set of s
 
 Infinite Scale follows a role-based access control model. Based on permissions for actions which are provided by the system and by extensions, roles can be composed. Ultimately, these roles can be assigned to users to define what users are permitted to do. This model allows a segregation of duties for administration and allows granular control of how different types of users (e.g., Guests) can use the platform.
 
-- Currently available permissions: Manage accounts (gives access to the internal user management)
+- Currently available permissions: Manage accounts (gives access to the internal user management), manage roles (allows to assign roles to users)
 - The current roles are exemplary default roles which are used for demonstration purposes
-  - "Admin": Has the permission to "manage accounts"
+  - "Admin": Has the permissions to "manage accounts" and to "manage roles"
   - "User": Does not have any dedicated permission
   - "Guest": Does not have any dedicated permission
 - Currently a user can only have one role
