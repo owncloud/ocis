@@ -68,13 +68,13 @@ These components can be deployed in a multi-tier deployment architecture. See th
 
 In standalone mode oCIS uses its built-in orchestrator to start all necessary services. This allows you to run oCIS on a single node without any outside dependencies like docker-compose, kubernetes or even a webserver. It will start an OpenID IdP and create a self-signed certificate. You can start right away by navigating to <https://localhost:9200>.
 
-#### Single services scaleouts
+#### Single services scaleout
 
 oCIS allows you to scale individual services using well-known orchestration frameworks like docker-compose, dockerSwarm and kubernetes.
 
 #### Bridge mode with ownCloud 10 backend
 
-For the product transition phase, ownCloud Infinite Scale comes with an operation mode ("bridge mode") that allows a hybrid deployment to be created between both server generations to operate the new web frontend with ownCloud 10 and Infinite Scale in parallel. This setup allows the ownCloud Web frontend to operate with both server generations and provides the foundation to migrate users gradually to the new backend.
+For the product transition phase, ownCloud Infinite Scale comes with an operation mode ("bridge mode") that allows a hybrid deployment, between both server generations to operate the new web frontend with ownCloud 10 and Infinite Scale in parallel. This setup allows the ownCloud Web frontend to operate with both server generations and provides the foundation to migrate users gradually to the new backend.
 
 **Requirements for the bridge mode**
 - ownCloud Server >= 10.6
@@ -98,11 +98,11 @@ Version 1.0.0 comes with the base functionality for sync and share with a much h
 
 ### How to get started?
 
-One of the most important objectives for oCIS was to ease the setup of a working instance dramatically. Since oCIS is built on Google's powerful Go language it supports the single-file-deployment: Installing oCIS 1.0.0 is as easy as downloading a single file, applying execution permission to it and get started. No more fiddling around with complicated LAMP stacks.
+One of the most important objectives for oCIS was to ease the setup of a working instance dramatically. Since oCIS is built with Google's powerful Go language it supports the single-file-deployment: Installing oCIS 1.0.0 is as easy as downloading a single file, applying execution permission to it and get started. No more fiddling around with complicated LAMP stacks.
 
 #### Deployment Options
 
-Given the Golang-based architecture of oCIS, there are various deployment options based on the users requirements. With our experience with the for many users difficult setup of the LAMP stack before a big emphasis was put on easy yet functional deployment strategies.
+Given the architecture of oCIS, there are various deployment options based on the users requirements. In our experience setting up the LAMP stack for ownCloud 10 was difficult for many users. Therefore a big emphasis was put on easy yet functional deployment strategies.
 
 {{< tabs "deployments" >}}
 {{< tab "Single binary" >}}
@@ -113,10 +113,10 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
 1. Download the binary
 
     **Linux**
-    `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
+    `curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-linux-amd64 -o ocis`
 
     **MacOS**
-    `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
+    `curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-darwin-amd64 -o ocis`
 
 2. Make it executable
    `chmod +x ocis`
@@ -126,12 +126,13 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
 
 4. Navigate to <http://localhost:9200> and log in to ownCloud Web (admin:admin)
 
-oCIS environments to last should use a more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
+Production environments will need a more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
+
 {{< /tab >}}
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated and production setups we recommend using one of our proposed docker setups. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with Traefik as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
 {{< /tab >}}
 {{< /tabs >}}
@@ -163,7 +164,7 @@ For more sophisticated and production setups we recommend using one of our propo
 - Delete
 - Indicators for resources shared with people (including subfiles and subfolders)
 - Indicators for resources shared by link (including subfiles and subfolders)
-- Quick actions (extension point)
+- Quick actions
   - Add people
   - Create public link on-the-fly and copy it to the clipboard
 - Favorites (view + add/remove)
@@ -182,11 +183,11 @@ For more sophisticated and production setups we recommend using one of our propo
   - Roles: Viewer / Editor (folder) / Advanced permissions (granular permissions)
   - Expiration date
 - Listing people who have access to a resource
-  - People can be listed when a resource is directly shared and when it's indirectly shared via a parent folder.
-  - When listing people of an indirectly shared resource, there is a "via" indicator that guides to the directly shared parent.
-  - Every person can recognize the owner of a resource.
-  - Every person can recognize their role.
-  - The owner of a resource can recognize persons that added other people (reshare indicator).
+  - People can be listed when a resource is directly shared and when it's indirectly shared via a parent folder
+  - When listing people of an indirectly shared resource, there is a "via" indicator that guides to the directly shared parent
+  - Every person can recognize the owner of a resource
+  - Every person can recognize their role
+  - The owner of a resource can recognize persons that added other people (reshare indicator)
   - Editing persons
   - Removing persons
 
@@ -200,8 +201,8 @@ For more sophisticated and production setups we recommend using one of our propo
     - Password-protection
     - Expiration date
   - Listing public links
-    - Public links can be listed when a resource is directly shared and when it's indirectly shared via a parent folder.
-    - When listing public links of an indirectly shared resource, there is a "via" indicator that guides to the directly shared parent.
+    - Public links can be listed when a resource is directly shared and when it's indirectly shared via a parent folder
+    - When listing public links of an indirectly shared resource, there is a "via" indicator that guides to the directly shared parent
     - Copying existing public links
     - Editing existing public links
     - Removing existing public links
@@ -215,10 +216,6 @@ For more sophisticated and production setups we recommend using one of our propo
 
 {{< /tab >}}
 {{< tab "User Settings" >}}
-
-#### Settings
-
-The settings service provides APIs for other services for registering a set of settings as `Bundle`. It also provides a pluggable extension for ownCloud Web which provides dynamically built web forms, so that users can customize their own settings. Some well known settings are directly used by ownCloud Web for adapted user experience, e.g. the UI language. Services can query the users' chosen settings for customized backend and frontend operations as needed.
 
 ##### Basic user settings
 - Language of the web interface
@@ -249,26 +246,26 @@ The default OCIS storage driver deconstructs a filesystem to be able to efficien
 - Group creation (API)
 - Add/remove users to/from groups (API)
 - Group deletion (API)
-- Create/read/update users and groups (CLI)
+- Create/read/update/delete users and groups (CLI)
 
 {{< /tab >}}
 {{< tab "Settings" >}}
-#### Settings
-##### Settings bundles framework
-- What is a settings bundle?
-- What can you do with it?
-- Extensions?
+
+##### Settings
+
+The settings service provides APIs for other services for registering a set of settings as `Bundle`. It also provides a pluggable extension for ownCloud Web which provides dynamically built web forms, so that users can customize their own settings. Some well known settings are directly used by ownCloud Web for adapted user experience, e.g. the UI language. Services can query the users' chosen settings for customized backend and frontend operations as needed.
 
 ##### Roles & Permissions System
+
 Infinite Scale follows a role-based access control model. Based on permissions for actions which are provided by the system and by extensions, roles can be composed. Ultimately, these roles can be assigned to users to define what users are permitted to do. This model allows a segregation of duties for administration and allows granular control of how different types of users (e.g., Guests) can use the platform.
 
 - Currently available permissions: Manage accounts (gives access to the internal user management)
-- The current roles are exemplary default roles which are defined in config files
+- The current roles are exemplary default roles which are used for demonstration purposes
   - "Admin": Has the permission to "manage accounts"
   - "User": Does not have any dedicated permission
   - "Guest": Does not have any dedicated permission
 - Currently a user can only have one role
-- Users with the role "Admin" can assign/unassign roles to/from other users (as part of the permission to "manage accounts")
+- Users with the role "Admin" can assign/unassign roles to/from other users (as part of the permission to "manage roles")
 
 {{< /tab >}}
 {{< tab "APIs" >}}
@@ -286,7 +283,6 @@ Infinite Scale follows a role-based access control model. Based on permissions f
   - Share recipients can add more people or create public links with higher permissions than they originally had
   - Every person in a share can see all other people in the people list
 - Sharing indicators in the file list will only be shown after opening the right sidebar for a resource
-- Displayed Quota does not reflect the actual free disk space
 - Users can't change their password yet
 - Folder sizes will not be calculated
 - Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
