@@ -99,7 +99,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	req.Header.Set("x-access-token", token)
+	req.Header.Set(tokenPkg.TokenHeader, token)
 
 	m.next.ServeHTTP(w, req)
 }
