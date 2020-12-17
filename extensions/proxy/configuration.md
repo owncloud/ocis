@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-17T11:35:17+0000"
+date: "2020-12-17T16:13:56+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -61,7 +61,7 @@ Usage: `proxy server [command options] [arguments...]`
 : Endpoint for the agent.
 
 --tracing-collector | $PROXY_TRACING_COLLECTOR  
-: Endpoint for the collector. Default: `http://localhost:14268/api/traces`.
+: Endpoint for the collector.
 
 --tracing-service | $PROXY_TRACING_SERVICE  
 : Service name for tracing. Default: `proxy`.
