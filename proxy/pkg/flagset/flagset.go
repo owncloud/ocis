@@ -77,7 +77,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "http://localhost:14268/api/traces",
+			Value:       "",
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"PROXY_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
