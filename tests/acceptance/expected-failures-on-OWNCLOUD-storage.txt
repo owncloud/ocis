@@ -2427,3 +2427,23 @@ apiWebdavUploadTUS/uploadToNonExistingFolder.feature:43
 apiWebdavUploadTUS/uploadToNonExistingFolder.feature:44
 apiWebdavUploadTUS/uploadToNonExistingFolder.feature:57
 apiWebdavUploadTUS/uploadToNonExistingFolder.feature:58
+
+# https://github.com/owncloud/ocis/issues/1039 The Patch Request Response doesnot contain a body
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:29
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:30
+
+# https://github.com/owncloud/ocis/issues/1047 500 Internal Server Error on Post request for TUS upload to a non-existing folder on the received share
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:43
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:44
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:57
+apiWebdavUploadTUS/uploadToNonExistingFolder.feature:58
+
+# https://github.com/owncloud/ocis/issues/1001 invalid file-names should not be created using the TUS protocol
+apiWebdavUploadTUS/uploadFile.feature:135
+apiWebdavUploadTUS/uploadFile.feature:136
+apiWebdavUploadTUS/uploadFile.feature:137
+apiWebdavUploadTUS/uploadFile.feature:138
+apiWebdavUploadTUS/uploadFile.feature:139
+apiWebdavUploadTUS/uploadFile.feature:140
+apiWebdavUploadTUS/uploadFile.feature:141
+apiWebdavUploadTUS/uploadFile.feature:142
