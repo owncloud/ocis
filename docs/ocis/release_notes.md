@@ -13,34 +13,34 @@ We are pleased to announce the availability of ownCloud Infinite Scale 1.0.0 Tec
 
 ### Microservice architecture
 
-ownCloud Infinite Scale is following the microservices architectural pattern. It is implemented as a set of microservices which are independent of each other. They are coupled with very well-defined APIs and communicate via HTTP. This architecture fosters a lot of benefits that we were going for with the new design for oCIS:
+ownCloud Infinite Scale is following the microservices architectural pattern. It is implemented as a set of microservices which are independent of each other. They are coupled with well-defined APIs. This architecture fosters a lot of benefits that we were aiming for with the new design for oCIS:
 
-- Independent services: Every service is independent, comparably small and brings it's own webserver, backend/APIs and frontend components.
+- Every service is independent, comparably small and brings it's own webserver, backend/APIs and frontend components
 - Each service runs as a separate service on the system, increasing security and stability
-- Scalability:  High performance demands can be fulfilled by scaling the distribution of services
+- Scalability:  High performance demands can be fulfilled by scaling and distributing of services
 - Testability: Each service can be tested on its own due to well-defined APIs and functionality
-- Protocol-driven development
-- High-performance communication between services through technologies like gRPC
-- Multi-platform support through utilizing Golang - only minimal dependency on platform packages
-- Cloud-native deployment and update strategies
+- Protocol-driven development using protobuf
+- High-performance communication between services through gRPC
+- Multi-platform support powered by Golang - only minimal dependency on platform packages
+- Cloud-native deployment, update, monitoring, logging, tracing and orchestration strategies
 
 ### Key figures
 
-- The all-new ownCloud Web frontend ships with the platform
-- OpenID Connect is the technology choice for authentication
-- An Identity Provider is bundled to ease deployment and operations. It can be replaced with other applications if desired.
-- Up-to-date, cloud-native deployment options are available
-- Flexible configuration through environment variables, yaml files or command-line switches
+- The all-new ownCloud Web frontend is shipped as part of the platform
+- OpenID Connect is the future-proof technology choice for authentication
+- An Identity Provider is bundled to ease deployment and operations. It can be replaced with an external OpenID IdP if desired
+- Automatically built and fully maintained Docker containers are available
+- Flexible configuration through environment variables, config files or command-line flags
 - Database-less architecture - metadata and data are kept together in the storage as a single source of truth
-- Native storage capabilities are used where possible
-- Public ownCloud APIs like WebDAV and OCS have been kept compatible to ownCloud 10
-- A secure and flexible framework to create extensions for ownCloud. It allows integration with ownCloud data in a very easy yet powerful way.
+- Native storage capabilities are used where like native versioning and trashbin
+- Public APIs like WebDAV and OCS have been kept compatible with ownCloud 10
+- A secure and flexible framework to create extensions
 
 #### Supported platforms
 
 - Linux-amd64
 - Darwin-amd64
-- Experimental: Windows, ARM (e.g., Raspberry Pi)
+- Experimental: Windows, ARM (e.g., Raspberry Pi, Termux on Android)
 
 #### Client support
 
@@ -64,11 +64,13 @@ These components can be deployed in a multi-tier deployment architecture. See th
 
 ### Operation modes
 
-#### Full Stack Server mode (with oCIS storage driver)
-@TODO
+#### Standalone mode (with oCIS storage driver)
+
+In standalone mode oCIS uses its built-in orchestrator to start all necessary services. This allows you to run oCIS on a single node without any outside dependencies like docker-compose, kubernetes or even a webserver. It will start an OpenID IdP and create a self-signed certificate. You can start right away by navigating to <https://localhost:9200>.
 
 #### Single services scaleouts
-@TODO
+
+oCIS allows you to scale individual services using well-known orchestration frameworks like docker-compose, dockerSwarm and kubernetes.
 
 #### Bridge mode with ownCloud 10 backend
 
@@ -213,7 +215,12 @@ For more sophisticated and production setups we recommend using one of our propo
 
 {{< /tab >}}
 {{< tab "User Settings" >}}
-#### Basic user settings
+
+#### Settings
+
+The settings service provides APIs for other services for registering a set of settings as `Bundle`. It also provides a pluggable extension for ownCloud Web which provides dynamically built web forms, so that users can customize their own settings. Some well known settings are directly used by ownCloud Web for adapted user experience, e.g. the UI language. Services can query the users' chosen settings for customized backend and frontend operations as needed.
+
+##### Basic user settings
 - Language of the web interface
 
 {{< /tab >}}
@@ -279,6 +286,7 @@ Infinite Scale follows a role-based access control model. Based on permissions f
   - Share recipients can add more people or create public links with higher permissions than they originally had
   - Every person in a share can see all other people in the people list
 - Sharing indicators in the file list will only be shown after opening the right sidebar for a resource
+- Displayed Quota does not reflect the actual free disk space
 - Users can't change their password yet
 - Folder sizes will not be calculated
 - Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
