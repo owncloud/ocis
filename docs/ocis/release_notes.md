@@ -6,7 +6,6 @@ geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
-# Release Notes
 
 ## ownCloud Infinite Scale 1.0.0 Technology Preview - Initial Release Notes
 
@@ -33,26 +32,29 @@ ownCloud Infinite Scale is following the microservices architectual pattern. It 
 - Up-to-date, cloud-native deployment options are available
 - Flexible configuration through environment variables, yaml files or command-line switches
 - Database-less architecture - metadata and data are kept together in the storage as a single source of truth
-- Native storage capabilities are used
+- Native storage capabilities are used where possible
 - Public ownCloud APIs like WebDAV and OCS have been kept compatible to ownCloud 10
 - A secure and flexible framework to create extensions for ownCloud. It allows to integrate with ownCloud data in a very easy yet powerful way.
 
 #### Supported platforms
+
 - Linux-amd64
 - Darwin-amd64
 - Experimental: Windows, ARM (e.g., Raspberry Pi)
 
 #### Client support
+
 All official ownCloud Clients support the Infinite Scale server with the following versions:
 - Desktop >= 2.7.0
 - Android >= 2.15
 - iOS >= 1.2
 
-### Architecture
+### Architecture components
 
 ownCloud Infinite Scale is built as a modular framework in which components can be scaled individually. It consists of
 
 - a user management service
+- a settings service
 - a storage backend service
 - Built-in IdP
 - Frontend
@@ -62,9 +64,11 @@ These components can be deployed in a multi-tier deployment architecture. See th
 
 ### Operation modes
 
-#### Standalone Full Stack Server mode (with oCIS storage driver)
+#### Full Stack Server mode (with oCIS storage driver)
+@TODO
 
-#### Standalone Single service mode for scaleouts
+#### Single services scaleouts
+@TODO
 
 #### Bridge mode with ownCloud 10 backend
 
@@ -76,11 +80,13 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 - The [Graph API](https://marketplace.owncloud.com/apps/graphapi) app is installed on ownCloud Server
 - The latest client versions are rolled-out to users (required for OpenID Connect support). See the [ownCloud Documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
 
-{{< hint [warning] >}}
-**ownCloud Infinite Scale is currently in Technology Preview. The bridge mode should only be used in non-productive environments.**
-{{< /hint >}}
+See the [Documentation](<https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/>) on how to deploy Infinite Scale in bridge mode.
 
-https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/
+{{< hint "warning" >}}
+**Technology Preview**
+
+ownCloud Infinite Scale is currently in Technology Preview. The bridge mode should only be used in non-productive environments.
+{{< /hint >}}
 
 ### What to expect?
 
@@ -103,10 +109,12 @@ Given the Golang-based architecture of oCIS, there are various deployment option
 The single binary is the best option to test the new ownCloud Infinite Scale 1.0.0 Technical Preview release on a local machine. Follow these instructions to get the platform running in the most simple way:
 
 1. Download the binary
-   **Linux**
-   `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
-   **MacOS**
-   `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
+
+    **Linux**
+    `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
+
+    **MacOS**
+    `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
 
 2. Make it executable
    `chmod +x ocis`
@@ -114,19 +122,15 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
 3. Run it
    `./ocis server`
 
-4. Navigate to http://localhost:9200 and log in to ownCloud Web (admin/admin)
+4. Navigate to <http://localhost:9200> and log in to ownCloud Web (admin:admin)
 
 oCIS environments to last should use more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
 {{< /tab >}}
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated and production setups we recommend to use one of our proposed docker setups, see [Link]
+For more sophisticated and production setups we recommend to use one of our proposed docker setups. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with Traefik as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
-- Traefik reverse proxy
-- Letsencrypt certificate provisioning
-
-https://owncloud.github.io/ocis/deployment/ocis_traefik/
 {{< /tab >}}
 {{< /tabs >}}
 
@@ -220,6 +224,7 @@ https://owncloud.github.io/ocis/deployment/ocis_traefik/
 {{< tabs "backend-features" >}}
 {{< tab "Storage" >}}
 #### Storage
+@TODO
 
 {{< /tab >}}
 {{< tab "IDM" >}}
