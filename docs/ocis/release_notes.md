@@ -60,7 +60,7 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 - Frontend
 - Application gateway/proxy
 
-These components can be deployed in a multi-tier deployment architecture. See the [documentation]https://owncloud.github.io/ocis/ for an overview of the services.
+These components can be deployed in a multi-tier deployment architecture. See the [documentation](https://owncloud.github.io/ocis/) for an overview of the services.
 
 ## Various Operation modes
 ### Standalone Full Stack Server mode (with oCIS storage driver)
@@ -72,9 +72,9 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 
 **Requirements for the bridge mode**
 - ownCloud Server >= 10.6
-- https://marketplace.owncloud.com/apps/openidconnect[Open ID Connect] is used for user authentication
-- The https://marketplace.owncloud.com/apps/graphapi[Graph API] app is installed on ownCloud Server
-- The latest client versions are rolled-out to users (required for OpenID Connect support). See the https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients[ownCloud Documentation] for more information.
+- [Open ID Connect](https://marketplace.owncloud.com/apps/openidconnect) is used for user authentication
+- The [Graph API](https://marketplace.owncloud.com/apps/graphapi) app is installed on ownCloud Server
+- The latest client versions are rolled-out to users (required for OpenID Connect support). See the [ownCloud Documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
 
 TIP: **ownCloud Infinite Scale is currently in Technology Preview. The bridge mode should only be used in non-productive environments.**
 
@@ -84,9 +84,9 @@ https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/
 
 # What to expect?
 
-This is the first promoted public release of oCIS, released as "technical preview". oCIS is not yet ready for production installations. Technical audience will get a good impression of the potential of ownClouds new platform.
+This is the first promoted public release of ownCloud Infinite Scale, released as "Technical Preview". Infinite Scale is not yet ready for production installations. Technical audience will get a good impression of the potential of ownClouds new platform.
 
-oCIS 1.0.0 comes with the base functionality for sync and share on a much higher performance-, stability- and security-level compared to all available platforms. Based on ten years of experience in enterprise sync and share and a long standing collaboration with the biggest global science organizations this new platform will exceed what enterprise sync and share / Content Collaboration (?) is today.
+Version 1.0.0 comes with the base functionality for sync and share on a much higher performance-, stability- and security-level compared to all available platforms. Based on ten years of experience in enterprise sync and share and a long standing collaboration with the biggest global science organizations this new platform will exceed what content collaboration is today.
 
 TODO: Mention the base modules of oCIS
 
@@ -103,9 +103,13 @@ Given the GOlang based architecture of oCIS, there are various deployment option
 The single binary is the best option to test the new ownCloud Infinite Scale 1.0.0 Technical Preview release on a local machine. Follow these instructions to get the platform running in the most simple way:
 
 1. Download the binary
+
 **Linux**
+
 `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
+
 **MacOS**
+
 `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
 
 2. Make it executable
@@ -243,7 +247,6 @@ https://owncloud.github.io/ocis/deployment/ocis_traefik/
   - Share recipients can add more people or create public links with higher permissions than they originally had
   - Every person in a share can see all other people in the people list
 - Sharing indicators in the file list will only be shown after opening the right sidebar for a resource
-- The location for incoming shares is currently hardcoded to "/Shared"
 - Users can't change their password yet
-- No size tree accounting with OCIS storage yet
-- Cleanups are not available => e.g., shares of a deleted user will not be removed
+- Folder sizes will not be calculated
+- Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
