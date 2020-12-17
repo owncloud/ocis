@@ -9,7 +9,7 @@ geekdocFilePath: release_notes.md
 
 ## ownCloud Infinite Scale 1.0.0 Technology Preview - Initial Release Notes
 
-We are pleased to annouce the availability of ownCloud Infinite Scale 1.0.0 Technology Preview which is released as the first public version of the new Infinite Scale platform.
+We are pleased to announce the availability of ownCloud Infinite Scale 1.0.0 Technology Preview which is released as the first public version of the new Infinite Scale platform.
 
 ### Microservice architecture
 
@@ -20,8 +20,8 @@ ownCloud Infinite Scale is following the microservices architectural pattern. It
 - Scalability:  High performance demands can be fulfilled by scaling the distribution of services
 - Testability: Each service can be tested on its own due to well-defined APIs and functionality
 - Protocol-driven development
-- High-performance communication between services through technologies like GRPC
-- Multi-platform support through utilizing Golang - only minimal dependency on platform packages.
+- High-performance communication between services through technologies like gRPC
+- Multi-platform support through utilizing Golang - only minimal dependency on platform packages
 - Cloud-native deployment and update strategies
 
 ### Key figures
@@ -96,7 +96,7 @@ Version 1.0.0 comes with the base functionality for sync and share with a much h
 
 ### How to get started?
 
-One of the most important objectives for oCIS was to ease the setup of a working instance dramatically. Since oCIS is built on Google's powerful GO language it supports the single-file-deployment: Installing oCIS 1.0.0 is as easy as downloading a single file, applying execution permission to it and get started. No more fiddling around with complicated LAMP stacks.
+One of the most important objectives for oCIS was to ease the setup of a working instance dramatically. Since oCIS is built on Google's powerful Go language it supports the single-file-deployment: Installing oCIS 1.0.0 is as easy as downloading a single file, applying execution permission to it and get started. No more fiddling around with complicated LAMP stacks.
 
 #### Deployment Options
 
