@@ -221,14 +221,15 @@ For more sophisticated and production setups we recommend to use one of our prop
 - What can you do with it?
 - Extensions?
 
-##### Roles & permissions system
-- How is the framework designed? (permissions for actions are available in the system => can be bundled to roles)
-- Currently available permissions: Manage accounts (gives access to the user management)
-- Current roles are default roles defined in config files (??)
+##### Roles & Permissions System
+Infinite Scale follows a role-based access control model. Based on permissions for actions which are provided by the system and by extensions, roles can be composed. Ultimately, these roles can be assigned to users to define what users are permitted to do. This model allows to realize a segregation of duties for administration and allows to control granularly how different types of users (e.g., Guests) can use the platform.
+
+- Currently available permissions: Manage accounts (gives access to the internal user management)
+- The current roles are exemplary default roles which defined in config files
   - "Admin": Has the permission to "manage accounts"
   - "User": Does not have any dedicated permission
   - "Guest": Does not have any dedicated permission
-- Currently a user can have only one role
+- Currently a user can only have one role
 - Users with the role "Admin" can assign/unassign roles to/from other users (as part of the permission to "manage accounts")
 
 #### APIs
