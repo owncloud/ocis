@@ -1,4 +1,4 @@
-# Changes in unreleased
+# Changes in 1.0.0
 
 ## Summary
 
