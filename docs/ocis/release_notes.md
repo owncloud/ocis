@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
-## ownCloud Infinite Scale 1.0.0 Technology Preview - Initial Release Notes
+## ownCloud Infinite Scale 1.0.0 Technology Preview
 
 We are pleased to announce the availability of ownCloud Infinite Scale 1.0.0 Technology Preview which is released as the first public version of the new Infinite Scale platform.
 
@@ -28,7 +28,7 @@ ownCloud Infinite Scale is following the microservices architectural pattern. It
 
 - The all-new ownCloud Web frontend is shipped as part of the platform
 - OpenID Connect is the future-proof technology choice for authentication
-- An Identity Provider is bundled to ease deployment and operations. It can be replaced with an external OpenID IdP if desired
+- An Identity Provider is bundled to ease deployment and operations. It can be replaced with an external OpenID IdP, if desired
 - Automatically built and fully maintained Docker containers are available
 - Flexible configuration through environment variables, config files or command-line flags
 - Database-less architecture - metadata and data are kept together in the storage as a single source of truth
@@ -55,10 +55,10 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 
 - a user management service
 - a settings service
+- a frontend service
 - a storage backend service
-- Built-in IdP
-- Frontend
-- Application gateway/proxy
+- a built-in IdP
+- an application gateway/proxy
 
 These components can be deployed in a multi-tier deployment architecture. See the [documentation](https://owncloud.github.io/ocis/) for an overview of the services.
 
@@ -80,9 +80,9 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 - ownCloud Server >= 10.6
 - [Open ID Connect](https://marketplace.owncloud.com/apps/openidconnect) is used for user authentication
 - The [Graph API](https://marketplace.owncloud.com/apps/graphapi) app is installed on ownCloud Server
-- The latest client versions are rolled-out to users (required for OpenID Connect support). See the [ownCloud Documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
+- The latest client versions are rolled-out to users (required for OpenID Connect support). See the [documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
 
-See the [Documentation](<https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/>) on how to deploy Infinite Scale in bridge mode.
+See the [documentation](https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/) on how to deploy Infinite Scale in bridge mode.
 
 {{< hint "warning" >}}
 **Technology Preview**
@@ -119,12 +119,14 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
     `curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-darwin-amd64 -o ocis`
 
 2. Make it executable
-   `chmod +x ocis`
+
+    `chmod +x ocis`
 
 3. Run it
-   `./ocis server`
+   
+    `./ocis server`
 
-4. Navigate to <http://localhost:9200> and log in to ownCloud Web (admin:admin)
+4. Navigate to <https://localhost:9200> and log in to ownCloud Web (admin:admin)
 
 Production environments will need a more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
 
@@ -230,7 +232,7 @@ For more sophisticated setups we recommend using one of our docker setup example
 
 #### Storage
 
-The default OCIS storage driver deconstructs a filesystem to be able to efficiently look up files by fileid as well as path. It stores all folders and files by a uuid and persists share and other metadata using extended attributes. This allows using the linux VFS cache using stat syscalls instead of a database or key/value store. The driver implements trash, versions and sharing. It not only serves as the current default storage driver, but also as a blueprint for future storage driver implementations.
+The default oCIS storage driver deconstructs a filesystem to be able to efficiently look up files by fileid as well as path. It stores all folders and files by a uuid and persists share and other metadata using extended attributes. This allows using the linux VFS cache using stat syscalls instead of a database or key/value store. The driver implements trash, versions and sharing. It not only serves as the current default storage driver, but also as a blueprint for future storage driver implementations.
 
 {{< /tab >}}
 {{< tab "IDM" >}}
@@ -270,24 +272,28 @@ Infinite Scale follows a role-based access control model. Based on permissions f
 {{< /tab >}}
 {{< tab "APIs" >}}
 #### APIs
+
 - WebDAV
 - OCS
 
 {{< /tab >}}
 {{< /tabs >}}
 
-### Known issues for OCIS standalone
+### Known issues
+
 - There are feature differences depending on the operation mode, e.g., no user management with ownCloud Web and oC 10 backend
 - Public links do not yet respect the given role (a recipient has full permissions no matter which role has been set)
-- Resharing works but does not have necessary restrictions in place
-  - Share recipients can add more people or create public links with higher permissions than they originally had
-  - Every person in a share can see all other people in the people list
+- Resharing does not yet work as expected
+  - Share recipients can create public links with higher permissions than they originally had
+  - Share recipients can add other people but they will not be able to access the data
 - Sharing indicators in the file list will only be shown after opening the right sidebar for a resource
 - Users can't change their password yet
 - Folder sizes will not be calculated
 - Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
 - Sharing from the desktop client does not work yet
 - There are no notifications yet
-- There can be issues with tokens not being refreshed correctly, leading to interruptings, e.g., during uploads
+- There can be issues with access tokens not being refreshed correctly, leading to interruptings, e.g., during uploads
 - Deleting non-empty folders from the trash bin does not work
 - Emptying the whole trash bin does not work
+
+For feedback and bug reports, please use the [public issue tracker](https://github.com/owncloud/ocis/issues).
