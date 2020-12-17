@@ -61,6 +61,7 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 These components can be deployed in a multi-tier deployment architecture. See the [documentation](https://owncloud.github.io/ocis/) for an overview of the services.
 
 ### Operation modes
+
 #### Standalone Full Stack Server mode (with oCIS storage driver)
 
 #### Standalone Single service mode for scaleouts
@@ -81,15 +82,11 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 
 https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/
 
-[To illustrate, a little graphic that describes the various operation modes would be cool
-
 ### What to expect?
 
 This is the first promoted public release of ownCloud Infinite Scale, released as "Technical Preview". Infinite Scale is not yet ready for production installations. Technical audience will get a good impression of the potential of ownClouds new platform.
 
 Version 1.0.0 comes with the base functionality for sync and share on a much higher performance-, stability- and security-level compared to all available platforms. Based on ten years of experience in enterprise sync and share and a long standing collaboration with the biggest global science organizations this new platform will exceed what content collaboration is today.
-
-TODO: Mention the base modules of oCIS
 
 ### How to get started?
 
@@ -99,35 +96,43 @@ One of the most important objectives for oCIS was to ease the setup of a working
 
 Given the Golang-based architecture of oCIS, there are various deployment options based on the users requirements. With our experience with the for many users difficult setup of the LAMP stack before a big emphasis was put on easy yet functional deployment strategies.
 
-##### Delivery as single binary
+{{< tabs "deployments" >}}
+{{< tab "Single binary" >}}
+#### Delivery as single binary
 
 The single binary is the best option to test the new ownCloud Infinite Scale 1.0.0 Technical Preview release on a local machine. Follow these instructions to get the platform running in the most simple way:
 
 1. Download the binary
-
-**Linux**
-
-`curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
-
-**MacOS**
-
-`curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
+   **Linux**
+   `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis`
+   **MacOS**
+   `curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis`
 
 2. Make it executable
-`chmod +x ocis`
+   `chmod +x ocis`
 
 3. Run it
-`./ocis server`
+   `./ocis server`
 
 4. Navigate to http://localhost:9200 and log in to ownCloud Web (admin/admin)
 
-Infinite Scale environments on remote machines should use a more sophisticated setup. See the [documentation](https://owncloud.github.io/ocis/deployment/) for more information.
+oCIS environments to last should use more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
+{{< /tab >}}
+{{< tab "Docker" >}}
+#### Containerized Setup
 
-##### Containerized Setup
+For more sophisticated and production setups we recommend to use one of our proposed docker setups, see [Link]
 
-For more sophisticated and production setups we recommend to use one of our proposed docker setups. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with Traefik as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+- Traefik reverse proxy
+- Letsencrypt certificate provisioning
+
+https://owncloud.github.io/ocis/deployment/ocis_traefik/
+{{< /tab >}}
+{{< /tabs >}}
 
 ### ownCloud Web Features
+{{< tabs "web-features" >}}
+{{< tab "Framework" >}}
 #### Framework
 - User avatars (compatible with oC 10 API)
 - Alerts for information/errors
@@ -137,6 +142,8 @@ For more sophisticated and production setups we recommend to use one of our prop
   - Media Viewer (images and videos)
   - Draw.io
 
+{{< /tab >}}
+{{< tab "Files" >}}
 #### Files
 - Listing and browsing the hierarchy
 - Sorting by columns (name/size/updated)
@@ -160,6 +167,8 @@ For more sophisticated and production setups we recommend to use one of our prop
 - Versions (list/restore/download/delete)
 - File/folder search
 
+{{< /tab >}}
+{{< tab "Sharing" >}}
 #### Sharing with People (user/group shares)
 - Adding people to a resource
   - Adding multiple people at once (users and groups)
@@ -175,6 +184,8 @@ For more sophisticated and production setups we recommend to use one of our prop
   - Editing persons
   - Removing persons
 
+{{< /tab >}}
+{{< tab "Links" >}}
 #### Sharing with Links
 - Private links (copy)
 - Public links
@@ -190,17 +201,28 @@ For more sophisticated and production setups we recommend to use one of our prop
     - Removing existing public links
   - Viewing public links
 
+{{< /tab >}}
+{{< tab "User Profile" >}}
 #### User Profile
 - Display basic profile information (user name, display name, e-mail, group memberships)
 - "Edit" button guides to ownCloud 10 user settings (when used with oC 10)
 
+{{< /tab >}}
+{{< tab "User Settings" >}}
 #### Basic user settings
 - Language of the web interface
 
+{{< /tab >}}
+{{< /tabs >}}
+
 ### oCIS Backend Features
 
+{{< tabs "backend-features" >}}
+{{< tab "Storage" >}}
 #### Storage
 
+{{< /tab >}}
+{{< tab "IDM" >}}
 #### User and group management
 - Functionality available via API and frontend ("Accounts" extension)
 - User listing (API/FE)
@@ -215,6 +237,8 @@ For more sophisticated and production setups we recommend to use one of our prop
 - Group deletion (API)
 - Create/read/update users and groups (CLI)
 
+{{< /tab >}}
+{{< tab "Settings" >}}
 #### Settings
 ##### Settings bundles framework
 - What is a settings bundle?
@@ -232,9 +256,14 @@ Infinite Scale follows a role-based access control model. Based on permissions f
 - Currently a user can only have one role
 - Users with the role "Admin" can assign/unassign roles to/from other users (as part of the permission to "manage accounts")
 
+{{< /tab >}}
+{{< tab "APIs" >}}
 #### APIs
 - WebDAV
 - OCS
+
+{{< /tab >}}
+{{< /tabs >}}
 
 ### Known issues for OCIS standalone
 - There are feature differences depending on the operation  mode, e.g., no user management with ownCloud Web and oC 10 backend
