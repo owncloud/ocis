@@ -223,8 +223,10 @@ For more sophisticated and production setups we recommend using one of our propo
 
 {{< tabs "backend-features" >}}
 {{< tab "Storage" >}}
+
 #### Storage
-@TODO
+
+The default OCIS storage driver deconstructs a filesystem to be able to efficiently look up files by fileid as well as path. It stores all folders and files by a uuid and persists share and other metadata using extended attributes. This allows using the linux VFS cache using stat syscalls instead of a database or key/value store. The driver implements trash, versions and sharing. It not only serves as the current default storage driver, but also as a blueprint for future storage driver implementations.
 
 {{< /tab >}}
 {{< tab "IDM" >}}
@@ -280,3 +282,8 @@ Infinite Scale follows a role-based access control model. Based on permissions f
 - Users can't change their password yet
 - Folder sizes will not be calculated
 - Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
+- Sharing from the desktop client does not work yet
+- There are no notifications yet
+- There can be issues with tokens not being refreshed correctly, leading to interruptings, e.g., during uploads
+- Deleting non-empty folders from the trash bin does not work
+- Emptying the whole trash bin does not work
