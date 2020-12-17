@@ -17,7 +17,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'sharesFromDeletedUser',
-    'coreCommit': '67c1e997c971c8aa213895aa89d7be921d3a8b06',
+    'coreCommit': 'e2a93742ee0fc8a34bffc375975a25708edc4d76',
     'numberOfParts': 10
   },
   'uiTests': {
