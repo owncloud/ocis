@@ -907,6 +907,12 @@ apiTrashbin/trashbinDelete.feature:37
 apiTrashbin/trashbinDelete.feature:50
 apiTrashbin/trashbinDelete.feature:67
 #
+# https://github.com/owncloud/ocis/issues/1120 href in trashbin PROPFIND response is wrong
+# https://github.com/owncloud/ocis/issues/1077 [QA] trashcan cannot delete a deep tree
+#
+apiTrashbin/trashbinDelete.feature:107
+apiTrashbin/trashbinDelete.feature:123
+#
 # https://github.com/owncloud/product/issues/255 trashbin filename invalid for nested files/folders
 #
 apiTrashbin/trashbinFilesFolders.feature:44
@@ -946,29 +952,21 @@ apiTrashbin/trashbinFilesFolders.feature:245
 apiTrashbin/trashbinFilesFolders.feature:246
 apiTrashbin/trashbinFilesFolders.feature:247
 #
-# https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
+# https://github.com/owncloud/ocis/issues/1116 PROPFIND on trashbin with Depth: infinity only shows the first level
 #
-apiTrashbin/trashbinRestore.feature:40
-apiTrashbin/trashbinRestore.feature:41
+apiTrashbin/trashbinFilesFolders.feature:272
+apiTrashbin/trashbinFilesFolders.feature:273
 #
-# https://github.com/owncloud/ocis-reva/issues/117 cannot restore trashbin item
+# https://github.com/owncloud/ocis/issues/1120 href in trashbin PROPFIND response is wrong
 #
 apiTrashbin/trashbinRestore.feature:54
 apiTrashbin/trashbinRestore.feature:55
 apiTrashbin/trashbinRestore.feature:70
 apiTrashbin/trashbinRestore.feature:71
-apiTrashbin/trashbinRestore.feature:90
-apiTrashbin/trashbinRestore.feature:91
-apiTrashbin/trashbinRestore.feature:92
-apiTrashbin/trashbinRestore.feature:93
-apiTrashbin/trashbinRestore.feature:94
-apiTrashbin/trashbinRestore.feature:95
 apiTrashbin/trashbinRestore.feature:118
 apiTrashbin/trashbinRestore.feature:119
 apiTrashbin/trashbinRestore.feature:120
 apiTrashbin/trashbinRestore.feature:121
-apiTrashbin/trashbinRestore.feature:138
-apiTrashbin/trashbinRestore.feature:139
 apiTrashbin/trashbinRestore.feature:211
 apiTrashbin/trashbinRestore.feature:212
 apiTrashbin/trashbinRestore.feature:255
@@ -979,8 +977,43 @@ apiTrashbin/trashbinRestore.feature:259
 apiTrashbin/trashbinRestore.feature:260
 apiTrashbin/trashbinRestore.feature:275
 apiTrashbin/trashbinRestore.feature:276
+apiTrashbin/trashbinRestore.feature:292
+apiTrashbin/trashbinRestore.feature:293
+#
+# https://github.com/owncloud/ocis/issues/1120 href in trashbin PROPFIND response is wrong
+# https://github.com/owncloud/ocis/issues/1121 trash-bin restore move does not send back Etag and other headers
+#
+apiTrashbin/trashbinRestore.feature:40
+apiTrashbin/trashbinRestore.feature:41
+apiTrashbin/trashbinRestore.feature:138
+apiTrashbin/trashbinRestore.feature:139
+#
+# https://github.com/owncloud/ocis/issues/1120 href in trashbin PROPFIND response is wrong
+# https://github.com/owncloud/ocis/issues/1122 cannot restore to a different file-name
+# https://github.com/owncloud/ocis/issues/1121 trash-bin restore move does not send back Etag and other headers
+#
+apiTrashbin/trashbinRestore.feature:90
+apiTrashbin/trashbinRestore.feature:91
+apiTrashbin/trashbinRestore.feature:92
+apiTrashbin/trashbinRestore.feature:93
+apiTrashbin/trashbinRestore.feature:94
+apiTrashbin/trashbinRestore.feature:95
+#
+# https://github.com/owncloud/ocis/issues/1120 href in trashbin PROPFIND response is wrong
+# https://github.com/owncloud/ocis/issues/1122 cannot restore to a different file-name
+#
+apiTrashbin/trashbinRestore.feature:311
+apiTrashbin/trashbinRestore.feature:312
+apiTrashbin/trashbinRestore.feature:330
+apiTrashbin/trashbinRestore.feature:331
+#
+# https://github.com/owncloud/ocis/issues/1123 deleting a received share-folder moves it to trash-bin but does not unshare it
+#
 apiTrashbin/trashbinSharingToShares.feature:24
 apiTrashbin/trashbinSharingToShares.feature:25
+#
+# https://github.com/owncloud/ocis/issues/1124 deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver
+#
 apiTrashbin/trashbinSharingToShares.feature:40
 apiTrashbin/trashbinSharingToShares.feature:41
 apiTrashbin/trashbinSharingToShares.feature:63
