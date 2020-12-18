@@ -55,17 +55,17 @@ services:
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
       LDAP_FILTER: "(&(objectclass=inetOrgPerson)(objectClass=owncloud))"
       LDAP_URI: ldap://ldap-server:389
-      LDAP_BINDDN: "cn=admin,dc=owncloud,dc=test"
+      LDAP_BINDDN: "cn=admin,dc=owncloud,dc=com"
       LDAP_BINDPW: ${LDAP_ADMIN_PASSWORD:-admin}
-      LDAP_BASEDN: "dc=owncloud,dc=test"
+      LDAP_BASEDN: "dc=owncloud,dc=com"
       LDAP_LOGIN_ATTRIBUTE: uid
       LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       LDAP_UUID_ATTRIBUTE_TYPE: binary
       PROXY_ACCOUNT_BACKEND_TYPE: cs3
       STORAGE_LDAP_HOSTNAME: ldap-server
       STORAGE_LDAP_PORT: 636
-      STORAGE_LDAP_BASE_DN: "dc=owncloud,dc=test"
-      STORAGE_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=test"
+      STORAGE_LDAP_BASE_DN: "dc=owncloud,dc=com"
+      STORAGE_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       STORAGE_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       STORAGE_LDAP_LOGINFILTER: '(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))'
       STORAGE_LDAP_USERFILTER: '(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))'
@@ -113,11 +113,14 @@ services:
     command: --copy-service --loglevel debug
     environment:
       LDAP_TLS_VERIFY_CLIENT: never
-      LDAP_DOMAIN: owncloud.test
+      LDAP_DOMAIN: owncloud.com
       LDAP_ORGANISATION: ownCloud
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       LDAP_RFC2307BIS_SCHEMA: "true"
       LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
+    ports:
+      - "389:389"
+      - "636:636"
     volumes:
       - ./config/ldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
     restart: always
