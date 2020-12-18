@@ -10,6 +10,7 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
 	github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/golang/mock v1.4.4 // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
@@ -23,6 +24,7 @@ require (
 	github.com/owncloud/ocis/store v0.0.0-00010101000000-000000000000
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
+	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.5

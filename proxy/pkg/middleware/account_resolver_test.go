@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend/test"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -104,7 +105,7 @@ func TestInternalServerErrorOnMissingMailAndUsername(t *testing.T) {
 }
 
 func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr error) http.Handler {
-	mock := &backend.UserBackendMock{
+	mock := &test.UserBackendMock{
 		GetUserByClaimsFunc: func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, error) {
 			return userBackendResult, userBackendErr
 		},
