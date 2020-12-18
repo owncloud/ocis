@@ -140,17 +140,17 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 		MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
 		Groups:       expandGroups(account),
 		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{},
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
+				},
+			},
 		},
-	}
-
-	user.Opaque.Map["uid"] = &types.OpaqueEntry{
-		Decoder: "plain",
-		Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-	}
-	user.Opaque.Map["gid"] = &types.OpaqueEntry{
-		Decoder: "plain",
-		Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
 	}
 	return user
 }
@@ -208,11 +208,7 @@ func injectRoles(ctx context.Context, u *cs3.User, ss settings.RoleService) erro
 		return err
 	}
 
-	u.Opaque = &types.Opaque{
-		Map: map[string]*types.OpaqueEntry{
-			"roles": enc,
-		},
-	}
+	u.Opaque.Map["roles"] = enc
 
 	return nil
 }
