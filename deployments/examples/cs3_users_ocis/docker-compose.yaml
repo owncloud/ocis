@@ -119,8 +119,8 @@ services:
       LDAP_RFC2307BIS_SCHEMA: "true"
       LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
     ports:
-      - "389:389"
-      - "636:636"
+      - "127.0.0.1:389:389"
+      - "127.0.0.1:636:636"
     volumes:
       - ./config/ldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
     restart: always
