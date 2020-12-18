@@ -235,35 +235,32 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 
 func (p MultiHostReverseProxy) queryRouteMatcher(endpoint string, target url.URL) bool {
 	u, _ := url.Parse(endpoint)
-	if strings.HasPrefix(target.Path, u.Path) && endpoint != "/" {
-		query := u.Query()
-		if len(query) != 0 {
-			rQuery := target.Query()
-			match := true
-			for k := range query {
-				v := query.Get(k)
-				rv := rQuery.Get(k)
-				if rv != v {
-					match = false
-					break
-				}
-			}
-			return match
+	if !strings.HasPrefix(target.Path, u.Path) || endpoint == "/" {
+		return false
+	}
+	q := u.Query()
+	if len(q) == 0 {
+		return false
+	}
+	tq := target.Query()
+	for k := range q {
+		if q.Get(k) != tq.Get(k) {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
-func (p *MultiHostReverseProxy) regexRouteMatcher(endpoint string, target url.URL) bool {
-	matched, err := regexp.MatchString(endpoint, target.String())
+func (p *MultiHostReverseProxy) regexRouteMatcher(pattern string, target url.URL) bool {
+	matched, err := regexp.MatchString(pattern, target.String())
 	if err != nil {
-		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", endpoint)
+		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", pattern)
 	}
 	return matched
 }
 
-func (p *MultiHostReverseProxy) prefixRouteMatcher(endpoint string, target url.URL) bool {
-	return strings.HasPrefix(target.Path, endpoint) && endpoint != "/"
+func (p *MultiHostReverseProxy) prefixRouteMatcher(prefix string, target url.URL) bool {
+	return strings.HasPrefix(target.Path, prefix) && prefix != "/"
 }
 
 func defaultPolicies() []config.Policy {

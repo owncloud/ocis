@@ -60,9 +60,7 @@ func EncoderForType(fileType string) Encoder {
 	switch strings.ToLower(fileType) {
 	case "png":
 		return PngEncoder{}
-	case "jpg":
-		fallthrough
-	case "jpeg":
+	case "jpg", "jpeg":
 		return JpegEncoder{}
 	default:
 		return nil
