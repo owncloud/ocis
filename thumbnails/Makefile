@@ -61,6 +61,10 @@ clean:
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST)
 
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@go mod tidy
+
 .PHONY: fmt
 fmt:
 	gofmt -s -w $(SOURCES)
