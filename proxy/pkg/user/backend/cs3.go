@@ -58,7 +58,6 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 	if len(roleIDs) == 0 {
 		return user, nil
-
 	}
 
 	enc, err := encodeRoleIDs(roleIDs)
