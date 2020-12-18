@@ -15,9 +15,9 @@ import (
 func TestStaticSelector(t *testing.T) {
 	ctx := context.Background()
 	req := httptest.NewRequest("GET", "https://example.org/foo", nil)
-	sel := NewStaticSelector(&config.StaticSelectorConf{Policy: "reva"})
+	sel := NewStaticSelector(&config.StaticSelectorConf{Policy: "ocis"})
 
-	want := "reva"
+	want := "ocis"
 	got, err := sel(ctx, req)
 	if got != want {
 		t.Errorf("Expected policy %v got %v", want, got)

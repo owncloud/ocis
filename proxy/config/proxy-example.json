@@ -8,12 +8,12 @@
   },
   "policy_selector": {
     "static": {
-      "policy": "reva"
+      "policy": "ocis"
     }
   },
   "policies": [
     {
-      "name": "reva",
+      "name": "ocis",
       "routes": [
         {
           "endpoint": "/",

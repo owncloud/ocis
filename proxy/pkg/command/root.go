@@ -19,7 +19,7 @@ func Execute() error {
 	app := &cli.App{
 		Name:     "ocis-proxy",
 		Version:  version.String,
-		Usage:    "proxy for Reva/oCIS",
+		Usage:    "proxy for oCIS",
 		Compiled: version.Compiled(),
 
 		Authors: []*cli.Author{
