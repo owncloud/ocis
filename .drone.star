@@ -383,7 +383,7 @@ def uploadCoverage(ctx):
     'steps': [
       {
         'name': 'sync-from-cache',
-        'image': 'minio/mc',
+        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
         'environment': {
           'MC_HOST_cache': {
             'from_secret': 'cache_s3_connection_url'
@@ -419,7 +419,7 @@ def uploadCoverage(ctx):
       },
       {
         'name': 'purge-cache',
-        'image': 'minio/mc',
+        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
         'environment': {
           'MC_HOST_cache': {
             'from_secret': 'cache_s3_connection_url'
@@ -1570,7 +1570,7 @@ def genericCachePurge(ctx, name, cache_key):
     'steps': [
       {
         'name': 'purge-cache',
-        'image': 'minio/mc',
+        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
         'failure': 'ignore',
         'environment': {
           'MC_HOST_cache': {
