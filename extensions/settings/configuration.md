@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-18T03:06:26+0000"
+date: "2020-12-18T10:33:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -32,33 +32,6 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### settings ocis-settings
-
-Provide settings and permissions for oCIS
-
-Usage: `settings ocis-settings [command options] [arguments...]`
-
---log-level | $SETTINGS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $SETTINGS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $SETTINGS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
-### settings version
-
-Print the versions of the running instances
-
-Usage: `settings version [command options] [arguments...]`
-
---grpc-namespace | $SETTINGS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
---name | $SETTINGS_NAME  
-: service name. Default: `settings`.
 
 ### settings health
 
@@ -131,4 +104,31 @@ Usage: `settings server [command options] [arguments...]`
 
 --jwt-secret | $SETTINGS_JWT_SECRET  
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
+
+### settings ocis-settings
+
+Provide settings and permissions for oCIS
+
+Usage: `settings ocis-settings [command options] [arguments...]`
+
+--log-level | $SETTINGS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $SETTINGS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $SETTINGS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
+
+### settings version
+
+Print the versions of the running instances
+
+Usage: `settings version [command options] [arguments...]`
+
+--grpc-namespace | $SETTINGS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+--name | $SETTINGS_NAME  
+: service name. Default: `settings`.
 
