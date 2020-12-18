@@ -8,7 +8,6 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/cespare/reflex v0.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.3
@@ -18,7 +17,6 @@ require (
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/ogier/pflag v0.0.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
@@ -34,7 +32,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	google.golang.org/genproto v0.0.0-20200918140846-d0d605568037 // indirect
-	google.golang.org/grpc v1.33.2
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
 

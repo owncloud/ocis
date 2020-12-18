@@ -306,10 +306,6 @@ github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21 h1:mZpylrgnCgSea
 github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5/go.mod h1:Hk3eCcdhtv4eIhKvRK736fQuOyS1HuHnUcz0Dq6NK1A=
 github.com/cs3org/reva v1.1.0/go.mod h1:fBzTrNuAKdQ62ybjpdu8nyhBin90/3/3s6DGQDCdBp4=
-github.com/cs3org/reva v1.4.1-0.20201209113234-e791b5599a89 h1:FV4bVGg+22YVyWXlj5VG35/fESoOZBokZiOH2E69PiU=
-github.com/cs3org/reva v1.4.1-0.20201209113234-e791b5599a89/go.mod h1:abC1Lo0ZKwkKloomTPZWunV/lUJvewkty1pI41zn2Ic=
-github.com/cs3org/reva v1.4.1-0.20201214141740-063b3db9162b h1:wL1Q4eX3LNZmuDXQhefTxYKisHdiyrsuinLWYiWD+6s=
-github.com/cs3org/reva v1.4.1-0.20201214141740-063b3db9162b/go.mod h1:abC1Lo0ZKwkKloomTPZWunV/lUJvewkty1pI41zn2Ic=
 github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1 h1:bTNyWMz+9x4JddkxUeuYkmCGL6tbLkUunbmW3Q0Nah8=
 github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1/go.mod h1:abC1Lo0ZKwkKloomTPZWunV/lUJvewkty1pI41zn2Ic=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
@@ -1289,8 +1285,6 @@ github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40T
 github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2/go.mod h1:7tZKcyumwBO6qip7RNQ5r77yrssm9bfCowcLEBcU5IA=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/refs/pman v0.0.0-20200701173654-f05b8833071a h1:GCYFb7layULUl1HvZG97ur0zyqtEPo3VHcJCcBSvk7M=
-github.com/refs/pman v0.0.0-20200701173654-f05b8833071a/go.mod h1:fp4xg8dOs/XaZfB3abn1pxvclh10MtG4tdCc61lrmCo=
 github.com/refs/pman v0.0.0-20201214134707-9ce4dcebbbf8 h1:7Pz7RrqgDeEp/nTGK55clOWODZ4+2D7J5K0VFOiYHU0=
 github.com/refs/pman v0.0.0-20201214134707-9ce4dcebbbf8/go.mod h1:EHI7tmxO5Ct3xBLHU43j51o5/U6VQz0TM6ik8RPE570=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=
