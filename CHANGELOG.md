@@ -1,4 +1,25 @@
-# Changes in 1.0.0
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.0.0...master
+
+## Summary
+
+* Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
+
+## Details
+
+* Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
+
+   Tags: ocis
+
+   Disable pretty logging default for performance reasons.
+
+   https://github.com/owncloud/ocis/pull/1133
+# Changelog for [1.0.0] (2020-12-17)
+
+The following sections list the changes for 1.0.0.
 
 ## Summary
 
