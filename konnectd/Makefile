@@ -66,6 +66,10 @@ clean:
 	rm -rf node_modules
 	rm -rf assets/identifier
 
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@go mod tidy
+
 .PHONY: fmt
 fmt:
 	gofmt -s -w $(SOURCES)

@@ -66,6 +66,10 @@ clean: clean-config
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST) $(HUGO)
 
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@go mod tidy
+
 .PHONY: clean-config
 clean-config:
 	rm -rf $(CONFIG)

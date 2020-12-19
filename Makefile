@@ -12,6 +12,20 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
+OCIS_MODULES = \
+	accounts \
+	glauth \
+	konnectd \
+	ocis \
+	ocs \
+	ocis-pkg \
+	proxy \
+	settings \
+	storage \
+	store \
+	thumbnails \
+	web \
+	webdav
 
 .PHONY: help
 help:
@@ -63,3 +77,9 @@ vendor-bin/behat/composer.lock: vendor-bin/behat/composer.json
 
 composer.lock: composer.json
 	@echo composer.lock is not up to date.
+
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod go-mod-tidy; \
+    done
