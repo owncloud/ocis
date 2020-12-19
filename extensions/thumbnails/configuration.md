@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-18T14:18:30+0000"
+date: "2020-12-19T05:03:24+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -32,6 +32,27 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails version
+
+Print the versions of the running instances
+
+Usage: `thumbnails version [command options] [arguments...]`
+
+--grpc-name | $THUMBNAILS_GRPC_NAME  
+: Name of the service. Default: `thumbnails`.
+
+--grpc-namespace | $THUMBNAILS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+### thumbnails health
+
+Check health status
+
+Usage: `thumbnails health [command options] [arguments...]`
+
+--debug-addr | $THUMBNAILS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9189`.
 
 ### thumbnails server
 
@@ -101,25 +122,4 @@ Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
 
 --log-color | $THUMBNAILS_LOG_COLOR  
 : Enable colored logging. Default: `true`.
-
-### thumbnails version
-
-Print the versions of the running instances
-
-Usage: `thumbnails version [command options] [arguments...]`
-
---grpc-name | $THUMBNAILS_GRPC_NAME  
-: Name of the service. Default: `thumbnails`.
-
---grpc-namespace | $THUMBNAILS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
-### thumbnails health
-
-Check health status
-
-Usage: `thumbnails health [command options] [arguments...]`
-
---debug-addr | $THUMBNAILS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9189`.
 

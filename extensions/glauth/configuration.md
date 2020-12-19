@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-18T14:18:19+0000"
+date: "2020-12-19T05:03:13+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -32,6 +32,15 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+--debug-addr | $GLAUTH_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9129`.
 
 ### glauth server
 
@@ -146,13 +155,4 @@ Usage: `glauth ocis-glauth [command options] [arguments...]`
 
 --log-color | $GLAUTH_LOG_COLOR  
 : Enable colored logging. Default: `true`.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
---debug-addr | $GLAUTH_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9129`.
 
