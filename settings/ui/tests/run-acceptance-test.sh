@@ -29,9 +29,9 @@ trap clean_up SIGHUP SIGINT SIGTERM
 if [ -z "$TEST_INFRA_DIRECTORY" ]
 then
 	cleanup=true
-	testFolder=$(mktemp -d)
+	testFolder=$(mktemp -d -p .)
 	printf "creating folder $testFolder for Test infrastructure setup\n\n"
-	export TEST_INFRA_DIRECTORY=$testFolder
+	export TEST_INFRA_DIRECTORY=$testFolder/tests
 fi
 
 clean_up() {
