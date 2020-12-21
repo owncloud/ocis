@@ -35,7 +35,7 @@ require (
 
 replace (
 	// pr https://github.com/cs3org/reva/pull/1368
-	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201216110846-3855e0ecfeb0
+	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201221220454-a2a2f2bb2ab5
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/settings => ../settings
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
