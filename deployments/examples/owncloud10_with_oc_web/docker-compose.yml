@@ -63,7 +63,7 @@ services:
       default:
     environment:
       # general config
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error}
       # proxy
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
@@ -71,12 +71,10 @@ services:
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_ENABLE_PRESIGNEDURLS: "false"
-      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       PROXY_TLS: "false"
       # konnectd - binddn must exist as oc10 admin user
       KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
       KONNECTD_INSECURE: "${INSECURE:-false}"
-      KONNECTD_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       KONNECTD_SIGNING_KID: super
       KONNECTD_TLS: 0
       LDAP_BASEDN: "dc=example,dc=org"
@@ -99,12 +97,8 @@ services:
       # web ui
       WEB_UI_CONFIG: "/config/config.json"
       # storage - although not used, yet
-      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       STORAGE_OIDC_INSECURE: "${INSECURE:-false}"
       STORAGE_TRANSFER_EXPIRES: 86400
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
-      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
       - ./config/ocis:/config
       - ocis-data:/var/tmp/ocis
@@ -129,7 +123,7 @@ services:
       - redis
     environment:
       PROXY_LOG_LEVEL: debug
-      OCIS_DOMAIN: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OWNCLOUD_DOMAIN: ${OC10_DOMAIN:-oc10.owncloud.test}
       OWNCLOUD_DB_TYPE: mysql
       OWNCLOUD_DB_NAME: owncloud

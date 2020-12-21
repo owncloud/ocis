@@ -1413,6 +1413,7 @@ def frontend(module):
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
   environment = {
     #'OCIS_LOG_LEVEL': 'debug',
+    'OCIS_URL': 'https://ocis-server:9200',
     'STORAGE_HOME_DRIVER': '%s' % (storage),
     'STORAGE_USERS_DRIVER': '%s' % (storage),
     'STORAGE_DRIVER_OCIS_ROOT': '/srv/app/tmp/ocis/storage/users',
@@ -1420,18 +1421,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
     'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
     'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
-    'STORAGE_LDAP_IDP': 'https://ocis-server:9200',
-    'STORAGE_OIDC_ISSUER': 'https://ocis-server:9200',
-    'PROXY_OIDC_ISSUER': 'https://ocis-server:9200',
     'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
-    'STORAGE_DATAGATEWAY_PUBLIC_URL': 'https://ocis-server:9200/data',
     'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
-    'STORAGE_FRONTEND_PUBLIC_URL': 'https://ocis-server:9200',
     'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
-    'KONNECTD_ISS': 'https://ocis-server:9200',
     'KONNECTD_TLS': 'true',
     'OCIS_LOG_LEVEL': 'warn',
   }

@@ -33,12 +33,21 @@ func Server(cfg *config.Config) *cli.Command {
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
 
 			cfg.Web.Config.Apps = c.StringSlice("web-config-app")
 
-			return ParseConfig(c, cfg)
+			if err := ParseConfig(c, cfg); err != nil {
+				return err
+			}
+
+			// build well known openid-configuration endpoint if it is not set
+			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
+				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority) + "/.well-known/openid-configuration"
+			}
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -55,7 +56,9 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

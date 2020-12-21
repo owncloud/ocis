@@ -38,18 +38,9 @@ services:
       OCIS_LOG_LEVEL: debug
       # domain setup
       # TODO currently the below lines hardcode the port to 9200, use an OCIS_URL that includes protocol and port
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-localhost}
-      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
-      KONNECTD_ISS: https://${OCIS_DOMAIN:-localhost}:9200
-      WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-localhost}:9200
-      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-localhost}:9200/.well-known/openid-configuration
-      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-localhost}:9200
-      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-localhost}:9200
-      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-localhost}:9200
+      OCIS_URL: https://${OCIS_DOMAIN:-localhost:9200}
       # TODO make id the default in ocis-storage
       STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-localhost}:9200
-      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-localhost}:9200/data
       # common eos settings used for both drivers: eos and eoshome
       STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}

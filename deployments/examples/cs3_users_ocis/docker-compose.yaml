@@ -73,23 +73,15 @@ services:
       STORAGE_LDAP_FINDFILTER: '(&(objectclass=owncloud)(|(uid={{query}}*)(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)(description={{query}}*)))'
       STORAGE_LDAP_GROUPFILTER: '(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))'
       # General ocis config
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: error
       # proxy config
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
-      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       PROXY_TLS: "false"
       # web config
-      WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/.well-known/openid-configuration
       WEB_UI_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # storage config
-      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
-      STORAGE_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # idp config
-      KONNECTD_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       KONNECTD_TLS: 'false'
     volumes:
       - ./config/ocis:/config

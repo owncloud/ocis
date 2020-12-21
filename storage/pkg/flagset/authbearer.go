@@ -24,7 +24,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "oidc-issuer",
 			Value:       "https://localhost:9200",
 			Usage:       "OIDC issuer",
-			EnvVars:     []string{"STORAGE_OIDC_ISSUER"},
+			EnvVars:     []string{"STORAGE_OIDC_ISSUER", "OCIS_URL"}, // STORAGE_OIDC_ISSUER takes precedence over OCIS_URL
 			Destination: &cfg.Reva.OIDC.Issuer,
 		},
 		&cli.BoolFlag{

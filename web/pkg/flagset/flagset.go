@@ -161,7 +161,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "web-config-server",
 			Value:       "https://localhost:9200",
 			Usage:       "Server URL",
-			EnvVars:     []string{"WEB_UI_CONFIG_SERVER"},
+			EnvVars:     []string{"WEB_UI_CONFIG_SERVER", "OCIS_URL"}, // WEB_UI_CONFIG_SERVER takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.Server,
 		},
 		&cli.StringFlag{
@@ -186,16 +186,16 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-metadata-url",
-			Value:       "https://localhost:9200/.well-known/openid-configuration",
-			Usage:       "OpenID Connect metadata URL",
+			Value:       "",
+			Usage:       "OpenID Connect metadata URL, defaults to <WEB_OIDC_AUTHORITY>/.well-known/openid-configuration",
 			EnvVars:     []string{"WEB_OIDC_METADATA_URL"},
 			Destination: &cfg.Web.Config.OpenIDConnect.MetadataURL,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-authority",
 			Value:       "https://localhost:9200",
-			Usage:       "OpenID Connect authority", // TODO rename to Issuer
-			EnvVars:     []string{"WEB_OIDC_AUTHORITY"},
+			Usage:       "OpenID Connect authority",                 // TODO rename to Issuer
+			EnvVars:     []string{"WEB_OIDC_AUTHORITY", "OCIS_URL"}, // WEB_OIDC_AUTHORITY takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.OpenIDConnect.Authority,
 		},
 		&cli.StringFlag{
