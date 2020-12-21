@@ -2551,3 +2551,7 @@ apiWebdavUploadTUS/uploadFile.feature:139
 apiWebdavUploadTUS/uploadFile.feature:140
 apiWebdavUploadTUS/uploadFile.feature:141
 apiWebdavUploadTUS/uploadFile.feature:142
+
+# https://github.com/owncloud/ocis/issues/1141 upload a file using TUS resource URL as an other user should not work
+apiWebdavUploadTUS/uploadFile.feature:155
+apiWebdavUploadTUS/uploadFile.feature:156
