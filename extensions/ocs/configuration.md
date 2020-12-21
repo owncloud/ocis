@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-19T05:03:19+0000"
+date: "2020-12-21T05:12:06+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -33,14 +33,20 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### ocs health
+### ocs ocis-ocs
 
-Check health status
+Serve OCS API for oCIS
 
-Usage: `ocs health [command options] [arguments...]`
+Usage: `ocs ocis-ocs [command options] [arguments...]`
 
---debug-addr | $OCS_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9114`.
+--log-level | $OCS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $OCS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $OCS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### ocs server
 
@@ -93,21 +99,6 @@ Usage: `ocs server [command options] [arguments...]`
 --jwt-secret | $OCS_JWT_SECRET  
 : Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
-### ocs ocis-ocs
-
-Serve OCS API for oCIS
-
-Usage: `ocs ocis-ocs [command options] [arguments...]`
-
---log-level | $OCS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $OCS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $OCS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
 ### ocs version
 
 Print the versions of the running instances
@@ -119,4 +110,13 @@ Usage: `ocs version [command options] [arguments...]`
 
 --name | $OCS_NAME  
 : Service name. Default: `ocs`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+--debug-addr | $OCS_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9114`.
 

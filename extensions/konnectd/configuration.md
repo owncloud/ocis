@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-19T05:03:15+0000"
+date: "2020-12-21T05:12:02+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/konnectd/templates
@@ -33,14 +33,20 @@ If you prefer to configure the service with environment variables you can see th
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### konnectd health
+### konnectd ocis-konnectd
 
-Check health status
+Serve Konnectd API for oCIS
 
-Usage: `konnectd health [command options] [arguments...]`
+Usage: `konnectd ocis-konnectd [command options] [arguments...]`
 
---debug-addr | $KONNECTD_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
+--log-level | $KONNECTD_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $KONNECTD_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $KONNECTD_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### konnectd server
 
@@ -156,21 +162,6 @@ Usage: `konnectd server [command options] [arguments...]`
 --disable-identifier-webapp | $KONNECTD_DISABLE_IDENTIFIER_WEBAPP  
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `true`.
 
-### konnectd ocis-konnectd
-
-Serve Konnectd API for oCIS
-
-Usage: `konnectd ocis-konnectd [command options] [arguments...]`
-
---log-level | $KONNECTD_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $KONNECTD_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $KONNECTD_LOG_COLOR  
-: Enable colored logging. Default: `true`.
-
 ### konnectd version
 
 Print the versions of the running instances
@@ -182,4 +173,13 @@ Usage: `konnectd version [command options] [arguments...]`
 
 --name | $KONNECTD_NAME  
 : Service name. Default: `konnectd`.
+
+### konnectd health
+
+Check health status
+
+Usage: `konnectd health [command options] [arguments...]`
+
+--debug-addr | $KONNECTD_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
 

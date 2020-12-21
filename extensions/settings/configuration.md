@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-19T05:03:21+0000"
+date: "2020-12-21T05:12:08+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -41,6 +41,21 @@ Usage: `settings health [command options] [arguments...]`
 
 --debug-addr | $SETTINGS_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9194`.
+
+### settings ocis-settings
+
+Provide settings and permissions for oCIS
+
+Usage: `settings ocis-settings [command options] [arguments...]`
+
+--log-level | $SETTINGS_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $SETTINGS_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $SETTINGS_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### settings server
 
@@ -104,21 +119,6 @@ Usage: `settings server [command options] [arguments...]`
 
 --jwt-secret | $SETTINGS_JWT_SECRET  
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
-
-### settings ocis-settings
-
-Provide settings and permissions for oCIS
-
-Usage: `settings ocis-settings [command options] [arguments...]`
-
---log-level | $SETTINGS_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $SETTINGS_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $SETTINGS_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### settings version
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-19T05:03:22+0000"
+date: "2020-12-21T05:12:10+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -41,6 +41,24 @@ Usage: `store health [command options] [arguments...]`
 
 --debug-addr | $STORE_DEBUG_ADDR  
 : Address to debug endpoint. Default: `0.0.0.0:9460`.
+
+### store ocis-store
+
+Service to store values for ocis extensions
+
+Usage: `store ocis-store [command options] [arguments...]`
+
+--config-file | $STORE_CONFIG_FILE  
+: Path to config file.
+
+--log-level | $STORE_LOG_LEVEL  
+: Set logging level. Default: `info`.
+
+--log-pretty | $STORE_LOG_PRETTY  
+: Enable pretty logging. Default: `true`.
+
+--log-color | $STORE_LOG_COLOR  
+: Enable colored logging. Default: `true`.
 
 ### store server
 
@@ -83,24 +101,6 @@ Usage: `store server [command options] [arguments...]`
 
 --data-path | $STORE_DATA_PATH  
 : location of the store data path. Default: `/var/tmp/ocis/store`.
-
-### store ocis-store
-
-Service to store values for ocis extensions
-
-Usage: `store ocis-store [command options] [arguments...]`
-
---config-file | $STORE_CONFIG_FILE  
-: Path to config file.
-
---log-level | $STORE_LOG_LEVEL  
-: Set logging level. Default: `info`.
-
---log-pretty | $STORE_LOG_PRETTY  
-: Enable pretty logging. Default: `true`.
-
---log-color | $STORE_LOG_COLOR  
-: Enable colored logging. Default: `true`.
 
 ### store version
 
