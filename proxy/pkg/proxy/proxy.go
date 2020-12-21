@@ -269,7 +269,7 @@ func (p *MultiHostReverseProxy) prefixRouteMatcher(endpoint string, target url.U
 func defaultPolicies() []config.Policy {
 	return []config.Policy{
 		{
-			Name: "reva",
+			Name: "ocis",
 			Routes: []config.Route{
 				{
 					Endpoint: "/",

@@ -8,14 +8,14 @@
   },
   "policy_selector": {
     "migration": {
-      "acc_found_policy" : "reva",
+      "acc_found_policy" : "ocis",
       "acc_not_found_policy": "oc10",
       "unauthenticated_policy": "oc10"
     }
   },
   "policies": [
     {
-      "name": "reva",
+      "name": "ocis",
       "routes": [
         {
           "endpoint": "/",

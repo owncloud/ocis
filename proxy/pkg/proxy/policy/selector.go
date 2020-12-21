@@ -75,7 +75,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 // Configuration:
 //
 // "policy_selector": {
-//    "static": {"policy" : "reva"}
+//    "static": {"policy" : "ocis"}
 //  },
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 	return func(ctx context.Context, r *http.Request) (s string, err error) {
@@ -87,7 +87,7 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 // The policy for each case is configurable:
 // "policy_selector": {
 //    "migration": {
-//      "acc_found_policy" : "reva",
+//      "acc_found_policy" : "ocis",
 //      "acc_not_found_policy": "oc10",
 //      "unauthenticated_policy": "oc10"
 //    }
