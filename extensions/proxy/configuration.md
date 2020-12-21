@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-21T05:12:07+0000"
+date: "2020-12-21T09:09:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -44,7 +44,7 @@ Usage: `proxy health [command options] [arguments...]`
 
 ### proxy ocis-proxy
 
-proxy for Reva/oCIS
+proxy for oCIS
 
 Usage: `proxy ocis-proxy [command options] [arguments...]`
 
