@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-22T09:45:39+0000"
+date: "2020-12-22T09:59:43+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -32,6 +32,18 @@ If you prefer to configure the service with environment variables you can see th
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails version
+
+Print the versions of the running instances
+
+Usage: `thumbnails version [command options] [arguments...]`
+
+--grpc-name | $THUMBNAILS_GRPC_NAME  
+: Name of the service. Default: `thumbnails`.
+
+--grpc-namespace | $THUMBNAILS_GRPC_NAMESPACE  
+: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
 ### thumbnails health
 
@@ -110,16 +122,4 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 --webdavsource-insecure | $THUMBNAILS_WEBDAVSOURCE_INSECURE  
 : Whether to skip certificate checks. Default: `true`.
-
-### thumbnails version
-
-Print the versions of the running instances
-
-Usage: `thumbnails version [command options] [arguments...]`
-
---grpc-name | $THUMBNAILS_GRPC_NAME  
-: Name of the service. Default: `thumbnails`.
-
---grpc-namespace | $THUMBNAILS_GRPC_NAMESPACE  
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
