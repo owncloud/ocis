@@ -18,9 +18,6 @@ COMPOSE_FILE ?= src/redis.yml:src/ocis-base.yml:src/acceptance.yml
 ## user input
 BEHAT_FEATURE ?=
 
-CORE_BRANCH ?= master
-CORE_COMMIT ?= 52105a981c0c74fc81c84218e9076d443b06f074
-
 ifdef OCIS_IMAGE_TAG
 	COMPOSE_FILE := $(COMPOSE_FILE):src/ocis-image.yml
 else
@@ -184,8 +181,6 @@ testSuite: clean-docker-container
 	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
-	CORE_BRANCH=$(CORE_BRANCH) \
-	CORE_COMMIT=$(CORE_COMMIT) \
 	DIVIDE_INTO_NUM_PARTS=$(DIVIDE_INTO_NUM_PARTS) \
 	RUN_PART=$(RUN_PART) \
 	docker-compose up -d --build --remove-orphans --force-recreate
@@ -201,8 +196,6 @@ clean-docker-container: ## clean docker containers created during acceptance tes
 	@COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	BEHAT_SUITE="" \
-	CORE_BRANCH="" \
-	CORE_COMMIT="" \
 	DIVIDE_INTO_NUM_PARTS="" \
 	OCIS_IMAGE_TAG="" \
 	RUN_PART="" \
@@ -216,8 +209,6 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 	STORAGE=$(STORAGE) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	BEHAT_SUITE="" \
-	CORE_BRANCH="" \
-	CORE_COMMIT="" \
 	DIVIDE_INTO_NUM_PARTS="" \
 	OCIS_IMAGE_TAG="" \
 	RUN_PART="" \
