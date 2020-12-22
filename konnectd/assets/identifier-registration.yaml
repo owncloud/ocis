@@ -7,15 +7,11 @@ clients:
     trusted: yes
     insecure: yes
     redirect_uris:
-      - https://localhost:9200/
-      - https://localhost:9200/oidc-callback.html
-      - https://localhost:9200/oidc-silent-redirect.html
-      - http://localhost:9100/
-      - http://localhost:9100/oidc-callback.html
-      - http://localhost:9100/oidc-silent-redirect.html
+      - {{OCIS_URL}}/
+      - {{OCIS_URL}}/oidc-callback.html
+      - {{OCIS_URL}}/oidc-silent-redirect.html
     origins:
-      - https://localhost:9200
-      - http://localhost:9100
+      - {{OCIS_URL}}
 
   - id: ocis-explorer.js
     name: oCIS Graph Explorer

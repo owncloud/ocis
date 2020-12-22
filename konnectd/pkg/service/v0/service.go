@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/gorilla/mux"
@@ -41,7 +42,7 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
-	if err := createConfigsIfNotExist(assetVFS); err != nil {
+	if err := createConfigsIfNotExist(assetVFS, options.Config.Konnectd.Iss); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
@@ -68,7 +69,7 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-func createConfigsIfNotExist(assets http.FileSystem) error {
+func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 	if _, err := os.Stat("./config"); os.IsNotExist(err) {
 		if err := os.Mkdir("./config", 0700); err != nil {
 			return err
@@ -94,6 +95,9 @@ func createConfigsIfNotExist(assets http.FileSystem) error {
 		if err != nil {
 			return err
 		}
+
+		// TODO replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
+		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", ocisURL))
 
 		err = ioutil.WriteFile("./config/identifier-registration.yaml", conf, 0600)
 		if err != nil {
