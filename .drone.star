@@ -16,13 +16,9 @@ config = {
     'onlyoffice':'frontend'
   },
   'apiTests': {
-    'coreBranch': 'master',
-    'coreCommit': '38c91e5cf5fc4ffdc0536ba1d147a2a618ef83b5',
     'numberOfParts': 10
   },
   'uiTests': {
-    'webBranch': 'master',
-    'webCommit': '5dae1886973ddbab0243e364800fa207fb716a20',
       'suites': {
         'webUIBasic': [
           'webUILogin',
@@ -251,18 +247,18 @@ def testOcisModules(ctx):
 
 def testPipelines(ctx):
   pipelines = [
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiOcisSpecific'),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiOcisSpecific'),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'owncloud', 'apiBasic', 'default'),
-    localApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], 'ocis', 'apiBasic', 'default')
+    localApiTests(ctx, 'owncloud', 'apiOcisSpecific'),
+    localApiTests(ctx, 'ocis', 'apiOcisSpecific'),
+    localApiTests(ctx, 'owncloud', 'apiBasic', 'default'),
+    localApiTests(ctx, 'ocis', 'apiBasic', 'default')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'owncloud'))
-    pipelines.append(coreApiTests(ctx, config['apiTests']['coreBranch'], config['apiTests']['coreCommit'], runPart, config['apiTests']['numberOfParts'], 'ocis'))
+    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'owncloud'))
+    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
-  pipelines += uiTests(ctx, config['uiTests']['webBranch'], config['uiTests']['webCommit'])
-  pipelines.append(accountsUITests(ctx, config['uiTests']['webBranch'], config['uiTests']['webCommit']))
+  pipelines += uiTests(ctx)
+  pipelines.append(accountsUITests(ctx))
   return pipelines
 
 def testOcisModule(ctx, module):
@@ -439,7 +435,7 @@ def uploadCoverage(ctx):
     },
   }
 
-def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
+def localApiTests(ctx, storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -451,7 +447,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
-      cloneCoreRepos(coreBranch, coreCommit) + [
+      cloneCoreRepos() + [
       {
         'name': 'localApiTests-%s-%s' % (suite, storage),
         'image': 'owncloudci/php:7.4',
@@ -486,7 +482,7 @@ def localApiTests(ctx, coreBranch = 'master', coreCommit = '', storage = 'ownclo
     'volumes': [pipelineVolumeOC10Tests],
   }
 
-def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -498,7 +494,7 @@ def coreApiTests(ctx, coreBranch = 'master', coreCommit = '', part_number = 1, n
     'steps':
       restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
-      cloneCoreRepos(coreBranch, coreCommit) + [
+      cloneCoreRepos() + [
       {
         'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
         'image': 'owncloudci/php:7.4',
@@ -580,11 +576,11 @@ def benchmark(ctx):
     },
   }
 
-def uiTests(ctx, webBranch, webCommit):
+def uiTests(ctx):
   suiteNames = config['uiTests']['suites'].keys()
-  return [uiTestPipeline(ctx, suiteName, webBranch, webCommit) for suiteName in suiteNames]
+  return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage = 'owncloud', accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficulty = 4):
   suites = config['uiTests']['suites']
   paths = ""
   suite = suites[suiteName]
@@ -622,12 +618,11 @@ def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage
           'TEST_PATHS': paths,
         },
         'commands': [
+          'source /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
+          'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
-        ] + ([
-          'git checkout %s' % (webCommit)
-        ] if webCommit != '' else []) + [
+          'git checkout $WEB_COMMITID',
           'cp -r tests/acceptance/filesForUpload/* /uploads',
           'yarn install-all',
           'yarn run acceptance-tests-drone'
@@ -659,7 +654,7 @@ def uiTestPipeline(ctx, suiteName, webBranch = 'master', webCommit = '', storage
     },
   }
 
-def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_hash_difficulty = 4):
+def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -689,12 +684,11 @@ def accountsUITests(ctx, webBranch, webCommit, storage = 'owncloud', accounts_ha
           'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
         },
         'commands': [
+          'source /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
-          'git clone -b %s --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web' % (webBranch),
+          'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
-        ] + ([
-          'git checkout %s' % (webCommit)
-        ] if webCommit != '' else []) + [
+          'git checkout $WEB_COMMITID',
           'cp -r tests/acceptance/filesForUpload/* /uploads',
           'yarn install-all',
           'cd /drone/src/accounts',
@@ -1466,19 +1460,19 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     },
   ]
 
-def cloneCoreRepos(coreBranch, coreCommit):
+def cloneCoreRepos():
   return [
     {
       'name': 'clone-core-repos',
-      'image': 'owncloudci/php:7.4',
+      'image': 'owncloudci/alpine:latest',
       'pull': 'always',
       'commands': [
+        'source /drone/src/.drone.env',
         'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing',
-        'git clone -b %s --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner' % (coreBranch),
+        'git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner',
         'cd /srv/app/testrunner',
-      ] + ([
-        'git checkout %s' % (coreCommit)
-      ] if coreCommit != '' else []),
+        'git checkout $CORE_COMMITID'
+      ],
       'volumes': [stepVolumeOC10Tests],
     }
   ]
