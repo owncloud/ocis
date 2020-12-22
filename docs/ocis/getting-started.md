@@ -21,9 +21,9 @@ The binaries for different platforms are downloadable at [our download mirror](h
 
 ```console
 # for mac
-curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-darwin-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-darwin-amd64 --output ocis
 # for linux
-curl https://download.owncloud.com/ocis/ocis/testing/ocis-testing-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-linux-amd64 --output ocis
 # make binary executable
 chmod +x ocis
 ./ocis server
