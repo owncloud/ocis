@@ -29,7 +29,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
 
 			if cfg.Reva.DataGateway.PublicURL == "" {
-				cfg.Reva.DataGateway.PublicURL == strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/")+"/data"
+				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
 			}
 
 			return nil

@@ -59,6 +59,11 @@ func Server(cfg *config.Config) *cli.Command {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
+
+			// TODO we could parse OCIS_URL and set the PROXY_HTTP_ADDR port but that would make it harder to deploy with a
+			// reverse proxy ... wouldn't it?
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
