@@ -39,7 +39,8 @@ require (
 
 replace (
 	// pr https://github.com/cs3org/reva/pull/1368
-	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201221220454-a2a2f2bb2ab5
+	//github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201221220454-a2a2f2bb2ab5
+	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201222133934-8e0b5aaf8aeb
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth

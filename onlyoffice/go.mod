@@ -22,3 +22,5 @@ replace (
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 )
+
+replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20201222133934-8e0b5aaf8aeb

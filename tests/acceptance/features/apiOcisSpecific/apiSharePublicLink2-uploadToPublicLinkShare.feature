@@ -14,4 +14,5 @@ Feature: upload to a public link share
       | permissions | create |
     When user "Alice" deletes file "/FOLDER" using the WebDAV API
     And the public uploads file "does-not-matter.txt" with content "does not matter" using the new public WebDAV API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
+    # actually it should be 404
