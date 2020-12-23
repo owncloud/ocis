@@ -19,12 +19,13 @@ func StorageUsersCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.StorageUsersWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageUsers(cfg)
+			origCmd := command.StorageUsers(configureStorageUsers(cfg))
 
-			return cli.HandleAction(
-				command.StorageUsers(scfg).Action,
-				c,
-			)
+			if err := origCmd.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

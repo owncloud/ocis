@@ -19,12 +19,13 @@ func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.StoragePublicLink(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStoragePublicLink(cfg)
+			origCmd := command.StoragePublicLink(configureStoragePublicLink(cfg))
 
-			return cli.HandleAction(
-				command.StoragePublicLink(scfg).Action,
-				c,
-			)
+			if err := origCmd.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

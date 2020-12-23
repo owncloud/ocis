@@ -22,14 +22,14 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Proxy),
 		},
-		Action: func(ctx *cli.Context) error {
-			proxyCommand := command.Server(configureProxy(cfg))
+		Action: func(c *cli.Context) error {
+			origCmd := command.Server(configureProxy(cfg))
 
-			if err := proxyCommand.Before(ctx); err != nil {
+			if err := origCmd.Before(c); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(proxyCommand.Action, ctx)
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

@@ -19,12 +19,13 @@ func StorageSharingCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.SharingWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageSharing(cfg)
+			origCmd := command.Sharing(configureStorageSharing(cfg))
 
-			return cli.HandleAction(
-				command.Sharing(scfg).Action,
-				c,
-			)
+			if err := origCmd.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

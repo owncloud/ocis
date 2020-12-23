@@ -23,13 +23,13 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.WebDAV),
 		},
 		Action: func(c *cli.Context) error {
-			webdavCommand := command.Server(configureWebDAV(cfg))
+			origCmd := command.Server(configureWebDAV(cfg))
 
-			if err := webdavCommand.Before(c); err != nil {
+			if err := origCmd.Before(c); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(webdavCommand.Action, c)
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

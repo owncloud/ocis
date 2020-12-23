@@ -28,12 +28,13 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Accounts),
 		},
 		Action: func(c *cli.Context) error {
-			accountsCommand := command.Server(configureAccounts(cfg))
-			if err := accountsCommand.Before(c); err != nil {
+			origCmd := command.Server(configureAccounts(cfg))
+
+			if err := origCmd.Before(c); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(accountsCommand.Action, c)
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

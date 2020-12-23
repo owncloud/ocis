@@ -19,12 +19,13 @@ func StorageGatewayCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.GatewayWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageGateway(cfg)
+			origCmd := command.Gateway(configureStorageGateway(cfg))
 
-			return cli.HandleAction(
-				command.Gateway(scfg).Action,
-				c,
-			)
+			if err := origCmd.Before(c); err != nil {
+				return err
+			}
+
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }

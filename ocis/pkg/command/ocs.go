@@ -22,14 +22,14 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.OCS),
 		},
-		Action: func(ctx *cli.Context) error {
-			ocsCommand := command.Server(configureOCS(cfg))
+		Action: func(c *cli.Context) error {
+			origCmd := command.Server(configureOCS(cfg))
 
-			if err := ocsCommand.Before(ctx); err != nil {
+			if err := origCmd.Before(c); err != nil {
 				return err
 			}
 
-			return cli.HandleAction(ocsCommand.Action, ctx)
+			return cli.HandleAction(origCmd.Action, c)
 		},
 	}
 }
