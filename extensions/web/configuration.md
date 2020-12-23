@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-23T11:36:00+0000"
+date: "2020-12-23T16:30:53+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -49,6 +49,15 @@ Usage: `web [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
+
+### web health
+
+Check health status
+
+Usage: `web health [command options] [arguments...]`
+
+--debug-addr | $WEB_DEBUG_ADDR  
+: Address to debug endpoint. Default: `0.0.0.0:9104`.
 
 ### web server
 
@@ -111,7 +120,7 @@ Usage: `web server [command options] [arguments...]`
 : Version. Default: `0.1.0`.
 
 --oidc-metadata-url | $WEB_OIDC_METADATA_URL  
-: OpenID Connect metadata URL. Default: `https://localhost:9200/.well-known/openid-configuration`.
+: OpenID Connect metadata URL, defaults to <WEB_OIDC_AUTHORITY>/.well-known/openid-configuration.
 
 --oidc-authority | $WEB_OIDC_AUTHORITY  
 : OpenID Connect authority. Default: `https://localhost:9200`.
@@ -124,13 +133,4 @@ Usage: `web server [command options] [arguments...]`
 
 --oidc-scope | $WEB_OIDC_SCOPE  
 : OpenID Connect scope. Default: `openid profile email`.
-
-### web health
-
-Check health status
-
-Usage: `web health [command options] [arguments...]`
-
---debug-addr | $WEB_DEBUG_ADDR  
-: Address to debug endpoint. Default: `0.0.0.0:9104`.
 
