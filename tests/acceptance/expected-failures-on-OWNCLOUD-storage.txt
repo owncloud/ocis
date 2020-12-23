@@ -2499,3 +2499,8 @@ apiTrashbin/trashbinFilesFolders.feature:285
 
 # https://github.com/owncloud/ocis/issues/763 reading a file that a collaborator uploaded is impossible
 apiShareOperationsToShares/uploadToShare.feature:280
+#https://github.com/owncloud/ocis/issues/903 Share lists deleted user as 'user' 
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:632
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:633
+apiShareManagementBasicToRoot/createShareToRootFolder.feature:523
+apiShareManagementBasicToRoot/createShareToRootFolder.feature:524

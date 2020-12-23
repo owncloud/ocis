@@ -16,7 +16,7 @@ config = {
     'onlyoffice':'frontend'
   },
   'apiTests': {
-    'coreBranch': 'sharesFromDeletedUser',
+    'coreBranch': 'master',
     'coreCommit': 'ebcd6ef99bbcaeb3493a284e125e818755bcdba3',
     'numberOfParts': 10
   },
