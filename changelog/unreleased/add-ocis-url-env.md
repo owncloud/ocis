@@ -8,7 +8,7 @@ Some environment variables are now built dynamically if they are not set:
 - `STORAGE_DATAGATEWAY_PUBLIC_URL` defaults to `<STORAGE_FRONTEND_PUBLIC_URL>/data`, also falling back to `OCIS_URL`
 - `WEB_OIDC_METADATA_URL` defaults to `<WEB_OIDC_AUTHORITY>/.well-known/openid-configuration`, also falling back to `OCIS_URL`
 
-Furthermore, the built in konnectd will generate an `identifier-registration.yaml` that uses the `KONNECTD_ISS` in the allowed `redirect_uris` and `origins`. It simplifies the default `https:/localhost:9200` and remote deployment with `OCIS_URL` which is evaluated as a fallback if `KONNECTD_ISS` is not set.
+Furthermore, the built in konnectd will generate an `identifier-registration.yaml` that uses the `KONNECTD_ISS` in the allowed `redirect_uris` and `origins`. It simplifies the default `https://localhost:9200` and remote deployment with `OCIS_URL` which is evaluated as a fallback if `KONNECTD_ISS` is not set.
 
 An OCIS server can now be started on a remote machine as easy as `OCIS_URL=https://cloud.ocis.test PROXY_HTTP_ADDR=0.0.0.0:443 ocis server`.
 
