@@ -96,8 +96,8 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 			return err
 		}
 
-		// TODO replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
-		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", ocisURL))
+		// replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
+		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/")))
 
 		err = ioutil.WriteFile("./config/identifier-registration.yaml", conf, 0600)
 		if err != nil {
