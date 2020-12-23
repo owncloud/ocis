@@ -144,15 +144,11 @@ Have a look into the [documentation](https://doc.owncloud.com/server/developer_m
 If you want to work on a specific issue
 
 1.  adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
-    For that change `coreCommit` in the `config` section:
+    For that change `CORE_COMMITID` in `.drone.env`:
 
-        config = {
-          'apiTests': {
-            'coreBranch': 'master',
-            'coreCommit': 'a06b1bd5ba8e5244bfaf7fa04f441961e6fb0daa',
-            'numberOfParts': 6
-          }
-        }
+        # The test runner source for API tests
+        CORE_COMMITID=38c91e5cf5fc4ffdc0536ba1d147a2a618ef83b5
+        CORE_BRANCH=master
 
 2.  locally run each of the tests marked with that issue in the expected failures file.
 
