@@ -20,12 +20,7 @@ func StorageHomeCommand(cfg *config.Config) *cli.Command {
 		Flags:    flagset.StorageHomeWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
 			origCmd := command.StorageHome(configureStorageHome(cfg))
-
-			if err := origCmd.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(origCmd.Action, c)
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

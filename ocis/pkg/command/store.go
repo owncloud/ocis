@@ -24,12 +24,7 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureStore(cfg))
-
-			if err := origCmd.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(origCmd.Action, c)
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }
