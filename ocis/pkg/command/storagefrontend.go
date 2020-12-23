@@ -19,16 +19,8 @@ func StorageFrontendCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.FrontendWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageFrontend(cfg)
-
-			if err := command.Frontend(scfg).Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(
-				command.Frontend(scfg).Action,
-				c,
-			)
+			origCmd := command.Frontend(configureStorageFrontend(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

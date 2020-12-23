@@ -19,12 +19,8 @@ func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.StoragePublicLink(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStoragePublicLink(cfg)
-
-			return cli.HandleAction(
-				command.StoragePublicLink(scfg).Action,
-				c,
-			)
+			origCmd := command.StoragePublicLink(configureStoragePublicLink(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

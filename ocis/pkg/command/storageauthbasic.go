@@ -19,12 +19,8 @@ func StorageAuthBasicCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.AuthBasicWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageAuthBasic(cfg)
-
-			return cli.HandleAction(
-				command.AuthBasic(scfg).Action,
-				c,
-			)
+			origCmd := command.AuthBasic(configureStorageAuthBasic(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

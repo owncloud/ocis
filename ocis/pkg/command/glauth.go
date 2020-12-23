@@ -18,16 +18,8 @@ func GLAuthCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.GLAuth),
 		Action: func(c *cli.Context) error {
-
-			cfg.GLAuth.Backend.Servers = c.StringSlice("backend-server")
-			cfg.GLAuth.Fallback.Servers = c.StringSlice("fallback-server")
-
-			scfg := configureGLAuth(cfg)
-
-			return cli.HandleAction(
-				command.Server(scfg).Action,
-				c,
-			)
+			origCmd := command.Server(configureGLAuth(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

@@ -92,9 +92,9 @@ generate: assets
 
 # TODO find a docker container with go and yarn so we can properly build assets in ci
 #assets: assets/identifier/static assets/identifier/index.html
-assets: static-assets
+assets: assets/identifier/static
 
-static-assets:
+assets/identifier/static:
 	mkdir -p assets/identifier/static
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}

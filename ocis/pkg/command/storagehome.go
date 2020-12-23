@@ -19,12 +19,8 @@ func StorageHomeCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.StorageHomeWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageHome(cfg)
-
-			return cli.HandleAction(
-				command.StorageHome(scfg).Action,
-				c,
-			)
+			origCmd := command.StorageHome(configureStorageHome(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

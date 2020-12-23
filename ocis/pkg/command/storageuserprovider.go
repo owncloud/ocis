@@ -19,12 +19,8 @@ func StorageUserProviderCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.UsersWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageUserProvider(cfg)
-
-			return cli.HandleAction(
-				command.Users(scfg).Action,
-				c,
-			)
+			origCmd := command.Users(configureStorageUserProvider(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

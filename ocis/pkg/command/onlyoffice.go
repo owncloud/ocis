@@ -1,12 +1,11 @@
 package command
 
 import (
-	"strings"
-
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/onlyoffice/pkg/command"
+	svcconfig "github.com/owncloud/ocis/onlyoffice/pkg/config"
 	"github.com/owncloud/ocis/onlyoffice/pkg/flagset"
 )
 
@@ -17,26 +16,14 @@ func OnlyofficeCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start onlyoffice server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Onlyoffice),
-		Before: func(c *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
-			return nil
-		},
 		Action: func(c *cli.Context) error {
-			onlyofficeCommand := command.Server(configureOnlyoffice(cfg).Onlyoffice)
-
-			if err := onlyofficeCommand.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(onlyofficeCommand.Action, c)
+			origCmd := command.Server(configureOnlyoffice(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }
 
-func configureOnlyoffice(cfg *config.Config) *config.Config {
+func configureOnlyoffice(cfg *config.Config) *svcconfig.Config {
 	cfg.Onlyoffice.Log.Level = cfg.Log.Level
 	cfg.Onlyoffice.Log.Pretty = cfg.Log.Pretty
 	cfg.Onlyoffice.Log.Color = cfg.Log.Color
@@ -48,7 +35,7 @@ func configureOnlyoffice(cfg *config.Config) *config.Config {
 		cfg.Onlyoffice.Tracing.Collector = cfg.Tracing.Collector
 	}
 
-	return cfg
+	return cfg.Onlyoffice
 }
 
 func init() {

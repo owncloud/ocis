@@ -80,7 +80,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "public-url",
 			Value:       "https://localhost:9200",
 			Usage:       "URL to use for the storage service",
-			EnvVars:     []string{"STORAGE_FRONTEND_PUBLIC_URL"},
+			EnvVars:     []string{"STORAGE_FRONTEND_PUBLIC_URL", "OCIS_URL"}, // STORAGE_FRONTEND_PUBLIC_URL takes precedence over OCIS_URL
 			Destination: &cfg.Reva.Frontend.PublicURL,
 		},
 		&cli.StringSliceFlag{

@@ -46,7 +46,7 @@ services:
       default:
     environment:
       # general config
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error}
       # proxy config
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
@@ -58,10 +58,7 @@ services:
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
       WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
       WEB_UI_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       # storage config
-      STORAGE_DATAGATEWAY_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/data
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/
       STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       # thumbnail config

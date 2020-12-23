@@ -199,7 +199,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "oidc-issuer",
 			Value:       "https://localhost:9200",
 			Usage:       "OIDC issuer",
-			EnvVars:     []string{"PROXY_OIDC_ISSUER"},
+			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"}, // PROXY_OIDC_ISSUER takes precedence over OCIS_URL
 			Destination: &cfg.OIDC.Issuer,
 		},
 		&cli.BoolFlag{

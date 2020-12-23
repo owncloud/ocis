@@ -58,13 +58,7 @@ You need to configure `your-host` in some services to provide the needed public 
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
-KONNECTD_ISS=https://your-server:9200 \
-REVA_OIDC_ISSUER=https://your-server:9200 \
-WEB_OIDC_AUTHORITY=https://your-server:9200 \
-WEB_UI_CONFIG_SERVER=https://your-server:9200 \
-WEB_OIDC_METADATA_URL=https://your-server:9200/.well-known/openid-configuration \
-REVA_DATAGATEWAY_URL=https://your-server:9200/data \
-REVA_FRONTEND_URL=https://your-server:9200 \
+OCIS_URL=https://your-server:9200 \
 PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
 PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 KONNECTD_TLS=0 \
@@ -93,8 +87,7 @@ cd compose-playground/compose/ocis
 sed -i -e 's/your-url/192.168.103.195/g' config/identifier-registration.yml
 
 cat << EOF > .env
-OCIS_BASE_URL=192.168.103.195
-OCIS_HTTP_PORT=9200
+OCIS_URL=https://192.168.103.195
 OCIS_DOCKER_TAG=latest
 EOF
 

@@ -19,12 +19,8 @@ func StorageAuthBearerCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.AuthBearerWithConfig(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			scfg := configureStorageAuthBearer(cfg)
-
-			return cli.HandleAction(
-				command.AuthBearer(scfg).Action,
-				c,
-			)
+			origCmd := command.AuthBearer(configureStorageAuthBearer(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

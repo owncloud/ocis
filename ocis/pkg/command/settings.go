@@ -22,14 +22,9 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Settings),
 		},
-		Action: func(ctx *cli.Context) error {
-			settingsCommand := command.Server(configureSettings(cfg))
-
-			if err := settingsCommand.Before(ctx); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(settingsCommand.Action, ctx)
+		Action: func(c *cli.Context) error {
+			origCmd := command.Server(configureSettings(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

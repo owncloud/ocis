@@ -17,13 +17,8 @@ func StorageMetadataCommand(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Flags:    flagset.StorageMetadata(cfg.Storage),
 		Action: func(c *cli.Context) error {
-			revaStorageMetadataCommand := command.StorageMetadata(configureStorageMetadata(cfg))
-
-			if err := revaStorageMetadataCommand.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(revaStorageMetadataCommand.Action, c)
+			origCmd := command.StorageMetadata(configureStorageMetadata(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

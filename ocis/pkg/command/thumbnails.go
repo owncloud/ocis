@@ -24,13 +24,8 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Thumbnails),
 		},
 		Action: func(c *cli.Context) error {
-			thumbnailsCommand := command.Server(configureThumbnails(cfg))
-
-			if err := thumbnailsCommand.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(thumbnailsCommand.Action, c)
+			origCmd := command.Server(configureThumbnails(cfg))
+			return handleOriginalAction(c, origCmd)
 		},
 	}
 }

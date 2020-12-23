@@ -84,7 +84,7 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "ldap-idp",
 			Value:       "https://localhost:9200",
 			Usage:       "Identity provider to use for users",
-			EnvVars:     []string{"STORAGE_LDAP_IDP"},
+			EnvVars:     []string{"STORAGE_LDAP_IDP", "OCIS_URL"}, // STORAGE_LDAP_IDP takes precedence over OCIS_URL
 			Destination: &cfg.Reva.LDAP.IDP,
 		},
 		// ldap dn is always the dn
