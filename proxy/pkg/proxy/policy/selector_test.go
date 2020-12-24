@@ -12,6 +12,33 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
+func TestLoadSelector(t *testing.T) {
+	type test struct {
+		cfg         *config.PolicySelector
+		expectedErr error
+	}
+	sCfg := &config.StaticSelectorConf{Policy: "reva"}
+	mcfg := &config.MigrationSelectorConf{
+		AccFoundPolicy:        "found",
+		AccNotFoundPolicy:     "not_found",
+		UnauthenticatedPolicy: "unauth",
+	}
+
+	table := []test{
+		{cfg: &config.PolicySelector{Static: sCfg, Migration: mcfg}, expectedErr: ErrMultipleSelectors},
+		{cfg: &config.PolicySelector{}, expectedErr: ErrSelectorConfigIncomplete},
+		{cfg: &config.PolicySelector{Static: sCfg}, expectedErr: nil},
+		{cfg: &config.PolicySelector{Migration: mcfg}, expectedErr: nil},
+	}
+
+	for _, test := range table {
+		_, err := LoadSelector(test.cfg)
+		if err != test.expectedErr {
+			t.Fail()
+		}
+	}
+}
+
 func TestStaticSelector(t *testing.T) {
 	ctx := context.Background()
 	req := httptest.NewRequest("GET", "https://example.org/foo", nil)
