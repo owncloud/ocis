@@ -19,6 +19,7 @@ services:
       - "--entryPoints.https.address=:443"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
+      - "--serversTransport.insecureSkipVerify=true" # oCIS uses self generated certificate
     ports:
       - "80:80"
       - "443:443"
@@ -45,24 +46,18 @@ services:
     networks:
       default:
     environment:
-      # general config
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error}
-      # proxy config
+      # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
-      PROXY_TLS: "false"
-      # ownCloud Web config
       WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
       WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
-      WEB_UI_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      # storage config
       STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
-      # thumbnail config
-      THUMBNAILS_WEBDAVSOURCE_BASEURL: http://localhost:9200/remote.php/webdav/
+      # general config
+      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
     volumes:
       - ocis-data:/var/tmp/ocis
     labels:
@@ -77,6 +72,7 @@ services:
       - "traefik.http.routers.ocis-secure.tls.certresolver=http"
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+      - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
     restart: always
 
   postgres:

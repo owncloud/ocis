@@ -18,6 +18,7 @@ services:
       - "--entryPoints.https.address=:443"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
+      - "--serversTransport.insecureSkipVerify=true" # oCIS uses self generated certificate
     ports:
       - "80:80"
       - "443:443"
@@ -41,32 +42,13 @@ services:
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - | # as long as https://github.com/owncloud/product/issues/15 is open we need this step to template konnectd config
-        cp /config/identifier-registration.dist.yaml /config/identifier-registration.yaml
-        sed -i 's/ocis.owncloud.test/${OCIS_DOMAIN:-ocis.owncloud.test}/g' /config/identifier-registration.yaml
-        ocis server
     networks:
       default:
     environment:
-      # general config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error}
-      # proxy config
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
-      PROXY_TLS: "false"
-      # web config
-      WEB_UI_CONFIG_APPS: files,draw-io,markdown-editor,media-viewer
-      # storage config
-      STORAGE_OIDC_INSECURE: "${INSECURE:-false}"
-      # idp config
-      KONNECTD_TLS: 'false'
-      # thumbnail config
-      THUMBNAILS_WEBDAVSOURCE_BASEURL: http://localhost:9200/remote.php/webdav/
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
     volumes:
-      - ./config:/config
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
@@ -80,6 +62,7 @@ services:
       - "traefik.http.routers.ocis-secure.tls.certresolver=http"
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+      - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
     restart: always
 
 volumes:
