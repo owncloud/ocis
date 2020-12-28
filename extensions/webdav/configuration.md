@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T07:03:00+0000"
+date: "2020-12-28T13:25:20+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -29,6 +29,8 @@ So far we support the file formats `JSON` and `YAML`, if you want to get a full 
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
+If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
+
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
@@ -39,13 +41,13 @@ Serve WebDAV API for oCIS
 
 Usage: `webdav [global options] command [command options] [arguments...]`
 
---log-level | $WEBDAV_LOG_LEVEL  
+-log-level |  $WEBDAV_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $WEBDAV_LOG_PRETTY  
+-log-pretty |  $WEBDAV_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $WEBDAV_LOG_COLOR  
+-log-color |  $WEBDAV_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
@@ -56,7 +58,7 @@ Check health status
 
 Usage: `webdav health [command options] [arguments...]`
 
---debug-addr | $WEBDAV_DEBUG_ADDR  
+-debug-addr |  $WEBDAV_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9119`.
 
 ### webdav server
@@ -65,46 +67,46 @@ Start integrated server
 
 Usage: `webdav server [command options] [arguments...]`
 
---config-file | $WEBDAV_CONFIG_FILE  
+-config-file |  $WEBDAV_CONFIG_FILE
 : Path to config file.
 
---tracing-enabled | $WEBDAV_TRACING_ENABLED  
+-tracing-enabled |  $WEBDAV_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $WEBDAV_TRACING_TYPE  
+-tracing-type |  $WEBDAV_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $WEBDAV_TRACING_ENDPOINT  
+-tracing-endpoint |  $WEBDAV_TRACING_ENDPOINT
 : Endpoint for the agent.
 
---tracing-collector | $WEBDAV_TRACING_COLLECTOR  
+-tracing-collector |  $WEBDAV_TRACING_COLLECTOR
 : Endpoint for the collector.
 
---tracing-service | $WEBDAV_TRACING_SERVICE  
+-tracing-service |  $WEBDAV_TRACING_SERVICE
 : Service name for tracing. Default: `webdav`.
 
---debug-addr | $WEBDAV_DEBUG_ADDR  
+-debug-addr |  $WEBDAV_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9119`.
 
---debug-token | $WEBDAV_DEBUG_TOKEN  
+-debug-token |  $WEBDAV_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $WEBDAV_DEBUG_PPROF  
+-debug-pprof |  $WEBDAV_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $WEBDAV_DEBUG_ZPAGES  
+-debug-zpages |  $WEBDAV_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---http-addr | $WEBDAV_HTTP_ADDR  
+-http-addr |  $WEBDAV_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9115`.
 
---http-namespace | $WEBDAV_HTTP_NAMESPACE  
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
---service-name | $WEBDAV_SERVICE_NAME  
+-service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `webdav`.
 
---http-root | $WEBDAV_HTTP_ROOT  
+-http-root |  $WEBDAV_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
 ### webdav version
@@ -113,9 +115,9 @@ Print the versions of the running instances
 
 Usage: `webdav version [command options] [arguments...]`
 
---http-namespace | $WEBDAV_HTTP_NAMESPACE  
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
 : Set the base namespace for service discovery. Default: `com.owncloud.web`.
 
---service-name | $WEBDAV_SERVICE_NAME  
+-service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `webdav`.
 

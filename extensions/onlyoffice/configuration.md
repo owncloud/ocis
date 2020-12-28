@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T07:03:01+0000"
+date: "2020-12-28T13:25:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -33,6 +33,8 @@ So far we support the file formats `JSON` and `YAML`, if you want to get a full 
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
+If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
+
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
@@ -43,16 +45,16 @@ OnlyOffice oCIS extension
 
 Usage: `onlyoffice [global options] command [command options] [arguments...]`
 
---config-file | $ONLYOFFICE_CONFIG_FILE  
+-config-file |  $ONLYOFFICE_CONFIG_FILE
 : Path to config file.
 
---log-level | $ONLYOFFICE_LOG_LEVEL  
+-log-level |  $ONLYOFFICE_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $ONLYOFFICE_LOG_PRETTY  
+-log-pretty |  $ONLYOFFICE_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $ONLYOFFICE_LOG_COLOR  
+-log-color |  $ONLYOFFICE_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
@@ -63,7 +65,7 @@ Check health status
 
 Usage: `onlyoffice health [command options] [arguments...]`
 
---debug-addr | $ONLYOFFICE_DEBUG_ADDR  
+-debug-addr |  $ONLYOFFICE_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9224`.
 
 ### onlyoffice server
@@ -72,42 +74,42 @@ Start integrated server
 
 Usage: `onlyoffice server [command options] [arguments...]`
 
---tracing-enabled | $ONLYOFFICE_TRACING_ENABLED  
+-tracing-enabled |  $ONLYOFFICE_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $ONLYOFFICE_TRACING_TYPE  
+-tracing-type |  $ONLYOFFICE_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $ONLYOFFICE_TRACING_ENDPOINT  
+-tracing-endpoint |  $ONLYOFFICE_TRACING_ENDPOINT
 : Endpoint for the agent.
 
---tracing-collector | $ONLYOFFICE_TRACING_COLLECTOR  
+-tracing-collector |  $ONLYOFFICE_TRACING_COLLECTOR
 : Endpoint for the collector.
 
---tracing-service | $ONLYOFFICE_TRACING_SERVICE  
+-tracing-service |  $ONLYOFFICE_TRACING_SERVICE
 : Service name for tracing. Default: `onlyoffice`.
 
---debug-addr | $ONLYOFFICE_DEBUG_ADDR  
+-debug-addr |  $ONLYOFFICE_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9224`.
 
---debug-token | $ONLYOFFICE_DEBUG_TOKEN  
+-debug-token |  $ONLYOFFICE_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $ONLYOFFICE_DEBUG_PPROF  
+-debug-pprof |  $ONLYOFFICE_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $ONLYOFFICE_DEBUG_ZPAGES  
+-debug-zpages |  $ONLYOFFICE_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---http-addr | $ONLYOFFICE_HTTP_ADDR  
+-http-addr |  $ONLYOFFICE_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9220`.
 
---http-namespace | $ONLYOFFICE_HTTP_NAMESPACE  
+-http-namespace |  $ONLYOFFICE_HTTP_NAMESPACE
 : Set the base namespace for the http namespace. Default: `com.owncloud.web`.
 
---http-root | $ONLYOFFICE_HTTP_ROOT  
+-http-root |  $ONLYOFFICE_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
---asset-path | $ONLYOFFICE_ASSET_PATH  
+-asset-path |  $ONLYOFFICE_ASSET_PATH
 : Path to custom assets.
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T07:02:57+0000"
+date: "2020-12-28T13:25:18+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -29,6 +29,8 @@ So far we support the file formats `JSON` and `YAML`, if you want to get a full 
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
+If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
+
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
@@ -39,7 +41,7 @@ Check health status
 
 Usage: `store health [command options] [arguments...]`
 
---debug-addr | $STORE_DEBUG_ADDR  
+-debug-addr |  $STORE_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9460`.
 
 ### store ocis-store
@@ -48,16 +50,16 @@ Service to store values for ocis extensions
 
 Usage: `store ocis-store [command options] [arguments...]`
 
---config-file | $STORE_CONFIG_FILE  
+-config-file |  $STORE_CONFIG_FILE
 : Path to config file.
 
---log-level | $STORE_LOG_LEVEL  
+-log-level |  $STORE_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $STORE_LOG_PRETTY  
+-log-pretty |  $STORE_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $STORE_LOG_COLOR  
+-log-color |  $STORE_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 ### store server
@@ -66,40 +68,40 @@ Start integrated server
 
 Usage: `store server [command options] [arguments...]`
 
---tracing-enabled | $STORE_TRACING_ENABLED  
+-tracing-enabled |  $STORE_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $STORE_TRACING_TYPE  
+-tracing-type |  $STORE_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $STORE_TRACING_ENDPOINT  
+-tracing-endpoint |  $STORE_TRACING_ENDPOINT
 : Endpoint for the agent.
 
---tracing-collector | $STORE_TRACING_COLLECTOR  
+-tracing-collector |  $STORE_TRACING_COLLECTOR
 : Endpoint for the collector.
 
---tracing-service | $STORE_TRACING_SERVICE  
+-tracing-service |  $STORE_TRACING_SERVICE
 : Service name for tracing. Default: `store`.
 
---debug-addr | $STORE_DEBUG_ADDR  
+-debug-addr |  $STORE_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9460`.
 
---debug-token | $STORE_DEBUG_TOKEN  
+-debug-token |  $STORE_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $STORE_DEBUG_PPROF  
+-debug-pprof |  $STORE_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $STORE_DEBUG_ZPAGES  
+-debug-zpages |  $STORE_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---grpc-namespace | $STORE_GRPC_NAMESPACE  
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
---name | $STORE_NAME  
+-name |  $STORE_NAME
 : Service name. Default: `store`.
 
---data-path | $STORE_DATA_PATH  
+-data-path |  $STORE_DATA_PATH
 : location of the store data path. Default: `/var/tmp/ocis/store`.
 
 ### store version
@@ -108,9 +110,9 @@ Print the versions of the running instances
 
 Usage: `store version [command options] [arguments...]`
 
---grpc-namespace | $STORE_GRPC_NAMESPACE  
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
---name | $STORE_NAME  
+-name |  $STORE_NAME
 : Service name. Default: `store`.
 

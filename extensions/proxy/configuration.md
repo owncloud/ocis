@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T07:02:54+0000"
+date: "2020-12-28T13:25:15+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -29,6 +29,8 @@ So far we support the file formats `JSON` and `YAML`, if you want to get a full 
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
+If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
+
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
@@ -39,13 +41,13 @@ proxy for oCIS
 
 Usage: `proxy ocis-proxy [command options] [arguments...]`
 
---log-level | $PROXY_LOG_LEVEL  
+--log-level |  $PROXY_LOG_LEVEL
 : Set logging level. Default: `info`.
 
---log-pretty | $PROXY_LOG_PRETTY  
+--log-pretty |  $PROXY_LOG_PRETTY
 : Enable pretty logging. Default: `true`.
 
---log-color | $PROXY_LOG_COLOR  
+--log-color |  $PROXY_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 ### proxy server
@@ -54,85 +56,85 @@ Start integrated server
 
 Usage: `proxy server [command options] [arguments...]`
 
---config-file | $PROXY_CONFIG_FILE  
+--config-file |  $PROXY_CONFIG_FILE
 : Path to config file.
 
---tracing-enabled | $PROXY_TRACING_ENABLED  
+--tracing-enabled |  $PROXY_TRACING_ENABLED
 : Enable sending traces.
 
---tracing-type | $PROXY_TRACING_TYPE  
+--tracing-type |  $PROXY_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
 
---tracing-endpoint | $PROXY_TRACING_ENDPOINT  
+--tracing-endpoint |  $PROXY_TRACING_ENDPOINT
 : Endpoint for the agent.
 
---tracing-collector | $PROXY_TRACING_COLLECTOR  
+--tracing-collector |  $PROXY_TRACING_COLLECTOR
 : Endpoint for the collector.
 
---tracing-service | $PROXY_TRACING_SERVICE  
+--tracing-service |  $PROXY_TRACING_SERVICE
 : Service name for tracing. Default: `proxy`.
 
---debug-addr | $PROXY_DEBUG_ADDR  
+--debug-addr |  $PROXY_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9205`.
 
---debug-token | $PROXY_DEBUG_TOKEN  
+--debug-token |  $PROXY_DEBUG_TOKEN
 : Token to grant metrics access.
 
---debug-pprof | $PROXY_DEBUG_PPROF  
+--debug-pprof |  $PROXY_DEBUG_PPROF
 : Enable pprof debugging.
 
---debug-zpages | $PROXY_DEBUG_ZPAGES  
+--debug-zpages |  $PROXY_DEBUG_ZPAGES
 : Enable zpages debugging.
 
---http-addr | $PROXY_HTTP_ADDR  
+--http-addr |  $PROXY_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9200`.
 
---http-root | $PROXY_HTTP_ROOT  
+--http-root |  $PROXY_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
---asset-path | $PROXY_ASSET_PATH  
+--asset-path |  $PROXY_ASSET_PATH
 : Path to custom assets.
 
---service-namespace | $PROXY_SERVICE_NAMESPACE  
+--service-namespace |  $PROXY_SERVICE_NAMESPACE
 : Set the base namespace for the service namespace. Default: `com.owncloud.web`.
 
---service-name | $PROXY_SERVICE_NAME  
+--service-name |  $PROXY_SERVICE_NAME
 : Service name. Default: `proxy`.
 
---transport-tls-cert | $PROXY_TRANSPORT_TLS_CERT  
+--transport-tls-cert |  $PROXY_TRANSPORT_TLS_CERT
 : Certificate file for transport encryption.
 
---transport-tls-key | $PROXY_TRANSPORT_TLS_KEY  
+--transport-tls-key |  $PROXY_TRANSPORT_TLS_KEY
 : Secret file for transport encryption.
 
---tls | $PROXY_TLS  
+--tls |  $PROXY_TLS
 : Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).. Default: `true`.
 
---jwt-secret | $PROXY_JWT_SECRET  
+--jwt-secret |  $PROXY_JWT_SECRET
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
---reva-gateway-addr | $PROXY_REVA_GATEWAY_ADDR  
+--reva-gateway-addr |  $PROXY_REVA_GATEWAY_ADDR
 : REVA Gateway Endpoint. Default: `127.0.0.1:9142`.
 
---insecure | $PROXY_INSECURE_BACKENDS  
+--insecure |  $PROXY_INSECURE_BACKENDS
 : allow insecure communication to upstream servers. Default: `false`.
 
---oidc-issuer | $PROXY_OIDC_ISSUER  
+--oidc-issuer |  $PROXY_OIDC_ISSUER , $OCIS_URL
 : OIDC issuer. Default: `https://localhost:9200`.
 
---oidc-insecure | $PROXY_OIDC_INSECURE  
+--oidc-insecure |  $PROXY_OIDC_INSECURE
 : OIDC allow insecure communication. Default: `true`.
 
---autoprovision-accounts | $PROXY_AUTOPROVISION_ACCOUNTS  
+--autoprovision-accounts |  $PROXY_AUTOPROVISION_ACCOUNTS
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
 
---enable-presignedurls | $PROXY_ENABLE_PRESIGNEDURLS  
+--enable-presignedurls |  $PROXY_ENABLE_PRESIGNEDURLS
 : Enable or disable handling the presigned urls in the proxy. Default: `true`.
 
---enable-basic-auth | $PROXY_ENABLE_BASIC_AUTH  
+--enable-basic-auth |  $PROXY_ENABLE_BASIC_AUTH
 : enable basic authentication. Default: `false`.
 
---account-backend-type | $PROXY_ACCOUNT_BACKEND_TYPE  
+--account-backend-type |  $PROXY_ACCOUNT_BACKEND_TYPE
 : account-backend-type. Default: `accounts`.
 
 ### proxy version
@@ -141,10 +143,10 @@ Print the versions of the running instances
 
 Usage: `proxy version [command options] [arguments...]`
 
---service-namespace | $PROXY_SERVICE_NAMESPACE  
+--service-namespace |  $PROXY_SERVICE_NAMESPACE
 : Set the base namespace for the service namespace. Default: `com.owncloud.web`.
 
---service-name | $PROXY_SERVICE_NAME  
+--service-name |  $PROXY_SERVICE_NAME
 : Service name. Default: `proxy`.
 
 ### proxy health
@@ -153,6 +155,6 @@ Check health status
 
 Usage: `proxy health [command options] [arguments...]`
 
---debug-addr | $PROXY_DEBUG_ADDR  
+--debug-addr |  $PROXY_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9109`.
 
