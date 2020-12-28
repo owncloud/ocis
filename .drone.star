@@ -17,7 +17,7 @@ config = {
   },
   'apiTests': {
     'coreBranch': 'master',
-    'coreCommit': '9a9feed2f359eb220788b7bb914f514b9316736d',
+    'coreCommit': '32f41e237657ea93b341321a4e3c6e4644b57c13',
     'numberOfParts': 10
   },
   'uiTests': {
@@ -25,7 +25,7 @@ config = {
         'webUIBasic': [
           'webUILogin',
           'webUINotifications',
-          'webUIPrivateLinks',
+          'webUIPrivateLinks',0
           'webUIPreview',
           'webUIAccount',
           # The following suites may have all scenarios currently skipped.
