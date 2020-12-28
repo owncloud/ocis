@@ -2484,3 +2484,18 @@ apiWebdavUploadTUS/uploadFile.feature:142
 # https://github.com/owncloud/ocis/issues/1141 upload a file using TUS resource URL as an other user should not work
 apiWebdavUploadTUS/uploadFile.feature:155
 apiWebdavUploadTUS/uploadFile.feature:156
+
+# https://github.com/owncloud/ocis/issues/903 Share lists deleted user as 'user'
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:632
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:633
+
+# https://github.com/owncloud/ocis/issues/1126 share owner cannot delete other user's files
+apiShareUpdateToShares/updateShare.feature:384
+apiShareUpdateToShares/updateShare.feature:385
+
+# https://github.com/owncloud/ocis/issues/541 Deletion time in trash bin shows a wrong date
+apiTrashbin/trashbinFilesFolders.feature:284
+apiTrashbin/trashbinFilesFolders.feature:285
+
+# https://github.com/owncloud/ocis/issues/763 reading a file that a collaborator uploaded is impossible
+apiShareOperationsToShares/uploadToShare.feature:280
