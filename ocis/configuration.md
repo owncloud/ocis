@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T13:24:58+0000"
+date: "2020-12-28T15:52:02+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -83,6 +83,15 @@ Kill an extension by name
 
 Usage: `ocis kill [command options] [arguments...]`
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
 ### ocis server
 
 Start fullstack server
@@ -110,14 +119,11 @@ Usage: `ocis server [command options] [arguments...]`
 -grpc-addr |  $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
-### ocis health
+### ocis run
 
-Check health status
+Runs an extension
 
-Usage: `ocis health [command options] [arguments...]`
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
+Usage: `ocis run [command options] [arguments...]`
 
 ### ocis list
 
@@ -125,63 +131,41 @@ Lists running ocis extensions
 
 Usage: `ocis list [command options] [arguments...]`
 
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis thumbnails
+#### ocis onlyoffice
 
-Start thumbnails server
-
-#### ocis settings
-
-Start settings server
+Start onlyoffice server
 
 #### ocis storage-home
 
 Start storage and data provider for /home mount
 
-#### ocis glauth
-
-Start glauth server
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis version
-
-Lists running services with version
-
-#### ocis web
-
-Start web server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
 #### ocis storage-sharing
 
 Start storage sharing service
 
-#### ocis storage-userprovider
+#### ocis konnectd
 
-Start storage userprovider service
+Start konnectd server
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis storage-frontend
+
+Start storage frontend
 
 #### ocis ocs
 
@@ -191,35 +175,51 @@ Start ocs server
 
 Start storage public link storage
 
-#### ocis onlyoffice
+#### ocis version
 
-Start onlyoffice server
+Lists running services with version
 
-#### ocis storage-auth-bearer
+#### ocis glauth
 
-Start storage auth-bearer service
+Start glauth server
 
 #### ocis storage-metadata
 
 Start storage and data service for metadata
 
-#### ocis storage-users
+#### ocis webdav
 
-Start storage and data provider for /users mount
+Start webdav server
 
-#### ocis accounts
+#### ocis storage-auth-basic
 
-Start accounts server
+Start storage auth-basic service
 
-#### ocis konnectd
+#### ocis web
 
-Start konnectd server
+Start web server
 
 #### ocis proxy
 
 Start proxy server
 
-#### ocis storage-frontend
+#### ocis settings
 
-Start storage frontend
+Start settings server
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-gateway
+
+Start storage gateway
 

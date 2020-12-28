@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2020-12-28T13:25:15+0000"
+date: "2020-12-28T15:52:06+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -34,6 +34,15 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### proxy health
+
+Check health status
+
+Usage: `proxy health [command options] [arguments...]`
+
+--debug-addr |  $PROXY_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
 ### proxy ocis-proxy
 
@@ -148,13 +157,4 @@ Usage: `proxy version [command options] [arguments...]`
 
 --service-name |  $PROXY_SERVICE_NAME
 : Service name. Default: `proxy`.
-
-### proxy health
-
-Check health status
-
-Usage: `proxy health [command options] [arguments...]`
-
---debug-addr |  $PROXY_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9109`.
 
