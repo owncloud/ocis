@@ -10,7 +10,7 @@ services:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
     command:
       #- "--log.level=DEBUG"
-      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-'example@example.org'}"
+      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       - "--api.dashboard=true"
@@ -69,7 +69,7 @@ services:
       # General ocis config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
+      PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
     volumes:
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
       - ocis-data:/var/tmp/ocis

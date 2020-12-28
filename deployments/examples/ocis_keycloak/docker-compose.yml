@@ -19,6 +19,7 @@ services:
       - "--entryPoints.https.address=:443"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
+      - "--serversTransport.insecureSkipVerify=true" # oCIS uses self generated certificate
     ports:
       - "80:80"
       - "443:443"
@@ -38,7 +39,6 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
-      - "--serversTransport.insecureSkipVerify=true" # oCIS uses self generated certificate
     restart: always
 
   ocis:
