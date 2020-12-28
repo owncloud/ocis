@@ -95,6 +95,11 @@ changelog:
 test:
 	go run github.com/haya14busa/goverage -v -coverprofile coverage.out $(PACKAGES)
 
+.PHONY: go-coverage
+go-coverage:
+	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
+	@go tool cover -func coverage.out | tail -1 | grep -Eo "[0-9]+\.[0-9]+"
+
 .PHONY: install
 install: $(SOURCES)
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)

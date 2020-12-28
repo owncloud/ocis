@@ -368,6 +368,18 @@ def buildOcisBinaryForTesting(ctx):
   }
 
 def uploadCoverage(ctx):
+  sonar_env = {
+      'SONAR_TOKEN': {
+        'from_secret': 'sonar_token',
+      },
+    }
+  if True or ctx.build.event == 'pull_request':
+    sonar_env.update({
+      'SONAR_PULL_REQUEST_BASE': '%s' % (ctx.build.target),
+      'SONAR_PULL_REQUEST_BRANCH': '%s' % (ctx.build.source),
+      'SONAR_PULL_REQUEST_KEY': '%s' % (ctx.build.ref.replace("refs/pull/", "").split("/")[0]),
+    })
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -404,14 +416,7 @@ def uploadCoverage(ctx):
         'name': 'sonarcloud',
         'image': 'sonarsource/sonar-scanner-cli',
         'pull': 'always',
-        'environment': {
-          'SONAR_TOKEN': {
-            'from_secret': 'sonar_token',
-          },
-          'SONAR_PULL_REQUEST_BASE': '%s' % ('master' if ctx.build.event == 'pull_request' else None),
-          'SONAR_PULL_REQUEST_BRANCH': '%s' % (ctx.build.source if ctx.build.event == 'pull_request' else None),
-          'SONAR_PULL_REQUEST_KEY': '%s' % (ctx.build.ref.replace("refs/pull/", "").split("/")[0] if ctx.build.event == 'pull_request' else None),
-        },
+        'environment': sonar_env,
       },
       {
         'name': 'purge-cache',
