@@ -5,7 +5,7 @@ services:
   traefik:
     image: "traefik:v2.3"
     networks:
-      default:
+      ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
     command:
@@ -43,7 +43,7 @@ services:
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      default:
+      ocis-net:
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
@@ -68,3 +68,6 @@ services:
 volumes:
   certs:
   ocis-data:
+
+networks:
+  ocis-net:

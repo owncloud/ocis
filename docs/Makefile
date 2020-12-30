@@ -38,10 +38,6 @@ docs-copy: ## copy docs to hugo
 	rsync -ax --delete --exclude hugo/ --exclude Makefile --exclude .gitignore --exclude README.md ../. content/; \
 
 .PHONY: docs-serve
-docs-serve: config-docs-generate docs-copy
-	docker run --rm --network host -v $(shell pwd)/hugo:/src owncloudci/hugo:0 server
-
-.PHONY: docs-serve
 docs-serve: config-docs-generate docs-copy ## serve docs with hugo
 	@docker run --rm --network host -v $(shell pwd)/hugo:/src owncloudci/hugo:0 server
 
