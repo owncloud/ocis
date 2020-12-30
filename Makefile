@@ -17,8 +17,9 @@ OCIS_MODULES = \
 	glauth \
 	konnectd \
 	ocis \
-	ocs \
 	ocis-pkg \
+	ocs \
+	onlyoffice \
 	proxy \
 	settings \
 	storage \
@@ -82,4 +83,17 @@ composer.lock: composer.json
 go-mod-tidy:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod go-mod-tidy; \
+    done
+
+.PHONY: test
+test:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod test; \
+    done
+
+.PHONY: go-coverage
+go-coverage:
+	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
+	@for mod in $(OCIS_MODULES); do \
+        echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
