@@ -2530,12 +2530,7 @@ apiWebdavUploadTUS/uploadFileMtimeShares.feature:71
 apiWebdavUploadTUS/uploadToShare.feature:23
 apiWebdavUploadTUS/uploadToShare.feature:24
 apiWebdavUploadTUS/uploadToShare.feature:37
-apiWebdavUploadTUS/uploadToShare.feature:38
-apiWebdavUploadTUS/uploadToShare.feature:66
-apiWebdavUploadTUS/uploadToShare.feature:67
-
-# https://github.com/owncloud/product/issues/293 sharing with group not available
-apiWebdavUploadTUS/uploadToShare.feature:52
+apiWebdavUploadTUS/uploadToShare.feature:38Add webUI tests for preview of jpeg and png file with media viewer
 apiWebdavUploadTUS/uploadToShare.feature:53
 
 # https://github.com/owncloud/ocis/issues/1012 TUS OPTIONS requests does not reply with TUS headers when invalid password
@@ -2574,3 +2569,9 @@ apiShareOperationsToShares/uploadToShare.feature:280
 
 # https://github.com/owncloud/ocis/issues/766 [OCIS-storage] overwriting a file as share receiver, does not create a new file version for the sharer
 apiVersions/fileVersionsSharingToShares.feature:291
+
+#https://github.com/owncloud/ocis/issues/903 Share lists deleted user as 'user' 
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:632
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:633
+apiShareManagementBasicToRoot/createShareToRootFolder.feature:523
+apiShareManagementBasicToRoot/createShareToRootFolder.feature:524
