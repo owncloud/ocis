@@ -199,9 +199,9 @@ def main(ctx):
     ]
 
   elif \
-  (ctx.build.event == "pull" and '[docs-only]' in ctx.build.title) \
+  (ctx.build.event == "pull_request" and '[docs-only]' in ctx.build.title) \
   or \
-  (ctx.build.event != "pull" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
+  (ctx.build.event != "pull_request" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
   # [docs-only] is not taken from PR messages, but from commit messages
     pipelines = [docs(ctx)]
 
@@ -373,7 +373,7 @@ def uploadCoverage(ctx):
         'from_secret': 'sonar_token',
       },
     }
-  if ctx.build.event == 'pull':
+  if ctx.build.event == "pull_request":
     sonar_env.update({
       'SONAR_PULL_REQUEST_BASE': '%s' % (ctx.build.target),
       'SONAR_PULL_REQUEST_BRANCH': '%s' % (ctx.build.source),
