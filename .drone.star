@@ -373,7 +373,7 @@ def uploadCoverage(ctx):
         'from_secret': 'sonar_token',
       },
     }
-  if True or ctx.build.event == 'pull_request':
+  if ctx.build.event == 'pull':
     sonar_env.update({
       'SONAR_PULL_REQUEST_BASE': '%s' % (ctx.build.target),
       'SONAR_PULL_REQUEST_BRANCH': '%s' % (ctx.build.source),
