@@ -32,14 +32,14 @@ then
         export DELETE_USER_DATA_CMD=''
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OC-Storage'
         export OCIS_SKELETON_STRATEGY='copy'
-        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-on-OWNCLOUD-storage.txt'
+        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OWNCLOUD-storage.txt'
     elif [ "$STORAGE" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
         export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
         export OCIS_SKELETON_STRATEGY='upload'
-        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-on-OCIS-storage.txt'
+        export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.txt'
     else
         echo "non existing STORAGE selected"
         exit 1
