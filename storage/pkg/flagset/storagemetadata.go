@@ -52,7 +52,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tmp-folder",
-			Value:       "/var/tmp/ocis/tmp/metadata",
+			Value:       "./data/tmp/storage/metadata",
 			Usage:       "path to tmp folder",
 			EnvVars:     []string{"STORAGE_METADATA_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageMetadata.TempFolder,
