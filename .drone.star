@@ -1354,8 +1354,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'IDP_TLS': 'true',
     'OCIS_LOG_LEVEL': 'warn',
-    #'STORAGE_CHUNK_FOLDER': '/var/tmp/ocis/chunks',
-    #'STORAGE_DRIVER_OWNCLOUD_UPLOADINFO_DIR': "/tmp",
+    'STORAGE_CHUNK_FOLDER': '/var/tmp/ocis/chunks', # TODO: pipeline should not fail without this!?
+    'STORAGE_DRIVER_OWNCLOUD_UPLOADINFO_DIR': "/tmp", # TODO: pipeline should not fail without this!?
   }
 
   # Pass in "default" accounts_hash_difficulty to not set this environment variable.
