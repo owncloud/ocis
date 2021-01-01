@@ -1,9 +1,421 @@
-# this file contains the scenarios from web UI tests that are currently expected to fail
+# this file contains the scenarios from web tests that are currently expected to fail on OCIS with owncloud storage
 #
 # https://github.com/owncloud/ocisissues/1106 media viewer does not support mp3 files
-webUIPreview/imageMediaViewer.feature:70
-webUIPreview/imageMediaViewer.feature:76
+webUIPreview/imageMediaViewer.feature:78
+webUIPreview/imageMediaViewer.feature:85
 #
 # https://github.com/owncloud/web/issues/4564 authentication dialog appears when user is deleted
 # https://github.com/owncloud/ocis/issues/1129 login error page loops when logged in user is deleted
-webUILogin/login.feature:59
+webUILogin/login.feature:62
+#
+# https://github.com/owncloud/ocis-reva/issues/107 User request using token and basic authentication gives different display names
+webUIAccount/accountInformation.feature:10
+#
+# https://github.com/owncloud/ocis-konnectd/issues/42 LDAP Groups not working with konnectd
+webUIAccount/accountInformation.feature:20
+#
+# https://github.com/owncloud/ocis-reva/issues/107 User request using token and basic authentication gives different display names
+# https://github.com/owncloud/ocis-konnectd/issues/42 LDAP Groups not working with konnectd
+webUIAccount/accountInformation.feature:34
+#
+# https://github.com/owncloud/ocis-reva/issues/39 REPORT request not implemented
+webUIDeleteFilesFolders/deleteFilesFolders.feature:253
+webUIFavorites/favoritesFile.feature:14
+webUIFavorites/favoritesFile.feature:27
+webUIFavorites/favoritesFile.feature:40
+webUIFavorites/favoritesFile.feature:56
+webUIFavorites/favoritesFile.feature:63
+webUIFavorites/favoritesFile.feature:69
+webUIFavorites/favoritesFile.feature:74
+webUIFavorites/favoritesFile.feature:91
+webUIFavorites/favoritesFile.feature:110
+webUIFavorites/unfavoriteFile.feature:13
+webUIFavorites/unfavoriteFile.feature:30
+webUIFavorites/unfavoriteFile.feature:47
+webUIFavorites/unfavoriteFile.feature:60
+webUIFavorites/unfavoriteFile.feature:73
+webUIFavorites/unfavoriteFile.feature:85
+webUIFiles/fileDetails.feature:35
+webUIFiles/fileDetails.feature:46
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
+webUIDeleteFilesFolders/deleteFilesFolders.feature:202
+webUIFiles/fileDetails.feature:88
+webUIFiles/fileDetails.feature:103
+webUIFiles/versions.feature:33
+webUIRenameFiles/renameFiles.feature:178
+webUIRenameFiles/renameFiles.feature:199
+webUIRenameFiles/renameFiles.feature:220
+webUISharingInternalUsers/shareWithUsers.feature:54
+webUISharingInternalUsers/shareWithUsers.feature:55
+webUISharingInternalUsers/shareWithUsers.feature:56
+webUISharingInternalUsers/shareWithUsers.feature:77
+webUISharingInternalUsers/shareWithUsers.feature:78
+webUISharingInternalUsers/shareWithUsers.feature:79
+webUISharingInternalUsers/shareWithUsers.feature:80
+webUISharingInternalUsers/shareWithUsers.feature:155
+webUISharingInternalUsers/shareWithUsers.feature:172
+webUISharingInternalUsers/shareWithUsers.feature:182
+webUISharingInternalUsers/shareWithUsers.feature:221
+webUISharingInternalUsers/shareWithUsers.feature:234
+webUISharingInternalUsers/shareWithUsers.feature:281
+webUISharingInternalUsers/shareWithUsers.feature:291
+webUISharingInternalUsers/shareWithUsers.feature:325
+webUISharingInternalUsers/shareWithUsers.feature:338
+webUISharingInternalUsers/shareWithUsers.feature:368
+webUISharingInternalUsers/shareWithUsers.feature:417
+webUISharingInternalUsers/shareWithUsers.feature:449
+webUISharingInternalUsers/shareWithUsers.feature:450
+webUISharingInternalUsers/shareWithUsers.feature:477
+webUISharingInternalUsers/shareWithUsers.feature:489
+webUISharingInternalUsers/shareWithUsers.feature:535
+webUISharingInternalUsers/shareWithUsers.feature:536
+webUISharingInternalUsers/shareWithUsers.feature:537
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:16
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:23
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:32
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:51
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:78
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:79
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:96
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:97
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:100
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:125
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:167
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:168
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:193
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:194
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:197
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:213
+webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:224
+webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:77
+webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:95
+webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:114
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:16
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:48
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:64
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:80
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:111
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:112
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:113
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:114
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:115
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:156
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:157
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:230
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:231
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:232
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:256
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:292
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:305
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:319
+#
+# https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
+webUIFiles/copy.feature:71
+webUIFiles/copy.feature:79
+webUIMoveFilesFolders/moveFiles.feature:87
+webUIMoveFilesFolders/moveFolders.feature:67
+webUISharingPublic/shareByPublicLink.feature:572
+webUISharingPublic/shareByPublicLink.feature:607
+webUISharingPublic/shareByPublicLink.feature:624
+webUISharingPublic/shareByPublicLink.feature:641
+webUISharingPublic/shareByPublicLink.feature:658
+#
+# https://github.com/owncloud/ocis-phoenix/issues/52 Copy private link option not available
+webUIFiles/copyPrivateLinks.feature:18
+webUIFiles/copyPrivateLinks.feature:19
+#
+# https://github.com/owncloud/web/issues/276 Display previews
+webUIFiles/fileList.feature:23
+webUIFiles/fileList.feature:28
+#
+# https://github.com/owncloud/ocis-reva/issues/110 Versions Cleanup not available
+webUIFiles/versions.feature:45
+webUIFiles/versions.feature:56
+webUIFiles/versions.feature:71
+#
+# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+webUIFiles/search.feature:15
+webUIFiles/search.feature:26
+webUIFiles/search.feature:38
+webUIFiles/search.feature:83
+webUIFiles/search.feature:90
+webUIFiles/search.feature:99
+webUIFiles/search.feature:106
+webUIFiles/search.feature:137
+webUIFiles/search.feature:149
+webUIFiles/search.feature:159
+webUIFiles/search.feature:168
+webUIRestrictSharing/restrictReSharing.feature:23
+webUIRestrictSharing/restrictReSharing.feature:40
+webUIRestrictSharing/restrictSharing.feature:25
+webUIRestrictSharing/restrictSharing.feature:34
+webUIRestrictSharing/restrictSharing.feature:43
+webUIRestrictSharing/restrictSharing.feature:50
+webUISharingAcceptShares/acceptShares.feature:16
+webUISharingAcceptShares/acceptShares.feature:213
+webUISharingAutocompletion/shareAutocompletion.feature:33
+webUISharingAutocompletion/shareAutocompletion.feature:44
+webUISharingAutocompletion/shareAutocompletion.feature:55
+webUISharingAutocompletion/shareAutocompletion.feature:64
+webUISharingAutocompletion/shareAutocompletion.feature:73
+webUISharingAutocompletion/shareAutocompletion.feature:109
+webUISharingAutocompletion/shareAutocompletion.feature:121
+webUISharingAutocompletion/shareAutocompletion.feature:133
+webUISharingAutocompletion/shareAutocompletion.feature:145
+webUISharingAutocompletion/shareAutocompletion.feature:158
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:36
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:37
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:38
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:39
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:54
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:55
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:56
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:71
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:72
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:73
+webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:74
+webUISharingInternalUsersBlacklisted/shareWithUsers.feature:26
+webUISharingInternalUsersBlacklisted/shareWithUsers.feature:44
+webUISharingInternalUsersBlacklisted/shareWithUsers.feature:62
+webUISharingInternalUsersBlacklisted/shareWithUsers.feature:80
+webUISharingInternalUsersBlacklisted/shareWithUsers.feature:90
+#
+# https://github.com/owncloud/ocis-konnectd/issues/68 Can login with invalid password while logging in with openidconnect in oc10
+webUILogin/login.feature:52
+#
+# Image-Media-Viewer-Issue
+webUIPreview/imageMediaViewer.feature:30
+#
+# webUI-Private-Links
+webUIPrivateLinks/accessingPrivateLinks.feature:8
+webUIPrivateLinks/accessingPrivateLinks.feature:16
+webUIPrivateLinks/accessingPrivateLinks.feature:24
+webUIPrivateLinks/accessingPrivateLinks.feature:33
+webUIPrivateLinks/accessingPrivateLinks.feature:49
+#
+# renameFiles
+webUIRenameFiles/renameFiles.feature:113
+webUIRenameFiles/renameFiles.feature:114
+webUIRenameFiles/renameFiles.feature:115
+webUIRenameFiles/renameFiles.feature:160
+#
+# renameFolders
+webUIRenameFolders/renameFolders.feature:104
+webUIRenameFolders/renameFolders.feature:105
+webUIRenameFolders/renameFolders.feature:106
+webUIRenameFolders/renameFolders.feature:125
+#
+# Reshare is not available in ocis webUI
+webUIResharing/reshareUsers.feature:17
+webUIResharing/reshareUsers.feature:28
+webUIResharing/reshareUsers.feature:40
+webUIResharing/reshareUsers.feature:68
+webUIResharing/reshareUsers.feature:69
+webUIResharing/reshareUsers.feature:70
+webUIResharing/reshareUsers.feature:71
+webUIResharing/reshareUsers.feature:72
+webUIResharing/reshareUsers.feature:94
+webUIResharing/reshareUsers.feature:95
+webUIResharing/reshareUsers.feature:96
+webUIResharing/reshareUsers.feature:97
+webUIResharing/reshareUsers.feature:98
+webUIResharing/reshareUsers.feature:129
+webUIResharing/reshareUsers.feature:130
+webUIResharing/reshareUsers.feature:131
+webUIResharing/reshareUsers.feature:132
+webUIResharing/reshareUsers.feature:133
+webUIResharing/reshareUsers.feature:165
+webUIResharing/reshareUsers.feature:166
+webUIResharing/reshareUsers.feature:167
+webUIResharing/reshareUsers.feature:168
+webUIResharing/reshareUsers.feature:169
+webUIResharing/reshareUsers.feature:172
+webUIResharing/reshareUsers.feature:200
+webUIResharing/reshareUsers.feature:228
+webUIResharing/reshareUsers.feature:269
+webUIResharing/reshareUsers.feature:270
+webUIResharing/reshareUsers.feature:271
+webUIResharing/reshareUsers.feature:272
+webUIResharing/reshareUsers.feature:285
+webUIResharing/reshareUsers.feature:286
+webUIResharing/reshareUsers.feature:289
+webUIResharing/reshareUsers.feature:311
+webUIResharing/reshareUsers.feature:332
+webUIResharing/reshareUsers.feature:353
+webUIResharing/reshareUsers.feature:394
+webUIResharing/reshareUsers.feature:411
+webUIResharing/reshareUsers.feature:423
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+webUIRestrictSharing/disableSharing.feature:13
+webUIRestrictSharing/disableSharing.feature:19
+webUIRestrictSharing/disableSharing.feature:29
+webUIRestrictSharing/disableSharing.feature:46
+webUISharingPublic/shareByPublicLink.feature:162
+webUISharingPublic/shareByPublicLink.feature:163
+webUISharingPublic/shareByPublicLink.feature:164
+webUISharingPublic/shareByPublicLink.feature:165
+webUISharingPublic/shareByPublicLink.feature:187
+webUISharingPublic/shareByPublicLink.feature:188
+webUISharingPublic/shareByPublicLink.feature:189
+webUISharingPublic/shareByPublicLink.feature:190
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:48
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:49
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:67
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:68
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:71
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:81
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:100
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:123
+webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:139
+#
+# https://github.com/owncloud/product/issues/276 [OCIS] declining a received share gives 500 error even if the share is declined.
+webUISharingAcceptShares/acceptShares.feature:124
+#
+# https://github.com/owncloud/ocis/issues/714 Cannot delete a received share
+webUISharingAcceptShares/acceptShares.feature:184
+#
+# https://github.com/owncloud/ocis/issues/713 Accepting different shares with same filename from different users overwrites one file
+webUISharingAcceptShares/acceptShares.feature:198
+#
+# https://github.com/owncloud/product/issues/203 file_target in share response
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:59
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:60
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:61
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:62
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:63
+webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:64
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:110
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:111
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:112
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:113
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:114
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:115
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:116
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:117
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:60
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:61
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:62
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:63
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:64
+webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:65
+#
+# https://github.com/owncloud/ocis-reva/issues/194 Group shares support
+webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:60
+webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:61
+webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62
+webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:63
+webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:64
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:60
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:61
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:62
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:63
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:64
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:65
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:66
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:67
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:68
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:69
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:70
+webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:71
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:60
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:61
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:62
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:63
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:64
+webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:65
+webUISharingInternalGroups/shareWithGroups.feature:23
+webUISharingInternalGroups/shareWithGroups.feature:71
+webUISharingInternalGroups/shareWithGroups.feature:72
+webUISharingInternalGroups/shareWithGroups.feature:73
+webUISharingInternalGroups/shareWithGroups.feature:98
+webUISharingInternalGroups/shareWithGroups.feature:173
+webUISharingInternalGroups/shareWithGroups.feature:186
+webUISharingInternalGroups/shareWithGroups.feature:205
+webUISharingInternalGroups/shareWithGroups.feature:216
+webUISharingInternalGroups/shareWithGroups.feature:231
+webUISharingInternalGroups/shareWithGroups.feature:245
+webUISharingInternalGroups/shareWithGroups.feature:255
+webUISharingInternalGroups/shareWithGroups.feature:276
+webUISharingInternalGroups/shareWithGroups.feature:304
+webUISharingInternalGroups/shareWithGroups.feature:305
+webUISharingInternalGroups/shareWithGroups.feature:327
+webUISharingInternalGroups/shareWithGroups.feature:328
+webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:48
+webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:72
+webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:95
+webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:120
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:23
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:43
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:59
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:75
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:90
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:102
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:112
+webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:122
+#
+# https://github.com/owncloud/ocis-reva/issues/14 renaming a resource does not work
+webUISharingNotifications/shareWithGroups.feature:24
+webUISharingNotifications/shareWithUsers.feature:17
+webUISharingNotifications/shareWithUsers.feature:28
+webUISharingNotifications/shareWithUsers.feature:36
+webUISharingNotifications/shareWithUsers.feature:49
+#
+# https://github.com/owncloud/ocis-reva/issues/383 name of public link is empty and not "Public link" when not specified in the create request
+webUISharingPublic/shareByPublicLink.feature:30
+webUISharingPublic/shareByPublicLink.feature:31
+#
+# https://github.com/owncloud/ocis-reva/issues/398 Cannot upload files to the ownCloud storage
+webUISharingPublic/shareByPublicLink.feature:63
+webUISharingPublic/shareByPublicLink.feature:77
+#
+# https://github.com/owncloud/ocis-reva/issues/389 public share are not deleted when user is deleted
+webUISharingPublic/shareByPublicLink.feature:135
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+webUISharingPublic/shareByPublicLink.feature:407
+#
+# https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
+webUISharingPublic/shareByPublicLink.feature:739
+#
+# https://github.com/owncloud/product/issues/130 Public link on a file has a '+ New' button
+webUISharingPublic/shareByPublicLink.feature:780
+#
+# https://github.com/owncloud/ocis-reva/issues/383 name of public link is empty and not "Public link" when not specified in the create request
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:31
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:32
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:33
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:57
+#
+# https://github.com/owncloud/product/issues/125 phoenix sometimes asks for basic auth after successful oidc login
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:115
+#
+# https://github.com/owncloud/ocis/issues/723 upload-only public link does not refer to files-drop page, nor are the permissions enforced
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:205
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:265
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:285
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:311
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:319
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:328
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:337
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:346
+#
+# https://github.com/owncloud/product/issues/188 Deletion of a recursive folder from trashbin is not possible
+webUITrashbinDelete/trashbinDelete.feature:36
+webUITrashbinDelete/trashbinDelete.feature:66
+webUITrashbinDelete/trashbinDelete.feature:93
+#
+# https://github.com/owncloud/product/issues/139 Trashbin fails with unknown error when restoring
+webUITrashbinDelete/trashbinDelete.feature:114
+#
+# https://github.com/owncloud/product/issues/186 Propfind response to trashbin endpoint is different in ocis
+# https://github.com/owncloud/web/issues/1753 restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more
+webUITrashbinRestore/trashbinRestore.feature:123
+#
+# https://github.com/owncloud/ocis-reva/issues/200 Conflict / overwrite issues with TUS
+webUIUpload/uploadEdgecases.feature:105
+webUIUpload/uploadEdgecases.feature:121
+webUIUpload/uploadFileGreaterThanQuotaSize.feature:12
