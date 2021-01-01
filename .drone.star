@@ -514,7 +514,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-on-%s-storage.txt' % (storage.upper()),
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.txt' % (storage.upper()),
         },
         'commands': [
           'make -C /srv/app/testrunner test-acceptance-api',
@@ -621,6 +621,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
           'TEST_PATHS': paths,
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage.txt' % (storage.upper()),
         },
         'commands': [
           'source /drone/src/.drone.env',
@@ -630,7 +631,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'git checkout $WEB_COMMITID',
           'cp -r tests/acceptance/filesForUpload/* /uploads',
           'yarn install-all',
-          'yarn run acceptance-tests-drone'
+          './tests/acceptance/run.sh'
         ],
         'volumes':
           [stepVolumeOC10Tests] +

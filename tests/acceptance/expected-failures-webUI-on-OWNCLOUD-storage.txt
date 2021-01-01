@@ -1,0 +1,9 @@
+# this file contains the scenarios from web UI tests that are currently expected to fail
+#
+# https://github.com/owncloud/ocisissues/1106 media viewer does not support mp3 files
+webUIPreview/imageMediaViewer.feature:70
+webUIPreview/imageMediaViewer.feature:76
+#
+# https://github.com/owncloud/web/issues/4564 authentication dialog appears when user is deleted
+# https://github.com/owncloud/ocis/issues/1129 login error page loops when logged in user is deleted
+webUILogin/login.feature:59
