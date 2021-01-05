@@ -1043,6 +1043,8 @@ apiTrashbin/trashbinRestore.feature:331
 #
 apiTrashbin/trashbinSharingToShares.feature:24
 apiTrashbin/trashbinSharingToShares.feature:25
+apiShareManagementToShares/acceptShares.feature:469
+apiShareManagementToShares/acceptShares.feature:470
 #
 # https://github.com/owncloud/ocis/issues/1124 deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver
 #
