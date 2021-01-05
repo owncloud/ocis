@@ -1611,8 +1611,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:61
 apiWebdavEtagPropagation1/moveFileFolder.feature:62
 apiWebdavEtagPropagation1/moveFileFolder.feature:78
 apiWebdavEtagPropagation1/moveFileFolder.feature:79
-apiWebdavEtagPropagation1/moveFileFolder.feature:98
-apiWebdavEtagPropagation1/moveFileFolder.feature:99
 apiWebdavEtagPropagation1/moveFileFolder.feature:146
 apiWebdavEtagPropagation1/moveFileFolder.feature:147
 apiWebdavEtagPropagation1/moveFileFolder.feature:174
