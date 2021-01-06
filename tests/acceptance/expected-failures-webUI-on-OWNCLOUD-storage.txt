@@ -422,3 +422,9 @@ webUITrashbinRestore/trashbinRestore.feature:123
 webUIUpload/uploadEdgecases.feature:105
 webUIUpload/uploadEdgecases.feature:121
 webUIUpload/uploadFileGreaterThanQuotaSize.feature:12
+#
+# Previews are not getting disabled in CI during a test scenario
+# ToDo: look into how these test scenarios pass when run in owncloud/web
+webUIPreview/imageMediaViewer.feature:114
+webUIPreview/imageMediaViewer.feature:100
+webUISharingInternalUsers/shareWithUsers.feature:585
