@@ -1011,6 +1011,9 @@ apiTrashbin/trashbinRestore.feature:331
 #
 apiTrashbin/trashbinSharingToShares.feature:24
 apiTrashbin/trashbinSharingToShares.feature:25
+apiShareManagementToShares/acceptShares.feature:469
+apiShareManagementToShares/acceptShares.feature:470
+
 #
 # https://github.com/owncloud/ocis/issues/1124 deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver
 #
@@ -1608,8 +1611,6 @@ apiWebdavEtagPropagation1/moveFileFolder.feature:61
 apiWebdavEtagPropagation1/moveFileFolder.feature:62
 apiWebdavEtagPropagation1/moveFileFolder.feature:78
 apiWebdavEtagPropagation1/moveFileFolder.feature:79
-apiWebdavEtagPropagation1/moveFileFolder.feature:98
-apiWebdavEtagPropagation1/moveFileFolder.feature:99
 apiWebdavEtagPropagation1/moveFileFolder.feature:146
 apiWebdavEtagPropagation1/moveFileFolder.feature:147
 apiWebdavEtagPropagation1/moveFileFolder.feature:174
@@ -2507,3 +2508,5 @@ apiTrashbin/trashbinFilesFolders.feature:285
 
 # https://github.com/owncloud/ocis/issues/763 reading a file that a collaborator uploaded is impossible
 apiShareOperationsToShares/uploadToShare.feature:280
+
+
