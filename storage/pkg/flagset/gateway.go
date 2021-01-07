@@ -100,7 +100,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "storage-home-mapping",
 			Value:       "",
-			Usage:       "mapping template for user home paths to user-specific mount points",
+			Usage:       "mapping template for user home paths to user-specific mount points, e.g. /home/{{substr 0 1 .Username}}",
 			EnvVars:     []string{"STORAGE_GATEWAY_HOME_MAPPING"},
 			Destination: &cfg.Reva.Gateway.HomeMapping,
 		},
