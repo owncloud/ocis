@@ -20,9 +20,10 @@ type Gateway struct {
 	Port
 	CommitShareToStorageGrant  bool
 	CommitShareToStorageRef    bool
+	DisableHomeCreationOnLogin bool
 	ShareFolder                string
 	LinkGrants                 string
-	DisableHomeCreationOnLogin bool
+	HomeMapping                string
 }
 
 // StorageRegistry defines the available storage registry configuration
