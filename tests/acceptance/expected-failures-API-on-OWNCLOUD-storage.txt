@@ -1961,7 +1961,18 @@ apiShareManagementToShares/moveReceivedShare.feature:70
 apiShareManagementToShares/moveReceivedShare.feature:71
 apiShareManagementToShares/moveReceivedShare.feature:73
 apiShareManagementToShares/moveReceivedShare.feature:88
-
+apiShareManagementToShares/moveReceivedShare.feature:102
+apiShareManagementToShares/moveReceivedShare.feature:110
+apiShareManagementToShares/moveReceivedShare.feature:118
+apiShareManagementToShares/moveReceivedShare.feature:128
+apiShareManagementToShares/moveReceivedShare.feature:138
+apiShareManagementToShares/moveReceivedShare.feature:148
+apiShareManagementToShares/moveReceivedShare.feature:158
+apiShareManagementToShares/moveReceivedShare.feature:168
+apiShareManagementToShares/moveReceivedShare.feature:197
+apiShareManagementToShares/moveReceivedShare.feature:198
+apiShareManagementToShares/moveReceivedShare.feature:221
+apiShareManagementToShares/moveReceivedShare.feature:222
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 # https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
