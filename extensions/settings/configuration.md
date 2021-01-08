@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-06T03:59:20+0000"
+date: "2021-01-08T14:42:00+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,21 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### settings ocis-settings
-
-Provide settings and permissions for oCIS
-
-Usage: `settings ocis-settings [command options] [arguments...]`
-
--log-level |  $SETTINGS_LOG_LEVEL
-: Set logging level. Default: `info`.
-
--log-pretty |  $SETTINGS_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $SETTINGS_LOG_COLOR
-: Enable colored logging. Default: `true`.
 
 ### settings server
 
@@ -133,4 +118,19 @@ Usage: `settings health [command options] [arguments...]`
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9194`.
+
+### settings ocis-settings
+
+Provide settings and permissions for oCIS
+
+Usage: `settings ocis-settings [command options] [arguments...]`
+
+-log-level |  $SETTINGS_LOG_LEVEL
+: Set logging level. Default: `info`.
+
+-log-pretty |  $SETTINGS_LOG_PRETTY
+: Enable pretty logging. Default: `true`.
+
+-log-color |  $SETTINGS_LOG_COLOR
+: Enable colored logging. Default: `true`.
 
