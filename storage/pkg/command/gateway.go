@@ -24,7 +24,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Name:  "gateway",
 		Usage: "Start gateway",
 		Flags: flagset.GatewayWithConfig(cfg),
-		Before: func(c *cli.Context) error {
+		Action: func(c *cli.Context) error {
 			cfg.Reva.Gateway.Services = c.StringSlice("service")
 			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
 
@@ -32,9 +32,6 @@ func Gateway(cfg *config.Config) *cli.Command {
 				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
 			}
 
-			return nil
-		},
-		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
 			if cfg.Tracing.Enabled {
