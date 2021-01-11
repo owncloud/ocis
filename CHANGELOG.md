@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
+* Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
 ## Details
 
@@ -48,6 +49,15 @@ The following sections list the changes for unreleased.
    containers.
 
    https://github.com/owncloud/ocis/pull/1148
+
+* Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
+
+  * Enhancement: calculate and expose actual file permission set [cs3org/reva#1368](https://github.com/cs3org/reva/pull/1368)
+  * initial range request support [cs3org/reva#1326](https://github.com/cs3org/reva/pull/1388)
+
+   https://github.com/owncloud/ocis/pull/1194
+   https://github.com/cs3org/reva/pull/1368
+   https://github.com/cs3org/reva/pull/1388
 # Changelog for [1.0.0] (2020-12-17)
 
 The following sections list the changes for 1.0.0.
