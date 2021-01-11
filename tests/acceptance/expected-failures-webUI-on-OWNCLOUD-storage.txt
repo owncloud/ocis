@@ -402,6 +402,9 @@ webUIUpload/uploadEdgecases.feature:105
 webUIUpload/uploadEdgecases.feature:121
 webUIUpload/uploadFileGreaterThanQuotaSize.feature:12
 #
+# https://github.com/owncloud/ocis/issues/1124 restoring a file deleted from a received shared folder is not possible
+webUITrashbinRestore/trashbinRestore.feature:240
+#
 # https://github.com/owncloud/web/issues/4601 Adjust web UI test scenarios that demonstrate fixed bugs
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:165
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:166
