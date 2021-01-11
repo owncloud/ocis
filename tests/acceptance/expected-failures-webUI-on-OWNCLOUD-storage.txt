@@ -90,7 +90,6 @@ webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:213
 webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:224
 webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:77
 webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:95
-webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:114
 webUISharingPermissionsUsers/sharePermissionsUsers.feature:16
 webUISharingPermissionsUsers/sharePermissionsUsers.feature:48
 webUISharingPermissionsUsers/sharePermissionsUsers.feature:64
@@ -286,11 +285,9 @@ webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:61
 webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:62
 webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:63
 webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:64
-webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:110
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:111
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:112
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:113
-webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:114
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:115
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:116
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:117
@@ -368,33 +365,18 @@ webUISharingPublic/shareByPublicLink.feature:31
 #
 # https://github.com/owncloud/ocis-reva/issues/398 Cannot upload files to the ownCloud storage
 webUISharingPublic/shareByPublicLink.feature:63
-webUISharingPublic/shareByPublicLink.feature:77
 #
 # https://github.com/owncloud/ocis-reva/issues/389 public share are not deleted when user is deleted
 webUISharingPublic/shareByPublicLink.feature:135
 #
-# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-webUISharingPublic/shareByPublicLink.feature:407
-#
 # https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
 webUISharingPublic/shareByPublicLink.feature:739
-#
-# https://github.com/owncloud/product/issues/130 Public link on a file has a '+ New' button
-webUISharingPublic/shareByPublicLink.feature:780
 #
 # https://github.com/owncloud/ocis-reva/issues/383 name of public link is empty and not "Public link" when not specified in the create request
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:31
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:32
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:33
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:57
-#
-# https://github.com/owncloud/product/issues/125 phoenix sometimes asks for basic auth after successful oidc login
-webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:115
-#
-# https://github.com/owncloud/ocis/issues/723 upload-only public link does not refer to files-drop page, nor are the permissions enforced
-webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:205
-webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:265
-webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:285
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:311
@@ -419,3 +401,14 @@ webUITrashbinRestore/trashbinRestore.feature:123
 webUIUpload/uploadEdgecases.feature:105
 webUIUpload/uploadEdgecases.feature:121
 webUIUpload/uploadFileGreaterThanQuotaSize.feature:12
+#
+# https://github.com/owncloud/web/issues/4601 Adjust web UI test scenarios that demonstrate fixed bugs
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:165
+webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:166
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:32
+webUISharingPermissionsUsers/sharePermissionsUsers.feature:136
+webUISharingPublic/shareByPublicLink.feature:791
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:122
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:298
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:275
+webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:212

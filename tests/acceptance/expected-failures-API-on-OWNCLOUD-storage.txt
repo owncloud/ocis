@@ -445,13 +445,6 @@ apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:61
 apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:79
 apiShareOperationsToShares/gettingSharesSharedFilteredEmpty.feature:80
 #
-# https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
-#
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:23
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:24
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:142
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:143
-#
 # https://github.com/owncloud/ocis-reva/issues/282 Split old public API webdav tests from new public webdav tests
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
 # https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
@@ -483,9 +476,7 @@ apiSharePublicLink1/changingPublicLinkShare.feature:244
 # https://github.com/owncloud/ocis/issues/723 upload-only public link does not refer to files-drop page, nor are the permissions enforced
 #
 apiSharePublicLink1/changingPublicLinkShare.feature:267
-apiSharePublicLink1/changingPublicLinkShare.feature:278
 apiSharePublicLink1/changingPublicLinkShare.feature:289
-apiSharePublicLink1/changingPublicLinkShare.feature:300
 apiSharePublicLink1/createPublicLinkShare.feature:34
 apiSharePublicLink1/createPublicLinkShare.feature:35
 apiSharePublicLink1/createPublicLinkShare.feature:183
@@ -499,12 +490,8 @@ apiSharePublicLink1/createPublicLinkShare.feature:371
 #
 # https://github.com/owncloud/ocis-reva/issues/12 Range Header is not obeyed when downloading a file
 #
-apiSharePublicLink1/createPublicLinkShare.feature:63
-apiSharePublicLink1/createPublicLinkShare.feature:64
 apiSharePublicLink1/createPublicLinkShare.feature:95
 apiSharePublicLink1/createPublicLinkShare.feature:96
-apiSharePublicLink1/createPublicLinkShare.feature:245
-apiSharePublicLink1/createPublicLinkShare.feature:246
 apiSharePublicLink1/createPublicLinkShare.feature:276
 apiSharePublicLink1/createPublicLinkShare.feature:277
 #
@@ -517,8 +504,6 @@ apiSharePublicLink1/createPublicLinkShare.feature:156
 #
 # https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
 #
-apiSharePublicLink1/createPublicLinkShare.feature:389
-apiSharePublicLink1/createPublicLinkShare.feature:390
 apiSharePublicLink1/createPublicLinkShare.feature:410
 apiSharePublicLink1/createPublicLinkShare.feature:411
 apiSharePublicLink1/createPublicLinkShare.feature:431
@@ -595,11 +580,6 @@ apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:158
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:179
 apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:180
 #
-# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
-#
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:97
-apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:98
-#
 # https://github.com/owncloud/product/issues/272 [OCIS] old public webdav api doesnt works
 #
 apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:30
@@ -635,12 +615,9 @@ apiSharePublicLink2/updatePublicLinkShare.feature:440
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
 #
-apiSharePublicLink2/updatePublicLinkShare.feature:461
-apiSharePublicLink2/updatePublicLinkShare.feature:462
 apiSharePublicLink2/updatePublicLinkShare.feature:486
 apiSharePublicLink2/updatePublicLinkShare.feature:487
 apiSharePublicLink2/uploadToPublicLinkShare.feature:9
-apiSharePublicLink2/uploadToPublicLinkShare.feature:74
 apiSharePublicLink2/uploadToPublicLinkShare.feature:83
 apiSharePublicLink2/uploadToPublicLinkShare.feature:103
 apiSharePublicLink2/uploadToPublicLinkShare.feature:121
@@ -653,8 +630,6 @@ apiSharePublicLink2/uploadToPublicLinkShare.feature:273
 #
 # https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
 #
-apiSharePublicLink2/uploadToPublicLinkShare.feature:62
-apiSharePublicLink2/uploadToPublicLinkShare.feature:63
 apiSharePublicLink2/uploadToPublicLinkShare.feature:66
 #
 # https://github.com/owncloud/ocis-reva/issues/195 Set quota over settings
@@ -1066,14 +1041,6 @@ apiWebdavMove1/moveFileAsync.feature:234
 apiWebdavMove1/moveFileAsync.feature:235
 apiWebdavMove1/moveFileAsync.feature:240
 #
-# https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
-#
-apiWebdavMove1/moveFileAsync.feature:156
-apiWebdavMove1/moveFileAsync.feature:173
-apiWebdavMove1/moveFileAsync.feature:174
-apiWebdavMove1/moveFileAsync.feature:184
-apiWebdavMove1/moveFileAsync.feature:185
-#
 # https://github.com/owncloud/product/issues/260 cannot set blacklisted file names
 #
 apiWebdavMove1/moveFileToBlacklistedNameAsync.feature:12
@@ -1168,20 +1135,10 @@ apiWebdavOperations/deleteFolder.feature:92
 # https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
 # https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
-apiWebdavOperations/downloadFile.feature:29
-apiWebdavOperations/downloadFile.feature:30
 apiWebdavOperations/downloadFile.feature:72
 apiWebdavOperations/downloadFile.feature:73
 apiWebdavOperations/downloadFile.feature:84
 apiWebdavOperations/downloadFile.feature:85
-apiWebdavOperations/downloadFile.feature:144
-apiWebdavOperations/downloadFile.feature:145
-apiWebdavOperations/downloadFile.feature:179
-apiWebdavOperations/downloadFile.feature:180
-apiWebdavOperations/downloadFile.feature:189
-apiWebdavOperations/downloadFile.feature:190
-apiWebdavOperations/downloadFile.feature:198
-apiWebdavOperations/downloadFile.feature:199
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
 #
@@ -1336,10 +1293,6 @@ apiWebdavProperties2/getFileProperties.feature:327
 apiWebdavProperties2/getFileProperties.feature:328
 apiWebdavProperties2/getFileProperties.feature:376
 apiWebdavProperties2/getFileProperties.feature:377
-apiWebdavProperties2/getFileProperties.feature:415
-apiWebdavProperties2/getFileProperties.feature:416
-apiWebdavProperties2/getFileProperties.feature:428
-apiWebdavProperties2/getFileProperties.feature:429
 apiWebdavProperties2/getFileProperties.feature:441
 apiWebdavProperties2/getFileProperties.feature:442
 apiWebdavProperties2/getFileProperties.feature:454
@@ -1514,11 +1467,6 @@ apiWebdavPreviews/previews.feature:165
 apiWebdavPreviews/previews.feature:166
 apiWebdavPreviews/previews.feature:178
 apiWebdavPreviews/previews.feature:179
-#
-# https://github.com/owncloud/ocis/issues/762 path and other information are not shown if a share does not have "read" permission
-#
-apiShareOperationsToShares/uploadToShare.feature:64
-apiShareOperationsToShares/uploadToShare.feature:65
 #
 # https://github.com/owncloud/product/issues/293 sharing with group not available
 #
@@ -1976,8 +1924,6 @@ apiShareManagementToShares/moveReceivedShare.feature:222
 #
 # https://github.com/owncloud/product/issues/203 file_target in share response
 # https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:38
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:39
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:59
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:60
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:73
@@ -1988,8 +1934,6 @@ apiShareOperationsToShares/getWebDAVSharePermissions.feature:108
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:109
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:129
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:130
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:157
-apiShareOperationsToShares/getWebDAVSharePermissions.feature:158
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:177
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:178
 apiShareOperationsToShares/getWebDAVSharePermissions.feature:191
@@ -2509,15 +2453,6 @@ apiWebdavUploadTUS/uploadFile.feature:156
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:632
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:633
 
-# https://github.com/owncloud/ocis/issues/1126 share owner cannot delete other user's files
-apiShareUpdateToShares/updateShare.feature:384
-apiShareUpdateToShares/updateShare.feature:385
-
 # https://github.com/owncloud/ocis/issues/541 Deletion time in trash bin shows a wrong date
 apiTrashbin/trashbinFilesFolders.feature:284
 apiTrashbin/trashbinFilesFolders.feature:285
-
-# https://github.com/owncloud/ocis/issues/763 reading a file that a collaborator uploaded is impossible
-apiShareOperationsToShares/uploadToShare.feature:280
-
-
