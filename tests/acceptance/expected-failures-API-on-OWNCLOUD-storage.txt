@@ -1066,14 +1066,6 @@ apiWebdavMove1/moveFileAsync.feature:234
 apiWebdavMove1/moveFileAsync.feature:235
 apiWebdavMove1/moveFileAsync.feature:240
 #
-# https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
-#
-apiWebdavMove1/moveFileAsync.feature:156
-apiWebdavMove1/moveFileAsync.feature:173
-apiWebdavMove1/moveFileAsync.feature:174
-apiWebdavMove1/moveFileAsync.feature:184
-apiWebdavMove1/moveFileAsync.feature:185
-#
 # https://github.com/owncloud/product/issues/260 cannot set blacklisted file names
 #
 apiWebdavMove1/moveFileToBlacklistedNameAsync.feature:12
@@ -1168,20 +1160,10 @@ apiWebdavOperations/deleteFolder.feature:92
 # https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
 # https://github.com/owncloud/core/issues/38006 Review and fix the tests that have sharing step to work with ocis
 #
-apiWebdavOperations/downloadFile.feature:29
-apiWebdavOperations/downloadFile.feature:30
 apiWebdavOperations/downloadFile.feature:72
 apiWebdavOperations/downloadFile.feature:73
 apiWebdavOperations/downloadFile.feature:84
 apiWebdavOperations/downloadFile.feature:85
-apiWebdavOperations/downloadFile.feature:144
-apiWebdavOperations/downloadFile.feature:145
-apiWebdavOperations/downloadFile.feature:179
-apiWebdavOperations/downloadFile.feature:180
-apiWebdavOperations/downloadFile.feature:189
-apiWebdavOperations/downloadFile.feature:190
-apiWebdavOperations/downloadFile.feature:198
-apiWebdavOperations/downloadFile.feature:199
 apiWebdavOperations/refuseAccess.feature:21
 apiWebdavOperations/refuseAccess.feature:22
 #
