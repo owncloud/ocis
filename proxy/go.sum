@@ -194,8 +194,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666/go.mod h1:UXha4T
 github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21 h1:mZpylrgnCgSeaZ5EznvHIPIKuaQHMHZDi2wkJtk4M8Y=
 github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.2.2-0.20200924071957-e6676516e61e/go.mod h1:DOV5SjpOBKN+aWfOHLdA4KiLQkpyC786PQaXEdRAZ0M=
-github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1 h1:bTNyWMz+9x4JddkxUeuYkmCGL6tbLkUunbmW3Q0Nah8=
-github.com/cs3org/reva v1.4.1-0.20201216095137-5207197217f1/go.mod h1:abC1Lo0ZKwkKloomTPZWunV/lUJvewkty1pI41zn2Ic=
+github.com/cs3org/reva v1.4.1-0.20210111080247-f2b63bfd6825 h1:U6pAVGTjesstz+EXd8+YpIG1xwKH1ovOXdWrMCvnopw=
+github.com/cs3org/reva v1.4.1-0.20210111080247-f2b63bfd6825/go.mod h1:abC1Lo0ZKwkKloomTPZWunV/lUJvewkty1pI41zn2Ic=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548/go.mod h1:e6NPNENfs9mPDVNRekM7lKScauxd5kXTr1Mfyig6TDM=
 github.com/cznic/strutil v0.0.0-20181122101858-275e90344537/go.mod h1:AHHPPPXTw0h6pVabbcbyGRK1DckRn7r/STdZEeIDzZc=
