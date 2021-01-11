@@ -18,6 +18,115 @@ repository:
   allow_rebase_merge: true
 
 labels:
+  # sane labeling scheme
+  - name: 'Priority: Critical'
+    color: "#e11d21"
+    board: false
+    priority: 10
+  - name: 'Priority: High'
+    color: "#eb6420"
+    board: false
+    priority: 9
+  - name: 'Priority: Medium'
+    color: "#fbca04"
+    board: false
+    priority: 8
+  - name: 'Priority: Low'
+    color: "#009800"
+    board: false
+    priority: 7
+  - name: 'Status: Abandoned'
+    color: "#000000"
+    board: false
+    priority: 1
+  - name: 'Status: Accepted'
+    color: "#009800"
+    board: true
+    priority: 1
+  - name: 'Status: Proposal'
+    color: "#e11d21"
+    board: true
+    priority: 1
+  - name: 'Status: In Progress'
+    color: "#cccccc"
+    board: true
+    priority: 1
+  - name: 'Status: TBD'
+    color: "#e11d21"
+    board: false
+    priority: 1
+  - name: 'Status: Review Needed'
+    color: "#fbca04"
+    board: true
+    priority: 1
+    description: Needs review from a maintainer
+  - name: 'Status: Revision Needed'
+    color: "#e11d21"
+    board: false
+    priority: 1
+    description: Needs code input from a maintainer
+  - name: 'Status: Doc Needed'
+    color: "#006b75"
+    board: true
+    priority: 1
+  - name: 'Status: Available'
+    color: "#bfe5bf"
+    board: true
+    priority: 1
+  - name: 'Status: Blocked'
+    color: "#e11d21"
+    board: false
+    priority: 1
+    description: Blocked because of upstream dependencies
+  - name: 'Status: Wontfix'
+    color: "#D2DAE1"
+    board: false
+    priority: 1
+  - name: 'Type: Bug'
+    color: "#e11d21"
+    board: false
+    priority: 11
+  - name: 'Type: Maintenance'
+    color: "#fbca04"
+    board: false
+    priority: 1
+  - name: 'Type: Enhancement'
+    color: "#84b6eb"
+    board: false
+    priority: 1
+  - name: 'Type: Discussion'
+    color: "#cc317c"
+    board: false
+    priority: 1
+  - name: "¯\\_[ツ]_/¯"
+    color: "#FFC107"
+    board: false
+    priority: 1
+  - name: "[ノಠ益ಠ]ノ彡┻━┻"
+    color: "#333333"
+    board: false
+    priority: 1
+  - name: 'Type: Security'
+    color: "#EE3F46"
+    board: false
+    priority: 11
+  - name: 'Type: Feature'
+    color: "#91ca55"
+    board: false
+    priority: 1
+  - name: 'Type: Optimization'
+    color: "#5EBEFF"
+    board: false
+    priority: 1
+  - name: 'Type: UI/UX'
+    color: "#FFC274"
+    board: false
+    priority: 1
+  - name: 'Type: Compatibility'
+    color: "#000000"
+    board: false
+    priority: 1
+  # !sane labeling scheme
   - name: bug
     color: d73a4a
     description: Something isn't working
