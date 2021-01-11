@@ -426,3 +426,4 @@ webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:212
 # https://github.com/owncloud/ocis/issues/1197 Investigate why some imageMediaViewer web UI tests fail when run in OCIS CI
 webUIPreview/imageMediaViewer.feature:100
 webUIPreview/imageMediaViewer.feature:114
+webUISharingInternalUsers/shareWithUsers.feature:585
