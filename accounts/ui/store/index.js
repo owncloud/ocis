@@ -98,7 +98,7 @@ const actions = {
     injectAuthToken(rootGetters.user.token)
     try {
       const response = await AccountsService_ListAccounts({
-        $domain: rootGetters.configuration.server,
+        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
         body: {}
       })
       if (response.status === 201) {
@@ -115,7 +115,7 @@ const actions = {
     injectAuthToken(rootGetters.user.token)
     try {
       const response = await RoleService_ListRoles({
-        $domain: rootGetters.configuration.server,
+        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
         body: {}
       })
       if (response.status === 201) {
@@ -143,7 +143,7 @@ const actions = {
 
       try {
         const response = await AccountsService_UpdateAccount({
-          $domain: rootGetters.configuration.server,
+          $domain: rootGetters.configuration.server.replace(/\/$/, ''),
           body: {
             account: {
               id: account.id,
@@ -186,7 +186,7 @@ const actions = {
 
     try {
       const response = await AccountsService_CreateAccount({
-        $domain: rootGetters.configuration.server,
+        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
         body: {
           account: {
             on_premises_sam_account_name: account.username,
@@ -222,7 +222,7 @@ const actions = {
     for (const account of state.selectedAccounts) {
       try {
         const response = await AccountsService_DeleteAccount({
-          $domain: rootGetters.configuration.server,
+          $domain: rootGetters.configuration.server.replace(/\/$/, ''),
           body: {
             id: account.id
           }

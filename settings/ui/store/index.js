@@ -55,7 +55,7 @@ const actions = {
     injectAuthToken(rootGetters)
     try {
       const response = await BundleService_ListBundles({
-        $domain: rootGetters.configuration.server,
+        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
         body: {}
       })
       if (response.status === 201) {
@@ -96,7 +96,7 @@ const actions = {
     injectAuthToken(rootGetters)
     try {
       const response = await ValueService_SaveValue({
-        $domain: rootGetters.configuration.server,
+        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
         body: {
           value: payload
         }
