@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-11T12:53:20+0000"
+date: "2021-01-12T03:36:37+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/storage/templates
@@ -55,77 +55,56 @@ Usage: `storage [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### storage auth-basic
+### storage frontend
 
-Start authprovider for basic auth
+Start frontend service
 
-Usage: `storage auth-basic [command options] [arguments...]`
+Usage: `storage frontend [command options] [arguments...]`
 
--debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9147`.
+-debug-addr |  $STORAGE_FRONTEND_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9141`.
 
--auth-driver |  $STORAGE_AUTH_DRIVER
-: auth driver: 'demo', 'json' or 'ldap'. Default: `ldap`.
+-transfer-secret |  $STORAGE_TRANSFER_SECRET
+: Transfer secret for datagateway. Default: `replace-me-with-a-transfer-secret`.
 
--auth-json |  $STORAGE_AUTH_JSON
-: Path to users.json file.
+-chunk-folder |  $STORAGE_CHUNK_FOLDER
+: temp directory for chunked uploads. Default: `/var/tmp/ocis/tmp/chunks`.
 
--network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
-: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+-webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
+: Namespace prefix for the /webdav endpoint. Default: `/home/`.
 
--addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9146`.
+-dav-files-namespace |  $STORAGE_DAV_FILES_NAMESPACE
+: Namespace prefix for the webdav /dav/files endpoint. Default: `/users/`.
 
-### storage auth-bearer
-
-Start authprovider for bearer auth
-
-Usage: `storage auth-bearer [command options] [arguments...]`
-
--debug-addr |  $STORAGE_AUTH_BEARER_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9149`.
-
--oidc-issuer |  $STORAGE_OIDC_ISSUER , $OCIS_URL
-: OIDC issuer. Default: `https://localhost:9200`.
-
--oidc-insecure |  $STORAGE_OIDC_INSECURE
-: OIDC allow insecure communication. Default: `true`.
-
--oidc-id-claim |  $STORAGE_OIDC_ID_CLAIM
-: OIDC id claim. Default: `preferred_username`.
-
--oidc-uid-claim |  $STORAGE_OIDC_UID_CLAIM
-: OIDC uid claim.
-
--oidc-gid-claim |  $STORAGE_OIDC_GID_CLAIM
-: OIDC gid claim.
-
--network |  $STORAGE_AUTH_BEARER_GRPC_NETWORK
+-network |  $STORAGE_FRONTEND_HTTP_NETWORK
 : Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
--addr |  $STORAGE_AUTH_BEARER_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9148`.
+-addr |  $STORAGE_FRONTEND_HTTP_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9140`.
 
-### storage storage-public-link
+-public-url |  $STORAGE_FRONTEND_PUBLIC_URL , $OCIS_URL
+: URL to use for the storage service. Default: `https://localhost:9200`.
 
-Start storage-public-link service
+-datagateway-prefix |  $STORAGE_FRONTEND_DATAGATEWAY_PREFIX
+: datagateway prefix. Default: `data`.
 
-Usage: `storage storage-public-link [command options] [arguments...]`
+-ocdav-prefix |  $STORAGE_FRONTEND_OCDAV_PREFIX
+: owncloud webdav endpoint prefix.
 
--debug-addr |  $STORAGE_PUBLIC_LINK_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9179`.
+-ocs-prefix |  $STORAGE_FRONTEND_OCS_PREFIX
+: open collaboration services endpoint prefix. Default: `ocs`.
 
--network |  $STORAGE_PUBLIC_LINK_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+-ocs-share-prefix |  $STORAGE_FRONTEND_OCS_Share_PREFIX
+: the prefix prepended to the path of shared files. Default: `/Shares`.
 
--addr |  $STORAGE_PUBLIC_LINK_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9178`.
+-gateway-url |  $STORAGE_GATEWAY_ENDPOINT
+: URL to use for the storage gateway service. Default: `localhost:9142`.
 
--mount-path |  $STORAGE_PUBLIC_LINK_MOUNT_PATH
-: mount path. Default: `/public`.
+-upload-disable-tus |  $STORAGE_FRONTEND_UPLOAD_DISABLE_TUS
+: Disables TUS upload mechanism. Default: `false`.
 
--gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the storage gateway service. Default: `localhost:9142`.
+-upload-http-method-override |  $STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE
+: Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
 
 ### storage storage
 
@@ -144,33 +123,6 @@ Usage: `storage storage [command options] [arguments...]`
 
 -log-color |  $STORAGE_LOG_COLOR
 : Enable colored logging.
-
-### storage sharing
-
-Start sharing service
-
-Usage: `storage sharing [command options] [arguments...]`
-
--debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9151`.
-
--network |  $STORAGE_SHARING_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
--addr |  $STORAGE_SHARING_GRPC_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9150`.
-
--user-driver |  $STORAGE_SHARING_USER_DRIVER
-: driver to use for the UserShareProvider. Default: `json`.
-
--user-json-file |  $STORAGE_SHARING_USER_JSON_FILE
-: file used to persist shares for the UserShareProvider. Default: `/var/tmp/ocis/storage/shares.json`.
-
--public-driver |  $STORAGE_SHARING_PUBLIC_DRIVER
-: driver to use for the PublicShareProvider. Default: `json`.
-
--public-json-file |  $STORAGE_SHARING_PUBLIC_JSON_FILE
-: file used to persist shares for the PublicShareProvider. Default: `/var/tmp/ocis/storage/publicshares.json`.
 
 ### storage storage-home
 
@@ -262,56 +214,128 @@ Usage: `storage storage-metadata [command options] [arguments...]`
 -storage-root |  $STORAGE_METADATA_ROOT
 : the path to the metadata storage root. Default: `/var/tmp/ocis/storage/metadata`.
 
-### storage frontend
+### storage storage-public-link
 
-Start frontend service
+Start storage-public-link service
 
-Usage: `storage frontend [command options] [arguments...]`
+Usage: `storage storage-public-link [command options] [arguments...]`
 
--debug-addr |  $STORAGE_FRONTEND_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9141`.
+-debug-addr |  $STORAGE_PUBLIC_LINK_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9179`.
 
--transfer-secret |  $STORAGE_TRANSFER_SECRET
-: Transfer secret for datagateway. Default: `replace-me-with-a-transfer-secret`.
-
--chunk-folder |  $STORAGE_CHUNK_FOLDER
-: temp directory for chunked uploads. Default: `/var/tmp/ocis/tmp/chunks`.
-
--webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
-: Namespace prefix for the /webdav endpoint. Default: `/home/`.
-
--dav-files-namespace |  $STORAGE_DAV_FILES_NAMESPACE
-: Namespace prefix for the webdav /dav/files endpoint. Default: `/users/`.
-
--network |  $STORAGE_FRONTEND_HTTP_NETWORK
+-network |  $STORAGE_PUBLIC_LINK_GRPC_NETWORK
 : Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
--addr |  $STORAGE_FRONTEND_HTTP_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9140`.
+-addr |  $STORAGE_PUBLIC_LINK_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9178`.
 
--public-url |  $STORAGE_FRONTEND_PUBLIC_URL , $OCIS_URL
-: URL to use for the storage service. Default: `https://localhost:9200`.
+-mount-path |  $STORAGE_PUBLIC_LINK_MOUNT_PATH
+: mount path. Default: `/public`.
 
--datagateway-prefix |  $STORAGE_FRONTEND_DATAGATEWAY_PREFIX
-: datagateway prefix. Default: `data`.
+-gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
+: endpoint to use for the storage gateway service. Default: `localhost:9142`.
 
--ocdav-prefix |  $STORAGE_FRONTEND_OCDAV_PREFIX
-: owncloud webdav endpoint prefix.
+### storage users
 
--ocs-prefix |  $STORAGE_FRONTEND_OCS_PREFIX
-: open collaboration services endpoint prefix. Default: `ocs`.
+Start users service
 
--ocs-share-prefix |  $STORAGE_FRONTEND_OCS_Share_PREFIX
-: the prefix prepended to the path of shared files. Default: `/Shares`.
+Usage: `storage users [command options] [arguments...]`
 
--gateway-url |  $STORAGE_GATEWAY_ENDPOINT
-: URL to use for the storage gateway service. Default: `localhost:9142`.
+-debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9145`.
 
--upload-disable-tus |  $STORAGE_FRONTEND_UPLOAD_DISABLE_TUS
-: Disables TUS upload mechanism. Default: `false`.
+-network |  $STORAGE_USERPROVIDER_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
 
--upload-http-method-override |  $STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE
-: Specify an HTTP method (ex: POST) that clients should to use when uploading instead of PATCH.
+-addr |  $STORAGE_USERPROVIDER_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9144`.
+
+-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: URL to use for the storage service. Default: `localhost:9144`.
+
+-driver |  $STORAGE_USERPROVIDER_DRIVER
+: user driver: 'demo', 'json', 'ldap', or 'rest'. Default: `ldap`.
+
+-json-config |  $STORAGE_USERPROVIDER_JSON
+: Path to users.json file.
+
+-rest-client-id |  $STORAGE_REST_CLIENT_ID
+: User rest driver Client ID.
+
+-rest-client-secret |  $STORAGE_REST_CLIENT_SECRET
+: User rest driver Client Secret.
+
+-rest-redis-address |  $STORAGE_REST_REDIS_ADDRESS
+: Address for redis server. Default: `localhost:6379`.
+
+-rest-redis-username |  $STORAGE_REST_REDIS_USERNAME
+: Username for redis server.
+
+-rest-redis-password |  $STORAGE_REST_REDIS_PASSWORD
+: Password for redis server.
+
+-rest-id-provider |  $STORAGE_REST_ID_PROVIDER
+: The OIDC Provider.
+
+-rest-api-base-url |  $STORAGE_REST_API_BASE_URL
+: Base API Endpoint.
+
+-rest-oidc-token-endpoint |  $STORAGE_REST_OIDC_TOKEN_ENDPOINT
+: Endpoint to generate token to access the API.
+
+-rest-target-api |  $STORAGE_REST_TARGET_API
+: The target application.
+
+### storage auth-basic
+
+Start authprovider for basic auth
+
+Usage: `storage auth-basic [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9147`.
+
+-auth-driver |  $STORAGE_AUTH_DRIVER
+: auth driver: 'demo', 'json' or 'ldap'. Default: `ldap`.
+
+-auth-json |  $STORAGE_AUTH_JSON
+: Path to users.json file.
+
+-network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
+: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+-addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9146`.
+
+### storage auth-bearer
+
+Start authprovider for bearer auth
+
+Usage: `storage auth-bearer [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_AUTH_BEARER_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9149`.
+
+-oidc-issuer |  $STORAGE_OIDC_ISSUER , $OCIS_URL
+: OIDC issuer. Default: `https://localhost:9200`.
+
+-oidc-insecure |  $STORAGE_OIDC_INSECURE
+: OIDC allow insecure communication. Default: `true`.
+
+-oidc-id-claim |  $STORAGE_OIDC_ID_CLAIM
+: OIDC id claim. Default: `preferred_username`.
+
+-oidc-uid-claim |  $STORAGE_OIDC_UID_CLAIM
+: OIDC uid claim.
+
+-oidc-gid-claim |  $STORAGE_OIDC_GID_CLAIM
+: OIDC gid claim.
+
+-network |  $STORAGE_AUTH_BEARER_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+-addr |  $STORAGE_AUTH_BEARER_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9148`.
 
 ### storage gateway
 
@@ -403,6 +427,33 @@ Usage: `storage health [command options] [arguments...]`
 -debug-addr |  $STORAGE_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9109`.
 
+### storage sharing
+
+Start sharing service
+
+Usage: `storage sharing [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9151`.
+
+-network |  $STORAGE_SHARING_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
+
+-addr |  $STORAGE_SHARING_GRPC_ADDR
+: Address to bind storage service. Default: `0.0.0.0:9150`.
+
+-user-driver |  $STORAGE_SHARING_USER_DRIVER
+: driver to use for the UserShareProvider. Default: `json`.
+
+-user-json-file |  $STORAGE_SHARING_USER_JSON_FILE
+: file used to persist shares for the UserShareProvider. Default: `/var/tmp/ocis/storage/shares.json`.
+
+-public-driver |  $STORAGE_SHARING_PUBLIC_DRIVER
+: driver to use for the PublicShareProvider. Default: `json`.
+
+-public-json-file |  $STORAGE_SHARING_PUBLIC_JSON_FILE
+: file used to persist shares for the PublicShareProvider. Default: `/var/tmp/ocis/storage/publicshares.json`.
+
 ### storage storage-users
 
 Start storage-users service
@@ -450,57 +501,6 @@ Usage: `storage storage-users [command options] [arguments...]`
 
 -users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
 : endpoint to use for the storage service. Default: `localhost:9144`.
-
-### storage users
-
-Start users service
-
-Usage: `storage users [command options] [arguments...]`
-
--debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9145`.
-
--network |  $STORAGE_USERPROVIDER_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `tcp`.
-
--addr |  $STORAGE_USERPROVIDER_ADDR
-: Address to bind storage service. Default: `0.0.0.0:9144`.
-
--endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: URL to use for the storage service. Default: `localhost:9144`.
-
--driver |  $STORAGE_USERPROVIDER_DRIVER
-: user driver: 'demo', 'json', 'ldap', or 'rest'. Default: `ldap`.
-
--json-config |  $STORAGE_USERPROVIDER_JSON
-: Path to users.json file.
-
--rest-client-id |  $STORAGE_REST_CLIENT_ID
-: User rest driver Client ID.
-
--rest-client-secret |  $STORAGE_REST_CLIENT_SECRET
-: User rest driver Client Secret.
-
--rest-redis-address |  $STORAGE_REST_REDIS_ADDRESS
-: Address for redis server. Default: `localhost:6379`.
-
--rest-redis-username |  $STORAGE_REST_REDIS_USERNAME
-: Username for redis server.
-
--rest-redis-password |  $STORAGE_REST_REDIS_PASSWORD
-: Password for redis server.
-
--rest-id-provider |  $STORAGE_REST_ID_PROVIDER
-: The OIDC Provider.
-
--rest-api-base-url |  $STORAGE_REST_API_BASE_URL
-: Base API Endpoint.
-
--rest-oidc-token-endpoint |  $STORAGE_REST_OIDC_TOKEN_ENDPOINT
-: Endpoint to generate token to access the API.
-
--rest-target-api |  $STORAGE_REST_TARGET_API
-: The target application.
 
 ## Config for the different Storage Drivers
 
