@@ -1,8 +1,8 @@
 # this file contains the scenarios from web tests that are currently expected to fail on OCIS with owncloud storage
 #
 # https://github.com/owncloud/ocisissues/1106 media viewer does not support mp3 files
-webUIPreview/imageMediaViewer.feature:78
-webUIPreview/imageMediaViewer.feature:85
+webUIPreview/imageMediaViewer.feature:81
+webUIPreview/imageMediaViewer.feature:88
 #
 # https://github.com/owncloud/web/issues/4564 authentication dialog appears when user is deleted
 # https://github.com/owncloud/ocis/issues/1129 login error page loops when logged in user is deleted
@@ -184,7 +184,14 @@ webUISharingInternalUsersBlacklisted/shareWithUsers.feature:90
 webUILogin/login.feature:52
 #
 # Image-Media-Viewer-Issue
-webUIPreview/imageMediaViewer.feature:30
+webUIPreview/imageMediaViewer.feature:33
+#
+# https://github.com/owncloud/web/issues/4296 media viewer does not display jpeg file
+webUIPreview/imageMediaViewer.feature:15
+#
+#
+webUIPreview/imageMediaViewer.feature:100
+webUIPreview/imageMediaViewer.feature:114
 #
 # webUI-Private-Links
 webUIPrivateLinks/accessingPrivateLinks.feature:8
@@ -402,6 +409,9 @@ webUIUpload/uploadEdgecases.feature:105
 webUIUpload/uploadEdgecases.feature:121
 webUIUpload/uploadFileGreaterThanQuotaSize.feature:12
 #
+# https://github.com/owncloud/ocis/issues/1124 restoring a file deleted from a received shared folder is not possible
+webUITrashbinRestore/trashbinRestore.feature:240
+#
 # https://github.com/owncloud/web/issues/4601 Adjust web UI test scenarios that demonstrate fixed bugs
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:165
 webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:166
@@ -412,3 +422,8 @@ webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:122
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:298
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:275
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:212
+#
+# https://github.com/owncloud/ocis/issues/1197 Investigate why some imageMediaViewer web UI tests fail when run in OCIS CI
+webUIPreview/imageMediaViewer.feature:100
+webUIPreview/imageMediaViewer.feature:114
+webUISharingInternalUsers/shareWithUsers.feature:585
