@@ -1,4 +1,6 @@
 ---
+_extends: gh-labels
+
 repository:
   name: ocis
   description: ':atom_symbol: ownCloud Infinite Scale Stack'
@@ -18,58 +20,10 @@ repository:
   allow_rebase_merge: true
 
 labels:
-  - name: bug
-    color: d73a4a
+  - name: OCIS-Fastlane
+    color: "#deadbf"
     description: Something isn't working
-  - name: documentation
-    color: 0075ca
-    description: Improvements or additions to documentation
-  - name: duplicate
-    color: cfd3d7
-    description: This issue or pull request already exists
-  - name: enhancement
-    color: a2eeef
-    description: New feature or request
-  - name: good first issue
-    color: 7057ff
-    description: Good for newcomers
-  - name: help wanted
-    color: 008672
-    description: Extra attention is needed
-  - name: invalid
-    color: e4e669
-    description: This doesn't seem right
-  - name: question
-    color: d876e3
-    description: Further information is requested
-  - name: wontfix
-    color: ffffff
-    description: This will not be worked on
-  - name: effort/trivial
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/0.25d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/0.5d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/1d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/2d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/4d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/5d
-    color: c2e0c6
-    description: Required effort to finish task
-  - name: effort/10d
-    color: c2e0c6
-    description: Required effort to finish task
-
+  
 teams:
   - name: ci
     permission: admin
