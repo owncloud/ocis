@@ -189,10 +189,6 @@ webUIPreview/imageMediaViewer.feature:33
 # https://github.com/owncloud/web/issues/4296 media viewer does not display jpeg file
 webUIPreview/imageMediaViewer.feature:15
 #
-#
-webUIPreview/imageMediaViewer.feature:100
-webUIPreview/imageMediaViewer.feature:114
-#
 # webUI-Private-Links
 webUIPrivateLinks/accessingPrivateLinks.feature:8
 webUIPrivateLinks/accessingPrivateLinks.feature:16
@@ -426,4 +422,3 @@ webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:212
 # https://github.com/owncloud/ocis/issues/1197 Investigate why some imageMediaViewer web UI tests fail when run in OCIS CI
 webUIPreview/imageMediaViewer.feature:100
 webUIPreview/imageMediaViewer.feature:114
-webUISharingInternalUsers/shareWithUsers.feature:585
