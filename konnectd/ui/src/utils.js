@@ -1,5 +1,9 @@
 export function withClientRequestState(obj) {
-  obj.state = Math.random().toString(36).substring(7);
+  // Generate a 16 byte random token
+  const values = new Uint8Array(16);
+  crypto.getRandomValues(values);
+  // Convert the 16 byte to a hex string and assign to the state attribute
+  obj.state = Array.prototype.map.call(values, x => x.toString(16)).join('');
 
   return obj;
 }
