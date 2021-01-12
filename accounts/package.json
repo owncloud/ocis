@@ -34,7 +34,7 @@
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^2.3.0",
     "archiver": "^4.0.1",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "core-js": "3",
     "cross-env": "^6.0.3",
     "cucumber": "^6.0.5",
