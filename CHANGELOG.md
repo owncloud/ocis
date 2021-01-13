@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
+* Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
@@ -20,6 +21,15 @@ The following sections list the changes for unreleased.
    Disable pretty logging default for performance reasons.
 
    https://github.com/owncloud/ocis/pull/1133
+
+* Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
+
+   Replaced Math.random with a cryptographically secure way to generate the oidc state token
+   using the javascript crypto api.
+
+   https://github.com/owncloud/ocis/pull/1203
+   https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
+   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 
