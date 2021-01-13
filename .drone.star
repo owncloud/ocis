@@ -709,6 +709,7 @@ def settingsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
           'FEATURE_PATH': '/drone/src/settings/ui/tests/acceptance/features',
         },
         'commands': [
+          'source /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
