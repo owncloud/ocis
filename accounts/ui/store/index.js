@@ -31,7 +31,8 @@ const getters = {
     })
   },
   areAllAccountsSelected: state => state.accounts.length === state.selectedAccounts.length,
-  isAnyAccountSelected: state => state.selectedAccounts.length > 0
+  isAnyAccountSelected: state => state.selectedAccounts.length > 0,
+  getServerForJsClient: (state, getters, rootState, rootGetters) => rootGetters.configuration.server.replace(/\/$/, '')
 }
 
 const mutations = {
@@ -94,11 +95,11 @@ const actions = {
     }
   },
 
-  async fetchAccounts ({ commit, rootGetters }) {
+  async fetchAccounts ({ commit, getters, rootGetters }) {
     injectAuthToken(rootGetters.user.token)
     try {
       const response = await AccountsService_ListAccounts({
-        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+        $domain: getters.getServerForJsClient,
         body: {}
       })
       if (response.status === 201) {
@@ -111,11 +112,11 @@ const actions = {
     commit('SET_FAILED', true)
   },
 
-  async fetchRoles ({ commit, rootGetters }) {
+  async fetchRoles ({ commit, getters, rootGetters }) {
     injectAuthToken(rootGetters.user.token)
     try {
       const response = await RoleService_ListRoles({
-        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+        $domain: getters.getServerForJsClient,
         body: {}
       })
       if (response.status === 201) {
@@ -132,7 +133,7 @@ const actions = {
     getters.areAllAccountsSelected ? commit('RESET_ACCOUNTS_SELECTION') : commit('SET_SELECTED_ACCOUNTS', [...state.accounts])
   },
 
-  async setAccountActivated ({ commit, dispatch, state, rootGetters }, activated) {
+  async setAccountActivated ({ commit, dispatch, state, getters, rootGetters }, activated) {
     const failedAccounts = []
     injectAuthToken(rootGetters.user.token)
 
@@ -143,7 +144,7 @@ const actions = {
 
       try {
         const response = await AccountsService_UpdateAccount({
-          $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+          $domain: getters.getServerForJsClient,
           body: {
             account: {
               id: account.id,
@@ -181,12 +182,13 @@ const actions = {
     commit('RESET_ACCOUNTS_SELECTION')
     return Promise.resolve(true)
   },
-  async createNewAccount ({ rootGetters, commit, dispatch }, account) {
+
+  async createNewAccount ({ getters, rootGetters, commit, dispatch }, account) {
     injectAuthToken(rootGetters.user.token)
 
     try {
       const response = await AccountsService_CreateAccount({
-        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+        $domain: getters.getServerForJsClient,
         body: {
           account: {
             on_premises_sam_account_name: account.username,
@@ -214,7 +216,7 @@ const actions = {
     return Promise.resolve(false)
   },
 
-  async deleteAccounts ({ rootGetters, state, commit, dispatch }) {
+  async deleteAccounts ({ getters, rootGetters, state, commit, dispatch }) {
     const failedAccounts = []
 
     injectAuthToken(rootGetters.user.token)
@@ -222,7 +224,7 @@ const actions = {
     for (const account of state.selectedAccounts) {
       try {
         const response = await AccountsService_DeleteAccount({
-          $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+          $domain: getters.getServerForJsClient,
           body: {
             id: account.id
           }

@@ -92,7 +92,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['user', 'configuration']),
+    ...mapGetters(['user', 'getServerForJsClient']),
     ...mapState('Accounts', ['roles', 'selectedAccounts']),
 
     selectAccountLabel () {
@@ -114,7 +114,7 @@ export default {
       injectAuthToken(this.user.token)
 
       const response = await RoleService_AssignRoleToUser({
-        $domain: this.configuration.server,
+        $domain: this.getServerForJsClient,
         body: {
           account_uuid: this.account.id,
           role_id: roleId
@@ -139,7 +139,7 @@ export default {
       injectAuthToken(this.user.token)
 
       const response = await RoleService_ListRoleAssignments({
-        $domain: this.configuration.server,
+        $domain: this.getServerForJsClient,
         body: {
           account_uuid: this.account.id
         }

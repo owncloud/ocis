@@ -25,7 +25,8 @@ const getters = {
       .sort((b1, b2) => {
         return b1.name.localeCompare(b2.name)
       })
-  }
+  },
+  getServerForJsClient: (state, getters, rootState, rootGetters) => rootGetters.configuration.server.replace(/\/$/, '')
 }
 
 const mutations = {
@@ -51,11 +52,11 @@ const actions = {
     commit('SET_INITIALIZED', true)
   },
 
-  async fetchBundles ({ commit, dispatch, rootGetters }) {
+  async fetchBundles ({ commit, dispatch, getters, rootGetters }) {
     injectAuthToken(rootGetters)
     try {
       const response = await BundleService_ListBundles({
-        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+        $domain: getters.getServerForJsClient,
         body: {}
       })
       if (response.status === 201) {
@@ -96,7 +97,7 @@ const actions = {
     injectAuthToken(rootGetters)
     try {
       const response = await ValueService_SaveValue({
-        $domain: rootGetters.configuration.server.replace(/\/$/, ''),
+        $domain: getters.getServerForJsClient,
         body: {
           value: payload
         }
