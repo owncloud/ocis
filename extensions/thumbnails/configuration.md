@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-12T21:44:14+0000"
+date: "2021-01-13T11:55:38+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,30 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### thumbnails health
-
-Check health status
-
-Usage: `thumbnails health [command options] [arguments...]`
-
--debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9189`.
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
-
--log-level |  $THUMBNAILS_LOG_LEVEL
-: Set logging level. Default: `info`.
-
--log-pretty |  $THUMBNAILS_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $THUMBNAILS_LOG_COLOR
-: Enable colored logging. Default: `true`.
 
 ### thumbnails server
 
@@ -124,4 +100,28 @@ Usage: `thumbnails version [command options] [arguments...]`
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+
+### thumbnails health
+
+Check health status
+
+Usage: `thumbnails health [command options] [arguments...]`
+
+-debug-addr |  $THUMBNAILS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9189`.
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
+-log-level |  $THUMBNAILS_LOG_LEVEL
+: Set logging level. Default: `info`.
+
+-log-pretty |  $THUMBNAILS_LOG_PRETTY
+: Enable pretty logging. Default: `true`.
+
+-log-color |  $THUMBNAILS_LOG_COLOR
+: Enable colored logging. Default: `true`.
 
