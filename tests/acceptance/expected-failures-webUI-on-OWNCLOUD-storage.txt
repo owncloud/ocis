@@ -418,3 +418,6 @@ webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:122
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:298
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:275
 webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:212
+#
+# https://github.com/owncloud/web/issues/4192 renamed file cannot be shared
+webUISharingInternalUsers/shareWithUsers.feature:595
