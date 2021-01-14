@@ -5,7 +5,7 @@ services:
   traefik:
     image: "traefik:v2.3"
     networks:
-      default:
+      ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
           - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
@@ -46,7 +46,7 @@ services:
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      default:
+      ocis-net:
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
@@ -81,6 +81,8 @@ services:
 
   postgres:
     image: postgres:alpine
+    networks:
+      ocis-net:
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     environment:
@@ -93,6 +95,8 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
+    networks:
+      ocis-net:
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
@@ -126,3 +130,6 @@ volumes:
   certs:
   ocis-data:
   keycloak_postgres_data:
+
+networks:
+  ocis-net:
