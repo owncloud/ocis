@@ -11,7 +11,7 @@ assignees: ''
 
 A clear and concise description of what the bug is.
 
-## Steps to Reproduce
+## Steps to reproduce
 
 Steps to reproduce the behavior:
 
@@ -21,7 +21,7 @@ Steps to reproduce the behavior:
 
 ## Setup
 
-Please describe how did you start the server and relevant environment variables.
+Please describe how you started the server and provide a list of relevant environment variables.
 
 <details>
 <p>

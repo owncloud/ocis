@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for improving OCIS
+about: Suggest an idea for improving oCIS
 title: ''
 labels: Category:Feature, Topic:needs-triage
 assignees: ''

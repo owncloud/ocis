@@ -1,7 +1,7 @@
 <!--
 Thanks for submitting a change to ownCloud!
 
-This is the bug tracker for the OCIS component. Find other components at https://github.com/owncloud/core/blob/master/.github/CONTRIBUTING.md#guidelines
+This is the bug tracker for the oCIS component. Find other components at https://github.com/owncloud/core/blob/master/.github/CONTRIBUTING.md#guidelines
 
 For fixing potential security issues please see https://owncloud.org/security/
 
@@ -55,4 +55,3 @@ Please set the following labels:
 - [ ] Unit tests added
 - [ ] Acceptance tests added
 - [ ] Documentation ticket raised: <link> 
-
