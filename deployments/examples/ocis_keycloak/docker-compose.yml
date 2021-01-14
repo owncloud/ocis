@@ -120,6 +120,16 @@ services:
       - "traefik.http.routers.keycloak-secure.service=keycloak"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
+      # let /.well-known/openid-configuration be served by Keycloak
+      - "traefik.http.routers.idp-wellknown-secure.entrypoints=https"
+      - "traefik.http.routers.idp-wellknown-secure.tls=true"
+      - "traefik.http.routers.idp-wellknown-secure.tls.certresolver=http"
+      - "traefik.http.routers.idp-wellknown-secure.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`) && Path(`/.well-known/openid-configuration`)"
+      - "traefik.http.middlewares.idp-headers.headers.customrequestheaders.X-Forwarded-Host=${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}"
+      - "traefik.http.middlewares.idp-prefix.addprefix.prefix=/auth/realms/${KEYCLOAK_REALM:-master}"
+      - "traefik.http.middlewares.idp-override.chain.middlewares=idp-headers,idp-prefix"
+      - "traefik.http.routers.idp-wellknown-secure.middlewares=idp-override"
+      - "traefik.http.routers.idp-wellknown-secure.service=keycloak"
     depends_on:
       - postgres
     logging:
