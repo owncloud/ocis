@@ -19,6 +19,12 @@ Steps to reproduce the behavior:
 2.
 3.
 
+## Expected behavior
+A clear and concise description of what you expected to happen.
+
+## Actual behavior
+A clear and concise description of what happened.
+
 ## Setup
 
 Please describe how you started the server and provide a list of relevant environment variables.
@@ -34,9 +40,6 @@ STORAGE_FRONTEND_UPLOAD_DISABLE_TUS=false
 
 </p>
 </details>
-
-## Expected behavior
-A clear and concise description of what you expected to happen.
 
 ## Additional context
 Add any other context about the problem here.
