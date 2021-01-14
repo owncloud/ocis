@@ -1,6 +1,6 @@
 ---
 exclude_paths:
-  - '.github'
+  - '.github/**'
   - 'CHANGELOG.md'
   - '**/CHANGELOG.md'
   - 'changelog/**'
