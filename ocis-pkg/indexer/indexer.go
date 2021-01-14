@@ -3,9 +3,6 @@ package indexer
 
 import (
 	"fmt"
-	"path"
-	"strings"
-
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
@@ -15,12 +12,17 @@ import (
 	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/disk" // to populate index
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"path"
+	"strings"
 )
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
 	config  *config.Config
 	indices typeMap
+
+	mu sync.NRWMutex
 }
 
 // IdxAddResult represents the result of an Add call on an index
@@ -33,6 +35,7 @@ func CreateIndexer(cfg *config.Config) *Indexer {
 	return &Indexer{
 		config:  cfg,
 		indices: typeMap{},
+		mu:      sync.NewNRWMutex(),
 	}
 }
 
@@ -45,9 +48,9 @@ func getRegistryStrategy(cfg *config.Config) string {
 }
 
 // Reset takes care of deleting all indices from storage and from the internal map of indices
-func (i Indexer) Reset() error {
-	for j := range i.indices {
-		for _, indices := range i.indices[j].IndicesByField {
+func (i *Indexer) Reset() error {
+	for j := range i.indices.allTypeMappings() {
+		for _, indices := range i.indices.getTypeMapping(j).IndicesByField {
 			for _, idx := range indices {
 				err := idx.Delete()
 				if err != nil {
@@ -55,29 +58,19 @@ func (i Indexer) Reset() error {
 				}
 			}
 		}
-		delete(i.indices, j)
+		i.indices.deleteTypeMapping(j)
 	}
 
 	return nil
 }
 
 // AddIndex adds a new index to the indexer receiver.
-func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
+func (i *Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
 	strategy := getRegistryStrategy(i.config)
 	f := registry.IndexConstructorRegistry[strategy][indexType]
 	var idx index.Index
 
-	if strategy == "disk" {
-		idx = f(
-			option.CaseInsensitive(caseInsensitive),
-			option.WithEntity(t),
-			option.WithBounds(bound),
-			option.WithTypeName(getTypeFQN(t)),
-			option.WithIndexBy(indexBy),
-			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
-			option.WithDataDir(i.config.Repo.Disk.Path),
-		)
-	} else if strategy == "cs3" {
+	if strategy == "cs3" {
 		idx = f(
 			option.CaseInsensitive(caseInsensitive),
 			option.WithEntity(t),
@@ -90,6 +83,16 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 			option.WithProviderAddr(i.config.Repo.CS3.ProviderAddr),
 			option.WithServiceUser(i.config.ServiceUser),
 		)
+	} else {
+		idx = f(
+			option.CaseInsensitive(caseInsensitive),
+			option.WithEntity(t),
+			option.WithBounds(bound),
+			option.WithTypeName(getTypeFQN(t)),
+			option.WithIndexBy(indexBy),
+			option.WithFilesDir(path.Join(i.config.Repo.Disk.Path, entityDirName)),
+			option.WithDataDir(i.config.Repo.Disk.Path),
+		)
 	}
 
 	i.indices.addIndex(getTypeFQN(t), pkName, idx)
@@ -97,10 +100,14 @@ func (i Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexTy
 }
 
 // Add a new entry to the indexer
-func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
+func (i *Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 	typeName := getTypeFQN(t)
+
+	i.mu.Lock(typeName)
+	defer i.mu.Unlock(typeName)
+
 	var results []IdxAddResult
-	if fields, ok := i.indices[typeName]; ok {
+	if fields := i.indices.getTypeMapping(typeName); fields != nil {
 		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
@@ -121,10 +128,14 @@ func (i Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 }
 
 // FindBy finds a value on an index by field and value.
-func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, error) {
+func (i *Indexer) FindBy(t interface{}, field string, val string) ([]string, error) {
 	typeName := getTypeFQN(t)
+
+	i.mu.RLock(typeName)
+	defer i.mu.RUnlock(typeName)
+
 	resultPaths := make([]string, 0)
-	if fields, ok := i.indices[typeName]; ok {
+	if fields := i.indices.getTypeMapping(typeName); fields != nil {
 		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			idxVal := val
 			res, err := idx.Lookup(idxVal)
@@ -152,9 +163,13 @@ func (i Indexer) FindBy(t interface{}, field string, val string) ([]string, erro
 }
 
 // Delete deletes all indexed fields of a given type t on the Indexer.
-func (i Indexer) Delete(t interface{}) error {
+func (i *Indexer) Delete(t interface{}) error {
 	typeName := getTypeFQN(t)
-	if fields, ok := i.indices[typeName]; ok {
+
+	i.mu.Lock(typeName)
+	defer i.mu.Unlock(typeName)
+
+	if fields := i.indices.getTypeMapping(typeName); fields != nil {
 		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
@@ -170,10 +185,14 @@ func (i Indexer) Delete(t interface{}) error {
 }
 
 // FindByPartial allows for glob search across all indexes.
-func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]string, error) {
+func (i *Indexer) FindByPartial(t interface{}, field string, pattern string) ([]string, error) {
 	typeName := getTypeFQN(t)
+
+	i.mu.RLock(typeName)
+	defer i.mu.RUnlock(typeName)
+
 	resultPaths := make([]string, 0)
-	if fields, ok := i.indices[typeName]; ok {
+	if fields := i.indices.getTypeMapping(typeName); fields != nil {
 		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			res, err := idx.Search(pattern)
 			if err != nil {
@@ -201,14 +220,18 @@ func (i Indexer) FindByPartial(t interface{}, field string, pattern string) ([]s
 }
 
 // Update updates all indexes on a value <from> to a value <to>.
-func (i Indexer) Update(from, to interface{}) error {
+func (i *Indexer) Update(from, to interface{}) error {
 	typeNameFrom := getTypeFQN(from)
 	typeNameTo := getTypeFQN(to)
+
+	i.mu.Lock(typeNameFrom)
+	defer i.mu.Unlock(typeNameFrom)
+
 	if typeNameFrom != typeNameTo {
 		return fmt.Errorf("update types do not match: from %v to %v", typeNameFrom, typeNameTo)
 	}
 
-	if fields, ok := i.indices[typeNameFrom]; ok {
+	if fields := i.indices.getTypeMapping(typeNameFrom); fields != nil {
 		for fName, indices := range fields.IndicesByField {
 			oldV := valueOf(from, fName)
 			newV := valueOf(to, fName)
@@ -240,7 +263,7 @@ func (i Indexer) Update(from, to interface{}) error {
 }
 
 // Query parses an OData query into something our indexer.Index understands and resolves it.
-func (i Indexer) Query(t interface{}, q string) ([]string, error) {
+func (i *Indexer) Query(t interface{}, q string) ([]string, error) {
 	query, err := godata.ParseFilterString(q)
 	if err != nil {
 		return nil, err
@@ -263,7 +286,7 @@ func (i Indexer) Query(t interface{}, q string) ([]string, error) {
 // conventions and be in PascalCase. For a better overview on this contemplate reading the reflection package under the
 // indexer directory. Traversal of the tree happens in a pre-order fashion.
 // TODO implement logic for `and` operators.
-func (i Indexer) resolveTree(t interface{}, tree *queryTree, partials *[]string) error {
+func (i *Indexer) resolveTree(t interface{}, tree *queryTree, partials *[]string) error {
 	if partials == nil {
 		return fmt.Errorf("return value cannot be nil: partials")
 	}

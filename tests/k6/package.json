@@ -8,11 +8,6 @@
     "build": "rollup -c",
     "build:w": "rollup -c -w"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{ts}": [
       "eslint --fix"
@@ -40,7 +35,6 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-prettier": "^3.2.0",
     "eslint-plugin-simple-import-sort": "^6.0.1",
-    "husky": "^4.3.0",
     "jest": "^25.4.0",
     "k6": "^0.0.0",
     "lint-staged": "^10.1.7",
