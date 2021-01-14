@@ -21,7 +21,7 @@ Steps to reproduce the behavior:
 
 ## Setup
 
-Please describe how is your server running and relevant environment variables.
+Please describe how did you start the server and relevant environment variables.
 
 <details>
 <p>
