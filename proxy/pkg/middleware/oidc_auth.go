@@ -24,7 +24,7 @@ type OIDCProvider interface {
 // OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
-	tokenCache := cache.NewCache(cache.Size(options.UserinfoCacheSize))
+	tokenCache := cache.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
 		logger:        options.Logger,
