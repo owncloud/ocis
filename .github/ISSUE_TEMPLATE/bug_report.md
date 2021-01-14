@@ -7,19 +7,21 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+## Describe the bug
 
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+## Steps to Reproduce
 
 Steps to reproduce the behavior:
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
-How did you start the server? What's in your environment?
+## Setup
+
+Please describe how is your server running and relevant environment variables.
 
 <details>
 <p>
@@ -33,8 +35,8 @@ STORAGE_FRONTEND_UPLOAD_DISABLE_TUS=false
 </p>
 </details>
 
-**Expected behavior**
+## Expected behavior
 A clear and concise description of what you expected to happen.
 
-**Additional context**
+## Additional context
 Add any other context about the problem here.
