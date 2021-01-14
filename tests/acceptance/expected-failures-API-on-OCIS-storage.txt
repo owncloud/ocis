@@ -208,10 +208,18 @@ apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
 #
 apiProvisioning-v1/disableUser.feature:99
 apiProvisioning-v1/disableUser.feature:129
+apiProvisioning-v1/disableUser.feature:165
+apiProvisioning-v1/disableUser.feature:172
+apiProvisioning-v1/disableUser.feature:190
+apiProvisioning-v1/disableUser.feature:203
 apiProvisioning-v2/disableUser.feature:79
 apiProvisioning-v2/disableUser.feature:99
 apiProvisioning-v2/disableUser.feature:108
 apiProvisioning-v2/disableUser.feature:130
+apiProvisioning-v2/disableUser.feature:166
+apiProvisioning-v2/disableUser.feature:173
+apiProvisioning-v2/disableUser.feature:191
+apiProvisioning-v2/disableUser.feature:204
 #
 # https://github.com/owncloud/ocis-ocs/issues/51
 # displayname of user can be changed to empty
@@ -598,10 +606,12 @@ apiSharePublicLink2/copyFromPublicLink.feature:182
 apiSharePublicLink2/copyFromPublicLink.feature:183
 apiSharePublicLink2/updatePublicLinkShare.feature:44
 apiSharePublicLink2/updatePublicLinkShare.feature:45
-apiSharePublicLink2/updatePublicLinkShare.feature:93
-apiSharePublicLink2/updatePublicLinkShare.feature:94
-apiSharePublicLink2/updatePublicLinkShare.feature:284
-apiSharePublicLink2/updatePublicLinkShare.feature:285
+apiSharePublicLink2/updatePublicLinkShare.feature:114
+apiSharePublicLink2/updatePublicLinkShare.feature:115
+apiSharePublicLink2/updatePublicLinkShare.feature:130
+apiSharePublicLink2/updatePublicLinkShare.feature:131
+apiSharePublicLink2/updatePublicLinkShare.feature:321
+apiSharePublicLink2/updatePublicLinkShare.feature:322
 #
 # https://github.com/owncloud/product/issues/270 [OCIS] share permissions not enforced
 #
@@ -625,27 +635,27 @@ apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:115
 #
 # https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
 #
-apiSharePublicLink2/updatePublicLinkShare.feature:303
-apiSharePublicLink2/updatePublicLinkShare.feature:304
-apiSharePublicLink2/updatePublicLinkShare.feature:322
-apiSharePublicLink2/updatePublicLinkShare.feature:323
+apiSharePublicLink2/updatePublicLinkShare.feature:340
 apiSharePublicLink2/updatePublicLinkShare.feature:341
-apiSharePublicLink2/updatePublicLinkShare.feature:342
+apiSharePublicLink2/updatePublicLinkShare.feature:359
 apiSharePublicLink2/updatePublicLinkShare.feature:360
-apiSharePublicLink2/updatePublicLinkShare.feature:361
+apiSharePublicLink2/updatePublicLinkShare.feature:378
 apiSharePublicLink2/updatePublicLinkShare.feature:379
-apiSharePublicLink2/updatePublicLinkShare.feature:380
+apiSharePublicLink2/updatePublicLinkShare.feature:397
 apiSharePublicLink2/updatePublicLinkShare.feature:398
-apiSharePublicLink2/updatePublicLinkShare.feature:399
+apiSharePublicLink2/updatePublicLinkShare.feature:416
 apiSharePublicLink2/updatePublicLinkShare.feature:417
-apiSharePublicLink2/updatePublicLinkShare.feature:418
-apiSharePublicLink2/updatePublicLinkShare.feature:439
-apiSharePublicLink2/updatePublicLinkShare.feature:440
+apiSharePublicLink2/updatePublicLinkShare.feature:435
+apiSharePublicLink2/updatePublicLinkShare.feature:436
+apiSharePublicLink2/updatePublicLinkShare.feature:454
+apiSharePublicLink2/updatePublicLinkShare.feature:455
+apiSharePublicLink2/updatePublicLinkShare.feature:476
+apiSharePublicLink2/updatePublicLinkShare.feature:477
 #
 # https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
 #
-apiSharePublicLink2/updatePublicLinkShare.feature:486
-apiSharePublicLink2/updatePublicLinkShare.feature:487
+apiSharePublicLink2/updatePublicLinkShare.feature:523
+apiSharePublicLink2/updatePublicLinkShare.feature:524
 apiSharePublicLink2/uploadToPublicLinkShare.feature:9
 apiSharePublicLink2/uploadToPublicLinkShare.feature:83
 apiSharePublicLink2/uploadToPublicLinkShare.feature:103
