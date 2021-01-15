@@ -7,7 +7,7 @@ For fixing potential security issues please see https://owncloud.org/security/
 
 To make it possible for us to get your change reviewed and merged please carefully fill out the requested information below.
 
-Please note that any kind of change needs first be submitted to the master branch which holds the next version of ownCloud.
+Please note that any kind of change needs first be submitted to the master branch which holds the next version of OCIS.
 
 Please set the following labels:
 
