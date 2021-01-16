@@ -1,11 +1,11 @@
-FROM webhippie/golang:1.14 as build
+FROM webhippie/golang:1.15 as build
 
 COPY ./ /ocis/
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 
 RUN apk update && \
-	apk upgrade && \
+	apk upgrade --ignore musl-dev && \
 	apk add make gcc bash && \
 	rm -rf /var/cache/apk/*
 

@@ -6,16 +6,16 @@ import (
 	"testing"
 )
 
-func HammerMutex(m *NRWMutex, loops int, cdone chan bool) {
+func HammerMutex(m *NRWMutex, loops int, c chan bool) {
 	for i := 0; i < loops; i++ {
 		id := fmt.Sprintf("%v", i)
 		m.Lock(id)
 		m.Unlock(id)
 	}
-	cdone <- true
+	c <- true
 }
 
-func TestMutex(t *testing.T) {
+func TestNRWMutex(t *testing.T) {
 	if n := runtime.SetMutexProfileFraction(1); n != 0 {
 		t.Logf("got mutexrate %d expected 0", n)
 	}
