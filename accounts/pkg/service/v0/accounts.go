@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"github.com/owncloud/ocis/ocis-pkg/cache"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"golang.org/x/crypto/bcrypt"
 	"path"
 	"regexp"
@@ -33,7 +33,7 @@ import (
 )
 
 // passwordValidCache caches basic auth password validations
-var passwordValidCache = cache.NewCache(1024)
+var passwordValidCache = sync.NewCache(1024)
 
 // passwordValidCacheExpiration defines the entry lifetime
 const passwordValidCacheExpiration = 10 * time.Minute

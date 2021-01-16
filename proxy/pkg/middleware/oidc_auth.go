@@ -10,9 +10,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 
 	gOidc "github.com/coreos/go-oidc"
-	"github.com/owncloud/ocis/ocis-pkg/cache"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"golang.org/x/oauth2"
 )
 
@@ -24,7 +24,7 @@ type OIDCProvider interface {
 // OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
-	tokenCache := cache.NewCache(options.UserinfoCacheSize)
+	tokenCache := sync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
 		logger:        options.Logger,
@@ -74,7 +74,7 @@ type oidcAuth struct {
 	providerFunc  func() (OIDCProvider, error)
 	httpClient    *http.Client
 	oidcIss       string
-	tokenCache    *cache.Cache
+	tokenCache    *sync.Cache
 	tokenCacheTTL time.Duration
 }
 

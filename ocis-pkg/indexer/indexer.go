@@ -3,6 +3,10 @@ package indexer
 
 import (
 	"fmt"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"path"
+	"strings"
+
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
@@ -12,17 +16,13 @@ import (
 	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/disk" // to populate index
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"path"
-	"strings"
 )
 
 // Indexer is a facade to configure and query over multiple indices.
 type Indexer struct {
 	config  *config.Config
 	indices typeMap
-
-	mu sync.NRWMutex
+	mu      sync.NRWMutex
 }
 
 // IdxAddResult represents the result of an Add call on an index
@@ -49,8 +49,8 @@ func getRegistryStrategy(cfg *config.Config) string {
 
 // Reset takes care of deleting all indices from storage and from the internal map of indices
 func (i *Indexer) Reset() error {
-	for j := range i.indices.allTypeMappings() {
-		for _, indices := range i.indices.getTypeMapping(j).IndicesByField {
+	for j := range i.indices {
+		for _, indices := range i.indices[j].IndicesByField {
 			for _, idx := range indices {
 				err := idx.Delete()
 				if err != nil {
@@ -58,7 +58,7 @@ func (i *Indexer) Reset() error {
 				}
 			}
 		}
-		i.indices.deleteTypeMapping(j)
+		delete(i.indices, j)
 	}
 
 	return nil
@@ -107,7 +107,7 @@ func (i *Indexer) Add(t interface{}) ([]IdxAddResult, error) {
 	defer i.mu.Unlock(typeName)
 
 	var results []IdxAddResult
-	if fields := i.indices.getTypeMapping(typeName); fields != nil {
+	if fields, ok := i.indices[typeName]; ok {
 		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
@@ -135,7 +135,7 @@ func (i *Indexer) FindBy(t interface{}, field string, val string) ([]string, err
 	defer i.mu.RUnlock(typeName)
 
 	resultPaths := make([]string, 0)
-	if fields := i.indices.getTypeMapping(typeName); fields != nil {
+	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			idxVal := val
 			res, err := idx.Lookup(idxVal)
@@ -169,7 +169,7 @@ func (i *Indexer) Delete(t interface{}) error {
 	i.mu.Lock(typeName)
 	defer i.mu.Unlock(typeName)
 
-	if fields := i.indices.getTypeMapping(typeName); fields != nil {
+	if fields, ok := i.indices[typeName]; ok {
 		for _, indices := range fields.IndicesByField {
 			for _, idx := range indices {
 				pkVal := valueOf(t, fields.PKFieldName)
@@ -192,7 +192,7 @@ func (i *Indexer) FindByPartial(t interface{}, field string, pattern string) ([]
 	defer i.mu.RUnlock(typeName)
 
 	resultPaths := make([]string, 0)
-	if fields := i.indices.getTypeMapping(typeName); fields != nil {
+	if fields, ok := i.indices[typeName]; ok {
 		for _, idx := range fields.IndicesByField[strcase.ToCamel(field)] {
 			res, err := idx.Search(pattern)
 			if err != nil {
@@ -231,7 +231,7 @@ func (i *Indexer) Update(from, to interface{}) error {
 		return fmt.Errorf("update types do not match: from %v to %v", typeNameFrom, typeNameTo)
 	}
 
-	if fields := i.indices.getTypeMapping(typeNameFrom); fields != nil {
+	if fields, ok := i.indices[typeNameFrom]; ok {
 		for fName, indices := range fields.IndicesByField {
 			oldV := valueOf(from, fName)
 			newV := valueOf(to, fName)
