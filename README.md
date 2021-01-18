@@ -12,6 +12,8 @@
 
 ## Run ownCloud Infinite Scale
 
+Trigger CI
+
 Please see [Getting Started](https://owncloud.github.io/ocis/getting-started/)
 
 ## Development
