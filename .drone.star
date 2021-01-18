@@ -514,7 +514,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.txt' % (storage.upper()),
+          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md' % (storage.upper()),
         },
         'commands': [
           'make -C /srv/app/testrunner test-acceptance-api',
