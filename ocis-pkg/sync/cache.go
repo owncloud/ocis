@@ -2,6 +2,7 @@ package sync
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -9,8 +10,8 @@ import (
 type Cache struct {
 	entries  sync.Map
 	pool     sync.Pool
-	capacity int
-	length   int
+	capacity uint64
+	length   uint64
 }
 
 // CacheEntry represents an entry on the cache. You can type assert on V.
@@ -22,15 +23,15 @@ type CacheEntry struct {
 // NewCache returns a new instance of Cache.
 func NewCache(capacity int) Cache {
 	return Cache{
-		capacity: capacity,
+		capacity: uint64(capacity),
 		pool: sync.Pool{New: func() interface{} {
 			return new(CacheEntry)
 		}},
 	}
 }
 
-// Get gets an entry by given key
-func (c *Cache) Get(key string) *CacheEntry {
+// Load loads an entry by given key
+func (c *Cache) Load(key string) *CacheEntry {
 	if mapEntry, ok := c.entries.Load(key); ok {
 		entry := mapEntry.(*CacheEntry)
 		if c.expired(entry) {
@@ -42,9 +43,9 @@ func (c *Cache) Get(key string) *CacheEntry {
 	return nil
 }
 
-// Set adds an entry for given key and value
-func (c *Cache) Set(key string, val interface{}, expiration time.Time) {
-	if !c.fits() {
+// Store adds an entry for given key and value
+func (c *Cache) Store(key string, val interface{}, expiration time.Time) {
+	if c.length > c.capacity {
 		c.evict()
 	}
 
@@ -60,18 +61,19 @@ func (c *Cache) Set(key string, val interface{}, expiration time.Time) {
 		entry.V = val
 		entry.expiration = expiration
 
-		c.length++
+		atomic.AddUint64(&c.length, 1)
 	}
 }
 
-// Unset removes an entry by given key
-func (c *Cache) Unset(key string) bool {
-	if _, loaded := c.entries.LoadAndDelete(key); !loaded {
-		return false
+// Delete removes an entry by given key
+func (c *Cache) Delete(key string) bool {
+	_, loaded := c.entries.LoadAndDelete(key)
+
+	if loaded {
+		atomic.AddUint64(&c.length, ^uint64(0))
 	}
 
-	c.length--
-	return true
+	return loaded
 }
 
 // evict frees memory from the cache by removing entries that exceeded the cache TTL.
@@ -79,8 +81,7 @@ func (c *Cache) evict() {
 	c.entries.Range(func(key, mapEntry interface{}) bool {
 		entry := mapEntry.(*CacheEntry)
 		if c.expired(entry) {
-			c.entries.Delete(key)
-			c.length--
+			c.Delete(key.(string))
 		}
 		return true
 	})
@@ -89,9 +90,4 @@ func (c *Cache) evict() {
 // expired checks if an entry is expired
 func (c *Cache) expired(e *CacheEntry) bool {
 	return e.expiration.Before(time.Now())
-}
-
-// fits returns whether the cache fits more entries.
-func (c *Cache) fits() bool {
-	return c.capacity > c.length
 }

@@ -178,7 +178,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			vh.Write([]byte(a.PasswordProfile.Password))
 			v := vh.Sum([]byte(password))
 
-			e := passwordValidCache.Get(k)
+			e := passwordValidCache.Load(k)
 
 			if e == nil {
 				suspicious = !isPasswordValid(s.log, a.PasswordProfile.Password, password)
@@ -187,12 +187,12 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			}
 
 			if suspicious {
-				passwordValidCache.Unset(k)
+				passwordValidCache.Delete(k)
 				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 			}
 
 			if e == nil {
-				passwordValidCache.Set(k, v, time.Now().Add(passwordValidCacheExpiration))
+				passwordValidCache.Store(k, v, time.Now().Add(passwordValidCacheExpiration))
 			}
 		}
 
