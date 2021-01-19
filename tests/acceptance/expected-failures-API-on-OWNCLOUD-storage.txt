@@ -195,6 +195,7 @@ apiProvisioning-v1/disableUser.feature:165
 apiProvisioning-v1/disableUser.feature:172
 apiProvisioning-v1/disableUser.feature:190
 apiProvisioning-v1/disableUser.feature:203
+apiProvisioning-v1/disableUser.feature:219
 apiProvisioning-v2/disableUser.feature:79
 apiProvisioning-v2/disableUser.feature:99
 apiProvisioning-v2/disableUser.feature:108
@@ -203,6 +204,7 @@ apiProvisioning-v2/disableUser.feature:166
 apiProvisioning-v2/disableUser.feature:173
 apiProvisioning-v2/disableUser.feature:191
 apiProvisioning-v2/disableUser.feature:204
+apiProvisioning-v2/disableUser.feature:220
 #
 # https://github.com/owncloud/ocis-ocs/issues/51
 # displayname of user can be changed to empty
@@ -1521,6 +1523,7 @@ apiShareOperationsToShares/changingFilesShare.feature:60
 #
 # restoring an older version of a shared file deletes the share https://github.com/owncloud/ocis/issues/765
 #
+apiShareManagementToShares/acceptShares.feature:473
 apiVersions/fileVersionsSharingToShares.feature:44
 #
 # https://github.com/owncloud/ocis/issues/560 cannot move from Shares folder
@@ -2422,6 +2425,8 @@ apiVersions/fileVersionsSharingToShares.feature:279
 # https://github.com/owncloud/ocis/issues/719 when a share exists its impossible to share a renamed folder
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:611
 apiShareManagementBasicToShares/createShareToSharesFolder.feature:612
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:665
+apiShareManagementBasicToShares/createShareToSharesFolder.feature:666
 
 # https://github.com/owncloud/ocis/issues/1012 TUS OPTIONS requests does not reply with TUS headers when invalid password
 apiWebdavUploadTUS/optionsRequest.feature:29
