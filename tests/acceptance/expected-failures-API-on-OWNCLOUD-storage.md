@@ -7,13 +7,14 @@
 
 -   [apiMain/checksums.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L24)
 -   [apiMain/checksums.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L25)
+-   [apiMain/checksums.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L26)
 -   [apiMain/checksums.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L35)
 -   [apiMain/checksums.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L36)
 -   [apiMain/checksums.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L46)
 -   [apiMain/checksums.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L47)
 -   [apiMain/checksums.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L50)
 -   [apiMain/checksums.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L58)
--   [apiMain/checksums.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L67)
+-   [apiMain/checksums.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L60)
 -   [apiMain/checksums.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L99)
 -   [apiMain/checksums.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L100)
 -   [apiMain/checksums.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L103)
@@ -2430,7 +2431,6 @@ special character username not valid
 
 ### [The Patch Request Response does not contain a body](https://github.com/owncloud/ocis/issues/1039)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L29)
--   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L30)
 
 ### [500 Internal Server Error on Post request for TUS upload to a non-existing folder on the received share](https://github.com/owncloud/ocis/issues/1047)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L43)
