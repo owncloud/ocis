@@ -22,7 +22,7 @@ import (
 type Indexer struct {
 	config  *config.Config
 	indices typeMap
-	mu      sync.NRWMutex
+	mu      sync.NamedRWMutex
 }
 
 // IdxAddResult represents the result of an Add call on an index
@@ -35,7 +35,7 @@ func CreateIndexer(cfg *config.Config) *Indexer {
 	return &Indexer{
 		config:  cfg,
 		indices: typeMap{},
-		mu:      sync.NewNRWMutex(),
+		mu:      sync.NewNamedRWMutex(),
 	}
 }
 
