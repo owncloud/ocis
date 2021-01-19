@@ -1,4 +1,4 @@
-## Scenarios from api tests that are expected to fail on OCIS with owncloud storage(tagged skipOnOcis-OC-Storage in core)
+## Scenarios from api tests that are expected to fail on OCIS with owncloud storage
 
 -   [apiWebdavProperties1/setFileProperties.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L32)
 -   [apiWebdavProperties1/setFileProperties.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L33)
@@ -2344,7 +2344,7 @@ restoring a file doesn't changes the etags of the parents
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L77)
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L78)
 
-### [adding user to non-existant group gives wrong statuscode](https://github.com/owncloud/product/issues/286)
+### [adding user to non-existent group gives wrong statuscode](https://github.com/owncloud/product/issues/286)
 -   [apiProvisioningGroups-v1/addToGroup.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L107)
 -   [apiProvisioningGroups-v1/removeFromGroup.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/removeFromGroup.feature#L101)
 
@@ -2353,7 +2353,7 @@ restoring a file doesn't changes the etags of the parents
 ### [adding user to empty group gives wrong statuscode](https://github.com/owncloud/product/issues/287)
 -   [apiProvisioningGroups-v1/addToGroup.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L116)
 
-### [adding non-existant user to a group gives wrong status code](https://github.com/owncloud/product/issues/288)
+### [adding non-existent user to a group gives wrong status code](https://github.com/owncloud/product/issues/288)
 -   [apiProvisioningGroups-v1/addToGroup.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L124)
 
 ### [subadmin endpoints not implemented](https://github.com/owncloud/product/issues/289)
@@ -2428,7 +2428,7 @@ special character username not valid
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L57)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L58)
 
-### [The Patch Request Response doesnot contain a body](https://github.com/owncloud/ocis/issues/1039)
+### [The Patch Request Response does not contain a body](https://github.com/owncloud/ocis/issues/1039)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L29)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L30)
 

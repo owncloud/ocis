@@ -1832,7 +1832,7 @@
 -   [apiShareOperationsToShares/gettingShares.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/gettingShares.feature#L184)
 
 ### [various sharing settings cannot be set](https://github.com/owncloud/ocis-reva/issues/41)
-### [Group shares support(https://github.com/owncloud/ocis-reva/issues/194)
+### [Group shares support](https://github.com/owncloud/ocis-reva/issues/194)
 
 -   [apiShareUpdateToShares/updateShare.feature:290](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L290)
 -   [apiShareUpdateToShares/updateShare.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L291)
@@ -2201,7 +2201,7 @@
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L77)
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L78)
 
-### [adding user to non-existant group gives wrong statuscode](https://github.com/owncloud/product/issues/286)
+### [adding user to non-existent group gives wrong statuscode](https://github.com/owncloud/product/issues/286)
 -   [apiProvisioningGroups-v1/addToGroup.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L107)
 -   [apiProvisioningGroups-v1/removeFromGroup.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/removeFromGroup.feature#L101)
 
@@ -2210,7 +2210,7 @@
 ### [adding user to empty group gives wrong statuscode](https://github.com/owncloud/product/issues/287)
 -   [apiProvisioningGroups-v1/addToGroup.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L116)
 
-### [adding non-existant user to a group gives wrong status code](https://github.com/owncloud/product/issues/288)
+### [adding non-existent user to a group gives wrong status code](https://github.com/owncloud/product/issues/288)
 -   [apiProvisioningGroups-v1/addToGroup.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L124)
 
 ### [subadmin endpoints not implemented](https://github.com/owncloud/product/issues/289)
