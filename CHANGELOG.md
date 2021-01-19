@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
+* Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
 ## Details
@@ -70,6 +71,25 @@ The following sections list the changes for unreleased.
    containers.
 
    https://github.com/owncloud/ocis/pull/1148
+
+* Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
+
+   Tags: ocis-pkg, accounts
+
+   We had the case that we needed kind of a named locking mechanism which enables us to lock only
+   under certain conditions. It's used in the indexer package where we do not need to lock
+   everything, instead just lock the requested parts and differentiate between reads and
+   writes.
+
+   This made it possible to entirely remove locks from the accounts service and move them to the
+   ocis-pkg indexer. Another part of this refactor was to make the cache atomic and write tests for
+   it.
+
+   - remove locking from accounts service - add sync package with named mutex - add named locking to
+   indexer - move cache to sync package
+
+   https://github.com/owncloud/ocis/issues/966
+   https://github.com/owncloud/ocis/pull/1212
 
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
