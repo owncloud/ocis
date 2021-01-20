@@ -191,10 +191,9 @@ def main(ctx):
 
   if ctx.build.event == "cron":
     pipelines = test_pipelines + [
-      benchmark(ctx),
       pipelineDependsOn(
         purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
-        testPipelines(ctx) + [benchmark(ctx)]
+        testPipelines(ctx)
       )
     ]
 
@@ -206,21 +205,12 @@ def main(ctx):
     pipelines = [docs(ctx)]
 
   else:
-    if '[with-benchmarks]' in (ctx.build.title + ctx.build.message):
-      test_pipelines += [
-      benchmark(ctx),
+    test_pipelines.append(
       pipelineDependsOn(
         purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
-        testPipelines(ctx) + [benchmark(ctx)]
+        testPipelines(ctx)
       )
-    ]
-    else:
-      test_pipelines.append(
-        pipelineDependsOn(
-          purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
-          testPipelines(ctx)
-        )
-      )
+    )
 
     pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
@@ -533,52 +523,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
       ],
     },
     'volumes': [pipelineVolumeOC10Tests],
-  }
-
-def benchmark(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'benchmark',
-    'failure': 'ignore',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps':
-      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer('ocis') + [
-      {
-        'name': 'build benchmarks',
-        'image': 'node',
-        'pull': 'always',
-        'commands': [
-          'cd tests/k6',
-          'yarn',
-          'yarn build',
-        ],
-      },
-      {
-        'name': 'run benchmarks',
-        'image': 'loadimpact/k6',
-        'pull': 'always',
-        'environment': {
-          'OC_HOST': 'https://ocis-server:9200',
-        },
-        'commands': [
-          'cd tests/k6',
-          'for f in ./dist/test-* ; do k6 run "$f" -q; done',
-        ],
-      },
-    ],
-    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/v*',
-        'refs/pull/**',
-      ],
-    },
   }
 
 def uiTests(ctx):
