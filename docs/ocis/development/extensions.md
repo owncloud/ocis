@@ -64,7 +64,7 @@ make generate build
 ```
 
 Two options:
-1. run only the necessery services from ocis and ocis-hello independently
+1. run only the necessary services from ocis and ocis-hello independently
 2. compile ocis with the updated ocis-hello
 
 ### Option 1:
@@ -227,7 +227,7 @@ Long answer: micro and ocis-hello follow a protocol driven development:
 - the gateways and protocols are optional
 
 - owncloud and kopano are looking into a [MS graph](https://developer.microsoft.com/de-de/graph) like api to handle ownCloud Web requests.
-  - they might be about user, contacrs, calendars ... which is covered by the graph api
-  - we want to integrate with eg. kopano and provide a commen api (file sync and share is covered as well)
+  - they might be about user, contacts, calendars ... which is covered by the graph api
+  - we want to integrate with eg. kopano and provide a common api (file sync and share is covered as well)
 
 - as an example for protobuf take a look at [ocis-hello](https://github.com/owncloud/ocis-hello/tree/master/pkg/proto/v0)

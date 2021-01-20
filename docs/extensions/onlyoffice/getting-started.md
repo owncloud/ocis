@@ -41,7 +41,7 @@ When loading the extension in the ownCloud Web, it is necessary to specify to wh
 ]
 ```
 
-### Envrionment variables
+### Environment variables
 
 If you prefer to configure the service with environment variables you can see the available variables below.
 
@@ -172,7 +172,7 @@ So far we support the file formats `JSON` and `YAML`, if you want to get a full 
 
 ## Usage
 
-The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formated help output if you execute the binary via `ocis-onlyoffice --help`.
+The program provides a few sub-commands on execution. The available configuration methods have already been mentioned above. Generally you can always see a formatted help output if you execute the binary via `ocis-onlyoffice --help`.
 
 ### Server
 

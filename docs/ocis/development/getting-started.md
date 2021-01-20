@@ -29,7 +29,7 @@ This repository follows the [golang-standard project-layout](https://github.com/
 
 oCIS consists of multiple micro services, also called extensions. We started by having standalone repositories for each of them but quickly noticed, that this adds a time consuming overhead for developers. So we ended up with a monorepo housing all the extensions in one repository.
 
-Each of the extensions live in a subfolder (eg. `accounts` or `settings`) in this repository, technically creating independant Go modules.
+Each of the extensions live in a subfolder (eg. `accounts` or `settings`) in this repository, technically creating independent Go modules.
 
 The `ocis` folder does also contain a Go module but is no extension at all. Instead this module is used to import all extensions and furthermore implement commands to start the extensions. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 
