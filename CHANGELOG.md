@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
+* Enhancement - Use sync.cache for roles cache: [#1367](https://github.com/owncloud/ocis/pull/1367)
 * Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
@@ -90,6 +91,14 @@ The following sections list the changes for unreleased.
    containers.
 
    https://github.com/owncloud/ocis/pull/1148
+
+* Enhancement - Use sync.cache for roles cache: [#1367](https://github.com/owncloud/ocis/pull/1367)
+
+   Tags: ocis-pkg
+
+   Update ocis-pkg/roles cache to use ocis-pkg/sync cache
+
+   https://github.com/owncloud/ocis/pull/1367
 
 * Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
 
