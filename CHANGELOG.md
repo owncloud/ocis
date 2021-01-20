@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
+* Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
 * Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
@@ -31,6 +32,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/1203
    https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+* Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
+
+   Tags: go
+
+   Update go from 1.13 to 1.15
+
+   https://github.com/owncloud/ocis/pull/1364
 
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 
