@@ -1555,10 +1555,6 @@ restoring a file doesn't changes the etags of the parents
 
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L21)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L22)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L41)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L42)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L61)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L62)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L78)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L79)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L146)
