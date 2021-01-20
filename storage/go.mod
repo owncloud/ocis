@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/storage
 
-go 1.13
+go 1.15
 
 require (
 	github.com/cs3org/reva v1.4.1-0.20210111080247-f2b63bfd6825

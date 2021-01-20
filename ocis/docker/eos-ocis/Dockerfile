@@ -9,9 +9,9 @@ RUN rpm --rebuilddb && yum -y install \
     make \
     gcc \
     git
-RUN wget -q https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz
+RUN wget -q https://dl.google.com/go/go1.15.7.linux-amd64.tar.gz
 RUN mkdir -p /usr/local/bin
-RUN tar xf go1.14.2.linux-amd64.tar.gz -C /usr/local
+RUN tar xf go1.15.7.linux-amd64.tar.gz -C /usr/local
 RUN ln -s /usr/local/go/bin/* /usr/local/bin
 RUN git clone https://github.com/owncloud/ocis.git
 RUN cd ocis && git checkout ${BRANCH}
