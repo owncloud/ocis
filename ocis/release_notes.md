@@ -123,7 +123,7 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
     `chmod +x ocis`
 
 3. Run it
-   
+
     `./ocis server`
 
 4. Navigate to <https://localhost:9200> and log in to ownCloud Web (admin:admin)
@@ -292,7 +292,7 @@ Infinite Scale follows a role-based access control model. Based on permissions f
 - Cleanups are not yet available (e.g., shares of a deleted user will not be removed)
 - Sharing from the desktop client does not work yet
 - There are no notifications yet
-- There can be issues with access tokens not being refreshed correctly, leading to interruptings, e.g., during uploads
+- There can be issues with access tokens not being refreshed correctly, leading to interruptions, e.g., during uploads
 - Deleting non-empty folders from the trash bin does not work
 - Emptying the whole trash bin does not work
 

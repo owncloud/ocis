@@ -24,7 +24,7 @@ The `identifier-registration.yml` file will only be generated if there is no suc
 
 ### Add your hostname to the idp config
 
-Let us assume `your-host` is your remote domain name or IP adress. Add your host to the `identifier-registration.yml` like this:
+Let us assume `your-host` is your remote domain name or IP address. Add your host to the `identifier-registration.yml` like this:
 
 ```yaml {linenos=table,hl_lines=["15-17",21]}
 # OpenID Connect client registry.
@@ -54,7 +54,7 @@ In this example we do not change the default port (`9200`). But this could be ch
 
 ### Start the ocis fullstack server
 
-You need to configure `your-host` in some services to provide the needed public resources. 
+You need to configure `your-host` in some services to provide the needed public resources.
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
@@ -65,11 +65,11 @@ KONNECTD_TLS=0 \
 ./bin/ocis server
 ```
 
-For more configuration options check the configuration secion in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
+For more configuration options check the configuration section in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
 
 {{< hint info >}}
 **TLS Certificate**\
-In this example, we are replacing the default self signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
+In this example, we are replacing the default self-signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
 {{< /hint >}}
 
 ## Use Docker Compose

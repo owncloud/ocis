@@ -41,7 +41,7 @@ The names of the full test suite make targets have the same naming as in the CI 
 
 For example `make -C tests/acceptance/docker localApiTests-apiOcisSpecific-ocis` runs the same tests as the `localApiTests-apiOcisSpecific-ocis` CI pipeline, which runs the oCIS test suite "apiOcisSpecific" against an oCIS with oCIS storage.
 
-For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
+For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
 
 ### Run single feature test
 

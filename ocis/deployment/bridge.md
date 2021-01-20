@@ -232,7 +232,7 @@ $CONFIG = [
     'loginButtonName' => 'OpenId Connect @ Konnectd',
   ],
   'debug' => true, // if using self signed certificates
-  // allow the different domains access to the ocs and wabdav endpoints:
+  // allow the different domains access to the ocs and webdav endpoints:
   'cors.allowed-domains' => [
     'https://cloud.example.com',
     'http://localhost:9100',
@@ -249,6 +249,6 @@ In the above configuration replace
 
 ## Next steps
 
-Aside from the above todos these are the next stepo
+Aside from the above todos these are the next steps
 - tie it all together behind `ocis-proxy`
 - create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
