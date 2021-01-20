@@ -43,7 +43,7 @@ You may add flags to your commit message or PR title in order to speed up pipeli
 
 - My pipeline fails because some CI related files or commands are missing.
 
-  Please make sure to rebase your branch onto the lastest master of oCIS. It could be that the pipeline definition (`.drone.star`) was changed on the master branch. This is the only file, that will not be auto merged to master upon pipeline run. So things could be out of sync.
+  Please make sure to rebase your branch onto the latest master of oCIS. It could be that the pipeline definition (`.drone.star`) was changed on the master branch. This is the only file, that will not be auto merged to master upon pipeline run. So things could be out of sync.
 
 - How can I see the YAML drone pipeline definition?
 

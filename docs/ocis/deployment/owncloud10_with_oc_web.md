@@ -26,7 +26,7 @@ In this setup it's mandatory that the users in ownCloud 10 are assigned to at le
 {{< /hint >}}
 
 {{< hint info >}}
-In this setup relies on graph-api app to be installed in ownCloud 10. This app is included by default beginning with ownCloud 10.6. If you are on a lower version, please install it manually. 
+In this setup relies on graph-api app to be installed in ownCloud 10. This app is included by default beginning with ownCloud 10.6. If you are on a lower version, please install it manually.
 {{< /hint >}}
 
 ## Server Deployment
@@ -36,7 +36,7 @@ In this setup relies on graph-api app to be installed in ownCloud 10. This app i
 * Linux server with docker and docker-compose installed
 * Three domains set up and pointing to your server
   - ocis.* for serving oCIS
-  - oc10.* for serving 
+  - oc10.* for serving
   - traefik.* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server.md" >}})
@@ -79,9 +79,9 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  Set your domain for the Traefik dasboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  Set your domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dasboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 

@@ -70,7 +70,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_OIDC_CLIENT_ID=
 
   ### Keycloak ###
-  # Domain of Keycloak, where you can find the managment and authentication frontend. Defaults to "keycloak.owncloud.test"
+  # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
   KEYCLOAK_DOMAIN=
   # Realm which to be used with oCIS. Defaults to "master"
   KEYCLOAK_REALM=
@@ -83,9 +83,9 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  Set your domain for the Traefik dasboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  Set your domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dasboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
@@ -95,7 +95,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
 
-  Set your domain for the Keycloak adminstration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
+  Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
   Changing the used Keycloak realm can be done by setting `KEYCLOAK_REALM=`. This defaults to the master realm `KEYCLOAK_REALM=master`.
 

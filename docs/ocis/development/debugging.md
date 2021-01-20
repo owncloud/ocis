@@ -69,7 +69,7 @@ Then you can set a breakpoint in the service you need and attach to the process 
 
 #### Start all services independently to replace one of them with a debug process
 
-1. You can use this `./ocis.sh` script to start all services independently, so they don't get restrarted by the runtime when you kill them:
+1. You can use this `./ocis.sh` script to start all services independently, so they don't get restarted by the runtime when you kill them:
 
 ```bash
 #/bin/sh
