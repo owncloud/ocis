@@ -65,7 +65,7 @@ KONNECTD_TLS=0 \
 ./bin/ocis server
 ```
 
-For more configuration options check the configuration secion in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
+For more configuration options check the configuration section in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
 
 {{< hint info >}}
 **TLS Certificate**\
