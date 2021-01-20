@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
+* Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
@@ -32,6 +33,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/1203
    https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+* Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
+
+   Tags: performance, testing, k6
+
+   The ownCloud performance tests can not only be used to test ocis. This is why we have decided to
+   move the k6 tests to https://github.com/owncloud/cdperf
+
+   https://github.com/owncloud/ocis/pull/1358
 
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 
