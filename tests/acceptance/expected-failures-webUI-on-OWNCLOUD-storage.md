@@ -18,7 +18,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [User request using token and basic authentication gives different display names](https://github.com/owncloud/ocis-reva/issues/107)
 -   [webUIAccount/accountInformation.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L10)
--   [webUIAccount/accountInformation.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L10)
 -   [webUIAccount/accountInformation.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L34)
 
 ### [LDAP Groups not working with konnectd](https://github.com/owncloud/ocis-konnectd/issues/42)
@@ -49,9 +48,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIFiles/fileDetails.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L88)
 -   [webUIFiles/fileDetails.feature:103](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L103)
 -   [webUIFiles/versions.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/versions.feature#L33)
--   [webUIRenameFiles/renameFiles.feature:178](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L178)
--   [webUIRenameFiles/renameFiles.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L199)
--   [webUIRenameFiles/renameFiles.feature:220](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L220)
 -   [webUISharingInternalUsers/shareWithUsers.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L54)
 -   [webUISharingInternalUsers/shareWithUsers.feature:55](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L55)
 -   [webUISharingInternalUsers/shareWithUsers.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L56)
@@ -201,16 +197,19 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L49)
 
 ### renameFiles
--   [webUIRenameFiles/renameFiles.feature:113](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L113)
--   [webUIRenameFiles/renameFiles.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L114)
--   [webUIRenameFiles/renameFiles.feature:115](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L115)
--   [webUIRenameFiles/renameFiles.feature:160](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L160)
+-   [webUIRenameFiles/renameFiles.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L124)
+-   [webUIRenameFiles/renameFiles.feature:125](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L125)
+-   [webUIRenameFiles/renameFiles.feature:126](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L126)
+-   [webUIRenameFiles/renameFiles.feature:193](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L193)
+-   [webUIRenameFiles/renameFiles.feature:214](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L214)
+-   [webUIRenameFiles/renameFiles.feature:235](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L235)
+
 
 ### renameFolders
--   [webUIRenameFolders/renameFolders.feature:104](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L104)
--   [webUIRenameFolders/renameFolders.feature:105](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L105)
--   [webUIRenameFolders/renameFolders.feature:106](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L106)
--   [webUIRenameFolders/renameFolders.feature:125](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L125)
+-   [webUIRenameFolders/renameFolders.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L114)
+-   [webUIRenameFolders/renameFolders.feature:115](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L115)
+-   [webUIRenameFolders/renameFolders.feature:116](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L116)
+-   [webUIRenameFolders/renameFolders.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L140)
 
 ### Reshare is not available in ocis (webUI)
 -   [webUIResharing/reshareUsers.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing/reshareUsers.feature#L17)
