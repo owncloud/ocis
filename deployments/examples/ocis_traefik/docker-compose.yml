@@ -38,6 +38,11 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging: &logging
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "2"
     restart: always
 
   ocis:
@@ -63,6 +68,8 @@ services:
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
+    logging:
+      <<: *logging
     restart: always
 
 volumes:

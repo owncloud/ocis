@@ -38,6 +38,11 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging: &logging
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "2"
     restart: always
 
   ocis:
@@ -86,6 +91,8 @@ services:
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
+    logging:
+      <<: *logging
     restart: always
 
   ldap-server:
@@ -103,6 +110,8 @@ services:
       - "127.0.0.1:636:636"
     volumes:
       - ./config/ldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    logging:
+      <<: *logging
     restart: always
 
   ldap-manager:
@@ -122,6 +131,8 @@ services:
       - "traefik.http.routers.ldap-manager-secure.tls.certresolver=http"
       - "traefik.http.routers.ldap-manager-secure.service=ldap-manager"
       - "traefik.http.services.ldap-manager.loadbalancer.server.port=80"
+    logging:
+      <<: *logging
     restart: always
 
 volumes:
