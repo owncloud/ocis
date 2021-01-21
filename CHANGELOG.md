@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
+* Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
@@ -25,6 +26,15 @@ The following sections list the changes for unreleased.
    Disable pretty logging default for performance reasons.
 
    https://github.com/owncloud/ocis/pull/1133
+
+* Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
+
+   Tags: docker
+
+   Add "expose" information to docker images. Docker users will now see that we offer services on
+   port 9200.
+
+   https://github.com/owncloud/ocis/pull/1366
 
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 
