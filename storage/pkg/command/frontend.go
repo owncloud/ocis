@@ -88,7 +88,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"versioning":        true,
 				}
 
-				if !cfg.Reva.UploadDisableTus {
+				if cfg.Reva.DefaultUploadProtocol == "tus" {
 					filesCfg["tus_support"] = map[string]interface{}{
 						"version":              "1.0.0",
 						"resumable":            "1.0.0",
@@ -131,12 +131,10 @@ func Frontend(cfg *config.Config) *cli.Command {
 							},
 							"ocdav": map[string]interface{}{
 								"prefix":           cfg.Reva.Frontend.OCDavPrefix,
-								"chunk_folder":     cfg.Reva.OCDav.ChunkFolder,
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 								"timeout":          86400,
 								"insecure":         true,
-								"disable_tus":      cfg.Reva.UploadDisableTus,
 							},
 							"ocs": map[string]interface{}{
 								"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
@@ -148,7 +146,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 									"contact": "admin@localhost",
 									"ssl":     "false",
 								},
-								"disable_tus": cfg.Reva.UploadDisableTus,
+								"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,
 								"capabilities": map[string]interface{}{
 									"capabilities": map[string]interface{}{
 										"core": map[string]interface{}{

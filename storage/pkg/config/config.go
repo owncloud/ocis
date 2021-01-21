@@ -283,7 +283,6 @@ type LDAPSchema struct {
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
-	ChunkFolder       string
 	WebdavNamespace   string
 	DavFilesNamespace string
 }
@@ -319,10 +318,10 @@ type Reva struct {
 	// chunking and resumable upload config (TUS)
 	UploadMaxChunkSize       int
 	UploadHTTPMethodOverride string
-	UploadDisableTus         bool
 	// checksumming capabilities
 	ChecksumSupportedTypes      []string
 	ChecksumPreferredUploadType string
+	DefaultUploadProtocol       string
 }
 
 // Tracing defines the available tracing configuration.
