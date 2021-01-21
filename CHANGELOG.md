@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Disable pretty logging by default: [#1133](https://github.com/owncloud/ocis/pull/1133)
+* Change - Add "volume" declaration to docker images: [#1375](https://github.com/owncloud/ocis/pull/1375)
 * Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
@@ -26,6 +27,15 @@ The following sections list the changes for unreleased.
    Disable pretty logging default for performance reasons.
 
    https://github.com/owncloud/ocis/pull/1133
+
+* Change - Add "volume" declaration to docker images: [#1375](https://github.com/owncloud/ocis/pull/1375)
+
+   Tags: docker
+
+   Add "volume" declaration to docker images. This makes it easier for Docker users to see where
+   oCIS stores data.
+
+   https://github.com/owncloud/ocis/pull/1375
 
 * Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
 
