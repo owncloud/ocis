@@ -777,10 +777,6 @@
 
 ### [empty trashbin does not work](https://github.com/owncloud/product/issues/254)
 
--   [apiTrashbin/trashbinDelete.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L31)
--   [apiTrashbin/trashbinDelete.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L32)
--   [apiTrashbin/trashbinDelete.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L33)
--   [apiTrashbin/trashbinDelete.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L34)
 -   [apiTrashbin/trashbinDelete.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L37)
 
 ### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
@@ -1223,8 +1219,6 @@
 
 ### [cannot get share-types webdav property](https://github.com/owncloud/ocis/issues/567)
 
--   [apiWebdavProperties2/getFileProperties.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L135)
--   [apiWebdavProperties2/getFileProperties.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L136)
 -   [apiWebdavProperties2/getFileProperties.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L174)
 -   [apiWebdavProperties2/getFileProperties.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L175)
 
