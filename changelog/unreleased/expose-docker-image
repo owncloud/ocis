@@ -1,0 +1,7 @@
+Change: Add "expose" information to docker images
+
+Tags: docker
+
+Add "expose" information to docker images. Docker users will now see that we offer services on port 9200.
+
+https://github.com/owncloud/ocis/pull/1366
