@@ -1,5 +1,9 @@
 FROM arm64v8/alpine:3.12
 
+ARG CREATED=""
+ARG VERSION=""
+ARG REVISION=""
+
 RUN apk update && \
 	apk upgrade && \
 	apk add ca-certificates mailcap && \
@@ -7,9 +11,17 @@ RUN apk update && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
-  org.label-schema.name="ownCloud Infinite Scale" \
-  org.label-schema.vendor="ownCloud GmbH" \
-  org.label-schema.schema-version="1.0"
+  org.opencontainers.image.title="ownCloud Infinite Scale" \
+  org.opencontainers.image.vendor="ownCloud GmbH" \
+  org.opencontainers.image.authors="ownCloud GmbH" \
+  org.opencontainers.image.description="oCIS - ownCloud Infinite Scale is a modern file-sync and share platform" \
+  org.opencontainers.image.licenses="Apache-2.0" \
+  org.opencontainers.image.documentation="https://owncloud.github.io/ocis.git" \
+  org.opencontainers.image.created="${CREATED}" \
+  org.opencontainers.image.url="https://hub.docker.com/r/owncloud/ocis" \
+  org.opencontainers.image.source="https://github.com/owncloud/ocis" \
+  org.opencontainers.image.version="${VERSION}" \
+  org.opencontainers.image.revision="${REVISION}"
 
 EXPOSE 9200/tcp
 
