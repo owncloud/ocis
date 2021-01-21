@@ -14,29 +14,6 @@ Feature: files and folders can be deleted from the trashbin
     And user "Alice" has uploaded file with content "to delete" to "/PARENT/CHILD/child.txt"
 
   @smokeTest
-  @issue-product-139
-  @issue-product-178
-  @issue-product-179
-  Scenario Outline: Trashbin cannot be emptied
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-    Given user "Alice" has uploaded file with content "file with comma" to "sample,0.txt"
-    And user "Alice" has uploaded file with content "file with comma" to "sample,1.txt"
-    And using <dav-path> DAV path
-    And user "Alice" has deleted file "<filename1>"
-    And user "Alice" has deleted file "<filename2>"
-    And as "Alice" file "<filename1>" should exist in the trashbin
-    And as "Alice" file "<filename2>" should exist in the trashbin
-    When user "Alice" empties the trashbin using the trashbin API
-    Then as "Alice" the file with original path "<filename1>" should exist in the trashbin
-    And as "Alice" the file with original path "<filename2>" should exist in the trashbin
-    Examples:
-      | dav-path | filename1     | filename2     |
-      | old      | textfile0.txt | textfile1.txt |
-      | old      | sample,0.txt  | sample,1.txt  |
-      | new      | textfile0.txt | textfile1.txt |
-      | new      | sample,0.txt  | sample,1.txt  |
-
-  @smokeTest
   @issue-ocis-reva-118
   @issue-product-179
   @skipOnOcis-OCIS-Storage
