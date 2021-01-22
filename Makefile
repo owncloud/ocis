@@ -15,7 +15,7 @@ RESET := $(shell tput -Txterm sgr0)
 OCIS_MODULES = \
 	accounts \
 	glauth \
-	konnectd \
+	idp \
 	ocis \
 	ocis-pkg \
 	ocs \

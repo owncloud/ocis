@@ -236,14 +236,14 @@ func (s Service) createDefaultAccounts() (err error) {
 		// technical users for kopano and reva
 		{
 			Id:                       "820ba2a1-3f54-4538-80a4-2d73007e30bf",
-			PreferredName:            "konnectd",
-			OnPremisesSamAccountName: "konnectd",
+			PreferredName:            "idp",
+			OnPremisesSamAccountName: "idp",
 			Mail:                     "idp@example.org",
-			DisplayName:              "Kopano Konnectd",
+			DisplayName:              "Kopano IDP",
 			UidNumber:                10000,
 			GidNumber:                15000,
 			PasswordProfile: &proto.PasswordProfile{
-				Password: "$2a$11$ntoTP2W/kyQIuoYpH5mRBuNzaEERYWSwn/zCsY5rtffen4d41y9.6",
+				Password: "$2y$12$ywfGLDPsSlBTVZU0g.2GZOPO8Wap3rVOpm8e3192VlytNdGWH7x72",
 			},
 			AccountEnabled: true,
 			MemberOf: []*proto.Group{
@@ -309,7 +309,7 @@ func (s Service) createDefaultAccounts() (err error) {
 	for _, accountID := range []string{
 		"058bff95-6708-4fe5-91e4-9ea3d377588b", //moss
 		"ddc2004c-0977-11eb-9d3f-a793888cd0f8", //admin
-		"820ba2a1-3f54-4538-80a4-2d73007e30bf", //konnectd
+		"820ba2a1-3f54-4538-80a4-2d73007e30bf", //idp
 		"bc596f3c-c955-4328-80a0-60d018b4ad57", //reva
 	} {
 		assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
@@ -327,7 +327,7 @@ func (s Service) createDefaultAccounts() (err error) {
 func (s Service) createDefaultGroups() (err error) {
 	groups := []proto.Group{
 		{Id: "34f38767-c937-4eb6-b847-1c175829a2a0", GidNumber: 15000, OnPremisesSamAccountName: "sysusers", DisplayName: "Technical users", Description: "A group for technical users. They should not show up in sharing dialogs.", Members: []*proto.Account{
-			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // konnectd
+			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // idp
 			{Id: "bc596f3c-c955-4328-80a0-60d018b4ad57"}, // reva
 		}},
 		{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa", GidNumber: 30000, OnPremisesSamAccountName: "users", DisplayName: "Users", Description: "A group every normal user belongs to.", Members: []*proto.Account{
