@@ -38,11 +38,8 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
-    logging: &logging
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "2"
+    logging:
+      driver: "local"
     restart: always
 
   ocis:
@@ -120,7 +117,7 @@ services:
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
-      <<: *logging
+      driver: "local"
     restart: always
 
   oc10:
@@ -164,7 +161,7 @@ services:
       - "traefik.http.routers.oc10-secure.service=oc10"
       - "traefik.http.services.oc10.loadbalancer.server.port=8080"
     logging:
-      <<: *logging
+      driver: "local"
     restart: always
 
   db:
@@ -185,7 +182,7 @@ services:
       - mysql:/var/lib/mysql
       - backup:/var/lib/backup
     logging:
-      <<: *logging
+      driver: "local"
     restart: always
 
   redis:
@@ -195,7 +192,7 @@ services:
     volumes:
       - redis:/var/lib/redis
     logging:
-      <<: *logging
+      driver: "local"
     restart: always
 
 
