@@ -23,7 +23,7 @@ services:
       - .:/ocis
       - ../accounts:/accounts
       - ../glauth:/glauth
-      - ../konnectd:/konnectd
+      - ../idp:/idp
       - ../web:/web
       - ../ocis-pkg:/ocis-pkg
       - ../ocs:/ocs
