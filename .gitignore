@@ -14,7 +14,7 @@ node_modules/
 yarn-error.log
 
 # Konnectd
-konnectd/assets/identifier
+idp/assets/identifier
 
 # Composer - used for API acceptance tests
 composer.lock

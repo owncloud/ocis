@@ -28,7 +28,7 @@ sequenceDiagram
         Note over client,proxy: What is in a bearer token? <br> The spec recommends opaque tokens. <br> Treat it as random byte noise.
         Note over client,proxy: the proxy MUST authenticate users <br> using ocis-accounts because it needs <br> to decide where to send the request
         %% Mention introspection endpoint for opaque tokens
-        %% konnectd uses jwt, so we can save a request
+        %% idp uses jwt, so we can save a request
         %% either way the token can be used to look up the sub and iss of the user
 
             %% or is token check enough?

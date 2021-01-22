@@ -39,7 +39,7 @@ Run the debug binary with `OCIS_LOG_LEVEL=debug bin/ocis-debug server` and then 
 12920 pts/1    Sl     0:00 bin/ocis-debug reva-users
 12929 pts/1    Sl     0:00 bin/ocis-debug glauth
 12940 pts/1    Sl     0:00 bin/ocis-debug reva-storage-home-data
-12948 pts/1    Sl     0:00 bin/ocis-debug konnectd
+12948 pts/1    Sl     0:00 bin/ocis-debug idp
 12952 pts/1    Sl     0:00 bin/ocis-debug proxy
 12961 pts/1    Sl     0:00 bin/ocis-debug thumbnails
 12971 pts/1    Sl     0:00 bin/ocis-debug reva-storage-oc
@@ -81,7 +81,7 @@ bin/ocis --log-level=$LOG_LEVEL glauth &
 bin/ocis --log-level=$LOG_LEVEL graph-explorer &
 bin/ocis --log-level=$LOG_LEVEL graph &
 #bin/ocis --log-level=$LOG_LEVEL hello &
-bin/ocis --log-level=$LOG_LEVEL konnectd &
+bin/ocis --log-level=$LOG_LEVEL idp &
 #bin/ocis --log-level=$LOG_LEVEL ocs &
 bin/ocis --log-level=$LOG_LEVEL web &
 bin/ocis --log-level=$LOG_LEVEL reva-auth-basic &
@@ -118,7 +118,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 12920 pts/1    Sl     0:00 bin/ocis-debug reva-users
 12929 pts/1    Sl     0:00 bin/ocis-debug glauth
 12940 pts/1    Sl     0:00 bin/ocis-debug reva-storage-home-data
-12948 pts/1    Sl     0:00 bin/ocis-debug konnectd
+12948 pts/1    Sl     0:00 bin/ocis-debug idp
 12952 pts/1    Sl     0:00 bin/ocis-debug proxy
 12961 pts/1    Sl     0:00 bin/ocis-debug thumbnails
 12971 pts/1    Sl     0:00 bin/ocis-debug reva-storage-oc
