@@ -3,10 +3,14 @@ package svc
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/go-chi/chi"
@@ -42,7 +46,7 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
-	if err := createConfigsIfNotExist(assetVFS, options.Config.IDP.Iss); err != nil {
+	if err := createConfigsIfNotExist(options.Config, assetVFS); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
@@ -69,22 +73,23 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
-	if _, err := os.Stat("./config"); os.IsNotExist(err) {
-		if err := os.Mkdir("./config", 0700); err != nil {
+func createConfigsIfNotExist(cfg *config.Config, assets http.FileSystem) error {
+
+	configPath := filepath.Dir(cfg.IDP.IdentifierRegistrationConf)
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		if err := os.Mkdir(configPath, 0700); err != nil {
 			return err
 		}
 	}
 
-	if _, err := os.Stat("./config/identifier-registration.yaml"); os.IsNotExist(err) {
-		defaultConf, err := assets.Open("/identifier-registration.yaml")
-		if err != nil {
-			return err
-		}
+	defaultConf, err := assets.Open("/identifier-registration.yaml")
+	if err != nil {
+		return err
+	}
+	defer defaultConf.Close()
 
-		defer defaultConf.Close()
-
-		confOnDisk, err := os.Create("./config/identifier-registration.yaml")
+	if _, err := os.Stat(cfg.IDP.IdentifierRegistrationConf); os.IsNotExist(err) {
+		confOnDisk, err := os.Create(cfg.IDP.IdentifierRegistrationConf)
 		if err != nil {
 			return err
 		}
@@ -96,13 +101,50 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 			return err
 		}
 
-		// replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
-		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/")))
+		conf, _ = templateConfig(cfg, conf)
 
-		err = ioutil.WriteFile("./config/identifier-registration.yaml", conf, 0600)
+		err = ioutil.WriteFile(cfg.IDP.IdentifierRegistrationConf, conf, 0600)
 		if err != nil {
 			return err
 		}
+	} else {
+		confOnDisk, err := os.Open(cfg.IDP.IdentifierRegistrationConf)
+		if err != nil {
+			return err
+		}
+
+		defer confOnDisk.Close()
+
+		conf, err := ioutil.ReadAll(confOnDisk)
+		if err != nil {
+			return err
+		}
+
+		re := regexp.MustCompile(`sha256: (.*?)\n`)
+		matches := re.FindStringSubmatch(string(conf))
+
+		checksum := ""
+		if len(matches) > 1 {
+			checksum = matches[1]
+		}
+
+		if checksum != confChecksum(conf) {
+			// The config was touched meanwhile. Do not change it!
+			return nil
+		}
+
+		conf, err = ioutil.ReadAll(defaultConf)
+		if err != nil {
+			return err
+		}
+
+		conf, _ = templateConfig(cfg, conf)
+
+		err = ioutil.WriteFile(cfg.IDP.IdentifierRegistrationConf, conf, 0600)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	return nil
@@ -110,6 +152,30 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 }
 
 // Init vars which are currently not accessible via idp api
+func templateConfig(cfg *config.Config, conf []byte) (config []byte, checksum string) {
+	// replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
+	conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", strings.TrimRight(cfg.IDP.Iss, "/")))
+
+	checksum = confChecksum(conf)
+
+	checksumConf := append([]byte("sha256: "), checksum[:]...)
+	checksumConf = append(checksumConf, []byte("\n")...)
+	checksumConf = append(checksumConf, conf...)
+
+	return checksumConf, checksum
+}
+
+func confChecksum(conf []byte) string {
+	if !strings.Contains(string(conf), "---\n") {
+		conf = append([]byte("---\n"), conf...)
+	}
+
+	sha := sha256.Sum256([]byte(strings.Split(string(conf), "---")[1]))
+	checksum := hex.EncodeToString(sha[:])
+	return checksum
+}
+
+// Init vars which are currently not accessible via konnectd api
 func initKonnectInternalEnvVars() error {
 	var defaults = map[string]string{
 		"LDAP_URI":                 "ldap://localhost:9125",
