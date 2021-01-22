@@ -17,3 +17,5 @@ ENTRYPOINT ["/usr/bin/ocis"]
 CMD ["server"]
 
 COPY bin/ocis /usr/bin/ocis
+
+VOLUME [ "/var/tmp/ocis" ]
