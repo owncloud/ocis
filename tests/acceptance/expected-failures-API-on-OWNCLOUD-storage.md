@@ -876,10 +876,6 @@ User cannot create a folder named Share
 ### [delete from trashbin does not work](https://github.com/owncloud/ocis/issues/551)
 ### [deleting multiple elements concurrently will not delete all the items.](https://github.com/owncloud/product/issues/256)
 
--   [apiTrashbin/trashbinDelete.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L31)
--   [apiTrashbin/trashbinDelete.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L32)
--   [apiTrashbin/trashbinDelete.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L33)
--   [apiTrashbin/trashbinDelete.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L34)
 -   [apiTrashbin/trashbinDelete.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L37)
 -   [apiTrashbin/trashbinDelete.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L50)
 -   [apiTrashbin/trashbinDelete.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L67)
