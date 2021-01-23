@@ -38,6 +38,8 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging:
+      driver: "local"
     restart: always
 
   ocis:
@@ -86,6 +88,8 @@ services:
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
+    logging:
+      driver: "local"
     restart: always
 
   ldap-server:
@@ -103,6 +107,8 @@ services:
       - "127.0.0.1:636:636"
     volumes:
       - ./config/ldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    logging:
+      driver: "local"
     restart: always
 
   ldap-manager:
@@ -122,6 +128,8 @@ services:
       - "traefik.http.routers.ldap-manager-secure.tls.certresolver=http"
       - "traefik.http.routers.ldap-manager-secure.service=ldap-manager"
       - "traefik.http.services.ldap-manager.loadbalancer.server.port=80"
+    logging:
+      driver: "local"
     restart: always
 
 volumes:
