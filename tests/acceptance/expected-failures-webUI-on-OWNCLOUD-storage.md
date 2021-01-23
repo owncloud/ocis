@@ -392,9 +392,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUITrashbinDelete/trashbinDelete.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L66)
 -   [webUITrashbinDelete/trashbinDelete.feature:93](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L93)
 
-### [Trashbin fails with unknown error when restoring](https://github.com/owncloud/product/issues/139)
--   [webUITrashbinDelete/trashbinDelete.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L114)
-
 ### [Propfind response to trashbin endpoint is different in ocis](https://github.com/owncloud/product/issues/186)
 ### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
 -   [webUITrashbinRestore/trashbinRestore.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L123)
