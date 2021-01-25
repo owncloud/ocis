@@ -56,11 +56,11 @@ In this example we do not change the default port (`9200`). But this could be ch
 
 You need to configure `your-host` in some services to provide the needed public resources.
 
+This snippet will start the ocis server with auto generated self signed certificates:
+
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 OCIS_URL=https://your-server:9200 \
-PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
-PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 KONNECTD_TLS=0 \
 ./bin/ocis server
 ```
@@ -69,7 +69,11 @@ For more configuration options check the configuration section in [ocis](https:/
 
 {{< hint info >}}
 **TLS Certificate**\
-In this example, we are replacing the default self-signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
+If you have a CA signed certificate for your domain, add the following configurations:
+```
+PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
+PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
+```
 {{< /hint >}}
 
 ## Use Docker Compose
