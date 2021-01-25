@@ -80,10 +80,12 @@ func New(cfg *config.Config) Runtime {
 // Start rpc runtime
 func (r *Runtime) Start() error {
 	go r.Launch()
-	return service.Start()
+	return service.Start(
+		service.WithLogPretty(r.c.Log.Pretty),
+	)
 }
 
-// Launch ocis default ocis extensions.
+// Launch oCIS default extensions.
 func (r *Runtime) Launch() {
 	var client *rpc.Client
 	var err error
