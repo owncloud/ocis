@@ -9,7 +9,14 @@ geekdocFilePath: release_notes.md
 
 ## ownCloud Infinite Scale 1.1.0 Technology Preview
 
-Version 1.1.0 is a hardening and patch release. It ships with version 1.0.2 of ownCloud Web and brings a couple of dependency updates and minor improvements. The minor version increase is needed due to changes in configuration. The documentation has been updated to reflect the changes. Deployments with version 1.0.0 will not break, but the 1.1.0 deployment best practises are not backwards compatible.
+Version 1.1.0 is a hardening and patch release. It ships with the latest version of ownCloud Web and brings a couple of minor improvements. The minor version increase is needed due to non-backwards compatible changes in configuration. The documentation has been updated to reflect the changes. Please note that this version is still a Technology Preview and not suited for production use.
+
+The most prominent changes in version 1.1.0 comprise
+- Performance and stability improvements for installations with multiple concurrent users
+- Simplified configuration by introducing the new environment variable OCIS_URL
+- Beta release of [ownCloud performance scripts](https://github.com/owncloud/cdperf)
+- Update ownCloud web to [v1.0.1](https://github.com/owncloud/web/releases/tag/v1.0.1)
+- Update reva to [v1.5.1](https://github.com/cs3org/reva/releases/tag/v1.5.1)
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) for further details on what has changed.
 
