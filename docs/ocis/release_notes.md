@@ -7,6 +7,12 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.1.0 Technology Preview
+
+Version 1.1.0 is a hardening and patch release. It ships with version 1.0.2 of ownCloud Web and brings a couple of dependency updates and minor improvements. The minor version increase is needed due to changes in configuration. The documentation has been updated to reflect the changes. Deployments with version 1.0.0 will not break, but the 1.1.0 deployment best practises are not backwards compatible.
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) for further details on what has changed.
+
 ## ownCloud Infinite Scale 1.0.0 Technology Preview
 
 We are pleased to announce the availability of ownCloud Infinite Scale 1.0.0 Technology Preview which is released as the first public version of the new Infinite Scale platform.
