@@ -45,7 +45,7 @@ func (m *Map) Load(name string) int {
 
 // LoadAll values from the underlying data structure.
 func (m *Map) LoadAll() Entries {
-	e := make(map[string]int, 0)
+	e := make(map[string]int)
 	m.c.Range(func(k, v interface{}) bool {
 		ks, ok := k.(string)
 		if !ok {
