@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
@@ -65,6 +66,16 @@ The following sections list the changes for unreleased.
    move the k6 tests to https://github.com/owncloud/cdperf
 
    https://github.com/owncloud/ocis/pull/1358
+
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+
+   Tags: ocis, runtime
+
+   Currently, the runtime is under the private account of an oCIS developer. For future-proofing
+   we don't want oCIS mission critical components to depend on external repositories, so we're
+   including refs/pman module as an oCIS package instead.
+
+   https://github.com/owncloud/ocis/pull/1483
 
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 
