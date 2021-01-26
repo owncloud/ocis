@@ -27,6 +27,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
+			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
 			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -166,8 +167,8 @@ func Frontend(cfg *config.Config) *cli.Command {
 											"support_url_signing": true,
 										},
 										"checksums": map[string]interface{}{
-											"supported_types":       []string{"SHA256"},
-											"preferred_upload_type": "SHA256",
+											"supported_types":       cfg.Reva.ChecksumSupportedTypes,
+											"preferred_upload_type": cfg.Reva.ChecksumPreferredUploadType,
 										},
 										"files": filesCfg,
 										"dav":   map[string]interface{}{},
