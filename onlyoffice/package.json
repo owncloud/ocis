@@ -20,7 +20,7 @@
     "acceptance-tests": "cucumber-js --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
+    "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/plugin-proposal-export-default-from": "^7.7.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
