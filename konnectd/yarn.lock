@@ -4416,10 +4416,10 @@ debug@=3.1.0:
   dependencies:
     ms "2.0.0"
 
-debug@^3.1.1, debug@^3.2.5:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
-  integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
+debug@^3.1.1, debug@^3.2.6:
+  version "3.2.7"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.7.tgz#72580b7e9145fb39b6676f9c5e5fb100b934179a"
+  integrity sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==
   dependencies:
     ms "^2.1.1"
 
@@ -5382,14 +5382,7 @@ fast-memoize@^2.5.2:
   resolved "https://registry.yarnpkg.com/fast-memoize/-/fast-memoize-2.5.2.tgz#79e3bb6a4ec867ea40ba0e7146816f6cdce9b57e"
   integrity sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw==
 
-faye-websocket@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/faye-websocket/-/faye-websocket-0.10.0.tgz#4e492f8d04dfb6f89003507f6edbf2d501e7c6f4"
-  integrity sha1-TkkvjQTftviQA1B/btvy1QHnxvQ=
-  dependencies:
-    websocket-driver ">=0.5.1"
-
-faye-websocket@~0.11.1:
+faye-websocket@^0.11.3:
   version "0.11.3"
   resolved "https://registry.yarnpkg.com/faye-websocket/-/faye-websocket-0.11.3.tgz#5c0e9a8968e8912c286639fde977a8b209f2508e"
   integrity sha512-D2y4bovYpzziGgbHYtGCMjlJM36vAl/y+xUyn1C+FVx8szd1E+86KwVw6XvYSzOP8iMpm1X0I4xJD+QtUb36OA==
@@ -6086,10 +6079,10 @@ html-encoding-sniffer@^1.0.2:
   dependencies:
     whatwg-encoding "^1.0.1"
 
-html-entities@^1.2.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.3.1.tgz#fb9a1a4b5b14c5daba82d3e34c6ae4fe701a0e44"
-  integrity sha512-rhE/4Z3hIhzHAUKbW8jVcCyuT5oJCXXqhN/6mXXVCpzTmvJnoH2HL/bt3EZ6p55jbFJBeAe1ZNpL5BugLujxNA==
+html-entities@^1.3.1:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.4.0.tgz#cfbd1b01d2afaf9adca1b10ae7dffab98c71d2dc"
+  integrity sha512-8nxjcBcd8wovbeKx7h3wTji4e6+rhaVuPNpMqwWgnHh+N9ToqsCs6XztWRBPQ+UtzsoMAdKZtUENoVzU/EMtZA==
 
 html-escaper@^2.0.0:
   version "2.0.2"
@@ -7381,7 +7374,7 @@ json-stringify-safe@~5.0.1:
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
   integrity sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=
 
-json3@^3.3.2:
+json3@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/json3/-/json3-3.3.3.tgz#7fc10e375fc5ae42c4705a5cc0aa6f62be305b81"
   integrity sha512-c7/8mbUsKigAbLkD5B010BK4D9LZm7A1pNItkEwiUZRpIN66exu/e7YQWysGun+TRKaJp8MhemM+VkfWv42aCA==
@@ -7734,10 +7727,10 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
-loglevel@^1.6.6:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.7.0.tgz#728166855a740d59d38db01cf46f042caa041bb0"
-  integrity sha512-i2sY04nal5jDcagM3FMfG++T69GEEM8CYuOfeOIvmXzOIcwE9a/CJPR0MFM97pYMj/u10lzz7/zd7+qwhrBTqQ==
+loglevel@^1.6.8:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.7.1.tgz#005fde2f5e6e47068f935ff28573e125ef72f197"
+  integrity sha512-Hesni4s5UkWkwCGJMQGAh71PaLUmKFM60dHvq0zi/vDhhrzuk+4GgNbTXJ12YYQJn6ZKBDNIjYcuQGKudvqrIw==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.2.0, loose-envify@^1.3.1, loose-envify@^1.4.0:
   version "1.4.0"
@@ -8523,7 +8516,7 @@ os-homedir@^1.0.0:
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
   integrity sha1-/7xJiDNuDoM94MFox+8VISGqf7M=
 
-os-locale@^3.0.0, os-locale@^3.1.0:
+os-locale@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/os-locale/-/os-locale-3.1.0.tgz#a802a6ee17f24c10483ab9935719cef4ed16bf1a"
   integrity sha512-Z8l3R4wYWM40/52Z+S265okfFj8Kt2cC2MKY+xNi3kFs+XGI7WXu/I309QQQYbRW4ijiZ+yxs9pqEhJh0DqW3Q==
@@ -8924,7 +8917,7 @@ popper.js@1.16.1-lts:
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1-lts.tgz#cf6847b807da3799d80ee3d6d2f90df8a3f50b05"
   integrity sha512-Kjw8nKRl1m+VrSFCoVGPph93W/qrSO7ZkqPpTf7F4bk/sqcfWK019dWBUpE/fBOsOQY1dks/Bmcbfn1heM/IsA==
 
-portfinder@^1.0.25:
+portfinder@^1.0.26:
   version "1.0.28"
   resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.28.tgz#67c4622852bd5374dd1dd900f779f53462fac778"
   integrity sha512-Se+2isanIcEqf2XMHjyUKskczxbPH7dQnlMjXX6+dybayyHvAf/TCgyMRlzf/B6QDhAEFOGes0pzRo3by4AbMA==
@@ -10632,7 +10625,7 @@ select-hose@^2.0.0:
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
   integrity sha1-Yl2GWPhlr0Psliv8N2o3NZpJlMo=
 
-selfsigned@^1.10.7:
+selfsigned@^1.10.8:
   version "1.10.8"
   resolved "https://registry.yarnpkg.com/selfsigned/-/selfsigned-1.10.8.tgz#0d17208b7d12c33f8eac85c41835f27fc3d81a30"
   integrity sha512-2P4PtieJeEwVgTU9QEcwIRDQ/mXJLX8/+I3ur+Pg16nS8oNbrGxEso9NyYWy8NAmXiNl4dlAp5MwoNeCWzON4w==
@@ -10884,25 +10877,26 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sockjs-client@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.4.0.tgz#c9f2568e19c8fd8173b4997ea3420e0bb306c7d5"
-  integrity sha512-5zaLyO8/nri5cua0VtOrFXBPK1jbL4+1cebT/mmKA1E1ZXOvJrII75bPu0l0k843G/+iAbhEqzyKr0w/eCCj7g==
+sockjs-client@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.5.0.tgz#2f8ff5d4b659e0d092f7aba0b7c386bd2aa20add"
+  integrity sha512-8Dt3BDi4FYNrCFGTL/HtwVzkARrENdwOUf1ZoW/9p3M8lZdFT35jVdrHza+qgxuG9H3/shR4cuX/X9umUrjP8Q==
   dependencies:
-    debug "^3.2.5"
+    debug "^3.2.6"
     eventsource "^1.0.7"
-    faye-websocket "~0.11.1"
-    inherits "^2.0.3"
-    json3 "^3.3.2"
-    url-parse "^1.4.3"
+    faye-websocket "^0.11.3"
+    inherits "^2.0.4"
+    json3 "^3.3.3"
+    url-parse "^1.4.7"
 
-sockjs@0.3.19:
-  version "0.3.19"
-  resolved "https://registry.yarnpkg.com/sockjs/-/sockjs-0.3.19.tgz#d976bbe800af7bd20ae08598d582393508993c0d"
-  integrity sha512-V48klKZl8T6MzatbLlzzRNhMepEys9Y4oGFpypBFFn1gLI/QQ9HtLLyWJNbPlwGLelOVOEijUbTTJeLLI59jLw==
+sockjs@^0.3.21:
+  version "0.3.21"
+  resolved "https://registry.yarnpkg.com/sockjs/-/sockjs-0.3.21.tgz#b34ffb98e796930b60a0cfa11904d6a339a7d417"
+  integrity sha512-DhbPFGpxjc6Z3I+uX07Id5ZO2XwYsWOrYjaSeieES78cq+JaJvVe5q/m1uvjIQhXinhIeCFRH6JgXe+mvVMyXw==
   dependencies:
-    faye-websocket "^0.10.0"
-    uuid "^3.0.1"
+    faye-websocket "^0.11.3"
+    uuid "^3.4.0"
+    websocket-driver "^0.7.4"
 
 sort-keys@^1.0.0:
   version "1.1.2"
@@ -11010,7 +11004,7 @@ spdy-transport@^3.0.0:
     readable-stream "^3.0.6"
     wbuf "^1.7.3"
 
-spdy@^4.0.1:
+spdy@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/spdy/-/spdy-4.0.2.tgz#b74f466203a3eda452c02492b91fb9e84a27677b"
   integrity sha512-r46gZQZQV+Kl9oItvl1JZZqJKGr+oEkB08A6BzkiR7593/7IbtuncXHd2YoYeTsG4157ZssMu9KYvUHLcjcDoA==
@@ -11776,7 +11770,7 @@ url-loader@2.3.0:
     mime "^2.4.4"
     schema-utils "^2.5.0"
 
-url-parse@^1.4.3:
+url-parse@^1.4.3, url-parse@^1.4.7:
   version "1.4.7"
   resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.7.tgz#a8a83535e8c00a316e403a5db4ac1b9b853ae278"
   integrity sha512-d3uaVyzDB9tQoSXFvuSUNFibTd9zxd2bkVrDRvF5TmvWWQwqE4lgYJ5m+x1DbecWkw+LK4RNl2CU1hHuOKPVlg==
@@ -11844,7 +11838,7 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-uuid@^3.0.1, uuid@^3.3.2:
+uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
@@ -11955,10 +11949,10 @@ webpack-dev-middleware@^3.7.2:
     range-parser "^1.2.1"
     webpack-log "^2.0.0"
 
-webpack-dev-server@3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-3.10.1.tgz#1ff3e5cccf8e0897aa3f5909c654e623f69b1c0e"
-  integrity sha512-AGG4+XrrXn4rbZUueyNrQgO4KGnol+0wm3MPdqGLmmA+NofZl3blZQKxZ9BND6RDNuvAK9OMYClhjOSnxpWRoA==
+webpack-dev-server@3.11.2:
+  version "3.11.2"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-3.11.2.tgz#695ebced76a4929f0d5de7fd73fafe185fe33708"
+  integrity sha512-A80BkuHRQfCiNtGBS1EMf2ChTUs0x+B3wGDFmOeT4rmJOHhHTCH2naNxIHhmkr0/UillP4U3yeIyv1pNp+QDLQ==
   dependencies:
     ansi-html "0.0.7"
     bonjour "^3.5.0"
@@ -11968,31 +11962,31 @@ webpack-dev-server@3.10.1:
     debug "^4.1.1"
     del "^4.1.1"
     express "^4.17.1"
-    html-entities "^1.2.1"
+    html-entities "^1.3.1"
     http-proxy-middleware "0.19.1"
     import-local "^2.0.0"
     internal-ip "^4.3.0"
     ip "^1.1.5"
     is-absolute-url "^3.0.3"
     killable "^1.0.1"
-    loglevel "^1.6.6"
+    loglevel "^1.6.8"
     opn "^5.5.0"
     p-retry "^3.0.1"
-    portfinder "^1.0.25"
+    portfinder "^1.0.26"
     schema-utils "^1.0.0"
-    selfsigned "^1.10.7"
+    selfsigned "^1.10.8"
     semver "^6.3.0"
     serve-index "^1.9.1"
-    sockjs "0.3.19"
-    sockjs-client "1.4.0"
-    spdy "^4.0.1"
+    sockjs "^0.3.21"
+    sockjs-client "^1.5.0"
+    spdy "^4.0.2"
     strip-ansi "^3.0.1"
     supports-color "^6.1.0"
     url "^0.11.0"
     webpack-dev-middleware "^3.7.2"
     webpack-log "^2.0.0"
     ws "^6.2.1"
-    yargs "12.0.5"
+    yargs "^13.3.2"
 
 webpack-log@^2.0.0:
   version "2.0.0"
@@ -12049,7 +12043,7 @@ webpack@4.41.5:
     watchpack "^1.6.0"
     webpack-sources "^1.4.1"
 
-websocket-driver@>=0.5.1:
+websocket-driver@>=0.5.1, websocket-driver@^0.7.4:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/websocket-driver/-/websocket-driver-0.7.4.tgz#89ad5295bbf64b480abcba31e4953aca706f5760"
   integrity sha512-b17KeDIQVjvb0ssuSDF2cYXSg2iztliJ4B9WdsuB6J952qCPKmnVq4DyW5motImXHDC1cBT/1UezrJVsKw5zjg==
@@ -12346,7 +12340,7 @@ y18n@^3.2.1:
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"
   integrity sha1-bRX7qITAhnnA136I53WegR4H+kE=
 
-"y18n@^3.2.1 || ^4.0.0", y18n@^4.0.0:
+y18n@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.0.tgz#95ef94f85ecc81d007c264e190a120f0a3c8566b"
   integrity sha512-r9S/ZyXu/Xu9q1tYlpsLIsa3EeLXXk0VwlxqTcFRfg9EhMW+17kbt9G0NrgCmhGb5vT2hyhJZLfDGx+7+5Uj/w==
@@ -12366,14 +12360,6 @@ yaml@^1.7.2:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.0.tgz#3b593add944876077d4d683fee01081bd9fff31e"
   integrity sha512-yr2icI4glYaNG+KWONODapy2/jDdMSDnrONSjblABjD9B4Z5LgiircSt8m8sRZFNi08kG9Sm0uSHtEmP3zaEGg==
 
-yargs-parser@^11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-11.1.1.tgz#879a0865973bca9f6bab5cbdf3b1c67ec7d3bcf4"
-  integrity sha512-C6kB/WJDiaxONLJQnF8ccx9SEeoTTLek8RVbaOIsrAUS8VrBEXfmeSnCZxygc+XC2sNMBIwOOnfcxiynjHsVSQ==
-  dependencies:
-    camelcase "^5.0.0"
-    decamelize "^1.2.0"
-
 yargs-parser@^13.1.2:
   version "13.1.2"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-13.1.2.tgz#130f09702ebaeef2650d54ce6e3e5706f7a4fb38"
@@ -12388,24 +12374,6 @@ yargs-parser@^9.0.2:
   integrity sha1-nM9qQ0YP5O1Aqbto9I1DuKaMwHc=
   dependencies:
     camelcase "^4.1.0"
-
-yargs@12.0.5:
-  version "12.0.5"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
-  integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==
-  dependencies:
-    cliui "^4.0.0"
-    decamelize "^1.2.0"
-    find-up "^3.0.0"
-    get-caller-file "^1.0.1"
-    os-locale "^3.0.0"
-    require-directory "^2.1.1"
-    require-main-filename "^1.0.1"
-    set-blocking "^2.0.0"
-    string-width "^2.0.0"
-    which-module "^2.0.0"
-    y18n "^3.2.1 || ^4.0.0"
-    yargs-parser "^11.1.1"
 
 yargs@^11.0.0:
   version "11.1.1"
@@ -12425,7 +12393,7 @@ yargs@^11.0.0:
     y18n "^3.2.1"
     yargs-parser "^9.0.2"
 
-yargs@^13.3.0:
+yargs@^13.3.0, yargs@^13.3.2:
   version "13.3.2"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-13.3.2.tgz#ad7ffefec1aa59565ac915f82dccb38a9c31a2dd"
   integrity sha512-AX3Zw5iPruN5ie6xGRIDgqkT+ZhnRlZMLMHAs8tg7nRruy2Nb+i5o9bwghAogtM08q1dpr2LVoS8KSTMYpWXUw==
