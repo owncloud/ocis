@@ -38,17 +38,6 @@ Feature: get file properties
       | old         | /file ?2.txt | webdav\/file%20%3F2\.txt                 |
       | new         | /file ?2.txt | dav\/files\/%username%\/file%20%3F2\.txt |
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-265 @skipOnOcis-OCIS-Storage
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-  Scenario Outline: upload a file to content
-    Given using <dav_version> DAV path
-    When user "Alice" uploads file with content "uploaded content" to "<file_name>" using the WebDAV API
-    Then the HTTP status code should be "500"
-    Examples:
-      | dav_version | file_name    |
-      | old         | /file ?2.txt |
-      | new         | /file ?2.txt |
-
   @issue-ocis-reva-214 @skipOnOcis-OCIS-Storage
   # after fixing all issues delete this Scenario and use the one from oC10 core
   Scenario Outline: Do a PROPFIND of various folder names
