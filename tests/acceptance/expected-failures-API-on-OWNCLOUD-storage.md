@@ -1,4 +1,4 @@
-## Scenarios from api tests that are expected to fail on OCIS with owncloud storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with owncloud storage
 
 -   [apiWebdavProperties1/setFileProperties.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L32)
 -   [apiWebdavProperties1/setFileProperties.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L33)

@@ -1,4 +1,4 @@
-## Scenarios from ownCloud10 core api tests that are expected to fail with OCIS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage
 
 ### Test scenarios that specifically fail with OCIS storage
 
