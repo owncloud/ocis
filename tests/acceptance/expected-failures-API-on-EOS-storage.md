@@ -1,4 +1,4 @@
-## Scenarios from ownCloud10 core api tests that are expected to fail with EOS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with EOS storage
 
 ### [Checksum feature](https://github.com/owncloud/ocis/issues/1291)
 -   [apiMain/checksums.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L24)
@@ -144,7 +144,10 @@
 -   [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
 -   [apiWebdavOperations/search.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L229)
 
-OCS Provisioning API scenarios that fail - to be investigated and issues raised or comments added here
+### OCS Provisioning API scenarios that fail
+
+to be investigated and issues raised or comments added here
+
 -   [apiProvisioning-v1/addUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L29)
 -   [apiProvisioning-v1/addUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L30)
 -   [apiProvisioning-v1/addUser.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L32)
@@ -412,9 +415,6 @@ OCS Provisioning API scenarios that fail - to be investigated and issues raised 
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L98)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L135)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L136)
-
-These currently pass in owncloud/ocis-reva and should start passing here in ocis soon
-
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L115)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L116)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L153)

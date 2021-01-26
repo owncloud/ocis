@@ -32,13 +32,3 @@ Feature: move (rename) file
       | dav_version |
       | old         |
       | new         |
-
-  @skipOnOcis-OC-Storage @issue-ocis-reva-211 @skipOnOcis-OCIS-Storage
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-  Scenario Outline: renaming to a file with special characters
-    When user "Alice" moves file "/textfile0.txt" to "/<renamed_file>" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/<renamed_file>" for user "Alice" should be ""
-    Examples:
-      | renamed_file  |
-      | #oc ab?cd=ef# |
