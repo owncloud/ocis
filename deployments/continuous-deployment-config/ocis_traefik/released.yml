@@ -1,0 +1,38 @@
+---
+- name: continuous-deployment-ocis-traefik-released
+  server:
+    server_type: cx21
+    image: ubuntu-20.04
+    location: nbg1
+    inital_ssh_key_names:
+      - owncloud-ocis@drone.owncloud.com
+    labels:
+      owner: wkloucek
+      for: oCIS-continuous-deployment-examples
+    rebuild: $REBUILD
+
+  domains:
+    - "*.ocis-traefik.released.owncloud.works"
+
+  vars:
+    docker_compose_projects:
+      - name: ocis
+        git_url: https://github.com/owncloud/ocis.git
+        ref: master
+        docker_compose_path: deployments/examples/ocis_traefik
+        env:
+          INSECURE: "false"
+          TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
+          OCIS_DOCKER_TAG: 1
+          OCIS_DOMAIN: ocis.ocis-traefik.released.owncloud.works
+          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+      - name: monitoring
+        git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
+        ref: master
+        env:
+          NETWORK_NAME: ocis-net
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-traefik.released.owncloud.works
+          JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
+          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
+          OCIS_URL: ocis.ocis-traefik.released.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-traefik-released

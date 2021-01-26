@@ -185,8 +185,7 @@ def main(ctx):
   build_release_helpers = [
     changelog(ctx),
     docs(ctx),
-    refreshDockerBadges(ctx),
-    updateDeployment(ctx),
+    refreshDockerBadges(ctx)
   ]
 
   if ctx.build.event == "cron":
@@ -195,7 +194,7 @@ def main(ctx):
         purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
         testPipelines(ctx)
       )
-    ]
+    ] + example_deploys(ctx)
 
   elif \
   (ctx.build.event == "pull_request" and '[docs-only]' in ctx.build.title) \
@@ -213,6 +212,14 @@ def main(ctx):
     )
 
     pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+
+
+    pipelines = \
+      pipelines + \
+      pipelinesDependsOn(
+        example_deploys(ctx),
+        pipelines
+      )
 
   # always append notification step
   pipelines.append(
@@ -1266,39 +1273,6 @@ def makeGenerate(module):
     }
   ]
 
-def updateDeployment(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'updateDeployment',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps': [
-      {
-        'name': 'webhook',
-        'image': 'plugins/webhook:1',
-        'settings': {
-          'username': {
-            'from_secret': 'webhook_username',
-          },
-          'password': {
-            'from_secret': 'webhook_password',
-          },
-          'method': 'GET',
-          'urls': 'https://ocis.owncloud.works/hooks/update-ocis',
-        }
-      }
-    ],
-    'depends_on': getPipelineNames(dockerReleases(ctx) + binaryReleases(ctx)),
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-      ],
-    }
-  }
-
 def notify(ctx):
   return {
     'kind': 'pipeline',
@@ -1459,6 +1433,87 @@ def build():
       'volumes': [stepVolumeGoWebhippie,],
     },
   ]
+
+def example_deploys(ctx):
+  latest_configs = [
+    'cs3_users_ocis/latest.yml',
+    'ocis_keycloak/latest.yml',
+    'ocis_traefik/latest.yml',
+  ]
+  released_configs = [
+    'cs3_users_ocis/released.yml',
+    'ocis_keycloak/released.yml',
+    'ocis_traefik/released.yml',
+  ]
+
+  # if on master branch:
+  configs = latest_configs
+  rebuild = "false"
+
+  if ctx.build.event == "tag":
+    configs = released_configs
+    rebuild = 'false'
+
+  if ctx.build.event == "cron":
+    configs = latest_configs + released_configs
+    rebuild = 'true'
+
+  deploys = []
+  for config in configs:
+    deploys.append(deploy(ctx, config, rebuild))
+
+  return deploys
+
+def deploy(ctx, config, rebuild):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'deploy_%s' % (config),
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps': [
+      {
+        'name': 'clone continuous deployment playbook',
+        'image': 'alpine/git',
+        'commands': [
+          'cd deployments/continuous-deployment-config',
+          'git clone https://github.com/owncloud-devops/continuous-deployment.git',
+        ]
+      },
+      {
+        'name': 'deploy',
+        'image': 'owncloudci/drone-ansible',
+        'failure': 'ignore',
+        'environment': {
+          'CONTINUOUS_DEPLOY_SERVERS_CONFIG': '../%s' % (config),
+          "REBUILD": '%s' % (rebuild),
+          'HCLOUD_API_TOKEN': {
+            'from_secret': 'hcloud_api_token'
+          },
+          'CLOUDFLARE_API_TOKEN': {
+            'from_secret': 'cloudflare_api_token'
+          }
+        },
+        'settings': {
+          'playbook': 'deployments/continuous-deployment-config/continuous-deployment/playbook-all.yml',
+          'galaxy': 'deployments/continuous-deployment-config/continuous-deployment/requirements.yml',
+          'requirements': 'deployments/continuous-deployment-config/continuous-deployment/py-requirements.txt',
+          'inventory': 'localhost',
+          'private_key': {
+            'from_secret': 'ssh_private_key'
+          }
+        }
+      },
+    ],
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+      ],
+    },
+  }
 
 def genericCache(name, action, mounts, cache_key):
   rebuild = 'false'
