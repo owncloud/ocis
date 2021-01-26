@@ -11,11 +11,13 @@ The following sections list the changes for unreleased.
 * Change - Add "expose" information to docker images: [#1366](https://github.com/owncloud/ocis/pull/1366)
 * Change - Generate cryptographically secure state token: [#1203](https://github.com/owncloud/ocis/pull/1203)
 * Change - Move k6 to cdperf: [#1358](https://github.com/owncloud/ocis/pull/1358)
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 * Change - Update ownCloud Web to v1.0.1: [#1191](https://github.com/owncloud/ocis/pull/1191)
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
 * Enhancement - Use sync.cache for roles cache: [#1367](https://github.com/owncloud/ocis/pull/1367)
 * Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
+* Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 * Enhancement - Update reva to v1.5.1: [#1372](https://github.com/owncloud/ocis/pull/1372)
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
@@ -64,6 +66,16 @@ The following sections list the changes for unreleased.
    move the k6 tests to https://github.com/owncloud/cdperf
 
    https://github.com/owncloud/ocis/pull/1358
+
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+
+   Tags: ocis, runtime
+
+   Currently, the runtime is under the private account of an oCIS developer. For future-proofing
+   we don't want oCIS mission critical components to depend on external repositories, so we're
+   including refs/pman module as an oCIS package instead.
+
+   https://github.com/owncloud/ocis/pull/1483
 
 * Change - Update go version: [#1364](https://github.com/owncloud/ocis/pull/1364)
 
@@ -139,6 +151,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/966
    https://github.com/owncloud/ocis/pull/1212
+
+* Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
+
+  * initial checksum support for ocis [cs3org/reva#1400](https://github.com/cs3org/reva/pull/1400)
+  * Use updated etag of home directory even if it is cached [cs3org/reva#1416](https://github.com/cs3org/reva/pull/#1416)
+  * Indicate in EOS containers that TUS is not supported [cs3org/reva#1415](https://github.com/cs3org/reva/pull/#1415)
+  * Get status code from recycle response [cs3org/reva#1408](https://github.com/cs3org/reva/pull/#1408)
+
+   https://github.com/owncloud/ocis/pull/1482
+   https://github.com/cs3org/reva/pull/1400
+   https://github.com/cs3org/reva/pull/1416
+   https://github.com/cs3org/reva/pull/1415
+   https://github.com/cs3org/reva/pull/1408
 
 * Enhancement - Update reva to v1.5.1: [#1372](https://github.com/owncloud/ocis/pull/1372)
 

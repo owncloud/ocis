@@ -149,6 +149,19 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE"},
 			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
+		&cli.StringSliceFlag{
+			Name:    "checksum-suppored-type",
+			Value:   cli.NewStringSlice("sha1", "md5", "adler32"),
+			Usage:   "--checksum-suppored-type sha1 [--checksum-suppored-type adler32]",
+			EnvVars: []string{"STORAGE_FRONTEND_CHECKSUM_SUPPORTED_TYPES"},
+		},
+		&cli.StringFlag{
+			Name:        "checksum-preferred-upload-type",
+			Value:       "",
+			Usage:       "Specify the preferred checksum algorithm used for uploads",
+			EnvVars:     []string{"STORAGE_FRONTEND_CHECKSUM_PREFERRED_UPLOAD_TYPE"},
+			Destination: &cfg.Reva.ChecksumPreferredUploadType,
+		},
 
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{

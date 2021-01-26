@@ -16,14 +16,14 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [login error page loops when logged in user is deleted](https://github.com/owncloud/ocis/issues/1129)
 -   [webUILogin/login.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L62)
 
-### [User request using token and basic authentication gives different display names](https://github.com/owncloud/ocis-reva/issues/107)
+### [User request using token and basic authentication gives different display names](https://github.com/owncloud/ocis/issues/1312)
 -   [webUIAccount/accountInformation.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L10)
 -   [webUIAccount/accountInformation.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L34)
 
 ### [LDAP Groups not working with konnectd](https://github.com/owncloud/ocis-konnectd/issues/42)
 -   [webUIAccount/accountInformation.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L20)
 
-### [REPORT request not implemented](https://github.com/owncloud/ocis-reva/issues/39)
+### [REPORT request not implemented](https://github.com/owncloud/ocis/issues/1330)
 -   [webUIDeleteFilesFolders/deleteFilesFolders.feature:253](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L253)
 -   [webUIFavorites/favoritesFile.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L14)
 -   [webUIFavorites/favoritesFile.feature:27](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L27)
@@ -43,7 +43,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIFiles/fileDetails.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L35)
 -   [webUIFiles/fileDetails.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L46)
 
-### [Sharing seems to work but does not work](https://github.com/owncloud/ocis-reva/issues/243)
+### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 -   [webUIDeleteFilesFolders/deleteFilesFolders.feature:202](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L202)
 -   [webUIFiles/fileDetails.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L88)
 -   [webUIFiles/fileDetails.feature:103](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileDetails.feature#L103)
@@ -120,7 +120,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublic/shareByPublicLink.feature:641](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L641)
 -   [webUISharingPublic/shareByPublicLink.feature:658](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L658)
 
-### [Copy private link option not available](https://github.com/owncloud/ocis-phoenix/issues/52)
+### [Copy private link option not available](https://github.com/owncloud/ocis/issues/1409)
 -   [webUIFiles/copyPrivateLinks.feature:18](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/copyPrivateLinks.feature#L18)
 -   [webUIFiles/copyPrivateLinks.feature:19](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/copyPrivateLinks.feature#L19)
 
@@ -128,7 +128,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIFiles/fileList.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileList.feature#L23)
 -   [webUIFiles/fileList.feature:28](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/fileList.feature#L28)
 
-### [Versions Cleanup not available](https://github.com/owncloud/ocis-reva/issues/110)
+### [Versions Cleanup not available](https://github.com/owncloud/ocis/issues/1310)
 -   [webUIFiles/versions.feature:45](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/versions.feature#L45)
 -   [webUIFiles/versions.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/versions.feature#L56)
 -   [webUIFiles/versions.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/versions.feature#L71)
@@ -180,7 +180,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L80)
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L90)
 
-### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis-konnectd/issues/68)
+### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis/issues/1428)
 -   [webUILogin/login.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L52)
 
 ### Image-Media-Viewer-Issue
@@ -252,7 +252,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIResharing/reshareUsers.feature:411](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing/reshareUsers.feature#L411)
 -   [webUIResharing/reshareUsers.feature:423](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing/reshareUsers.feature#L423)
 
-### [various sharing settings cannot be set](https://github.com/owncloud/ocis-reva/issues/41)
+### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [webUIRestrictSharing/disableSharing.feature:13](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L13)
 -   [webUIRestrictSharing/disableSharing.feature:19](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L19)
 -   [webUIRestrictSharing/disableSharing.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L29)
@@ -309,7 +309,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature#L64)
 -   [webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature#L65)
 
-### [Group shares support](https://github.com/owncloud/ocis-reva/issues/194)
+### [Group shares support](https://github.com/owncloud/ocis/issues/1289)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:60](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L60)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L61)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L62)
@@ -370,7 +370,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingNotifications/shareWithUsers.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L36)
 -   [webUISharingNotifications/shareWithUsers.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L49)
 
-### [name of public link is empty and not "Public link" when not specified in the create request](https://github.com/owncloud/ocis-reva/issues/383)
+### [name of public link is empty and not "Public link" when not specified in the create request](https://github.com/owncloud/ocis/issues/1237)
 -   [webUISharingPublic/shareByPublicLink.feature:30](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L30)
 -   [webUISharingPublic/shareByPublicLink.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L31)
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L31)
@@ -381,10 +381,10 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [Cannot upload files to the ownCloud storage](https://github.com/owncloud/ocis-reva/issues/398)
 -   [webUISharingPublic/shareByPublicLink.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L63)
 
-### [public share are not deleted when user is deleted](https://github.com/owncloud/ocis-reva/issues/389)
+### [public share are not deleted when user is deleted](https://github.com/owncloud/ocis/issues/1240)
 -   [webUISharingPublic/shareByPublicLink.feature:135](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L135)
 
-### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis-reva/issues/372)
+### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 -   [webUISharingPublic/shareByPublicLink.feature:739](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublic/shareByPublicLink.feature#L739)
 
 ### [Deletion of a recursive folder from trashbin is not possible](https://github.com/owncloud/product/issues/188)
@@ -396,7 +396,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
 -   [webUITrashbinRestore/trashbinRestore.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L123)
 
-### [Conflict / overwrite issues with TUS](https://github.com/owncloud/ocis-reva/issues/200)
+### [Conflict / overwrite issues with TUS](https://github.com/owncloud/ocis/issues/1294)
 -   [webUIUpload/uploadEdgecases.feature:105](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L105)
 -   [webUIUpload/uploadEdgecases.feature:121](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L121)
 -   [webUIUpload/uploadFileGreaterThanQuotaSize.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadFileGreaterThanQuotaSize.feature#L12)
