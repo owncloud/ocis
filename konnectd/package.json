@@ -57,7 +57,7 @@
     "react-redux": "^5.0.6",
     "react-router": "^5.0.0",
     "react-router-dom": "5.0.0",
-    "redux": "^3.7.2",
+    "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "render-if": "^0.1.1",
