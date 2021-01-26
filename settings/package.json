@@ -54,7 +54,7 @@
     "nightwatch": "^1.3.6",
     "nightwatch-api": "^3.0.1",
     "node-fetch": "^2.6.1",
-    "qs": "^6.9.1",
+    "qs": "^6.9.6",
     "rimraf": "^3.0.0",
     "rollup": "^1.28.0",
     "rollup-plugin-babel": "^4.3.3",
