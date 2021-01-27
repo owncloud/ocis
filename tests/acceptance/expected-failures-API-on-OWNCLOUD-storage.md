@@ -1920,6 +1920,7 @@ restoring a file doesn't changes the etags of the parents
 -   [apiShareManagementToShares/moveReceivedShare.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveReceivedShare.feature#L198)
 -   [apiShareManagementToShares/moveReceivedShare.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveReceivedShare.feature#L221)
 -   [apiShareManagementToShares/moveReceivedShare.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveReceivedShare.feature#L222)
+-   [apiShareManagementToShares/moveReceivedShare.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveReceivedShare.feature#L224)
 
 ### [file_target in share response](https://github.com/owncloud/product/issues/203)
 ### [cannot get ocs:share-permissions via WebDAV](https://github.com/owncloud/ocis/issues/1326)
