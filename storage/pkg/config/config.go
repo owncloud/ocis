@@ -320,6 +320,9 @@ type Reva struct {
 	UploadMaxChunkSize       int
 	UploadHTTPMethodOverride string
 	UploadDisableTus         bool
+	// checksumming capabilities
+	ChecksumSupportedTypes      []string
+	ChecksumPreferredUploadType string
 }
 
 // Tracing defines the available tracing configuration.
