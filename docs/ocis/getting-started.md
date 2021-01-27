@@ -16,16 +16,20 @@ We are distributing oCIS as binaries and Docker images.
 You can find more deployments examples in the [deployment section](https://owncloud.github.io/ocis/deployment/)
 
 ### Binaries
+You can find the latest official release of ocis at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).
+The latest build from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
-The binaries for different platforms are downloadable at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases). Latest binaries from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
+To run ocis as binary you need to download it first and then run the following commands.
+For this example, assuming version 1.1.0 of ocis running on a Linux AMD64 host:
 
 ```console
-# for mac
-curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-darwin-amd64 --output ocis
-# for linux
-curl https://download.owncloud.com/ocis/ocis/1.0.0/ocis-1.0.0-linux-amd64 --output ocis
+# download
+curl https://download.owncloud.com/ocis/ocis/1.1.0/ocis-1.1.0-linux-amd64 --output ocis
+
 # make binary executable
 chmod +x ocis
+
+# run
 ./ocis server
 ```
 
