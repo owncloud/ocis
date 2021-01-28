@@ -1,6 +1,6 @@
-## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with oCIS storage
 
-### Test scenarios that specifically fail with OCIS storage
+### Test scenarios that specifically fail with oCIS storage
 
 -   [apiWebdavProperties1/setFileProperties.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L32)
 -   [apiWebdavProperties1/setFileProperties.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L33)
@@ -453,7 +453,7 @@
 
 ### [Split old public API webdav tests from new public webdav tests](https://github.com/owncloud/ocis-reva/issues/282)
 ### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
@@ -572,14 +572,14 @@
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:321](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L321)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:322](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L322)
 
-### [OCIS share permissions not enforced](https://github.com/owncloud/product/issues/270)
+### [oCIS share permissions not enforced](https://github.com/owncloud/product/issues/270)
 
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L157)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L158)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L179)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L180)
 
-### [OCIS old public webdav api doesnt works](https://github.com/owncloud/product/issues/272)
+### [oCIS old public webdav api doesnt works](https://github.com/owncloud/product/issues/272)
 
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature#L30)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature#L31)
@@ -645,7 +645,7 @@
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L238)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L255)
 
-### [Resharing does not work with ocis storage](https://github.com/owncloud/product/issues/265)
+### [Resharing does not work with oCIS storage](https://github.com/owncloud/product/issues/265)
 
 -   [apiShareReshareToShares1/reShare.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L56)
 -   [apiShareReshareToShares1/reShare.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L57)
@@ -1029,7 +1029,7 @@
 -   [apiWebdavMove1/moveFolderToExcludedDirectory.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolderToExcludedDirectory.feature#L70)
 -   [apiWebdavMove1/moveFolderToExcludedDirectory.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolderToExcludedDirectory.feature#L71)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavMove2/moveFile.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L89)
 -   [apiWebdavMove2/moveFile.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L90)
@@ -1072,7 +1072,7 @@
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L63)
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L64)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavOperations/deleteFolder.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L67)
 -   [apiWebdavOperations/deleteFolder.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L68)
@@ -1082,7 +1082,7 @@
 -   [apiWebdavOperations/deleteFolder.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L92)
 
 ### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavOperations/downloadFile.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L60)
 -   [apiWebdavOperations/downloadFile.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L61)
@@ -1093,7 +1093,7 @@
 -   [apiWebdavOperations/refuseAccess.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L21)
 -   [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavProperties1/copyFile.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L65)
 -   [apiWebdavProperties1/copyFile.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L66)
@@ -1268,7 +1268,7 @@
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L99)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L100)
 
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
 -   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
@@ -1340,7 +1340,7 @@
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L314)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:315](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L315)
 
-### [Implement Trashbin Feature for ocis storage](https://github.com/owncloud/product/issues/209)
+### [Implement Trashbin Feature for oCIS storage](https://github.com/owncloud/product/issues/209)
 
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L26)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L27)
@@ -1351,7 +1351,7 @@
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L90)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L91)
 
-### [Implement Versions Feature for ocis storage](https://github.com/owncloud/product/issues/210)
+### [Implement Versions Feature for oCIS storage](https://github.com/owncloud/product/issues/210)
 
 -   [apiWebdavEtagPropagation2/restoreVersion.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreVersion.feature#L10)
 
@@ -1393,7 +1393,7 @@
 -   [apiShareOperationsToShares/changingFilesShare.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L59)
 -   [apiShareOperationsToShares/changingFilesShare.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L60)
 
-### [OCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 
 -   [apiVersions/fileVersionsSharingToShares.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L33)
 
@@ -2310,7 +2310,7 @@
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L55)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L56)
 
-### [OCIS-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
+### [oCIS-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L70)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L71)
 
@@ -2344,5 +2344,5 @@
 -   [apiTrashbin/trashbinFilesFolders.feature:284](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L284)
 -   [apiTrashbin/trashbinFilesFolders.feature:285](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L285)
 
-### [OCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 -   [apiVersions/fileVersionsSharingToShares.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L291)

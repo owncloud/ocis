@@ -28,10 +28,10 @@ type Controller struct {
 
 	Store storage.Storage
 
-	// Bin is the OCIS single binary name.
+	// Bin is the oCIS single binary name.
 	Bin string
 
-	// BinPath is the OCIS single binary path withing the host machine.
+	// BinPath is the oCIS single binary path withing the host machine.
 	// The Controller needs to know the binary location in order to spawn new extensions.
 	BinPath string
 
@@ -70,7 +70,7 @@ func NewController(o ...Option) Controller {
 	// Get binary location from $PATH lookup. If not present, it uses arg[0] as entry point.
 	path, err := exec.LookPath(c.Bin)
 	if err != nil {
-		c.log.Debug().Msg("OCIS binary not present in PATH, using Args[0]")
+		c.log.Debug().Msg("oCIS binary not present in PATH, using Args[0]")
 		path = os.Args[0]
 	}
 	c.BinPath = path

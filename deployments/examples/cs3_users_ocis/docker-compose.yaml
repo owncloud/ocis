@@ -68,7 +68,7 @@ services:
       STORAGE_LDAP_ATTRIBUTEFILTER: '(&(objectclass=owncloud)({{attr}}={{value}}))'
       STORAGE_LDAP_FINDFILTER: '(&(objectclass=owncloud)(|(uid={{query}}*)(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)(description={{query}}*)))'
       STORAGE_LDAP_GROUPFILTER: '(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))'
-      # General ocis config
+      # General oCIS config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates

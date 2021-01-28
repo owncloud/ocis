@@ -154,7 +154,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 
 	// fallbacks
 	/* TODO decide if we want to make these fallbacks. Keep in mind:
-	- ocis requires a preferred_name and email
+	- oCIS requires a preferred_name and email
 	*/
 	if displayname == "" {
 		displayname = userid

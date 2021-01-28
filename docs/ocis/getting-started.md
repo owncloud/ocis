@@ -19,8 +19,8 @@ You can find more deployments examples in the [deployment section](https://owncl
 You can find the latest official release of ocis at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).
 The latest build from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
-To run ocis as binary you need to download it first and then run the following commands.
-For this example, assuming version 1.1.0 of ocis running on a Linux AMD64 host:
+To run oCIS as binary you need to download it first and then run the following commands.
+For this example, assuming version 1.1.0 of oCIS running on a Linux AMD64 host:
 
 ```console
 # download

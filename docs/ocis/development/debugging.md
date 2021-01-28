@@ -139,7 +139,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 
 ### Gather error messages
 
-We recommend you collect all related information in a single file or in a github issue. Let us start with an error that pops up in the Web UI:
+We recommend you collect all related information in a single file or in a GitHub issue. Let us start with an error that pops up in the Web UI:
 
 > Error while sharing.
 > error sending a grpc stat request
