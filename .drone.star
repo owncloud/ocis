@@ -239,8 +239,8 @@ def testPipelines(ctx):
   pipelines = [
     localApiTests(ctx, 'owncloud', 'apiOcisSpecific'),
     localApiTests(ctx, 'ocis', 'apiOcisSpecific'),
-    localApiTests(ctx, 'owncloud', 'apiBasic', 'default'),
-    localApiTests(ctx, 'ocis', 'apiBasic', 'default')
+    localApiTests(ctx, 'owncloud', 'apiAccountsHashDifficulty', 'default'),
+    localApiTests(ctx, 'ocis', 'apiAccountsHashDifficulty', 'default')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):

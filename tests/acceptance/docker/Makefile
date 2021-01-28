@@ -51,11 +51,11 @@ help:
 	@echo -e "https://hub.docker.com/r/owncloud/ocis."
 	@echo
 	@echo -e "${GREEN}Run full oCIS test suites against oCIS with oCIS storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiBasic-ocis\t\t${BLUE}run apiBasic test suite${RESET}"
+	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-ocis\t\t${BLUE}run apiAccountsHashDifficulty test suite${RESET}"
 	@echo -e "\tmake localApiTests-apiOcisSpecific-ocis\t\t${BLUE}run apiOcisSPecific test suite${RESET}"
 	@echo
 	@echo -e "${GREEN}Run full oCIS test suites against oCIS with ownCloud storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiBasic-owncloud\t\t${BLUE}run apiBasic test suite${RESET}"
+	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-owncloud\t\t${BLUE}run apiAccountsHashDifficulty test suite${RESET}"
 	@echo -e "\tmake localApiTests-apiOcisSpecific-owncloud\t${BLUE}run apiOcisSpecific test suite${RESET}"
 	@echo
 	@echo -e "${GREEN}Run full ownCloud test suites against oCIS with oCIS storage:${RESET}\n"
@@ -133,11 +133,11 @@ localApiTests-apiOcisSpecific-owncloud: ## run apiOcisSpecific test suite with o
 	BEHAT_SUITE=apiOcisSpecific \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: localApiTests-apiBasic-owncloud
-localApiTests-apiBasic-owncloud: ## run apiBasic test suite with owncloud storage
+.PHONY: localApiTests-apiAccountsHashDifficulty-owncloud
+localApiTests-apiAccountsHashDifficulty-owncloud: ## run apiAccountsHashDifficulty test suite with owncloud storage
 	@TEST_SOURCE=ocis \
 	STORAGE=owncloud \
-	BEHAT_SUITE=apiBasic \
+	BEHAT_SUITE=apiAccountsHashDifficulty \
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: localApiTests-apiOcisSpecific-ocis
@@ -147,11 +147,11 @@ localApiTests-apiOcisSpecific-ocis: ## run apiOcisSPecific test suite with ocis 
 	BEHAT_SUITE=apiOcisSpecific \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: localApiTests-apiBasic-ocis
-localApiTests-apiBasic-ocis: ## run apiBasic test suite with ocis storage
+.PHONY: localApiTests-apiAccountsHashDifficulty-ocis
+localApiTests-apiAccountsHashDifficulty-ocis: ## run apiAccountsHashDifficulty test suite with ocis storage
 	@TEST_SOURCE=ocis \
 	STORAGE=ocis \
-	BEHAT_SUITE=apiBasic \
+	BEHAT_SUITE=apiAccountsHashDifficulty \
 	$(MAKE) --no-print-directory testSuite
 
 targets = $(addprefix Core-API-Tests-owncloud-storage-,$(PARTS))

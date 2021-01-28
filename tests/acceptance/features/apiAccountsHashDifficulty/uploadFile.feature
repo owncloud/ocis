@@ -1,8 +1,11 @@
 @api
 Feature: upload file
   As a user
-  I want to be able to upload files
-  So that I can store and share files between multiple client systems
+  I want to be able to upload files when passwords are stored with the full hash difficulty
+  So that I can store and share files securely between multiple client systems
+
+  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
+  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Scenario Outline: upload a file and check download content
     Given using OCS API version "<ocs_api_version>"
