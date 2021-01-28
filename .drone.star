@@ -237,10 +237,10 @@ def testOcisModules(ctx):
 
 def testPipelines(ctx):
   pipelines = [
-    localApiTests(ctx, 'owncloud', 'apiOcisSpecific'),
-    localApiTests(ctx, 'ocis', 'apiOcisSpecific'),
-    localApiTests(ctx, 'owncloud', 'apiBasic', 'default'),
-    localApiTests(ctx, 'ocis', 'apiBasic', 'default')
+    localApiTests(ctx, 'owncloud', 'apiBugDemonstration'),
+    localApiTests(ctx, 'ocis', 'apiBugDemonstration'),
+    localApiTests(ctx, 'owncloud', 'apiAccountsHashDifficulty', 'default'),
+    localApiTests(ctx, 'ocis', 'apiAccountsHashDifficulty', 'default')
   ]
 
   for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
@@ -430,7 +430,7 @@ def uploadCoverage(ctx):
     },
   }
 
-def localApiTests(ctx, storage = 'owncloud', suite = 'apiOcisSpecific', accounts_hash_difficulty = 4):
+def localApiTests(ctx, storage = 'owncloud', suite = 'apiBugDemonstration', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',

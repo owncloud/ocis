@@ -1,5 +1,11 @@
 @api @files_sharing-app-required
 Feature: sharing
+  As a user
+  I want to be able to share files when passwords are stored with the full hash difficulty
+  So that I can give people secure controlled access to my data
+
+  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
+  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Scenario Outline: Creating a share of a file with a user
     Given the administrator has set the default folder for received shares to "Shares"

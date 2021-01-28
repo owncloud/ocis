@@ -39,7 +39,7 @@ You can invoke two types of test suite runs:
 
 The names of the full test suite make targets have the same naming as in the CI pipeline.
 
-For example `make -C tests/acceptance/docker localApiTests-apiOcisSpecific-ocis` runs the same tests as the `localApiTests-apiOcisSpecific-ocis` CI pipeline, which runs the oCIS test suite "apiOcisSpecific" against an oCIS with oCIS storage.
+For example `make -C tests/acceptance/docker localApiTests-apiBugDemonstration-ocis` runs the same tests as the `localApiTests-apiBugDemonstration-ocis` CI pipeline, which runs the oCIS test suite "apiBugDemonstration" against an oCIS with oCIS storage.
 
 For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
 
@@ -48,7 +48,7 @@ For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`r
 The single feature tests can also be run against the different storage backends. Therefore multiple make targets with the schema test-<test source>-feature-<storage backend> exists. For selecting a single feature test you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis BEHAT_FEATURE='tests/acceptance/features/apiOcisSpecific/apiAuthOcs-ocsDELETEAuth.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis BEHAT_FEATURE='tests/acceptance/features/apiBugDemonstration/apiAuthOcs-ocsDELETEAuth.feature'
 ```
 
 This must be pointing to a valid feature definition.
@@ -58,7 +58,7 @@ This must be pointing to a valid feature definition.
 By default the tests will be run against docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (eg. 'latest').
 
 ```
-make -C tests/acceptance/docker localApiTests-apiOcisSpecific-ocis OCIS_IMAGE_TAG=latest
+make -C tests/acceptance/docker localApiTests-apiBugDemonstration-ocis OCIS_IMAGE_TAG=latest
 ```
 
 ### Test log output
@@ -138,7 +138,7 @@ Those scenarios are run in the ordinary acceptance test pipeline in CI. The scen
 expected failures. If there are any differences then the CI pipeline fails.
 Similarly, scenarios that do not work in oCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.txt`.
 Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva).
-Those scenarios are in this ocis repository in `tests/acceptance/features/apiOcisSpecific`.
+Those scenarios are in this ocis repository in `tests/acceptance/features/apiBugDemonstration`.
 Have a look into the [documentation](https://doc.owncloud.com/server/developer_manual/testing/acceptance-tests.html#writing-scenarios-for-bugs) to understand why we are writing those tests.
 
 If you want to work on a specific issue

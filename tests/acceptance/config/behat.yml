@@ -3,9 +3,9 @@ default:
     '': '%paths.base%/../features/bootstrap'
 
   suites:
-    apiBasic:
+    apiAccountsHashDifficulty:
       paths:
-        - '%paths.base%/../features/apiBasic'
+        - '%paths.base%/../features/apiAccountsHashDifficulty'
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -29,9 +29,9 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
 
-    apiOcisSpecific:
+    apiBugDemonstration:
       paths:
-        - '%paths.base%/../features/apiOcisSpecific'
+        - '%paths.base%/../features/apiBugDemonstration'
       context: *common_ldap_suite_context
       contexts:
         - RevaContext:
