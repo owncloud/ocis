@@ -97,6 +97,8 @@ services:
     image: quay.io/keycloak/keycloak:latest
     networks:
       ocis-net:
+    volumes:
+      - ./config/keycloak/keycloak-import.json:/opt/jboss/keycloak/keycloak-import.json
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
@@ -107,6 +109,7 @@ services:
       KEYCLOAK_USER: ${KEYCLOAK_ADMIN_USER:-admin}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
       PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/keycloak-import.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=http"
