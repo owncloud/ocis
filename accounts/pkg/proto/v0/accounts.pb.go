@@ -480,12 +480,12 @@ type Account struct {
 	IsResourceAccount bool `protobuf:"varint,3,opt,name=is_resource_account,json=isResourceAccount,proto3" json:"is_resource_account,omitempty"`
 	// Indicates whether the account was created as
 	// - a regular school or work account ("" / emptystring),
-	// - a local account, fully managed by ocis (LocalAccount), includes synced accounts or
+	// - a local account, fully managed by oCIS (LocalAccount), includes synced accounts or
 	// - an external account (Invitation),
 	// - self-service sign-up using email verification (EmailVerified). Read-only.
 	CreationType string `protobuf:"bytes,4,opt,name=creation_type,json=creationType,proto3" json:"creation_type,omitempty"`
 	// Represents the identities that can be used to sign in to this account.
-	// An identity can be provided by OCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.
+	// An identity can be provided by oCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.
 	// May contain multiple items with the same signInType value. Supports $filter.
 	Identities []*Identities `protobuf:"bytes,5,rep,name=identities,proto3" json:"identities,omitempty"`
 	// The name displayed in the address book for the account.
@@ -527,7 +527,7 @@ type Account struct {
 	// *false* if this object was originally synced from an on-premises directory but is no longer synced;
 	// null if this object has never been synced from an on-premises directory (default). Read-only
 	OnPremisesSyncEnabled bool `protobuf:"varint,20,opt,name=on_premises_sync_enabled,json=onPremisesSyncEnabled,proto3" json:"on_premises_sync_enabled,omitempty"`
-	// This property is used to associate an on-premises LDAP user to the ocis account object.
+	// This property is used to associate an on-premises LDAP user to the oCIS account object.
 	// This property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.
 	// Important: The $ and _ characters cannot be used when specifying this property. Supports $filter.
 	OnPremisesImmutableId string `protobuf:"bytes,21,opt,name=on_premises_immutable_id,json=onPremisesImmutableId,proto3" json:"on_premises_immutable_id,omitempty"`
@@ -796,7 +796,7 @@ func (x *Account) GetSignInSessionsValidFromDateTime() *timestamp.Timestamp {
 }
 
 // Identities Represents an identity used to sign in to a user account.
-// An identity can be provided by ocis, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.
+// An identity can be provided by oCIS, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.
 // This enables the user to sign in to the user account with any of those associated identities.
 // They are also used to keep a history of old usernames.
 type Identities struct {
@@ -1643,7 +1643,7 @@ type Group struct {
 	// null if this object has never been synced from an on-premises directory (default).
 	// Returned by default. Read-only. Supports $filter.
 	OnPremisesSyncEnabled bool `protobuf:"varint,20,opt,name=on_premises_sync_enabled,json=onPremisesSyncEnabled,proto3" json:"on_premises_sync_enabled,omitempty"`
-	// This property is used to associate an on-premises LDAP user to the ocis account object.
+	// This property is used to associate an on-premises LDAP user to the oCIS account object.
 	// This property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.
 	// Important: The $ and _ characters cannot be used when specifying this property. Supports $filter.
 	OnPremisesImmutableId string `protobuf:"bytes,21,opt,name=on_premises_immutable_id,json=onPremisesImmutableId,proto3" json:"on_premises_immutable_id,omitempty"`

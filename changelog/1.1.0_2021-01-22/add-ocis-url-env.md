@@ -10,8 +10,8 @@ Some environment variables are now built dynamically if they are not set:
 
 Furthermore, the built in konnectd will generate an `identifier-registration.yaml` that uses the `KONNECTD_ISS` in the allowed `redirect_uris` and `origins`. It simplifies the default `https://localhost:9200` and remote deployment with `OCIS_URL` which is evaluated as a fallback if `KONNECTD_ISS` is not set.
 
-An OCIS server can now be started on a remote machine as easy as `OCIS_URL=https://cloud.ocis.test PROXY_HTTP_ADDR=0.0.0.0:443 ocis server`.
+An oCIS server can now be started on a remote machine as easy as `OCIS_URL=https://cloud.ocis.test PROXY_HTTP_ADDR=0.0.0.0:443 ocis server`.
 
-Note that the `OCIS_DOMAIN` environment variable is not used by ocis, but by the docker containers.
+Note that the `OCIS_DOMAIN` environment variable is not used by oCIS, but by the docker containers.
 
 https://github.com/owncloud/ocis/pull/1148

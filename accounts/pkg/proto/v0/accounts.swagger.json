@@ -568,14 +568,14 @@
         },
         "creation_type": {
           "type": "string",
-          "description": "Indicates whether the account was created as\n- a regular school or work account (\"\" / emptystring),\n- a local account, fully managed by ocis (LocalAccount), includes synced accounts or\n- an external account (Invitation),\n- self-service sign-up using email verification (EmailVerified). Read-only."
+          "description": "Indicates whether the account was created as\n- a regular school or work account (\"\" / emptystring),\n- a local account, fully managed by oCIS (LocalAccount), includes synced accounts or\n- an external account (Invitation),\n- self-service sign-up using email verification (EmailVerified). Read-only."
         },
         "identities": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/settingsIdentities"
           },
-          "description": "Represents the identities that can be used to sign in to this account.\nAn identity can be provided by OCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.\nMay contain multiple items with the same signInType value. Supports $filter."
+          "description": "Represents the identities that can be used to sign in to this account.\nAn identity can be provided by oCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.\nMay contain multiple items with the same signInType value. Supports $filter."
         },
         "display_name": {
           "type": "string",
@@ -631,7 +631,7 @@
         },
         "on_premises_immutable_id": {
           "type": "string",
-          "description": "This property is used to associate an on-premises LDAP user to the ocis account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
+          "description": "This property is used to associate an on-premises LDAP user to the oCIS account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
         },
         "on_premises_security_identifier": {
           "type": "string",
@@ -815,7 +815,7 @@
         },
         "on_premises_immutable_id": {
           "type": "string",
-          "description": "This property is used to associate an on-premises LDAP user to the ocis account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
+          "description": "This property is used to associate an on-premises LDAP user to the oCIS account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
         },
         "on_premises_security_identifier": {
           "type": "string",
@@ -866,7 +866,7 @@
           "description": "Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).\nWhen *signInType* is set to:\n* `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) *issuerAssignedId* must be a valid email address\n* `userName`, issuer_assigned_id must be a valid local part of an email address\nSupports $filter. 512 character limit."
         }
       },
-      "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by ocis, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
+      "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by oCIS, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
     },
     "settingsListAccountsRequest": {
       "type": "object",
