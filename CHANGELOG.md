@@ -95,7 +95,7 @@ The following sections list the changes for 1.1.0.
 
    Tags: performance, testing, k6
 
-   The ownCloud performance tests can not only be used to test ocis. This is why we have decided to
+   The ownCloud performance tests can not only be used to test oCIS. This is why we have decided to
    move the k6 tests to https://github.com/owncloud/cdperf
 
    https://github.com/owncloud/ocis/pull/1358
@@ -140,10 +140,10 @@ The following sections list the changes for 1.1.0.
    default `https://localhost:9200` and remote deployment with `OCIS_URL` which is evaluated
    as a fallback if `KONNECTD_ISS` is not set.
 
-   An OCIS server can now be started on a remote machine as easy as
+   An oCIS server can now be started on a remote machine as easy as
    `OCIS_URL=https://cloud.ocis.test PROXY_HTTP_ADDR=0.0.0.0:443 ocis server`.
 
-   Note that the `OCIS_DOMAIN` environment variable is not used by ocis, but by the docker
+   Note that the `OCIS_DOMAIN` environment variable is not used by oCIS, but by the docker
    containers.
 
    https://github.com/owncloud/ocis/pull/1148
@@ -233,7 +233,7 @@ The following sections list the changes for 1.1.0.
 
   * Enhancement #1393: Allow setting favorites, mtime and a temporary etag
 
-   We now let the ocis driver persist favorites, set temporary etags and the mtime as arbitrary
+   We now let the oCIS driver persist favorites, set temporary etags and the mtime as arbitrary
    metadata.
 
    Https://github.com/owncloud/ocis/issues/567
@@ -2241,7 +2241,7 @@ The following sections list the changes for 1.0.0.
    Furthermore, we not only take care of such a thing at the Proxy but also Reva will take care of it.
    In addition, we now are able to lock-in a set of User-Agent to specific challenges.
 
-   Admins can use this feature by configuring OCIS + Reva following this approach:
+   Admins can use this feature by configuring oCIS + Reva following this approach:
 
    ``` STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT="mirall:basic,
    Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101
@@ -2255,6 +2255,6 @@ The following sections list the changes for 1.0.0.
    `STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT` as well as
    `PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT`, The reason they have the same value
    is not to rely on the os env on a distributed environment, so in redundancy we trust. They both
-   configure the same on the backend storage and OCIS Proxy.
+   configure the same on the backend storage and oCIS Proxy.
 
    https://github.com/owncloud/ocis/pull/1009
