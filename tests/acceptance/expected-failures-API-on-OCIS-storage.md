@@ -1393,7 +1393,7 @@
 -   [apiShareOperationsToShares/changingFilesShare.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L59)
 -   [apiShareOperationsToShares/changingFilesShare.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L60)
 
-### [ocis-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 
 -   [apiVersions/fileVersionsSharingToShares.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L33)
 
@@ -2310,7 +2310,7 @@
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L55)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L56)
 
-### [ocis-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
+### [oCIS-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L70)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L71)
 
@@ -2344,5 +2344,5 @@
 -   [apiTrashbin/trashbinFilesFolders.feature:284](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L284)
 -   [apiTrashbin/trashbinFilesFolders.feature:285](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L285)
 
-### [ocis-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 -   [apiVersions/fileVersionsSharingToShares.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L291)

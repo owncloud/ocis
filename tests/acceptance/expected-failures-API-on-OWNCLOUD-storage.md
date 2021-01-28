@@ -471,7 +471,7 @@ User cannot create a folder named Share
 
 ### [Split old public API webdav tests from new public webdav tests](https://github.com/owncloud/ocis-reva/issues/282)
 ### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-### [Previews via webDAV API tests fail on CISS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
@@ -1423,7 +1423,7 @@ User cannot create a folder named Share
 
 -   [apiSharePublicLink2/multilinkSharing.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/multilinkSharing.feature#L181)
 
-### [Previews via webDAV API tests fail on CISS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
 -   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
