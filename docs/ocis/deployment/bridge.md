@@ -101,7 +101,7 @@ Groups should work as well:
 $ ldapsearch -x -H ldap://localhost:9125 -b dc=example,dc=com -D "cn=admin,dc=example,dc=com" -W '(objectclass=posixgroup)'
 ```
 
-> Note: This is currently a readonly implementation and minimal to the usecase of authenticating users with konnectd.
+> Note: This is currently a readonly implementation and minimal to the usecase of authenticating users with idp.
 
 ### Start ocis-web
 
@@ -124,21 +124,21 @@ $ bin/web server --web-config-server https://cloud.example.com --oidc-authority 
 
 `ocis-web` needs to know
 - `--web-config-server https://cloud.example.com` is ownCloud url with webdav and ocs endpoints (oc10 or ocis)
-- `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-konnectd`, running on port 9130
+- `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-idp`, running on port 9130
 - `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, eg. ping identity provides multiple endpoints to separate domains
-- `--oidc-client-id ocis` the client id we will register later with `ocis-konnectd` in the `identifier-registration.yaml`
+- `--oidc-client-id ocis` the client id we will register later with `ocis-idp` in the `identifier-registration.yaml`
 
-### Start ocis-konnectd
+### Start ocis-idp
 
 #### Get it!
 
 In an `ocis` folder
 ```
-$ git clone git@github.com:owncloud/ocis-konnectd.git
-$ cd ocis-konnectd
+$ git clone git@github.com:owncloud/ocis-idp.git
+$ cd ocis-idp
 $ make
 ```
-This should give you a `bin/ocis-konnectd` binary. Try listing the help with `bin/ocis-konnectd --help`.
+This should give you a `bin/ocis-idp` binary. Try listing the help with `bin/ocis-idp --help`.
 
 #### Set environment variables
 
@@ -183,12 +183,12 @@ Replace `localhost:9100` in the redirect URIs with your `ocis-web` host and port
 
 #### Run it!
 
-You can now bring up `ocis-konnectd` with:
+You can now bring up `ocis-idp` with:
 ```console
-$ bin/ocis-konnectd server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
+$ bin/ocis-idp server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
 ```
 
-`ocis-konnectd` needs to know
+`ocis-idp` needs to know
 - `--iss https://192.168.1.100:9130` the issuer, which must be a reachable https endpoint. For testing an ip works. HTTPS is NOT optional. This url is exposed in the `https://192.168.1.100:9130/.well-known/openid-configuration` endpoint and clients need to be able to connect to it
 - `--identifier-registration-conf assets/identifier-registration.yaml` the identifier-registration.yaml you created
 - `--signing-kid gen1-2020-02-27` a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
@@ -203,7 +203,7 @@ $ curl https://192.168.1.100:9130/.well-known/openid-configuration
 
 2. Check if the login works at https://192.168.1.100:9130/signin/v1/identifier
 
-> Note: If you later get a `Unable to find a key for (algorithm, kid):PS256, )` Error make sure you did set a `--signing-kid` when starting `ocis-konnectd` by checking it is present in https://192.168.1.100:9130/konnect/v1/jwks.json
+> Note: If you later get a `Unable to find a key for (algorithm, kid):PS256, )` Error make sure you did set a `--signing-kid` when starting `ocis-idp` by checking it is present in https://192.168.1.100:9130/konnect/v1/jwks.json
 
 ### Patch owncloud
 
@@ -241,7 +241,7 @@ $CONFIG = [
 ```
 
 In the above configuration replace
-- `provider-url` with the URL to your `ocis-konnectd` issuer
+- `provider-url` with the URL to your `ocis-idp` issuer
 - `https://cloud.example.com` with the URL to your ownCloud 10 instance
 - `http://localhost:9100` with the URL to your ownCloud Web instance
 
@@ -251,4 +251,4 @@ In the above configuration replace
 
 Aside from the above todos these are the next steps
 - tie it all together behind `ocis-proxy`
-- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-konnectd` `identifier-registration.yaml` file for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
+- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-idp` `identifier-registration.yaml` file for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
