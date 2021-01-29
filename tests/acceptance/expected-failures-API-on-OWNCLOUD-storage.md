@@ -222,6 +222,10 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiWebdavUploadTUS/uploadFile.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L155)
 -   [apiWebdavUploadTUS/uploadFile.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L156)
 
+### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
+-   [apiWebdavUploadTUS/optionsRequest.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L29)
+-   [apiWebdavUploadTUS/optionsRequest.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L40)
+
 #### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavProperties1/copyFile.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L102)
 -   [apiWebdavProperties1/copyFile.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L103)
@@ -972,11 +976,6 @@ cannot share a folder with create permission
 -   [apiShareOperationsToShares/gettingShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/gettingShares.feature#L24)
 -   [apiShareOperationsToShares/gettingShares.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/gettingShares.feature#L25)
 
-#### [There is no such thing like a super-user](https://github.com/owncloud/ocis/issues/1319)
-
--   [apiShareOperationsToShares/gettingShares.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/gettingShares.feature#L38)
--   [apiShareOperationsToShares/gettingShares.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/gettingShares.feature#L39)
-
 #### [Delete shares from user when user is deleted](https://github.com/owncloud/ocis-reva/issues/357)
 #### [no displayname_owner shown when creating a share](https://github.com/owncloud/ocis-reva/issues/301)
 #### [when sharing a file mime-type field is set to application/octet-stream](https://github.com/owncloud/ocis/issues/578)
@@ -1038,6 +1037,48 @@ cannot share a folder with create permission
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L43)
+
+#### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+
+-   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
+-   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
+-   [apiWebdavPreviews/previews.feature:17](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L17)
+-   [apiWebdavPreviews/previews.feature:18](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L18)
+-   [apiWebdavPreviews/previews.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L19)
+-   [apiWebdavPreviews/previews.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L30)
+-   [apiWebdavPreviews/previews.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L31)
+-   [apiWebdavPreviews/previews.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L32)
+-   [apiWebdavPreviews/previews.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L33)
+-   [apiWebdavPreviews/previews.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L34)
+-   [apiWebdavPreviews/previews.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L35)
+-   [apiWebdavPreviews/previews.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L36)
+-   [apiWebdavPreviews/previews.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L47)
+-   [apiWebdavPreviews/previews.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L48)
+-   [apiWebdavPreviews/previews.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L49)
+-   [apiWebdavPreviews/previews.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L50)
+-   [apiWebdavPreviews/previews.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L51)
+-   [apiWebdavPreviews/previews.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L52)
+-   [apiWebdavPreviews/previews.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L53)
+-   [apiWebdavPreviews/previews.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L56)
+-   [apiWebdavPreviews/previews.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L71)
+-   [apiWebdavPreviews/previews.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L72)
+-   [apiWebdavPreviews/previews.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L73)
+-   [apiWebdavPreviews/previews.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L83)
+-   [apiWebdavPreviews/previews.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L84)
+-   [apiWebdavPreviews/previews.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L87)
+-   [apiWebdavPreviews/previews.feature:95](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L95)
+-   [apiWebdavPreviews/previews.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L104)
+-   [apiWebdavPreviews/previews.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L113)
+-   [apiWebdavPreviews/previews.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L120)
+-   [apiWebdavPreviews/previews.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L127)
+-   [apiWebdavPreviews/previews.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L135)
+-   [apiWebdavPreviews/previews.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L144)
+-   [apiWebdavPreviews/previews.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L163)
+-   [apiWebdavPreviews/previews.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L164)
+-   [apiWebdavPreviews/previews.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L165)
+-   [apiWebdavPreviews/previews.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L166)
+-   [apiWebdavPreviews/previews.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L178)
+-   [apiWebdavPreviews/previews.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L179)
 
 #### [creating public links with permissions fails](https://github.com/owncloud/product/issues/252)
 
@@ -1210,11 +1251,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L103)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L121)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L139)
-
-#### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
-
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L48)
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L49)
 
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
 
@@ -1930,6 +1966,9 @@ special character username not valid
 -   [apiProvisioning-v1/getUser.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L35)
 -   [apiProvisioning-v2/addUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L29)
 -   [apiProvisioning-v2/addUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L30)
+-   [apiProvisioning-v2/addUser.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L121)
+-   [apiProvisioning-v2/addUser.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L122)
+-   [apiProvisioning-v2/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L123)
 -   [apiProvisioning-v2/deleteUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L29)
 -   [apiProvisioning-v2/deleteUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L30)
 -   [apiProvisioning-v2/disableUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L29)
@@ -1940,6 +1979,12 @@ special character username not valid
 -   [apiProvisioning-v2/enableUser.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L32)
 -   [apiProvisioning-v2/getUser.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L34)
 -   [apiProvisioning-v2/getUser.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L35)
+-   [apiTrashbin/trashbinFilesFolders.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L239)
+-   [apiTrashbin/trashbinFilesFolders.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L240)
+-   [apiTrashbin/trashbinFilesFolders.feature:241](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L241)
+-   [apiTrashbin/trashbinFilesFolders.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L245)
+-   [apiTrashbin/trashbinFilesFolders.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L246)
+-   [apiTrashbin/trashbinFilesFolders.feature:247](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L247)
 
 #### [Creating an already existing user works](https://github.com/owncloud/ocis-accounts/issues/80)
 -   [apiProvisioning-v1/addUser.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L32)
@@ -2291,8 +2336,6 @@ Scenario Outline: Unauthenticated call
 -   [apiWebdavOperations/refuseAccess.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L21)
 -   [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
     Scenario Outline: A disabled user cannot use webdav
--   [apiWebdavOperations/refuseAccess.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L33)
--   [apiWebdavOperations/refuseAccess.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L34)
 
 
 #### [trying to access a non-existing resource returns an empty body](https://github.com/owncloud/ocis/issues/1282)
@@ -2399,8 +2442,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiCapabilities/capabilities.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L93)
 -   [apiCapabilities/capabilities.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L107)
 -   [apiCapabilities/capabilities.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L116)
--   [apiCapabilities/capabilities.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L125)
--   [apiCapabilities/capabilities.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L132)
 -   [apiCapabilities/capabilities.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L138)
 -   [apiCapabilities/capabilities.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L144)
 -   [apiCapabilities/capabilities.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L151)
@@ -2413,7 +2454,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiCapabilities/capabilities.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L219)
 -   [apiCapabilities/capabilities.feature:231](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L231)
 -   [apiCapabilities/capabilities.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L238)
--   [apiCapabilities/capabilities.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L245)
 -   [apiCapabilities/capabilities.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L252)
 -   [apiCapabilities/capabilities.feature:275](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L275)
 -   [apiCapabilities/capabilities.feature:292](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L292)
