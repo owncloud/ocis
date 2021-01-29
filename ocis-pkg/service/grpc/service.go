@@ -1,7 +1,6 @@
 package grpc
 
 import (
-	"os"
 	"strings"
 	"time"
 
@@ -9,12 +8,8 @@ import (
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
 
-	etcdr "github.com/micro/go-micro/v2/registry/etcd"
-	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
-
-	"github.com/micro/go-micro/v2/registry"
-
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
+	"github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
 
@@ -22,13 +17,7 @@ import (
 var DefaultClient = newGrpcClient()
 
 func newGrpcClient() mclient.Client {
-	var r registry.Registry
-	switch os.Getenv("MICRO_REGISTRY") {
-	case "etcd":
-		r = etcdr.NewRegistry()
-	default:
-		r = mdnsr.NewRegistry()
-	}
+	r := *registry.GetRegistry()
 
 	c := grpc.NewClient(
 		mclient.RequestTimeout(10*time.Second),
