@@ -67,7 +67,11 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 			ctx = context.WithValue(ctx, UUIDKey, u.Id.OpaqueId)
 			// TODO: implement token manager in cs3org/reva that uses generic metadata instead of access token from header.
 			ctx = metadata.Set(ctx, AccountID, u.Id.OpaqueId)
-			ctx = metadata.Set(ctx, RoleIDs, string(u.Opaque.Map["roles"].Value))
+			if u.Opaque != nil {
+				if roles, ok := u.Opaque.Map["roles"]; ok {
+					ctx = metadata.Set(ctx, RoleIDs, string(roles.Value))
+				}
+			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
