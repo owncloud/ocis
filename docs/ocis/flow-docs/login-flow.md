@@ -44,7 +44,7 @@ sequenceDiagram
         Note over client, idp: GET /authorize?<br>response_type=code<br>&scope=openid%20profile%20email<br>&client_id=s6BhdRkqt3<br>&state=af0ifjsldkj<br>&redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1<br>Host: server.example.com
         Note over user, idp: 3. Authorization Server Authenticates the End-User.
         Note over idp,ldap: Either an IdP already exists or a new one is introduced. Since we are not yet using oidc discovery we can only use one IdP.
-        alt all users managed by konnectd/ocis
+        alt all users managed by idp/ocis
             idp->>+glauth: LDAP query/bind
             glauth->>+graph: GET user with Basic Auth<br>GraphAPI
             graph->>+accounts: internal GRPC
