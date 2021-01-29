@@ -79,10 +79,6 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: generate
-generate:
-	go generate $(GENERATE)
-
 .PHONY: changelog
 changelog:
 	go run github.com/restic/calens >| CHANGELOG.md
@@ -139,49 +135,26 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: config-docs-generate
-config-docs-generate:
-	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
-
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-# $(GOPATH)/bin/protoc-gen-go:
-# 	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+############ docs generate ############
 
-# $(GOPATH)/bin/protoc-gen-micro:
-# 	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
+.PHONY: docs-generate
+docs-generate: config-docs-generate
 
-# $(GOPATH)/bin/protoc-gen-microweb:
-# 	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
-# $(GOPATH)/bin/protoc-gen-swagger:
-# 	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+############ generate ############
+.PHONY: generate
+generate: ci-node-generate ci-go-generate
 
-# pkg/proto/v0/example.pb.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
+.PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
+	go generate $(GENERATE)
 
-# pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
-
-# .PHONY: protobuf
-# protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
+.PHONY: ci-node-generate
+ci-node-generate:

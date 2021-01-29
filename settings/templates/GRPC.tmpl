@@ -1,0 +1,75 @@
+---
+title: "GRPC API"
+date: 2018-05-02T00:00:00+00:00
+weight: 50
+geekdocRepo: https://github.com/owncloud/ocis-thumbnails
+geekdocEditPath: edit/master/docs
+geekdocFilePath: grpc.md
+---
+
+{{`{{< toc >}}`}}
+
+{{ range .Files -}}
+## {{ .Name }}
+
+{{ .Description }}
+{{- range .Messages -}}
+{{- /* remove newline */}}### {{ .LongName }}
+
+{{ .Description }}
+
+{{ if .HasFields -}}
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+{{ range .Fields -}}
+| {{.Name}} | [{{.LongType}}](#{{.LongType | lower | replace "." "" }}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
+{{ end -}}
+{{ end }}
+{{ if .HasExtensions -}}
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range .Enums -}}
+### {{ .LongName }}
+
+{{ .Description }}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
+
+{{ if .HasExtensions }}
+
+### File-level Extensions
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
+{{ end -}}
+{{ end -}} 
+{{- range .Services }}
+### {{ .Name }}
+
+{{ .Description }}
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+{{ range .Methods -}}
+| {{.Name}} | [{{.RequestLongType}}](#{{.RequestLongType | lower | replace "." "" }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseLongType | lower | replace "." "" }}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
+{{ end }}
+## Scalar Value Types
+
+| .proto Type | Notes | C++ | Java |
+| ----------- | ----- | --- | ---- |
+{{ range .Scalars -}}
+| {{`{{< div id="`}}{{.ProtoType}}{{`" content="`}}{{.ProtoType}}{{`" >}}`}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} |
+{{ end }}

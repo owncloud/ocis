@@ -3,6 +3,9 @@ NAME := store
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
+HUGO := hugo
+PROTO_VERSION := v0
+PROTO_SRC := pkg/proto/$(PROTO_VERSION)
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
@@ -23,6 +26,11 @@ SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
 GENERATE ?= $(PACKAGES)
 
 TAGS ?=
+
+ifndef GOPATH
+	export GOPATH := $(shell go env GOPATH)
+endif
+export PATH := $(PATH):$(GOPATH)/bin
 
 ifndef OUTPUT
 	ifneq ($(DRONE_TAG),)
@@ -80,10 +88,6 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: generate
-generate:
-	go generate $(GENERATE)
-
 .PHONY: changelog
 changelog:
 	go run github.com/restic/calens >| CHANGELOG.md
@@ -140,29 +144,95 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: config-docs-generate
-config-docs-generate:
-	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
-
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
+############ docs generate ############
+
+.PHONY: docs-generate
+docs-generate: config-docs-generate \
+			   grpc-docs-generate
+
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
+
+.PHONY: grpc-docs-generate
+grpc-docs-generate: ../docs/extensions/${NAME}/grpc.md
+
+############ generate ############
+.PHONY: generate
+generate: ci-node-generate ci-go-generate
+
+.PHONY: ci-go-generate
+ci-go-generate: protobuf # CI runs ci-node-generate automatically before this target
+	go generate $(GENERATE)
+
+.PHONY: ci-node-generate
+ci-node-generate:
+
+
+############ protobuf ############
 $(GOPATH)/bin/protoc-gen-go:
-	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+	GO111MODULE=off go get -v google.golang.org/protobuf/cmd/protoc-gen-go
 
 $(GOPATH)/bin/protoc-gen-micro:
-	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
+	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
 
-pkg/proto/v0/store.pb.go: pkg/proto/v0/store.proto
-	protoc \
-		-I=pkg/proto/v0/ \
-		--go_out=pkg/proto/v0 store.proto
+$(GOPATH)/bin/protoc-gen-microweb:
+	GO111MODULE=off go get -v github.com/owncloud/protoc-gen-microweb
 
-pkg/proto/v0/store.pb.micro.go: pkg/proto/v0/store.proto
+$(GOPATH)/bin/protoc-gen-openapiv2:
+	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-openapiv2
+
+$(GOPATH)/bin/protoc-gen-doc:
+	GO111MODULE=off go get -v github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+
+.PHONY: $(PROTO_SRC)/${NAME}.pb.go
+$(PROTO_SRC)/${NAME}.pb.go: $(GOPATH)/bin/protoc-gen-openapiv2 $(GOPATH)/bin/protoc-gen-go
 	protoc \
-		-I=pkg/proto/v0/ \
-		--micro_out=pkg/proto/v0 store.proto
+		-I=../third_party/ \
+		-I=$(PROTO_SRC)/ \
+		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/ \
+		--go_out=. ${NAME}.proto
+
+.PHONY: $(PROTO_SRC)/${NAME}.pb.micro.go
+$(PROTO_SRC)/${NAME}.pb.micro.go: $(GOPATH)/bin/protoc-gen-openapiv2 $(GOPATH)/bin/protoc-gen-micro
+	protoc \
+		-I=../third_party/ \
+		-I=$(PROTO_SRC)/ \
+		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/ \
+		--micro_out=. ${NAME}.proto
+
+.PHONY: $(PROTO_SRC)/${NAME}.pb.web.go
+$(PROTO_SRC)/${NAME}.pb.web.go: $(GOPATH)/bin/protoc-gen-openapiv2 $(GOPATH)/bin/protoc-gen-microweb
+	protoc \
+		-I=../third_party/ \
+		-I=$(PROTO_SRC)/ \
+		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/ \
+		--microweb_out=. ${NAME}.proto
+
+.PHONY: $(PROTO_SRC)/${NAME}.swagger.json
+$(PROTO_SRC)/${NAME}.swagger.json: $(GOPATH)/bin/protoc-gen-openapiv2
+	protoc \
+		-I=../third_party/ \
+		-I=$(PROTO_SRC)/ \
+		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/ \
+		--openapiv2_out=$(PROTO_SRC)/ ${NAME}.proto
+
+.PHONY: ../docs/extensions/${NAME}/grpc.md
+../docs/extensions/${NAME}/grpc.md: $(GOPATH)/bin/protoc-gen-openapiv2 $(GOPATH)/bin/protoc-gen-doc
+	protoc \
+		-I=../third_party/ \
+		-I=$(PROTO_SRC)/ \
+		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/ \
+		--doc_opt=./templates/GRPC.tmpl,grpc.md \
+		--doc_out=../docs/extensions/${NAME} $(PROTO_SRC)/${NAME}.proto
 
 .PHONY: protobuf
-protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro pkg/proto/v0/store.pb.go pkg/proto/v0/store.pb.micro.go
+protobuf: $(PROTO_SRC)/${NAME}.pb.go \
+		  $(PROTO_SRC)/${NAME}.pb.micro.go \
+		  $(PROTO_SRC)/${NAME}.swagger.json \
+		  ../docs/extensions/${NAME}/grpc.md
+		  #$(PROTO_SRC)/${NAME}.pb.web.go \ # not needed for store

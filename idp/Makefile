@@ -86,32 +86,6 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: generate
-generate: assets
-	go generate $(GENERATE)
-
-# TODO find a docker container with go and yarn so we can properly build assets in ci
-#assets: assets/identifier/static assets/identifier/index.html
-.PHONY: assets
-assets: assets/identifier/static assets/identifier/static/logo.svg assets/identifier/static/favicon.ico
-
-assets/identifier/static:
-	mkdir -p assets/identifier/static
-
-.PHONY: assets/identifier/static/logo.svg
-assets/identifier/static/logo.svg:
-	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
-
-.PHONY: assets/identifier/static/favicon.ico
-assets/identifier/static/favicon.ico:
-	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
-
-assets/identifier/index.html: node_modules
-	yarn build
-
-node_modules:
-	yarn install
-
 .PHONY: changelog
 changelog:
 	go run github.com/restic/calens >| CHANGELOG.md
@@ -168,49 +142,59 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: config-docs-generate
-config-docs-generate:
-	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
-
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
 
-# $(GOPATH)/bin/protoc-gen-go:
-# 	GO111MODULE=off go get -v github.com/golang/protobuf/protoc-gen-go
+############ docs generate ############
 
-# $(GOPATH)/bin/protoc-gen-micro:
-# 	GO111MODULE=off go get -v github.com/micro/protoc-gen-micro
+.PHONY: docs-generate
+docs-generate: config-docs-generate
 
-# $(GOPATH)/bin/protoc-gen-microweb:
-# 	GO111MODULE=off go get -v github.com/webhippie/protoc-gen-microweb
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
-# $(GOPATH)/bin/protoc-gen-swagger:
-# 	GO111MODULE=off go get -v github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+############ generate ############
+.PHONY: generate
+generate: ci-node-generate ci-go-generate
 
-# pkg/proto/v0/example.pb.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--go_out=pkg/proto/v0 example.proto
+.PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
+	go generate $(GENERATE)
 
-# pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--micro_out=pkg/proto/v0 example.proto
+.PHONY: ci-node-generate
+ci-node-generate: assets
 
-# pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--microweb_out=pkg/proto/v0 example.proto
+.PHONY: assets
+assets: yarn-build \
+		assets/identifier/static \
+		assets/identifier/static/logo.svg \
+		assets/identifier/static/favicon.ico
 
-# pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
-# 	protoc \
-# 		-I=third_party/ \
-# 		-I=pkg/proto/v0/ \
-# 		--swagger_out=pkg/proto/v0 example.proto
+assets/identifier/static:
+	mkdir -p assets/identifier/static
 
-# .PHONY: protobuf
-# protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
+.PHONY: assets/identifier/static/logo.svg # force overwrite
+assets/identifier/static/logo.svg:
+	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
+
+.PHONY: assets/identifier/static/favicon.ico # force overwrite
+assets/identifier/static/favicon.ico:
+	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
+
+.PHONY: yarn-build
+yarn-build: node_modules
+	#yarn lint #TODO: activate
+	#yarn test #TODO: activate
+	yarn build
+
+.PHONY: node_modules
+node_modules:
+	yarn install --frozen-lockfile
+
+#########
+
+.PHONY: generate
+generate: assets
+	go generate $(GENERATE)
