@@ -74,7 +74,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   ### Keycloak ###
   # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
   KEYCLOAK_DOMAIN=
-  # Realm which to be used with oCIS. Defaults to "master"
+  # Realm which to be used with oCIS. Defaults to "oCIS"
   KEYCLOAK_REALM=
   # Admin user login name. Defaults to "admin"
   KEYCLOAK_ADMIN_USER=
@@ -99,7 +99,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
-  Changing the used Keycloak realm can be done by setting `KEYCLOAK_REALM=`. This defaults to the master realm `KEYCLOAK_REALM=master`.
+  Changing the used Keycloak realm can be done by setting `KEYCLOAK_REALM=`. This defaults to the oCIS realm `KEYCLOAK_REALM=oCIS`. The oCIS realm will be automatically imported on startup and includes our demo users.
 
   You probably should secure your Keycloak admin account by setting `KEYCLOAK_ADMIN_USER=` and `KEYCLOAK_ADMIN_PASSWORD=` to values other than `admin`.
 
@@ -109,11 +109,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   `docker-compose up -d`
 
-* Visit the Keycloak administration console on your configured domain. Go to clients settings and add a client. The client id is `ocis-web` or the one you changed it to. The client protocol is openid-connect. The root url for the client is the url you selected for oCIS. Then save the client.
-
-* You may also add users to Keycloak
-
-* You now can visit oCIS and Traefik dashboard on your configured domains
+* You now can visit oCIS, Keycloak and Traefik dashboard on your configured domains
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
@@ -132,8 +128,5 @@ After that you're ready to start the application stack:
 `docker-compose up -d`
 
 Open https://keycloak.owncloud.test in your browser and accept the invalid certificate warning.
-Go to clients settings and add a client. The client id is `ocis-web` or the one you changed it to. The client protocol is openid-connect. THe root url for the client is `https://ocis.owncloud.test`. Then save the client.
 
-* You may also add users to Keycloak
-
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the admin user of keycloak and additional users you created.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the demo users.
