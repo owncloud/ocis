@@ -1416,6 +1416,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       'pull': 'always',
       'commands': [
         'wait-for ocis-server:9200 -t 300',
+        'sleep 100'
       ],
     },
   ]
