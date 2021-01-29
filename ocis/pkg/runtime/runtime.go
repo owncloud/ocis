@@ -30,7 +30,7 @@ var (
 		"registry", // :8000
 	}
 
-	// Extensions are ocis extension services
+	// Extensions are oCIS extension services
 	Extensions = []string{
 		"glauth",
 		"konnectd",
@@ -70,7 +70,7 @@ type Runtime struct {
 	c *config.Config
 }
 
-// New creates a new ocis + micro runtime
+// New creates a new oCIS + micro runtime
 func New(cfg *config.Config) Runtime {
 	return Runtime{
 		c: cfg,
@@ -85,7 +85,7 @@ func (r *Runtime) Start() error {
 	)
 }
 
-// Launch ocis default ocis extensions.
+// Launch oCIS default oCIS extensions.
 func (r *Runtime) Launch() {
 	var client *rpc.Client
 	var err error

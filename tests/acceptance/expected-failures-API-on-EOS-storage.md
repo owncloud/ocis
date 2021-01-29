@@ -1053,7 +1053,7 @@ to be investigated and issues raised or comments added here
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L100)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L101)
 
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 -   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
 -   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
 -   [apiWebdavPreviews/previews.feature:17](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L17)

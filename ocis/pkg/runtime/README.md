@@ -65,4 +65,4 @@ func main() {
 }
 ```
 
-Run the above example with `RUNTIME_KEEP_ALIVE=true` and with no `RUNTIME_KEEP_ALIVE` set to see its behavior. It requires an [OCIS binary](https://github.com/owncloud/ocis/releases) present in your `$PATH` for it to work.
+Run the above example with `RUNTIME_KEEP_ALIVE=true` and with no `RUNTIME_KEEP_ALIVE` set to see its behavior. It requires an [oCIS binary](https://github.com/owncloud/ocis/releases) present in your `$PATH` for it to work.

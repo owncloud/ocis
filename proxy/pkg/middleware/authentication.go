@@ -13,7 +13,7 @@ var (
 	SupportedAuthStrategies []string
 
 	// ProxyWwwAuthenticate is a list of endpoints that do not rely on reva underlying authentication, such as ocs.
-	// services that fallback to reva authentication are declared in the "frontend" command on OCIS. It is a list of strings
+	// services that fallback to reva authentication are declared in the "frontend" command on oCIS. It is a list of strings
 	// to be regexp compiled.
 	ProxyWwwAuthenticate = []string{"/ocs/v[12].php/cloud/"}
 

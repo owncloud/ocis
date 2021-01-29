@@ -1,6 +1,6 @@
-## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with oCIS storage
 
-### Test scenarios that specifically fail with OCIS storage
+### Test scenarios that specifically fail with oCIS storage
 
 -   [apiWebdavProperties1/setFileProperties.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L32)
 -   [apiWebdavProperties1/setFileProperties.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L33)
@@ -140,8 +140,12 @@
 -   [apiProvisioning-v1/enableUser.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L32)
 -   [apiProvisioning-v1/getUser.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L34)
 -   [apiProvisioning-v1/getUser.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L35)
+
 -   [apiProvisioning-v2/addUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L29)
 -   [apiProvisioning-v2/addUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L30)
+-   [apiProvisioning-v2/addUser.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L121)
+-   [apiProvisioning-v2/addUser.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L122)
+-   [apiProvisioning-v2/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L123)
 -   [apiProvisioning-v2/deleteUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L29)
 -   [apiProvisioning-v2/deleteUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L30)
 -   [apiProvisioning-v2/disableUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L29)
@@ -179,6 +183,10 @@
 -   [apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/apiProvisioningUsingAppPassword.feature#L67)
 
 ### [disable users /cloud/users/disable|enable not available](https://github.com/owncloud/ocis/issues/1420)
+
+-   [apiProvisioning-v1/enableUser.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L92)
+-   [apiProvisioning-v1/enableUser.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L102)
+-   [apiProvisioning-v1/enableUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L129)
 -   [apiProvisioning-v1/disableUser.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L99)
 -   [apiProvisioning-v1/disableUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L129)
 -   [apiProvisioning-v1/disableUser.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L165)
@@ -219,8 +227,39 @@
 -   [apiProvisioning-v2/getUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L47)
 
 ### [subadmin endpoints not implemented](https://github.com/owncloud/product/issues/289)
+-   [apiProvisioning-v1/addUser.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L125)
+-   [apiProvisioning-v1/createSubAdmin.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L48)
+-   [apiProvisioning-v1/deleteUser.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/deleteUser.feature#L73)
+-   [apiProvisioning-v1/disableUser.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L222)
+-   [apiProvisioning-v1/editUser.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L131)
+-   [apiProvisioning-v1/editUser.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L143)
+-   [apiProvisioning-v1/getUser.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L170)
+-   [apiProvisioning-v1/resetUserPassword.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/resetUserPassword.feature#L113)
+
+-   [apiProvisioning-v2/addUser.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L125)
+-   [apiProvisioning-v2/createSubAdmin.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L48)
+-   [apiProvisioning-v2/deleteUser.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L64)
+-   [apiProvisioning-v2/deleteUser.feature:74](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L74)
+-   [apiProvisioning-v2/deleteUser.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L88)
+-   [apiProvisioning-v2/deleteUser.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L101)
+-   [apiProvisioning-v2/deleteUser.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L115)
 -   [apiProvisioning-v2/disableUser.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L48)
 -   [apiProvisioning-v2/disableUser.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L64)
+-   [apiProvisioning-v2/disableUser.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L223)
+-   [apiProvisioning-v2/disableUser.feature:237](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L237)
+-   [apiProvisioning-v2/editUser.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L131)
+-   [apiProvisioning-v2/editUser.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L143)
+-   [apiProvisioning-v2/editUser.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L159)
+-   [apiProvisioning-v2/enableUser.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L104)
+-   [apiProvisioning-v2/enableUser.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L118)
+-   [apiProvisioning-v2/enableUser.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L131)
+-   [apiProvisioning-v2/enableUser.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L146)
+-   [apiProvisioning-v2/getUser.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L145)
+-   [apiProvisioning-v2/getUser.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L156)
+-   [apiProvisioning-v2/getUser.feature:171](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L171)
+-   [apiProvisioning-v2/resetUserPassword.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/resetUserPassword.feature#L101)
+-   [apiProvisioning-v2/resetUserPassword.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/resetUserPassword.feature#L113)
+-   [apiProvisioning-v2/resetUserPassword.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/resetUserPassword.feature#L129)
 
 ### [invalid format of sharees response](https://github.com/owncloud/product/issues/292)
 ### [Searching sharee with displayname](https://github.com/owncloud/ocis/issues/547)
@@ -453,7 +492,7 @@
 
 ### [Split old public API webdav tests from new public webdav tests](https://github.com/owncloud/ocis-reva/issues/282)
 ### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
@@ -572,14 +611,14 @@
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:321](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L321)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:322](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L322)
 
-### [OCIS share permissions not enforced](https://github.com/owncloud/product/issues/270)
+### [oCIS share permissions not enforced](https://github.com/owncloud/product/issues/270)
 
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L157)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L158)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L179)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L180)
 
-### [OCIS old public webdav api doesnt works](https://github.com/owncloud/product/issues/272)
+### [oCIS old public webdav api doesnt works](https://github.com/owncloud/product/issues/272)
 
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature#L30)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesOldDav.feature#L31)
@@ -645,7 +684,7 @@
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L238)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L255)
 
-### [Resharing does not work with ocis storage](https://github.com/owncloud/product/issues/265)
+### [Resharing does not work with oCIS storage](https://github.com/owncloud/product/issues/265)
 
 -   [apiShareReshareToShares1/reShare.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L56)
 -   [apiShareReshareToShares1/reShare.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L57)
@@ -1029,7 +1068,7 @@
 -   [apiWebdavMove1/moveFolderToExcludedDirectory.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolderToExcludedDirectory.feature#L70)
 -   [apiWebdavMove1/moveFolderToExcludedDirectory.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolderToExcludedDirectory.feature#L71)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavMove2/moveFile.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L89)
 -   [apiWebdavMove2/moveFile.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L90)
@@ -1072,7 +1111,7 @@
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L63)
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L64)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavOperations/deleteFolder.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L67)
 -   [apiWebdavOperations/deleteFolder.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L68)
@@ -1082,7 +1121,7 @@
 -   [apiWebdavOperations/deleteFolder.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L92)
 
 ### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavOperations/downloadFile.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L60)
 -   [apiWebdavOperations/downloadFile.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L61)
@@ -1093,7 +1132,7 @@
 -   [apiWebdavOperations/refuseAccess.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L21)
 -   [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
 
-### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
+### [Review and fix the tests that have sharing step to work with oCIS](https://github.com/owncloud/core/issues/38006)
 
 -   [apiWebdavProperties1/copyFile.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L65)
 -   [apiWebdavProperties1/copyFile.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L66)
@@ -1268,7 +1307,7 @@
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L99)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L100)
 
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
 -   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
@@ -1340,7 +1379,7 @@
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L314)
 -   [apiWebdavEtagPropagation1/moveFileFolder.feature:315](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L315)
 
-### [Implement Trashbin Feature for ocis storage](https://github.com/owncloud/product/issues/209)
+### [Implement Trashbin Feature for oCIS storage](https://github.com/owncloud/product/issues/209)
 
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L26)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L27)
@@ -1351,7 +1390,7 @@
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L90)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L91)
 
-### [Implement Versions Feature for ocis storage](https://github.com/owncloud/product/issues/210)
+### [Implement Versions Feature for oCIS storage](https://github.com/owncloud/product/issues/210)
 
 -   [apiWebdavEtagPropagation2/restoreVersion.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreVersion.feature#L10)
 
@@ -1393,7 +1432,7 @@
 -   [apiShareOperationsToShares/changingFilesShare.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L59)
 -   [apiShareOperationsToShares/changingFilesShare.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L60)
 
-### [OCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 
 -   [apiVersions/fileVersionsSharingToShares.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L33)
 
@@ -2310,7 +2349,7 @@
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L55)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L56)
 
-### [OCIS-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
+### [oCIS-storage reading a file that a collaborator uploaded is impossible](https://github.com/owncloud/ocis/issues/763)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L70)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L71)
 
@@ -2344,5 +2383,9 @@
 -   [apiTrashbin/trashbinFilesFolders.feature:284](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L284)
 -   [apiTrashbin/trashbinFilesFolders.feature:285](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L285)
 
-### [OCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+### [oCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
 -   [apiVersions/fileVersionsSharingToShares.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L291)
+
+### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
+-   [apiShareManagementBasicToShares/deleteShareFromShares.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#211)
+-   [apiShareManagementBasicToShares/deleteShareFromShares.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#212)

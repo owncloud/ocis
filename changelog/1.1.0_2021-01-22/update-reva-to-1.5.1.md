@@ -58,7 +58,7 @@ Details
 
 * Enhancement #1393: Allow setting favorites, mtime and a temporary etag
 
-  We now let the ocis driver persist favorites, set temporary etags and the mtime as arbitrary
+  We now let the oCIS driver persist favorites, set temporary etags and the mtime as arbitrary
   metadata.
 
   https://github.com/owncloud/ocis/issues/567
