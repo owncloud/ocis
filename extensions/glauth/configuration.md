@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-29T09:44:55+0000"
+date: "2021-01-29T10:17:54+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -23,7 +23,7 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-glauth reads `glauth.json | yaml | toml ...`*.
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/glauth/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
 ### Environment variables
 
@@ -34,6 +34,15 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+-debug-addr |  $GLAUTH_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9129`.
 
 ### glauth ocis-glauth
 
@@ -148,13 +157,4 @@ Usage: `glauth server [command options] [arguments...]`
 
 -fallback-use-graphapi |  $GLAUTH_FALLBACK_USE_GRAPHAPI
 : use Graph API, only for owncloud datastore. Default: `true`.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
--debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9129`.
 

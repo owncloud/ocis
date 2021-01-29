@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-29T09:44:54+0000"
+date: "2021-01-29T10:17:52+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -23,7 +23,7 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-accounts reads `accounts.json | yaml | toml ...`*.
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/accounts/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
 ### Environment variables
 
@@ -35,11 +35,17 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts version
+### accounts add
 
-Print the versions of the running instances
+Create a new account
 
-Usage: `accounts version [command options] [arguments...]`
+Usage: `accounts add [command options] [arguments...]`
+
+### accounts remove
+
+Removes an existing account
+
+Usage: `accounts remove [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
@@ -128,35 +134,17 @@ Usage: `accounts server [command options] [arguments...]`
 -service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
 : username of the internal service user (required on EOS).
 
-### accounts update
+### accounts version
 
-Make changes to an existing account
+Print the versions of the running instances
 
-Usage: `accounts update [command options] [arguments...]`
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-### accounts remove
-
-Removes an existing account
-
-Usage: `accounts remove [command options] [arguments...]`
+Usage: `accounts version [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `accounts`.
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
 
 ### accounts inspect
 
@@ -181,4 +169,16 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `accounts`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
 

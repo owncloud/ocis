@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-29T09:45:02+0000"
+date: "2021-01-29T10:18:04+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -23,7 +23,7 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/store/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
 ### Environment variables
 
@@ -34,33 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store health
-
-Check health status
-
-Usage: `store health [command options] [arguments...]`
-
--debug-addr |  $STORE_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9460`.
-
-### store ocis-store
-
-Service to store values for ocis extensions
-
-Usage: `store ocis-store [command options] [arguments...]`
-
--config-file |  $STORE_CONFIG_FILE
-: Path to config file.
-
--log-level |  $STORE_LOG_LEVEL
-: Set logging level. Default: `info`.
-
--log-pretty |  $STORE_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $STORE_LOG_COLOR
-: Enable colored logging. Default: `true`.
 
 ### store server
 
@@ -115,4 +88,31 @@ Usage: `store version [command options] [arguments...]`
 
 -name |  $STORE_NAME
 : Service name. Default: `store`.
+
+### store health
+
+Check health status
+
+Usage: `store health [command options] [arguments...]`
+
+-debug-addr |  $STORE_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9460`.
+
+### store ocis-store
+
+Service to store values for ocis extensions
+
+Usage: `store ocis-store [command options] [arguments...]`
+
+-config-file |  $STORE_CONFIG_FILE
+: Path to config file.
+
+-log-level |  $STORE_LOG_LEVEL
+: Set logging level. Default: `info`.
+
+-log-pretty |  $STORE_LOG_PRETTY
+: Enable pretty logging. Default: `true`.
+
+-log-color |  $STORE_LOG_COLOR
+: Enable colored logging. Default: `true`.
 

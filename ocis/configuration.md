@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-01-29T09:44:58+0000"
+date: "2021-01-29T10:17:58+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -27,7 +27,7 @@ $HOME/.ocis
 
 For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-proxy reads `proxy.json | yaml | toml ...`*.
 
-So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/ocis/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
 
 ### Environment variables
 
@@ -77,12 +77,6 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
 ### ocis server
 
 Start fullstack server
@@ -110,12 +104,6 @@ Usage: `ocis server [command options] [arguments...]`
 -grpc-addr |  $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
 ### ocis health
 
 Check health status
@@ -131,17 +119,29 @@ Runs an extension
 
 Usage: `ocis run [command options] [arguments...]`
 
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis settings
+#### ocis onlyoffice
 
-Start settings server
+Start onlyoffice server
 
-#### ocis storage-public-link
+#### ocis proxy
 
-Start storage public link storage
+Start proxy server
 
 #### ocis thumbnails
 
@@ -151,45 +151,9 @@ Start thumbnails server
 
 Start konnectd server
 
-#### ocis onlyoffice
+#### ocis storage-home
 
-Start onlyoffice server
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis web
-
-Start web server
+Start storage and data provider for /home mount
 
 #### ocis accounts
 
@@ -199,27 +163,63 @@ Start accounts server
 
 Start ocs server
 
-#### ocis storage-auth-bearer
+#### ocis settings
 
-Start storage auth-bearer service
+Start settings server
 
-#### ocis version
+#### ocis storage-auth-basic
 
-Lists running services with version
+Start storage auth-basic service
 
-#### ocis storage-sharing
+#### ocis web
 
-Start storage sharing service
+Start web server
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
 
 #### ocis storage-frontend
 
 Start storage frontend
 
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis webdav
+
+Start webdav server
+
 #### ocis storage-gateway
 
 Start storage gateway
 
-#### ocis storage-home
+#### ocis version
 
-Start storage and data provider for /home mount
+Lists running services with version
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
 
