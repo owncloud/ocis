@@ -62,6 +62,9 @@ This snippet will start the oCIS server with auto generated self signed certific
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 OCIS_URL=https://your-server:9200 \
 KONNECTD_TLS=0 \
+PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
+PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
+IDP_TLS=0 \
 ./bin/ocis server
 ```
 
