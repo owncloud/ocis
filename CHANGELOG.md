@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
+* Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
@@ -15,6 +16,14 @@ The following sections list the changes for unreleased.
 * Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
 
    https://github.com/owncloud/ocis/pull/1388
+
+* Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
+
+   The etcd server address in `MICRO_REGISTRY_ADDRESS` was not picked up when etcd was set as
+   service discovery registry `MICRO_REGISTRY=etcd`. Therefore etcd was only working if
+   available on localhost / 127.0.0.1.
+
+   https://github.com/owncloud/ocis/pull/1546
 
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 
