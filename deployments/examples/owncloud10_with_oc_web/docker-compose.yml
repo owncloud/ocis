@@ -74,11 +74,11 @@ services:
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_ENABLE_PRESIGNEDURLS: "false"
       PROXY_TLS: "false"
-      # konnectd - binddn must exist as oc10 admin user
-      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
-      KONNECTD_INSECURE: "${INSECURE:-false}"
-      KONNECTD_SIGNING_KID: super
-      KONNECTD_TLS: 0
+      # idp - binddn must exist as oc10 admin user
+      IDP_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
+      IDP_INSECURE: "${INSECURE:-false}"
+      IDP_SIGNING_KID: super
+      IDP_TLS: 0
       LDAP_BASEDN: "dc=example,dc=org"
       LDAP_BINDDN: "cn=admin,dc=example,dc=org"
       LDAP_BINDPW: "admin"

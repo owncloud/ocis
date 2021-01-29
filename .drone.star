@@ -2,7 +2,7 @@ config = {
   'modules': {
     'accounts': 'frontend',
     'glauth':'',
-    'konnectd':'',
+    'idp':'',
     'ocis': '',
     'web':'',
     'ocis-pkg':'',
@@ -1370,8 +1370,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
     'PROXY_ENABLE_BASIC_AUTH': True,
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
-    'KONNECTD_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
-    'KONNECTD_TLS': 'true',
+    'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
+    'IDP_TLS': 'true',
     'OCIS_LOG_LEVEL': 'warn',
   }
 
