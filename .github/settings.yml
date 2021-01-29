@@ -39,7 +39,7 @@ branches:
         require_code_owner_reviews: false
         dismissal_restrictions: {}
       required_status_checks:
-        strict: true
+        strict: false
         contexts:
           - continuous-integration/drone/pr
       enforce_admins: false
