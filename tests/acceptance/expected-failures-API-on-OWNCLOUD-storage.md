@@ -2526,3 +2526,11 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L29)
 -   [apiTranslation/translation.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L30)
 
+### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
+-   [apiShareManagementBasicToShares/deleteShareFromShares.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#211)
+-   [apiShareManagementBasicToShares/deleteShareFromShares.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#212)
+
+
+-   [apiTrashbin/trashbinRestore.feature:372](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L372)
+-   [apiTrashbin/trashbinRestore.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L373)
+
