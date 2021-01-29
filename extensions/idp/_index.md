@@ -1,8 +1,8 @@
 ---
-title: Konnectd
+title: IDP
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/konnectd
+geekdocEditPath: edit/master/docs/extensions/idp
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
