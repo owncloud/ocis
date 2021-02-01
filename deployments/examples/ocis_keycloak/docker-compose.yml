@@ -97,9 +97,12 @@ services:
     image: quay.io/keycloak/keycloak:latest
     networks:
       ocis-net:
+    entrypoint: ["/bin/sh", "/opt/jboss/tools/docker-entrypoint-override.sh"]
     volumes:
-      - ./config/keycloak/ocis-realm.json:/opt/jboss/keycloak/ocis-realm.json
+      - ./config/keycloak/docker-entrypoint-override.sh:/opt/jboss/tools/docker-entrypoint-override.sh
+      - ./config/keycloak/ocis-realm.dist.json:/opt/jboss/keycloak/ocis-realm.dist.json
     environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
       DB_DATABASE: keycloak
