@@ -12,6 +12,15 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIPreview/imageMediaViewer.feature:81](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L81)
 -   [webUIPreview/imageMediaViewer.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L88)
 
+### [Media Viewer preview not visible for files with .jpeg, .ogg, .webm and .gif formats](https://github.com/owncloud/ocis/issues/1490)
+-   [webUIPreview/imageMediaViewer.feature:127](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L127)
+-   [webUIPreview/imageMediaViewer.feature:136](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L136)
+-   [webUIPreview/imageMediaViewer.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L145)
+-   [webUIPreview/imageMediaViewer.feature:154](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L154)
+
+### [Media viewer previews are not visible in public share](https://github.com/owncloud/ocis/issues/1370)
+-   [webUIPreview/imageMediaViewer.feature:110](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L110)
+
 ### [authentication dialog appears when user is deleted](https://github.com/owncloud/web/issues/4564)
 ### [login error page loops when logged in user is deleted](https://github.com/owncloud/ocis/issues/1129)
 -   [webUILogin/login.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L62)
