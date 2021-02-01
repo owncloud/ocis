@@ -128,12 +128,12 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		// Chunking
-		&cli.BoolFlag{
-			Name:        "upload-disable-tus",
-			Value:       false,
-			Usage:       "Disables TUS upload mechanism",
-			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_DISABLE_TUS"},
-			Destination: &cfg.Reva.UploadDisableTus,
+		&cli.StringFlag{
+			Name:        "default-upload-protocol",
+			Value:       "tus",
+			Usage:       "Default upload chunking protocol to be used out of tus/v1/ng",
+			EnvVars:     []string{"STORAGE_FRONTEND_DEFAULT_UPLOAD_PROTOCOL"},
+			Destination: &cfg.Reva.DefaultUploadProtocol,
 		},
 		&cli.IntFlag{
 			Name:        "upload-max-chunk-size",
