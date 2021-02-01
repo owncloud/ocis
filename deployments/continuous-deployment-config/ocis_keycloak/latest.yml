@@ -4,7 +4,7 @@
     server_type: cx21
     image: ubuntu-20.04
     location: nbg1
-    inital_ssh_key_names:
+    initial_ssh_key_names:
       - owncloud-ocis@drone.owncloud.com
     labels:
       owner: wkloucek
