@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
 * Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
@@ -35,6 +36,11 @@ The following sections list the changes for unreleased.
    including refs/pman module as an oCIS package instead.
 
    https://github.com/owncloud/ocis/pull/1483
+
+* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+
+   https://github.com/cs3org/reva/pull/1331
+   https://github.com/owncloud/ocis/pull/1374
 
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
 
