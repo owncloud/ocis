@@ -695,6 +695,11 @@ def dockerReleases(ctx):
   return pipelines
 
 def dockerRelease(ctx, arch):
+  build_args = [
+    'REVISION=%s' % (ctx.build.commit),
+    'VERSION=%s' % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest")
+  ]
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -716,6 +721,7 @@ def dockerRelease(ctx, arch):
           'tags': 'linux-%s' % (arch),
           'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
           'repo': ctx.repo.slug,
+          'build_args': build_args,
         },
         'when': {
           'ref': {
@@ -740,7 +746,8 @@ def dockerRelease(ctx, arch):
           'context': 'ocis',
           'auto_tag_suffix': 'linux-%s' % (arch),
           'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
-          'repo': ctx.repo.slug,
+          'repo': ctx.build.commit,
+          'build_args': build_args,
         },
         'when': {
           'ref': {
