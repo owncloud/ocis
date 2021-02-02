@@ -9,7 +9,7 @@ geekdocFilePath: continuous_deployment.md
 
 {{< toc >}}
 
-We are continuously deploying following deployment examples. Every example is deployed in two flavors:
+We are continuously deploying the following deployment examples. Every example is deployed in two flavors:
 - Latest: reflects the current master branch state of oCIS and will be updated with every commit to master
 - Released: reflects the newest release state (currently latest release of version 1) and will be updated with every release
 
