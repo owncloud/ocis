@@ -15,8 +15,8 @@ import (
 	"github.com/micro/micro/v2/client/api"
 	"github.com/micro/micro/v2/service/registry"
 
-	"github.com/refs/pman/pkg/process"
-	"github.com/refs/pman/pkg/service"
+	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
+	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
 )
 
 var (
@@ -30,10 +30,10 @@ var (
 		"registry", // :8000
 	}
 
-	// Extensions are ocis extension services
+	// Extensions are oCIS extension services
 	Extensions = []string{
 		"glauth",
-		"konnectd",
+		"idp",
 		"ocs",
 		"onlyoffice",
 		"proxy",
@@ -70,7 +70,7 @@ type Runtime struct {
 	c *config.Config
 }
 
-// New creates a new ocis + micro runtime
+// New creates a new oCIS + micro runtime
 func New(cfg *config.Config) Runtime {
 	return Runtime{
 		c: cfg,
@@ -80,10 +80,12 @@ func New(cfg *config.Config) Runtime {
 // Start rpc runtime
 func (r *Runtime) Start() error {
 	go r.Launch()
-	return service.Start()
+	return service.Start(
+		service.WithLogPretty(r.c.Log.Pretty),
+	)
 }
 
-// Launch ocis default ocis extensions.
+// Launch oCIS default oCIS extensions.
 func (r *Runtime) Launch() {
 	var client *rpc.Client
 	var err error

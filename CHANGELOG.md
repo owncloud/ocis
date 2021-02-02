@@ -2,7 +2,74 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.0.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.1.0...master
+
+## Summary
+
+* Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
+* Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+* Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
+* Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
+
+## Details
+
+* Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
+
+   https://github.com/owncloud/ocis/pull/1388
+
+* Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
+
+   The etcd server address in `MICRO_REGISTRY_ADDRESS` was not picked up when etcd was set as
+   service discovery registry `MICRO_REGISTRY=etcd`. Therefore etcd was only working if
+   available on localhost / 127.0.0.1.
+
+   https://github.com/owncloud/ocis/pull/1546
+
+* Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+
+   Tags: ocis, runtime
+
+   Currently, the runtime is under the private account of an oCIS developer. For future-proofing
+   we don't want oCIS mission critical components to depend on external repositories, so we're
+   including refs/pman module as an oCIS package instead.
+
+   https://github.com/owncloud/ocis/pull/1483
+
+* Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
+
+   https://github.com/cs3org/reva/pull/1331
+   https://github.com/owncloud/ocis/pull/1374
+
+* Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
+
+   We added a parameter in reva that allows us to redirect /home requests to different storage
+   providers based on a mapping derived from the user attributes, which was previously not
+   possible since we hardcode the /home path for all users. For example, having its value as
+   `/home/{{substr 0 1 .Username}}` can be used to redirect home requests for different users to
+   different storage providers.
+
+   https://github.com/owncloud/ocis/pull/1186
+   https://github.com/cs3org/reva/pull/1142
+
+* Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
+
+  * initial checksum support for ocis [cs3org/reva#1400](https://github.com/cs3org/reva/pull/1400)
+  * Use updated etag of home directory even if it is cached [cs3org/reva#1416](https://github.com/cs3org/reva/pull/#1416)
+  * Indicate in EOS containers that TUS is not supported [cs3org/reva#1415](https://github.com/cs3org/reva/pull/#1415)
+  * Get status code from recycle response [cs3org/reva#1408](https://github.com/cs3org/reva/pull/#1408)
+
+   https://github.com/owncloud/ocis/pull/1482
+   https://github.com/cs3org/reva/pull/1400
+   https://github.com/cs3org/reva/pull/1416
+   https://github.com/cs3org/reva/pull/1415
+   https://github.com/cs3org/reva/pull/1408
+# Changelog for [1.1.0] (2021-01-22)
+
+The following sections list the changes for 1.1.0.
+
+[1.1.0]: https://github.com/owncloud/ocis/compare/v1.0.0...v1.1.0
 
 ## Summary
 
@@ -16,6 +83,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add OCIS_URL env var: [#1148](https://github.com/owncloud/ocis/pull/1148)
 * Enhancement - Use sync.cache for roles cache: [#1367](https://github.com/owncloud/ocis/pull/1367)
 * Enhancement - Add named locks and refactor cache: [#1212](https://github.com/owncloud/ocis/pull/1212)
+* Enhancement - Update reva to v1.5.1: [#1372](https://github.com/owncloud/ocis/pull/1372)
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
 ## Details
@@ -59,7 +127,7 @@ The following sections list the changes for unreleased.
 
    Tags: performance, testing, k6
 
-   The ownCloud performance tests can not only be used to test ocis. This is why we have decided to
+   The ownCloud performance tests can not only be used to test oCIS. This is why we have decided to
    move the k6 tests to https://github.com/owncloud/cdperf
 
    https://github.com/owncloud/ocis/pull/1358
@@ -104,10 +172,10 @@ The following sections list the changes for unreleased.
    default `https://localhost:9200` and remote deployment with `OCIS_URL` which is evaluated
    as a fallback if `KONNECTD_ISS` is not set.
 
-   An OCIS server can now be started on a remote machine as easy as
+   An oCIS server can now be started on a remote machine as easy as
    `OCIS_URL=https://cloud.ocis.test PROXY_HTTP_ADDR=0.0.0.0:443 ocis server`.
 
-   Note that the `OCIS_DOMAIN` environment variable is not used by ocis, but by the docker
+   Note that the `OCIS_DOMAIN` environment variable is not used by oCIS, but by the docker
    containers.
 
    https://github.com/owncloud/ocis/pull/1148
@@ -138,6 +206,81 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/966
    https://github.com/owncloud/ocis/pull/1212
+
+* Enhancement - Update reva to v1.5.1: [#1372](https://github.com/owncloud/ocis/pull/1372)
+
+   Summary -------
+
+  * Fix #1401: Use the user in request for deciding the layout for non-home DAV requests
+  * Fix #1413: Re-include the '.git' dir in the Docker images to pass the version tag
+  * Fix #1399: Fix ocis trash-bin purge
+  * Enh #1397: Bump the Copyright date to 2021
+  * Enh #1398: Support site authorization status in Mentix
+  * Enh #1393: Allow setting favorites, mtime and a temporary etag
+  * Enh #1403: Support remote cloud gathering metrics
+
+   Details -------
+
+  * Bugfix #1401: Use the user in request for deciding the layout for non-home DAV requests
+
+   For the incoming /dav/files/userID requests, we have different namespaces depending on
+   whether the request is for the logged-in user's namespace or not. Since in the storage drivers,
+   we specify the layout depending only on the user whose resources are to be accessed, this fails
+   when a user wants to access another user's namespace when the storage provider depends on the
+   logged in user's namespace. This PR fixes that.
+
+   For example, consider the following case. The owncloud fs uses a layout {{substr 0 1
+   .Id.OpaqueId}}/{{.Id.OpaqueId}}. The user einstein sends a request to access a resource
+   shared with him, say /dav/files/marie/abcd, which should be allowed. However, based on the
+   way we applied the layout, there's no way in which this can be translated to /m/marie/.
+
+   Https://github.com/cs3org/reva/pull/1401
+
+  * Bugfix #1413: Re-include the '.git' dir in the Docker images to pass the version tag
+
+   And git SHA to the release tool.
+
+   Https://github.com/cs3org/reva/pull/1413
+
+  * Bugfix #1399: Fix ocis trash-bin purge
+
+   Fixes the empty trash-bin functionality for ocis-storage
+
+   Https://github.com/owncloud/product/issues/254
+   https://github.com/cs3org/reva/pull/1399
+
+  * Enhancement #1397: Bump the Copyright date to 2021
+
+   Https://github.com/cs3org/reva/pull/1397
+
+  * Enhancement #1398: Support site authorization status in Mentix
+
+   This enhancement adds support for a site authorization status to Mentix. This way, sites
+   registered via a web app can now be excluded until authorized manually by an administrator.
+
+   Furthermore, Mentix now sets the scheme for Prometheus targets. This allows us to also support
+   monitoring of sites that do not support the default HTTPS scheme.
+
+   Https://github.com/cs3org/reva/pull/1398
+
+  * Enhancement #1393: Allow setting favorites, mtime and a temporary etag
+
+   We now let the oCIS driver persist favorites, set temporary etags and the mtime as arbitrary
+   metadata.
+
+   Https://github.com/owncloud/ocis/issues/567
+   https://github.com/cs3org/reva/issues/1394
+   https://github.com/cs3org/reva/pull/1393
+
+  * Enhancement #1403: Support remote cloud gathering metrics
+
+   The current metrics package can only gather metrics either from json files. With this feature,
+   the metrics can be gathered polling the http endpoints exposed by the owncloud/nextcloud
+   sciencemesh apps.
+
+   Https://github.com/cs3org/reva/pull/1403
+
+   https://github.com/owncloud/ocis/pull/1372
 
 * Enhancement - Update reva to v1.4.1-0.20210111080247-f2b63bfd6825: [#1194](https://github.com/owncloud/ocis/pull/1194)
 
@@ -2130,7 +2273,7 @@ The following sections list the changes for 1.0.0.
    Furthermore, we not only take care of such a thing at the Proxy but also Reva will take care of it.
    In addition, we now are able to lock-in a set of User-Agent to specific challenges.
 
-   Admins can use this feature by configuring OCIS + Reva following this approach:
+   Admins can use this feature by configuring oCIS + Reva following this approach:
 
    ``` STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT="mirall:basic,
    Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101
@@ -2144,6 +2287,6 @@ The following sections list the changes for 1.0.0.
    `STORAGE_FRONTEND_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT` as well as
    `PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT`, The reason they have the same value
    is not to rely on the os env on a distributed environment, so in redundancy we trust. They both
-   configure the same on the backend storage and OCIS Proxy.
+   configure the same on the backend storage and oCIS Proxy.
 
    https://github.com/owncloud/ocis/pull/1009

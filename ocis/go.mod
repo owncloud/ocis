@@ -20,7 +20,7 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853
 	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
-	github.com/owncloud/ocis/konnectd v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/idp v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-pkg v0.1.0
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/onlyoffice v0.0.0-00010101000000-000000000000
@@ -31,17 +31,20 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.1.6
 	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
-	github.com/refs/pman v0.0.0-20201214134707-9ce4dcebbbf8
 	github.com/restic/calens v0.2.0
+	github.com/rs/zerolog v1.20.0
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
+	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.5
+	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1
 )
 
 replace (
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
-	github.com/owncloud/ocis/konnectd => ../konnectd
+	github.com/owncloud/ocis/idp => ../idp
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/ocs => ../ocs
 	github.com/owncloud/ocis/onlyoffice => ../onlyoffice

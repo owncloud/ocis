@@ -8,7 +8,7 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
-This service provides an ocis extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
+This service provides an oCIS extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
 
 It uses the port range 9140-9179 to preconfigure several services.
 

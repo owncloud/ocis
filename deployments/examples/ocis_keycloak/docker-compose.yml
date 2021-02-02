@@ -5,7 +5,7 @@ services:
   traefik:
     image: "traefik:v2.3"
     networks:
-      default:
+      ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
           - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
@@ -27,7 +27,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$apr1$4vqie50r$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
@@ -39,19 +39,21 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging:
+      driver: "local"
     restart: always
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      default:
+      ocis-net:
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
-      PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
-      WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}
+      PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
+      WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
-      WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-master}/.well-known/openid-configuration
+      WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}/.well-known/openid-configuration
       STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       # general config
@@ -73,20 +75,30 @@ services:
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
       - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
+    logging:
+      driver: "local"
     restart: always
 
   postgres:
     image: postgres:alpine
+    networks:
+      ocis-net:
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
+    logging:
+      driver: "local"
     restart: always
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
+    networks:
+      ocis-net:
+    volumes:
+      - ./config/keycloak/ocis-realm.json:/opt/jboss/keycloak/ocis-realm.json
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
@@ -97,6 +109,7 @@ services:
       KEYCLOAK_USER: ${KEYCLOAK_ADMIN_USER:-admin}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
       PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/ocis-realm.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=http"
@@ -110,11 +123,26 @@ services:
       - "traefik.http.routers.keycloak-secure.service=keycloak"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
+      # let /.well-known/openid-configuration be served by Keycloak
+      - "traefik.http.routers.idp-wellknown-secure.entrypoints=https"
+      - "traefik.http.routers.idp-wellknown-secure.tls=true"
+      - "traefik.http.routers.idp-wellknown-secure.tls.certresolver=http"
+      - "traefik.http.routers.idp-wellknown-secure.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`) && Path(`/.well-known/openid-configuration`)"
+      - "traefik.http.middlewares.idp-headers.headers.customrequestheaders.X-Forwarded-Host=${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}"
+      - "traefik.http.middlewares.idp-prefix.addprefix.prefix=/auth/realms/${KEYCLOAK_REALM:-oCIS}"
+      - "traefik.http.middlewares.idp-override.chain.middlewares=idp-headers,idp-prefix"
+      - "traefik.http.routers.idp-wellknown-secure.middlewares=idp-override"
+      - "traefik.http.routers.idp-wellknown-secure.service=keycloak"
     depends_on:
       - postgres
+    logging:
+      driver: "local"
     restart: always
 
 volumes:
   certs:
   ocis-data:
   keycloak_postgres_data:
+
+networks:
+  ocis-net:

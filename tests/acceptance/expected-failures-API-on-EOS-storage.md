@@ -1,6 +1,6 @@
-## Scenarios from ownCloud10 core api tests that are expected to fail with EOS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with EOS storage
 
-### [Checksum feature](https://github.com/owncloud/ocis-reva/issues/196)
+### [Checksum feature](https://github.com/owncloud/ocis/issues/1291)
 -   [apiMain/checksums.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L24)
 -   [apiMain/checksums.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L25)
 -   [apiMain/checksums.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L35)
@@ -35,14 +35,14 @@
 -   [apiMain/checksums.feature:312](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L312)
 -   [apiMain/checksums.feature:324](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L324)
 
-### https://github.com/owncloud/ocis-reva/issues/214
+### [XML properties in webdav response not properly encoded](https://github.com/owncloud/ocis/issues/1296)
 -   [apiMain/checksums.feature:346](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L346)
 -   [apiMain/checksums.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L347)
 
-### [no robots.txt available](https://github.com/owncloud/ocis-reva/issues/100)
+### [no robots.txt available](https://github.com/owncloud/ocis/issues/1314)
 -   [apiMain/main.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/main.feature#L5)
 
-### [quota query](https://github.com/owncloud/ocis-reva/issues/101)
+### [quota query](https://github.com/owncloud/ocis/issues/1313)
 -   [apiMain/quota.feature:9](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L9)
 -   [apiMain/quota.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L16)
 -   [apiMain/quota.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L23)
@@ -64,12 +64,12 @@
 -   [apiWebdavProperties1/getQuota.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L77)
 -   [apiWebdavProperties1/getQuota.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L78)
 
-### [There is no such thing like a "super-user"](https://github.com/owncloud/ocis-reva/issues/65)
-### [no command equivalent to occ](https://github.com/owncloud/ocis-reva/issues/97)
+### [There is no such thing like a "super-user"](https://github.com/owncloud/ocis/issues/1319)
+### [no command equivalent to occ](https://github.com/owncloud/ocis/issues/1317)
 -   [apiMain/status.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/status.feature#L5)
 
-### [ocs config endpoint only accessible by authorized users](https://github.com/owncloud/ocis-reva/issues/29)
-### [HTTP 401 Unauthorized responses don't contain a body](https://github.com/owncloud/ocis-reva/issues/30)
+### [ocs config endpoint only accessible by authorized users](https://github.com/owncloud/ocis/issues/1338)
+### [HTTP 401 Unauthorized responses don't contain a body](https://github.com/owncloud/ocis/issues/1337)
 -   [apiAuthOcs/ocsDELETEAuth.feature:9](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L9)
 -   [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10)
 -   [apiAuthOcs/ocsGETAuth.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L33)
@@ -80,24 +80,24 @@
 -   [apiAuthOcs/ocsPOSTAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPOSTAuth.feature#L10)
 -   [apiAuthOcs/ocsPUTAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L10)
 
-### [users can access each-others data using the new webdav API](https://github.com/owncloud/ocis-reva/issues/9)
+### [users can access each-others data using the new webdav API](https://github.com/owncloud/ocis/issues/1347)
 -   [apiAuthWebDav/webDavLOCKAuth.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavLOCKAuth.feature#L38)
 -   [apiAuthWebDav/webDavMKCOLAuth.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMKCOLAuth.feature#L37)
 
 ### [renaming a resource does not work](https://github.com/owncloud/ocis-reva/issues/14)
 -   [apiAuthWebDav/webDavMOVEAuth.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMOVEAuth.feature#L37)
 
-### [send POST requests to another user's webDav endpoints as normal user](https://github.com/owncloud/ocis-reva/issues/179)
+### [send POST requests to another user's webDav endpoints as normal user](https://github.com/owncloud/ocis/issues/1287)
 -   [apiAuthWebDav/webDavPOSTAuth.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPOSTAuth.feature#L38)
 
-### [users can access each-others data using the new webdav API](https://github.com/owncloud/ocis-reva/issues/9)
+### [users can access each-others data using the new webdav API](https://github.com/owncloud/ocis/issues/1347)
 -   [apiAuthWebDav/webDavPUTAuth.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPUTAuth.feature#L38)
 
-### [Default capabilities for normal user not same as in oC-core](https://github.com/owncloud/ocis-reva/issues/175)
-### [Difference in response content of status.php and default capabilities](https://github.com/owncloud/ocis-reva/issues/176)
+### [Default capabilities for normal user not same as in oC-core](https://github.com/owncloud/ocis/issues/1285)
+### [Difference in response content of status.php and default capabilities](https://github.com/owncloud/ocis/issues/1286)
 -   [apiCapabilities/capabilitiesWithNormalUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature#L11)
 
-### [elements cannot be favorited](https://github.com/owncloud/ocis-reva/issues/276)
+### [elements cannot be favorited](https://github.com/owncloud/ocis/issues/1263)
 -   [apiFavorites/favorites.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L28)
 -   [apiFavorites/favorites.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L29)
 -   [apiFavorites/favorites.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L44)
@@ -114,15 +114,40 @@
 -   [apiWebdavProperties1/setFileProperties.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L77)
 -   [apiWebdavProperties1/setFileProperties.feature:80](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L80)
 
-### [elements cannot be favorited](https://github.com/owncloud/ocis-reva/issues/265)
+### [elements cannot be favorited](https://github.com/owncloud/ocis/issues/1259)
 -   [apiWebdavProperties2/getFileProperties.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L102)
 -   [apiWebdavProperties2/getFileProperties.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L103)
 
-### [REPORT request not implemented](https://github.com/owncloud/ocis-reva/issues/39)
+### [REPORT request not implemented](https://github.com/owncloud/ocis/issues/1330)
 -   [apiFavorites/favorites.feature:228](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L228)
 -   [apiFavorites/favorites.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L229)
+-   [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
+-   [apiWebdavOperations/search.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L43)
+-   [apiWebdavOperations/search.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L57)
+-   [apiWebdavOperations/search.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L58)
+-   [apiWebdavOperations/search.feature:74](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L74)
+-   [apiWebdavOperations/search.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L75)
+-   [apiWebdavOperations/search.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L83)
+-   [apiWebdavOperations/search.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L84)
+-   [apiWebdavOperations/search.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L101)
+-   [apiWebdavOperations/search.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L102)
+-   [apiWebdavOperations/search.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L119)
+-   [apiWebdavOperations/search.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L120)
+-   [apiWebdavOperations/search.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L138)
+-   [apiWebdavOperations/search.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L139)
+-   [apiWebdavOperations/search.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L165)
+-   [apiWebdavOperations/search.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L166)
+-   [apiWebdavOperations/search.feature:191](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L191)
+-   [apiWebdavOperations/search.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L192)
+-   [apiWebdavOperations/search.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L210)
+-   [apiWebdavOperations/search.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L211)
+-   [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
+-   [apiWebdavOperations/search.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L229)
 
-OCS Provisioning API scenarios that fail - to be investigated and issues raised or comments added here
+### OCS Provisioning API scenarios that fail
+
+to be investigated and issues raised or comments added here
+
 -   [apiProvisioning-v1/addUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L29)
 -   [apiProvisioning-v1/addUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L30)
 -   [apiProvisioning-v1/addUser.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L32)
@@ -276,7 +301,7 @@ OCS Provisioning API scenarios that fail - to be investigated and issues raised 
 -   [apiSharees/sharees.feature:537](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L537)
 -   [apiSharees/sharees.feature:538](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L538)
 
-### [various sharing settings cannot be set (shareapi_auto_accept_share)](https://github.com/owncloud/ocis-reva/issues/41)
+### [various sharing settings cannot be set (shareapi_auto_accept_share)](https://github.com/owncloud/ocis/issues/1328)
 -   [apiShareManagement/acceptShares.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptShares.feature#L155)
 -   [apiShareManagement/acceptShares.feature:313](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptShares.feature#L313)
 -   [apiShareManagement/acceptShares.feature:333](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptShares.feature#L333)
@@ -310,13 +335,13 @@ OCS Provisioning API scenarios that fail - to be investigated and issues raised 
 -   [apiShareManagement/acceptSharesToSharesFolder.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptSharesToSharesFolder.feature#L52)
 
 ### [groups endpoint does not exist](https://github.com/owncloud/ocis-reva/issues/34)
-### [Sharing seems to work but does not work](https://github.com/owncloud/ocis-reva/issues/243)
-### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis-reva/issues/372)
+### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
+### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 ### [Fields missing in delete share OCS response](https://github.com/owncloud/ocis-reva/issues/356)
 ### [file_target in share response](https://github.com/owncloud/product/issues/203)
-### [Shares not deleted when user is deleted](https://github.com/owncloud/ocis-reva/issues/357)
-### [EOS no displayname owner when creating share](https://github.com/owncloud/ocis-reva/issues/301)
-### [EOS mime-type is not set correctly when sharing](https://github.com/owncloud/ocis-reva/issues/302)
+### [Shares not deleted when user is deleted](hhttps://github.com/owncloud/ocis/issues/1226)
+### [EOS no displayname owner when creating share](https://github.com/owncloud/ocis/issues/1270)
+### [EOS mime-type is not set correctly when sharing](https://github.com/owncloud/ocis/issues/1271)
 -   [apiShareToSharesManagementBasic/createShareToSharesFolder.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/createShareToSharesFolder.feature#L36)
 -   [apiShareToSharesManagementBasic/createShareToSharesFolder.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/createShareToSharesFolder.feature#L37)
 -   [apiShareToSharesManagementBasic/createShareToSharesFolder.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/createShareToSharesFolder.feature#L66)
@@ -390,48 +415,45 @@ OCS Provisioning API scenarios that fail - to be investigated and issues raised 
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L98)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L135)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L136)
-
-These currently pass in owncloud/ocis-reva and should start passing here in ocis soon
-
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L115)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L116)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L153)
 -   [apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature#L154)
 
-### [Sharee retrieves the information about a share -but gets response containing all the shares](https://github.com/owncloud/ocis-reva/issues/260)
+### [Sharee retrieves the information about a share -but gets response containing all the shares](https://github.com/owncloud/ocis/issues/1257)
 -   [apiShareOperations/accessToShare.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/accessToShare.feature#L48)
 -   [apiShareOperations/accessToShare.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/accessToShare.feature#L49)
 
-### [Shares are not deleted when user is deleted](https://github.com/owncloud/ocis-reva/issues/262)
+### [Shares are not deleted when user is deleted](https://github.com/owncloud/ocis/issues/1258)
 -   [apiShareOperations/gettingShares.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L21)
 -   [apiShareOperations/gettingShares.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L22)
 
-### [There is no such thing like a "super-user"](https://github.com/owncloud/ocis-reva/issues/65)
+### [There is no such thing like a "super-user"](https://github.com/owncloud/ocis/issues/1319)
 -   [apiShareOperations/gettingShares.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L34)
 -   [apiShareOperations/gettingShares.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L35)
 
-### [Delete shares from user when user is deleted](https://github.com/owncloud/ocis-reva/issues/357)
-### [no displayname_owner shown when creating a share](https://github.com/owncloud/ocis-reva/issues/301)
-### [when sharing a file mime-type field is set to application/octet-stream](https://github.com/owncloud/ocis-reva/issues/302)
+### [Delete shares from user when user is deleted](hhttps://github.com/owncloud/ocis/issues/1226)
+### [no displayname_owner shown when creating a share](https://github.com/owncloud/ocis/issues/1270)
+### [when sharing a file mime-type field is set to application/octet-stream](https://github.com/owncloud/ocis/issues/1271)
 -   [apiShareOperations/gettingShares.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L124)
 -   [apiShareOperations/gettingShares.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L125)
 
-### [OCS error message for attempting to access share via share id as an unauthorized user is not informative](https://github.com/owncloud/ocis-reva/issues/374)
+### [OCS error message for attempting to access share via share id as an unauthorized user is not informative](https://github.com/owncloud/ocis/issues/1233)
 -   [apiShareOperations/gettingShares.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L168)
 -   [apiShareOperations/gettingShares.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L169)
 
-### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis-reva/issues/372)
+### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 -   [apiShareOperations/gettingShares.feature:204](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L204)
 -   [apiShareOperations/gettingShares.feature:205](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/gettingShares.feature#L205)
 
-### [cannot get ocs:share-permissions via WebDAV](https://github.com/owncloud/ocis-reva/issues/47)
+### [cannot get ocs:share-permissions via WebDAV](https://github.com/owncloud/ocis/issues/1326)
 -   [apiShareOperations/getWebDAVSharePermissions.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/getWebDAVSharePermissions.feature#L21)
 -   [apiShareOperations/getWebDAVSharePermissions.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/getWebDAVSharePermissions.feature#L22)
 -   [apiShareOperations/getWebDAVSharePermissions.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/getWebDAVSharePermissions.feature#L134)
 -   [apiShareOperations/getWebDAVSharePermissions.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperations/getWebDAVSharePermissions.feature#L135)
 
 ### [Split old public API webdav tests from new public webdav tests](https://github.com/owncloud/ocis-reva/issues/282)
-### [Public link enforce permissions](https://github.com/owncloud/ocis-reva/issues/292)
+### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
@@ -477,28 +499,28 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L121)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L139)
 
-### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis-reva/issues/12)
+### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L63)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L64)
 
 -   [apiSharePublicLink1/createPublicLinkShare.feature:95](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L95)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:96](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L96)
 
-### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis-reva/issues/199)
+### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L127)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L128)
 
 -   [apiSharePublicLink1/createPublicLinkShare.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L155)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L156)
 
-### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis-reva/issues/12)
+### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L245)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L246)
 
 -   [apiSharePublicLink1/createPublicLinkShare.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L276)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:277](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L277)
 
-### [various sharing settings cannot be set](https://github.com/owncloud/ocis-reva/issues/41)
+### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:389](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L389)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:390](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L390)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L411)
@@ -530,7 +552,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L238)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L255)
 
-### [Prevent creating public share for the home root folder](https://github.com/owncloud/ocis-reva/issues/283)
+### [Prevent creating public share for the home root folder](https://github.com/owncloud/ocis/issues/1265)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:620](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L620)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:621](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L621)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:634](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L634)
@@ -538,10 +560,10 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiSharePublicLink1/createPublicLinkShare.feature:663](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L663)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:664](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L664)
 
-### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis-reva/issues/199)
+### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:718](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L718)
 
-### [Cannot set Mtime on upload](https://github.com/owncloud/ocis-reva/issues/468)
+### [Cannot set Mtime on upload](https://github.com/owncloud/ocis/issues/1248)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:760](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L760)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:761](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L761)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:774](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L774)
@@ -555,19 +577,19 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload1/uploadFile.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L184)
 -   [apiWebdavUpload1/uploadFile.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L185)
 
-### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis-reva/issues/373)
+### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 -   [apiSharePublicLink2/copyFromPublicLink.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L60)
 
-### https://github.com/owncloud/ocis-reva/issues/373
+### https://github.com/owncloud/ocis/issues/1232
 -   [apiSharePublicLink2/copyFromPublicLink.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L86)
 
-### [copying a file from within a public link folder to "/" overwrites the parent folder](https://github.com/owncloud/ocis-reva/issues/368)
+### [copying a file from within a public link folder to "/" overwrites the parent folder](https://github.com/owncloud/ocis/issues/1230)
 -   [apiSharePublicLink2/copyFromPublicLink.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L167)
 -   [apiSharePublicLink2/copyFromPublicLink.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L168)
 -   [apiSharePublicLink2/copyFromPublicLink.feature:183](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L183)
 -   [apiSharePublicLink2/copyFromPublicLink.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L184)
 
-### [overwriting a file removes it's public links](https://github.com/owncloud/ocis-reva/issues/476)
+### [overwriting a file removes it's public links](https://github.com/owncloud/ocis/issues/13266)
 -   [apiSharePublicLink2/multilinkSharing.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/multilinkSharing.feature#L160)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L94)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:95](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L95)
@@ -592,21 +614,21 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:440](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L440)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:441](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L441)
 
-### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
+### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L23)
 
-### [Accessing non-existing public link should return 404, not 500](https://github.com/owncloud/ocis-reva/issues/290)
+### [Accessing non-existing public link should return 404, not 500](https://github.com/owncloud/ocis/issues/1268)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L62)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L63)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L66)
 
-### [Set quota over settings](https://github.com/owncloud/ocis-reva/issues/195)
+### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L148)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L158)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L167)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L177)
 
-### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
+### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L273)
 
 ### [Propfind to trashbin endpoint requires UUID](https://github.com/owncloud/product/issues/179)
@@ -677,8 +699,8 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiTrashbin/trashbinRestore.feature:343](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L343)
 -   [apiTrashbin/trashbinRestore.feature:344](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L344)
 
-### [uploading with old-chunking does not work](https://github.com/owncloud/ocis-reva/issues/17)
-### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis-reva/issues/56)
+### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
+### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
 -   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:12](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L12)
 -   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L29)
 -   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L43)
@@ -747,7 +769,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L49)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L52)
 
-### [file id changes on every uploaded](https://github.com/owncloud/ocis-reva/issues/275)
+### [file id changes on every uploaded](https://github.com/owncloud/ocis/issues/1262)
 -   [apiVersions/fileVersions.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L29)
 -   [apiVersions/fileVersions.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L52)
 -   [apiVersions/fileVersions.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L61)
@@ -841,7 +863,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L63)
 -   [apiWebdavMove2/moveFileToExcludedDirectory.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L64)
 
-### [file cannot contain ? character](https://github.com/owncloud/ocis-reva/issues/265)
+### [file cannot contain ? character](https://github.com/owncloud/ocis/issues/1259)
 -   [apiWebdavMove2/moveFile.feature:292](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L292)
 
 ### [listing received shares does not work](https://github.com/owncloud/ocis-reva/issues/11)
@@ -852,7 +874,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavOperations/deleteFolder.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L91)
 -   [apiWebdavOperations/deleteFolder.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L92)
 
-### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis-reva/issues/12)
+### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
 -   [apiWebdavOperations/downloadFile.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L29)
 -   [apiWebdavOperations/downloadFile.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L30)
 
@@ -868,41 +890,17 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavOperations/refuseAccess.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L33)
 -   [apiWebdavOperations/refuseAccess.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L34)
 
-### [REPORT request not implemented](https://github.com/owncloud/ocis-reva/issues/39)
--   [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
--   [apiWebdavOperations/search.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L43)
--   [apiWebdavOperations/search.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L57)
--   [apiWebdavOperations/search.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L58)
--   [apiWebdavOperations/search.feature:74](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L74)
--   [apiWebdavOperations/search.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L75)
--   [apiWebdavOperations/search.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L83)
--   [apiWebdavOperations/search.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L84)
--   [apiWebdavOperations/search.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L101)
--   [apiWebdavOperations/search.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L102)
--   [apiWebdavOperations/search.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L119)
--   [apiWebdavOperations/search.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L120)
--   [apiWebdavOperations/search.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L138)
--   [apiWebdavOperations/search.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L139)
--   [apiWebdavOperations/search.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L165)
--   [apiWebdavOperations/search.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L166)
--   [apiWebdavOperations/search.feature:191](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L191)
--   [apiWebdavOperations/search.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L192)
--   [apiWebdavOperations/search.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L210)
--   [apiWebdavOperations/search.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L211)
--   [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
--   [apiWebdavOperations/search.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L229)
-
 ### [listing received shares does not work](https://github.com/owncloud/ocis-reva/issues/11)
 -   [apiWebdavProperties1/copyFile.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L65)
 -   [apiWebdavProperties1/copyFile.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L66)
 -   [apiWebdavProperties1/copyFile.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L85)
 -   [apiWebdavProperties1/copyFile.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L86)
 
-### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis-reva/issues/15)
+### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavProperties1/copyFile.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L102)
 -   [apiWebdavProperties1/copyFile.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L103)
 
-### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis-reva/issues/387)
+### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
 -   [apiWebdavProperties1/copyFile.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L116)
 -   [apiWebdavProperties1/copyFile.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L117)
 -   [apiWebdavProperties1/copyFile.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L129)
@@ -924,23 +922,23 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavProperties1/copyFile.feature:474](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L474)
 -   [apiWebdavProperties1/copyFile.feature:475](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L475)
 
-### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis-reva/issues/15)
+### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavProperties1/createFolder.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L71)
 -   [apiWebdavProperties1/createFolder.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L72)
 
-### [creating a folder that already exists returns an empty body](https://github.com/owncloud/ocis-reva/issues/168)
+### [creating a folder that already exists returns an empty body](https://github.com/owncloud/ocis/issues/1283)
 -   [apiWebdavProperties1/createFolder.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L85)
 -   [apiWebdavProperties1/createFolder.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L86)
 -   [apiWebdavProperties1/createFolder.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L99)
 -   [apiWebdavProperties1/createFolder.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L100)
 
-### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis-reva/issues/217)
+### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis/issues/1297)
 -   [apiWebdavProperties1/setFileProperties.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L32)
 -   [apiWebdavProperties1/setFileProperties.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L33)
 -   [apiWebdavProperties1/setFileProperties.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L63)
 -   [apiWebdavProperties1/setFileProperties.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L64)
 
-### [XML properties in webdav response not properly encoded](https://github.com/owncloud/ocis-reva/issues/214)
+### [XML properties in webdav response not properly encoded](https://github.com/owncloud/ocis/issues/1296)
 -   [apiWebdavProperties2/getFileProperties.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L37)
 -   [apiWebdavProperties2/getFileProperties.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L39)
 -   [apiWebdavProperties2/getFileProperties.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L40)
@@ -970,18 +968,18 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavProperties2/getFileProperties.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L218)
 -   [apiWebdavProperties2/getFileProperties.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L219)
 
-### [Private link support](https://github.com/owncloud/ocis-reva/issues/216)
+### [Private link support](https://github.com/owncloud/product/issues/201)
 -   [apiWebdavProperties2/getFileProperties.feature:232](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L232)
 -   [apiWebdavProperties2/getFileProperties.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L233)
 
-### [trying to access a non-existing resource returns an empty body](https://github.com/owncloud/ocis-reva/issues/163)
+### [trying to access a non-existing resource returns an empty body](https://github.com/owncloud/ocis/issues/1282)
 -   [apiWebdavProperties2/getFileProperties.feature:242](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L242)
 -   [apiWebdavProperties2/getFileProperties.feature:243](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L243)
 
-### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis-reva/issues/217)
+### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis/issues/1297)
 -   [apiWebdavProperties2/getFileProperties.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L246)
 
-### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis-reva/issues/217)
+### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis/issues/1297)
 -   [apiWebdavProperties2/getFileProperties.feature:266](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L266)
 -   [apiWebdavProperties2/getFileProperties.feature:301](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L301)
 -   [apiWebdavProperties2/getFileProperties.feature:302](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L302)
@@ -1002,7 +1000,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavProperties2/getFileProperties.feature:454](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L454)
 -   [apiWebdavProperties2/getFileProperties.feature:455](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L455)
 
-### [filename cannot contain ?](https://github.com/owncloud/ocis-reva/issues/265)
+### [filename cannot contain ?](https://github.com/owncloud/ocis/issues/1259)
 -   [apiWebdavUpload1/uploadFile.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L48)
 -   [apiWebdavUpload1/uploadFile.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L49)
 -   [apiWebdavUpload1/uploadFile.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L50)
@@ -1014,19 +1012,19 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload1/uploadFile.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L97)
 -   [apiWebdavUpload1/uploadFile.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L98)
 
-### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis-reva/issues/15)
+### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavUpload1/uploadFile.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L112)
 -   [apiWebdavUpload1/uploadFile.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L113)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L19)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L20)
 
-### [system configuration options missing](https://github.com/owncloud/ocis-reva/issues/54)
+### [system configuration options missing](https://github.com/owncloud/ocis/issues/1323)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L31)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L32)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L65)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L66)
 
-### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis-reva/issues/15)
+### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L13)
 -   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L20)
 -   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L37)
@@ -1034,7 +1032,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L39)
 -   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L42)
 
-### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis-reva/issues/15)
+### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L13)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L21)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L39)
@@ -1042,7 +1040,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L41)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L44)
 
-### [uploading with old-chunking does not work](https://github.com/owncloud/ocis-reva/issues/17)
+### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L13)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L26)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L35)
@@ -1055,7 +1053,7 @@ These currently pass in owncloud/ocis-reva and should start passing here in ocis
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L100)
 -   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L101)
 
-### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
+### [Previews via webDAV API tests fail on oCIS](https://github.com/owncloud/ocis/issues/187)
 -   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
 -   [apiWebdavPreviews/previews.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L16)
 -   [apiWebdavPreviews/previews.feature:17](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L17)

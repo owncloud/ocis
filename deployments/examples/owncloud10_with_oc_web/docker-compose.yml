@@ -26,7 +26,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$apr1$4vqie50r$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
@@ -38,6 +38,8 @@ services:
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=http"
       - "traefik.http.routers.traefik-secure.service=api@internal"
+    logging:
+      driver: "local"
     restart: always
 
   ocis:
@@ -72,11 +74,11 @@ services:
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
       PROXY_ENABLE_PRESIGNEDURLS: "false"
       PROXY_TLS: "false"
-      # konnectd - binddn must exist as oc10 admin user
-      KONNECTD_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
-      KONNECTD_INSECURE: "${INSECURE:-false}"
-      KONNECTD_SIGNING_KID: super
-      KONNECTD_TLS: 0
+      # idp - binddn must exist as oc10 admin user
+      IDP_IDENTIFIER_REGISTRATION_CONF: "/config/identifier-registration.yaml"
+      IDP_INSECURE: "${INSECURE:-false}"
+      IDP_SIGNING_KID: super
+      IDP_TLS: 0
       LDAP_BASEDN: "dc=example,dc=org"
       LDAP_BINDDN: "cn=admin,dc=example,dc=org"
       LDAP_BINDPW: "admin"
@@ -114,6 +116,8 @@ services:
       - "traefik.http.routers.ocis-secure.tls.certresolver=http"
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+    logging:
+      driver: "local"
     restart: always
 
   oc10:
@@ -156,6 +160,8 @@ services:
       - "traefik.http.routers.oc10-secure.tls.certresolver=http"
       - "traefik.http.routers.oc10-secure.service=oc10"
       - "traefik.http.services.oc10.loadbalancer.server.port=8080"
+    logging:
+      driver: "local"
     restart: always
 
   db:
@@ -175,6 +181,8 @@ services:
     volumes:
       - mysql:/var/lib/mysql
       - backup:/var/lib/backup
+    logging:
+      driver: "local"
     restart: always
 
   redis:
@@ -183,6 +191,8 @@ services:
       - REDIS_DATABASES=1
     volumes:
       - redis:/var/lib/redis
+    logging:
+      driver: "local"
     restart: always
 
 

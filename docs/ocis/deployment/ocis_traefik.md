@@ -18,7 +18,7 @@ geekdocFilePath: ocis_traefik.md
 
 The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/konnectd/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/idp/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
 
 ## Server Deployment
 
@@ -50,6 +50,8 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   INSECURE=true
 
   ### Traefik settings ###
+  # Serve Treafik dashboard. Defaults to "false".
+  TRAEFIK_DASHBOARD=
   # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
   TRAEFIK_DOMAIN=
   # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
@@ -66,7 +68,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  Set your domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
   The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 

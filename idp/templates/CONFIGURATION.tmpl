@@ -1,0 +1,76 @@
+---
+title: "Configuration"
+date: "{{ date "2006-01-02T15:04:05-0700" now }}"
+weight: 20
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/idp/templates
+geekdocFilePath: CONFIGURATION.tmpl
+---
+{{- define "options"}}
+{{ $fnName := (last . ).Flags -}}
+{{ range $opt := first . }}{{ with list $fnName $opt -}}
+{{ $o := last . -}}
+{{ if eq $o.FnName $fnName -}}
+-{{ $o.Name }} | {{ range $i, $e := $o.Env }} {{ if $i }}, {{ end }}${{ $e }}{{ end }}
+: {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
+
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{ end }}
+
+{{`{{< toc >}}`}}
+
+## Configuration
+
+### Configuration using config files
+
+Out of the box extensions will attempt to read configuration details from:
+
+```console
+/etc/ocis
+$HOME/.ocis
+./config
+```
+
+For this configuration to be picked up, have a look at your extension `root` command and look for which default config name it has assigned. *i.e: ocis-idp reads `idp.json | yaml | toml ...`*.
+
+So far we support the file formats `JSON` and `YAML`, if you want to get a full example configuration just take a look at [our repository](https://github.com/owncloud/ocis/tree/master/idp/config), there you can always see the latest configuration format. These example configurations include all available options and the default values. The configuration file will be automatically loaded if it's placed at `/etc/ocis/ocis.yml`, `${HOME}/.ocis/ocis.yml` or `$(pwd)/config/ocis.yml`.
+
+### Environment variables
+
+If you prefer to configure the service with environment variables you can see the available variables below.
+
+If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
+
+### Commandline flags
+
+If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+{{ $options := .Options -}}
+{{ range $com := .Commands }}{{ with (list $options $com) -}}
+{{ $c := last . -}}
+{{ if eq $c.Name "idp" -}}
+## Root Command
+
+{{ $c.Usage }}
+
+Usage: `idp [global options] command [command options] [arguments...]`
+{{ template "options" . -}}
+## Sub Commands
+
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range $com := .Commands }}{{ with (list $options $com) -}}
+{{- $c := last . }}
+{{- if ne $c.Name "idp" -}}
+### idp {{ $c.Name }}
+
+{{ $c.Usage }}
+
+Usage: `idp {{ $c.Name }} [command options] [arguments...]`
+{{ template "options" . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

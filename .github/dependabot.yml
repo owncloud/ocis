@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/ocis"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/accounts"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/settings"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/onlyoffice"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/idp"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+

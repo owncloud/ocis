@@ -126,7 +126,7 @@ func getGroup(group string) *proto.Group {
 	switch group {
 	case "sysusers":
 		return &proto.Group{Id: "34f38767-c937-4eb6-b847-1c175829a2a0", GidNumber: 15000, OnPremisesSamAccountName: "sysusers", DisplayName: "Technical users", Description: "A group for technical users. They should not show up in sharing dialogs.", Members: []*proto.Account{
-			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // konnectd
+			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // idp
 			{Id: "bc596f3c-c955-4328-80a0-60d018b4ad57"}, // reva
 		}}
 	case "users":

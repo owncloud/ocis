@@ -9,13 +9,13 @@ geekdocFilePath: basic-remote-setup.md
 
 {{< toc >}}
 
-Out of the box the ocis single binary and the `owncloud/ocis` docker image are configured to run on localhost for quick testing and development.
+Out of the box the oCIS single binary and the `owncloud/ocis` docker image are configured to run on localhost for quick testing and development.
 
-If you need to access ocis on a VM or a remote machine e.g. when testing a mobile client you need to configure ocis to run on a different host.
+If you need to access oCIS on a VM or a remote machine e.g. when testing a mobile client you need to configure oCIS to run on a different host.
 
 ## Use the binary
 
-If you start the ocis fullstack for the first time with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder relative to its location. This file is used to configure the clients for the built-in Identity Provider.
+If you start the oCIS fullstack for the first time with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder relative to its location. This file is used to configure the clients for the built-in Identity Provider.
 
 {{< hint warning >}}
 **Outdated version**\
@@ -52,24 +52,31 @@ clients:
 
 In this example we do not change the default port (`9200`). But this could be changed to another port.
 
-### Start the ocis fullstack server
+### Start the oCIS fullstack server
 
 You need to configure `your-host` in some services to provide the needed public resources.
+
+This snippet will start the oCIS server with auto generated self signed certificates:
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 OCIS_URL=https://your-server:9200 \
+KONNECTD_TLS=0 \
 PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
 PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
-KONNECTD_TLS=0 \
+IDP_TLS=0 \
 ./bin/ocis server
 ```
 
-For more configuration options check the configuration section in [ocis](https://owncloud.github.io/ocis/configuration/) and every ocis extension.
+For more configuration options check the configuration section in [ocis](https://owncloud.github.io/ocis/configuration/) and every oCIS extension.
 
 {{< hint info >}}
 **TLS Certificate**\
-In this example, we are replacing the default self-signed cert with a CA signed one to avoid the certificate warning when accessing the login page.
+If you have a CA signed certificate for your domain, add the following configurations:
+```
+PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
+PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
+```
 {{< /hint >}}
 
 ## Use Docker Compose

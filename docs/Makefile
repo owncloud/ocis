@@ -3,7 +3,7 @@ SHELL := bash
 OCIS_MODULES = \
 	accounts \
 	glauth \
-	konnectd \
+	idp \
 	ocis \
 	ocs \
 	ocis-pkg \

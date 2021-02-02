@@ -27,6 +27,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
+			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
 			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -87,7 +88,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"versioning":        true,
 				}
 
-				if !cfg.Reva.UploadDisableTus {
+				if cfg.Reva.DefaultUploadProtocol == "tus" {
 					filesCfg["tus_support"] = map[string]interface{}{
 						"version":              "1.0.0",
 						"resumable":            "1.0.0",
@@ -130,12 +131,10 @@ func Frontend(cfg *config.Config) *cli.Command {
 							},
 							"ocdav": map[string]interface{}{
 								"prefix":           cfg.Reva.Frontend.OCDavPrefix,
-								"chunk_folder":     cfg.Reva.OCDav.ChunkFolder,
 								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 								"timeout":          86400,
 								"insecure":         true,
-								"disable_tus":      cfg.Reva.UploadDisableTus,
 							},
 							"ocs": map[string]interface{}{
 								"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
@@ -147,7 +146,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 									"contact": "admin@localhost",
 									"ssl":     "false",
 								},
-								"disable_tus": cfg.Reva.UploadDisableTus,
+								"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,
 								"capabilities": map[string]interface{}{
 									"capabilities": map[string]interface{}{
 										"core": map[string]interface{}{
@@ -166,8 +165,8 @@ func Frontend(cfg *config.Config) *cli.Command {
 											"support_url_signing": true,
 										},
 										"checksums": map[string]interface{}{
-											"supported_types":       []string{"SHA256"},
-											"preferred_upload_type": "SHA256",
+											"supported_types":       cfg.Reva.ChecksumSupportedTypes,
+											"preferred_upload_type": cfg.Reva.ChecksumPreferredUploadType,
 										},
 										"files": filesCfg,
 										"dav":   map[string]interface{}{},
