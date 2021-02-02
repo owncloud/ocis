@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
+* Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
 ## Details
@@ -52,6 +53,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1186
    https://github.com/cs3org/reva/pull/1142
+
+* Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
+
+   Switch docker image annotation scheme to org.opencontainers standard because
+   org.label-schema is depreciated.
+
+   https://github.com/owncloud/ocis/pull/1381
 
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
