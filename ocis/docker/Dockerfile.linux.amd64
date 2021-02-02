@@ -1,6 +1,5 @@
 FROM amd64/alpine:3.12
 
-ARG CREATED=""
 ARG VERSION=""
 ARG REVISION=""
 
@@ -17,7 +16,6 @@ LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.opencontainers.image.description="oCIS - ownCloud Infinite Scale is a modern file-sync and share platform" \
   org.opencontainers.image.licenses="Apache-2.0" \
   org.opencontainers.image.documentation="https://owncloud.github.io/ocis.git" \
-  org.opencontainers.image.created="${CREATED}" \
   org.opencontainers.image.url="https://hub.docker.com/r/owncloud/ocis" \
   org.opencontainers.image.source="https://github.com/owncloud/ocis" \
   org.opencontainers.image.version="${VERSION}" \

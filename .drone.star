@@ -690,8 +690,7 @@ def dockerReleases(ctx):
 def dockerRelease(ctx, arch):
   build_args = [
     'REVISION=%s' % (ctx.build.commit),
-    'VERSION=%s' % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
-    'CREATED=""', # TODO: add time in RFC 3339 format
+    'VERSION=%s' % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest")
   ]
 
   return {
