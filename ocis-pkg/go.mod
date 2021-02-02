@@ -6,8 +6,8 @@ require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.5.2-0.20210125114636-0c10b333ee69
+	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
+	github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/iancoleman/strcase v0.1.2
@@ -21,12 +21,12 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
-	go.opencensus.io v0.22.5
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
+	go.opencensus.io v0.22.6
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	google.golang.org/grpc v1.33.2
+	google.golang.org/grpc v1.35.0
 	honnef.co/go/tools v0.0.1-2020.1.5
 )
 

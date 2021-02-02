@@ -7,14 +7,15 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.5.2-0.20210125114636-0c10b333ee69
+	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
+	github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
+	github.com/oleiade/reflections v1.0.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
@@ -24,9 +25,8 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
-	go.opencensus.io v0.22.5
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	github.com/stretchr/testify v1.7.0
+	go.opencensus.io v0.22.6
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
 	google.golang.org/protobuf v1.25.0
 )
