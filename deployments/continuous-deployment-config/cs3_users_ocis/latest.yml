@@ -25,14 +25,14 @@
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
           OCIS_DOCKER_TAG: latest
           OCIS_DOMAIN: ocis.ocis-cs3-users.latest.owncloud.works
-          LDAP_MANAGER_DOMAIN: ldap.ocis-keycloak.released.owncloud.works
+          LDAP_MANAGER_DOMAIN: ldap.ocis-cs3-users.latest.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
         env:
           NETWORK_NAME: ocis-net
-          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-traefik.latest.owncloud.works
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-cs3-users.latest.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
           OCIS_URL: ocis.ocis-cs3-users.latest.owncloud.works
