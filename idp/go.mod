@@ -24,9 +24,8 @@ require (
 	github.com/rs/zerolog v1.20.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/viper v1.7.0
-	go.opencensus.io v0.22.5
-	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
-	golang.org/x/net v0.0.0-20201022231255-08b38378de70
+	go.opencensus.io v0.22.6
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	stash.kopano.io/kc/konnect v0.33.3
 	stash.kopano.io/kgol/rndm v1.1.0
 )

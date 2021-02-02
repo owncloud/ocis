@@ -22,7 +22,7 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
-	go.opencensus.io v0.22.5
+	go.opencensus.io v0.22.6
 )
 
 replace (
