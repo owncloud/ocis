@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
-	github.com/gofrs/uuid v3.3.0+incompatible
+	github.com/gofrs/uuid v3.4.0+incompatible
 	github.com/golang/protobuf v1.4.3
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/micro/cli/v2 v2.1.2
@@ -23,10 +23,10 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.5
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
 	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible

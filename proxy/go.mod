@@ -7,8 +7,8 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21
-	github.com/cs3org/reva v1.5.2-0.20210125114636-0c10b333ee69
+	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
+	github.com/cs3org/reva v1.5.2-0.20210203162922-4a70b9aa3ab4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/justinas/alice v1.2.0
@@ -26,11 +26,11 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.5
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	google.golang.org/grpc v1.33.2
+	google.golang.org/grpc v1.35.0
 )
 
 replace (
