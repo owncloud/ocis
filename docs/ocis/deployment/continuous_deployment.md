@@ -39,12 +39,12 @@ Credentials:
 ## Latest
 
 - oCIS: [ocis.ocis-keycloak.latest.owncloud.works](https://ocis.ocis-keycloak.latest.owncloud.works)
-- Keycloak: [keycloak.ocis-keycloak.latest.owncloud.works](https://https://keycloak.ocis-keycloak.latest.owncloud.works)
+- Keycloak: [keycloak.ocis-keycloak.latest.owncloud.works](https://keycloak.ocis-keycloak.latest.owncloud.works)
 
 ## Released
 
 - oCIS: [ocis.ocis-keycloak.released.owncloud.works](https://ocis.ocis-keycloak.released.owncloud.works)
-- Keycloak: [keycloak.ocis-keycloak.latest.owncloud.works](https://keycloak.ocis-keycloak.latest.owncloud.works)
+- Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
 
 # oCIS with CS3 users
 
