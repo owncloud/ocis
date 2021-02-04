@@ -1,6 +1,6 @@
 <template>
-  <oc-table-row>
-    <oc-table-cell>
+  <oc-tr>
+    <oc-td alignH="center">
       <oc-checkbox
         class="oc-ml-s"
         size="large"
@@ -10,14 +10,14 @@
         :label="selectAccountLabel"
         hide-label
       />
-    </oc-table-cell>
-    <oc-table-cell>
+    </oc-td>
+    <oc-td>
       <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
-    </oc-table-cell>
-    <oc-table-cell v-text="account.onPremisesSamAccountName" />
-    <oc-table-cell v-text="account.displayName || '-'" />
-    <oc-table-cell v-text="account.mail" />
-    <oc-table-cell>
+    </oc-td>
+    <oc-td v-text="account.onPremisesSamAccountName" />
+    <oc-td v-text="account.displayName || '-'" />
+    <oc-td v-text="account.mail" />
+    <oc-td>
       <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" variation="raw">
         <span class="uk-flex uk-flex-middle accounts-roles-current-role">
           {{ currentRole ? currentRole.displayName : $gettext('Select role') }}
@@ -43,8 +43,8 @@
           </li>
         </ul>
       </oc-drop>
-    </oc-table-cell>
-    <oc-table-cell class="uk-text-center">
+    </oc-td>
+    <oc-td alignH="center">
       <oc-icon
         v-if="account.accountEnabled"
         key="account-icon-enabled"
@@ -61,8 +61,8 @@
         :aria-label="$gettext('Account is blocked')"
         class="accounts-status-indicator-disabled"
       />
-    </oc-table-cell>
-  </oc-table-row>
+    </oc-td>
+  </oc-tr>
 </template>
 
 <script>
