@@ -1,0 +1,18 @@
+baseURL = "https://owncloud.github.io/ocis-graph-explorer/"
+languageCode = "en-us"
+title = "ownCloud Infinite Scale: Graph-Explorer"
+pygmentsUseClasses = true
+
+disableKinds = ["taxonomy", "taxonomyTerm", "RSS", "sitemap"]
+
+[blackfriday]
+  angledQuotes = true
+  fractions = false
+  plainIDAnchors = true
+  smartlists = true
+  extensions = ["hardLineBreak"]
+
+[params]
+  author = "ownCloud GmbH"
+  description = "Serve Graph-Explorer for oCIS"
+  keywords = "reva, ocis"
