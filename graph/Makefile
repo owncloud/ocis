@@ -1,6 +1,6 @@
 SHELL := bash
-NAME := ocis-graph
-IMPORT := github.com/owncloud/$(NAME)
+NAME := graph
+IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
 
@@ -45,6 +45,7 @@ ifndef DATE
 endif
 
 LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
 GCFLAGS += all=-N -l
 
 .PHONY: all
@@ -58,6 +59,10 @@ sync:
 clean:
 	go clean -i ./...
 	rm -rf $(BIN) $(DIST)
+
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@go mod tidy
 
 .PHONY: fmt
 fmt:
@@ -87,6 +92,11 @@ changelog:
 test:
 	go run github.com/haya14busa/goverage -v -coverprofile coverage.out $(PACKAGES)
 
+.PHONY: go-coverage
+go-coverage:
+	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
+	@go tool cover -func coverage.out | tail -1 | grep -Eo "[0-9]+\.[0-9]+"
+
 .PHONY: install
 install: $(SOURCES)
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)
@@ -98,7 +108,7 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
-	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
 release: release-dirs release-linux release-windows release-darwin release-copy release-check
@@ -130,9 +140,9 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: docs
-docs:
-	cd docs; hugo
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: watch
 watch:
