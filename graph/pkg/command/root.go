@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis-graph/pkg/config"
-	"github.com/owncloud/ocis-graph/pkg/flagset"
-	"github.com/owncloud/ocis-graph/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/log"
+	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/flagset"
+	"github.com/owncloud/ocis/graph/pkg/version"
 	"github.com/spf13/viper"
 )
 
@@ -17,7 +17,7 @@ func Execute() error {
 	cfg := config.New()
 
 	app := &cli.App{
-		Name:     "ocis-graph",
+		Name:     "graph",
 		Version:  version.String,
 		Usage:    "Serve Graph API for oCIS",
 		Compiled: version.Compiled(),

@@ -3,7 +3,7 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis-graph/pkg/metrics"
+	"github.com/owncloud/ocis/graph/pkg/metrics"
 )
 
 // NewInstrument returns a service that instruments metrics.

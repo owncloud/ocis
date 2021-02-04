@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/owncloud/ocis-graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"

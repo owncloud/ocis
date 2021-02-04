@@ -4,9 +4,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis-graph/pkg/config"
-	"github.com/owncloud/ocis-graph/pkg/version"
 	"github.com/owncloud/ocis-pkg/v2/service/debug"
+	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/version"
 )
 
 // Server initializes the debug service and server.

@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis-graph
+module github.com/owncloud/ocis/graph
 
 go 1.13
 
