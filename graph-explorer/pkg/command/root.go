@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Execute is the entry point for the ocis-graph-explorer command.
+// Execute is the entry point for the graph-explorer command.
 func Execute() error {
 	cfg := config.New()
 
