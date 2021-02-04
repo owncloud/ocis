@@ -1,9 +1,9 @@
 <template>
   <div>
-    <oc-table middle divider>
-      <oc-table-group>
-        <oc-table-row class="fix-table-header">
-          <oc-table-cell shrink type="head" class="uk-text-center">
+    <oc-table-simple>
+      <oc-thead>
+        <oc-tr class="fix-table-header">
+          <oc-th shrink type="head" alignH="center">
             <oc-checkbox
               class="oc-ml-s"
               :value="areAllAccountsSelected"
@@ -11,23 +11,23 @@
               :label="$gettext('Select all users')"
               hide-label
             />
-          </oc-table-cell>
-          <oc-table-cell shrink type="head" />
-          <oc-table-cell type="head" v-text="$gettext('Username')" />
-          <oc-table-cell type="head" v-text="$gettext('Display name')" />
-          <oc-table-cell type="head" v-text="$gettext('Email')" />
-          <oc-table-cell type="head" v-text="$gettext('Role')" />
-          <oc-table-cell shrink type="head" v-text="$gettext('Activated')" />
-        </oc-table-row>
-      </oc-table-group>
-      <oc-table-group>
+          </oc-th>
+          <oc-th shrink type="head" />
+          <oc-th type="head" v-text="$gettext('Username')" />
+          <oc-th type="head" v-text="$gettext('Display name')" />
+          <oc-th type="head" v-text="$gettext('Email')" />
+          <oc-th type="head" v-text="$gettext('Role')" />
+          <oc-th shrink type="head" v-text="$gettext('Activated')" alignH="center"/>
+        </oc-tr>
+      </oc-thead>
+      <oc-tbody>
         <accounts-list-row
           v-for="account in accounts"
           :key="`account-list-row-${account.id}`"
           :account="account"
         />
-      </oc-table-group>
-    </oc-table>
+      </oc-tbody>
+    </oc-table-simple>
   </div>
 </template>
 
