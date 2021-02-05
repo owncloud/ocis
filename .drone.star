@@ -746,7 +746,7 @@ def dockerRelease(ctx, arch):
           'context': 'ocis',
           'auto_tag_suffix': 'linux-%s' % (arch),
           'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
-          'repo': ctx.build.commit,
+          'repo': ctx.repo.slug,
           'build_args': build_args,
         },
         'when': {
