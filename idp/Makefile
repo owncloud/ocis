@@ -98,9 +98,11 @@ assets: assets/identifier/static assets/identifier/static/logo.svg assets/identi
 assets/identifier/static:
 	mkdir -p assets/identifier/static
 
+.PHONY: assets/identifier/static/logo.svg
 assets/identifier/static/logo.svg:
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 
+.PHONY: assets/identifier/static/favicon.ico
 assets/identifier/static/favicon.ico:
 	curl -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
