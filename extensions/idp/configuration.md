@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-05T12:35:45+0000"
+date: "2021-02-08T07:45:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -34,30 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### idp health
-
-Check health status
-
-Usage: `idp health [command options] [arguments...]`
-
--debug-addr |  $IDP_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9134`.
-
-### idp ocis-idp
-
-Serve IDP API for oCIS
-
-Usage: `idp ocis-idp [command options] [arguments...]`
-
--log-level |  $IDP_LOG_LEVEL
-: Set logging level. Default: `info`.
-
--log-pretty |  $IDP_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $IDP_LOG_COLOR
-: Enable colored logging. Default: `true`.
 
 ### idp server
 
@@ -184,4 +160,28 @@ Usage: `idp version [command options] [arguments...]`
 
 -name |  $IDP_NAME
 : Service name. Default: `idp`.
+
+### idp health
+
+Check health status
+
+Usage: `idp health [command options] [arguments...]`
+
+-debug-addr |  $IDP_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9134`.
+
+### idp ocis-idp
+
+Serve IDP API for oCIS
+
+Usage: `idp ocis-idp [command options] [arguments...]`
+
+-log-level |  $IDP_LOG_LEVEL
+: Set logging level. Default: `info`.
+
+-log-pretty |  $IDP_LOG_PRETTY
+: Enable pretty logging. Default: `true`.
+
+-log-color |  $IDP_LOG_COLOR
+: Enable colored logging. Default: `true`.
 
