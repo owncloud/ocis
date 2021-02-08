@@ -96,7 +96,7 @@ type exec func() error
 
 // Start rpc runtime
 func (r *Runtime) Start() error {
-	halt := make(chan os.Signal)
+	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, os.Interrupt)
 
 	// initialize reva storages
