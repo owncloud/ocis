@@ -163,7 +163,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
+					//http.Flags(flagset.RootWithConfig(config.New())),
 				)
 
 				if err != nil {

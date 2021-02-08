@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro/v2"
 	mclient "github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
+	"github.com/micro/go-micro/v2/server"
 
 	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
@@ -40,17 +41,17 @@ func NewService(opts ...Option) Service {
 		Str("addr", sopts.Address).
 		Msg("starting server")
 
+	sname := strings.Join(
+		[]string{
+			sopts.Namespace,
+			sopts.Name,
+		},
+		".",
+	)
+
 	mopts := []micro.Option{
-		micro.Name(
-			strings.Join(
-				[]string{
-					sopts.Namespace,
-					sopts.Name,
-				},
-				".",
-			),
-		),
-		micro.Client(DefaultClient),
+		micro.Name(sname),
+		micro.Client(newGrpcClient()),
 		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
@@ -61,6 +62,7 @@ func NewService(opts ...Option) Service {
 		micro.RegisterInterval(time.Second * 10),
 		micro.Context(sopts.Context),
 		micro.Flags(sopts.Flags...),
+		micro.Server(server.NewServer(server.Name(sname))),
 	}
 
 	return Service{

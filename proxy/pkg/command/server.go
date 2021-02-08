@@ -176,8 +176,8 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics),
-					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
-					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
+					//proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
+					//proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 

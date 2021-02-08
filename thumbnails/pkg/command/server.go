@@ -140,7 +140,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Namespace(cfg.Server.Namespace),
 				grpc.Address(cfg.Server.Address),
 				grpc.Metrics(metrics),
-				grpc.Flags(flagset.RootWithConfig(config.New())),
+				//grpc.Flags(flagset.RootWithConfig(config.New())),
 			)
 
 			gr.Add(func() error {

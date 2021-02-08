@@ -5,10 +5,23 @@ import (
 	golog "log"
 	"net/rpc"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/micro/go-micro/v2"
 	"github.com/owncloud/ocis/ocis/pkg/config"
+
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	idp "github.com/owncloud/ocis/idp/pkg/command"
+	ocs "github.com/owncloud/ocis/ocs/pkg/command"
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
+	proxy "github.com/owncloud/ocis/proxy/pkg/command"
+	settings "github.com/owncloud/ocis/settings/pkg/command"
+	store "github.com/owncloud/ocis/store/pkg/command"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
+	web "github.com/owncloud/ocis/web/pkg/command"
+	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
 	cli "github.com/micro/cli/v2"
 
@@ -16,7 +29,6 @@ import (
 	"github.com/micro/micro/v2/service/registry"
 
 	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
 )
 
 var (
@@ -77,12 +89,62 @@ func New(cfg *config.Config) Runtime {
 	}
 }
 
+type exec func() error
+
 // Start rpc runtime
 func (r *Runtime) Start() error {
-	go r.Launch()
-	return service.Start(
-		service.WithLogPretty(r.c.Log.Pretty),
-	)
+	halt := make(chan os.Signal)
+	signal.Notify(halt, os.Interrupt)
+
+	// initialize reva storages
+	//cfg := storagesConfig.New()
+	//_ = []*cli.Command{
+	//	storage.StorageMetadata(cfg),
+	//	storage.StoragePublicLink(cfg),
+	//	storage.StorageUsers(cfg),
+	//	storage.Users(cfg),
+	//	storage.StorageHome(cfg),
+	//	storage.Frontend(cfg),
+	//	storage.Gateway(cfg),
+	//	storage.AuthBearer(cfg),
+	//	storage.AuthBasic(cfg),
+	//	storage.Sharing(cfg),
+	//}
+
+	//for i := range storages {
+	//	a := i
+	//	go func(z int) {
+	//		f := &flag.FlagSet{}
+	//		for k := range storages[z].Flags {
+	//			storages[z].Flags[k].Apply(f)
+	//		}
+	//		ctx := cli.NewContext(nil, f, nil)
+	//		storages[z].Before(ctx)
+	//		storages[z].Action(ctx)
+	//	}(a)
+	//}
+
+	services := []exec{
+		glauth.Execute,
+		idp.Execute,
+		ocs.Execute,
+		onlyoffice.Execute,
+		proxy.Execute,
+		settings.Execute,
+		store.Execute,
+		thumbnails.Execute,
+		web.Execute,
+		webdav.Execute,
+	}
+	for i := range services {
+		go services[i]()
+	}
+
+	time.Sleep(1 * time.Second)
+	go accounts.Execute()
+	<-halt
+
+	return nil
 }
 
 // Launch oCIS default oCIS extensions.

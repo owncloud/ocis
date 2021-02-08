@@ -31,6 +31,7 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.1.6
 	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
+	github.com/refs/pman v0.0.0-20210125101615-7406747552bc
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/cobra v1.0.0

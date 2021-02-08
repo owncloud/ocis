@@ -135,8 +135,8 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(mtrcs),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
+					//http.Flags(flagset.RootWithConfig(config.New())),
+					//http.Flags(flagset.ServerWithConfig(config.New())),
 					http.Handler(handler),
 				)
 
