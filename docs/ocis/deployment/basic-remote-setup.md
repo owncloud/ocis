@@ -15,7 +15,7 @@ If you need to access oCIS running in a docker container, on a VM or a remote ma
 
 ## Start the oCIS fullstack server from binary
 
-Upon first start of the oCIS fullstack server with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder in your current working directory. This file is used to configure the clients for the built-in identity provider.
+Upon first start of the oCIS fullstack server with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder in your current working directory. This file is used to configure the built-in identity provider and therefore contains the OpenID Connect issuer and also information about relying parties, for example ownCloud Web and our desktop and mobile applications.
 
 {{< hint warning >}}
 The `identifier-registration.yml` file will only be generated if does not exist. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
@@ -25,7 +25,7 @@ For the following examples you need to have the oCIS binary in your current work
 
 ### Using automatically generated certificates
 
-In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname you are in control of.
+In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname.
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
