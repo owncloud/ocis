@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"flag"
 	"fmt"
 	golog "log"
 	"net/rpc"
@@ -18,6 +19,8 @@ import (
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
+	storagesConfig "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
@@ -97,32 +100,34 @@ func (r *Runtime) Start() error {
 	signal.Notify(halt, os.Interrupt)
 
 	// initialize reva storages
-	//cfg := storagesConfig.New()
-	//_ = []*cli.Command{
-	//	storage.StorageMetadata(cfg),
-	//	storage.StoragePublicLink(cfg),
-	//	storage.StorageUsers(cfg),
-	//	storage.Users(cfg),
-	//	storage.StorageHome(cfg),
-	//	storage.Frontend(cfg),
-	//	storage.Gateway(cfg),
-	//	storage.AuthBearer(cfg),
-	//	storage.AuthBasic(cfg),
-	//	storage.Sharing(cfg),
-	//}
+	cfg := storagesConfig.New()
+	storages := []*cli.Command{
+		storage.StorageMetadata(cfg),
+		storage.StoragePublicLink(cfg),
+		storage.StorageUsers(cfg),
+		storage.Users(cfg),
+		storage.StorageHome(cfg),
+		storage.Frontend(cfg),
+		storage.Gateway(cfg),
+		storage.AuthBearer(cfg),
+		storage.AuthBasic(cfg),
+		storage.Sharing(cfg),
+	}
 
-	//for i := range storages {
-	//	a := i
-	//	go func(z int) {
-	//		f := &flag.FlagSet{}
-	//		for k := range storages[z].Flags {
-	//			storages[z].Flags[k].Apply(f)
-	//		}
-	//		ctx := cli.NewContext(nil, f, nil)
-	//		storages[z].Before(ctx)
-	//		storages[z].Action(ctx)
-	//	}(a)
-	//}
+	for i := range storages {
+		a := i
+		go func(z int) {
+			f := &flag.FlagSet{}
+			for k := range storages[z].Flags {
+				storages[z].Flags[k].Apply(f)
+			}
+			ctx := cli.NewContext(nil, f, nil)
+			if storages[z].Before != nil {
+				storages[z].Before(ctx)
+			}
+			storages[z].Action(ctx)
+		}(a)
+	}
 
 	services := []exec{
 		glauth.Execute,
