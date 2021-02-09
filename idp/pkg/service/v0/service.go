@@ -38,7 +38,7 @@ func NewService(opts ...Option) Service {
 		assets.Config(options.Config),
 	)
 
-	if err := initKonnectInternalEnvVars(); err != nil {
+	if err := initKonnectInternalEnvVars(&options.Config.Ldap); err != nil {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
@@ -110,26 +110,24 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 }
 
 // Init vars which are currently not accessible via idp api
-func initKonnectInternalEnvVars() error {
+func initKonnectInternalEnvVars(ldap *config.Ldap) error {
 	var defaults = map[string]string{
-		"LDAP_URI":                 "ldap://localhost:9125",
-		"LDAP_BINDDN":              "cn=idp,ou=sysusers,dc=example,dc=org",
-		"LDAP_BINDPW":              "idp",
-		"LDAP_BASEDN":              "ou=users,dc=example,dc=org",
-		"LDAP_SCOPE":               "sub",
-		"LDAP_LOGIN_ATTRIBUTE":     "cn",
-		"LDAP_EMAIL_ATTRIBUTE":     "mail",
-		"LDAP_NAME_ATTRIBUTE":      "sn",
-		"LDAP_UUID_ATTRIBUTE":      "uid",
-		"LDAP_UUID_ATTRIBUTE_TYPE": "text",
-		"LDAP_FILTER":              "(objectClass=posixaccount)",
+		"LDAP_URI":                 ldap.URI,
+		"LDAP_BINDDN":              ldap.BindDN,
+		"LDAP_BINDPW":              ldap.BindPassword,
+		"LDAP_BASEDN":              ldap.BaseDN,
+		"LDAP_SCOPE":               ldap.Scope,
+		"LDAP_LOGIN_ATTRIBUTE":     ldap.LoginAttribute,
+		"LDAP_EMAIL_ATTRIBUTE":     ldap.EmailAttribute,
+		"LDAP_NAME_ATTRIBUTE":      ldap.NameAttribute,
+		"LDAP_UUID_ATTRIBUTE":      ldap.UUIDAttribute,
+		"LDAP_UUID_ATTRIBUTE_TYPE": ldap.UUIDAttributeType,
+		"LDAP_FILTER":              ldap.Filter,
 	}
 
 	for k, v := range defaults {
-		if _, exists := os.LookupEnv(k); !exists {
-			if err := os.Setenv(k, v); err != nil {
-				return fmt.Errorf("could not set env var %s=%s", k, v)
-			}
+		if err := os.Setenv(k, v); err != nil {
+			return fmt.Errorf("could not set env var %s=%s", k, v)
 		}
 	}
 

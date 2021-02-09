@@ -268,6 +268,12 @@ func (s Service) createDefaultAccounts() (err error) {
 		},
 	}
 	for i := range accounts {
+		a := &proto.Account{}
+		err := s.repo.LoadAccount(context.Background(), accounts[i].Id, a)
+		if !storage.IsNotFoundErr(err) {
+			continue // account already exists -> do not overwrite
+		}
+
 		if err := s.repo.WriteAccount(context.Background(), &accounts[i]); err != nil {
 			return err
 		}
@@ -360,6 +366,12 @@ func (s Service) createDefaultGroups() (err error) {
 		}},
 	}
 	for i := range groups {
+		g := &proto.Group{}
+		err := s.repo.LoadGroup(context.Background(), groups[i].Id, g)
+		if !storage.IsNotFoundErr(err) {
+			continue // group already exists -> do not overwrite
+		}
+
 		if err := s.repo.WriteGroup(context.Background(), &groups[i]); err != nil {
 			return err
 		}
