@@ -8,7 +8,7 @@ Technical Story: [File system based indexing](https://github.com/owncloud/ocis-a
 
 ## Context and Problem Statement
 
-To set up High Availability (HA) or a geo-replicated setup we need to persist accounts in a distributed way. Furthermore, the [bleve](https://github.com/blevesearch/bleve) index makes the accounts service stateful, which we want to avoid for a scale out deployment.
+To set up High Availability (HA) or a geo-replicated setup we need to persist accounts in a distributed way. To efficiently query the accounts by email or username, and not only by id, they need to be indexed. Unfortunately, the [bleve](https://github.com/blevesearch/bleve) index we currently store locally on disk cannot be shared by multiple instances, preventing a scale out deployment.
 
 ## Considered Options
 

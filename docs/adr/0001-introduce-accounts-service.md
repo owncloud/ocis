@@ -1,6 +1,6 @@
 # 1. Introduce an accounts service
 
-* Status: superseded by [ADR-0003](0003-outsource-user-management.md) <!-- optional -->
+* Status: superseded by [ADR-0003](0003-external-user-management.md) <!-- optional -->
 * Deciders: @butonic, @felixboehm, @micbar, @pmaier1 <!-- optional -->
 * Date: [2020-06-15](https://github.com/owncloud/ocis-accounts/pull/34/commits/2fd05e2b6fe2a47c687bd0c0bc5e1b5c48a585b2) <!-- optional -->
 
@@ -12,7 +12,7 @@ To attach metadata like shares to users ownCloud relies on persistent, non-reass
 
 ## Decision Drivers <!-- optional -->
 
-* OCIS should be a single binary that can run out of the box without external dependencies like an LDAP server.
+* oCIS should be a single binary that can run out of the box without external dependencies like an LDAP server.
 * Time: we want to build a release candidate asap.
 * Firewalls need access to guests, typically via LDAP.
 * Not all external LDAPs are writeable for us to provision Guest accounts.
