@@ -13,28 +13,22 @@ import (
 )
 
 // Execute is the entry point for the ocis-onlyoffice command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "onlyoffice",
 		Version:  version.String,
 		Usage:    "OnlyOffice oCIS extension",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg)
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),

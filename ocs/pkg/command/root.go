@@ -13,29 +13,23 @@ import (
 )
 
 // Execute is the entry point for the ocis-ocs command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-ocs",
 		Version:  version.String,
 		Usage:    "Serve OCS API for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return nil
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),

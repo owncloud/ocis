@@ -21,7 +21,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "Start authprovider for basic auth",
-		Flags: flagset.AuthBasicWithConfig(cfg),
+		Flags: append(flagset.AuthBasicWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBasic.Services = c.StringSlice("service")
 
@@ -85,7 +85,6 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.AuthBasic.GRPCNetwork,
 						"address": cfg.Reva.AuthBasic.GRPCAddr,
-						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"authprovider": map[string]interface{}{
 								"auth_manager": cfg.Reva.AuthProvider.Driver,

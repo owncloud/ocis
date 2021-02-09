@@ -24,7 +24,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "Start frontend service",
-		Flags: flagset.FrontendWithConfig(cfg),
+		Flags: append(flagset.FrontendWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
 			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
@@ -73,7 +73,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				uuid := uuid.Must(uuid.NewV4())
 				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-				// pregenerate list of valid localhost ports for the desktop redirect_uri
+				// pre-generate list of valid localhost ports for the desktop redirect_uri
 				// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
 				var desktopRedirectURIs [65535 - 1024]string
 				for port := 0; port < len(desktopRedirectURIs); port++ {
@@ -121,7 +121,6 @@ func Frontend(cfg *config.Config) *cli.Command {
 								"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
 							},
 						},
-						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"datagateway": map[string]interface{}{
 								"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,

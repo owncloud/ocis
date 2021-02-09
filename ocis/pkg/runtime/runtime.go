@@ -20,7 +20,6 @@ import (
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
-	storagesConfig "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
@@ -99,19 +98,17 @@ func (r *Runtime) Start() error {
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, os.Interrupt)
 
-	// initialize reva storages
-	cfg := storagesConfig.New()
 	storages := []*cli.Command{
-		storage.StorageMetadata(cfg),
-		storage.StoragePublicLink(cfg),
-		storage.StorageUsers(cfg),
-		storage.Users(cfg),
-		storage.StorageHome(cfg),
-		storage.Frontend(cfg),
-		storage.Gateway(cfg),
-		storage.AuthBearer(cfg),
-		storage.AuthBasic(cfg),
-		storage.Sharing(cfg),
+		storage.StorageMetadata(r.c.Storage),
+		storage.StoragePublicLink(r.c.Storage),
+		storage.StorageUsers(r.c.Storage),
+		storage.Users(r.c.Storage),
+		storage.StorageHome(r.c.Storage),
+		storage.Frontend(r.c.Storage),
+		storage.Gateway(r.c.Storage),
+		storage.AuthBearer(r.c.Storage),
+		storage.AuthBasic(r.c.Storage),
+		storage.Sharing(r.c.Storage),
 	}
 
 	for i := range storages {
@@ -129,26 +126,23 @@ func (r *Runtime) Start() error {
 		}(a)
 	}
 
-	services := []exec{
-		glauth.Execute,
-		idp.Execute,
-		ocs.Execute,
-		onlyoffice.Execute,
-		proxy.Execute,
-		settings.Execute,
-		store.Execute,
-		thumbnails.Execute,
-		web.Execute,
-		webdav.Execute,
-	}
-	for i := range services {
-		go services[i]()
-	}
+	// TODO please find a better way to start all commands that doesn't involve doing this.
+	// TODO should execute accept a context so it's easier to propagate a stopping signal.
+	go idp.Execute(r.c.IDP)
+	go glauth.Execute(r.c.GLAuth)
+	go ocs.Execute(r.c.OCS)
+	go onlyoffice.Execute(r.c.Onlyoffice)
+	go proxy.Execute(r.c.Proxy)
+	go settings.Execute(r.c.Settings)
+	go store.Execute(r.c.Store)
+	go thumbnails.Execute(r.c.Thumbnails)
+	go web.Execute(r.c.Web)
+	go webdav.Execute(r.c.WebDAV)
 
 	time.Sleep(1 * time.Second)
-	go accounts.Execute()
-	<-halt
+	go accounts.Execute(r.c.Accounts)
 
+	<-halt
 	return nil
 }
 

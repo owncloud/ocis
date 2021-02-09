@@ -13,9 +13,7 @@ import (
 )
 
 // Execute is the entry point for the ocis-glauth command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-glauth",
 		Version:  version.String,

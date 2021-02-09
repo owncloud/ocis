@@ -21,7 +21,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-home",
 		Usage: "Start storage-home service",
-		Flags: flagset.StorageHomeWithConfig(cfg),
+		Flags: append(flagset.StorageHomeWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.StorageHome.Services = c.StringSlice("service")
 

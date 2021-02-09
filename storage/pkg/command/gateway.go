@@ -23,7 +23,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "gateway",
 		Usage: "Start gateway",
-		Flags: flagset.GatewayWithConfig(cfg),
+		Flags: append(flagset.GatewayWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Gateway.Services = c.StringSlice("service")
 			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")

@@ -21,7 +21,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "Start authprovider for bearer auth",
-		Flags: flagset.AuthBearerWithConfig(cfg),
+		Flags: append(flagset.AuthBearerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
 
@@ -61,7 +61,6 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
 			)
 
 			defer cancel()
@@ -85,7 +84,6 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 					"grpc": map[string]interface{}{
 						"network": cfg.Reva.AuthBearer.GRPCNetwork,
 						"address": cfg.Reva.AuthBearer.GRPCAddr,
-						// TODO build services dynamically
 						"services": map[string]interface{}{
 							"authprovider": map[string]interface{}{
 								"auth_manager": "oidc",

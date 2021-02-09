@@ -8,8 +8,6 @@ import (
 // AuthBasicWithConfig applies cfg to the root flagset
 func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 	flags := []cli.Flag{
-
-		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
 			Value:       "0.0.0.0:9147",
@@ -17,9 +15,6 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AuthBasic.DebugAddr,
 		},
-
-		// Auth
-
 		&cli.StringFlag{
 			Name:        "auth-driver",
 			Value:       "ldap",
@@ -34,11 +29,6 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_AUTH_JSON"},
 			Destination: &cfg.Reva.AuthProvider.JSON,
 		},
-
-		// Services
-
-		// AuthBasic
-
 		&cli.StringFlag{
 			Name:        "network",
 			Value:       "tcp",
