@@ -8,7 +8,7 @@ Technical Story: [Skip account-service by talking to CS3 user-api](https://githu
 
 ## Context and Problem Statement
 
-To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email and username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party such as ownCloud should should behave, it still requires the RP to maintain its own user identifiers.
+To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email and username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party (RP) such as ownCloud should behave, it still requires the RP to maintain its own user identifiers.
 
 ## Decision Drivers <!-- optional -->
 
@@ -36,14 +36,14 @@ Chosen option: "Move accounts functionality to GLAuth and name it accounts", by 
   - Users, groups and roles are stored and managed within GLAuth
 - Use external user management
   - Recommended for mid and large scale use cases
-  - Users, groups and roles are stored and managed within an external LDAP/AD directory / IDM
+  - Users, groups and roles are stored and managed within an external LDAP / AD / IDM
   - Separate oCIS and LDAP admin: oCIS admin relies on the LDAP admin to manage users
 - User permissions for roles are always managed in oCIS (settings service) because they are specific to oCIS
 
 ### Resulting technical implications
 - Make the file based reverse index a standalone library
 - Contribute to GLAuth
-  - Add ms graph based rest API to manage users groups and roles (the LDAP lib is currently readonly)
+  - Add ms graph based rest API to manage users, groups and roles (the LDAP lib is currently readonly)
   - Add web UI to glauth that uses the ms graph based rest API to manage users
   - Add a backend that uses the file based reverse index, currently living in the oCIS accounts service
   - Move fallback mechanism from ocis/glauth service to upstream GLAuth to support multiple LDAP servers

@@ -8,7 +8,7 @@ Technical Story: [persist accounts](https://github.com/owncloud/ocis-accounts/pu
 
 ## Context and Problem Statement
 
-To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email und username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party such as ownCloud should should behave, it still requires the RP to maintain its own user identifiers.
+To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email und username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party (RP) such as ownCloud should behave, it still requires the RP to maintain its own user identifiers.
 
 ## Decision Drivers <!-- optional -->
 
