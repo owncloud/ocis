@@ -25,21 +25,17 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Provide accounts and groups for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			AddAccount(cfg),

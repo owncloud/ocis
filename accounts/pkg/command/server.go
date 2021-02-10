@@ -30,7 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:        "server",
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
-		Flags:       append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")

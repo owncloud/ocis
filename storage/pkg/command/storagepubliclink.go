@@ -21,7 +21,7 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-public-link",
 		Usage:    "Start storage-public-link service",
-		Flags:    append(flagset.StoragePublicLink(cfg), flagset.RootWithConfig(cfg)...),
+		Flags:    flagset.StoragePublicLink(cfg),
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

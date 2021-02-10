@@ -66,7 +66,8 @@ func Server(opts ...Option) http.Service {
 	)
 
 	if err := service.Init(); err != nil {
-		panic(err)
+		//panic(err)
 	}
+	http.M.Unlock()
 	return service
 }

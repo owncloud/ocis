@@ -19,21 +19,17 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Example usage",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
 			return nil
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),

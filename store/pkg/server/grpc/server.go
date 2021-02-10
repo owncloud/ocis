@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/store/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/store/pkg/service/v0"
 )
@@ -32,5 +33,6 @@ func Server(opts ...Option) grpc.Service {
 	}
 
 	service.Init()
+	http.M.Unlock()
 	return service
 }

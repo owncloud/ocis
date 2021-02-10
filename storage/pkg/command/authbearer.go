@@ -21,7 +21,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "Start authprovider for bearer auth",
-		Flags: append(flagset.AuthBearerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.AuthBearerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
 

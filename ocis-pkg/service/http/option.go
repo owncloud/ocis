@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"sync"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -23,6 +24,7 @@ type Options struct {
 	Handler   http.Handler
 	Context   context.Context
 	Flags     []cli.Flag
+	Lock      *sync.Mutex
 }
 
 // newOptions initializes the available default options.
@@ -42,6 +44,13 @@ func newOptions(opts ...Option) Options {
 func Logger(l log.Logger) Option {
 	return func(o *Options) {
 		o.Logger = l
+	}
+}
+
+// Lock provides a function to set the logger option.
+func Lock(l *sync.Mutex) Option {
+	return func(o *Options) {
+		o.Lock = l
 	}
 }
 

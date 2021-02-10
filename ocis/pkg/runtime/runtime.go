@@ -10,9 +10,6 @@ import (
 	"time"
 
 	"github.com/micro/go-micro/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
-
-	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
@@ -20,15 +17,18 @@ import (
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
+	storageCfg "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
-	cli "github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis/pkg/config"
 
+	cli "github.com/micro/cli/v2"
 	"github.com/micro/micro/v2/client/api"
 	"github.com/micro/micro/v2/service/registry"
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 
 	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
 )
@@ -97,18 +97,28 @@ type exec func() error
 func (r *Runtime) Start() error {
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, os.Interrupt)
+	scfg := storageCfg.New() // need to make a copy because deep down in the storage values are copies.
 
+	// TODO(refs) find a better place for this propagation to happen.
+	// we can do this because storages parse flags when the command is called. By this point we are only interested
+	// in propagating the top level configuration from oCIS down to the storages. And it just so happen that it only
+	// contain log information, so each and every service log in the same way.
+	scfg.Log.Color = r.c.Log.Color
+	scfg.Log.Pretty = r.c.Log.Pretty
+	scfg.Log.Level = r.c.Log.Level
+
+	// TODO(refs) abstract this to its own function to show more intent and improve readibility.
 	storages := []*cli.Command{
-		storage.StorageMetadata(r.c.Storage),
-		storage.StoragePublicLink(r.c.Storage),
-		storage.StorageUsers(r.c.Storage),
-		storage.Users(r.c.Storage),
-		storage.StorageHome(r.c.Storage),
-		storage.Frontend(r.c.Storage),
-		storage.Gateway(r.c.Storage),
-		storage.AuthBearer(r.c.Storage),
-		storage.AuthBasic(r.c.Storage),
-		storage.Sharing(r.c.Storage),
+		storage.StorageMetadata(scfg),
+		storage.StoragePublicLink(scfg),
+		storage.StorageUsers(scfg),
+		storage.Users(scfg),
+		storage.StorageHome(scfg),
+		storage.Frontend(scfg),
+		storage.Gateway(scfg),
+		storage.AuthBearer(scfg),
+		storage.AuthBasic(scfg),
+		storage.Sharing(scfg),
 	}
 
 	for i := range storages {

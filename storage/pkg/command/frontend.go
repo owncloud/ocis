@@ -24,7 +24,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "Start frontend service",
-		Flags: append(flagset.FrontendWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
 			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")

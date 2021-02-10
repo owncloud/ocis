@@ -139,8 +139,6 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Context(ctx),
 					grpc.Config(cfg),
 					grpc.Metrics(metrics),
-					//grpc.Flags(flagset.RootWithConfig(config.New())),
-					//grpc.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				gr.Add(server.Run, func(_ error) {

@@ -21,7 +21,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "Start authprovider for basic auth",
-		Flags: append(flagset.AuthBasicWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.AuthBasicWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBasic.Services = c.StringSlice("service")
 

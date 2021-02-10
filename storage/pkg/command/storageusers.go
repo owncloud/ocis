@@ -21,7 +21,7 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-users",
 		Usage: "Start storage-users service",
-		Flags: append(flagset.StorageUsersWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.StorageUsersWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.StorageHome.Services = c.StringSlice("service")
 

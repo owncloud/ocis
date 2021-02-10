@@ -19,16 +19,13 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Serve ownCloud Web for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Flags: flagset.RootWithConfig(cfg),
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),

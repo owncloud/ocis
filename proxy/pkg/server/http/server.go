@@ -4,12 +4,12 @@ import (
 	"crypto/tls"
 	"os"
 
-	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/proxy/pkg/crypto"
 )
 
 // Server initializes the http service and server.
-func Server(opts ...Option) (svc.Service, error) {
+func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 	l := options.Logger
 	httpCfg := options.Config.HTTP
@@ -46,21 +46,22 @@ func Server(opts ...Option) (svc.Service, error) {
 	}
 	chain := options.Middlewares.Then(options.Handler)
 
-	service := svc.NewService(
-		svc.Name(options.Config.Service.Name),
-		svc.TLSConfig(tlsConfig),
-		svc.Logger(options.Logger),
-		svc.Namespace(options.Config.Service.Namespace),
-		svc.Version(options.Config.Service.Version),
-		svc.Address(options.Config.HTTP.Addr),
-		svc.Context(options.Context),
-		svc.Flags(options.Flags...),
-		svc.Handler(chain),
+	service := http.NewService(
+		http.Name(options.Config.Service.Name),
+		http.TLSConfig(tlsConfig),
+		http.Logger(options.Logger),
+		http.Namespace(options.Config.Service.Namespace),
+		http.Version(options.Config.Service.Version),
+		http.Address(options.Config.HTTP.Addr),
+		http.Context(options.Context),
+		http.Flags(options.Flags...),
+		http.Handler(chain),
 	)
 
 	if err := service.Init(); err != nil {
 		l.Fatal().Err(err).Msgf("Error initializing")
 	}
+	http.M.Unlock()
 
 	return service, nil
 }

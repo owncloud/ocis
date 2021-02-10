@@ -59,10 +59,6 @@ func Server(cfg *config.Config) *cli.Command {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
-
-			// TODO we could parse OCIS_URL and set the PROXY_HTTP_ADDR port but that would make it harder to deploy with a
-			// reverse proxy ... wouldn't it?
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -176,8 +172,6 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics),
-					//proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
-					//proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 

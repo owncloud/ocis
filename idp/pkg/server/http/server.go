@@ -48,7 +48,6 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Version(options.Config.Service.Version),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
-		http.Flags(options.Flags...),
 		http.TLSConfig(tlsConfig),
 	)
 
@@ -77,11 +76,9 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewLogging(handle, options.Logger)
 	}
 
-	service.Handle(
-		"/",
-		handle,
-	)
+	service.Handle("/", handle)
 
 	service.Init()
+	http.M.Unlock()
 	return service, nil
 }

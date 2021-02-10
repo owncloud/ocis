@@ -51,5 +51,6 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	service.Init()
+	http.M.Unlock()
 	return service, nil
 }

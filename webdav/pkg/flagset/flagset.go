@@ -16,14 +16,14 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
-			Value:       true,
+			Value:       false,
 			Name:        "log-pretty",
 			Usage:       "Enable pretty logging",
 			EnvVars:     []string{"OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
-			Value:       true,
+			Value:       false,
 			Name:        "log-color",
 			Usage:       "Enable colored logging",
 			EnvVars:     []string{"OCIS_LOG_COLOR"},

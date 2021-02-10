@@ -28,7 +28,7 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 
 			if cfg.HTTP.Root != "/" {
@@ -158,8 +158,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					//http.Flags(flagset.RootWithConfig(config.New())),
-					//http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {

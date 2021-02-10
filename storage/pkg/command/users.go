@@ -21,7 +21,7 @@ func Users(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "users",
 		Usage: "Start users service",
-		Flags: append(flagset.UsersWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		Flags: flagset.UsersWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Users.Services = c.StringSlice("service")
 

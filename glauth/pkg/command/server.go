@@ -147,7 +147,6 @@ func Server(cfg *config.Config) *cli.Command {
 			metrics.BuildInfo.WithLabelValues(cfg.Version).Set(1)
 
 			{
-
 				lcfg := glauthcfg.LDAP{
 					Enabled: cfg.Ldap.Enabled,
 					Listen:  cfg.Ldap.Address,

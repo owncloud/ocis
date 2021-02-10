@@ -19,8 +19,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Execute is the entry point for the ocis command.
+// Execute is the entry point for the oCIS command.
 func Execute() error {
+	// cfg is the root config that will trickle down to the subcommands
 	cfg := config.New()
 
 	app := &cli.App{
@@ -28,11 +29,9 @@ func Execute() error {
 		Version:  version.String,
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
-
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg)
 		},
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
@@ -49,10 +48,8 @@ func Execute() error {
 		)
 	}
 
-	r := *registry.GetRegistry()
-
 	opts := micro.Options{
-		Registry: r,
+		Registry: *registry.GetRegistry(),
 	}
 
 	runtime.AddMicroPlatform(app, opts)

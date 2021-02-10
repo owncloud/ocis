@@ -23,7 +23,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-metadata",
 		Usage:    "Start storage-metadata service",
-		Flags:    append(flagset.StorageMetadata(cfg), flagset.RootWithConfig(cfg)...),
+		Flags:    flagset.StorageMetadata(cfg),
 		Category: "Extensions",
 		Before: func(c *cli.Context) error {
 			storageRoot := c.String("storage-root")
@@ -69,7 +69,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
 			)
 
 			defer cancel()

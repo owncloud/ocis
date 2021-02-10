@@ -32,6 +32,7 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 	}
 }
 
+// TODO tracing config should be defined on the top level and cascade down to subcommands to avoid functions like this one
 func configureIDP(cfg *config.Config) *svcconfig.Config {
 	cfg.IDP.Log.Level = cfg.Log.Level
 	cfg.IDP.Log.Pretty = cfg.Log.Pretty
