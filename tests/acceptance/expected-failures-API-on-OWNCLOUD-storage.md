@@ -80,6 +80,8 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbin/trashbinRestore.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L281)
 -   [apiTrashbin/trashbinRestore.feature:298](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L298)
 -   [apiTrashbin/trashbinRestore.feature:299](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L299)
+-   [apiTrashbin/trashbinRestore.feature:372](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L372)
+-   [apiTrashbin/trashbinRestore.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L373)
 
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
 #### [trash-bin restore move does not send back Etag and other headers](https://github.com/owncloud/ocis/issues/1121)
@@ -357,22 +359,16 @@ Scenario Outline: try to create a folder that already exists
 #### [XML properties in webdav response not properly encoded](https://github.com/owncloud/ocis/issues/1296)
 Scenario Outline: Do a PROPFIND of various file names
 -   [apiWebdavProperties2/getFileProperties.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L37)
--   [apiWebdavProperties2/getFileProperties.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L39)
 -   [apiWebdavProperties2/getFileProperties.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L40)
 -   [apiWebdavProperties2/getFileProperties.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L41)
--   [apiWebdavProperties2/getFileProperties.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L43)
 -   [apiWebdavProperties2/getFileProperties.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L44)
 
 Scenario Outline: Do a PROPFIND of various folder names
--   [apiWebdavProperties2/getFileProperties.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L59)
 -   [apiWebdavProperties2/getFileProperties.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L60)
 -   [apiWebdavProperties2/getFileProperties.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L61)
--   [apiWebdavProperties2/getFileProperties.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L63)
 -   [apiWebdavProperties2/getFileProperties.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L64)
--   [apiWebdavProperties2/getFileProperties.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L66)
 -   [apiWebdavProperties2/getFileProperties.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L67)
 -   [apiWebdavProperties2/getFileProperties.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L68)
--   [apiWebdavProperties2/getFileProperties.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L70)
 -   [apiWebdavProperties2/getFileProperties.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L71)
 
 ### [Different webdav properties from core](https://github.com/owncloud/ocis/issues/1302)

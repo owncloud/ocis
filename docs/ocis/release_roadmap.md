@@ -7,8 +7,6 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_roadmap.md
 ---
 
-# Release Roadmap
-
 You may have asked yourself why there are major version 1 tags in our GitHub repository but the readme still states `ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.`. How can that be if its a major version 1?
 
 Our initial and also our current plan is to stick to SemVer as versioning scheme. But sometimes there are other factors which cross your plans. Therefore we started releasing oCIS with version `1.0.0 Tech Preview`.
