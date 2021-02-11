@@ -64,6 +64,12 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
+  # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
+  IDP_LDAP_BIND_PASSWORD=
+  # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
+  STORAGE_LDAP_BIND_PASSWORD=
+  # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
+  OCIS_JWT_SECRET=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -77,6 +83,8 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   By default ocis will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
+
+  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}}).
 
   Now you have configured everything and can save the file.
 

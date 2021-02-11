@@ -75,7 +75,7 @@ type Config struct {
 	Graph         *graph.Config
 	GraphExplorer *graphExplorer.Config
 	Hello         *hello.Config
-	IDP      	  *idp.Config
+	IDP           *idp.Config
 	OCS           *ocs.Config
 	Onlyoffice    *onlyoffice.Config
 	Web           *web.Config
@@ -96,7 +96,7 @@ func New() *Config {
 		Graph:         graph.New(),
 		GraphExplorer: graphExplorer.New(),
 		Hello:         hello.New(),
-		IDP:      	   idp.New(),
+		IDP:           idp.New(),
 		OCS:           ocs.New(),
 		Onlyoffice:    onlyoffice.New(),
 		Web:           web.New(),
