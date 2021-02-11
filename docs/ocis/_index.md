@@ -21,13 +21,5 @@ We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), 
 
 ### Architecture Overview
 
-{{< mermaid class="text-center">}}
-graph TD
-proxy -->
-    idp & web & thumbnails & ocs & webdav & storage & accounts & store & settings
 
-idp --> glauth
-
-storage --> REVA
-
-{{< /mermaid >}}
+{{< svg src="ocis/static/architecture-overview.drawio.svg" >}}
