@@ -46,6 +46,8 @@ type Config struct {
 	Tracing  Tracing
 	Datapath string
 	Service  Service
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

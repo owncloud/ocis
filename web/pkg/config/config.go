@@ -93,6 +93,8 @@ type Config struct {
 	Asset   Asset
 	OIDC    OIDC
 	Web     Web
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

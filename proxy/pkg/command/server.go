@@ -247,6 +247,9 @@ func Server(cfg *config.Config) *cli.Command {
 				})
 			}
 
+			if cfg.C != nil {
+				*cfg.C <- struct{}{}
+			}
 			return gr.Run()
 		},
 	}

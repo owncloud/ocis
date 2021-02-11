@@ -69,6 +69,8 @@ type Config struct {
 	Fallback       Backend
 	Version        string
 	RoleBundleUUID string
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

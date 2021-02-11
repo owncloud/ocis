@@ -40,6 +40,8 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Asset   Asset
+
+	C *chan struct{}
 }
 
 // Asset defines the available asset configuration.

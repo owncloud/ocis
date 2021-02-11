@@ -51,14 +51,16 @@ type Asset struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File     string
-	Log      Log
-	Debug    Debug
-	HTTP     HTTP
-	Tracing  Tracing
-	Asset    Asset
-	IDP bootstrap.Config
-	Service  Service
+	File    string
+	Log     Log
+	Debug   Debug
+	HTTP    HTTP
+	Tracing Tracing
+	Asset   Asset
+	IDP     bootstrap.Config
+	Service Service
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

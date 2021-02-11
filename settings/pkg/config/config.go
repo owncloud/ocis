@@ -66,6 +66,8 @@ type Config struct {
 	Tracing      Tracing
 	Asset        Asset
 	TokenManager TokenManager
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

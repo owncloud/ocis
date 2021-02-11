@@ -51,6 +51,8 @@ type Config struct {
 	Tracing      Tracing
 	TokenManager TokenManager
 	Service      Service
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

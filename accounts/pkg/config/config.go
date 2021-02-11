@@ -121,6 +121,8 @@ type Config struct {
 	Index        Index
 	ServiceUser  ServiceUser
 	Tracing      Tracing
+
+	C *chan struct{}
 }
 
 // New returns a new config.

@@ -40,6 +40,8 @@ type Config struct {
 	Server    Server
 	Tracing   Tracing
 	Thumbnail Thumbnail
+
+	C *chan struct{}
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.

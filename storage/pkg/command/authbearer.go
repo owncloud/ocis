@@ -171,6 +171,10 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				})
 			}
 
+			// the defensive code is needed because sending to a nil channel blocks forever
+			if cfg.C != nil {
+				*cfg.C <- struct{}{}
+			}
 			return gr.Run()
 		},
 	}

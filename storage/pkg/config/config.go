@@ -347,6 +347,8 @@ type Config struct {
 	Reva    Reva
 	Tracing Tracing
 	Asset   Asset
+
+	C *chan struct{}
 }
 
 // New initializes a new configuration with or without defaults.

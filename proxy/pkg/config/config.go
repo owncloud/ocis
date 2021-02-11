@@ -119,6 +119,8 @@ type Config struct {
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool
+
+	C *chan struct{}
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
