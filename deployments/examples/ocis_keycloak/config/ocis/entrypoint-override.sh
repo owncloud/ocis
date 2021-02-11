@@ -19,7 +19,7 @@ echo "  Reva user UUID: $REVA_USER_UUID"
 ocis accounts update --password $STORAGE_LDAP_BIND_PASSWORD $REVA_USER_UUID
 
 killall ocis
-echo "default serets changed"
+echo "default secrets changed"
 echo "##################################################"
 
 ocis server

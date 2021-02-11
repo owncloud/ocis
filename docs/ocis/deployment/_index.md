@@ -39,7 +39,7 @@ Both have simple default passwords which need to be changed. Currently, changing
 
 The new password for the Reva Inter Operability Platform user must be made available to oCIS by using the environment variable `STORAGE_LDAP_BIND_PASSWORD`. The same applies to the new Kopano IDP user password, which needs do be made available to oCIS in `IDP_LDAP_BIND_PASSWORD`.
 
-Furthermore oCIS needs to share a JWT token with REVA, which also need to be changed by the user.
+Furthermore, oCIS uses a shared secret to sign JWT tokens for inter service authorization, which also needs to be changed by the user.
 You can change it by setting the `OCIS_JWT_SECRET` environment variable for oCIS to a random string.
 
 ### Delete demo users
