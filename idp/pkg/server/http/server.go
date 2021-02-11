@@ -17,8 +17,8 @@ func Server(opts ...Option) (http.Service, error) {
 	var tlsConfig *tls.Config
 	if options.Config.HTTP.TLS {
 		if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
-			_, certErr := os.Stat("./server.crt")
-			_, keyErr := os.Stat("./server.key")
+			_, certErr := os.Stat("./data/proxy/server.crt")
+			_, keyErr := os.Stat("./data/proxy/server.key")
 
 			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 				options.Logger.Info().Msgf("Generating certs")
@@ -28,8 +28,8 @@ func Server(opts ...Option) (http.Service, error) {
 				}
 			}
 
-			options.Config.HTTP.TLSCert = "server.crt"
-			options.Config.HTTP.TLSKey = "server.key"
+			options.Config.HTTP.TLSCert = "./data/proxy/server.crt"
+			options.Config.HTTP.TLSKey = "./data/proxy/server.key"
 		}
 
 		cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)
