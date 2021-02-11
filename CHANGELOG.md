@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
 * Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
+* Enhancement - Migrate ocis-graph-explorer to ocis monorepo: [#1596](https://github.com/owncloud/ocis/pull/1596)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
 ## Details
@@ -68,6 +69,14 @@ The following sections list the changes for unreleased.
    org.label-schema is depreciated.
 
    https://github.com/owncloud/ocis/pull/1381
+
+* Enhancement - Migrate ocis-graph-explorer to ocis monorepo: [#1596](https://github.com/owncloud/ocis/pull/1596)
+
+   Tags: ocis, ocis-graph-explorer
+
+   Ocis-graph-explorer was not migrated during the monorepo conversion.
+
+   https://github.com/owncloud/ocis/pull/1596
 
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
