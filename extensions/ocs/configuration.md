@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-10T17:06:30+0000"
+date: "2021-02-11T10:50:07+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -98,7 +98,7 @@ Usage: `ocs server [command options] [arguments...]`
 -http-root |  $OCS_HTTP_ROOT
 : Root path of http server. Default: `/ocs`.
 
--jwt-secret |  $OCS_JWT_SECRET
+-jwt-secret |  $OCS_JWT_SECRET , $OCIS_JWT_SECRET
 : Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
 ### ocs version

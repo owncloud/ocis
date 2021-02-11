@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-10T17:06:24+0000"
+date: "2021-02-11T10:50:01+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -109,6 +109,39 @@ Usage: `idp server [command options] [arguments...]`
 
 -identity-manager |  $IDP_IDENTITY_MANAGER
 : Identity manager (one of ldap,kc,cookie,dummy). Default: `ldap`.
+
+-ldap-uri |  $IDP_LDAP_URI
+: URI of the LDAP server (glauth). Default: `ldap://localhost:9125`.
+
+-ldap-bind-dn |  $IDP_LDAP_BIND_DN
+: Bind DN for the LDAP server (glauth). Default: `cn=idp,ou=sysusers,dc=example,dc=org`.
+
+-ldap-bind-password |  $IDP_LDAP_BIND_PASSWORD
+: Password for the Bind DN of the LDAP server (glauth). Default: `idp`.
+
+-ldap-base-dn |  $IDP_LDAP_BASE_DN
+: LDAP base DN of the oCIS users. Default: `ou=users,dc=example,dc=org`.
+
+-ldap-scope |  $IDP_LDAP_SCOPE
+: LDAP scope of the oCIS users. Default: `sub`.
+
+-ldap-login-attribute |  $IDP_LDAP_LOGIN_ATTRIBUTE
+: LDAP login attribute of the oCIS users. Default: `cn`.
+
+-ldap-email-attribute |  $IDP_LDAP_EMAIL_ATTRIBUTE
+: LDAP email attribute of the oCIS users. Default: `mail`.
+
+-ldap-name-attribute |  $IDP_LDAP_NAME_ATTRIBUTE
+: LDAP name attribute of the oCIS users. Default: `sn`.
+
+-ldap-uuid-attribute |  $IDP_LDAP_UUID_ATTRIBUTE
+: LDAP UUID attribute of the oCIS users. Default: `uid`.
+
+-ldap-uuid-attribute-type |  $IDP_LDAP_UUID_ATTRIBUTE_TYPE
+: LDAP UUID attribute type of the oCIS users. Default: `text`.
+
+-ldap-filter |  $IDP_LDAP_FILTER
+: LDAP filter of the oCIS users. Default: `(objectClass=posixaccount)`.
 
 -transport-tls-cert |  $IDP_TRANSPORT_TLS_CERT
 : Certificate file for transport encryption.

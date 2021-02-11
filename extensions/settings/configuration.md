@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-10T17:06:33+0000"
+date: "2021-02-11T10:50:10+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -119,7 +119,7 @@ Usage: `settings server [command options] [arguments...]`
 -data-path |  $SETTINGS_DATA_PATH
 : Mount path for the storage. Default: `/var/tmp/ocis/settings`.
 
--jwt-secret |  $SETTINGS_JWT_SECRET
+-jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
 
 ### settings version

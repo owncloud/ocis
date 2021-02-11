@@ -70,6 +70,12 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   OCIS_DOMAIN=
   # ownCloud Web openid connect client id. Defaults to "ocis-web"
   OCIS_OIDC_CLIENT_ID=
+  # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
+  IDP_LDAP_BIND_PASSWORD=
+  # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
+  STORAGE_LDAP_BIND_PASSWORD=
+  # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
+  OCIS_JWT_SECRET=
 
   ### Keycloak ###
   # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
@@ -96,6 +102,8 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
   If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
+
+  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}}).
 
   Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
