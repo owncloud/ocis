@@ -149,7 +149,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Used to dismantle the access token, should equal reva's jwt-secret",
-			EnvVars:     []string{"OCS_JWT_SECRET"},
+			EnvVars:     []string{"OCS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 	}

@@ -1,7 +1,7 @@
 ---
 title: "Preparing a server"
 date: 2020-10-12T14:04:00+01:00
-weight: 10
+weight: 100
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
 geekdocFilePath: preparing_server.md

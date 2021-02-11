@@ -28,6 +28,21 @@ type HTTP struct {
 	TLS     bool
 }
 
+// Ldap defines the available LDAP configuration.
+type Ldap struct {
+	URI               string
+	BindDN            string
+	BindPassword      string
+	BaseDN            string
+	Scope             string
+	LoginAttribute    string
+	EmailAttribute    string
+	NameAttribute     string
+	UUIDAttribute     string
+	UUIDAttributeType string
+	Filter            string
+}
+
 // Service defines the available service configuration.
 type Service struct {
 	Name      string
@@ -58,6 +73,7 @@ type Config struct {
 	Tracing Tracing
 	Asset   Asset
 	IDP     bootstrap.Config
+	Ldap    Ldap
 	Service Service
 
 	C *chan struct{}

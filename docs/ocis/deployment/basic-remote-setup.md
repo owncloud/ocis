@@ -21,6 +21,10 @@ Upon first start of the oCIS fullstack server with `./bin/ocis server` it will g
 The `identifier-registration.yml` file will only be generated if does not exist. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
 {{< /hint >}}
 
+{{< hint warning >}}
+oCIS is currently in a Tech Preview state and is shipped with demo users. In order to secure your oCIS instances please follow following guide: [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}})
+{{< /hint >}}
+
 For the following examples you need to have the oCIS binary in your current working directory, we assume it is named `ocis` and it needs to be marked as executable. See [Getting Started]({{< ref "../getting-started/#binaries" >}}) for where to get the binary from.
 
 ### Using automatically generated certificates

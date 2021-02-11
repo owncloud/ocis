@@ -175,7 +175,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
-			EnvVars:     []string{"PROXY_JWT_SECRET"},
+			EnvVars:     []string{"PROXY_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{

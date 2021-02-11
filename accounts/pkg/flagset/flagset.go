@@ -137,7 +137,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
-			EnvVars:     []string{"ACCOUNTS_JWT_SECRET"},
+			EnvVars:     []string{"ACCOUNTS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{
@@ -172,7 +172,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "storage-cs3-jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
-			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_JWT_SECRET"},
+			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.Repo.CS3.JWTSecret,
 		},
 		&cli.StringFlag{
