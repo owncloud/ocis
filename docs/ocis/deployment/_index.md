@@ -39,10 +39,15 @@ Both have simple default passwords which need to be changed. Currently, changing
 
 The new password for the Reva Inter Operability Platform user must be made available to oCIS by using the environment variable `STORAGE_LDAP_BIND_PASSWORD`. The same applies to the new Kopano IDP user password, which needs do be made available to oCIS in `IDP_LDAP_BIND_PASSWORD`.
 
-Furthermore oCIS needs to share a JWT token with REVA, wich also need to be changed by the user.
+Furthermore oCIS needs to share a JWT token with REVA, which also need to be changed by the user.
 You can change it by setting the `OCIS_JWT_SECRET` environment variable for oCIS to a random string.
 
 ### Delete demo users
+
+{{< hint info >}}
+Before deleting the demo users mentioned below, you must create a new account for yourself and assign it to the administrator role.
+{{< /hint >}}
+
 oCIS ships with a few demo users besides the system users:
 - Admin (ddc2004c-0977-11eb-9d3f-a793888cd0f8)
 - Albert Einstein (4c510ada-c86b-4815-8820-42cdf82c3d51)
@@ -51,4 +56,4 @@ oCIS ships with a few demo users besides the system users:
 - Marie Curie (f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c)
 
 You can view them in ownCloud Web if you log in as Admin user or list them by running `ocis accounts list`.
-Before deleting all demo users mentioned above, you must create a new account for yourself and assign it to the administrator role. After doing so it is safe to delete the demo users in the web UI or with the command `ocis accounts remove <id>`. Please do not delete the system users (see [change default secrets]({{< ref "_index.md#change-default-secrets" >}})) or oCIS will not function properly anymore.
+After adding your own user it is safe to delete the demo users in the web UI or with the command `ocis accounts remove <id>`. Please do not delete the system users (see [change default secrets]({{< ref "_index.md#change-default-secrets" >}})) or oCIS will not function properly anymore.
