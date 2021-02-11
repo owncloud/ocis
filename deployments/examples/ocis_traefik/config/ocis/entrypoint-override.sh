@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -evx
+set -e
 
 ocis server&
 sleep 10
