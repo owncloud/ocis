@@ -24,6 +24,7 @@ type Gateway struct {
 	ShareFolder                string
 	LinkGrants                 string
 	HomeMapping                string
+	EtagCacheTTL               int
 }
 
 // StorageRegistry defines the available storage registry configuration
@@ -37,10 +38,15 @@ type StorageRegistry struct {
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver     string
-	UserJSONFile   string
-	PublicDriver   string
-	PublicJSONFile string
+	UserDriver      string
+	UserJSONFile    string
+	UserSQLUsername string
+	UserSQLPassword string
+	UserSQLHost     string
+	UserSQLPort     int
+	UserSQLName     string
+	PublicDriver    string
+	PublicJSONFile  string
 }
 
 // Port defines the available port configuration.
@@ -73,8 +79,17 @@ type Port struct {
 // Users defines the available users configuration.
 type Users struct {
 	Port
-	Driver string
-	JSON   string
+	Driver                    string
+	JSON                      string
+	UserGroupsCacheExpiration int
+}
+
+// Groups defines the available groups configuration.
+type Groups struct {
+	Port
+	Driver                      string
+	JSON                        string
+	GroupMembersCacheExpiration int
 }
 
 // FrontendPort defines the available frontend configuration.
@@ -244,37 +259,41 @@ type OIDC struct {
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	Hostname        string
-	Port            int
-	BaseDN          string
-	LoginFilter     string
-	UserFilter      string
-	AttributeFilter string
-	FindFilter      string
-	GroupFilter     string
-	BindDN          string
-	BindPassword    string
-	IDP             string
-	Schema          LDAPSchema
+	Hostname             string
+	Port                 int
+	BaseDN               string
+	LoginFilter          string
+	UserFilter           string
+	UserAttributeFilter  string
+	UserFindFilter       string
+	UserGroupFilter      string
+	GroupFilter          string
+	GroupAttributeFilter string
+	GroupFindFilter      string
+	GroupMemberFilter    string
+	BindDN               string
+	BindPassword         string
+	IDP                  string
+	Schema               LDAPSchema
 }
 
-// UserRest defines the user REST driver specification.
-type UserRest struct {
-	ClientID                  string
-	ClientSecret              string
-	RedisAddress              string
-	RedisUsername             string
-	RedisPassword             string
-	IDProvider                string
-	APIBaseURL                string
-	OIDCTokenEndpoint         string
-	TargetAPI                 string
-	UserGroupsCacheExpiration int
+// UserGroupRest defines the REST driver specification for user and group resolution.
+type UserGroupRest struct {
+	ClientID          string
+	ClientSecret      string
+	RedisAddress      string
+	RedisUsername     string
+	RedisPassword     string
+	IDProvider        string
+	APIBaseURL        string
+	OIDCTokenEndpoint string
+	TargetAPI         string
 }
 
 // LDAPSchema defines the available ldap schema configuration.
 type LDAPSchema struct {
 	UID         string
+	GID         string
 	Mail        string
 	DisplayName string
 	CN          string
@@ -296,7 +315,7 @@ type Reva struct {
 	TransferExpires int
 	OIDC            OIDC
 	LDAP            LDAP
-	UserRest        UserRest
+	UserGroupRest   UserGroupRest
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
@@ -305,6 +324,7 @@ type Reva struct {
 	Gateway           Gateway
 	StorageRegistry   StorageRegistry
 	Users             Users
+	Groups            Groups
 	AuthProvider      Users
 	AuthBasic         Port
 	AuthBearer        Port

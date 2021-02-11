@@ -5,76 +5,76 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
-// UsersWithConfig applies cfg to the root flagset
-func UsersWithConfig(cfg *config.Config) []cli.Flag {
+// GroupsWithConfig applies cfg to the root flagset
+func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 	flags := []cli.Flag{
 
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9145",
+			Value:       "0.0.0.0:9161",
 			Usage:       "Address to bind debug server",
-			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
-			Destination: &cfg.Reva.Users.DebugAddr,
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Groups.DebugAddr,
 		},
 
 		// Services
 
-		// Userprovider
+		// Groupprovider
 
 		&cli.StringFlag{
 			Name:        "network",
 			Value:       "tcp",
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
-			EnvVars:     []string{"STORAGE_USERPROVIDER_NETWORK"},
-			Destination: &cfg.Reva.Users.GRPCNetwork,
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_NETWORK"},
+			Destination: &cfg.Reva.Groups.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       "0.0.0.0:9144",
+			Value:       "0.0.0.0:9160",
 			Usage:       "Address to bind storage service",
-			EnvVars:     []string{"STORAGE_USERPROVIDER_ADDR"},
-			Destination: &cfg.Reva.Users.GRPCAddr,
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ADDR"},
+			Destination: &cfg.Reva.Groups.GRPCAddr,
 		},
 		&cli.StringFlag{
 			Name:        "endpoint",
-			Value:       "localhost:9144",
+			Value:       "localhost:9160",
 			Usage:       "URL to use for the storage service",
-			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
-			Destination: &cfg.Reva.Users.Endpoint,
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.Groups.Endpoint,
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   cli.NewStringSlice("userprovider"), // TODO preferences
-			Usage:   "--service userprovider [--service otherservice]",
-			EnvVars: []string{"STORAGE_USERPROVIDER_SERVICES"},
+			Value:   cli.NewStringSlice("groupprovider"), // TODO preferences
+			Usage:   "--service groupprovider [--service otherservice]",
+			EnvVars: []string{"STORAGE_GROUPPROVIDER_SERVICES"},
 		},
 
 		&cli.StringFlag{
 			Name:        "driver",
 			Value:       "ldap",
-			Usage:       "user driver: 'demo', 'json', 'ldap', or 'rest'",
-			EnvVars:     []string{"STORAGE_USERPROVIDER_DRIVER"},
-			Destination: &cfg.Reva.Users.Driver,
+			Usage:       "group driver: 'json', 'ldap', or 'rest'",
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DRIVER"},
+			Destination: &cfg.Reva.Groups.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "json-config",
 			Value:       "",
-			Usage:       "Path to users.json file",
-			EnvVars:     []string{"STORAGE_USERPROVIDER_JSON"},
-			Destination: &cfg.Reva.Users.JSON,
+			Usage:       "Path to groups.json file",
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_JSON"},
+			Destination: &cfg.Reva.Groups.JSON,
 		},
-		&cli.IntFlag{
-			Name:        "user-groups-cache-expiration",
+    &cli.IntFlag{
+			Name:        "group-members-cache-expiration",
 			Value:       5,
 			Usage:       "Time in minutes for redis cache expiration.",
-			EnvVars:     []string{"STORAGE_USER_CACHE_EXPIRATION"},
-			Destination: &cfg.Reva.Users.UserGroupsCacheExpiration,
+			EnvVars:     []string{"STORAGE_GROUP_CACHE_EXPIRATION"},
+			Destination: &cfg.Reva.Groups.GroupMembersCacheExpiration,
 		},
 
-		// rest driver
+    // rest driver
 
-		&cli.StringFlag{
+    &cli.StringFlag{
 			Name:        "rest-client-id",
 			Value:       "",
 			Usage:       "User/group rest driver Client ID",

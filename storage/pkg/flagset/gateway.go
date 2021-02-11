@@ -104,6 +104,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_GATEWAY_HOME_MAPPING"},
 			Destination: &cfg.Reva.Gateway.HomeMapping,
 		},
+		&cli.IntFlag{
+			Name:        "etag-cache-ttl",
+			Value:       0,
+			Usage:       "TTL for the home and shares directory etags cache",
+			EnvVars:     []string{"STORAGE_GATEWAY_ETAG_CACHE_TTL"},
+			Destination: &cfg.Reva.Gateway.EtagCacheTTL,
+		},
 
 		// other services
 

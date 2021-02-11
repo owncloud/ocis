@@ -16,14 +16,14 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 )
 
-// Sharing is the entrypoint for the sharing command.
-func Sharing(cfg *config.Config) *cli.Command {
+// Groups is the entrypoint for the sharing command.
+func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "sharing",
-		Usage: "Start sharing service",
-		Flags: flagset.SharingWithConfig(cfg),
+		Name:  "groups",
+		Usage: "Start groups service",
+		Flags: flagset.GroupsWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Sharing.Services = c.StringSlice("service")
+			cfg.Reva.Groups.Services = c.StringSlice("service")
 
 			return nil
 		},
@@ -67,13 +67,12 @@ func Sharing(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-
 				uuid := uuid.Must(uuid.NewV4())
 				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 				rcfg := map[string]interface{}{
 					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Sharing.MaxCPUs,
+						"max_cpus":             cfg.Reva.Groups.MaxCPUs,
 						"tracing_enabled":      cfg.Tracing.Enabled,
 						"tracing_endpoint":     cfg.Tracing.Endpoint,
 						"tracing_collector":    cfg.Tracing.Collector,
@@ -83,30 +82,47 @@ func Sharing(cfg *config.Config) *cli.Command {
 						"jwt_secret": cfg.Reva.JWTSecret,
 					},
 					"grpc": map[string]interface{}{
-						"network": cfg.Reva.Sharing.GRPCNetwork,
-						"address": cfg.Reva.Sharing.GRPCAddr,
+						"network": cfg.Reva.Groups.GRPCNetwork,
+						"address": cfg.Reva.Groups.GRPCAddr,
 						// TODO build services dynamically
 						"services": map[string]interface{}{
-							"usershareprovider": map[string]interface{}{
-								"driver": cfg.Reva.Sharing.UserDriver,
+							"groupprovider": map[string]interface{}{
+								"driver": cfg.Reva.Groups.Driver,
 								"drivers": map[string]interface{}{
 									"json": map[string]interface{}{
-										"file": cfg.Reva.Sharing.UserJSONFile,
+										"groups": cfg.Reva.Groups.JSON,
 									},
-									"sql": map[string]interface{}{
-										"db_username": cfg.Reva.Sharing.UserSQLUsername,
-										"db_password": cfg.Reva.Sharing.UserSQLPassword,
-										"db_host":     cfg.Reva.Sharing.UserSQLHost,
-										"db_port":     cfg.Reva.Sharing.UserSQLPort,
-										"db_name":     cfg.Reva.Sharing.UserSQLName,
+									"ldap": map[string]interface{}{
+										"hostname":        cfg.Reva.LDAP.Hostname,
+										"port":            cfg.Reva.LDAP.Port,
+										"base_dn":         cfg.Reva.LDAP.BaseDN,
+										"groupfilter":     cfg.Reva.LDAP.GroupFilter,
+										"attributefilter": cfg.Reva.LDAP.GroupAttributeFilter,
+										"findfilter":      cfg.Reva.LDAP.GroupFindFilter,
+										"memberfilter":    cfg.Reva.LDAP.GroupMemberFilter,
+										"bind_username":   cfg.Reva.LDAP.BindDN,
+										"bind_password":   cfg.Reva.LDAP.BindPassword,
+										"idp":             cfg.Reva.LDAP.IDP,
+										"schema": map[string]interface{}{
+											"dn":          "dn",
+											"gid":         cfg.Reva.LDAP.Schema.GID,
+											"mail":        cfg.Reva.LDAP.Schema.Mail,
+											"displayName": cfg.Reva.LDAP.Schema.DisplayName,
+											"cn":          cfg.Reva.LDAP.Schema.CN,
+											"gidNumber":   cfg.Reva.LDAP.Schema.GIDNumber,
+										},
 									},
-								},
-							},
-							"publicshareprovider": map[string]interface{}{
-								"driver": cfg.Reva.Sharing.PublicDriver,
-								"drivers": map[string]interface{}{
-									"json": map[string]interface{}{
-										"file": cfg.Reva.Sharing.PublicJSONFile,
+									"rest": map[string]interface{}{
+										"client_id":                      cfg.Reva.UserGroupRest.ClientID,
+										"client_secret":                  cfg.Reva.UserGroupRest.ClientSecret,
+										"redis_address":                  cfg.Reva.UserGroupRest.RedisAddress,
+										"redis_username":                 cfg.Reva.UserGroupRest.RedisUsername,
+										"redis_password":                 cfg.Reva.UserGroupRest.RedisPassword,
+										"group_members_cache_expiration": cfg.Reva.Groups.GroupMembersCacheExpiration,
+										"id_provider":                    cfg.Reva.UserGroupRest.IDProvider,
+										"api_base_url":                   cfg.Reva.UserGroupRest.APIBaseURL,
+										"oidc_token_endpoint":            cfg.Reva.UserGroupRest.OIDCTokenEndpoint,
+										"target_api":                     cfg.Reva.UserGroupRest.TargetAPI,
 									},
 								},
 							},
@@ -133,7 +149,7 @@ func Sharing(cfg *config.Config) *cli.Command {
 			{
 				server, err := debug.Server(
 					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.Sharing.DebugAddr),
+					debug.Addr(cfg.Reva.Users.DebugAddr),
 					debug.Logger(logger),
 					debug.Context(ctx),
 					debug.Config(cfg),

@@ -42,6 +42,7 @@ var (
 		"storage-frontend",
 		"storage-gateway",
 		"storage-userprovider",
+		"storage-groupprovider",
 		"storage-auth-basic",
 		"storage-auth-bearer",
 		"storage-home",
