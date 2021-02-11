@@ -4,14 +4,11 @@ import (
 	"context"
 	"image"
 
-	"gopkg.in/square/go-jose.v2/jwt"
-
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
-	"github.com/pkg/errors"
 )
 
 // NewService returns a service implementation for Service.
@@ -56,9 +53,9 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	if auth == "" {
 		return merrors.BadRequest(g.serviceID, "authorization is missing")
 	}
-	username, err := usernameFromAuthorization(auth)
-	if err != nil {
-		return merrors.InternalServerError(g.serviceID, "could not get username: %v", err.Error())
+	username := req.Username
+	if username == "" {
+		return merrors.BadRequest(g.serviceID, "username missing in request")
 	}
 
 	tr := thumbnail.Request{
@@ -91,23 +88,4 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rs
 	rsp.Thumbnail = thumbnail
 	rsp.Mimetype = tr.Encoder.MimeType()
 	return nil
-}
-
-func usernameFromAuthorization(auth string) (string, error) {
-	tokenString := auth[len("Bearer "):] // strip the bearer prefix
-
-	var claims map[string]interface{}
-	token, err := jwt.ParseSigned(tokenString)
-	if err != nil {
-		return "", errors.Wrap(err, "could not parse auth token")
-	}
-	err = token.UnsafeClaimsWithoutVerification(&claims)
-	if err != nil {
-		return "", errors.Wrap(err, "could not get claims from auth token")
-	}
-
-	identityMap := claims["kc.identity"].(map[string]interface{})
-	username := identityMap["kc.i.un"].(string)
-
-	return username, nil
 }

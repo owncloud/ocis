@@ -25,6 +25,7 @@ type Request struct {
 	Width         int
 	Height        int
 	Authorization string
+	Username      string
 }
 
 // NewRequest extracts all required parameters from a http request.
@@ -54,6 +55,7 @@ func NewRequest(r *http.Request) (Request, error) {
 		Width:         width,
 		Height:        height,
 		Authorization: authorization,
+		Username:      chi.URLParam(r, "user"),
 	}
 
 	return tr, nil
