@@ -30,5 +30,12 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_DRIVER_OCIS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.Common.UserLayout,
 		},
+		&cli.StringFlag{
+			Name:        "service-user-uuid",
+			Value:       "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			Usage:       "uuid of the internal service user",
+			EnvVars:     []string{"STORAGE_DRIVER_OCIS_SERVICE_USER_UUID"},
+			Destination: &cfg.Reva.Storages.OCIS.ServiceUserUUID,
+		},
 	}
 }

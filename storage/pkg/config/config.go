@@ -165,6 +165,7 @@ type StorageConfig struct {
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
 	Common   DriverCommon
+	OCIS     DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
 
@@ -240,6 +241,11 @@ type DriverEOS struct {
 
 	// gateway service to use for uid lookups
 	GatewaySVC string
+}
+
+// DriverOCIS defines the available oCIS storage driver configuration.
+type DriverOCIS struct {
+	ServiceUserUUID string
 }
 
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
