@@ -94,7 +94,7 @@
     "react-intl-cra": "^0.3.3",
     "react-intl-po": "^2.2.2",
     "source-map-explorer": "^1.8.0",
-    "yarn-deduplicate": "^1.1.1"
+    "yarn-deduplicate": "^3.1.0"
   },
   "jest": {
     "roots": [
