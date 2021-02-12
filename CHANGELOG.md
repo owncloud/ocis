@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
 * Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
+* Bugfix - Remove unimplemented config file option for oCIS root command: [#1636](https://github.com/owncloud/ocis/pull/1636)
 * Bugfix - Fix thumbnail generation when using different idp: [#1624](https://github.com/owncloud/ocis/issues/1624)
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
@@ -30,6 +31,10 @@ The following sections list the changes for unreleased.
    available on localhost / 127.0.0.1.
 
    https://github.com/owncloud/ocis/pull/1546
+
+* Bugfix - Remove unimplemented config file option for oCIS root command: [#1636](https://github.com/owncloud/ocis/pull/1636)
+
+   https://github.com/owncloud/ocis/pull/1636
 
 * Bugfix - Fix thumbnail generation when using different idp: [#1624](https://github.com/owncloud/ocis/issues/1624)
 
