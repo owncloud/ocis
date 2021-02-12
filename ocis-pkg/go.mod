@@ -6,8 +6,8 @@ require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
-	github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c
+	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
+	github.com/cs3org/reva v1.5.2-0.20210215094754-dda48c9cb779
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
 	github.com/iancoleman/strcase v0.1.2

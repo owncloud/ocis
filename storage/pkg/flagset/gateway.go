@@ -178,6 +178,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Users.Endpoint,
 		},
 		&cli.StringFlag{
+                        Name:        "groupprovider-endpoint",
+                        Value:       "localhost:9160",
+                        Usage:       "endpoint to use for the groupprovider",
+                        EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
+                        Destination: &cfg.Reva.Groups.Endpoint,
+                },
+		&cli.StringFlag{
 			Name:        "sharing-endpoint",
 			Value:       "localhost:9150",
 			Usage:       "endpoint to use for the storage service",

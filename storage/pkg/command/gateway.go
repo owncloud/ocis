@@ -143,6 +143,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 						},
 					},
 				}
+				logger.Info().Msgf("rcfg %+v", rcfg)
 
 				gr.Add(func() error {
 					err := external.RegisterGRPCEndpoint(

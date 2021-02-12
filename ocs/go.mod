@@ -8,8 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
-	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
-	github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c
+	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
+	github.com/cs3org/reva v1.5.2-0.20210215094754-dda48c9cb779
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.3
