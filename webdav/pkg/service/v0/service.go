@@ -64,6 +64,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		Width:         int32(tr.Width),
 		Height:        int32(tr.Height),
 		Authorization: tr.Authorization,
+		Username:      tr.Username,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
