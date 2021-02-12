@@ -22,7 +22,7 @@ echo "default secrets changed"
 echo "##################################################"
 
 echo "##################################################"
-echo "delete demo users:" # demo users are provided by keycloak
+echo "delete demo users" # demo users are provided by keycloak
 
 set +e # accounts can only delete once, so it will fail the second time
 ocis accounts remove 4c510ada-c86b-4815-8820-42cdf82c3d51
@@ -34,6 +34,4 @@ set -e
 
 echo "##################################################"
 
-killall ocis
-
-ocis server
+wait # wait for oCIS to exit
