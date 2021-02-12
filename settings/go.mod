@@ -23,10 +23,10 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
-	go.opencensus.io v0.22.5
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	github.com/stretchr/testify v1.7.0
+	go.opencensus.io v0.22.6
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
 	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible

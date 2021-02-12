@@ -14,7 +14,6 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
-	github.com/kr/pty v1.1.8 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/ogier/pflag v0.0.1
@@ -27,13 +26,11 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
-	go.opencensus.io v0.22.5
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	github.com/stretchr/testify v1.7.0
+	go.opencensus.io v0.22.6
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	google.golang.org/genproto v0.0.0-20200918140846-d0d605568037 // indirect
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
 replace (

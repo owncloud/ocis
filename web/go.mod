@@ -16,8 +16,8 @@ require (
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20200918114005-1a0ddd2190ee
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
-	go.opencensus.io v0.22.5
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	go.opencensus.io v0.22.6
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 )
 
 replace (

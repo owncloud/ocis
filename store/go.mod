@@ -27,7 +27,7 @@ require (
 	github.com/restic/calens v0.2.0
 	github.com/spf13/viper v1.7.0
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
-	go.opencensus.io v0.22.5
+	go.opencensus.io v0.22.6
 	google.golang.org/protobuf v1.25.0
 )
 
