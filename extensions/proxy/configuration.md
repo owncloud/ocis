@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-13T03:16:49+0000"
+date: "2021-02-13T21:55:55+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -34,6 +34,18 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### proxy version
+
+Print the versions of the running instances
+
+Usage: `proxy version [command options] [arguments...]`
+
+--service-namespace |  $PROXY_SERVICE_NAMESPACE
+: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
+
+--service-name |  $PROXY_SERVICE_NAME
+: Service name. Default: `proxy`.
 
 ### proxy health
 
@@ -145,16 +157,4 @@ Usage: `proxy server [command options] [arguments...]`
 
 --account-backend-type |  $PROXY_ACCOUNT_BACKEND_TYPE
 : account-backend-type. Default: `accounts`.
-
-### proxy version
-
-Print the versions of the running instances
-
-Usage: `proxy version [command options] [arguments...]`
-
---service-namespace |  $PROXY_SERVICE_NAMESPACE
-: Set the base namespace for the service namespace. Default: `com.owncloud.web`.
-
---service-name |  $PROXY_SERVICE_NAME
-: Service name. Default: `proxy`.
 
