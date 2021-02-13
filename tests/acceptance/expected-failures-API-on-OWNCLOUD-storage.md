@@ -23,6 +23,12 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiTrashbin/trashbinDelete.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L107)
 -   [apiTrashbin/trashbinDelete.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L123)
 
+### [A deleted folder with & in it does not appear in the trashbin](https://github.com/owncloud/ocis/issues/1547)
+-   [apiTrashbin/trashbinDelete.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L167)
+-   [apiTrashbin/trashbinDelete.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L168)
+-   [apiTrashbin/trashbinDelete.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L199)
+-   [apiTrashbin/trashbinDelete.feature:200](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L200)
+
 ### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
 
 The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
@@ -69,6 +75,10 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbin/trashbinRestore.feature:299](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L299)
 -   [apiTrashbin/trashbinRestore.feature:372](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L372)
 -   [apiTrashbin/trashbinRestore.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L373)
+-   [apiTrashbin/trashbinRestore.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L411)
+-   [apiTrashbin/trashbinRestore.feature:412](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L412)
+-   [apiTrashbin/trashbinRestore.feature:450](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L450)
+-   [apiTrashbin/trashbinRestore.feature:451](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L451)
 
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
 #### [trash-bin restore move does not send back Etag and other headers](https://github.com/owncloud/ocis/issues/1121)
@@ -113,7 +123,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiVersions/fileVersions.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L93)
 -   [apiVersions/fileVersions.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L288)
 -   [apiVersions/fileVersions.feature:362](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L362)
--   [apiVersions/fileVersions.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L373)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L14)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L31)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L48)
@@ -173,6 +182,12 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 -   [apiVersions/fileVersions.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L104)
+
+#### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
+-   [apiVersions/fileVersions.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L373)
+
+#### [Version cannot be restored when file has been renamed](https://github.com/owncloud/ocis/issues/1633)
+-   [apiVersions/fileVersions.feature:399](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L399)
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
 -   [apiWebdavUpload1/uploadFile.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L112)
@@ -825,6 +840,8 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiSharees/sharees.feature:516](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L516)
 -   [apiSharees/sharees.feature:537](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L537)
 -   [apiSharees/sharees.feature:538](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L538)
+-   [apiSharees/sharees.feature:560](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L560)
+-   [apiSharees/sharees.feature:561](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L561)
 
 #### [sharing with group not available](https://github.com/owncloud/product/issues/293)
 -   [apiShareManagementToShares/acceptShares.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L22)
