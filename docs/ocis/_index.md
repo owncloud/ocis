@@ -17,7 +17,7 @@ Welcome to oCIS, the modern file-sync and share platform, which is based on our 
 
 The oCIS server implementation follows [Go](https://golang.org/) best practices and is based on the [go-micro](https://go-micro.dev/) framework and [REVA](https://reva.link/). We love and stick to [12 Factor](https://12factor.net/).
 oCIS is a micro-service based server, which allows scale-out of individual services to meet your specific performance requirements.
-We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which was originated in ownCloud 10 and continues to grow.
+We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which originated in ownCloud 10 and continues to grow.
 
 ### Architecture Overview
 
