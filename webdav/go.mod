@@ -16,7 +16,7 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.0.0-20200918125107-fcca9faa81c8
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.0
-	go.opencensus.io v0.22.5
+	go.opencensus.io v0.22.6
 )
 
 replace (
