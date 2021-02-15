@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
-	github.com/cs3org/reva v1.5.2-0.20210215094754-dda48c9cb779
+	github.com/cs3org/reva v1.6.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible
