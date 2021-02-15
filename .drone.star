@@ -13,7 +13,9 @@ config = {
     'store':'',
     'thumbnails':'',
     'webdav':'',
-    'onlyoffice':'frontend'
+    'onlyoffice':'frontend',
+    'graph': '',
+    'graph-explorer': ''
   },
   'apiTests': {
     'numberOfParts': 10
