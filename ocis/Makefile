@@ -73,6 +73,7 @@ go-mod-tidy:
 .PHONY: clean-config
 clean-config:
 	rm -rf $(CONFIG)
+	rm -rf ldap.crt ldap.key server.crt server.key
 
 .PHONY: fmt
 fmt: ## fmt

@@ -81,7 +81,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsers/shareWithUsers.feature:368](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L368)
 -   [webUISharingInternalUsers/shareWithUsers.feature:417](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L417)
 -   [webUISharingInternalUsers/shareWithUsers.feature:449](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L449)
--   [webUISharingInternalUsers/shareWithUsers.feature:450](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L450)
+-   [webUISharingInternalUsers/shareWithUsers.feature:453](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L453)
 -   [webUISharingInternalUsers/shareWithUsers.feature:477](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L477)
 -   [webUISharingInternalUsers/shareWithUsers.feature:489](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L489)
 -   [webUISharingInternalUsers/shareWithUsers.feature:535](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L535)
@@ -431,3 +431,12 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [renamed file cannot be shared](https://github.com/owncloud/web/issues/4192)
 -   [webUISharingInternalUsers/shareWithUsers.feature:595](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L595)
+
+### [Moving files in a shared folder causes errors but succeeds](https://github.com/owncloud/ocis/issues/873)
+-   [webUIMoveFilesFolders/moveFiles.feature:122](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature:122#L122)
+
+### [Blocked user is not logged out](https://github.com/owncloud/ocis/issues/902)
+-   [webUILogin/adminBlocksUser.feature:6](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L6)
+
+### [Browser session deleted user should not be valid for newly created user of same name](https://github.com/owncloud/ocis/issues/904)
+-   [webUILogin/login.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L74)

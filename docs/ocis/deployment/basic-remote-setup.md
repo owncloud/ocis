@@ -9,94 +9,48 @@ geekdocFilePath: basic-remote-setup.md
 
 {{< toc >}}
 
-Out of the box the oCIS single binary and the `owncloud/ocis` docker image are configured to run on localhost for quick testing and development.
+The default configuration of the oCIS binary and the `owncloud/ocis` docker image assume, that you access oCIS on `localhost`. This enables you to do quick testing and development without any configuration.
 
-If you need to access oCIS on a VM or a remote machine e.g. when testing a mobile client you need to configure oCIS to run on a different host.
+If you need to access oCIS running in a docker container, on a VM or a remote machine via an other hostname than `localhost`, you need to configure this hostname in oCIS. The same applies if you are not using hostnames but instead an IP (eg. `192.168.178.25`).
 
-## Use the binary
+## Start the oCIS fullstack server from binary
 
-If you start the oCIS fullstack for the first time with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder relative to its location. This file is used to configure the clients for the built-in Identity Provider.
+Upon first start of the oCIS fullstack server with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder in your current working directory. This file is used to configure the built-in identity provider and therefore contains the OpenID Connect issuer and also information about relying parties, for example ownCloud Web and our desktop and mobile applications.
 
 {{< hint warning >}}
-**Outdated version**\
-The `identifier-registration.yml` file will only be generated if there is no such file in place. You could miss updates on this file. Run `make clean` to delete the file and keep the development environment tidy otherwise as well.
+The `identifier-registration.yml` file will only be generated if does not exist. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
 {{< /hint >}}
 
-### Add your hostname to the idp config
+{{< hint warning >}}
+oCIS is currently in a Tech Preview state and is shipped with demo users. In order to secure your oCIS instances please follow following guide: [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}})
+{{< /hint >}}
 
-Let us assume `your-host` is your remote domain name or IP address. Add your host to the `identifier-registration.yml` like this:
+For the following examples you need to have the oCIS binary in your current working directory, we assume it is named `ocis` and it needs to be marked as executable. See [Getting Started]({{< ref "../getting-started/#binaries" >}}) for where to get the binary from.
 
-```yaml {linenos=table,hl_lines=["15-17",21]}
-# OpenID Connect client registry.
-clients:
-  - id: web
-    name: ownCloud web app
-    application_type: web
-    insecure: yes
-    trusted: yes
-    redirect_uris:
-      - http://localhost:9100/
-      - http://localhost:9100/oidc-callback.html
-      - http://localhost:9100/oidc-silent-redirect.html
-      - https://localhost:9200/
-      - https://localhost:9200/oidc-callback.html
-      - https://localhost:9200/oidc-silent-redirect.html
-      - https://your-server:9200/
-      - https://your-server:9200/oidc-callback.html
-      - https://your-server:9200/oidc-silent-redirect.html
-    origins:
-      - http://localhost:9100
-      - https://localhost:9200
-      - https://your-server:9200
-```
+### Using automatically generated certificates
 
-In this example we do not change the default port (`9200`). But this could be changed to another port.
-
-### Start the oCIS fullstack server
-
-You need to configure `your-host` in some services to provide the needed public resources.
-
-This snippet will start the oCIS server with auto generated self signed certificates:
+In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname.
 
 ```bash
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
-OCIS_URL=https://your-server:9200 \
-KONNECTD_TLS=0 \
-PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
-PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
-IDP_TLS=0 \
-./bin/ocis server
+OCIS_URL=https://your-host:9200 \
+./ocis server
 ```
 
-For more configuration options check the configuration section in [ocis](https://owncloud.github.io/ocis/configuration/) and every oCIS extension.
+### Using already present certificates
 
-{{< hint info >}}
-**TLS Certificate**\
-If you have a CA signed certificate for your domain, add the following configurations:
-```
-PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
-PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
-```
-{{< /hint >}}
-
-## Use Docker Compose
-
-We are using our [docker compose playground](https://github.com/owncloud-docker/compose-playground) as a repository to share snippets that make our test setups easier and more aligned.
-
-You can start oCIS with docker very easily on a different host using this snippet.
-
-Let us assume your local IP is `192.168.103.195`
+If you have your own certificates already in place, you may want to make oCIS use them:
 
 ```bash
-git clone https://github.com/owncloud-docker/compose-playground.git
-cd compose-playground/compose/ocis
-
-sed -i -e 's/your-url/192.168.103.195/g' config/identifier-registration.yml
-
-cat << EOF > .env
-OCIS_URL=https://192.168.103.195
-OCIS_DOCKER_TAG=latest
-EOF
-
-curl -k https://192.168.103.195:9200/status.php
+PROXY_HTTP_ADDR=0.0.0.0:9200 \
+OCIS_URL=https://your-host:9200 \
+PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
+PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
+./ocis server
 ```
+
+For more configuration options check the configuration section in [oCIS](https://owncloud.github.io/ocis/configuration/) and the oCIS extensions.
+
+## Start the oCIS fullstack server with Docker Compose
+
+Please have a look at our other [deployment examples]({{< ref "./_index.md" >}}).

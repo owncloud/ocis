@@ -32,13 +32,14 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.1.6
 	github.com/owncloud/ocis/web v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/webdav v0.0.0-00010101000000-000000000000
+	github.com/refs/pman v0.0.0-20210125101615-7406747552bc
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.opencensus.io v0.22.5
-	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1
+	go.opencensus.io v0.22.6
+	golang.org/x/sys v0.0.0-20210112080510-489259a85091
 )
 
 replace (

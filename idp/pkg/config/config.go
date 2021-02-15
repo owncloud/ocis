@@ -28,6 +28,21 @@ type HTTP struct {
 	TLS     bool
 }
 
+// Ldap defines the available LDAP configuration.
+type Ldap struct {
+	URI               string
+	BindDN            string
+	BindPassword      string
+	BaseDN            string
+	Scope             string
+	LoginAttribute    string
+	EmailAttribute    string
+	NameAttribute     string
+	UUIDAttribute     string
+	UUIDAttributeType string
+	Filter            string
+}
+
 // Service defines the available service configuration.
 type Service struct {
 	Name      string
@@ -51,14 +66,15 @@ type Asset struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File     string
-	Log      Log
-	Debug    Debug
-	HTTP     HTTP
-	Tracing  Tracing
-	Asset    Asset
-	IDP bootstrap.Config
-	Service  Service
+	File    string
+	Log     Log
+	Debug   Debug
+	HTTP    HTTP
+	Tracing Tracing
+	Asset   Asset
+	IDP     bootstrap.Config
+	Ldap    Ldap
+	Service Service
 }
 
 // New initializes a new configuration with or without defaults.

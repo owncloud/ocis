@@ -3,7 +3,7 @@ version: "3.7"
 
 services:
   traefik:
-    image: "traefik:v2.3"
+    image: traefik:v2.4
     networks:
       ocis-net:
         aliases:
@@ -47,6 +47,9 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
@@ -60,7 +63,12 @@ services:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
+      # change default secrets
+      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
+      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
+      OCIS_JWT_SECRET: ${STORAGE_JWT_SECRET:-Pive-Fumkiu4}
     volumes:
+      - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"

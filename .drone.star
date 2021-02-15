@@ -746,7 +746,7 @@ def dockerRelease(ctx, arch):
           'context': 'ocis',
           'auto_tag_suffix': 'linux-%s' % (arch),
           'dockerfile': 'ocis/docker/Dockerfile.linux.%s' % (arch),
-          'repo': ctx.build.commit,
+          'repo': ctx.repo.slug,
           'build_args': build_args,
         },
         'when': {
@@ -1419,7 +1419,7 @@ def selenium():
   return [
     {
       'name': 'selenium',
-      'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+      'image': 'selenium/standalone-chrome-debug:3.141.59',
       'pull': 'always',
       'volumes': [{
           'name': 'uploads',

@@ -28,6 +28,8 @@ message GetRequest {
     int32 height = 5;
     // The authorization token
     string authorization = 6;
+    // The user requesting the resource.
+    string username = 7;
 }
 
 // The service response

@@ -3,7 +3,7 @@ version: "3.7"
 
 services:
   traefik:
-    image: "traefik:v2.3"
+    image: traefik:v2.4
     networks:
       ocis-net:
         aliases:
@@ -51,14 +51,14 @@ services:
     environment:
       # CS3 users from ldap specific configuration
       PROXY_CONFIG_FILE: "/config/proxy-config.json"
-      LDAP_FILTER: "(&(objectclass=inetOrgPerson)(objectClass=owncloud))"
-      LDAP_URI: ldap://ldap-server:389
-      LDAP_BINDDN: "cn=admin,dc=owncloud,dc=com"
-      LDAP_BINDPW: ${LDAP_ADMIN_PASSWORD:-admin}
-      LDAP_BASEDN: "dc=owncloud,dc=com"
-      LDAP_LOGIN_ATTRIBUTE: uid
-      LDAP_UUID_ATTRIBUTE: "ownclouduuid"
-      LDAP_UUID_ATTRIBUTE_TYPE: binary
+      IDP_LDAP_FILTER: "(&(objectclass=inetOrgPerson)(objectClass=owncloud))"
+      IDP_LDAP_URI: ldap://ldap-server:389
+      IDP_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      IDP_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      IDP_LDAP_BASE_DN: "dc=owncloud,dc=com"
+      IDP_LDAP_LOGIN_ATTRIBUTE: uid
+      IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
       PROXY_ACCOUNT_BACKEND_TYPE: cs3
       STORAGE_LDAP_HOSTNAME: ldap-server
       STORAGE_LDAP_PORT: 636
@@ -74,6 +74,8 @@ services:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
+      # change default secrets
+      OCIS_JWT_SECRET: ${STORAGE_JWT_SECRET:-Pive-Fumkiu4}
     volumes:
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
       - ocis-data:/var/tmp/ocis

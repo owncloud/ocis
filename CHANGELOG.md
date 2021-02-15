@@ -8,10 +8,14 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Check if roles are present in user object before looking those up: [#1388](https://github.com/owncloud/ocis/pull/1388)
 * Bugfix - Fix etcd address configuration: [#1546](https://github.com/owncloud/ocis/pull/1546)
+* Bugfix - Remove unimplemented config file option for oCIS root command: [#1636](https://github.com/owncloud/ocis/pull/1636)
+* Bugfix - Fix thumbnail generation when using different idp: [#1624](https://github.com/owncloud/ocis/issues/1624)
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 * Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
+* Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
+* Enhancement - Migrate ocis-graph-explorer to ocis monorepo: [#1596](https://github.com/owncloud/ocis/pull/1596)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
 ## Details
@@ -27,6 +31,18 @@ The following sections list the changes for unreleased.
    available on localhost / 127.0.0.1.
 
    https://github.com/owncloud/ocis/pull/1546
+
+* Bugfix - Remove unimplemented config file option for oCIS root command: [#1636](https://github.com/owncloud/ocis/pull/1636)
+
+   https://github.com/owncloud/ocis/pull/1636
+
+* Bugfix - Fix thumbnail generation when using different idp: [#1624](https://github.com/owncloud/ocis/issues/1624)
+
+   The thumbnail service was relying on a konnectd specific field in the access token. This logic
+   was now replaced by a service parameter for the username.
+
+   https://github.com/owncloud/ocis/issues/1624
+   https://github.com/owncloud/ocis/pull/1628
 
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
 
@@ -54,12 +70,27 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/1186
    https://github.com/cs3org/reva/pull/1142
 
+* Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
+
+   We will keep track of [Architectual Decision Records using
+   Markdown](https://adr.github.io/madr/) in `/docs/adr`.
+
+   https://github.com/owncloud/ocis/pull/1042
+
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
 
    Switch docker image annotation scheme to org.opencontainers standard because
    org.label-schema is depreciated.
 
    https://github.com/owncloud/ocis/pull/1381
+
+* Enhancement - Migrate ocis-graph-explorer to ocis monorepo: [#1596](https://github.com/owncloud/ocis/pull/1596)
+
+   Tags: ocis, ocis-graph-explorer
+
+   Ocis-graph-explorer was not migrated during the monorepo conversion.
+
+   https://github.com/owncloud/ocis/pull/1596
 
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 

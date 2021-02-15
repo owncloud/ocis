@@ -12,7 +12,7 @@ func SecretWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "jwt-secret",
 			Value:       "Pive-Fumkiu4",
 			Usage:       "Shared jwt secret for reva service communication",
-			EnvVars:     []string{"STORAGE_JWT_SECRET"},
+			EnvVars:     []string{"STORAGE_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.Reva.JWTSecret,
 		},
 	}

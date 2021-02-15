@@ -4,9 +4,6 @@
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
 #### [Implement Trashbin Feature for ocis storage](https://github.com/owncloud/product/issues/209)
-
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L26)
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L27)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L48)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L49)
 -   [apiWebdavEtagPropagation2/restoreFromTrash.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L68)
@@ -18,11 +15,7 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiTrashbin/trashbinFilesFolders.feature:284](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L284)
 -   [apiTrashbin/trashbinFilesFolders.feature:285](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L285)
 
-#### [empty trashbin does not work](https://github.com/owncloud/product/issues/254)
--   [apiTrashbin/trashbinDelete.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L37)
-
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
--   [apiTrashbin/trashbinDelete.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L50)
 -   [apiTrashbin/trashbinDelete.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L67)
 
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
@@ -30,11 +23,11 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiTrashbin/trashbinDelete.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L107)
 -   [apiTrashbin/trashbinDelete.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L123)
 
-#### [trashbin filename invalid for nested files/folders](https://github.com/owncloud/product/issues/255)
--   [apiTrashbin/trashbinFilesFolders.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L44)
--   [apiTrashbin/trashbinFilesFolders.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L45)
--   [apiTrashbin/trashbinFilesFolders.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L60)
--   [apiTrashbin/trashbinFilesFolders.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L61)
+### [A deleted folder with & in it does not appear in the trashbin](https://github.com/owncloud/ocis/issues/1547)
+-   [apiTrashbin/trashbinDelete.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L167)
+-   [apiTrashbin/trashbinDelete.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L168)
+-   [apiTrashbin/trashbinDelete.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L199)
+-   [apiTrashbin/trashbinDelete.feature:200](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L200)
 
 ### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
 
@@ -80,6 +73,12 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbin/trashbinRestore.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L281)
 -   [apiTrashbin/trashbinRestore.feature:298](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L298)
 -   [apiTrashbin/trashbinRestore.feature:299](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L299)
+-   [apiTrashbin/trashbinRestore.feature:372](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L372)
+-   [apiTrashbin/trashbinRestore.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L373)
+-   [apiTrashbin/trashbinRestore.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L411)
+-   [apiTrashbin/trashbinRestore.feature:412](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L412)
+-   [apiTrashbin/trashbinRestore.feature:450](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L450)
+-   [apiTrashbin/trashbinRestore.feature:451](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L451)
 
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
 #### [trash-bin restore move does not send back Etag and other headers](https://github.com/owncloud/ocis/issues/1121)
@@ -124,7 +123,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiVersions/fileVersions.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L93)
 -   [apiVersions/fileVersions.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L288)
 -   [apiVersions/fileVersions.feature:362](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L362)
--   [apiVersions/fileVersions.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L373)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L14)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L31)
 -   [apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature#L48)
@@ -184,6 +182,12 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 -   [apiVersions/fileVersions.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L104)
+
+#### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
+-   [apiVersions/fileVersions.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L373)
+
+#### [Version cannot be restored when file has been renamed](https://github.com/owncloud/ocis/issues/1633)
+-   [apiVersions/fileVersions.feature:399](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L399)
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
 -   [apiWebdavUpload1/uploadFile.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L112)
@@ -354,34 +358,6 @@ Scenario Outline: try to create a folder that already exists
 -   [apiWebdavProperties1/createFolder.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L99)
 -   [apiWebdavProperties1/createFolder.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L100)
 
-#### [XML properties in webdav response not properly encoded](https://github.com/owncloud/ocis/issues/1296)
-Scenario Outline: Do a PROPFIND of various file names
--   [apiWebdavProperties2/getFileProperties.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L37)
--   [apiWebdavProperties2/getFileProperties.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L39)
--   [apiWebdavProperties2/getFileProperties.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L40)
--   [apiWebdavProperties2/getFileProperties.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L41)
--   [apiWebdavProperties2/getFileProperties.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L43)
--   [apiWebdavProperties2/getFileProperties.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L44)
-
-Scenario Outline: Do a PROPFIND of various folder names
--   [apiWebdavProperties2/getFileProperties.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L59)
--   [apiWebdavProperties2/getFileProperties.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L60)
--   [apiWebdavProperties2/getFileProperties.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L61)
--   [apiWebdavProperties2/getFileProperties.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L63)
--   [apiWebdavProperties2/getFileProperties.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L64)
--   [apiWebdavProperties2/getFileProperties.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L66)
--   [apiWebdavProperties2/getFileProperties.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L67)
--   [apiWebdavProperties2/getFileProperties.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L68)
--   [apiWebdavProperties2/getFileProperties.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L70)
--   [apiWebdavProperties2/getFileProperties.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L71)
-
-### [Different webdav properties from core](https://github.com/owncloud/ocis/issues/1302)
-Scenario Outline: Propfind the last modified date of a folder using webdav api `Property "d:getlastmodified" found with value "Wed, 20 Jan 2021 14:39:31 +0000", expected "/^[MTWFS][uedhfriatno]{2},\s(\d){2}\s[JFMAJSOND][anebrpyulgctov]{2}\s\d{4}\s\d{2}:\d{2}:\d{2} GMT$/"`
--   [apiWebdavProperties2/getFileProperties.feature:301](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L301)
--   [apiWebdavProperties2/getFileProperties.feature:302](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L302)
-    Scenario Outline: Propfind the content type of a folder using webdav api `Property "d:getcontenttype" found with value "httpd/unix-directory", expected "#^$#" or "#^$#"`
--   [apiWebdavProperties2/getFileProperties.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L314)
--   [apiWebdavProperties2/getFileProperties.feature:315](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L315)
     Scenario Outline: Propfind the content type of a file using webdav api `Property "d:getcontenttype" found with value "text/plain; charset=utf-8", expected "#^text/plain$#" or "#^text/plain$#"`
 -   [apiWebdavProperties2/getFileProperties.feature:327](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L327)
 -   [apiWebdavProperties2/getFileProperties.feature:328](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L328)
@@ -864,6 +840,8 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiSharees/sharees.feature:516](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L516)
 -   [apiSharees/sharees.feature:537](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L537)
 -   [apiSharees/sharees.feature:538](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L538)
+-   [apiSharees/sharees.feature:560](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L560)
+-   [apiSharees/sharees.feature:561](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L561)
 
 #### [sharing with group not available](https://github.com/owncloud/product/issues/293)
 -   [apiShareManagementToShares/acceptShares.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L22)
