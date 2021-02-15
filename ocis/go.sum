@@ -131,6 +131,7 @@ github.com/aws/aws-sdk-go v1.23.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN
 github.com/aws/aws-sdk-go v1.23.19/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go v1.28.2/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go v1.33.19/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.35.27/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
 github.com/aws/aws-sdk-go v1.37.3 h1:1f0groABc4AuapskpHf6EBRaG2tqw0Sx3ebCMwfp1Ys=
 github.com/aws/aws-sdk-go v1.37.3/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-xray-sdk-go v0.9.4/go.mod h1:XtMKdBQfpVut+tJEwI7+dJFRxxRdxHDyVNp2tHXRq04=
@@ -194,6 +195,8 @@ github.com/cenkalti/backoff/v4 v4.0.0/go.mod h1:eEew/i+1Q6OrCDZh3WiXYv3+nJwBASZ8
 github.com/census-instrumentation/opencensus-proto v0.2.0/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.2.1 h1:glEXhBS5PSLLv4IXzLA5yPRVX4bilULVyxxbrfOtDAk=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
+github.com/cernbox/ocis-canary v0.0.0-20201208115737-084b59e999ff h1:OBmswig2ublnESDe66wl0gwfOYL8w4BvfYX4u9N0igQ=
+github.com/cernbox/ocis-canary v0.0.0-20201208115737-084b59e999ff/go.mod h1:V66cW778R+VVHySCw7C29fXwQgPiteorY1hiDVE9vNI=
 github.com/cespare/reflex v0.2.0/go.mod h1:ooqOLJ4algvHP/oYvKWfWJ9tFUzCLDk5qkIJduMYrgI=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
@@ -272,10 +275,12 @@ github.com/cs3org/cato v0.0.0-20200626150132-28a40e643719/go.mod h1:XJEZ3/EQuI3B
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20191128165347-19746c015c83/go.mod h1:IsVGyZrOLUQD48JIhlM/xb3Vz6He5o2+W0ZTfUGY+IU=
 github.com/cs3org/go-cs3apis v0.0.0-20200730121022-c4f3d4f7ddfd/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/go-cs3apis v0.0.0-20201118090759-87929f5bae21/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc h1:vHFqu+Gb/iOKYFy2KswpwIG3G6zRMudRn+rQ2bg3TPE=
 github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v0.0.2-0.20200115110931-4c7513415ec5/go.mod h1:Hk3eCcdhtv4eIhKvRK736fQuOyS1HuHnUcz0Dq6NK1A=
 github.com/cs3org/reva v1.1.0/go.mod h1:fBzTrNuAKdQ62ybjpdu8nyhBin90/3/3s6DGQDCdBp4=
+github.com/cs3org/reva v1.4.1-0.20201203135805-655c9babdc3f/go.mod h1:3Bz9oExBSgKjDspq3pBso31HlLSD98SlcURV54N3yPs=
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c h1:fyo4TNiZdfQS27XHnAMb+S2wkdlmBf6ZLkU4uHEgWSA=
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c/go.mod h1:24c68Ys3h7srGohymDKSXakN4OrhzABJoKFoMeSIBvk=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
@@ -742,6 +747,7 @@ github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm4
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
@@ -790,6 +796,8 @@ github.com/grpc-ecosystem/grpc-gateway v1.9.4/go.mod h1:vNeuVxBJEsws4ogUvrchl83t
 github.com/grpc-ecosystem/grpc-gateway v1.9.5/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/grpc-ecosystem/grpc-gateway v1.14.6 h1:8ERzHx8aj1Sc47mu9n/AksaKCSWrMchFtkdrS4BIj5o=
 github.com/grpc-ecosystem/grpc-gateway v1.14.6/go.mod h1:zdiPV4Yse/1gnckTHtghG4GkDEdKCRJduHpTxT3/jcw=
+github.com/grpc-ecosystem/grpc-gateway v1.16.0 h1:gmcG1KaJ57LophUzW0Hy8NmPhnMZb4M0+kPpLofRdBo=
+github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542/go.mod h1:Ow0tF8D4Kplbc8s8sSb3V2oUCygFHVp8gC3Dn6U4MNI=
 github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
 github.com/hashicorp/consul/sdk v0.1.1/go.mod h1:VKf9jXwCTEY1QZP2MOLRhb5i/I/ssyNV1vwHyQBF0x8=
@@ -1037,6 +1045,7 @@ github.com/mennanov/fieldmask-utils v0.3.3/go.mod h1:OcOWam4DG685inAjtNuFONKpkit
 github.com/mholt/certmagic v0.7.5/go.mod h1:91uJzK5K8IWtYQqTi5R2tsxV1pCde+wdGfaRaOZi6aQ=
 github.com/mholt/certmagic v0.8.3/go.mod h1:91uJzK5K8IWtYQqTi5R2tsxV1pCde+wdGfaRaOZi6aQ=
 github.com/mholt/certmagic v0.9.1/go.mod h1:nu8jbsbtwK4205EDH/ZUMTKsfYpJA1Q7MKXHfgTihNw=
+github.com/mholt/certmagic v0.9.3/go.mod h1:nu8jbsbtwK4205EDH/ZUMTKsfYpJA1Q7MKXHfgTihNw=
 github.com/micro/cli v0.2.0 h1:ut3rV5JWqZjsXIa2MvGF+qMUP8DAUTvHX9Br5gO4afA=
 github.com/micro/cli v0.2.0/go.mod h1:jRT9gmfVKWSS6pkKcXQ8YhUyj6bzwxK8Fp5b0Y7qNnk=
 github.com/micro/cli/v2 v2.1.1/go.mod h1:EguNh6DAoWKm9nmk+k/Rg0H3lQnDxqzu5x5srOtGtYg=
@@ -1046,6 +1055,7 @@ github.com/micro/go-micro v1.16.0/go.mod h1:A0F58bHLh2m0LAI9QyhvmbN8c1cxhAZo3cM6
 github.com/micro/go-micro v1.18.0 h1:gP70EZVHpJuUIT0YWth192JmlIci+qMOEByHm83XE9E=
 github.com/micro/go-micro v1.18.0/go.mod h1:klwUJL1gkdY1MHFyz+fFJXn52dKcty4hoe95Mp571AA=
 github.com/micro/go-micro/v2 v2.0.0/go.mod h1:v7QP5UhKRt37ixjJe8DouWmg0/eE6dltr5h0idJ9BpE=
+github.com/micro/go-micro/v2 v2.4.1-0.20200415105401-9961ebb46e7b/go.mod h1:zHSGsGANG9ufjYPnoMSsQHS+qWhUvK9UEUaSynv1jzo=
 github.com/micro/go-micro/v2 v2.8.0/go.mod h1:hSdOM6jb6aGswjBpCeB9wJ0yVH+CugevRm/CX7NlSrQ=
 github.com/micro/go-micro/v2 v2.9.1 h1:+S9koIrNWARjpP6k2TZ7kt0uC9zUJtNXzIdZTZRms7Q=
 github.com/micro/go-micro/v2 v2.9.1/go.mod h1:x55ZM3Puy0FyvvkR3e0ha0xsE9DFwfPSUMWAIbFY0SY=
@@ -1056,6 +1066,7 @@ github.com/micro/mdns v0.3.0/go.mod h1:KJ0dW7KmicXU2BV++qkLlmHYcVv7/hHnbtguSWt9A
 github.com/micro/micro/v2 v2.8.0 h1:AMqpnKsOBnuGHjU0jVmTL17BRdsOx0FbvI/Gkl2uLrA=
 github.com/micro/micro/v2 v2.8.0/go.mod h1:VTIGqEBLAMh22q72DnGd95iJSQY/3yvXd9GIIooQ69c=
 github.com/micro/protoc-gen-micro v1.0.0/go.mod h1:C8ij4DJhapBmypcT00AXdb0cZ675/3PqUO02buWWqbE=
+github.com/micro/protoc-gen-micro/v2 v2.1.1/go.mod h1:GgA+ozazAeSPj/1+2ITnrBvpagwkgwVdTZ7ZC0PoAZU=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
@@ -1209,6 +1220,7 @@ github.com/ory/dockertest/v3 v3.5.4/go.mod h1:J8ZUbNB2FOhm1cFZW9xBpDsODqsSWcyYgt
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
 github.com/ory/fosite v0.30.2/go.mod h1:Lq9qQ9Sl6mcea2Tt8J7PU+wUeFYPZ+vg7N3zPVKGbN8=
 github.com/ory/fosite v0.32.2/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
+github.com/ory/fosite v0.35.1/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
 github.com/ory/fosite v0.37.0 h1:NaKYm3hhZW1c812uetiNfHlvXmTokIRrOOiTYz+Yhro=
 github.com/ory/fosite v0.37.0/go.mod h1:37r59qkOSPueYKmaA7EHiXrDMF1B+XPN+MgkZgTRg3Y=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
@@ -1237,6 +1249,8 @@ github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY
 github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203/go.mod h1:jip86t4OVURJTf8CM/0e2qcji/Y4NG3l2lR8kex4JWw=
 github.com/owncloud/flaex v0.2.0 h1:3FLf8oyMgA6HLK7w4+VJ5N1oVA8G7MptLCVjfxxIaww=
 github.com/owncloud/flaex v0.2.0/go.mod h1:jip86t4OVURJTf8CM/0e2qcji/Y4NG3l2lR8kex4JWw=
+github.com/owncloud/ocis v1.0.0-rc6 h1:o6vQKinwVN5oMqYN5ehIxift4CGKZVrxsxDZYXk/mWQ=
+github.com/owncloud/ocis v1.0.0-rc6/go.mod h1:kHoustfrV4pGvkKcNFXIr8GRT9MY25mzOKGij4uAC60=
 github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7 h1:gT0GyIOoR7XtpZ7sIxVJSckcz/nueGB1Cm1xNaflXQ0=
 github.com/owncloud/ocis-graph v0.0.0-20200318175820-9a5a6e029db7/go.mod h1:IRm6BBJqyPhYI+3fm5bWkhgFL/yh63ASUznFqN4yXgs=
 github.com/owncloud/ocis-graph-explorer v0.0.0-20200210111049-017eeb40dc0c h1:8g3u2JwOMP/UE+0B+YjV7UWEQzyCPbnZzwIto6lNc0I=
@@ -1275,6 +1289,7 @@ github.com/pkg/profile v1.2.1/go.mod h1:hJw3o1OdXxsrSjjVksARp5W95eeEaEfptyVZyv6J
 github.com/pkg/sftp v1.10.1/go.mod h1:lYOWFsE0bwd1+KfKJaKeuokY15vzFx25BLbzYYoAxZI=
 github.com/pkg/term v1.1.0/go.mod h1:E25nymQcrSllhX42Ok8MRm1+hyBdHY0dCeiKZ9jpNGw=
 github.com/pkg/xattr v0.4.1/go.mod h1:W2cGD0TBEus7MkUgv0tNZ9JutLtVO3cXu+IBRuHqnFs=
+github.com/pkg/xattr v0.4.2/go.mod h1:sBD3RAqlr8Q+RC3FutZcikpT8nyDrIEEBw2J744gVWs=
 github.com/pkg/xattr v0.4.3 h1:5Jx4GCg5ABtqWZH8WLzeI4fOtM1HyX4RBawuCoua1es=
 github.com/pkg/xattr v0.4.3/go.mod h1:sBD3RAqlr8Q+RC3FutZcikpT8nyDrIEEBw2J744gVWs=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
@@ -1642,6 +1657,7 @@ golang.org/x/crypto v0.0.0-20200414173820-0848c9571904/go.mod h1:LzIPMQfyMNhhGPh
 golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c h1:9HhBz5L/UjnK9XLtiZhYAdue5BVKep3PMmS2LuPDt8k=
 golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=

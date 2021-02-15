@@ -1,6 +1,7 @@
 package config
 
 import (
+	cernboxCanary "github.com/cernbox/ocis-canary/pkg/config"
 	graphExplorer "github.com/owncloud/ocis-graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis-graph/pkg/config"
 	hello "github.com/owncloud/ocis-hello/pkg/config"
@@ -85,6 +86,7 @@ type Config struct {
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
 	Runtime       *pman.Config
+	CernboxCanary *cernboxCanary.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -105,6 +107,7 @@ func New() *Config {
 		Store:         store.New(),
 		Thumbnails:    thumbnails.New(),
 		WebDAV:        webdav.New(),
+		CernboxCanary: cernboxCanary.New(),
 		Runtime:       pman.NewConfig(),
 	}
 }
