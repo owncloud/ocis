@@ -189,7 +189,7 @@ node_modules:
 
 ############ protobuf ############
 $(GOPATH)/bin/protoc-gen-go:
-	GO111MODULE=off go get -v google.golang.org/protobuf/cmd/protoc-gen-go
+	go get -v google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0
 
 $(GOPATH)/bin/protoc-gen-micro:
 	GO111MODULE=on go get -v github.com/micro/protoc-gen-micro/v2
