@@ -15,6 +15,8 @@ RESET := $(shell tput -Txterm sgr0)
 OCIS_MODULES = \
 	accounts \
 	glauth \
+	graph \
+	graph-explorer \
 	idp \
 	ocis \
 	ocis-pkg \
