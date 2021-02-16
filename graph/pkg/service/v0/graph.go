@@ -5,9 +5,9 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/go-chi/chi"
-	"github.com/owncloud/ocis-pkg/v2/log"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/cs3"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // Graph defines implements the business logic for Service.

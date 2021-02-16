@@ -6,21 +6,29 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
-	github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666
-	github.com/cs3org/reva v1.1.0
+	github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc
+	github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
-	github.com/go-ldap/ldap/v3 v3.2.3
+	github.com/go-ldap/ldap/v3 v3.2.4
 	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.2
-	github.com/owncloud/ocis-pkg/v2 v2.2.1
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/yaegashi/msgraph.go v0.1.4
-	go.opencensus.io v0.22.4
-	google.golang.org/grpc v1.31.0
+	go.opencensus.io v0.22.6
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
+	golang.org/x/mod v0.4.1 // indirect
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	google.golang.org/grpc v1.35.0
+	honnef.co/go/tools v0.1.1 // indirect
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+replace (
+	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+)
