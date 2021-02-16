@@ -57,10 +57,6 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: generate
-generate:
-	go generate $(GENERATE)
-
 .PHONY: changelog
 changelog:
 	go run github.com/restic/calens >| CHANGELOG.md
@@ -78,6 +74,18 @@ go-coverage:
 build:
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./...
 
-.PHONY: config-docs-generate
-config-docs-generate:
-#	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
+############ docs generate ############
+
+.PHONY: docs-generate
+docs-generate:
+
+############ generate ############
+.PHONY: generate
+generate: ci-node-generate ci-go-generate
+
+.PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
+	go generate $(GENERATE)
+
+.PHONY: ci-node-generate
+ci-node-generate:

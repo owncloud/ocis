@@ -15,6 +15,8 @@ RESET := $(shell tput -Txterm sgr0)
 OCIS_MODULES = \
 	accounts \
 	glauth \
+	graph \
+	graph-explorer \
 	idp \
 	ocis \
 	ocis-pkg \
@@ -78,6 +80,42 @@ vendor-bin/behat/composer.lock: vendor-bin/behat/composer.json
 
 composer.lock: composer.json
 	@echo composer.lock is not up to date.
+
+.PHONY: generate
+generate:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod generate; \
+    done
+
+.PHONY: vet
+vet:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod vet; \
+    done
+
+.PHONY: clean
+clean:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod clean; \
+    done
+
+.PHONY: docs-generate
+docs-generate:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod docs-generate; \
+    done
+
+.PHONY: ci-go-generate
+ci-go-generate:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod ci-go-generate; \
+    done
+
+.PHONY: ci-node-generate
+ci-node-generate:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod ci-node-generate; \
+    done
 
 .PHONY: go-mod-tidy
 go-mod-tidy:

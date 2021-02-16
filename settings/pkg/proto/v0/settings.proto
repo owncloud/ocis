@@ -4,32 +4,33 @@ package proto;
 option go_package = "pkg/proto/v0;proto";
 
 import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
-  info: {
-    title: "Settings";
-    version: "1.0";
-    contact: {
-      name: "ownCloud GmbH";
-      url: "https://github.com/owncloud/ocis-settings";
-      email: "support@owncloud.com";
-    };
-    license: {
-      name: "Apache-2.0";
-      url: "https://github.com/owncloud/ocis/settings/blob/master/LICENSE";
-    };
-  };
-  schemes: HTTP;
-  schemes: HTTPS;
-  consumes: "application/json";
-  produces: "application/json";
-  external_docs: {
-    description: "Developer Manual";
-    url: "http://owncloud.github.io/extensions/ocis_settings/";
-  };
-};
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {	
+    title: "ownCloud Infinite Scale settings";	
+    version: "1.0.0";	
+    contact: {	
+      name: "ownCloud GmbH";	
+      url: "https://github.com/owncloud/ocis";	
+      email: "support@owncloud.com";	
+    };	
+    license: {	
+      name: "Apache-2.0";	
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";	
+    };	
+  };	
+  schemes: HTTP;	
+  schemes: HTTPS;	
+  consumes: "application/json";	
+  produces: "application/json";	
+  external_docs: {	
+    description: "Developer Manual";	
+    url: "https://owncloud.github.io/extensions/settings/";	
+  };	
+};	
 
 service BundleService {
   rpc SaveBundle(SaveBundleRequest) returns (SaveBundleResponse) {

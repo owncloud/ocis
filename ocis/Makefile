@@ -87,10 +87,6 @@ vet: ## vet
 lint: ## lint
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: generate
-generate: ## generate
-	go generate $(GENERATE)
-
 .PHONY: changelog
 changelog: ## generate changelog
 	go run github.com/restic/calens -i ../changelog -t ../changelog/CHANGELOG.tmpl >| ../CHANGELOG.md
@@ -154,10 +150,26 @@ release-check:
 .PHONY: release-finish
 release-finish: release-copy release-check
 
-.PHONY: config-docs-generate
-config-docs-generate: ## generate configuration documentation
-	go run github.com/owncloud/flaex >| ../docs/ocis/configuration.md
-
 .PHONY: watch
 watch:
 	go run github.com/cespare/reflex -c reflex.conf
+
+############ docs generate ############
+
+.PHONY: docs-generate
+docs-generate: config-docs-generate
+
+.PHONY: config-docs-generate
+config-docs-generate:
+	go run github.com/owncloud/flaex >| ../docs/$(NAME)/configuration.md
+
+############ generate ############
+.PHONY: generate
+generate: ci-node-generate ci-go-generate
+
+.PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
+	go generate $(GENERATE)
+
+.PHONY: ci-node-generate
+ci-node-generate:
