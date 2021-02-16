@@ -143,15 +143,11 @@ watch:
 ############ docs generate ############
 
 .PHONY: docs-generate
-docs-generate: config-docs-generate \
-			   grpc-docs-generate
+docs-generate: config-docs-generate
 
 .PHONY: config-docs-generate
 config-docs-generate:
 	go run github.com/owncloud/flaex >| ../docs/extensions/$(NAME)/configuration.md
-
-.PHONY: grpc-docs-generate
-grpc-docs-generate: ../docs/extensions/${NAME}/grpc.md
 
 ############ generate ############
 .PHONY: generate
