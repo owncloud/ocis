@@ -2,14 +2,14 @@
 title: "GRPC API"
 date: 2018-05-02T00:00:00+00:00
 weight: 50
-geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/thumbnails
+geekdocRepo: https://github.com/owncloud/ocis-thumbnails
+geekdocEditPath: edit/master/docs
 geekdocFilePath: grpc.md
 ---
 
 {{< toc >}}
 
-## pkg/proto/v0/thumbnails.proto
+## thumbnails.proto
 
 ### GetRequest
 
@@ -23,6 +23,7 @@ A request to retrieve a thumbnail
 | width | [int32](#int32) |  | The width of the thumbnail |
 | height | [int32](#int32) |  | The height of the thumbnail |
 | authorization | [string](#string) |  | The authorization token |
+| username | [string](#string) |  | The user requesting the resource. |
 
 ### GetResponse
 
