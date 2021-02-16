@@ -10,6 +10,8 @@
       owner: wkloucek
       for: oCIS-continuous-deployment-examples
     rebuild: $REBUILD
+    rebuild_carry_paths:
+      - /var/lib/docker/volumes/ocis_certs
 
   domains:
     - "*.ocis-keycloak.released.owncloud.works"
