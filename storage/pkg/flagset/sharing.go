@@ -57,41 +57,6 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Sharing.UserJSONFile,
 		},
 		&cli.StringFlag{
-			Name:        "user-sql-username",
-			Value:       "",
-			Usage:       "Username to be used to connect to the SQL database",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_USERNAME"},
-			Destination: &cfg.Reva.Sharing.UserSQLUsername,
-		},
-		&cli.StringFlag{
-			Name:        "user-sql-password",
-			Value:       "",
-			Usage:       "Password to be used to connect to the SQL database",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_PASSWORD"},
-			Destination: &cfg.Reva.Sharing.UserSQLPassword,
-		},
-		&cli.StringFlag{
-			Name:        "user-sql-host",
-			Value:       "",
-			Usage:       "Hostname of the SQL database",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_HOST"},
-			Destination: &cfg.Reva.Sharing.UserSQLHost,
-		},
-		&cli.IntFlag{
-			Name:        "user-sql-port",
-			Value:       1433,
-			Usage:       "The port on which the SQL database is exposed",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_PORT"},
-			Destination: &cfg.Reva.Sharing.UserSQLPort,
-		},
-		&cli.StringFlag{
-			Name:        "user-sql-name",
-			Value:       "",
-			Usage:       "Name of the SQL database",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_Name"},
-			Destination: &cfg.Reva.Sharing.UserSQLName,
-		},
-		&cli.StringFlag{
 			Name:        "public-driver",
 			Value:       "json",
 			Usage:       "driver to use for the PublicShareProvider",
@@ -110,6 +75,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, TracingWithConfig(cfg)...)
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
+	flags = append(flags, SharingSQLWithConfig(cfg)...)
 
 	return flags
 }

@@ -64,78 +64,12 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_JSON"},
 			Destination: &cfg.Reva.Groups.JSON,
 		},
-    &cli.IntFlag{
+		&cli.IntFlag{
 			Name:        "group-members-cache-expiration",
 			Value:       5,
 			Usage:       "Time in minutes for redis cache expiration.",
 			EnvVars:     []string{"STORAGE_GROUP_CACHE_EXPIRATION"},
 			Destination: &cfg.Reva.Groups.GroupMembersCacheExpiration,
-		},
-
-    // rest driver
-
-    &cli.StringFlag{
-			Name:        "rest-client-id",
-			Value:       "",
-			Usage:       "User/group rest driver Client ID",
-			EnvVars:     []string{"STORAGE_REST_CLIENT_ID"},
-			Destination: &cfg.Reva.UserGroupRest.ClientID,
-		},
-		&cli.StringFlag{
-			Name:        "rest-client-secret",
-			Value:       "",
-			Usage:       "User/group rest driver Client Secret",
-			EnvVars:     []string{"STORAGE_REST_CLIENT_SECRET"},
-			Destination: &cfg.Reva.UserGroupRest.ClientSecret,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-address",
-			Value:       "localhost:6379",
-			Usage:       "Address for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_ADDRESS"},
-			Destination: &cfg.Reva.UserGroupRest.RedisAddress,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-username",
-			Value:       "",
-			Usage:       "Username for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_USERNAME"},
-			Destination: &cfg.Reva.UserGroupRest.RedisUsername,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-password",
-			Value:       "",
-			Usage:       "Password for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_PASSWORD"},
-			Destination: &cfg.Reva.UserGroupRest.RedisPassword,
-		},
-		&cli.StringFlag{
-			Name:        "rest-id-provider",
-			Value:       "",
-			Usage:       "The OIDC Provider",
-			EnvVars:     []string{"STORAGE_REST_ID_PROVIDER"},
-			Destination: &cfg.Reva.UserGroupRest.IDProvider,
-		},
-		&cli.StringFlag{
-			Name:        "rest-api-base-url",
-			Value:       "",
-			Usage:       "Base API Endpoint",
-			EnvVars:     []string{"STORAGE_REST_API_BASE_URL"},
-			Destination: &cfg.Reva.UserGroupRest.APIBaseURL,
-		},
-		&cli.StringFlag{
-			Name:        "rest-oidc-token-endpoint",
-			Value:       "",
-			Usage:       "Endpoint to generate token to access the API",
-			EnvVars:     []string{"STORAGE_REST_OIDC_TOKEN_ENDPOINT"},
-			Destination: &cfg.Reva.UserGroupRest.OIDCTokenEndpoint,
-		},
-		&cli.StringFlag{
-			Name:        "rest-target-api",
-			Value:       "",
-			Usage:       "The target application",
-			EnvVars:     []string{"STORAGE_REST_TARGET_API"},
-			Destination: &cfg.Reva.UserGroupRest.TargetAPI,
 		},
 	}
 
@@ -143,6 +77,7 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, LDAPWithConfig(cfg)...)
+	flags = append(flags, RestWithConfig(cfg)...)
 
 	return flags
 }
