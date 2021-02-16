@@ -15,9 +15,9 @@ require (
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
 	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1
-	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
-	github.com/owncloud/ocis/settings v0.0.0-20200918114005-1a0ddd2190ee
-	github.com/owncloud/ocis/storage v0.0.0-20201015120921-38358ba4d4df
+	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/storage v0.0.0-20210216094451-dc73176dc62d
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
@@ -27,7 +27,7 @@ require (
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	google.golang.org/grpc v1.35.0
-	honnef.co/go/tools v0.0.1-2020.1.5
+	honnef.co/go/tools v0.1.1
 )
 
 replace (
