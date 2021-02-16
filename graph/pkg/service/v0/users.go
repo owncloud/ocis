@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/go-ldap/ldap/v3"
-	"github.com/owncloud/ocis-pkg/v2/oidc"
+	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
