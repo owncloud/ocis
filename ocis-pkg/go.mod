@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
+	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
 	github.com/cs3org/reva v1.6.0

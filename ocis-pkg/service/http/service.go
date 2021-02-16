@@ -5,12 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/v2/web"
+	web "github.com/asim/go-micro/plugins/server/http/v3"
+	"github.com/asim/go-micro/v3/server"
 )
 
 // Service simply wraps the go-micro web service.
 type Service struct {
-	web.Service
+	server.Server
 }
 
 // NewService initializes a new http service.
@@ -21,8 +22,8 @@ func NewService(opts ...Option) Service {
 		Str("addr", sopts.Address).
 		Msg("starting server")
 
-	wopts := []web.Option{
-		web.Name(
+	wopts := []server.Option{
+		server.Name(
 			strings.Join(
 				[]string{
 					sopts.Namespace,
@@ -31,18 +32,18 @@ func NewService(opts ...Option) Service {
 				".",
 			),
 		),
-		web.Version(sopts.Version),
-		web.Address(sopts.Address),
-		web.RegisterTTL(time.Second * 30),
-		web.RegisterInterval(time.Second * 10),
-		web.Context(sopts.Context),
-		web.TLSConfig(sopts.TLSConfig),
-		web.Handler(sopts.Handler),
-		web.Flags(sopts.Flags...),
+		server.Version(sopts.Version),
+		server.Address(sopts.Address),
+		server.RegisterTTL(time.Second * 30),
+		server.RegisterInterval(time.Second * 10),
+		server.Context(sopts.Context),
+		server.TLSConfig(sopts.TLSConfig),
+		//server.Handler(sopts.Handler),
+		//server.Flags(sopts.Flags...),
 	}
 
 	return Service{
-		web.NewService(
+		web.NewServer(
 			wopts...,
 		),
 	}
