@@ -1,11 +1,11 @@
 package config
 
 import (
-	graphExplorer "github.com/owncloud/ocis-graph-explorer/pkg/config"
-	graph "github.com/owncloud/ocis-graph/pkg/config"
 	hello "github.com/owncloud/ocis-hello/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
+	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
+	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
 	pman "github.com/owncloud/ocis/ocis/pkg/runtime/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
