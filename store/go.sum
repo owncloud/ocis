@@ -1104,6 +1104,7 @@ github.com/ory/x v0.0.93/go.mod h1:lfcTaGXpTZs7IEQAW00r9EtTCOxD//SiP5uWtNiz31g=
 github.com/ory/x v0.0.110/go.mod h1:DJfkE3GdakhshNhw4zlKoRaL/ozg/lcTahA9OCih2BE=
 github.com/ory/x v0.0.162/go.mod h1:sj3z/MeCrAyNFFTfN6yK1nTmHXGSFnw+QwIIQ/Rowec=
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
+github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203 h1:sXVTQ94GWeiBhlgN0kSbcyXQNmwzPuuhWyObxgTu/xE=
 github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203/go.mod h1:jip86t4OVURJTf8CM/0e2qcji/Y4NG3l2lR8kex4JWw=
 github.com/owncloud/ocis-pkg/v2 v2.4.0/go.mod h1:FSzIvhx9HcZcq4jgNaDowNvM7PTX/XCyoMvyfzidUpE=
 github.com/owncloud/ocis-pkg/v2 v2.4.1-0.20200902134813-1e87c6173ada/go.mod h1:WdcVM54z0X7aQzS8eyGl7S5sjEMVBtLpfpzsPX3Z+Pw=

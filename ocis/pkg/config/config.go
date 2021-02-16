@@ -7,6 +7,7 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
+	pman "github.com/owncloud/ocis/ocis/pkg/runtime/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
@@ -16,7 +17,6 @@ import (
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
 	web "github.com/owncloud/ocis/web/pkg/config"
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
-	pman "github.com/refs/pman/pkg/config"
 )
 
 // Log defines the available logging configuration.

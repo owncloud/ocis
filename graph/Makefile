@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := graph-explorer
+NAME := graph
 IMPORT := github.com/owncloud/ocis/$(NAME)
 BIN := bin
 DIST := dist
@@ -58,7 +58,7 @@ sync:
 .PHONY: clean
 clean:
 	go clean -i ./...
-	rm -rf $(BIN) $(DIST) assets
+	rm -rf $(BIN) $(DIST)
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
@@ -81,7 +81,7 @@ lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: assets
+generate:
 	go generate $(GENERATE)
 
 .PHONY: changelog
@@ -164,28 +164,25 @@ watch:
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--go_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--go_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.micro.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--micro_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--micro_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.pb.web.go: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--microweb_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--microweb_out=pkg/proto/v0 example.proto
 
 # pkg/proto/v0/example.swagger.json: pkg/proto/v0/example.proto
 # 	protoc \
 # 		-I=third_party/ \
 # 		-I=pkg/proto/v0/ \
-# 		--swagger_out=logtostderr=true:pkg/proto/v0 example.proto
+# 		--swagger_out=pkg/proto/v0 example.proto
 
 # .PHONY: protobuf
 # protobuf:  $(GOPATH)/bin/protoc-gen-go $(GOPATH)/bin/protoc-gen-micro $(GOPATH)/bin/protoc-gen-microweb $(GOPATH)/bin/protoc-gen-swagger pkg/proto/v0/example.pb.go pkg/proto/v0/example.pb.micro.go pkg/proto/v0/example.pb.web.go pkg/proto/v0/example.swagger.json
-
-assets:
-	mkdir assets/ && curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/

@@ -20,6 +20,7 @@ require (
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20200828085053-37fcf3c8f853
 	github.com/owncloud/ocis/accounts v0.5.3-0.20201103104733-ff2c41028d9b
 	github.com/owncloud/ocis/glauth v0.0.0-00010101000000-000000000000
+	github.com/owncloud/ocis/graph v0.0.0-20210204104632-f55a8092cb1f // indirect
 	github.com/owncloud/ocis/idp v0.0.0-00010101000000-000000000000
 	github.com/owncloud/ocis/ocis-pkg v0.1.0
 	github.com/owncloud/ocis/ocs v0.0.0-00010101000000-000000000000
@@ -56,5 +57,6 @@ replace (
 	github.com/owncloud/ocis/thumbnails => ../thumbnails
 	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/webdav => ../webdav
+	github.com/owncloud/ocis/graph => ../graph
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 )
