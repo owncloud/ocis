@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -evx
+set -e
 
 ocis server&
 sleep 10
@@ -18,8 +18,7 @@ REVA_USER_UUID=$(ocis accounts list | grep " | Reva Inter " | egrep '[0-9a-f]{8}
 echo "  Reva user UUID: $REVA_USER_UUID"
 ocis accounts update --password $STORAGE_LDAP_BIND_PASSWORD $REVA_USER_UUID
 
-killall ocis
 echo "default secrets changed"
 echo "##################################################"
 
-ocis server
+wait # wait for oCIS to exit
