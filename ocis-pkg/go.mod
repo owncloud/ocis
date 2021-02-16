@@ -5,7 +5,12 @@ go 1.15
 require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
 	github.com/cs3org/reva v1.6.0
@@ -15,7 +20,6 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
-	github.com/micro/go-plugins/wrapper/trace/opencensus/v2 v2.9.1
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/storage v0.0.0-20210216094451-dc73176dc62d

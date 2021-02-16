@@ -4,11 +4,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/v2"
-	mclient "github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/client/grpc"
+	grpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	"github.com/asim/go-micro/v3"
+	"github.com/asim/go-micro/v3/client"
 
-	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
+	"github.com/asim/go-micro/plugins/server/grpc/v3"
+
+	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
@@ -16,12 +18,12 @@ import (
 // DefaultClient is a custom ocis grpc configured client.
 var DefaultClient = newGrpcClient()
 
-func newGrpcClient() mclient.Client {
-	r := *registry.GetRegistry()
+func newGrpcClient() client.Client {
+	//r := *registry.GetRegistry()
 
-	c := grpc.NewClient(
-		mclient.RequestTimeout(10*time.Second),
-		mclient.Registry(r),
+	c := grpcc.NewClient(
+	//grpcc.RequestTimeout(10*time.Second),
+	//grpcc.Registry(r),
 	)
 	return c
 }
@@ -40,7 +42,13 @@ func NewService(opts ...Option) Service {
 		Str("addr", sopts.Address).
 		Msg("starting server")
 
+	r := *registry.GetRegistry()
+
 	mopts := []micro.Option{
+		// This needs to be first as it replaces the underlying server
+		// which causes any configuration set before it
+		// to be discarded
+		micro.Server(grpc.NewServer()),
 		micro.Name(
 			strings.Join(
 				[]string{
@@ -51,6 +59,7 @@ func NewService(opts ...Option) Service {
 			),
 		),
 		micro.Client(DefaultClient),
+		micro.Registry(r),
 		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),

@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
