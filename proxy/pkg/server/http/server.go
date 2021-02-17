@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"os"
 
+	"github.com/asim/go-micro/v3"
+
 	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/proxy/pkg/crypto"
 )
@@ -55,12 +57,10 @@ func Server(opts ...Option) (svc.Service, error) {
 		svc.Address(options.Config.HTTP.Addr),
 		svc.Context(options.Context),
 		svc.Flags(options.Flags...),
-		svc.Handler(chain),
 	)
 
-	if err := service.Init(); err != nil {
-		l.Fatal().Err(err).Msgf("Error initializing")
-	}
+	micro.RegisterHandler(service.Server(), chain)
 
+	service.Init()
 	return service, nil
 }

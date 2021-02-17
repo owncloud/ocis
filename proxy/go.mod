@@ -6,13 +6,14 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
 	github.com/cs3org/reva v1.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2

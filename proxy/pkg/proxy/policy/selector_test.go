@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/micro/go-micro/v2/client"
+	"github.com/asim/go-micro/v3/client"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
