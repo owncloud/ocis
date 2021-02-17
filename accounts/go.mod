@@ -7,6 +7,9 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+	github.com/asim/go-micro/cmd/protoc-gen-micro/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
 	github.com/cs3org/reva v1.6.0
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -37,7 +40,7 @@ require (
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	golang.org/x/text v0.3.5 // indirect
-	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
+	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/grpc v1.35.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect

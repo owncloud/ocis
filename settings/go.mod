@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
@@ -31,9 +32,9 @@ require (
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5
 	golang.org/x/mod v0.4.1 // indirect
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
-	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
+	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible
 )

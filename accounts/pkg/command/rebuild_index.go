@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	"github.com/micro/cli/v2"
-	"github.com/micro/go-micro/v2/client/grpc"
 	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	index "github.com/owncloud/ocis/accounts/pkg/proto/v0"

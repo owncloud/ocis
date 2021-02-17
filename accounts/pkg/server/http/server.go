@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/asim/go-micro/v3"
 	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -60,13 +61,8 @@ func Server(opts ...Option) http.Service {
 		proto.RegisterGroupsServiceWeb(r, handler)
 	})
 
-	service.Handle(
-		"/",
-		mux,
-	)
+	micro.RegisterHandler(service.Server(), mux)
 
-	if err := service.Init(); err != nil {
-		panic(err)
-	}
+	service.Init()
 	return service
 }

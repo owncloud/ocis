@@ -145,6 +145,7 @@ github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535/go.mod h1:o
 github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee h1:3T/l+vMotQ7cDSLWNAn2Vg1SAQ3mdyLgBWWBitSS3uU=
 github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee/go.mod h1:u7Wtt4WATGGgae9mURNGQQqxAudPKrxfsbSDSGOso+g=
 github.com/asim/go-micro v1.18.0 h1:k/qyLA5R175Vr1Owf90Ms1+J/zhBf/aa8aiHGhk0x5s=
+github.com/asim/go-micro/cmd/protoc-gen-micro/v3 v3.0.0-20210210071449-f9f5e7422d8f/go.mod h1:fYvR5QgzmPPwycnoC7lyZanqQ4l41AbaZ+urE2DSsbI=
 github.com/asim/go-micro/plugins/broker/memory/v3 v3.0.0-20210202145831-070250155285/go.mod h1:IJrBUDk0XAbi0iDg+sKgkY588m311TkSoEAjU9xu/mc=
 github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210205090925-e8167a8b79ed/go.mod h1:Mx1EwGdIq7wl5IkKLaGbHtoIC4yvqUNxJtZu6wxsqiU=
 github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f h1:VTL4EFNLPzrc28lrYrLrjMkwx6xLEWII0v5rCb6Ozqw=
@@ -1077,6 +1078,7 @@ github.com/marten-seemann/qpack v0.1.0/go.mod h1:LFt1NU/Ptjip0C2CPkhimBz5CGE3WGD
 github.com/marten-seemann/qpack v0.2.1/go.mod h1:F7Gl5L1jIgN1D11ucXefiuJS9UMVP2opoCp2jDKb7wc=
 github.com/marten-seemann/qtls v0.3.2/go.mod h1:xzjG7avBwGGbdZ8dTGxlBnLArsVKLvwmjgmPuiQEcYk=
 github.com/marten-seemann/qtls v0.4.1/go.mod h1:pxVXcHHw1pNIt8Qo0pwSYQEoZ8yYOOPXTCZLQQunvRc=
+github.com/marten-seemann/qtls v0.10.0 h1:ECsuYUKalRL240rRD4Ri33ISb7kAQ3qGDlrrl55b2pc=
 github.com/marten-seemann/qtls v0.10.0/go.mod h1:UvMd1oaYDACI99/oZUYLzMCkBXQVT0aGm99sJhbT8hs=
 github.com/marten-seemann/qtls-go1-15 v0.1.1 h1:LIH6K34bPVttyXnUWixk0bzH6/N07VxbSabxn5A5gZQ=
 github.com/marten-seemann/qtls-go1-15 v0.1.1/go.mod h1:GyFwywLKkRt+6mfU99csTEY1joMZz5vmB1WNZH3P81I=
