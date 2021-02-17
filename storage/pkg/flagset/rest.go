@@ -1,0 +1,75 @@
+package flagset
+
+import (
+	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/storage/pkg/config"
+)
+
+// RestWithConfig applies REST user/group provider cfg to the flagset
+func RestWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "rest-client-id",
+			Value:       "",
+			Usage:       "User/group rest driver Client ID",
+			EnvVars:     []string{"STORAGE_REST_CLIENT_ID"},
+			Destination: &cfg.Reva.UserGroupRest.ClientID,
+		},
+		&cli.StringFlag{
+			Name:        "rest-client-secret",
+			Value:       "",
+			Usage:       "User/group rest driver Client Secret",
+			EnvVars:     []string{"STORAGE_REST_CLIENT_SECRET"},
+			Destination: &cfg.Reva.UserGroupRest.ClientSecret,
+		},
+		&cli.StringFlag{
+			Name:        "rest-redis-address",
+			Value:       "localhost:6379",
+			Usage:       "Address for redis server",
+			EnvVars:     []string{"STORAGE_REST_REDIS_ADDRESS"},
+			Destination: &cfg.Reva.UserGroupRest.RedisAddress,
+		},
+		&cli.StringFlag{
+			Name:        "rest-redis-username",
+			Value:       "",
+			Usage:       "Username for redis server",
+			EnvVars:     []string{"STORAGE_REST_REDIS_USERNAME"},
+			Destination: &cfg.Reva.UserGroupRest.RedisUsername,
+		},
+		&cli.StringFlag{
+			Name:        "rest-redis-password",
+			Value:       "",
+			Usage:       "Password for redis server",
+			EnvVars:     []string{"STORAGE_REST_REDIS_PASSWORD"},
+			Destination: &cfg.Reva.UserGroupRest.RedisPassword,
+		},
+		&cli.StringFlag{
+			Name:        "rest-id-provider",
+			Value:       "",
+			Usage:       "The OIDC Provider",
+			EnvVars:     []string{"STORAGE_REST_ID_PROVIDER"},
+			Destination: &cfg.Reva.UserGroupRest.IDProvider,
+		},
+		&cli.StringFlag{
+			Name:        "rest-api-base-url",
+			Value:       "",
+			Usage:       "Base API Endpoint",
+			EnvVars:     []string{"STORAGE_REST_API_BASE_URL"},
+			Destination: &cfg.Reva.UserGroupRest.APIBaseURL,
+		},
+		&cli.StringFlag{
+			Name:        "rest-oidc-token-endpoint",
+			Value:       "",
+			Usage:       "Endpoint to generate token to access the API",
+			EnvVars:     []string{"STORAGE_REST_OIDC_TOKEN_ENDPOINT"},
+			Destination: &cfg.Reva.UserGroupRest.OIDCTokenEndpoint,
+		},
+		&cli.StringFlag{
+			Name:        "rest-target-api",
+			Value:       "",
+			Usage:       "The target application",
+			EnvVars:     []string{"STORAGE_REST_TARGET_API"},
+			Destination: &cfg.Reva.UserGroupRest.TargetAPI,
+		},
+	}
+}

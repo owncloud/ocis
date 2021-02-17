@@ -64,78 +64,12 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERPROVIDER_JSON"},
 			Destination: &cfg.Reva.Users.JSON,
 		},
-
-		// rest driver
-
-		&cli.StringFlag{
-			Name:        "rest-client-id",
-			Value:       "",
-			Usage:       "User rest driver Client ID",
-			EnvVars:     []string{"STORAGE_REST_CLIENT_ID"},
-			Destination: &cfg.Reva.UserRest.ClientID,
-		},
-		&cli.StringFlag{
-			Name:        "rest-client-secret",
-			Value:       "",
-			Usage:       "User rest driver Client Secret",
-			EnvVars:     []string{"STORAGE_REST_CLIENT_SECRET"},
-			Destination: &cfg.Reva.UserRest.ClientSecret,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-address",
-			Value:       "localhost:6379",
-			Usage:       "Address for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_ADDRESS"},
-			Destination: &cfg.Reva.UserRest.RedisAddress,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-username",
-			Value:       "",
-			Usage:       "Username for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_USERNAME"},
-			Destination: &cfg.Reva.UserRest.RedisUsername,
-		},
-		&cli.StringFlag{
-			Name:        "rest-redis-password",
-			Value:       "",
-			Usage:       "Password for redis server",
-			EnvVars:     []string{"STORAGE_REST_REDIS_PASSWORD"},
-			Destination: &cfg.Reva.UserRest.RedisPassword,
-		},
 		&cli.IntFlag{
-			Name:        "rest-user-groups-cache-expiration",
+			Name:        "user-groups-cache-expiration",
 			Value:       5,
 			Usage:       "Time in minutes for redis cache expiration.",
-			EnvVars:     []string{"STORAGE_REST_CACHE_EXPIRATION"},
-			Destination: &cfg.Reva.UserRest.UserGroupsCacheExpiration,
-		},
-		&cli.StringFlag{
-			Name:        "rest-id-provider",
-			Value:       "",
-			Usage:       "The OIDC Provider",
-			EnvVars:     []string{"STORAGE_REST_ID_PROVIDER"},
-			Destination: &cfg.Reva.UserRest.IDProvider,
-		},
-		&cli.StringFlag{
-			Name:        "rest-api-base-url",
-			Value:       "",
-			Usage:       "Base API Endpoint",
-			EnvVars:     []string{"STORAGE_REST_API_BASE_URL"},
-			Destination: &cfg.Reva.UserRest.APIBaseURL,
-		},
-		&cli.StringFlag{
-			Name:        "rest-oidc-token-endpoint",
-			Value:       "",
-			Usage:       "Endpoint to generate token to access the API",
-			EnvVars:     []string{"STORAGE_REST_OIDC_TOKEN_ENDPOINT"},
-			Destination: &cfg.Reva.UserRest.OIDCTokenEndpoint,
-		},
-		&cli.StringFlag{
-			Name:        "rest-target-api",
-			Value:       "",
-			Usage:       "The target application",
-			EnvVars:     []string{"STORAGE_REST_TARGET_API"},
-			Destination: &cfg.Reva.UserRest.TargetAPI,
+			EnvVars:     []string{"STORAGE_USER_CACHE_EXPIRATION"},
+			Destination: &cfg.Reva.Users.UserGroupsCacheExpiration,
 		},
 	}
 
@@ -143,6 +77,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, LDAPWithConfig(cfg)...)
+	flags = append(flags, RestWithConfig(cfg)...)
 
 	return flags
 }

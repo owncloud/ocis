@@ -77,6 +77,7 @@ func Execute() error {
 			Frontend(cfg),
 			Gateway(cfg),
 			Users(cfg),
+			Groups(cfg),
 			AuthBasic(cfg),
 			AuthBearer(cfg),
 			Sharing(cfg),

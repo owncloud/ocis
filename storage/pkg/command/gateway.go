@@ -103,6 +103,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 								// user metadata is located on the users services
 								"preferencessvc":  cfg.Reva.Users.Endpoint,
 								"userprovidersvc": cfg.Reva.Users.Endpoint,
+								"groupprovidersvc": cfg.Reva.Groups.Endpoint,
 								// sharing is located on the sharing service
 								"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
 								"publicshareprovidersvc":        cfg.Reva.Sharing.Endpoint,
@@ -116,6 +117,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"transfer_shared_secret":         cfg.Reva.TransferSecret,
 								"transfer_expires":               cfg.Reva.TransferExpires,
 								"home_mapping":                   cfg.Reva.Gateway.HomeMapping,
+								"etag_cache_ttl":                 cfg.Reva.Gateway.EtagCacheTTL,
 							},
 							"authregistry": map[string]interface{}{
 								"driver": "static",

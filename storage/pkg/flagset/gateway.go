@@ -104,6 +104,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_GATEWAY_HOME_MAPPING"},
 			Destination: &cfg.Reva.Gateway.HomeMapping,
 		},
+		&cli.IntFlag{
+			Name:        "etag-cache-ttl",
+			Value:       0,
+			Usage:       "TTL for the home and shares directory etags cache",
+			EnvVars:     []string{"STORAGE_GATEWAY_ETAG_CACHE_TTL"},
+			Destination: &cfg.Reva.Gateway.EtagCacheTTL,
+		},
 
 		// other services
 
@@ -170,6 +177,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
 			Destination: &cfg.Reva.Users.Endpoint,
 		},
+		&cli.StringFlag{
+                        Name:        "groupprovider-endpoint",
+                        Value:       "localhost:9160",
+                        Usage:       "endpoint to use for the groupprovider",
+                        EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
+                        Destination: &cfg.Reva.Groups.Endpoint,
+                },
 		&cli.StringFlag{
 			Name:        "sharing-endpoint",
 			Value:       "localhost:9150",

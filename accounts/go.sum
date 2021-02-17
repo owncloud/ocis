@@ -130,6 +130,7 @@ github.com/aws/aws-sdk-go v1.34.12 h1:7UbBEYDUa4uW0YmRnOd806MS1yoJMcaodBWDzvBShA
 github.com/aws/aws-sdk-go v1.34.12/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.37.3 h1:1f0groABc4AuapskpHf6EBRaG2tqw0Sx3ebCMwfp1Ys=
 github.com/aws/aws-sdk-go v1.37.3/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
+github.com/aws/aws-sdk-go v1.37.10/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-xray-sdk-go v0.9.4/go.mod h1:XtMKdBQfpVut+tJEwI7+dJFRxxRdxHDyVNp2tHXRq04=
 github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f/go.mod h1:AuiFmCCPBSrqvVMvuqFuk0qogytodnVFVSN5CeJB8Gc=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -224,10 +225,14 @@ github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666 h1:E7VsSSN/2YZLS
 github.com/cs3org/go-cs3apis v0.0.0-20200810113633-b00aca449666/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc h1:vHFqu+Gb/iOKYFy2KswpwIG3G6zRMudRn+rQ2bg3TPE=
 github.com/cs3org/go-cs3apis v0.0.0-20210104105209-0d3ecb3453dc/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5 h1:wy1oeyy6v9/65G97AkE5o4jC9J+sngPV9AZL5TbNsaY=
+github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.2.2-0.20200924071957-e6676516e61e h1:khITGSnfDXtByQsLezoXgocUgGHJBBn0BPsUihGvk7w=
 github.com/cs3org/reva v1.2.2-0.20200924071957-e6676516e61e/go.mod h1:DOV5SjpOBKN+aWfOHLdA4KiLQkpyC786PQaXEdRAZ0M=
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c h1:fyo4TNiZdfQS27XHnAMb+S2wkdlmBf6ZLkU4uHEgWSA=
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c/go.mod h1:24c68Ys3h7srGohymDKSXakN4OrhzABJoKFoMeSIBvk=
+github.com/cs3org/reva v1.6.0 h1:xIhO7UtXQZbjYNeekaeQtZRo+HjZWWukCotb1tO4qMA=
+github.com/cs3org/reva v1.6.0/go.mod h1:3IWlJ4RcYYu0NEnlvP9QG66Inx7F0BtVLJWXit9Q5aw=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

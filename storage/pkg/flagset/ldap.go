@@ -36,6 +36,9 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_LDAP_LOGINFILTER"},
 			Destination: &cfg.Reva.LDAP.LoginFilter,
 		},
+
+		// User specific filters
+
 		&cli.StringFlag{
 			Name:        "ldap-userfilter",
 			Value:       "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
@@ -44,27 +47,60 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.LDAP.UserFilter,
 		},
 		&cli.StringFlag{
-			Name:        "ldap-attributefilter",
+			Name:        "ldap-userattributefilter",
 			Value:       "(&(objectclass=posixAccount)({{attr}}={{value}}))",
 			Usage:       "LDAP filter used when searching for a user by claim/attribute. {{attr}} will be replaced with the attribute, {{value}} with the value.",
-			EnvVars:     []string{"STORAGE_LDAP_ATTRIBUTEFILTER"},
-			Destination: &cfg.Reva.LDAP.AttributeFilter,
+			EnvVars:     []string{"STORAGE_LDAP_USERATTRIBUTEFILTER"},
+			Destination: &cfg.Reva.LDAP.UserAttributeFilter,
 		},
 		&cli.StringFlag{
-			Name:        "ldap-findfilter",
+			Name:        "ldap-userfindfilter",
 			Value:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-			Usage:       "LDAP filter used when searching for recipients. {{query}} will be replaced with the search query",
-			EnvVars:     []string{"STORAGE_LDAP_FINDFILTER"},
-			Destination: &cfg.Reva.LDAP.FindFilter,
+			Usage:       "LDAP filter used when searching for user recipients. {{query}} will be replaced with the search query",
+			EnvVars:     []string{"STORAGE_LDAP_USERFINDFILTER"},
+			Destination: &cfg.Reva.LDAP.UserFindFilter,
 		},
 		&cli.StringFlag{
-			Name: "ldap-groupfilter",
+			Name: "ldap-usergroupfilter",
 			// FIXME the storage implementation needs to use the memberof overlay to get the cn when it only has the uuid,
 			// because the ldap schema either uses the dn or the member(of) attributes to establish membership
 			Value:       "(&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*))", // This filter will never work
 			Usage:       "LDAP filter used when getting the groups of a user. The CS3 userid properties {{.OpaqueId}} and {{.Idp}} are available.",
+			EnvVars:     []string{"STORAGE_LDAP_USERGROUPFILTER"},
+			Destination: &cfg.Reva.LDAP.UserGroupFilter,
+		},
+
+		// Group specific filters
+		// These might not work at the moment. Need to be fixed
+
+		&cli.StringFlag{
+			Name:        "ldap-groupfilter",
+			Value:       "(&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
+			Usage:       "LDAP filter used when getting a group. The CS3 groupid properties {{.OpaqueId}} and {{.Idp}} are available.",
 			EnvVars:     []string{"STORAGE_LDAP_GROUPFILTER"},
 			Destination: &cfg.Reva.LDAP.GroupFilter,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-groupattributefilter",
+			Value:       "(&(objectclass=posixGroup)({{attr}}={{value}}))",
+			Usage:       "LDAP filter used when searching for a group by claim/attribute. {{attr}} will be replaced with the attribute, {{value}} with the value.",
+			EnvVars:     []string{"STORAGE_LDAP_GROUPATTRIBUTEFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupAttributeFilter,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-groupfindfilter",
+			Value:       "(&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
+			Usage:       "LDAP filter used when searching for group recipients. {{query}} will be replaced with the search query",
+			EnvVars:     []string{"STORAGE_LDAP_GROUPFINDFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupFindFilter,
+		},
+		&cli.StringFlag{
+			Name: "ldap-groupmemberfilter",
+			// FIXME the storage implementation needs to use the members overlay to get the cn when it only has the uuid
+			Value:       "(&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))", // This filter will never work
+			Usage:       "LDAP filter used when getting the members of a group. The CS3 groupid properties {{.OpaqueId}} and {{.Idp}} are available.",
+			EnvVars:     []string{"STORAGE_LDAP_GROUPMEMBERFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupMemberFilter,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
@@ -94,6 +130,13 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "LDAP schema uid",
 			EnvVars:     []string{"STORAGE_LDAP_SCHEMA_UID"},
 			Destination: &cfg.Reva.LDAP.Schema.UID,
+		},
+		&cli.StringFlag{
+			Name:        "ldap-schema-gid",
+			Value:       "ownclouduuid",
+			Usage:       "LDAP schema gid",
+			EnvVars:     []string{"STORAGE_LDAP_SCHEMA_GID"},
+			Destination: &cfg.Reva.LDAP.Schema.GID,
 		},
 		&cli.StringFlag{
 			Name:        "ldap-schema-mail",
