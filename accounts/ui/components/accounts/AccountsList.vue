@@ -17,7 +17,7 @@
           <oc-th type="head" v-text="$gettext('Display name')" />
           <oc-th type="head" v-text="$gettext('Email')" />
           <oc-th type="head" v-text="$gettext('Role')" />
-          <oc-th shrink type="head" v-text="$gettext('Activated')" alignH="center"/>
+          <oc-th shrink type="head" v-text="$gettext('Activated')" align-h="center"/>
         </oc-tr>
       </oc-thead>
       <oc-tbody>
