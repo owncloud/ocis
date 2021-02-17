@@ -12,6 +12,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix thumbnail generation when using different idp: [#1624](https://github.com/owncloud/ocis/issues/1624)
 * Change - Initial release of graph and graph explorer: [#1594](https://github.com/owncloud/ocis/pull/1594)
 * Change - Move runtime code on refs/pman over to owncloud/ocis/ocis: [#1483](https://github.com/owncloud/ocis/pull/1483)
+* Change - Update ownCloud Web to v2.0.0: [#1661](https://github.com/owncloud/ocis/pull/1661)
+* Enhancement - Make use of new design-system oc-table: [#1597](https://github.com/owncloud/ocis/pull/1597)
 * Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 * Enhancement - Functionality to map home directory to different storage providers: [#1186](https://github.com/owncloud/ocis/pull/1186)
 * Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
@@ -66,6 +68,25 @@ The following sections list the changes for unreleased.
    including refs/pman module as an oCIS package instead.
 
    https://github.com/owncloud/ocis/pull/1483
+
+* Change - Update ownCloud Web to v2.0.0: [#1661](https://github.com/owncloud/ocis/pull/1661)
+
+   Tags: web
+
+   We updated ownCloud Web to v2.0.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/1661
+   https://github.com/owncloud/web/releases/tag/v2.0.0
+
+* Enhancement - Make use of new design-system oc-table: [#1597](https://github.com/owncloud/ocis/pull/1597)
+
+   Tags: ui, accounts
+
+   The design-system table component has changed the way it's used. We updated accounts-ui to use
+   the new 'oc-table-simple' component.
+
+   https://github.com/owncloud/ocis/pull/1597
 
 * Enhancement - Use a default protocol parameter instead of explicitly disabling tus: [#1331](https://github.com/cs3org/reva/pull/1331)
 
