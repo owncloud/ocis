@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Switch to opencontainers annotation scheme: [#1381](https://github.com/owncloud/ocis/pull/1381)
 * Enhancement - Migrate ocis-graph-explorer to ocis monorepo: [#1596](https://github.com/owncloud/ocis/pull/1596)
 * Enhancement - Migrate ocis-graph to ocis monorepo: [#1594](https://github.com/owncloud/ocis/pull/1594)
+* Enhancement - Enable group sharing and add config for sharing SQL driver: [#1626](https://github.com/owncloud/ocis/pull/1626)
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
 ## Details
@@ -111,6 +112,17 @@ The following sections list the changes for unreleased.
    Ocis-graph was not migrated during the monorepo conversion.
 
    https://github.com/owncloud/ocis/pull/1594
+
+* Enhancement - Enable group sharing and add config for sharing SQL driver: [#1626](https://github.com/owncloud/ocis/pull/1626)
+
+   This PR adds config to support sharing with groups. It also introduces a breaking change for the
+   CS3APIs definitions since grantees can now refer to both users as well as groups. Since we store
+   the grantee information in a json file, `/var/tmp/ocis/storage/shares.json`, its previous
+   version needs to be removed as we won't be able to unmarshal data corresponding to the previous
+   definitions.
+
+   https://github.com/owncloud/ocis/pull/1626
+   https://github.com/cs3org/reva/pull/1453
 
 * Enhancement - Update reva to v1.5.2-0.20210125114636-0c10b333ee69: [#1482](https://github.com/owncloud/ocis/pull/1482)
 
