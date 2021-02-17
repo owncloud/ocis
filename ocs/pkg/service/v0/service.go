@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
-	"github.com/micro/go-micro/v2/client/grpc"
-	ogrpc "github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
@@ -21,8 +21,6 @@ import (
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
-
-var defaultClient = grpc.NewClient()
 
 // Service defines the extension handlers.
 type Service interface {
@@ -39,7 +37,7 @@ func NewService(opts ...Option) Service {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		roleService = settings.NewRoleService("com.owncloud.api.settings", ogrpc.DefaultClient)
+		roleService = settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {
@@ -152,11 +150,11 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o Ocs) getAccountService() accounts.AccountsService {
-	return accounts.NewAccountsService("com.owncloud.api.accounts", defaultClient)
+	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {
-	return accounts.NewGroupsService("com.owncloud.api.accounts", defaultClient)
+	return accounts.NewGroupsService("com.owncloud.api.accounts", grpc.DefaultClient)
 }
 
 // NotImplementedStub returns a not implemented error

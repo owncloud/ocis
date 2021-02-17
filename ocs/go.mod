@@ -7,6 +7,8 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
 	github.com/cs3org/reva v1.6.0
@@ -34,7 +36,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.opencensus.io v0.22.6
-	google.golang.org/genproto v0.0.0-20200624020401-64a14ca9d1ad
+	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/protobuf v1.25.0
 )
 

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/asim/go-micro/v3"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
@@ -45,10 +46,7 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewTracing(handle)
 	}
 
-	service.Handle(
-		"/",
-		handle,
-	)
+	micro.RegisterHandler(service.Server(), handle)
 
 	service.Init()
 	return service, nil
