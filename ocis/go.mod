@@ -7,7 +7,6 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
 	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
@@ -36,7 +35,6 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.etcd.io/etcd v0.5.0-alpha.5.0.20210209230119-3be9460ddc8e // indirect
 	go.opencensus.io v0.22.6
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
 )
