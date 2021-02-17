@@ -1,9 +1,9 @@
 <template>
   <div>
-    <oc-table-simple>
+    <oc-table-simple id="accounts-user-list">
       <oc-thead>
         <oc-tr class="fix-table-header">
-          <oc-th shrink type="head" alignH="center">
+          <oc-th shrink type="head" align-h="center">
             <oc-checkbox
               class="oc-ml-s"
               :value="areAllAccountsSelected"
