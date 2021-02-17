@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/micro/go-micro/v2/metadata"
+	"github.com/asim/go-micro/v3/metadata"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/stretchr/testify/assert"
 )

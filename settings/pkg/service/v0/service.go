@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	merrors "github.com/asim/go-micro/v3/errors"
+	"github.com/asim/go-micro/v3/metadata"
 	"github.com/golang/protobuf/ptypes/empty"
-	merrors "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
