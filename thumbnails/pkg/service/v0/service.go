@@ -4,7 +4,7 @@ import (
 	"context"
 	"image"
 
-	merrors "github.com/micro/go-micro/v2/errors"
+	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
