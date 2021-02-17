@@ -93,10 +93,3 @@ func TLSConfig(config *tls.Config) Option {
 		o.TLSConfig = config
 	}
 }
-
-// Handler sets the http handler for the service
-func Handler(h http.Handler) Option {
-	return func(o *Options) {
-		o.Handler = h
-	}
-}
