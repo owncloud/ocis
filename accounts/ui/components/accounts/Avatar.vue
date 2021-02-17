@@ -67,9 +67,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getToken']),
+    ...mapGetters(['getToken', 'configuration']),
     enabled: function () {
-      return this.$root.config.enableAvatars || true
+      return this.configuration.enableAvatars || true
     }
   },
   watch: {
@@ -97,7 +97,7 @@ export default {
         return
       }
       const headers = new Headers()
-      const instance = this.$root.config.server || window.location.origin
+      const instance = this.configuration.server || window.location.origin
       const url = instance + '/remote.php/dav/avatars/' + this.userid + '/128.png'
       headers.append('Authorization', 'Bearer ' + this.getToken)
       headers.append('X-Requested-With', 'XMLHttpRequest')
