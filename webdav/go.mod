@@ -6,10 +6,10 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
+	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.9.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/openzipkin/zipkin-go v0.2.2

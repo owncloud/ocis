@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	mreg "github.com/asim/go-micro/v3/registry"
 	"github.com/micro/cli/v2"
-	mreg "github.com/micro/go-micro/v2/registry"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis/pkg/config"

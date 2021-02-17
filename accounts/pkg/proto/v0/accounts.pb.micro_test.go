@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/asim/go-micro/v3/client"
+	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/micro/go-micro/v2/client"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/command"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"

@@ -7,10 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/micro/go-micro/v2"
 	"github.com/owncloud/ocis/ocis/pkg/config"
-
-	cli "github.com/micro/cli/v2"
 
 	"github.com/micro/micro/v2/client/api"
 	"github.com/micro/micro/v2/service/registry"
@@ -144,13 +141,13 @@ func RunService(client *rpc.Client, service string) int {
 }
 
 // AddMicroPlatform adds the micro subcommands to the cli app
-func AddMicroPlatform(app *cli.App, opts micro.Options) {
-	setDefaults()
-
-	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
-	//app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
-	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
-}
+//func AddMicroPlatform(app *cli.App, opts micro.Options) {
+//	setDefaults()
+//
+//	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
+//	//app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
+//	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
+//}
 
 // provide a config.Config with default values?
 func setDefaults() {
