@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [1.2.0] (2021-02-17)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.2.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.1.0...master
+[1.2.0]: https://github.com/owncloud/ocis/compare/v1.1.0...v1.2.0
 
 ## Summary
 
