@@ -29,7 +29,6 @@ func NewService(opts ...Option) Service {
 
 	wopts := []micro.Option{
 		micro.Server(http.NewServer(server.TLSConfig(sopts.TLSConfig))),
-		micro.Transport(getTransport(sopts.TLSConfig)),
 		micro.Registry(*registry.GetRegistry()),
 		micro.Address(sopts.Address),
 		micro.RegisterTTL(time.Second * 30),
