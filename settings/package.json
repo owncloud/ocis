@@ -36,7 +36,7 @@
     "archiver": "^4.0.1",
     "axios": "^0.21.1",
     "core-js": "3",
-    "cross-env": "^6.0.3",
+    "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
     "cucumber-pretty": ">=6.0.0",
     "debounce": "^1.2.0",
