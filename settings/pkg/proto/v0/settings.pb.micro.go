@@ -6,9 +6,9 @@ package proto
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
+	empty "github.com/golang/protobuf/ptypes/empty"
+	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	math "math"
 )
 
@@ -85,7 +85,7 @@ type BundleService interface {
 	GetBundle(ctx context.Context, in *GetBundleRequest, opts ...client.CallOption) (*GetBundleResponse, error)
 	ListBundles(ctx context.Context, in *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error)
 	AddSettingToBundle(ctx context.Context, in *AddSettingToBundleRequest, opts ...client.CallOption) (*AddSettingToBundleResponse, error)
-	RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*emptypb.Empty, error)
+	RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*empty.Empty, error)
 }
 
 type bundleService struct {
@@ -140,9 +140,9 @@ func (c *bundleService) AddSettingToBundle(ctx context.Context, in *AddSettingTo
 	return out, nil
 }
 
-func (c *bundleService) RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
+func (c *bundleService) RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "BundleService.RemoveSettingFromBundle", in)
-	out := new(emptypb.Empty)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ type BundleServiceHandler interface {
 	GetBundle(context.Context, *GetBundleRequest, *GetBundleResponse) error
 	ListBundles(context.Context, *ListBundlesRequest, *ListBundlesResponse) error
 	AddSettingToBundle(context.Context, *AddSettingToBundleRequest, *AddSettingToBundleResponse) error
-	RemoveSettingFromBundle(context.Context, *RemoveSettingFromBundleRequest, *emptypb.Empty) error
+	RemoveSettingFromBundle(context.Context, *RemoveSettingFromBundleRequest, *empty.Empty) error
 }
 
 func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, opts ...server.HandlerOption) error {
@@ -166,7 +166,7 @@ func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, op
 		GetBundle(ctx context.Context, in *GetBundleRequest, out *GetBundleResponse) error
 		ListBundles(ctx context.Context, in *ListBundlesRequest, out *ListBundlesResponse) error
 		AddSettingToBundle(ctx context.Context, in *AddSettingToBundleRequest, out *AddSettingToBundleResponse) error
-		RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, out *emptypb.Empty) error
+		RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, out *empty.Empty) error
 	}
 	type BundleService struct {
 		bundleService
@@ -230,7 +230,7 @@ func (h *bundleServiceHandler) AddSettingToBundle(ctx context.Context, in *AddSe
 	return h.BundleServiceHandler.AddSettingToBundle(ctx, in, out)
 }
 
-func (h *bundleServiceHandler) RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, out *emptypb.Empty) error {
+func (h *bundleServiceHandler) RemoveSettingFromBundle(ctx context.Context, in *RemoveSettingFromBundleRequest, out *empty.Empty) error {
 	return h.BundleServiceHandler.RemoveSettingFromBundle(ctx, in, out)
 }
 
@@ -442,7 +442,7 @@ type RoleService interface {
 	ListRoles(ctx context.Context, in *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error)
 	ListRoleAssignments(ctx context.Context, in *ListRoleAssignmentsRequest, opts ...client.CallOption) (*ListRoleAssignmentsResponse, error)
 	AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, opts ...client.CallOption) (*AssignRoleToUserResponse, error)
-	RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
+	RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, opts ...client.CallOption) (*empty.Empty, error)
 }
 
 type roleService struct {
@@ -487,9 +487,9 @@ func (c *roleService) AssignRoleToUser(ctx context.Context, in *AssignRoleToUser
 	return out, nil
 }
 
-func (c *roleService) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
+func (c *roleService) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "RoleService.RemoveRoleFromUser", in)
-	out := new(emptypb.Empty)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -503,7 +503,7 @@ type RoleServiceHandler interface {
 	ListRoles(context.Context, *ListBundlesRequest, *ListBundlesResponse) error
 	ListRoleAssignments(context.Context, *ListRoleAssignmentsRequest, *ListRoleAssignmentsResponse) error
 	AssignRoleToUser(context.Context, *AssignRoleToUserRequest, *AssignRoleToUserResponse) error
-	RemoveRoleFromUser(context.Context, *RemoveRoleFromUserRequest, *emptypb.Empty) error
+	RemoveRoleFromUser(context.Context, *RemoveRoleFromUserRequest, *empty.Empty) error
 }
 
 func RegisterRoleServiceHandler(s server.Server, hdlr RoleServiceHandler, opts ...server.HandlerOption) error {
@@ -511,7 +511,7 @@ func RegisterRoleServiceHandler(s server.Server, hdlr RoleServiceHandler, opts .
 		ListRoles(ctx context.Context, in *ListBundlesRequest, out *ListBundlesResponse) error
 		ListRoleAssignments(ctx context.Context, in *ListRoleAssignmentsRequest, out *ListRoleAssignmentsResponse) error
 		AssignRoleToUser(ctx context.Context, in *AssignRoleToUserRequest, out *AssignRoleToUserResponse) error
-		RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *emptypb.Empty) error
+		RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *empty.Empty) error
 	}
 	type RoleService struct {
 		roleService
@@ -564,7 +564,7 @@ func (h *roleServiceHandler) AssignRoleToUser(ctx context.Context, in *AssignRol
 	return h.RoleServiceHandler.AssignRoleToUser(ctx, in, out)
 }
 
-func (h *roleServiceHandler) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *emptypb.Empty) error {
+func (h *roleServiceHandler) RemoveRoleFromUser(ctx context.Context, in *RemoveRoleFromUserRequest, out *empty.Empty) error {
 	return h.RoleServiceHandler.RemoveRoleFromUser(ctx, in, out)
 }
 

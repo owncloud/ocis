@@ -14,7 +14,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang/protobuf v1.4.3
-	github.com/grpc-ecosystem/grpc-gateway v1.14.6
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mitchellh/copystructure v1.1.1 // indirect
@@ -33,7 +33,7 @@ require (
 	golang.org/x/mod v0.4.1 // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
-	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
+	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
 	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible
 )

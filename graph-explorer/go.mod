@@ -6,7 +6,6 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
-	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
 	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/imdario/mergo v0.3.11 // indirect

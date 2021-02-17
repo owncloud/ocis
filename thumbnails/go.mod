@@ -12,6 +12,7 @@ require (
 	github.com/cespare/reflex v0.2.0
 	github.com/go-test/deep v1.0.2-0.20181118220953-042da051cf31 // indirect
 	github.com/golang/protobuf v1.4.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/micro/cli/v2 v2.1.2

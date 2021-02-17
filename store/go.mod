@@ -17,6 +17,7 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/golang/protobuf v1.4.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/micro/cli/v2 v2.1.2

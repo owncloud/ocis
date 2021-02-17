@@ -8,7 +8,6 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
 	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/gorilla/mux v1.8.0
