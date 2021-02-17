@@ -7,6 +7,19 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.2.0 Technology Preview
+Version 1.2.0 brings more functionality and stability to ownCloud Infinite Scale. ownCloud Web now loads a lot faster and is prepared for the introduction of accessibility features. An initial implementation for S3 storage support is available and file integrity checking has been introduced.
+
+The most prominent changes in version 1.2.0 comprise:
+
+- The initial loading time for ownCloud Web has been reduced by handling dependencies more efficiently (the bundle size of ownCloud Web has been drastically reduced) https://github.com/owncloud/web/pull/4584
+- Preparations for accessibility features have been implemented to work towards WCAG 2.0 compliance https://github.com/owncloud/web/pull/4594
+- Initial S3 storage support is available https://github.com/cs3org/reva/issues/1429
+- File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums https://github.com/cs3org/reva/issues/1400
+- Public link passwords are now stored as hashes to improve security https://github.com/cs3org/reva/issues/1462
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+
 ## ownCloud Infinite Scale 1.1.0 Technology Preview
 
 Version 1.1.0 is a hardening and patch release. It ships with the latest version of ownCloud Web and brings a couple of minor improvements. The minor version increase is needed due to non-backwards compatible changes in configuration. The documentation has been updated to reflect the changes. Please note that this version is still a Technology Preview and not suited for production use.
