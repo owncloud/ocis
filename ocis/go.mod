@@ -56,4 +56,5 @@ replace (
 	github.com/owncloud/ocis/thumbnails => ../thumbnails
 	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/webdav => ../webdav
+	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
 )

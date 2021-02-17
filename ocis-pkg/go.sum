@@ -145,8 +145,6 @@ github.com/asim/go-micro/plugins/registry/memory/v3 v3.0.0-20210202145831-070250
 github.com/asim/go-micro/plugins/registry/memory/v3 v3.0.0-20210202145831-070250155285/go.mod h1:AU0vyZvsO1lpuQr/DUG4CnNRvITXqQcJRRAzBATR6Jo=
 github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f h1:WaTi2EiBXi48uXmlGTb7h+QxSqmhm6A6r5P2idxvLrM=
 github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f/go.mod h1:4cS4mKqylPAybKUO8/mdjTGlBImeAL1RWA2rV/mObPQ=
-github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210210071449-f9f5e7422d8f h1:fZuMpX1tMJKD93MdCsHTzSld6yAzdeZvzDgvKVT8ON8=
-github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210210071449-f9f5e7422d8f/go.mod h1:Oe0f4zsBx6if1scvMrL/4mNfkD7URaqkvhQWnWogcws=
 github.com/asim/go-micro/plugins/transport/grpc/v3 v3.0.0-20210202145831-070250155285 h1:3YQx0EQbHNYpp1FwnHrgU0oRFISjZvBGL7UhpA8/Nas=
 github.com/asim/go-micro/plugins/transport/grpc/v3 v3.0.0-20210202145831-070250155285/go.mod h1:FXWwzJ74gGEIY/gOdDHJqCQuago+tLSkcUPayf9daGM=
 github.com/asim/go-micro/plugins/transport/tcp/v3 v3.0.0-20210210071449-f9f5e7422d8f h1:VW8tZWJYqfn6l9RctPE1SbXsdoaiw1bvc4aXTsSorX0=
@@ -1215,6 +1213,8 @@ github.com/prometheus/statsd_exporter v0.15.0/go.mod h1:Dv8HnkoLQkeEjkIE4/2ndAA7
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2/go.mod h1:7tZKcyumwBO6qip7RNQ5r77yrssm9bfCowcLEBcU5IA=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
+github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6 h1:K94q5Cw19sn7K25RPb2wVVWMOuJ3fX18fDOhqUACq2o=
+github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6/go.mod h1:Oe0f4zsBx6if1scvMrL/4mNfkD7URaqkvhQWnWogcws=
 github.com/remyoudompheng/bigfft v0.0.0-20190728182440-6a916e37a237/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/restic/calens v0.2.0 h1:LVNAtmFc+Pb4ODX66qdX1T3Di1P0OTLyUsVyvM/xD7E=
 github.com/restic/calens v0.2.0/go.mod h1:UXwyAKS4wsgUZGEc7NrzzygJbLsQZIo3wl+62Q1wvmU=

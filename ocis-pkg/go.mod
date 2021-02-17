@@ -36,6 +36,7 @@ require (
 )
 
 replace (
+	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/storage => ../storage
