@@ -8,10 +8,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
 	"github.com/asim/go-micro/plugins/server/http/v3"
-	"github.com/asim/go-micro/plugins/transport/tcp/v3"
 	"github.com/asim/go-micro/v3"
 	"github.com/asim/go-micro/v3/server"
-	mt "github.com/asim/go-micro/v3/transport"
 )
 
 // Service simply wraps the go-micro web service.
@@ -40,14 +38,6 @@ func NewService(opts ...Option) Service {
 	}
 
 	return Service{micro.NewService(wopts...)}
-}
-
-func getTransport(tlscfg *tls.Config) mt.Transport {
-	if tlscfg == nil {
-		// return a default http transport
-		return mt.NewHTTPTransport()
-	}
-	return tcp.NewTransport(mt.Secure(true), mt.TLSConfig(tlscfg))
 }
 
 func transport(secure *tls.Config) string {
