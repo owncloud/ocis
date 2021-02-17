@@ -50,7 +50,7 @@
     "query-string": "^5.0.1",
     "react": "^16.8.0",
     "react-app-polyfill": "^1.0.6",
-    "react-dev-utils": "10.0.0",
+    "react-dev-utils": "11.0.2",
     "react-dom": "16.13.1",
     "react-intl": "^5.8.6",
     "react-loadable": "^5.3.1",
