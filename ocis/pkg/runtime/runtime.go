@@ -9,8 +9,8 @@ import (
 
 	"github.com/owncloud/ocis/ocis/pkg/config"
 
-	"github.com/micro/micro/v2/client/api"
-	"github.com/micro/micro/v2/service/registry"
+	//"github.com/micro/micro/v2/client/api"
+	//"github.com/micro/micro/v2/service/registry"
 
 	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
@@ -150,19 +150,19 @@ func RunService(client *rpc.Client, service string) int {
 //}
 
 // provide a config.Config with default values?
-func setDefaults() {
-	// api
-	api.Name = OwncloudNamespace + "api"
-	api.Namespace = OwncloudNamespace + "api"
-	api.HeaderPrefix = "X-Micro-Owncloud-"
-
-	// web
-	//web.Name = OwncloudNamespace + "web"
-	//web.Namespace = OwncloudNamespace + "web"
-
-	// registry
-	registry.Name = OwncloudNamespace + "registry"
-}
+//func setDefaults() {
+//	// api
+//	api.Name = OwncloudNamespace + "api"
+//	api.Namespace = OwncloudNamespace + "api"
+//	api.HeaderPrefix = "X-Micro-Owncloud-"
+//
+//	// web
+//	//web.Name = OwncloudNamespace + "web"
+//	//web.Namespace = OwncloudNamespace + "web"
+//
+//	// registry
+//	registry.Name = OwncloudNamespace + "registry"
+//}
 
 func contains(a []string, b string) bool {
 	for i := range a {

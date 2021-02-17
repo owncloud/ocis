@@ -9,6 +9,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210210071449-f9f5e7422d8f
+	github.com/asim/go-micro/plugins/transport/tcp/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210210071449-f9f5e7422d8f
 	github.com/asim/go-micro/v3 v3.5.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
@@ -19,7 +20,6 @@ require (
 	github.com/iancoleman/strcase v0.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.9.1
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/storage v0.0.0-20210216094451-dc73176dc62d

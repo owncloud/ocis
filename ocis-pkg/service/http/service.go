@@ -7,8 +7,10 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
-	"github.com/asim/go-micro/plugins/server/http/v3"
+	//"github.com/asim/go-micro/plugins/server/http/v3"
+	"github.com/asim/go-micro/plugins/transport/tcp/v3"
 	"github.com/asim/go-micro/v3"
+	"github.com/asim/go-micro/v3/server"
 	mt "github.com/asim/go-micro/v3/transport"
 )
 
@@ -26,8 +28,8 @@ func NewService(opts ...Option) Service {
 		Msg("starting server")
 
 	wopts := []micro.Option{
-		micro.Server(http.NewServer()),
-		micro.Transport(mt.NewHTTPTransport(mt.TLSConfig(sopts.TLSConfig))),
+		micro.Server(server.NewServer()),
+		micro.Transport(getTransport(sopts.TLSConfig)),
 		micro.Registry(*registry.GetRegistry()),
 		micro.Address(sopts.Address),
 		micro.RegisterTTL(time.Second * 30),
@@ -39,6 +41,14 @@ func NewService(opts ...Option) Service {
 	}
 
 	return Service{micro.NewService(wopts...)}
+}
+
+func getTransport(tlscfg *tls.Config) mt.Transport {
+	if tlscfg == nil {
+		// return a default http transport
+		return mt.NewHTTPTransport()
+	}
+	return tcp.NewTransport(mt.Secure(true), mt.TLSConfig(tlscfg))
 }
 
 func transport(secure *tls.Config) string {
