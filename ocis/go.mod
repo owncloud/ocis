@@ -7,6 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210210071449-f9f5e7422d8f // indirect
 	github.com/asim/go-micro/v3 v3.5.0
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
@@ -35,11 +36,13 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	go.etcd.io/etcd v0.5.0-alpha.5.0.20210209230119-3be9460ddc8e // indirect
 	go.opencensus.io v0.22.6
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
 )
 
 replace (
+	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
@@ -56,5 +59,9 @@ replace (
 	github.com/owncloud/ocis/thumbnails => ../thumbnails
 	github.com/owncloud/ocis/web => ../web
 	github.com/owncloud/ocis/webdav => ../webdav
-	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
+	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
+	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
+	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
+	// latest version compatible with etcd
+	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

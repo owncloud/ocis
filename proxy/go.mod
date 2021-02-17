@@ -39,5 +39,5 @@ replace (
 	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/store => ../store
 	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
-	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

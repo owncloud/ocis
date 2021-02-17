@@ -31,5 +31,5 @@ require (
 
 replace (
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
-	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )
