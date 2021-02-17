@@ -1,6 +1,6 @@
 <template>
   <oc-tr>
-    <oc-td alignH="center">
+    <oc-td align-h="center">
       <oc-checkbox
         class="oc-ml-s"
         size="large"
@@ -44,7 +44,7 @@
         </ul>
       </oc-drop>
     </oc-td>
-    <oc-td alignH="center">
+    <oc-td align-h="center">
       <oc-icon
         v-if="account.accountEnabled"
         key="account-icon-enabled"

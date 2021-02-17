@@ -104,15 +104,14 @@ module.exports = {
       selector: '#accounts-app'
     },
     accountsListTable: {
-      selector: "//table[@class='uk-table uk-table-middle uk-table-divider']",
-      locateStrategy: 'xpath'
+      selector: '#accounts-user-list'
     },
     userInAccountsList: {
-      selector: '//table//td[text()="%s"]',
+      selector: '//table[@id="accounts-user-list"]//td[text()="%s"]',
       locateStrategy: 'xpath'
     },
     rowByUsername: {
-      selector: '//table//td[text()="%s"]/ancestor::tr',
+      selector: '//table[@id="accounts-user-list"]//td[text()="%s"]/ancestor::tr',
       locateStrategy: 'xpath'
     },
     currentRole: {
