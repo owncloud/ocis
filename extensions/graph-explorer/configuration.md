@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-17T10:43:47+0000"
+date: "2021-02-17T13:21:24+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -52,15 +52,6 @@ Usage: `graph-explorer [global options] command [command options] [arguments...]
 
 ## Sub Commands
 
-### graph-explorer health
-
-Check health status
-
-Usage: `graph-explorer health [command options] [arguments...]`
-
--debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9136`.
-
 ### graph-explorer server
 
 Start integrated server
@@ -111,4 +102,13 @@ Usage: `graph-explorer server [command options] [arguments...]`
 
 -graph-url |  $GRAPH_EXPLORER_GRAPH_URL
 : Set the url to the graph api service. Default: `http://localhost:9120`.
+
+### graph-explorer health
+
+Check health status
+
+Usage: `graph-explorer health [command options] [arguments...]`
+
+-debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9136`.
 
