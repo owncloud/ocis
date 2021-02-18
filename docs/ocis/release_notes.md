@@ -13,7 +13,7 @@ Version 1.2.0 brings more functionality and stability to ownCloud Infinite Scale
 The most prominent changes in version 1.2.0 comprise:
 
 - The initial loading time for ownCloud Web has been reduced by handling dependencies more efficiently (the bundle size of ownCloud Web has been drastically reduced) https://github.com/owncloud/web/pull/4584
-- Preparations for accessibility features have been implemented to work towards WCAG 2.0 compliance https://github.com/owncloud/web/pull/4594
+- Preparations for accessibility features have been implemented to work towards WCAG 2.1 compliance https://github.com/owncloud/web/pull/4594
 - Initial S3 storage support is available https://github.com/cs3org/reva/issues/1429
 - File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums https://github.com/cs3org/reva/issues/1400
 - Public link passwords are now stored as hashes to improve security https://github.com/cs3org/reva/issues/1462
