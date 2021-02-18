@@ -7,7 +7,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
-	"github.com/asim/go-micro/plugins/server/http/v3"
+	mhttps "github.com/asim/go-micro/plugins/server/http/v3"
 	"github.com/asim/go-micro/v3"
 	"github.com/asim/go-micro/v3/server"
 )
@@ -26,7 +26,7 @@ func NewService(opts ...Option) Service {
 		Msg("starting server")
 
 	wopts := []micro.Option{
-		micro.Server(http.NewServer(server.TLSConfig(sopts.TLSConfig))),
+		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),

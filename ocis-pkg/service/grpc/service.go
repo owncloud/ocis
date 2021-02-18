@@ -4,29 +4,16 @@ import (
 	"strings"
 	"time"
 
-	grpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/client"
-
-	"github.com/asim/go-micro/plugins/server/grpc/v3"
-
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v3"
 	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
 	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
+	"github.com/asim/go-micro/v3"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 )
 
 // DefaultClient is a custom ocis grpc configured client.
-var DefaultClient = newGrpcClient()
-
-func newGrpcClient() client.Client {
-	//r := *registry.GetRegistry()
-
-	c := grpcc.NewClient(
-	//grpcc.RequestTimeout(10*time.Second),
-	//grpcc.Registry(r),
-	)
-	return c
-}
+var DefaultClient = mgrpcc.NewClient()
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {
@@ -43,7 +30,10 @@ func NewService(opts ...Option) Service {
 		Msg("starting server")
 
 	mopts := []micro.Option{
-		micro.Server(grpc.NewServer()),
+		// first add a server because it will reset any options
+		micro.Server(mgrpcs.NewServer()),
+		// also add a client that can be used after initializing the service
+		micro.Client(mgrpcc.NewClient()),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
