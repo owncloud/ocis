@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-18T08:58:31+0000"
+date: "2021-02-18T11:37:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -54,15 +54,6 @@ Usage: `graph [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
-
-### graph health
-
-Check health status
-
-Usage: `graph health [command options] [arguments...]`
-
--debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9124`.
 
 ### graph server
 
@@ -135,4 +126,13 @@ Usage: `graph server [command options] [arguments...]`
 
 -reva-gateway-addr |  $REVA_GATEWAY_ADDR
 : REVA Gateway Endpoint. Default: `127.0.0.1:9142`.
+
+### graph health
+
+Check health status
+
+Usage: `graph health [command options] [arguments...]`
+
+-debug-addr |  $GRAPH_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9124`.
 
