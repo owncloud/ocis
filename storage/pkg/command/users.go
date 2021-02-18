@@ -105,12 +105,12 @@ func Users(cfg *config.Config) *cli.Command {
 										"idp":             cfg.Reva.LDAP.IDP,
 										"schema": map[string]interface{}{
 											"dn":          "dn",
-											"uid":         cfg.Reva.LDAP.Schema.UID,
-											"mail":        cfg.Reva.LDAP.Schema.Mail,
-											"displayName": cfg.Reva.LDAP.Schema.DisplayName,
-											"cn":          cfg.Reva.LDAP.Schema.CN,
-											"uidNumber":   cfg.Reva.LDAP.Schema.UIDNumber,
-											"gidNumber":   cfg.Reva.LDAP.Schema.GIDNumber,
+											"uid":         cfg.Reva.LDAP.UserSchema.UID,
+											"mail":        cfg.Reva.LDAP.UserSchema.Mail,
+											"displayName": cfg.Reva.LDAP.UserSchema.DisplayName,
+											"cn":          cfg.Reva.LDAP.UserSchema.CN,
+											"uidNumber":   cfg.Reva.LDAP.UserSchema.UIDNumber,
+											"gidNumber":   cfg.Reva.LDAP.UserSchema.GIDNumber,
 										},
 									},
 									"rest": map[string]interface{}{

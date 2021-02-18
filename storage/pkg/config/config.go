@@ -274,7 +274,8 @@ type LDAP struct {
 	BindDN               string
 	BindPassword         string
 	IDP                  string
-	Schema               LDAPSchema
+	UserSchema           LDAPUserSchema
+	GroupSchema          LDAPGroupSchema
 }
 
 // UserGroupRest defines the REST driver specification for user and group resolution.
@@ -290,14 +291,22 @@ type UserGroupRest struct {
 	TargetAPI         string
 }
 
-// LDAPSchema defines the available ldap schema configuration.
-type LDAPSchema struct {
+// LDAPUserSchema defines the available ldap user schema configuration.
+type LDAPUserSchema struct {
 	UID         string
-	GID         string
 	Mail        string
 	DisplayName string
 	CN          string
 	UIDNumber   string
+	GIDNumber   string
+}
+
+// LDAPGroupSchema defines the available ldap group schema configuration.
+type LDAPGroupSchema struct {
+	GID         string
+	Mail        string
+	DisplayName string
+	CN          string
 	GIDNumber   string
 }
 

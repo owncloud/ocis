@@ -105,11 +105,11 @@ func Groups(cfg *config.Config) *cli.Command {
 										"idp":             cfg.Reva.LDAP.IDP,
 										"schema": map[string]interface{}{
 											"dn":          "dn",
-											"gid":         cfg.Reva.LDAP.Schema.GID,
-											"mail":        cfg.Reva.LDAP.Schema.Mail,
-											"displayName": cfg.Reva.LDAP.Schema.DisplayName,
-											"cn":          cfg.Reva.LDAP.Schema.CN,
-											"gidNumber":   cfg.Reva.LDAP.Schema.GIDNumber,
+											"gid":         cfg.Reva.LDAP.GroupSchema.GID,
+											"mail":        cfg.Reva.LDAP.GroupSchema.Mail,
+											"displayName": cfg.Reva.LDAP.GroupSchema.DisplayName,
+											"cn":          cfg.Reva.LDAP.GroupSchema.CN,
+											"gidNumber":   cfg.Reva.LDAP.GroupSchema.GIDNumber,
 										},
 									},
 									"rest": map[string]interface{}{
