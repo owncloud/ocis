@@ -139,6 +139,7 @@ github.com/asim/go-micro/plugins/broker/memory/v3 v3.0.0-20210202145831-07025015
 github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210205090925-e8167a8b79ed/go.mod h1:Mx1EwGdIq7wl5IkKLaGbHtoIC4yvqUNxJtZu6wxsqiU=
 github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:lqM9ErFn/8dof5TwoBxZ3I65pfPsCyh/5epMCcItyMg=
 github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:Mx1EwGdIq7wl5IkKLaGbHtoIC4yvqUNxJtZu6wxsqiU=
+github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:haYJgQRcIjFqISVLpuMwj6C5d5WNXqQGxnbBpzdQiI8=
 github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:K/ITrPYRzfvcc8q/n5qJe4P0uSzWPi+Z7FUf4Nme1Js=
 github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:14lNr4KR8mSDL1APh6UUYEo7wYPDPCZs9Oh782vve1M=
 github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:B9PDGhVx6Qg0r/XT4x7HqtR0aY1Tb4qRl4ugw9uXD+M=
@@ -1263,6 +1264,7 @@ github.com/rs/cors v1.7.0/go.mod h1:gFx+x8UowdsKA9AchylcLynDq+nNFfI8FkUZdN/jGCU=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
 github.com/rs/zerolog v1.13.0/go.mod h1:YbFCdg8HfsridGWAh22vktObvhZbQsZXe4/zB0OKkWU=
 github.com/rs/zerolog v1.15.0/go.mod h1:xYTKnLHcpfU2225ny5qZjxnj9NvkumZYjJHlAThCjNc=
+github.com/rs/zerolog v1.18.0/go.mod h1:9nvC1axdVrAHcu/s9taAVfBuIdTZLVQmKQyvrUjF5+I=
 github.com/rs/zerolog v1.19.0 h1:hYz4ZVdUgjXTBUmrkrw55j1nHx68LfOKIQk5IYtyScg=
 github.com/rs/zerolog v1.19.0/go.mod h1:IzD0RJ65iWH0w97OQQebJEvTZYvsCUm9WVLWBQrJRjo=
 github.com/rs/zerolog v1.20.0 h1:38k9hgtUBdxFwE34yS8rTHmHBa4eN16E4DJlv177LNs=
