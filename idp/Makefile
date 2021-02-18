@@ -86,10 +86,6 @@ staticcheck:
 lint:
 	for PKG in $(PACKAGES); do go run golang.org/x/lint/golint -set_exit_status $$PKG || exit 1; done;
 
-.PHONY: changelog
-changelog:
-	go run github.com/restic/calens >| CHANGELOG.md
-
 .PHONY: test
 test:
 	go run github.com/haya14busa/goverage -v -coverprofile coverage.out $(PACKAGES)
