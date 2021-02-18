@@ -7,6 +7,7 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+
 ## ownCloud Infinite Scale 1.2.0 Technology Preview
 Version 1.2.0 brings more functionality and stability to ownCloud Infinite Scale. ownCloud Web now loads a lot faster and is prepared for the introduction of accessibility features. An initial implementation for S3 storage support is available and file integrity checking has been introduced.
 
@@ -19,6 +20,46 @@ The most prominent changes in version 1.2.0 comprise:
 - Public link passwords are now stored as hashes to improve security https://github.com/cs3org/reva/issues/1462
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+{{< /hint >}}
+
+#### Fix IDP service user
+Related: [#1390](https://github.com/owncloud/ocis/pull/1390), [#1569](https://github.com/owncloud/ocis/issues/1569)
+
+After upgrading oCIS from a previous version to oCIS 1.2.0 you will not be able to login in ownCloud Web
+
+Implications:
+- manual action required
+
+Migration steps:
+- Stop oCIS
+- Open following file `/var/tmp/ocis/storage/metadata/nodes/root/accounts/820ba2a1-3f54-4538-80a4-2d73007e30bf`
+- Change password to `$2y$12$ywfGLDPsSlBTVZU0g.2GZOPO8Wap3rVOpm8e3192VlytNdGWH7x72`
+- Change onPremisesSamAccountName to `idp`
+- Change preferredName to `idp`
+- Save the changed file
+- Start oCIS
+- You now are able to lock back in again.
+
+Please have a look at [how to secure an oCIS instance]({{< ref "./deployment#secure-an-ocis-instance" >}}) since you seem to run it with default secrets.
+
+#### Reset shares
+Related: [#1626](https://github.com/owncloud/ocis/pull/1626)
+
+After upgrading oCIS from a previous version to oCIS 1.2.0 you will will not be able to use previous shares or create new shares.
+
+Implications:
+- manual action required
+- loss of shares (manual resharing is needed, files will not be lost)
+
+Migration steps:
+- Stop oCIS
+- Delete following file `/var/tmp/ocis/storage/shares.json`
+- Start oCIS
+- Recreate shares manually
 
 ## ownCloud Infinite Scale 1.1.0 Technology Preview
 
