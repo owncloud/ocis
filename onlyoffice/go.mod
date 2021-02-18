@@ -22,7 +22,6 @@ require (
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/mod v0.4.1 // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 )
 
 replace (
