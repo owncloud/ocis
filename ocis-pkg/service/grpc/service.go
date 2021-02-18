@@ -33,7 +33,7 @@ func NewService(opts ...Option) Service {
 		// first add a server because it will reset any options
 		micro.Server(mgrpcs.NewServer()),
 		// also add a client that can be used after initializing the service
-		micro.Client(mgrpcc.NewClient()),
+		micro.Client(DefaultClient),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
