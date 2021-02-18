@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/asim/go-micro/v3 v3.5.0
+	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/glauth/glauth v1.1.3-0.20201110124627-fd3ac7e4bbdc
 	github.com/go-logr/logr v0.1.0
 	github.com/micro/cli/v2 v2.1.2

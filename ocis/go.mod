@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/UnnoTed/fileb0x v1.1.4
-	github.com/asim/go-micro/v3 v3.5.0
+	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/go-test/deep v1.0.6 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/micro/cli/v2 v2.1.2
@@ -40,7 +40,6 @@ require (
 )
 
 replace (
-	github.com/asim/go-micro/plugins/server/http/v3 => github.com/refs/go-micro/plugins/server/http/v3 v3.0.0-20210217152250-44857d6dc4f6
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
