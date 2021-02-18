@@ -10,6 +10,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210217182006-0f0ace1a44a9
+	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible

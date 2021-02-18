@@ -10,9 +10,9 @@ import (
 
 	"github.com/asim/go-micro/plugins/server/grpc/v3"
 
+	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
 	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
-	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
 
 // DefaultClient is a custom ocis grpc configured client.
