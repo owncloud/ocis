@@ -43,24 +43,19 @@ func NewService(opts ...Option) Service {
 		Msg("starting server")
 
 	mopts := []micro.Option{
-		// This needs to be first as it replaces the underlying server
-		// which causes any configuration set before it
-		// to be discarded
 		micro.Server(grpc.NewServer()),
-		// TODO(refs) ideally we want to pass micro options from the consumers
-		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
+		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
+		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
 		micro.Flags(sopts.Flags...),
-		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
-		micro.Client(DefaultClient),
 		micro.Registry(*registry.GetRegistry()),
+		micro.RegisterTTL(time.Second * 30),
+		micro.RegisterInterval(time.Second * 10),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
 		micro.WrapClient(opencensus.NewClientWrapper()),
 		micro.WrapHandler(opencensus.NewHandlerWrapper()),
 		micro.WrapSubscriber(opencensus.NewSubscriberWrapper()),
-		micro.RegisterTTL(time.Second * 30),
-		micro.RegisterInterval(time.Second * 10),
 	}
 
 	return Service{micro.NewService(mopts...)}

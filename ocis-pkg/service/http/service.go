@@ -27,14 +27,14 @@ func NewService(opts ...Option) Service {
 
 	wopts := []micro.Option{
 		micro.Server(http.NewServer(server.TLSConfig(sopts.TLSConfig))),
-		micro.Registry(*registry.GetRegistry()),
 		micro.Address(sopts.Address),
-		micro.RegisterTTL(time.Second * 30),
-		micro.RegisterInterval(time.Second * 10),
-		micro.Context(sopts.Context),
-		micro.Flags(sopts.Flags...),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
+		micro.Context(sopts.Context),
+		micro.Flags(sopts.Flags...),
+		micro.Registry(*registry.GetRegistry()),
+		micro.RegisterTTL(time.Second * 30),
+		micro.RegisterInterval(time.Second * 10),
 	}
 
 	return Service{micro.NewService(wopts...)}
