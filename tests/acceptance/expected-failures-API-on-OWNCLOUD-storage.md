@@ -2462,5 +2462,11 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiMain/carddav.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L23)
 -   [apiMain/carddav.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L31)
 
--   [apiTranslation/translation.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L29)
--   [apiTranslation/translation.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L30)
+-   [apiTranslation/translation.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L20)
+-   [apiTranslation/translation.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L21)
+-   [apiTranslation/translation.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L22)
+-   [apiTranslation/translation.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L23)
+-   [apiTranslation/translation.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L24)
+-   [apiTranslation/translation.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L25)
+-   [apiTranslation/translation.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L26)
+-   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
