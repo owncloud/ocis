@@ -1,3 +1,24 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.2.0...master
+
+## Summary
+
+* Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
+
+## Details
+
+* Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
+
+   Tags: web
+
+   We updated ownCloud Web to v2.0.1. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/1683
+   https://github.com/owncloud/web/releases/tag/v2.0.1
 # Changelog for [1.2.0] (2021-02-17)
 
 The following sections list the changes for 1.2.0.
