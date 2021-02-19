@@ -10,7 +10,7 @@ Welcome to our developer documentation. Here you can find developer documentatio
 
 - [oCIS](https://owncloud.github.io/ocis/) server
 - oCIS extensions
-- Clients, like:
+- Clients like:
     - [ownCloud Web](https://github.com/owncloud/web) - the new web frontend for oCIS and ownCloud
     - [ownCloud Android app](https://github.com/owncloud/android)
     - [ownCloud iOS app](https://github.com/owncloud/ios-app)
@@ -28,7 +28,7 @@ You can also find all client sources on GitHub.
 
 The oCIS server repository on GitHub is a good entry point for you to join the project. But we also develop clients for iOS, Android, Desktop and Web.
 
-For communication on development you can join our public chat [talk.owncloud.com](https://talk.owncloud.com)
+For communication on development, join our public chat [talk.owncloud.com](https://talk.owncloud.com)
 
 If you want to help and improve ownCloud or oCIS, start coding or open issues on GitHub in the related repository.
 
