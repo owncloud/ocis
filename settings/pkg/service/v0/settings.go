@@ -1,6 +1,8 @@
 package svc
 
-import settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+import (
+	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+)
 
 const (
 	// BundleUUIDRoleAdmin represents the admin role
@@ -21,6 +23,21 @@ const (
 	SettingsManagementPermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
 	SettingsManagementPermissionName string = "settings-management"
+
+	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
+
+	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
+	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
+	// AccountManagementPermissionName is the hardcoded setting name for the account management permission
+	AccountManagementPermissionName string = "account-management"
+	// GroupManagementPermissionID is the hardcoded setting UUID for the group management permission
+	GroupManagementPermissionID string = "522adfbe-5908-45b4-b135-41979de73245"
+	// GroupManagementPermissionName is the hardcoded setting name for the group management permission
+	GroupManagementPermissionName string = "group-management"
+	// SelfManagementPermissionID is the hardcoded setting UUID for the self management permission
+	SelfManagementPermissionID string = "e03070e9-4362-4cc6-a872-1c7cb2eb2b8e"
+	// SelfManagementPermissionName is the hardcoded setting name for the self management permission
+	SelfManagementPermissionName string = "self-management"
 )
 
 // generateBundlesDefaultRoles bootstraps the default roles.
@@ -29,6 +46,7 @@ func generateBundlesDefaultRoles() []*settings.Bundle {
 		generateBundleAdminRole(),
 		generateBundleUserRole(),
 		generateBundleGuestRole(),
+		generateBundleProfileRequest(),
 	}
 }
 
@@ -74,6 +92,94 @@ func generateBundleGuestRole() *settings.Bundle {
 	}
 }
 
+var languageSetting = settings.Setting_SingleChoiceValue{
+	SingleChoiceValue: &settings.SingleChoiceList{
+		Options: []*settings.ListOption{
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "cs",
+					},
+				},
+				DisplayValue: "Czech",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "de",
+					},
+				},
+				DisplayValue: "Deutsch",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "en",
+					},
+				},
+				DisplayValue: "English",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "es",
+					},
+				},
+				DisplayValue: "Español",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "fr",
+					},
+				},
+				DisplayValue: "Français",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "gl",
+					},
+				},
+				DisplayValue: "Galego",
+			},
+			{
+				Value: &settings.ListOptionValue{
+					Option: &settings.ListOptionValue_StringValue{
+						StringValue: "it",
+					},
+				},
+				DisplayValue: "Italiano",
+			},
+		},
+	},
+}
+
+func generateBundleProfileRequest() *settings.Bundle {
+	return &settings.Bundle{
+		Id:        "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
+		Name:      "profile",
+		Extension: "ocis-accounts",
+		Type:      settings.Bundle_TYPE_DEFAULT,
+		Resource: &settings.Resource{
+			Type: settings.Resource_TYPE_SYSTEM,
+		},
+		DisplayName: "Profile",
+		Settings: []*settings.Setting{
+			{
+				Id:          settingUUIDProfileLanguage,
+				Name:        "language",
+				DisplayName: "Language",
+				Description: "User language",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+				},
+				Value: &languageSetting,
+			},
+		},
+	}
+}
+
 func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 	return []*settings.AddSettingToBundleRequest{
 		{
@@ -113,6 +219,147 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 					},
 				},
 			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          "7d81f103-0488-4853-bce5-98dcce36d649",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (anyone)",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SETTING,
+					Id:   settingUUIDProfileLanguage,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleUser,
+			Setting: &settings.Setting{
+				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (self)",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SETTING,
+					Id:   settingUUIDProfileLanguage,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleGuest,
+			Setting: &settings.Setting{
+				Id:          "ca878636-8b1a-4fae-8282-8617a4c13597",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (self)",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SETTING,
+					Id:   settingUUIDProfileLanguage,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          AccountManagementPermissionID,
+				Name:        AccountManagementPermissionName,
+				DisplayName: "Account Management",
+				Description: "This permission gives full access to everything that is related to account management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+					Id:   "all",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          GroupManagementPermissionID,
+				Name:        GroupManagementPermissionName,
+				DisplayName: "Group Management",
+				Description: "This permission gives full access to everything that is related to group management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_GROUP,
+					Id:   "all",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleUser,
+			Setting: &settings.Setting{
+				Id:          SelfManagementPermissionID,
+				Name:        SelfManagementPermissionName,
+				DisplayName: "Self Management",
+				Description: "This permission gives access to self management.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_USER,
+					Id:   "me",
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+	}
+}
+
+func defaultRoleAssignments() []*settings.UserRoleAssignment {
+	return []*settings.UserRoleAssignment{
+		// default admin users
+		{
+			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b",
+			RoleId:      BundleUUIDRoleAdmin,
+		}, {
+			AccountUuid: "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
+			RoleId:      BundleUUIDRoleAdmin,
+		}, {
+			AccountUuid: "820ba2a1-3f54-4538-80a4-2d73007e30bf",
+			RoleId:      BundleUUIDRoleAdmin,
+		}, {
+			AccountUuid: "bc596f3c-c955-4328-80a0-60d018b4ad57",
+			RoleId:      BundleUUIDRoleAdmin,
+		},
+		// default users with role "user"
+		{
+			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
+			RoleId:      BundleUUIDRoleUser,
+		}, {
+			AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
+			RoleId:      BundleUUIDRoleUser,
+		}, {
+			AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
+			RoleId:      BundleUUIDRoleUser,
 		},
 	}
 }

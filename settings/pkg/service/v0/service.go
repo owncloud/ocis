@@ -65,6 +65,14 @@ func (g Service) RegisterDefaultRoles() {
 				Msg("failed to register permission")
 		}
 	}
+
+	// TODO(refs) iterate over defaultRoleAssignment creating such role assignments. settings.go
+	//g.manager.WriteRoleAssignment()
+	for _, req := range defaultRoleAssignments() {
+		if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
+			// handle me
+		}
+	}
 }
 
 // TODO: check permissions on every request

@@ -21,7 +21,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // userDefaultGID is the default integer representing the "users" group.
@@ -68,7 +67,6 @@ func New(opts ...Option) (s *Service, err error) {
 	if err = s.createDefaultGroups(); err != nil {
 		return nil, err
 	}
-	// TODO watch folders for new records
 	return
 }
 
@@ -267,6 +265,7 @@ func (s Service) createDefaultAccounts() (err error) {
 			},
 		},
 	}
+	// this only deals with the metadata service.
 	for i := range accounts {
 		a := &proto.Account{}
 		err := s.repo.LoadAccount(context.Background(), accounts[i].Id, a)
@@ -287,7 +286,6 @@ func (s Service) createDefaultAccounts() (err error) {
 			}
 		}
 
-		// TODO: can be removed again as soon as we respect the predefined UIDs and GIDs from the account. Then no autoincrement is happening, therefore we don't need to update accounts.
 		changed := false
 		for _, r := range results {
 			if r.Field == "UidNumber" || r.Field == "GidNumber" {
@@ -308,24 +306,6 @@ func (s Service) createDefaultAccounts() (err error) {
 				return err
 			}
 		}
-	}
-
-	// set role for admin users and regular users
-	assignRoleToUser("058bff95-6708-4fe5-91e4-9ea3d377588b", settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
-	for _, accountID := range []string{
-		"058bff95-6708-4fe5-91e4-9ea3d377588b", //moss
-		"ddc2004c-0977-11eb-9d3f-a793888cd0f8", //admin
-		"820ba2a1-3f54-4538-80a4-2d73007e30bf", //idp
-		"bc596f3c-c955-4328-80a0-60d018b4ad57", //reva
-	} {
-		assignRoleToUser(accountID, settings_svc.BundleUUIDRoleAdmin, s.RoleService, s.log)
-	}
-	for _, accountID := range []string{
-		"4c510ada-c86b-4815-8820-42cdf82c3d51", //einstein
-		"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", //marie
-		"932b4540-8d16-481e-8ef4-588e4b6b151c", //richard
-	} {
-		assignRoleToUser(accountID, settings_svc.BundleUUIDRoleUser, s.RoleService, s.log)
 	}
 	return nil
 }
@@ -401,18 +381,6 @@ func (s Service) createDefaultGroups() (err error) {
 		}
 	}
 	return nil
-}
-
-func assignRoleToUser(accountID, roleID string, rs settings.RoleService, logger log.Logger) (ok bool) {
-	_, err := rs.AssignRoleToUser(context.Background(), &settings.AssignRoleToUserRequest{
-		AccountUuid: accountID,
-		RoleId:      roleID,
-	})
-	if err != nil {
-		logger.Error().Err(err).Str("accountID", accountID).Str("roleID", roleID).Msg("could not set role for account")
-		return false
-	}
-	return true
 }
 
 func createMetadataStorage(cfg *config.Config, logger log.Logger) storage.Repo {
