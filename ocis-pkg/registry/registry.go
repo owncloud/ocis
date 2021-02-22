@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v3"
+	kubernetesr "github.com/asim/go-micro/plugins/registry/kubernetes/v3"
 	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v3"
+	natsr "github.com/asim/go-micro/plugins/registry/nats/v3"
 
 	"github.com/asim/go-micro/v3/registry"
 )
@@ -23,6 +25,14 @@ func GetRegistry() registry.Registry {
 
 	var r registry.Registry
 	switch os.Getenv(registryEnv) {
+	case "nats":
+		r = natsr.NewRegistry(
+			registry.Addrs(addresses...),
+		)
+	case "kubernetes":
+		r = kubernetesr.NewRegistry(
+			registry.Addrs(addresses...),
+		)
 	case "etcd":
 		r = etcdr.NewRegistry(
 			registry.Addrs(addresses...),
