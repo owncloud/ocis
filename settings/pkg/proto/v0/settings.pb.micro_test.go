@@ -450,17 +450,17 @@ func TestSaveGetIntValue(t *testing.T) {
 		{
 			name:  "negative",
 			value: proto.Value_IntValue{IntValue: -42},
-			// https://github.com/owncloud/ocis/settings/issues/57
+			// no validation for SaveValue https://github.com/owncloud/ocis/issues/1445
 		},
 		{
 			name:  "less than Min",
 			value: proto.Value_IntValue{IntValue: 0},
-			// https://github.com/owncloud/ocis/settings/issues/57
+			// no validation for SaveValue https://github.com/owncloud/ocis/issues/1445
 		},
 		{
 			name:  "more than Max",
 			value: proto.Value_IntValue{IntValue: 128},
-			// https://github.com/owncloud/ocis/settings/issues/57
+			// no validation for SaveValue https://github.com/owncloud/ocis/issues/1445
 		},
 	}
 	for _, tt := range tests {
@@ -502,7 +502,7 @@ func TestSaveGetIntValue(t *testing.T) {
 
 /**
 try to save a wrong type of the value
-https://github.com/owncloud/ocis/settings/issues/57
+no validation for SaveValue https://github.com/owncloud/ocis/issues/1445
 */
 func TestSaveGetIntValueIntoString(t *testing.T) {
 	teardown := setup()
@@ -538,7 +538,7 @@ func TestSaveGetIntValueIntoString(t *testing.T) {
 	assert.Equal(t, "forty two", getValueResponse.Value.Value.GetStringValue())
 }
 
-// https://github.com/owncloud/ocis/settings/issues/18
+// no plausibility check in settings of bundle https://github.com/owncloud/ocis/issues/1455
 func TestSaveBundleWithInvalidSettings(t *testing.T) {
 	var tests = []proto.Setting{
 		{
@@ -747,7 +747,6 @@ func TestSaveBundleWithInvalidSettings(t *testing.T) {
 	}
 }
 
-// https://github.com/owncloud/ocis/settings/issues/19
 func TestGetBundleNoSideEffectsOnDisk(t *testing.T) {
 	teardown := setup()
 	defer teardown()
