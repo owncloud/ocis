@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 )
 
 var (
@@ -114,7 +113,7 @@ func newOIDCAuth(options Options) func(http.Handler) http.Handler {
 		HTTPClient(options.HTTPClient),
 		OIDCIss(options.OIDCIss),
 		TokenCacheSize(options.UserinfoCacheSize),
-		TokenCacheTTL(time.Second*time.Duration(options.UserinfoCacheTTL)),
+		TokenCacheTTL(options.UserinfoCacheTTL),
 		CredentialsByUserAgent(options.CredentialsByUserAgent),
 	)
 }
