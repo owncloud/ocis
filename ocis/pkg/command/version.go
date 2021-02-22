@@ -19,7 +19,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Lists running services with version",
 		Category: "Runtime",
 		Action: func(c *cli.Context) error {
-			reg := *registry.GetRegistry()
+			reg := registry.GetRegistry()
 			serviceList, err := reg.ListServices()
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not list services: %v", err))
