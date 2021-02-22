@@ -18,7 +18,7 @@ var (
 // GetRegistry returns a configured micro registry based on Micro env vars.
 // It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
 // and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
-func GetRegistry() *registry.Registry {
+func GetRegistry() registry.Registry {
 	addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
 
 	var r registry.Registry
@@ -31,5 +31,5 @@ func GetRegistry() *registry.Registry {
 		r = mdnsr.NewRegistry()
 	}
 
-	return &r
+	return r
 }
