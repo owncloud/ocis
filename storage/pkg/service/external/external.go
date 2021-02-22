@@ -19,13 +19,13 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 		Address:  addr,
 		Metadata: make(map[string]string),
 	}
+	r := oregistry.GetRegistry()
+
 	node.Metadata["broker"] = broker.String()
-	node.Metadata["registry"] = registry.String()
+	node.Metadata["registry"] = r.String()
 	node.Metadata["server"] = "grpc"
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
-
-	r := *oregistry.GetRegistry()
 
 	service := &registry.Service{
 		Name:      serviceID,

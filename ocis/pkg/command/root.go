@@ -44,7 +44,7 @@ func Execute() error {
 		)
 	}
 
-	//r := *registry.GetRegistry()
+	//r := registry.GetRegistry()
 
 	//opts := micro.Options{
 	//	Registry: r,

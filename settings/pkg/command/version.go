@@ -19,7 +19,7 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 		Usage: "Print the versions of the running instances",
 		Flags: flagset.ListSettingsWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			reg := *registry.GetRegistry()
+			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Service.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get settings services from the registry: %v", err))
