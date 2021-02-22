@@ -1,0 +1,245 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ownCloud Infinite Scale store",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "Store"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "storeDatabasesResponse": {
+      "type": "object",
+      "properties": {
+        "databases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "storeDeleteOptions": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        }
+      }
+    },
+    "storeDeleteResponse": {
+      "type": "object"
+    },
+    "storeField": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "type of value e.g string, int, int64, bool, float64"
+        },
+        "value": {
+          "type": "string",
+          "title": "the actual value"
+        }
+      }
+    },
+    "storeListOptions": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "storeListResponse": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "storeReadOptions": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "boolean"
+        },
+        "suffix": {
+          "type": "boolean"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "where": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/storeField"
+          }
+        }
+      }
+    },
+    "storeReadResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/storeRecord"
+          }
+        }
+      }
+    },
+    "storeRecord": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "key of the recorda"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "title": "value in the record"
+        },
+        "expiry": {
+          "type": "string",
+          "format": "int64",
+          "title": "time.Duration (signed int64 nanoseconds)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/storeField"
+          },
+          "title": "the associated metadata"
+        }
+      }
+    },
+    "storeTablesResponse": {
+      "type": "object",
+      "properties": {
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "storeWriteOptions": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "expiry": {
+          "type": "string",
+          "format": "int64",
+          "title": "time.Time"
+        },
+        "ttl": {
+          "type": "string",
+          "format": "int64",
+          "title": "time.Duration"
+        }
+      }
+    },
+    "storeWriteResponse": {
+      "type": "object"
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.github.io/extensions/store/"
+  }
+}

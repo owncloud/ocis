@@ -3,8 +3,8 @@ package proto
 import (
 	context "context"
 
+	client "github.com/asim/go-micro/v3/client"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	client "github.com/micro/go-micro/v2/client"
 )
 
 // MockAccountsService can be used to write tests

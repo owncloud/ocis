@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/asim/go-micro/v3/metadata"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
-	"github.com/micro/go-micro/v2/metadata"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"

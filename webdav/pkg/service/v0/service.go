@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+
 	"github.com/go-chi/chi"
-	"github.com/micro/go-micro/v2/client"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	thumbnail "github.com/owncloud/ocis/webdav/pkg/dav/thumbnails"
@@ -26,6 +28,7 @@ func NewService(opts ...Option) Service {
 
 	svc := Webdav{
 		config: options.Config,
+		log:    options.Logger,
 		mux:    m,
 	}
 
@@ -39,6 +42,7 @@ func NewService(opts ...Option) Service {
 // Webdav defines implements the business logic for Service.
 type Webdav struct {
 	config *config.Config
+	log    log.Logger
 	mux    *chi.Mux
 }
 
@@ -51,12 +55,13 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	tr, err := thumbnail.NewRequest(r)
 	if err != nil {
+		g.log.Error().Err(err).Msg("could not create Request")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", client.DefaultClient)
+	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
 	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		Filetype:      extensionToFiletype(tr.Filetype),
@@ -67,6 +72,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		Username:      tr.Username,
 	})
 	if err != nil {
+		g.log.Error().Err(err).Msg("could not get thumbnail")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return

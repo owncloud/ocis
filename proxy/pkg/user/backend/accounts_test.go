@@ -2,15 +2,16 @@ package backend
 
 import (
 	"context"
+	"testing"
+
+	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/micro/go-micro/v2/client"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var mockAccResp = []*accounts.Account{

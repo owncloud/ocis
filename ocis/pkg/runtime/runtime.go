@@ -7,13 +7,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/micro/go-micro/v2"
+	"github.com/rs/zerolog"
+
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
+	"github.com/asim/go-micro/v3/logger"
+
 	"github.com/owncloud/ocis/ocis/pkg/config"
-
-	cli "github.com/micro/cli/v2"
-
-	"github.com/micro/micro/v2/client/api"
-	"github.com/micro/micro/v2/service/registry"
 
 	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
@@ -25,8 +24,7 @@ var (
 
 	// MicroServices to start as part of the fullstack option
 	MicroServices = []string{
-		"api", // :8080
-		//"web",      // :8082
+		"api",      // :8080
 		"registry", // :8000
 	}
 
@@ -63,7 +61,7 @@ var (
 	}
 
 	// Maximum number of retries until getting a connection to the rpc runtime service.
-	maxRetries int = 10
+	maxRetries = 10
 )
 
 // Runtime represents an oCIS runtime environment.
@@ -80,10 +78,25 @@ func New(cfg *config.Config) Runtime {
 
 // Start rpc runtime
 func (r *Runtime) Start() error {
+	setMicroLogger(r.c.Log)
 	go r.Launch()
 	return service.Start(
 		service.WithLogPretty(r.c.Log.Pretty),
 	)
+}
+
+// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// want to expose to the end user the internal framework logs unless explicitly specified.a
+func setMicroLogger(log config.Log) {
+	if os.Getenv("MICRO_LOG_LEVEL") == "" {
+		os.Setenv("MICRO_LOG_LEVEL", "error")
+	}
+
+	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
+	if err != nil {
+		lev = zerolog.ErrorLevel
+	}
+	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
 }
 
 // Launch oCIS default oCIS extensions.
@@ -107,9 +120,9 @@ func (r *Runtime) Launch() {
 	}
 
 OUT:
-	for _, v := range MicroServices {
-		RunService(client, v)
-	}
+	//for _, v := range MicroServices {
+	//	RunService(client, v)
+	//}
 
 	for _, v := range Extensions {
 		RunService(client, v)
@@ -131,7 +144,7 @@ OUT:
 func RunService(client *rpc.Client, service string) int {
 	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
 
-	all := append(Extensions, append(dependants, MicroServices...)...)
+	all := append(Extensions, dependants...)
 	if !contains(all, service) {
 		return 1
 	}
@@ -141,30 +154,6 @@ func RunService(client *rpc.Client, service string) int {
 		golog.Fatal(err)
 	}
 	return reply
-}
-
-// AddMicroPlatform adds the micro subcommands to the cli app
-func AddMicroPlatform(app *cli.App, opts micro.Options) {
-	setDefaults()
-
-	app.Commands = append(app.Commands, api.Commands(micro.Registry(opts.Registry))...)
-	//app.Commands = append(app.Commands, web.Commands(micro.Registry(opts.Registry))...)
-	app.Commands = append(app.Commands, registry.Commands(micro.Registry(opts.Registry))...)
-}
-
-// provide a config.Config with default values?
-func setDefaults() {
-	// api
-	api.Name = OwncloudNamespace + "api"
-	api.Namespace = OwncloudNamespace + "api"
-	api.HeaderPrefix = "X-Micro-Owncloud-"
-
-	// web
-	//web.Name = OwncloudNamespace + "web"
-	//web.Namespace = OwncloudNamespace + "web"
-
-	// registry
-	registry.Name = OwncloudNamespace + "registry"
 }
 
 func contains(a []string, b string) bool {

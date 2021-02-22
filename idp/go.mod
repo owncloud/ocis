@@ -8,8 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/UnnoTed/fileb0x v1.1.4
+	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/go-chi/chi v4.1.2+incompatible
-	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/haya14busa/goverage v0.0.0-20180129164344-eec3514a20b5
@@ -30,14 +30,17 @@ require (
 	go.opencensus.io v0.22.6
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/mod v0.4.1 // indirect
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
-	honnef.co/go/tools v0.1.1 // indirect
 	stash.kopano.io/kc/konnect v0.33.3
 	stash.kopano.io/kgol/rndm v1.1.0
 )
 
 replace (
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
-	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
+	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
+	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
+	// latest version compatible with etcd
+	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

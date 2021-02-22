@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"os"
 
+	"github.com/asim/go-micro/v3"
+
 	"github.com/owncloud/ocis/idp/pkg/crypto"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -77,10 +79,7 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewLogging(handle, options.Logger)
 	}
 
-	service.Handle(
-		"/",
-		handle,
-	)
+	micro.RegisterHandler(service.Server(), handle)
 
 	service.Init()
 	return service, nil

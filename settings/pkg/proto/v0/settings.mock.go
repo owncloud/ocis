@@ -3,8 +3,8 @@ package proto
 import (
 	"context"
 
+	"github.com/asim/go-micro/v3/client"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/micro/go-micro/v2/client"
 )
 
 // MockBundleService can be used to write tests against the bundle service.

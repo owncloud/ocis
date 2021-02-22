@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/asim/go-micro/v3"
 	"github.com/go-chi/chi"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -70,13 +71,8 @@ func Server(opts ...Option) http.Service {
 		proto.RegisterPermissionServiceWeb(r, handle)
 	})
 
-	service.Handle(
-		"/",
-		mux,
-	)
+	micro.RegisterHandler(service.Server(), mux)
 
-	if err := service.Init(); err != nil {
-		panic(err)
-	}
+	service.Init()
 	return service
 }

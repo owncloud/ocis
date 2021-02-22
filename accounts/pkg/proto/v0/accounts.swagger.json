@@ -13,6 +13,17 @@
       "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
     }
   },
+  "tags": [
+    {
+      "name": "AccountsService"
+    },
+    {
+      "name": "GroupsService"
+    },
+    {
+      "name": "IndexService"
+    }
+  ],
   "schemes": [
     "http",
     "https"

@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/asim/go-micro/v3/client"
+	merrors "github.com/asim/go-micro/v3/errors"
+	"github.com/asim/go-micro/v3/metadata"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/micro/go-micro/v2/client"
-	merrors "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"

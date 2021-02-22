@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/asim/go-micro/v3/metadata"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/cs3org/reva/pkg/user"
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 )
 

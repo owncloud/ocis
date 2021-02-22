@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
-	etcdr "github.com/micro/go-micro/v2/registry/etcd"
-	mdnsr "github.com/micro/go-micro/v2/registry/mdns"
+	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v3"
+	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v3"
 
-	"github.com/micro/go-micro/v2/registry"
+	"github.com/asim/go-micro/v3/registry"
 )
 
 var (

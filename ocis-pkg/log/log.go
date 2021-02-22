@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	mdlog "github.com/micro/go-micro/v2/debug/log"
-	mlog "github.com/micro/go-micro/v2/util/log"
-	"github.com/micro/go-micro/v2/util/ring"
+	mdlog "github.com/asim/go-micro/v3/debug/log"
+	mlog "github.com/asim/go-micro/v3/util/log"
+	"github.com/asim/go-micro/v3/util/ring"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

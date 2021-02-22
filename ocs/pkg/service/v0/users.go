@@ -15,8 +15,8 @@ import (
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/micro/go-micro/v2/client/grpc"
-	merrors "github.com/micro/go-micro/v2/errors"
+	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	merrors "github.com/asim/go-micro/v3/errors"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"

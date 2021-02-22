@@ -5,10 +5,10 @@ import (
 	"path"
 	"strconv"
 
+	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/gofrs/uuid"
 	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
-	merrors "github.com/micro/go-micro/v2/errors"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 )

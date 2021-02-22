@@ -5,12 +5,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/v2/web"
+	"github.com/owncloud/ocis/ocis-pkg/registry"
+
+	mhttps "github.com/asim/go-micro/plugins/server/http/v3"
+	"github.com/asim/go-micro/v3"
+	"github.com/asim/go-micro/v3/server"
 )
 
 // Service simply wraps the go-micro web service.
 type Service struct {
-	web.Service
+	micro.Service
 }
 
 // NewService initializes a new http service.
@@ -21,31 +25,19 @@ func NewService(opts ...Option) Service {
 		Str("addr", sopts.Address).
 		Msg("starting server")
 
-	wopts := []web.Option{
-		web.Name(
-			strings.Join(
-				[]string{
-					sopts.Namespace,
-					sopts.Name,
-				},
-				".",
-			),
-		),
-		web.Version(sopts.Version),
-		web.Address(sopts.Address),
-		web.RegisterTTL(time.Second * 30),
-		web.RegisterInterval(time.Second * 10),
-		web.Context(sopts.Context),
-		web.TLSConfig(sopts.TLSConfig),
-		web.Handler(sopts.Handler),
-		web.Flags(sopts.Flags...),
+	wopts := []micro.Option{
+		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
+		micro.Address(sopts.Address),
+		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
+		micro.Version(sopts.Version),
+		micro.Context(sopts.Context),
+		micro.Flags(sopts.Flags...),
+		micro.Registry(*registry.GetRegistry()),
+		micro.RegisterTTL(time.Second * 30),
+		micro.RegisterInterval(time.Second * 10),
 	}
 
-	return Service{
-		web.NewService(
-			wopts...,
-		),
-	}
+	return Service{micro.NewService(wopts...)}
 }
 
 func transport(secure *tls.Config) string {

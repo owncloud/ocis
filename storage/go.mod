@@ -4,11 +4,11 @@ go 1.15
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/reva v1.6.0
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
-	github.com/micro/go-micro/v2 v2.9.1
 	github.com/mitchellh/copystructure v1.1.1 // indirect
 	github.com/oklog/run v1.1.0
 	github.com/owncloud/flaex v0.0.0-20200411150708-dce59891a203
@@ -22,5 +22,9 @@ require (
 
 replace (
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
-	google.golang.org/grpc => google.golang.org/grpc v1.26.0
+	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
+	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
+	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
+	// latest version compatible with etcd
+	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

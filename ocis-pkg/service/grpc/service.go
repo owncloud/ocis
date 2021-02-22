@@ -4,27 +4,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/v2"
-	mclient "github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/client/grpc"
-
-	"github.com/micro/go-plugins/wrapper/trace/opencensus/v2"
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v3"
+	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
+	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
+	"github.com/asim/go-micro/v3"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
-	"github.com/owncloud/ocis/ocis-pkg/wrapper/prometheus"
 )
 
 // DefaultClient is a custom ocis grpc configured client.
-var DefaultClient = newGrpcClient()
-
-func newGrpcClient() mclient.Client {
-	r := *registry.GetRegistry()
-
-	c := grpc.NewClient(
-		mclient.RequestTimeout(10*time.Second),
-		mclient.Registry(r),
-	)
-	return c
-}
+var DefaultClient = mgrpcc.NewClient()
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {
@@ -41,31 +30,23 @@ func NewService(opts ...Option) Service {
 		Msg("starting server")
 
 	mopts := []micro.Option{
-		micro.Name(
-			strings.Join(
-				[]string{
-					sopts.Namespace,
-					sopts.Name,
-				},
-				".",
-			),
-		),
+		// first add a server because it will reset any options
+		micro.Server(mgrpcs.NewServer()),
+		// also add a client that can be used after initializing the service
 		micro.Client(DefaultClient),
-		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
+		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
+		micro.Version(sopts.Version),
+		micro.Context(sopts.Context),
+		micro.Flags(sopts.Flags...),
+		micro.Registry(*registry.GetRegistry()),
+		micro.RegisterTTL(time.Second * 30),
+		micro.RegisterInterval(time.Second * 10),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
 		micro.WrapClient(opencensus.NewClientWrapper()),
 		micro.WrapHandler(opencensus.NewHandlerWrapper()),
 		micro.WrapSubscriber(opencensus.NewSubscriberWrapper()),
-		micro.RegisterTTL(time.Second * 30),
-		micro.RegisterInterval(time.Second * 10),
-		micro.Context(sopts.Context),
-		micro.Flags(sopts.Flags...),
 	}
 
-	return Service{
-		micro.NewService(
-			mopts...,
-		),
-	}
+	return Service{micro.NewService(mopts...)}
 }
