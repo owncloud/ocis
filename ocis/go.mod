@@ -33,7 +33,7 @@ require (
 	github.com/owncloud/ocis/webdav v0.0.0-20210216094451-dc73176dc62d
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
-	github.com/spf13/cobra v1.0.0
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.6
