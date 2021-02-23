@@ -51,9 +51,12 @@ var (
 		"web",
 		"webdav",
 		"accounts",
-		"storage-sharing",
 		//"graph",
 		//"graph-explorer",
+	}
+
+	dependants = []string{
+		"storage-sharing",
 	}
 	// Maximum number of retries until getting a connection to the rpc runtime service.
 	maxRetries = 10
@@ -123,23 +126,20 @@ OUT:
 		RunService(client, v)
 	}
 
-	//if len(dependants) > 0 {
-	//	// TODO(refs) this should disappear and tackled at the runtime (pman) level.
-	//	// see https://github.com/cs3org/reva/issues/795 for race condition.
-	//	// dependants might not be needed on a ocis_simple build, therefore
-	//	// it should not be started under these circumstances.
-	//	time.Sleep(2 * time.Second)
-	//	for _, v := range dependants {
-	//		RunService(client, v)
-	//	}
-	//}
+	if len(dependants) > 0 {
+		time.Sleep(2 * time.Second)
+		for _, v := range dependants {
+			RunService(client, v)
+		}
+	}
 }
 
 // RunService sends a Service.Start command with the given service name  to pman
 func RunService(client *rpc.Client, service string) int {
 	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
 
-	if !contains(Extensions, service) {
+	all := append(Extensions, dependants...)
+	if !contains(all, service) {
 		return 1
 	}
 
