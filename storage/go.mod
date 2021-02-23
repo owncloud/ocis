@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/reva v1.6.0
+	github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/micro/cli/v2 v2.1.2
@@ -17,7 +17,6 @@ require (
 	github.com/spf13/viper v1.7.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/mod v0.4.1 // indirect
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 )
 
 replace (
