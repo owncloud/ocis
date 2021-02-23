@@ -37,11 +37,12 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.6
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
+	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b
 )
 
 replace (
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
+	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/graph => ../graph
