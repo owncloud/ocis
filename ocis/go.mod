@@ -42,6 +42,7 @@ require (
 
 replace (
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
+	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/graph => ../graph
