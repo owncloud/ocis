@@ -49,6 +49,5 @@ func Server(opts ...Option) (http.Service, error) {
 
 	micro.RegisterHandler(service.Server(), handle)
 
-	service.Init()
 	return service, nil
 }

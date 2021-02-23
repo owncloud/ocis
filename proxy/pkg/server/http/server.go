@@ -61,6 +61,5 @@ func Server(opts ...Option) (svc.Service, error) {
 
 	micro.RegisterHandler(service.Server(), chain)
 
-	service.Init()
 	return service, nil
 }

@@ -46,6 +46,5 @@ func NewService(opts ...Option) grpc.Service {
 		thumbnail,
 	)
 
-	service.Init()
 	return service
 }

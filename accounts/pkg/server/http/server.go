@@ -63,6 +63,5 @@ func Server(opts ...Option) http.Service {
 
 	micro.RegisterHandler(service.Server(), mux)
 
-	service.Init()
 	return service
 }
