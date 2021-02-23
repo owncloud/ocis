@@ -60,22 +60,22 @@ func New(opts ...Option) (s *Service, err error) {
 	retries := 20
 	var current int
 	r := oreg.GetRegistry()
-	// TODO(refs) we only need to block here IF the accounts index is configured to use the CS3 index. This is because
-	// the cs3 implementation relies on a storage-metadata backend that runs as a reva service.
-	for {
-		if current >= retries {
-			panic("metadata service failed to start.")
+	if cfg.Repo.Disk.Path == "" {
+		for {
+			if current >= retries {
+				panic("metadata service failed to start.")
+			}
+			s, err := r.GetService("com.owncloud.storage.metadata")
+			if err != nil {
+				logger.Error().Err(err).Msg("error getting metadata service from service registry")
+			}
+			if len(s) > 0 {
+				break
+			}
+			logger.Info().Msg("accounts blocked waiting for metadata service to be up and running...")
+			time.Sleep(2 * time.Second)
+			current++
 		}
-		s, err := r.GetService("com.owncloud.storage.metadata")
-		if err != nil {
-			logger.Error().Err(err).Msg("error getting metadata service from service registry")
-		}
-		if len(s) > 0 {
-			break
-		}
-		logger.Info().Msg("accounts blocked waiting for metadata service to be up and running...")
-		time.Sleep(2 * time.Second)
-		current++
 	}
 
 	// we want to wait anyway. If it depends on a reva service it could be the case that the entry on the registry
