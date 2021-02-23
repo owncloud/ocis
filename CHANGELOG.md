@@ -6,10 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
+* Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
 ## Details
+
+* Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
+
+   The authentication cache ttl was multiplied with `time.Second` multiple times. This
+   resulted in a ttl that was not intended.
+
+   https://github.com/owncloud/ocis/pull/1699
 
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 
@@ -33,6 +42,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1670
    https://github.com/asim/go-micro/pull/2126
+
+* Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
+
+   We added initial support to use nats and kubernetes as a service registry using
+   `MICRO_REGISTRY=nats` and `MICRO_REGISTRY=kubernetes` respectively. Multiple nodes can
+   be given with `MICRO_REGISTRY_ADDRESS=1.2.3.4,5.6.7.8,9.10.11.12`.
+
+   https://github.com/owncloud/ocis/pull/1697
 # Changelog for [1.2.0] (2021-02-17)
 
 The following sections list the changes for 1.2.0.

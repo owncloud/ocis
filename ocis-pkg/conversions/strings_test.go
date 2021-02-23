@@ -26,7 +26,7 @@ func TestStringToSliceString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := StringToSliceString(tt.input, tt.separator)
 			for i, v := range tt.out {
-				if tt.out[i] != v {
+				if s[i] != v {
 					t.Errorf("got %q, want %q", s, tt.out)
 				}
 			}

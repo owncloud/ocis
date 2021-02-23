@@ -76,7 +76,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var users []*msgraph.User
+	users := make([]*msgraph.User, 0, len(result.Entries))
 
 	for _, user := range result.Entries {
 		users = append(

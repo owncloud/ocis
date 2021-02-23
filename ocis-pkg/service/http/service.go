@@ -32,7 +32,7 @@ func NewService(opts ...Option) Service {
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
 		micro.Flags(sopts.Flags...),
-		micro.Registry(*registry.GetRegistry()),
+		micro.Registry(registry.GetRegistry()),
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 	}

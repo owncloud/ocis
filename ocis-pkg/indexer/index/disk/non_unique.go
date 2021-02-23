@@ -83,7 +83,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 		return []string{}, err
 	}
 
-	var ids []string = nil
+	ids := make([]string, 0, len(fi))
 	for _, f := range fi {
 		ids = append(ids, f.Name())
 	}

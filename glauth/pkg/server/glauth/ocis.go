@@ -275,7 +275,7 @@ func attribute(name string, values ...string) *ldap.EntryAttribute {
 }
 
 func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
-	var entries []*ldap.Entry
+	entries := make([]*ldap.Entry, 0, len(accounts))
 	for i := range accounts {
 		attrs := []*ldap.EntryAttribute{
 			attribute("objectClass", "posixAccount", "inetOrgPerson", "organizationalPerson", "Person", "top"),
@@ -314,7 +314,7 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 }
 
 func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
-	var entries []*ldap.Entry
+	entries := make([]*ldap.Entry, 0, len(groups))
 	for i := range groups {
 		attrs := []*ldap.EntryAttribute{
 			attribute("objectClass", "posixGroup", "groupOfNames", "top"),

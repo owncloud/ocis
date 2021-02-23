@@ -19,7 +19,7 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 		Usage: "Print the versions of the running instances",
 		Flags: flagset.ListProxyWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			reg := *registry.GetRegistry()
+			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.Service.Namespace + "." + cfg.Service.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get proxy services from the registry: %v", err))
