@@ -53,7 +53,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var groups []*msgraph.Group
+	groups := make([]*msgraph.Group, 0, len(result.Entries))
 
 	for _, group := range result.Entries {
 		groups = append(

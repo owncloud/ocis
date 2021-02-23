@@ -36,7 +36,7 @@ type Resolutions []image.Rectangle
 
 // ParseResolutions creates an instance of Resolutions from resolution strings.
 func ParseResolutions(strs []string) (Resolutions, error) {
-	var rs Resolutions
+	rs := make(Resolutions, 0, len(strs))
 	for _, s := range strs {
 		r, err := ParseResolution(s)
 		if err != nil {
