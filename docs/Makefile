@@ -24,6 +24,11 @@ docs-copy: ## copy docs to hugo
 docs-serve: docs-generate docs-copy ## serve docs with hugo
 	@docker run --rm --network host -v $(shell pwd)/hugo:/src owncloudci/hugo:0 server
 
+.PHONY: docs-serve-native
+docs-serve-native: docs-copy
+	cd hugo && hugo server
+
+
 .PHONY: clean
 clean: ## clean up docs build artifacts
 	@rm -rf hugo
