@@ -19,6 +19,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
@@ -55,6 +56,31 @@ func New(opts ...Option) (s *Service, err error) {
 		RoleManager: roleManager,
 		repo:        createMetadataStorage(cfg, logger),
 	}
+
+	retries := 20
+	var current int
+	r := oreg.GetRegistry()
+	// TODO(refs) we only need to block here IF the accounts index is configured to use the CS3 index. This is because
+	// the cs3 implementation relies on a storage-metadata backend that runs as a reva service.
+	for {
+		if current >= retries {
+			panic("metadata service failed to start.")
+		}
+		s, err := r.GetService("com.owncloud.storage.metadata")
+		if err != nil {
+			logger.Error().Err(err).Msg("error getting metadata service from service registry")
+		}
+		if len(s) > 0 {
+			break
+		}
+		logger.Info().Msg("accounts blocked waiting for metadata service to be up and running...")
+		time.Sleep(2 * time.Second)
+		current++
+	}
+
+	// we want to wait anyway. If it depends on a reva service it could be the case that the entry on the registry
+	// happens prior to the reva service being up and running
+	time.Sleep(500 * time.Millisecond)
 
 	if s.index, err = s.buildIndex(); err != nil {
 		return nil, err
