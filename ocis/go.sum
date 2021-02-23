@@ -165,6 +165,8 @@ github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210217182006-0f0ace1a44
 github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:Oe0f4zsBx6if1scvMrL/4mNfkD7URaqkvhQWnWogcws=
 github.com/asim/go-micro/plugins/transport/grpc/v3 v3.0.0-20210202145831-070250155285 h1:3YQx0EQbHNYpp1FwnHrgU0oRFISjZvBGL7UhpA8/Nas=
 github.com/asim/go-micro/plugins/transport/grpc/v3 v3.0.0-20210202145831-070250155285/go.mod h1:FXWwzJ74gGEIY/gOdDHJqCQuago+tLSkcUPayf9daGM=
+github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:o9Tk3K1WQLOzyEeUBCO+GHO7s9MnzfUT7zLCZ6IzS2g=
+github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:nAb0ampZ6EieuECEhCoPKjQvGzqRv35uPtvZ/do7dWY=
 github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:divSMUzk92mF5yXK11fAqG/wqQ4Pcal2huJSQm3EwPE=
 github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210217182006-0f0ace1a44a9/go.mod h1:uyEy7qDUtW2lYTnAA9w4hKH+bzotiO1CIm2HHZFn2pg=
 github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210217182006-0f0ace1a44a9 h1:mX03duCTS0f3et6ZrnKxfh5dNqUIpP8+z+9YSvts8eY=
@@ -323,6 +325,7 @@ github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5 h1:wy1oeyy6v9/65
 github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.6.0 h1:xIhO7UtXQZbjYNeekaeQtZRo+HjZWWukCotb1tO4qMA=
 github.com/cs3org/reva v1.6.0/go.mod h1:3IWlJ4RcYYu0NEnlvP9QG66Inx7F0BtVLJWXit9Q5aw=
+github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e h1:fylXfGSnDzo+X+sgxNyWoU1NjAmTJBrj2ucgNKBmb6s=
 github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e/go.mod h1:DGqsIK/psLwnWz58z8t4Gmrhx9P5iccZZkzi8CBO1c0=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
@@ -1477,6 +1480,8 @@ github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIK
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/soheilhy/cmux v0.1.4 h1:0HKaf1o97UwFjHH9o5XsHUOF+tqmdA7KEzXLpiyaw0E=
 github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4kGIyLM=
+github.com/sony/gobreaker v0.4.1 h1:oMnRNZXX5j85zso6xCPRNPtmAycat+WcoKbklScLDgQ=
+github.com/sony/gobreaker v0.4.1/go.mod h1:ZKptC7FHNvhBz7dN2LGjPVBz2sZJmc0/PkyDJOjmxWY=
 github.com/sourcegraph/annotate v0.0.0-20160123013949-f4cad6c6324d/go.mod h1:UdhH50NIW0fCiwBSr0co2m7BnFLdv4fQTgdqdJTHFeE=
 github.com/sourcegraph/syntaxhighlight v0.0.0-20170531221838-bd320f5d308e/go.mod h1:HuIsMU8RRBOtsCgI77wP899iHVBQpCmg4ErYMZB+2IA=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1B0ujays3HV9gkFtllcxhzImRR7ArPQ=
@@ -1944,6 +1949,7 @@ golang.org/x/sys v0.0.0-20210112080510-489259a85091/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c h1:VwygUrnw9jn88c4u8GD3rZQbqrP/tgas88tPUbBxQrk=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b h1:lAZ0/chPUDWwjqosYR0X4M490zQhMsiJ4K3DbA7o+3g=
 golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221 h1:/ZHdbVpdR/jk3g30/d4yUL0JU9kksj8+F/bnQUVLGDM=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
