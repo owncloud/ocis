@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
 ## Details
@@ -42,6 +43,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1670
    https://github.com/asim/go-micro/pull/2126
+
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+
+  * quota querying and tree accounting [cs3org/reva#1405](https://github.com/cs3org/reva/pull/1405)
+
+   https://github.com/owncloud/ocis/pull/1683
+   https://github.com/cs3org/reva/pull/1405
 
 * Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
