@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
@@ -13,6 +14,28 @@ The following sections list the changes for unreleased.
 * Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
 ## Details
+
+* Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
+
+   Originally the accounts service relies on both the `settings` and `storage-metadata` to be up
+   and running at the moment it starts. This is an antipattern as it will cause the entire service to
+   panic if the dependants are not present.
+
+   We inverted this dependency and moved the default initialization data (i.e: creating roles,
+   permissions, settings bundles) and instead of notifying the settings service that the
+   account has to provide with such options, the settings is instead initialized with the options
+   the accounts rely on. Essentially saving bandwith as there is no longer a gRPC call to the
+   settings service.
+
+   For the `storage-metadata` a retry mechanism was added that retries by default 20 times to
+   fetch the `com.owncloud.storage.metadata` from the service registry every `500`
+   miliseconds. If this retry expires the accounts panics, as its dependency on the
+   `storage-metadata` service cannot be resolved.
+
+   We also introduced a client wrapper that acts as middleware between a client and a server. For
+   more information on how it works further read [here](https://github.com/sony/gobreaker)
+
+   https://github.com/owncloud/ocis/pull/1696
 
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 
