@@ -25,44 +25,34 @@ import (
 
 // GetSelf returns the currently logged in user
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
-	var account *accounts.Account
-	var err error
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
 		return
 	}
-
-	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-		Id: u.Id.OpaqueId,
-	})
-
-	if err != nil {
-		merr := merrors.FromError(err)
-		if merr.Code == http.StatusNotFound {
-			// if the user was authenticated why was he not found?!? log error?
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
-		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
-		}
-		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
-		return
-	}
-
-	// remove password from log if it is set
-	if account.PasswordProfile != nil {
-		account.PasswordProfile.Password = ""
-	}
-	o.logger.Debug().Interface("account", account).Msg("got user")
+	o.logger.Debug().Interface("user", u).Msg("got user from context")
 
 	d := &data.User{
-		UserID:            account.OnPremisesSamAccountName,
-		DisplayName:       account.DisplayName,
-		LegacyDisplayName: account.DisplayName,
-		Email:             account.Mail,
-		UIDNumber:         account.UidNumber,
-		GIDNumber:         account.GidNumber,
+		UserID:            u.Username,
+		DisplayName:       u.DisplayName,
+		LegacyDisplayName: u.DisplayName,
+		Email:             u.Mail,
 		// TODO hide enabled flag or it might get rendered as false
+	}
+	if u.Opaque != nil && u.Opaque.Map != nil {
+		var err error
+		if uidObj, ok := u.Opaque.Map["uid"]; ok {
+			if uidObj.Decoder == "plain" {
+				d.UIDNumber, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
+				o.logger.Error().Err(err).Interface("user", u).Msg("cannot parse uidnumber")
+			}
+		}
+		if gidObj, ok := u.Opaque.Map["gid"]; ok {
+			if gidObj.Decoder == "plain" {
+				d.GIDNumber, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
+				o.logger.Error().Err(err).Interface("user", u).Msg("cannot parse gidnumber")
+			}
+		}
 	}
 	render.Render(w, r, response.DataRender(d))
 }
@@ -75,17 +65,30 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	if userid == "" {
 		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
-	} else {
-		account, err = o.fetchAccountByUsername(r.Context(), userid)
+		return
 	}
+
+	u, ok := user.ContextGetUser(r.Context())
+	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
+		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+		return
+	}
+
+	if userid == u.Username {
+		o.GetSelf(w, r)
+		return
+	}
+
+	account, err = o.fetchAccountByUsername(r.Context(), userid)
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
 			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.logger.Debug().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		} else {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		}
-		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
 	}
 

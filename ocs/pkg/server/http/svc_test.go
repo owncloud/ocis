@@ -1419,57 +1419,6 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
-// This is a bug verification test for endpoint '/cloud/user'
-// Link to the fixed issue: https://github.com/owncloud/ocis-ocs/issues/52
-func TestGetSingleUser(t *testing.T) {
-	user := User{
-		Enabled:     "true",
-		ID:          "rutherford",
-		Email:       "rutherford@example.com",
-		Displayname: "Ernest RutherFord",
-		Password:    "password",
-	}
-
-	for _, ocsVersion := range ocsVersions {
-		for _, format := range formats {
-			err := createUser(user)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			formatpart := getFormatString(format)
-			res, err := sendRequest(
-				"GET",
-				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
-				"",
-				&User{ID: user.ID},
-				[]string{ssvc.BundleUUIDRoleUser},
-			)
-
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			var userResponse SingleUserResponse
-			if format == "json" {
-				if err := json.Unmarshal(res.Body.Bytes(), &userResponse); err != nil {
-					t.Fatal(err)
-				}
-			} else {
-				if err := xml.Unmarshal(res.Body.Bytes(), &userResponse.Ocs); err != nil {
-					t.Fatal(err)
-				}
-			}
-
-			assertStatusCode(t, 200, res, ocsVersion)
-			assert.True(t, userResponse.Ocs.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
-			assertUserSame(t, user, userResponse.Ocs.Data)
-
-			cleanUp(t)
-		}
-	}
-}
-
 // This is a bug demonstration test for endpoint '/cloud/user'
 // Link to the issue: https://github.com/owncloud/ocis/ocs/issues/53
 func TestGetUserSigningKey(t *testing.T) {
