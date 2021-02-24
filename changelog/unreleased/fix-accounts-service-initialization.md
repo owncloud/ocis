@@ -6,4 +6,6 @@ We inverted this dependency and moved the default initialization data (i.e: crea
 
 For the `storage-metadata` a retry mechanism was added that retries by default 20 times to fetch the `com.owncloud.storage.metadata` from the service registry every `500` miliseconds. If this retry expires the accounts panics, as its dependency on the `storage-metadata` service cannot be resolved.
 
+We also introduced a client wrapper that acts as middleware between a client and a server. For more information on how it works further read [here](https://github.com/sony/gobreaker)
+
 https://github.com/owncloud/ocis/pull/1696
