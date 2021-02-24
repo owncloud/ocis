@@ -52,7 +52,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 
 			tr := &http.Transport{
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: opt.Insecure,
+					InsecureSkipVerify: opt.Insecure, //nolint:gosec
 				},
 			}
 			customHTTPClient := &http.Client{
