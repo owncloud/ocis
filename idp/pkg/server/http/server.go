@@ -40,7 +40,7 @@ func Server(opts ...Option) (http.Service, error) {
 			os.Exit(1)
 		}
 
-		tlsConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
+		tlsConfig = &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{cer}}
 	}
 
 	service := http.NewService(
@@ -79,7 +79,9 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewLogging(handle, options.Logger)
 	}
 
-	micro.RegisterHandler(service.Server(), handle)
+	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
+		return http.Service{}, err
+	}
 
 	service.Init()
 	return service, nil
