@@ -12,6 +12,7 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
+# if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	accounts \
 	glauth \
@@ -29,6 +30,8 @@ OCIS_MODULES = \
 	thumbnails \
 	web \
 	webdav
+
+include .bingo/Variables.mk
 
 .PHONY: help
 help:
@@ -141,3 +144,6 @@ go-coverage:
 	@for mod in $(OCIS_MODULES); do \
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
+
+bingo-update: $(BINGO)
+	$(BINGO) get -u
