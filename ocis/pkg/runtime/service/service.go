@@ -34,12 +34,16 @@ type Service struct {
 
 // loadFromEnv would set cmd global variables. This is a workaround spf13/viper since pman used as a library does not
 // parse flags.
-func loadFromEnv() *config.Config {
+func loadFromEnv() (*config.Config, error) {
 	cfg := config.NewConfig()
 	viper.AutomaticEnv()
 
-	viper.BindEnv("keep-alive", "RUNTIME_KEEP_ALIVE")
-	viper.BindEnv("port", "RUNTIME_PORT")
+	if err := viper.BindEnv("keep-alive", "RUNTIME_KEEP_ALIVE"); err != nil {
+		return nil, err
+	}
+	if err := viper.BindEnv("port", "RUNTIME_PORT"); err != nil {
+		return nil, err
+	}
 
 	cfg.KeepAlive = viper.GetBool("keep-alive")
 
@@ -47,7 +51,7 @@ func loadFromEnv() *config.Config {
 		cfg.Port = viper.GetString("port")
 	}
 
-	return cfg
+	return cfg, nil
 }
 
 // NewService returns a configured service with a controller and a default logger.
@@ -55,14 +59,17 @@ func loadFromEnv() *config.Config {
 // calls are done explicitly to loadFromEnv().
 // Since this is the public constructor, options need to be added, at the moment only logging options
 // are supported in order to match the running OwnCloud services structured log.
-func NewService(options ...Option) *Service {
+func NewService(options ...Option) (*Service, error) {
 	opts := NewOptions()
 
 	for _, f := range options {
 		f(opts)
 	}
 
-	cfg := loadFromEnv()
+	cfg, err := loadFromEnv()
+	if err != nil {
+		return nil, err
+	}
 	l := log.NewLogger(
 		log.WithPretty(opts.Log.Pretty),
 	)
@@ -74,12 +81,15 @@ func NewService(options ...Option) *Service {
 			controller.WithConfig(cfg),
 			controller.WithLog(&l),
 		),
-	}
+	}, nil
 }
 
 // Start an rpc service.
 func Start(o ...Option) error {
-	s := NewService(o...)
+	s, err := NewService(o...)
+	if err != nil {
+		s.Log.Fatal().Err(err)
+	}
 
 	if err := rpc.Register(s); err != nil {
 		s.Log.Fatal().Err(err)
