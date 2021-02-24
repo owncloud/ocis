@@ -117,17 +117,17 @@ func (l logger) V(verbosity int) logr.InfoLogger {
 // uses '/' characters to separate name elements.  Callers should not pass '/'
 // in the provided name string, but this library does not actually enforce that.
 func (l logger) WithName(name string) logr.Logger {
-	new := l.clone()
+	nl := l.clone()
 	if len(l.prefix) > 0 {
-		new.prefix = l.prefix + "/"
+		nl.prefix = l.prefix + "/"
 	}
-	new.prefix += name
-	return new
+	nl.prefix += name
+	return nl
 }
 func (l logger) WithValues(kvList ...interface{}) logr.Logger {
-	new := l.clone()
-	new.values = append(new.values, kvList...)
-	return new
+	nl := l.clone()
+	nl.values = append(nl.values, kvList...)
+	return nl
 }
 
 var _ logr.Logger = logger{}
