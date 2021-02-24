@@ -7,8 +7,10 @@ import (
 	"path"
 	"time"
 
-	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
+	"github.com/owncloud/ocis/storage/pkg/service/external"
+
+	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/storage/pkg/config"
@@ -200,6 +202,14 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 					cancel()
 				})
 			}
+
+			external.RegisterGRPCEndpoint(
+				ctx,
+				"com.owncloud.storage.metadata",
+				uuid.Must(uuid.NewV4()).String(),
+				cfg.Reva.StorageMetadata.GRPCAddr,
+				logger,
+			)
 
 			return gr.Run()
 		},

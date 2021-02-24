@@ -37,6 +37,7 @@ var (
 		"proxy",
 		"settings",
 		"store",
+		"storage-metadata",
 		"storage-frontend",
 		"storage-gateway",
 		"storage-userprovider",
@@ -45,21 +46,18 @@ var (
 		"storage-auth-bearer",
 		"storage-home",
 		"storage-users",
-		"storage-metadata",
 		"storage-public-link",
 		"thumbnails",
 		"web",
 		"webdav",
+		"accounts",
 		//"graph",
 		//"graph-explorer",
 	}
 
-	// There seem to be a race condition when reva-sharing needs to read the sharing.json file and the parent folder is not present.
 	dependants = []string{
-		"accounts",
 		"storage-sharing",
 	}
-
 	// Maximum number of retries until getting a connection to the rpc runtime service.
 	maxRetries = 10
 )
@@ -112,7 +110,7 @@ func (r *Runtime) Launch() {
 		client, err = rpc.DialHTTP("tcp", "localhost:10666")
 		if err != nil {
 			try++
-			fmt.Println("runtime not available, retrying in 1 second...")
+			fmt.Println("runtime not available, retrying...")
 			time.Sleep(1 * time.Second)
 		} else {
 			goto OUT
@@ -129,10 +127,6 @@ OUT:
 	}
 
 	if len(dependants) > 0 {
-		// TODO(refs) this should disappear and tackled at the runtime (pman) level.
-		// see https://github.com/cs3org/reva/issues/795 for race condition.
-		// dependants might not be needed on a ocis_simple build, therefore
-		// it should not be started under these circumstances.
 		time.Sleep(2 * time.Second)
 		for _, v := range dependants {
 			RunService(client, v)

@@ -160,9 +160,6 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				gr.Add(func() error {
-					logger.Info().Str("service", server.Name()).Msg("Reporting settings bundles to settings service")
-					svc.RegisterSettingsBundles(&logger)
-					svc.RegisterPermissions(&logger)
 					return server.Run()
 				}, func(_ error) {
 					logger.Info().

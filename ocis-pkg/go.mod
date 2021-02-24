@@ -12,6 +12,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/nats/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210217182006-0f0ace1a44a9
+	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
@@ -29,6 +30,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/restic/calens v0.2.0
 	github.com/rs/zerolog v1.20.0
+	github.com/sony/gobreaker v0.4.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	go.opencensus.io v0.22.6

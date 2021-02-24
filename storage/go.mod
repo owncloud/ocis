@@ -4,6 +4,8 @@ go 1.15
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+	github.com/asim/go-micro/plugins/registry/kubernetes/v3 v3.0.0-20210217182006-0f0ace1a44a9 // indirect
+	github.com/asim/go-micro/plugins/registry/nats/v3 v3.0.0-20210217182006-0f0ace1a44a9 // indirect
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e
 	github.com/gofrs/uuid v3.3.0+incompatible
