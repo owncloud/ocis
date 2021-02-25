@@ -101,6 +101,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 										"bind_username": cfg.Reva.LDAP.BindDN,
 										"bind_password": cfg.Reva.LDAP.BindPassword,
 										"idp":           cfg.Reva.LDAP.IDP,
+										"gatewaysvc":    cfg.Reva.Gateway.Endpoint,
 										"schema": map[string]interface{}{
 											"dn":          "dn",
 											"uid":         cfg.Reva.LDAP.UserSchema.UID,

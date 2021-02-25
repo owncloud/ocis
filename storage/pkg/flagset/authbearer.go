@@ -86,6 +86,16 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   "--service authprovider [--service otherservice]",
 			EnvVars: []string{"STORAGE_AUTH_BEARER_SERVICES"},
 		},
+
+		// Gateway
+
+		&cli.StringFlag{
+			Name:        "gateway-url",
+			Value:       "localhost:9142",
+			Usage:       "URL to use for the storage gateway service",
+			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)
