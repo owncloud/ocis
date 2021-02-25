@@ -39,7 +39,7 @@ func (j *janitor) cleanup() {
 		// On unix like systems (linux, freebsd, etc) os.FindProcess will never return an error
 		if p, err := os.FindProcess(pid); err == nil {
 			if err := p.Signal(syscall.Signal(0)); err != nil {
-				j.store.Delete(process.ProcEntry{
+				_ = j.store.Delete(process.ProcEntry{
 					Pid:       pid,
 					Extension: name,
 				})
