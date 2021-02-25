@@ -61,7 +61,10 @@ func Server(opts ...Option) http.Service {
 		proto.RegisterGroupsServiceWeb(r, handler)
 	})
 
-	micro.RegisterHandler(service.Server(), mux)
+	err := micro.RegisterHandler(service.Server(), mux)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("failed to register the handler")
+	}
 
 	service.Init()
 	return service

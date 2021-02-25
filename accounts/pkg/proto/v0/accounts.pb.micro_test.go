@@ -304,14 +304,14 @@ func assertGroupsSame(t *testing.T, grp1, grp2 *proto.Group) {
 	}
 }
 
-func assertGroupHasMember(t *testing.T, grp *proto.Group, memberId string) {
+func assertGroupHasMember(t *testing.T, grp *proto.Group, memberID string) {
 	for _, m := range grp.Members {
-		if m.Id == memberId {
+		if m.Id == memberID {
 			return
 		}
 	}
 
-	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberId, grp.DisplayName)
+	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberID, grp.DisplayName)
 }
 
 func createAccount(t *testing.T, user string) (*proto.Account, error) {
@@ -556,7 +556,8 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
-	_, _ = createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
 
 	tests := []struct {
 		name        string
@@ -624,8 +625,10 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 }
 
 func TestListAccounts(t *testing.T) {
-	createAccount(t, "user1")
-	createAccount(t, "user2")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+	_, err = createAccount(t, "user2")
+	assert.NoError(t, err)
 
 	resp, err := listAccounts(t)
 	assert.NoError(t, err)
@@ -746,7 +749,8 @@ func TestListAccountsWithFilterQuery(t *testing.T) {
 }
 
 func TestGetAccount(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
 
 	req := &proto.GetAccountRequest{Id: getAccount("user1").Id}
 
@@ -764,8 +768,10 @@ func TestGetAccount(t *testing.T) {
 //TODO: This segfaults! WIP
 
 func TestDeleteAccount(t *testing.T) {
-	createAccount(t, "user1")
-	createAccount(t, "user2")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+	_, err = createAccount(t, "user2")
+	assert.NoError(t, err)
 
 	req := &proto.DeleteAccountRequest{Id: getAccount("user1").Id}
 
@@ -878,9 +884,12 @@ func TestDeleteGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	grp2 := getTestGroups("grp2")
 	grp3 := getTestGroups("grp3")
-	createGroup(t, grp1)
-	createGroup(t, grp2)
-	createGroup(t, grp3)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createGroup(t, grp2)
+	assert.NoError(t, err)
+	_, err = createGroup(t, grp3)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -949,7 +958,8 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 
 func TestUpdateGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -977,8 +987,10 @@ func TestAddMember(t *testing.T) {
 	updatedGroup := grp1
 	updatedGroup.Members = append(updatedGroup.Members, &proto.Account{Id: account.Id})
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1007,10 +1019,13 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 	updatedGroup := grp1
 	updatedGroup.Members = append(updatedGroup.Members, &proto.Account{Id: account.Id})
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	addMemberToGroup(t, grp1.Id, account.Id)
+	_, err = addMemberToGroup(t, grp1.Id, account.Id)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1035,7 +1050,8 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 func TestAddMemberNonExisting(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1064,11 +1080,11 @@ func TestAddMemberNonExisting(t *testing.T) {
 	cleanUp(t)
 }
 
-func addMemberToGroup(t *testing.T, groupId, memberId string) (*proto.Group, error) {
+func addMemberToGroup(t *testing.T, groupID, memberID string) (*proto.Group, error) {
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
-	req := &proto.AddMemberRequest{GroupId: groupId, AccountId: memberId}
+	req := &proto.AddMemberRequest{GroupId: groupID, AccountId: memberID}
 
 	res, err := cl.AddMember(context.Background(), req)
 
@@ -1080,10 +1096,13 @@ func TestRemoveMember(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	addMemberToGroup(t, grp1.Id, account.Id)
+	_, err = addMemberToGroup(t, grp1.Id, account.Id)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1106,7 +1125,8 @@ func TestRemoveMember(t *testing.T) {
 func TestRemoveMemberNonExistingUser(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1139,8 +1159,10 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
 	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
@@ -1231,7 +1253,9 @@ func TestListMembersEmptyGroup(t *testing.T) {
 }
 
 func TestAccountUpdateMask(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+
 	user1 := getAccount("user1")
 	client := mgrpcc.NewClient()
 	req := &proto.UpdateAccountRequest{
@@ -1254,7 +1278,9 @@ func TestAccountUpdateMask(t *testing.T) {
 }
 
 func TestAccountUpdateReadOnlyField(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+
 	user1 := getAccount("user1")
 	client := mgrpcc.NewClient()
 	req := &proto.UpdateAccountRequest{
