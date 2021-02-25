@@ -44,7 +44,7 @@ func Server(opts ...Option) (svc.Service, error) {
 			os.Exit(1)
 		}
 
-		tlsConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
+		tlsConfig = &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{cer}}
 	}
 	chain := options.Middlewares.Then(options.Handler)
 

@@ -54,7 +54,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: options.Config.InsecureBackends,
+			InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
 		},
 	}
 
