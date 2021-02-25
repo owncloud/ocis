@@ -286,7 +286,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	var oidcHTTPClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: cfg.OIDC.Insecure,
+				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
 			},
 			DisableKeepAlives: true,
 		},
