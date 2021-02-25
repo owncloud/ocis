@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-02-24T13:16:15+0000"
+date: "2021-02-25T08:52:44+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -74,6 +74,18 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
+### ocis run
+
+Runs an extension
+
+Usage: `ocis run [command options] [arguments...]`
+
 ### ocis health
 
 Check health status
@@ -88,18 +100,6 @@ Usage: `ocis health [command options] [arguments...]`
 Kill an extension by name
 
 Usage: `ocis kill [command options] [arguments...]`
-
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
 
 ### ocis server
 
@@ -136,41 +136,41 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start glauth server
 
-#### ocis onlyoffice
+#### ocis store
 
-Start onlyoffice server
+Start a go-micro store
 
-#### ocis storage-gateway
+#### ocis accounts
 
-Start storage gateway
+Start accounts server
 
-#### ocis storage-auth-bearer
+#### ocis ocs
 
-Start storage auth-bearer service
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
+Start ocs server
 
 #### ocis storage-users
 
 Start storage and data provider for /users mount
 
-#### ocis web
+#### ocis storage-frontend
 
-Start web server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
+Start storage frontend
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis storage-home
+#### ocis storage-userprovider
 
-Start storage and data provider for /home mount
+Start storage userprovider service
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis settings
+
+Start settings server
 
 #### ocis storage-metadata
 
@@ -180,47 +180,47 @@ Start storage and data service for metadata
 
 Start webdav server
 
-#### ocis idp
-
-Start idp server
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
 #### ocis thumbnails
 
 Start thumbnails server
 
-#### ocis accounts
+#### ocis web
 
-Start accounts server
+Start web server
+
+#### ocis storage-gateway
+
+Start storage gateway
 
 #### ocis storage-public-link
 
 Start storage public link storage
 
-#### ocis store
+#### ocis storage-sharing
 
-Start a go-micro store
+Start storage sharing service
 
 #### ocis version
 
 Lists running services with version
 
-#### ocis ocs
+#### ocis idp
 
-Start ocs server
+Start idp server
 
-#### ocis settings
+#### ocis onlyoffice
 
-Start settings server
+Start onlyoffice server
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
 
