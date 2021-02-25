@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
@@ -14,6 +15,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
 ## Details
+
+* Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
+
+   The auth provider `ldap` and `oidc` drivers now need to be able talk to the reva gateway. We added
+   the `gatewayscv` to the config that is passed to reva.
+
+   https://github.com/owncloud/ocis/pull/1716
 
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
 
