@@ -145,7 +145,10 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Err(err).Msg("error opening config file")
 					return err
 				}
-				json.Unmarshal(contents, &cfg.Web.Config)
+				if err := json.Unmarshal(contents, &cfg.Web.Config); err != nil {
+					logger.Fatal().Err(err).Msg("error unmarshalling config file")
+					return err
+				}
 			}
 
 			var (
