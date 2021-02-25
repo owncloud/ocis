@@ -302,7 +302,7 @@ def testOcisModule(ctx, module):
       },
       {
         'name': 'coverage-cache',
-        'image': 'plugins/s3',
+        'image': 'plugins/s3:1',
         'settings': {
           'endpoint': {
             'from_secret': 'cache_s3_endpoint'
@@ -411,7 +411,7 @@ def uploadCoverage(ctx):
       },
       {
         'name': 'sonarcloud',
-        'image': 'sonarsource/sonar-scanner-cli',
+        'image': 'sonarsource/sonar-scanner-cli:latest',
         'pull': 'always',
         'environment': sonar_env,
       },
@@ -713,7 +713,7 @@ def dockerRelease(ctx, arch):
       build() + [
       {
         'name': 'dryrun',
-        'image': 'plugins/docker:18.09',
+        'image': 'plugins/docker:latest',
         'pull': 'always',
         'settings': {
           'dry_run': True,
@@ -733,7 +733,7 @@ def dockerRelease(ctx, arch):
       },
       {
         'name': 'docker',
-        'image': 'plugins/docker:18.09',
+        'image': 'plugins/docker:latest',
         'pull': 'always',
         'settings': {
           'username': {
@@ -783,7 +783,7 @@ def dockerEos(ctx):
       build() + [
         {
           'name': 'dryrun-eos-ocis',
-          'image': 'plugins/docker:18.09',
+          'image': 'plugins/docker:latest',
           'pull': 'always',
           'settings': {
             'dry_run': True,
@@ -802,7 +802,7 @@ def dockerEos(ctx):
         },
         {
           'name': 'docker-eos-ocis',
-          'image': 'plugins/docker:18.09',
+          'image': 'plugins/docker:latest',
           'pull': 'always',
           'settings': {
             'username': {
@@ -915,10 +915,10 @@ def binaryRelease(ctx, name):
       },
       {
         'name': 'changelog',
-        'image': 'toolhippie/calens:latest',
+        'image': 'webhippie/golang:1.15',
         'pull': 'always',
         'commands': [
-          'calens --version %s -o ocis/dist/CHANGELOG.md' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+          'make changelog CHANGELOG_VERSION=%s' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
           'ref': [
@@ -1195,17 +1195,16 @@ def docs(ctx):
       },
       {
         'name': 'prepare',
-        'image': 'owncloudci/alpine:latest',
+        'image': 'webhippie/golang:1.15',
         'commands': [
           'make -C docs docs-copy'
         ],
       },
       {
         'name': 'test',
-        'image': 'owncloudci/hugo:0.71.0',
+        'image': 'webhippie/golang:1.15',
         'commands': [
-          'cd docs/hugo',
-          'hugo',
+          'make -C docs test'
         ],
       },
       {
@@ -1234,13 +1233,13 @@ def docs(ctx):
         'name': 'list and remove temporary files',
         'image': 'owncloudci/alpine:latest',
         'commands': [
-          'tree hugo/public',
+          'tree docs/hugo/public',
           'rm -rf docs/hugo',
         ],
       },
       {
         'name': 'downstream',
-        'image': 'plugins/downstream',
+        'image': 'plugins/downstream:latest',
         'settings': {
           'server': 'https://drone.owncloud.com/',
           'token': {
@@ -1480,7 +1479,7 @@ def deploy(ctx, config, rebuild):
     'steps': [
       {
         'name': 'clone continuous deployment playbook',
-        'image': 'alpine/git',
+        'image': 'alpine/git:latest',
         'commands': [
           'cd deployments/continuous-deployment-config',
           'git clone https://github.com/owncloud-devops/continuous-deployment.git',
@@ -1488,7 +1487,7 @@ def deploy(ctx, config, rebuild):
       },
       {
         'name': 'deploy',
-        'image': 'owncloudci/drone-ansible',
+        'image': 'owncloudci/drone-ansible:latest',
         'failure': 'ignore',
         'environment': {
           'CONTINUOUS_DEPLOY_SERVERS_CONFIG': '../%s' % (config),

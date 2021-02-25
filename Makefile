@@ -108,12 +108,6 @@ docs-generate:
         $(MAKE) --no-print-directory -C $$mod docs-generate; \
     done
 
-.PHONY: config-docs-generate
-config-docs-generate:
-	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod config-docs-generate; \
-    done
-
 .PHONY: ci-go-generate
 ci-go-generate:
 	@for mod in $(OCIS_MODULES); do \
@@ -145,5 +139,15 @@ go-coverage:
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
 
+.PHONY: bingo-update
 bingo-update: $(BINGO)
 	$(BINGO) get -u
+
+CHANGELOG_VERSION =
+
+.PHONY: changelog
+changelog: $(CALENS)
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md

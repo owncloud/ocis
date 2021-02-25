@@ -106,3 +106,7 @@ $(BIN)/$(EXECUTABLE): $(SOURCES)
 
 $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(DEBUG_LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
+
+.PHONY: watch
+watch: $(REFLEX)
+	$(REFLEX) -c reflex.conf
