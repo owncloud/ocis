@@ -20,7 +20,7 @@ func RequireAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			// get roles from context
 			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
 			if !ok {
-				render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 				return
 			}
 
@@ -30,8 +30,13 @@ func RequireAdmin(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
-
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 		})
+	}
+}
+
+func mustNotFail(err error) {
+	if err != nil {
+		panic(err)
 	}
 }

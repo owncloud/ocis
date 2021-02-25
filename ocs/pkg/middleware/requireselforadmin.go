@@ -21,17 +21,17 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 
 			u, ok := user.ContextGetUser(r.Context())
 			if !ok {
-				render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 				return
 			}
 			if u.Id == nil || u.Id.OpaqueId == "" {
-				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
 				return
 			}
 			// get roles from context
 			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
 			if !ok {
-				render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 				return
 			}
 
@@ -50,7 +50,7 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 				}
 			}
 
-			render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 
 		})
 	}

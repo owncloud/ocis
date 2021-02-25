@@ -61,6 +61,7 @@ func NewService(opts ...Option) Service {
 
 	requireAdmin := ocsm.RequireAdmin(
 		ocsm.RoleManager(roleManager),
+		ocsm.Logger(options.Logger),
 	)
 
 	requireSelfOrAdmin := ocsm.RequireSelfOrAdmin(
@@ -146,7 +147,7 @@ func (o Ocs) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // NotFound uses ErrRender to always return a proper OCS payload
 func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found"))
+	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found")))
 }
 
 func (o Ocs) getAccountService() accounts.AccountsService {
@@ -159,5 +160,5 @@ func (o Ocs) getGroupsService() accounts.GroupsService {
 
 // NotImplementedStub returns a not implemented error
 func (o Ocs) NotImplementedStub(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented"))
+	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented")))
 }

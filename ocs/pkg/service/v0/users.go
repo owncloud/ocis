@@ -29,7 +29,7 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	var err error
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
 		return
 	}
 
@@ -41,9 +41,9 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
 			// if the user was authenticated why was he not found?!? log error?
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
 		return
@@ -64,7 +64,7 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		GIDNumber:         account.GidNumber,
 		// TODO hide enabled flag or it might get rendered as false
 	}
-	render.Render(w, r, response.DataRender(d))
+	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
 
 // GetUser returns the user with the given userid
@@ -74,16 +74,16 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if userid == "" {
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
 	} else {
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	}
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
@@ -120,7 +120,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Definition: "default",
 		},
 	}
-	render.Render(w, r, response.DataRender(d))
+	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
 
 // AddUser creates a new user account
@@ -138,7 +138,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	if uid != "" {
 		uidNumber, err = strconv.ParseInt(uid, 10, 64)
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the uidnumber provided"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the uidnumber provided")))
 			o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the uidnumber provided")
 			return
 		}
@@ -146,7 +146,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	if gid != "" {
 		gidNumber, err = strconv.ParseInt(gid, 10, 64)
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidnumber provided"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Cannot use the gidnumber provided")))
 			o.logger.Error().Err(err).Str("userid", userid).Msg("Cannot use the gidnumber provided")
 			return
 		}
@@ -187,17 +187,17 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		merr := merrors.FromError(err)
 		switch merr.Code {
 		case http.StatusBadRequest:
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail)))
 		case http.StatusConflict:
 			if response.APIVersion(r.Context()) == "2" {
 				// it seems the application framework sets the ocs status code to the httpstatus code, which affects the provisioning api
 				// see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
-				render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail)))
 			} else {
-				render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail))
+				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaInvalidInput.StatusCode, merr.Detail)))
 			}
 		default:
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not add user")
 		// TODO check error if account already existed
@@ -217,7 +217,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	} else {
 		enabled = "false"
 	}
-	render.Render(w, r, response.DataRender(&data.User{
+	mustNotFail(render.Render(w, r, response.DataRender(&data.User{
 		UserID:            account.OnPremisesSamAccountName,
 		DisplayName:       account.DisplayName,
 		LegacyDisplayName: account.DisplayName,
@@ -225,7 +225,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		UIDNumber:         account.UidNumber,
 		GIDNumber:         account.GidNumber,
 		Enabled:           enabled,
-	}))
+	})))
 }
 
 // EditUser creates a new user account
@@ -235,9 +235,9 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not edit user")
 		return
@@ -269,7 +269,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		req.UpdateMask = &fieldmaskpb.FieldMask{Paths: []string{"DisplayName"}}
 	default:
 		// https://github.com/owncloud/core/blob/24b7fa1d2604a208582055309a5638dbd9bda1d1/apps/provisioning_api/lib/Users.php#L321
-		render.Render(w, r, response.ErrRender(103, "unknown key '"+key+"'"))
+		mustNotFail(render.Render(w, r, response.ErrRender(103, "unknown key '"+key+"'")))
 		return
 	}
 
@@ -278,9 +278,9 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		merr := merrors.FromError(err)
 		switch merr.Code {
 		case http.StatusBadRequest:
-			render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, merr.Detail)))
 		default:
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("account_id", req.Account.Id).Str("user_id", userid).Msg("could not edit user")
 		return
@@ -292,7 +292,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.logger.Debug().Interface("account", account).Msg("updated user")
-	render.Render(w, r, response.DataRender(struct{}{}))
+	mustNotFail(render.Render(w, r, response.DataRender(struct{}{})))
 }
 
 // DeleteUser deletes a user
@@ -302,9 +302,9 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not delete user")
 		return
@@ -318,16 +318,16 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", req.Id).Msg("could not delete user")
 		return
 	}
 
 	o.logger.Debug().Str("userid", req.Id).Msg("deleted user")
-	render.Render(w, r, response.DataRender(struct{}{}))
+	mustNotFail(render.Render(w, r, response.DataRender(struct{}{})))
 }
 
 // EnableUser enables a user
@@ -337,9 +337,9 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not enable user")
 		return
@@ -358,16 +358,16 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not enable account")
 		return
 	}
 
 	o.logger.Debug().Str("account_id", account.Id).Msg("enabled user")
-	render.Render(w, r, response.DataRender(struct{}{}))
+	mustNotFail(render.Render(w, r, response.DataRender(struct{}{})))
 }
 
 // DisableUser disables a user
@@ -377,9 +377,9 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not disable user")
 		return
@@ -398,16 +398,16 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested account could not be found")))
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(err).Str("account_id", account.Id).Msg("could not disable account")
 		return
 	}
 
 	o.logger.Debug().Str("account_id", account.Id).Msg("disabled user")
-	render.Render(w, r, response.DataRender(struct{}{}))
+	mustNotFail(render.Render(w, r, response.DataRender(struct{}{})))
 }
 
 // GetSigningKey returns the signing key for the current user. It will create it on the fly if it does not exist
@@ -417,7 +417,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
 		//o.logger.Error().Msg("missing user in context")
-		render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
 		return
 	}
 
@@ -433,10 +433,10 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		Key: userID,
 	})
 	if err == nil && len(res.Records) > 0 {
-		render.Render(w, r, response.DataRender(&data.SigningKey{
+		mustNotFail(render.Render(w, r, response.DataRender(&data.SigningKey{
 			User:       userID,
 			SigningKey: string(res.Records[0].Value),
-		}))
+		})))
 		return
 	}
 	if err != nil {
@@ -444,7 +444,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		if e.Code == http.StatusNotFound {
 			// not found is ok, so we can continue and generate the key on the fly
 		} else {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "error reading from store"))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "error reading from store")))
 			return
 		}
 	}
@@ -453,7 +453,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	key := make([]byte, 64)
 	_, err = rand.Read(key[:])
 	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not generate signing key"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not generate signing key")))
 		return
 	}
 	signingKey := hex.EncodeToString(key)
@@ -472,14 +472,14 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		//o.logger.Error().Err(err).Msg("error writing key")
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not persist signing key"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not persist signing key")))
 		return
 	}
 
-	render.Render(w, r, response.DataRender(&data.SigningKey{
+	mustNotFail(render.Render(w, r, response.DataRender(&data.SigningKey{
 		User:       userID,
 		SigningKey: signingKey,
-	}))
+	})))
 }
 
 // ListUsers lists the users
@@ -495,16 +495,16 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		o.logger.Err(err).Msg("could not list users")
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users"))
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users")))
 		return
 	}
 
-	users := []string{}
+	users := make([]string, 0, len(res.Accounts))
 	for i := range res.Accounts {
 		users = append(users, res.Accounts[i].OnPremisesSamAccountName)
 	}
 
-	render.Render(w, r, response.DataRender(&data.Users{Users: users}))
+	mustNotFail(render.Render(w, r, response.DataRender(&data.Users{Users: users})))
 }
 
 // escapeValue escapes all special characters in the value

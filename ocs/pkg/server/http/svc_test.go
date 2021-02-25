@@ -35,9 +35,8 @@ import (
 )
 
 const (
-	ocsV1          string = "v1.php"
-	ocsV2          string = "v2.php"
-	adminBasicAuth string = "admin:admin"
+	ocsV1 string = "v1.php"
+	ocsV2 string = "v2.php"
 )
 
 const unsuccessfulResponseText string = "The response was expected to be successful but was not"
@@ -604,7 +603,9 @@ func cleanUp(t *testing.T) {
 		}
 
 		if !found {
-			deleteAccount(t, f.Name())
+			if _, err := deleteAccount(t, f.Name()); err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -625,7 +626,9 @@ func cleanUp(t *testing.T) {
 		}
 
 		if !found {
-			deleteGroup(t, f.Name())
+			if _, err := deleteGroup(t, f.Name()); err != nil {
+				panic(err)
+			}
 		}
 	}
 }
