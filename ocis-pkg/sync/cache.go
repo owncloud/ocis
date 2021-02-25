@@ -49,7 +49,7 @@ func (c *Cache) Store(key string, val interface{}, expiration time.Time) {
 		c.evict()
 	}
 
-	poolEntry := c.pool.Get()
+	poolEntry := c.pool.Get() //nolint: ifshort
 	if mapEntry, loaded := c.entries.LoadOrStore(key, poolEntry); loaded {
 		entry := mapEntry.(*CacheEntry)
 		entry.V = val
