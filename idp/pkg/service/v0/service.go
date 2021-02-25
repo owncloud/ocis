@@ -25,7 +25,6 @@ import (
 // Service defines the extension handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
-	Dummy(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -178,14 +177,6 @@ func (k IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	k.mux.ServeHTTP(w, r)
 }
 
-// Dummy implements the Service interface.
-func (k IDP) Dummy(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-
-	w.Write([]byte(http.StatusText(http.StatusOK)))
-}
-
 // Index renders the static html with the
 func (k IDP) Index() http.HandlerFunc {
 
@@ -211,6 +202,8 @@ func (k IDP) Index() http.HandlerFunc {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write(indexHTML)
+		if _, err := w.Write(indexHTML); err != nil {
+			k.logger.Error().Err(err).Msg("could not write to response writer")
+		}
 	})
 }
