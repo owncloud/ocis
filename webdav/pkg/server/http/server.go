@@ -46,7 +46,9 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewTracing(handle)
 	}
 
-	micro.RegisterHandler(service.Server(), handle)
+	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
+		return http.Service{}, err
+	}
 
 	service.Init()
 	return service, nil

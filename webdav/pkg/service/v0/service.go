@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"io"
 	"net/http"
 	"strings"
 
@@ -57,7 +58,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		g.log.Error().Err(err).Msg("could not create Request")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+		mustWrite(g.log, w, []byte(err.Error()))
 		return
 	}
 
@@ -74,7 +75,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		g.log.Error().Err(err).Msg("could not get thumbnail")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+		mustWrite(g.log, w, []byte(err.Error()))
 		return
 	}
 
@@ -85,7 +86,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", rsp.GetMimetype())
 	w.WriteHeader(http.StatusOK)
-	w.Write(rsp.Thumbnail)
+	mustWrite(g.log, w, rsp.Thumbnail)
 }
 
 func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
@@ -94,4 +95,10 @@ func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
 		return thumbnails.GetRequest_FileType(-1)
 	}
 	return thumbnails.GetRequest_FileType(val)
+}
+
+func mustWrite(logger log.Logger, w io.Writer, val []byte) {
+	if _, err := w.Write(val); err != nil {
+		logger.Error().Err(err).Msg("could not write response")
+	}
 }
