@@ -42,6 +42,6 @@ func BenchmarkGet(b *testing.B) {
 	img, ext, _ := image.Decode(f)
 	req.Encoder = EncoderForType(ext)
 	for i := 0; i < b.N; i++ {
-		sut.Get(req, img)
+		_, _ = sut.Get(req, img)
 	}
 }

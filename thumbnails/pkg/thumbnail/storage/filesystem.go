@@ -113,7 +113,9 @@ func (s *FileSystem) storeImage(key string, img []byte) (string, error) {
 // This will balance the folders in setups with many users.
 func (s *FileSystem) userDir(username string) string {
 	hash := sha256.New224()
-	hash.Write([]byte(username))
+	if _, err := hash.Write([]byte(username)); err != nil {
+		s.logger.Fatal().Err(err).Msg("failed to create hash")
+	}
 	unHash := hex.EncodeToString(hash.Sum(nil)) // 224 Bits or 224 / 4 = 56 characters.
 
 	return filepath.Join(s.root, usersDir, unHash[:3], unHash[3:6], unHash[6:])
