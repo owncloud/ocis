@@ -93,8 +93,7 @@ func TestClosestMatch(t *testing.T) {
 }
 
 func TestParseWithEmptyString(t *testing.T) {
-	_, err := ParseResolution("")
-	if err == nil {
+	if _, err := ParseResolution(""); err == nil {
 		t.Error("Parse with empty string should return an error.")
 	}
 }

@@ -31,7 +31,6 @@ require (
 	go.opencensus.io v0.22.6
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	google.golang.org/protobuf v1.25.0
 )
 

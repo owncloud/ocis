@@ -29,7 +29,9 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -37,6 +39,8 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+			panic(err)
+		}
 	}
 }

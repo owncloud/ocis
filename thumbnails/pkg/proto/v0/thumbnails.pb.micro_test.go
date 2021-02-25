@@ -46,7 +46,9 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not register ThumbnailHandler: %v", err)
 	}
-	service.Server().Start()
+	 if err := service.Server().Start(); err != nil {
+	 	log.Fatalf("could not start server: %v", err)
+	 }
 }
 
 func TestGetThumbnailInvalidImage(t *testing.T) {

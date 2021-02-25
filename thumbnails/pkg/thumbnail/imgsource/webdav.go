@@ -36,7 +36,7 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
 	}
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure}
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure} //nolint:gosec
 
 	auth, ok := ContextGetAuthorization(ctx)
 	if !ok {
@@ -49,6 +49,7 @@ func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
 	}
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", file, resp.StatusCode)
