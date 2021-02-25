@@ -2323,3 +2323,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L25)
 -   [apiTranslation/translation.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L26)
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
+
+#### [The version number of a file is incorrect because of the incorrect number of <d:getetag> and <d:getlastmodified> element](https://github.com/owncloud/ocis/issues/1234)
+-   [apiVersions/fileVersions.feature:425]
