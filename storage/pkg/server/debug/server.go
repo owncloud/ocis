@@ -34,7 +34,9 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 
 		// TODO(tboerger): check if services are up and running
 
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -46,6 +48,8 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 
 		// TODO(tboerger): check if services are up and running
 
-		io.WriteString(w, http.StatusText(http.StatusOK))
+		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+			panic(err)
+		}
 	}
 }

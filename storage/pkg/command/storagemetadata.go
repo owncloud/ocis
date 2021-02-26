@@ -203,13 +203,15 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				})
 			}
 
-			external.RegisterGRPCEndpoint(
+			if err := external.RegisterGRPCEndpoint(
 				ctx,
 				"com.owncloud.storage.metadata",
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.Reva.StorageMetadata.GRPCAddr,
 				logger,
-			)
+			); err != nil {
+				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
+			}
 
 			return gr.Run()
 		},
