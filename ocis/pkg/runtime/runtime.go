@@ -50,13 +50,11 @@ var (
 		"thumbnails",
 		"web",
 		"webdav",
-		"accounts",
-		//"graph",
-		//"graph-explorer",
 	}
 
 	dependants = []string{
 		"storage-sharing",
+		"accounts",
 	}
 	// Maximum number of retries until getting a connection to the rpc runtime service.
 	maxRetries = 10
