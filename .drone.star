@@ -240,10 +240,10 @@ def testOcisModules(ctx):
   for module in config['modules']:
     pipelines.append(testOcisModule(ctx, module))
 
-  coverage_upload = uploadCoverage(ctx)
-  coverage_upload['depends_on'] = getPipelineNames(pipelines)
+  scan_result_upload = uploadScanResults(ctx)
+  scan_result_upload['depends_on'] = getPipelineNames(pipelines)
 
-  return pipelines + [coverage_upload]
+  return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
   pipelines = [
@@ -264,29 +264,13 @@ def testPipelines(ctx):
 def testOcisModule(ctx, module):
   steps = makeGenerate(module) + [
     {
-      'name': 'vet',
+      'name': 'golangci-lint',
       'image': 'webhippie/golang:1.15',
       'pull': 'always',
       'commands': [
-        'make -C %s vet' % (module),
-      ],
-      'volumes': [stepVolumeGoWebhippie,],
-    },
-    {
-      'name': 'staticcheck',
-      'image': 'webhippie/golang:1.15',
-      'pull': 'always',
-      'commands': [
-        'make -C %s staticcheck' % (module),
-      ],
-      'volumes': [stepVolumeGoWebhippie,],
-    },
-    {
-      'name': 'lint',
-      'image': 'webhippie/golang:1.15',
-      'pull': 'always',
-      'commands': [
-        'make -C %s lint' % (module),
+        'mkdir -p cache/checkstyle',
+        'make -C %s ci-golangci-lint' % (module),
+        'mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml' % (module, module),
       ],
       'volumes': [stepVolumeGoWebhippie,],
     },
@@ -295,8 +279,9 @@ def testOcisModule(ctx, module):
         'image': 'webhippie/golang:1.15',
         'pull': 'always',
         'commands': [
+          'mkdir -p cache/coverage',
           'make -C %s test' % (module),
-          'mv %s/coverage.out %s_coverage.out' % (module, module),
+          'mv %s/coverage.out cache/coverage/%s_coverage.out' % (module, module),
         ],
         'volumes': [stepVolumeGoWebhippie,],
       },
@@ -308,8 +293,8 @@ def testOcisModule(ctx, module):
             'from_secret': 'cache_s3_endpoint'
           },
           'bucket': 'cache',
-          'source': '%s_coverage.out' % (module),
-          'target': '%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+          'source': 'cache/**/*',
+          'target': '%s/%s' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
           'path_style': True,
           'access_key': {
             'from_secret': 'cache_s3_access_key'
@@ -364,7 +349,7 @@ def buildOcisBinaryForTesting(ctx):
     'volumes': [pipelineVolumeGoWebhippie],
   }
 
-def uploadCoverage(ctx):
+def uploadScanResults(ctx):
   sonar_env = {
       'SONAR_TOKEN': {
         'from_secret': 'sonar_token',
@@ -377,26 +362,39 @@ def uploadCoverage(ctx):
       'SONAR_PULL_REQUEST_KEY': '%s' % (ctx.build.ref.replace("refs/pull/", "").split("/")[0]),
     })
 
+  repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
+
   return {
     'kind': 'pipeline',
     'type': 'docker',
-    'name': 'upload-coverage',
+    'name': 'upload-scan-results',
     'platform': {
       'os': 'linux',
       'arch': 'amd64',
     },
+    'clone': {
+      'disable': True, # Sonarcloud does not apply issues on already merged branch
+    },
     'steps': [
       {
+        'name': 'clone',
+        'image': 'alpine/git',
+        'commands': [
+          'git clone https://github.com/%s.git .' % (repo_slug),
+          'git checkout $DRONE_COMMIT',
+        ],
+      },
+      {
         'name': 'sync-from-cache',
-        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
+        'image': 'minio/mc:RELEASE.2021-02-19T05-34-40Z',
         'environment': {
-          'MC_HOST_cache': {
+          'MC_HOST_cachebucket': {
             'from_secret': 'cache_s3_connection_url'
           }
         },
         'commands': [
-          'mkdir -p coverage',
-          'mc mirror cache/cache/%s/%s/coverage coverage/' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+          'mkdir -p cache',
+          'mc mirror cachebucket/cache/%s/%s/cache cache/' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
         ]
       },
       {
@@ -411,7 +409,7 @@ def uploadCoverage(ctx):
       },
       {
         'name': 'sonarcloud',
-        'image': 'sonarsource/sonar-scanner-cli:latest',
+        'image': 'sonarsource/sonar-scanner-cli',
         'pull': 'always',
         'environment': sonar_env,
       },
@@ -419,12 +417,12 @@ def uploadCoverage(ctx):
         'name': 'purge-cache',
         'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
         'environment': {
-          'MC_HOST_cache': {
+          'MC_HOST_cachebucket': {
             'from_secret': 'cache_s3_connection_url'
           }
         },
         'commands': [
-          'mc rm --recursive --force cache/cache/%s/%s/coverage' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
+          'mc rm --recursive --force cachebucket/cache/%s/%s/cache' % (ctx.repo.slug, ctx.build.commit + '-${DRONE_BUILD_NUMBER}'),
         ]
       },
     ],

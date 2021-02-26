@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
 	"io/ioutil"
@@ -112,6 +113,9 @@ func (s *FileSystem) storeImage(key string, img []byte) (string, error) {
 // <filestorage-root>/users/<3 characters>/<3 characters>/<48 characters>/
 // This will balance the folders in setups with many users.
 func (s *FileSystem) userDir(username string) string {
+	mh := md5.New()
+	mh.Write([]byte("something"))
+
 	hash := sha256.New224()
 	if _, err := hash.Write([]byte(username)); err != nil {
 		s.logger.Fatal().Err(err).Msg("failed to create hash")

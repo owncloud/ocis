@@ -47,17 +47,11 @@ $(FLAEX): $(BINGO_DIR)/flaex.mod
 	@echo "(re)installing $(GOBIN)/flaex-v0.2.0"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=flaex.mod -o=$(GOBIN)/flaex-v0.2.0 "github.com/owncloud/flaex"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.35.2
+GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.37.1
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v1.35.2"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.35.2 "github.com/golangci/golangci-lint/cmd/golangci-lint"
-
-GOLINT := $(GOBIN)/golint-v0.0.0-20201208152925-83fdc39ff7b5
-$(GOLINT): $(BINGO_DIR)/golint.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golint-v0.0.0-20201208152925-83fdc39ff7b5"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=golint.mod -o=$(GOBIN)/golint-v0.0.0-20201208152925-83fdc39ff7b5 "golang.org/x/lint/golint"
+	@echo "(re)installing $(GOBIN)/golangci-lint-v1.37.1"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.37.1 "github.com/golangci/golangci-lint/cmd/golangci-lint"
 
 GOVERAGE := $(GOBIN)/goverage-v0.0.0-20180129164344-eec3514a20b5
 $(GOVERAGE): $(BINGO_DIR)/goverage.mod
@@ -118,10 +112,3 @@ $(REFLEX): $(BINGO_DIR)/reflex.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
 	@echo "(re)installing $(GOBIN)/reflex-v0.3.0"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=reflex.mod -o=$(GOBIN)/reflex-v0.3.0 "github.com/cespare/reflex"
-
-STATICCHECK := $(GOBIN)/staticcheck-v0.1.2
-$(STATICCHECK): $(BINGO_DIR)/staticcheck.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/staticcheck-v0.1.2"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=staticcheck.mod -o=$(GOBIN)/staticcheck-v0.1.2 "honnef.co/go/tools/cmd/staticcheck"
-

@@ -23,7 +23,7 @@ docs-init:
 .PHONY: docs-serve
 docs-serve: docs-init docs-generate docs-copy ## serve docs with hugo
 	@bash -c "trap 'trap - SIGINT SIGTERM ERR; $(MAKE) --no-print-directory docs-sync-stop; exit 0' SIGINT SIGTERM ERR; $(MAKE) --no-print-directory docs-sync-start && $(MAKE) --no-print-directory hugo-serve"
-	
+
 .PHONY: test
 test: $(HUGO)
 	@cd hugo && $(HUGO)

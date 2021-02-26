@@ -35,13 +35,13 @@ assets: yarn-build \
 assets/identifier/static:
 	mkdir -p assets/identifier/static
 
-LOGO_URL = https://raw.githubusercontent.com/owncloud/assets/main/logo.svg	
+LOGO_URL = https://raw.githubusercontent.com/owncloud/assets/main/logo.svg
 
 .PHONY: assets/identifier/static/logo.svg # force overwrite
 assets/identifier/static/logo.svg:
 	curl -o assets/identifier/static/logo.svg ${LOGO_URL}
 
-FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico	
+FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
 
 .PHONY: assets/identifier/static/favicon.ico # force overwrite
 assets/identifier/static/favicon.ico:

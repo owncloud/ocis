@@ -68,17 +68,13 @@ go-mod-tidy:
 fmt:
 	gofmt -s -w $(SOURCES)
 
-.PHONY: vet
-vet:
-	go vet $(PACKAGES)
+.PHONY: golangci-lint
+golangci-lint: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME)
 
-.PHONY: staticcheck
-staticcheck: $(STATICCHECK)
-	$(STATICCHECK) -tags '$(TAGS)' $(PACKAGES)
-
-.PHONY: lint
-lint: $(GOLINT)
-	for PKG in $(PACKAGES); do $(GOLINT) -set_exit_status $$PKG || exit 1; done;
+.PHONY: ci-golangci-lint
+ci-golangci-lint: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
 test: $(GOVERAGE)
