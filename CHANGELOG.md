@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Purposely delay accounts service startup: [#1734](https://github.com/owncloud/ocis/pull/1734)
 * Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
@@ -15,6 +16,17 @@ The following sections list the changes for unreleased.
 * Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
 ## Details
+
+* Bugfix - Purposely delay accounts service startup: [#1734](https://github.com/owncloud/ocis/pull/1734)
+
+   As it turns out the race condition between `accounts <-> storage-metadata` still remains.
+   This PR is a hotfix, and it should be followed up with a proper fix. Either:
+
+   - block the accounts' initialization until the storage metadata is ready (using the registry)
+   or - allow the accounts service to initialize and use a message broker to signal the accounts the
+   metadata storage is ready to receive requests.
+
+   https://github.com/owncloud/ocis/pull/1734
 
 * Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 
