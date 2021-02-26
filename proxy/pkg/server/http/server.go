@@ -59,7 +59,9 @@ func Server(opts ...Option) (svc.Service, error) {
 		svc.Flags(options.Flags...),
 	)
 
-	micro.RegisterHandler(service.Server(), chain)
+	if err := micro.RegisterHandler(service.Server(), chain); err != nil {
+		return svc.Service{}, err
+	}
 
 	service.Init()
 	return service, nil
