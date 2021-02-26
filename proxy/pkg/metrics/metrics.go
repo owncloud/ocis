@@ -49,21 +49,27 @@ func New() *Metrics {
 		}, []string{"versions"}),
 	}
 
-	prometheus.Register(
+	mustNotFail(prometheus.Register(
 		m.Counter,
-	)
+	))
 
-	prometheus.Register(
+	mustNotFail(prometheus.Register(
 		m.Latency,
-	)
+	))
 
-	prometheus.Register(
+	mustNotFail(prometheus.Register(
 		m.Duration,
-	)
+	))
 
-	prometheus.Register(
+	mustNotFail(prometheus.Register(
 		m.BuildInfo,
-	)
+	))
 
 	return m
+}
+
+func mustNotFail(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

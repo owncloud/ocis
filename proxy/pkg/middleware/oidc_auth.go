@@ -112,7 +112,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 		return
 	}
 
-	var ok = false
+	var ok bool
 	if claims, ok = hit.V.(oidc.StandardClaims); !ok {
 		status = http.StatusInternalServerError
 		return
