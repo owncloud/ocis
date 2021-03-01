@@ -1,6 +1,6 @@
 # Project Development Dependencies.
 
-This is directory which stores Go modules with pinned buildable package that is used within this repository, managed by https://github.com/bwplotka/bingo.
+This directory stores Go modules with pinned buildable packages that are used within this repository, managed by https://github.com/bwplotka/bingo.
 
 * Run `bingo get` to install all tools having each own module file in this directory.
 * Run `bingo get <tool>` to install <tool> that have own module file in this directory.
