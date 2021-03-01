@@ -580,7 +580,8 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'cd /srv/app/web',
           'git checkout $WEB_COMMITID',
           'cp -r tests/acceptance/filesForUpload/* /uploads',
-          'yarn install-all',
+          'yarn install --all',
+          'yarn build',
           './tests/acceptance/run.sh'
         ],
         'volumes':
@@ -646,7 +647,8 @@ def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
           'cd /srv/app/web',
           'git checkout $WEB_COMMITID',
           'cp -r tests/acceptance/filesForUpload/* /uploads',
-          'yarn install-all',
+          'yarn install --all',
+          'yarn build',
           'cd /drone/src/accounts',
           'yarn install --all',
           'make test-acceptance-webui'

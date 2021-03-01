@@ -50,7 +50,7 @@
     "eslint-plugin-vue": "^7.6.0",
     "fs-extra": "^9.0.1",
     "join-path": "^1.1.1",
-    "ldap": "^0.7.1",
+    "ldapjs": "^2.2.3",
     "nightwatch": "^1.3.6",
     "nightwatch-api": "^3.0.1",
     "nightwatch-vrt": "^0.2.10",
