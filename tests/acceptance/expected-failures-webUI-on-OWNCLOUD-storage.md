@@ -28,7 +28,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [authentication dialog appears when user is deleted](https://github.com/owncloud/web/issues/4564)
 ### [login error page loops when logged in user is deleted](https://github.com/owncloud/ocis/issues/1129)
--   [webUILogin/login.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L62)
+-   [webUILogin/openidlogin.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L62)
 
 ### [User request using token and basic authentication gives different display names](https://github.com/owncloud/ocis/issues/1312)
 -   [webUIAccount/accountInformation.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L10)
@@ -161,10 +161,10 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIFiles/search.feature:168](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/search.feature#L168)
 -   [webUIRestrictSharing/restrictReSharing.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L23)
 -   [webUIRestrictSharing/restrictReSharing.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L40)
--   [webUIRestrictSharing/restrictSharing.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L25)
--   [webUIRestrictSharing/restrictSharing.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L34)
--   [webUIRestrictSharing/restrictSharing.feature:43](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L43)
--   [webUIRestrictSharing/restrictSharing.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L50)
+-   [webUIRestrictSharing/restrictSharing.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L29)
+-   [webUIRestrictSharing/restrictSharing.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L38)
+-   [webUIRestrictSharing/restrictSharing.feature:47](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L47)
+-   [webUIRestrictSharing/restrictSharing.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L54)
 -   [webUISharingAcceptShares/acceptShares.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L16)
 -   [webUISharingAcceptShares/acceptShares.feature:213](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L213)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L33)
@@ -195,7 +195,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L90)
 
 ### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis/issues/1428)
--   [webUILogin/login.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L52)
+-   [webUILogin/openidLogin.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L52)
 
 ### Image-Media-Viewer-Issue
 -   [webUIPreview/imageMediaViewer.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L33)
@@ -436,7 +436,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIMoveFilesFolders/moveFiles.feature:122](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature:122#L122)
 
 ### [Blocked user is not logged out](https://github.com/owncloud/ocis/issues/902)
--   [webUILogin/adminBlocksUser.feature:6](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L6)
+-   [webUILogin/adminBlocksUser.feature:7](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L7)
 
 ### [Browser session deleted user should not be valid for newly created user of same name](https://github.com/owncloud/ocis/issues/904)
--   [webUILogin/login.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/login.feature#L74)
+-   [webUILogin/openidLogin.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L74)
