@@ -286,7 +286,7 @@ def testOcisModule(ctx, module):
         'volumes': [stepVolumeGoWebhippie,],
       },
       {
-        'name': 'coverage-cache',
+        'name': 'scan-result-cache',
         'image': 'plugins/s3:1',
         'settings': {
           'endpoint': {
