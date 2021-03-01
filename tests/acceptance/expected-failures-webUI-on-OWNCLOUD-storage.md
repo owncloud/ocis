@@ -28,7 +28,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [authentication dialog appears when user is deleted](https://github.com/owncloud/web/issues/4564)
 ### [login error page loops when logged in user is deleted](https://github.com/owncloud/ocis/issues/1129)
--   [webUILogin/openidlogin.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L62)
+-   [webUILogin/openidLogin.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L62)
 
 ### [User request using token and basic authentication gives different display names](https://github.com/owncloud/ocis/issues/1312)
 -   [webUIAccount/accountInformation.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAccount/accountInformation.feature#L10)
