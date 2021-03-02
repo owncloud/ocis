@@ -32,7 +32,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.opencensus.io v0.22.6
+	go.opencensus.io v0.23.0
 	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b
 )
 
