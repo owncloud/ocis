@@ -12,6 +12,7 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
+# if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	accounts \
 	glauth \
@@ -29,6 +30,8 @@ OCIS_MODULES = \
 	thumbnails \
 	web \
 	webdav
+
+include .bingo/Variables.mk
 
 .PHONY: help
 help:
@@ -105,12 +108,6 @@ docs-generate:
         $(MAKE) --no-print-directory -C $$mod docs-generate; \
     done
 
-.PHONY: config-docs-generate
-config-docs-generate:
-	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod config-docs-generate; \
-    done
-
 .PHONY: ci-go-generate
 ci-go-generate:
 	@for mod in $(OCIS_MODULES); do \
@@ -141,3 +138,16 @@ go-coverage:
 	@for mod in $(OCIS_MODULES); do \
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
+
+.PHONY: bingo-update
+bingo-update: $(BINGO)
+	$(BINGO) get -u
+
+CHANGELOG_VERSION =
+
+.PHONY: changelog
+changelog: $(CALENS)
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
