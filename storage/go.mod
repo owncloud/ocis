@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e
+	github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect

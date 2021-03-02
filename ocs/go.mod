@@ -9,7 +9,7 @@ require (
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
-	github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e
+	github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.4.3
@@ -24,7 +24,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.7.0
-	go.opencensus.io v0.22.6
+	go.opencensus.io v0.23.0
 	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
 	google.golang.org/protobuf v1.25.0
 )

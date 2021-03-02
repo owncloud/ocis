@@ -108,6 +108,13 @@ func Sharing(cfg *config.Config) *cli.Command {
 									"json": map[string]interface{}{
 										"file": cfg.Reva.Sharing.PublicJSONFile,
 									},
+									"sql": map[string]interface{}{
+										"db_username": cfg.Reva.Sharing.UserSQLUsername,
+										"db_password": cfg.Reva.Sharing.UserSQLPassword,
+										"db_host":     cfg.Reva.Sharing.UserSQLHost,
+										"db_port":     cfg.Reva.Sharing.UserSQLPort,
+										"db_name":     cfg.Reva.Sharing.UserSQLName,
+									},
 								},
 							},
 						},

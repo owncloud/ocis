@@ -302,6 +302,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5 h1:wy1oeyy6v9/65
 github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e h1:fylXfGSnDzo+X+sgxNyWoU1NjAmTJBrj2ucgNKBmb6s=
 github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e/go.mod h1:DGqsIK/psLwnWz58z8t4Gmrhx9P5iccZZkzi8CBO1c0=
+github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366 h1:F/eyxxUSdEMi84nV7+YmUkpPnqjQDQ/4Do4UMGBwA2E=
+github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366/go.mod h1:TM0X9LA9X5hcQvr6iMmU8KW0ZPwyr9TnZ/ez5EGof4M=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
@@ -1174,6 +1176,8 @@ github.com/ory/dockertest/v3 v3.5.4/go.mod h1:J8ZUbNB2FOhm1cFZW9xBpDsODqsSWcyYgt
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
 github.com/ory/fosite v0.37.0 h1:NaKYm3hhZW1c812uetiNfHlvXmTokIRrOOiTYz+Yhro=
 github.com/ory/fosite v0.37.0/go.mod h1:37r59qkOSPueYKmaA7EHiXrDMF1B+XPN+MgkZgTRg3Y=
+github.com/ory/fosite v0.38.0 h1:4y+IurqBAu/Gf0NlW47gabRJZyYIqda+OFHMx5fsy6Q=
+github.com/ory/fosite v0.38.0/go.mod h1:37r59qkOSPueYKmaA7EHiXrDMF1B+XPN+MgkZgTRg3Y=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
 github.com/ory/go-acc v0.2.5 h1:31irXHzG2vnKQSE4weJm7AdfrnpaVjVCq3nD7viXCJE=
 github.com/ory/go-acc v0.2.5/go.mod h1:4Kb/UnPcT8qRAk3IAxta+hvVapdxTLWtrr7bFLlEgpw=

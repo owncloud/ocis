@@ -264,6 +264,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5/go.mod h1:UXha4T
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c/go.mod h1:24c68Ys3h7srGohymDKSXakN4OrhzABJoKFoMeSIBvk=
 github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e h1:fylXfGSnDzo+X+sgxNyWoU1NjAmTJBrj2ucgNKBmb6s=
 github.com/cs3org/reva v1.6.1-0.20210223065028-53f39499762e/go.mod h1:DGqsIK/psLwnWz58z8t4Gmrhx9P5iccZZkzi8CBO1c0=
+github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366 h1:F/eyxxUSdEMi84nV7+YmUkpPnqjQDQ/4Do4UMGBwA2E=
+github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366/go.mod h1:TM0X9LA9X5hcQvr6iMmU8KW0ZPwyr9TnZ/ez5EGof4M=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -1076,6 +1078,7 @@ github.com/ory/dockertest/v3 v3.5.4/go.mod h1:J8ZUbNB2FOhm1cFZW9xBpDsODqsSWcyYgt
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
 github.com/ory/fosite v0.37.0 h1:NaKYm3hhZW1c812uetiNfHlvXmTokIRrOOiTYz+Yhro=
 github.com/ory/fosite v0.37.0/go.mod h1:37r59qkOSPueYKmaA7EHiXrDMF1B+XPN+MgkZgTRg3Y=
+github.com/ory/fosite v0.38.0/go.mod h1:37r59qkOSPueYKmaA7EHiXrDMF1B+XPN+MgkZgTRg3Y=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
 github.com/ory/go-acc v0.2.5 h1:31irXHzG2vnKQSE4weJm7AdfrnpaVjVCq3nD7viXCJE=
 github.com/ory/go-acc v0.2.5/go.mod h1:4Kb/UnPcT8qRAk3IAxta+hvVapdxTLWtrr7bFLlEgpw=
@@ -1398,6 +1401,8 @@ go.opencensus.io v0.22.3/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.opencensus.io v0.22.4/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
 go.opencensus.io v0.22.6 h1:BdkrbWrzDlV9dnbzoP7sfN+dHheJ4J9JOaYxcUDL+ok=
 go.opencensus.io v0.22.6/go.mod h1:XItmlyltB5F7CS4xOC1DcqMoFqwtC6OG2xF7mCv7P7E=
+go.opencensus.io v0.23.0 h1:gqCw0LfLxScz8irSi8exQc7fyQ0fKQU/qnC/X8+V/1M=
+go.opencensus.io v0.23.0/go.mod h1:XItmlyltB5F7CS4xOC1DcqMoFqwtC6OG2xF7mCv7P7E=
 go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.13.0/go.mod h1:TwTkyRaTam1pOIb2wxcAiC2hkMVbokXkt6DEt5nDkD8=
 go.opentelemetry.io/otel v0.13.0/go.mod h1:dlSNewoRYikTkotEnxdmuBHgzT+k/idJSfDv/FxEnOY=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
