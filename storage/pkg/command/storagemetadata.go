@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -23,9 +24,10 @@ import (
 // It provides a ocis-specific storage store metadata (shares,account,settings...)
 func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-metadata",
-		Usage:    "Start storage-metadata service",
-		Flags:    flagset.StorageMetadata(cfg),
+		Name:  "storage-metadata",
+		Usage: "Start storage-metadata service",
+		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
+		Flags:    append(flagset.StorageMetadata(cfg), flagset.RootWithConfig(cfg)...),
 		Category: "Extensions",
 		Before: func(c *cli.Context) error {
 			storageRoot := c.String("storage-root")
@@ -216,4 +218,44 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewSutureService creates a new storagemetadata.SutureService
+func NewStorageMetadata(ctx context.Context, cfg *config.Config) SutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return SutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s SutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range StorageMetadata(s.cfg).Flags {
+		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
+			panic(err)
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if StorageMetadata(s.cfg).Before != nil {
+		if err := StorageMetadata(s.cfg).Before(ctx); err != nil {
+			panic(err)
+		}
+	}
+	if err := StorageMetadata(s.cfg).Action(ctx); err != nil {
+		panic(err)
+	}
+}
+
+func (s SutureService) Stop() {
+	s.cancel()
 }

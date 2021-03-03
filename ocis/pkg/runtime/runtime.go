@@ -2,12 +2,10 @@ package runtime
 
 import (
 	"context"
-	"fmt"
-	golog "log"
-	"net/rpc"
 	"os"
 	"os/signal"
-	"time"
+
+	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
 
@@ -18,8 +16,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis/pkg/config"
 
-	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
-	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
 )
 
 var (
@@ -96,15 +93,27 @@ func (r *Runtime) Start() error {
 	// - to avoid this getting out of hands, a supervisor would need to be injected on each supervised service.
 	// - each service would then add its execute func to the supervisor, and return its token (?)
 	// - this runtime should only care about start / stop services, for that we use serviceTokens.
+	// - normalize the use of panics so that suture can restart services that die.
+	// - shutting down a service implies iterating over all the serviceToken for the given service name and terminating them.
+	// - config file parsing with Viper is no longer possible as viper is not thread-safe (https://github.com/spf13/viper/issues/19)
+	// - replace occurrences of log.Fatal in favor of panic() since the supervisor relies on panics.
+
+	// propagate reva log config to storage services
+	r.c.Storage.Log.Level = r.c.Log.Level
+	r.c.Storage.Log.Color = r.c.Log.Color
+	r.c.Storage.Log.Pretty = r.c.Log.Pretty
 
 	tokens["settings"] = append(tokens["settings"], supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
+	tokens["storagemetadata"] = append(tokens["storagemetadata"], supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
 
 	go supervisor.ServeBackground()
 
-	<-halt
-	globalCancel()
-	close(halt)
-	return nil
+	select {
+	case <-halt:
+		globalCancel()
+		close(halt)
+		return nil
+	}
 }
 
 // for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
@@ -119,62 +128,4 @@ func setMicroLogger(log config.Log) {
 		lev = zerolog.ErrorLevel
 	}
 	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
-}
-
-// Launch oCIS default oCIS extensions.
-func (r *Runtime) Launch() {
-	var client *rpc.Client
-	var err error
-	var try int
-
-	for {
-		if try >= maxRetries {
-			golog.Fatal("could not get a connection to rpc runtime on localhost:10666")
-		}
-		client, err = rpc.DialHTTP("tcp", "localhost:10666")
-		if err != nil {
-			try++
-			fmt.Println("runtime not available, retrying...")
-			time.Sleep(1 * time.Second)
-		} else {
-			goto OUT
-		}
-	}
-
-OUT:
-	for _, v := range Extensions {
-		RunService(client, v)
-	}
-
-	if len(dependants) > 0 {
-		time.Sleep(2 * time.Second)
-		for _, v := range dependants {
-			RunService(client, v)
-		}
-	}
-}
-
-// RunService sends a Service.Start command with the given service name  to pman
-func RunService(client *rpc.Client, service string) int {
-	args := process.NewProcEntry(service, os.Environ(), []string{service}...)
-
-	all := append(Extensions, dependants...)
-	if !contains(all, service) {
-		return 1
-	}
-
-	var reply int
-	if err := client.Call("Service.Start", args, &reply); err != nil {
-		golog.Fatal(err)
-	}
-	return reply
-}
-
-func contains(a []string, b string) bool {
-	for i := range a {
-		if a[i] == b {
-			return true
-		}
-	}
-	return false
 }

@@ -117,11 +117,11 @@ type SutureService struct {
 
 // NewSutureService creates a new settings.SutureService
 func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
-	sctx, scancel := context.WithCancel(ctx)
+	sctx, cancel := context.WithCancel(ctx)
 	cfg.Context = sctx // propagate the context down to the go-micro services.
 	return SutureService{
 		ctx:    sctx,
-		cancel: scancel,
+		cancel: cancel,
 		cfg:    cfg,
 	}
 }
