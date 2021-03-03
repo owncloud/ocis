@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -66,6 +68,8 @@ type Config struct {
 	Tracing      Tracing
 	Asset        Asset
 	TokenManager TokenManager
+
+	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.

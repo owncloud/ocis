@@ -1,11 +1,15 @@
 package runtime
 
 import (
+	"context"
 	"fmt"
 	golog "log"
 	"net/rpc"
 	"os"
+	"os/signal"
 	"time"
+
+	"github.com/thejerf/suture"
 
 	"github.com/rs/zerolog"
 
@@ -15,7 +19,7 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/config"
 
 	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
+	settings "github.com/owncloud/ocis/settings/pkg/command"
 )
 
 var (
@@ -72,13 +76,35 @@ func New(cfg *config.Config) Runtime {
 	}
 }
 
+// serviceTokens keeps in memory a set of [service name] = []suture.ServiceToken that is used to shutdown services.
+// Shutting down a service implies removing it from the supervisor AND cancelling its context, this should be done
+// within the service Stop() method. Services should cancel their context.
+type serviceTokens map[string][]suture.ServiceToken
+
 // Start rpc runtime
 func (r *Runtime) Start() error {
 	setMicroLogger(r.c.Log)
-	go r.Launch()
-	return service.Start(
-		service.WithLogPretty(r.c.Log.Pretty),
-	)
+	halt := make(chan os.Signal, 1)
+	signal.Notify(halt, os.Interrupt)
+
+	// tokens are used to keep track of the services
+	tokens := serviceTokens{}
+	supervisor := suture.NewSimple("ocis")
+	globalCtx, globalCancel := context.WithCancel(context.Background())
+
+	// TODO(refs + jfd)
+	// - to avoid this getting out of hands, a supervisor would need to be injected on each supervised service.
+	// - each service would then add its execute func to the supervisor, and return its token (?)
+	// - this runtime should only care about start / stop services, for that we use serviceTokens.
+
+	tokens["settings"] = append(tokens["settings"], supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
+
+	go supervisor.ServeBackground()
+
+	<-halt
+	globalCancel()
+	close(halt)
+	return nil
 }
 
 // for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
@@ -116,10 +142,6 @@ func (r *Runtime) Launch() {
 	}
 
 OUT:
-	//for _, v := range MicroServices {
-	//	RunService(client, v)
-	//}
-
 	for _, v := range Extensions {
 		RunService(client, v)
 	}
