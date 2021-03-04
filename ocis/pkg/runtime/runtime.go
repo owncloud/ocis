@@ -37,9 +37,9 @@ var (
 		"ocs",
 		"onlyoffice",
 		"proxy",
-		"settings",
+		"settings", // done
 		"store",
-		"storage-metadata",
+		"storage-metadata", // done
 		"storage-frontend",
 		"storage-gateway",
 		"storage-userprovider",
@@ -56,7 +56,7 @@ var (
 
 	dependants = []string{
 		"storage-sharing",
-		"accounts",
+		"accounts", // done
 	}
 	// Maximum number of retries until getting a connection to the rpc runtime service.
 	maxRetries = 10
@@ -107,9 +107,9 @@ func (r *Runtime) Start() error {
 	r.c.Storage.Log.Color = r.c.Log.Color
 	r.c.Storage.Log.Pretty = r.c.Log.Pretty
 
-	tokens["settings"] = append(tokens["settings"], supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
-	tokens["storagemetadata"] = append(tokens["storagemetadata"], supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
-	tokens["accounts"] = append(tokens["accounts"], supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
+	addServiceToken("settings", supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
+	addServiceToken("storagemetadata", supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
+	addServiceToken("accounts", supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
 
 	go supervisor.ServeBackground()
 
@@ -119,6 +119,11 @@ func (r *Runtime) Start() error {
 		close(halt)
 		return nil
 	}
+}
+
+// addServiceToken adds a service token to a global slice of service tokens that contains services managed by the supervisor.
+func addServiceToken(service string, token suture.ServiceToken) {
+	tokens[service] = append(tokens[service], token)
 }
 
 // for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
