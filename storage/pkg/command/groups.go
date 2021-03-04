@@ -64,7 +64,6 @@ func Groups(cfg *config.Config) *cli.Command {
 				ctx, cancel = context.WithCancel(context.Background())
 				//metrics     = metrics.New()
 			)
-
 			defer cancel()
 
 			{

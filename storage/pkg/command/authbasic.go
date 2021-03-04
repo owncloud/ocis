@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -189,4 +190,44 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// AuthBasicSutureService allows for the storage-authbasic command to be embedded and supervised by a suture supervisor tree.
+type AuthBasicSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewAuthBasicSutureService creates a new store.AuthBasicSutureService
+func NewAuthBasic(ctx context.Context, cfg *config.Config) AuthBasicSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return AuthBasicSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s AuthBasicSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range AuthBasic(s.cfg).Flags {
+		if err := AuthBasic(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if AuthBasic(s.cfg).Before != nil {
+		if err := AuthBasic(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := AuthBasic(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s AuthBasicSutureService) Stop() {
+	s.cancel()
 }

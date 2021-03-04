@@ -36,19 +36,19 @@ var (
 
 	// Extensions are oCIS extension services
 	Extensions = []string{
-		"glauth",               // done
-		"idp",                  // done
-		"ocs",                  // done
-		"onlyoffice",           // done
-		"proxy",                // done
-		"settings",             // done
-		"store",                // done
-		"storage-metadata",     // done
-		"storage-frontend",     // done
-		"storage-gateway",      // done
-		"storage-userprovider", // done
-		"storage-groupprovider",
-		"storage-auth-basic",
+		"glauth",                // done
+		"idp",                   // done
+		"ocs",                   // done
+		"onlyoffice",            // done
+		"proxy",                 // done
+		"settings",              // done
+		"store",                 // done
+		"storage-metadata",      // done
+		"storage-frontend",      // done
+		"storage-gateway",       // done
+		"storage-userprovider",  // done
+		"storage-groupprovider", // done
+		"storage-auth-basic",    // done
 		"storage-auth-bearer",
 		"storage-home",
 		"storage-users",
@@ -130,7 +130,8 @@ func (r *Runtime) Start() error {
 	addServiceToken("frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
 	addServiceToken("gateway", supervisor.Add(storage.NewGateway(globalCtx, r.c.Storage)))
 	addServiceToken("users", supervisor.Add(storage.NewUsersProviderService(globalCtx, r.c.Storage)))
-	addServiceToken("groups-provider", supervisor.Add(storage.NewGroupsProvider(globalCtx, r.c.Storage)))
+	addServiceToken("groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx, r.c.Storage))) // TODO(refs) panic? are we sending to a nil / closed channel?
+	addServiceToken("authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
