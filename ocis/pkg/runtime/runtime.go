@@ -10,6 +10,7 @@ import (
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
+	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
@@ -120,6 +121,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("idp", supervisor.Add(idp.NewSutureService(globalCtx, r.c.IDP)))
 	addServiceToken("ocs", supervisor.Add(ocs.NewSutureService(globalCtx, r.c.OCS)))
 	addServiceToken("onlyoffice", supervisor.Add(onlyoffice.NewSutureService(globalCtx, r.c.Onlyoffice)))
+	addServiceToken("proxy", supervisor.Add(proxy.NewSutureService(globalCtx, r.c.Proxy)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

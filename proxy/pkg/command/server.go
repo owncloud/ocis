@@ -45,7 +45,7 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(ctx *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
@@ -176,8 +176,6 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics),
-					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
-					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
