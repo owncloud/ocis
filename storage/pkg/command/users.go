@@ -214,7 +214,7 @@ type UsersProviderService struct {
 	cfg    *config.Config
 }
 
-// NewUsersProviderService creates a new gateway.UsersProviderService
+// NewUsersProviderService creates a new storage.UsersProviderService
 func NewUsersProviderService(ctx context.Context, cfg *config.Config) UsersProviderService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Context = sctx

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -203,4 +204,44 @@ func Groups(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// GroupsProvider allows for the storage-groupsprovider command to be embedded and supervised by a suture supervisor tree.
+type GroupsProvider struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewGroupsProvider creates a new storage.GroupsProvider
+func NewGroupsProvider(ctx context.Context, cfg *config.Config) GroupsProvider {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return GroupsProvider{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s GroupsProvider) Serve() {
+	f := &flag.FlagSet{}
+	for k := range Groups(s.cfg).Flags {
+		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if Groups(s.cfg).Before != nil {
+		if err := Groups(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := Groups(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s GroupsProvider) Stop() {
+	s.cancel()
 }

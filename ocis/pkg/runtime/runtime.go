@@ -130,6 +130,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
 	addServiceToken("gateway", supervisor.Add(storage.NewGateway(globalCtx, r.c.Storage)))
 	addServiceToken("users", supervisor.Add(storage.NewUsersProviderService(globalCtx, r.c.Storage)))
+	addServiceToken("groups-provider", supervisor.Add(storage.NewGroupsProvider(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
