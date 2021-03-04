@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -17,15 +19,15 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string
-	Root      string
+	Addr string
+	Root string
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name string
+	Name      string
 	Namespace string
-	Version string
+	Version   string
 }
 
 // Tracing defines the available tracing configuration.
@@ -45,6 +47,8 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Service Service
+
+	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.

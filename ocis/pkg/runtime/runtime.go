@@ -15,6 +15,7 @@ import (
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
+	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
 	"github.com/thejerf/suture"
 
@@ -58,7 +59,7 @@ var (
 		"storage-users",
 		"storage-public-link",
 		"thumbnails", // done
-		"web",
+		"web",        // done
 		"webdav",
 	}
 
@@ -130,6 +131,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("store", supervisor.Add(store.NewSutureService(globalCtx, r.c.Store)))
 	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
 	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
+	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
