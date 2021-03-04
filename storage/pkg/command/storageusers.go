@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -196,4 +197,44 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// StorageUsersSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
+type StorageUsersSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
+func NewStorageUsers(ctx context.Context, cfg *config.Config) StorageUsersSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return StorageUsersSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s StorageUsersSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range StorageUsers(s.cfg).Flags {
+		if err := StorageUsers(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if StorageUsers(s.cfg).Before != nil {
+		if err := StorageUsers(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := StorageUsers(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s StorageUsersSutureService) Stop() {
+	s.cancel()
 }

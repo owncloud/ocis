@@ -134,6 +134,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx, r.c.Storage)))
 	addServiceToken("authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx, r.c.Storage)))
 	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx, r.c.Storage)))
+	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
