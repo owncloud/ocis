@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -325,4 +326,44 @@ func loadUserAgent(c *cli.Context, cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+// FrontendSutureService allows for the storage-frontend command to be embedded and supervised by a suture supervisor tree.
+type FrontendSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewFrontendSutureService creates a new frontend.FrontendSutureService
+func NewFrontend(ctx context.Context, cfg *config.Config) FrontendSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return FrontendSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s FrontendSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range Frontend(s.cfg).Flags {
+		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if Frontend(s.cfg).Before != nil {
+		if err := Frontend(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := Frontend(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s FrontendSutureService) Stop() {
+	s.cancel()
 }

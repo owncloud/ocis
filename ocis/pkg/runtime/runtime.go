@@ -127,6 +127,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
 	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
 	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
+	addServiceToken("frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
