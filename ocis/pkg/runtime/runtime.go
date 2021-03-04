@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
@@ -110,7 +111,9 @@ func (r *Runtime) Start() error {
 	addServiceToken("settings", supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
 	addServiceToken("storagemetadata", supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
 	addServiceToken("accounts", supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
+	addServiceToken("glauth", supervisor.Add(glauth.NewSutureService(globalCtx, r.c.GLAuth)))
 
+	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
 
 	select {

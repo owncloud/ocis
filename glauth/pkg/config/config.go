@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -69,6 +71,8 @@ type Config struct {
 	Fallback       Backend
 	Version        string
 	RoleBundleUUID string
+
+	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.
