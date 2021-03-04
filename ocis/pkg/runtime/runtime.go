@@ -14,6 +14,7 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
+	web "github.com/owncloud/ocis/web/pkg/command"
 
 	"github.com/thejerf/suture"
 
@@ -111,6 +112,7 @@ func (r *Runtime) Start() error {
 	// -  remove default log flagset values.
 	// - subcommands MUST also set MICRO_LOG_LEVEL to error.
 	// - 2021-03-04T14:06:37+01:00 FTL failed to read config error="open /Users/aunger/.ocis/idp.env: no such file or directory" service=idp still exists
+	// - normalize flag parsing (and fix hack of renaming ocis top level for the destination side effect)
 
 	// propagate reva log config to storage services
 	r.c.Storage.Log.Level = r.c.Log.Level
@@ -127,6 +129,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("proxy", supervisor.Add(proxy.NewSutureService(globalCtx, r.c.Proxy)))
 	addServiceToken("store", supervisor.Add(store.NewSutureService(globalCtx, r.c.Store)))
 	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
+	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

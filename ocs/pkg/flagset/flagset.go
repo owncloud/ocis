@@ -5,8 +5,21 @@ import (
 	"github.com/owncloud/ocis/ocs/pkg/config"
 )
 
-// RootWithConfig applies cfg to the root flagset
-func RootWithConfig(cfg *config.Config) []cli.Flag {
+// HealthWithConfig applies cfg to the root flagset
+func HealthWithConfig(cfg *config.Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "debug-addr",
+			Value:       "0.0.0.0:9114",
+			Usage:       "Address to debug endpoint",
+			EnvVars:     []string{"OCS_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
+		},
+	}
+}
+
+// ServerWithConfig applies cfg to the root flagset
+func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-level",
@@ -26,25 +39,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-	}
-}
-
-// HealthWithConfig applies cfg to the root flagset
-func HealthWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:        "debug-addr",
-			Value:       "0.0.0.0:9114",
-			Usage:       "Address to debug endpoint",
-			EnvVars:     []string{"OCS_DEBUG_ADDR"},
-			Destination: &cfg.Debug.Addr,
-		},
-	}
-}
-
-// ServerWithConfig applies cfg to the root flagset
-func ServerWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "config-file",
 			Value:       "",

@@ -8,7 +8,6 @@ import (
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocs/pkg/flagset"
 	"github.com/owncloud/ocis/ocs/pkg/version"
 	"github.com/spf13/viper"
 )
@@ -27,8 +26,6 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
-
-		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
