@@ -7,6 +7,7 @@ import (
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	idp "github.com/owncloud/ocis/idp/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
@@ -33,7 +34,7 @@ var (
 
 	// Extensions are oCIS extension services
 	Extensions = []string{
-		"glauth",
+		"glauth", // done
 		"idp",
 		"ocs",
 		"onlyoffice",
@@ -102,6 +103,7 @@ func (r *Runtime) Start() error {
 	// - replace occurrences of log.Fatal in favor of panic() since the supervisor relies on panics.
 	// - the runtime should ideally run as an rpc service one can do requests, like the good ol' pman, rest in pieces.
 	// - establish on suture a max number of retries before all initialization comes to a halt.
+	// -  remove default log flagset values.
 
 	// propagate reva log config to storage services
 	r.c.Storage.Log.Level = r.c.Log.Level
@@ -112,6 +114,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("storagemetadata", supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
 	addServiceToken("accounts", supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
 	addServiceToken("glauth", supervisor.Add(glauth.NewSutureService(globalCtx, r.c.GLAuth)))
+	addServiceToken("idp", supervisor.Add(idp.NewSutureService(globalCtx, r.c.IDP)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

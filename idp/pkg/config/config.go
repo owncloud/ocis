@@ -1,6 +1,8 @@
 package config
 
 import (
+	"context"
+
 	"stash.kopano.io/kc/konnect/bootstrap"
 )
 
@@ -75,6 +77,8 @@ type Config struct {
 	IDP     bootstrap.Config
 	Ldap    Ldap
 	Service Service
+
+	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.

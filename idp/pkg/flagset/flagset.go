@@ -10,23 +10,20 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-level",
-			Value:       "info",
 			Usage:       "Set logging level",
-			EnvVars:     []string{"IDP_LOG_LEVEL"},
+			EnvVars:     []string{"IDP_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
-			Value:       true,
 			Name:        "log-pretty",
 			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"IDP_LOG_PRETTY"},
+			EnvVars:     []string{"IDP_LOG_PRETTY", "OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
-			Value:       true,
 			Name:        "log-color",
 			Usage:       "Enable colored logging",
-			EnvVars:     []string{"IDP_LOG_COLOR"},
+			EnvVars:     []string{"IDP_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 	}
