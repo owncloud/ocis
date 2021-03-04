@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -196,4 +197,44 @@ func StorageHome(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// StorageHomeSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
+type StorageHomeSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
+func NewStorageHome(ctx context.Context, cfg *config.Config) StorageHomeSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return StorageHomeSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s StorageHomeSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range StorageHome(s.cfg).Flags {
+		if err := StorageHome(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if StorageHome(s.cfg).Before != nil {
+		if err := StorageHome(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := StorageHome(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s StorageHomeSutureService) Stop() {
+	s.cancel()
 }
