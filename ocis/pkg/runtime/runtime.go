@@ -13,6 +13,7 @@ import (
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	store "github.com/owncloud/ocis/store/pkg/command"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 
 	"github.com/thejerf/suture"
 
@@ -38,13 +39,13 @@ var (
 
 	// Extensions are oCIS extension services
 	Extensions = []string{
-		"glauth",     // done
-		"idp",        // done
-		"ocs",        // done
-		"onlyoffice", // done
-		"proxy",      // done
-		"settings",   // done
-		"store",
+		"glauth",           // done
+		"idp",              // done
+		"ocs",              // done
+		"onlyoffice",       // done
+		"proxy",            // done
+		"settings",         // done
+		"store",            // done
 		"storage-metadata", // done
 		"storage-frontend",
 		"storage-gateway",
@@ -55,7 +56,7 @@ var (
 		"storage-home",
 		"storage-users",
 		"storage-public-link",
-		"thumbnails",
+		"thumbnails", // done
 		"web",
 		"webdav",
 	}
@@ -109,6 +110,7 @@ func (r *Runtime) Start() error {
 	// - establish on suture a max number of retries before all initialization comes to a halt.
 	// -  remove default log flagset values.
 	// - subcommands MUST also set MICRO_LOG_LEVEL to error.
+	// - 2021-03-04T14:06:37+01:00 FTL failed to read config error="open /Users/aunger/.ocis/idp.env: no such file or directory" service=idp still exists
 
 	// propagate reva log config to storage services
 	r.c.Storage.Log.Level = r.c.Log.Level
@@ -124,6 +126,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("onlyoffice", supervisor.Add(onlyoffice.NewSutureService(globalCtx, r.c.Onlyoffice)))
 	addServiceToken("proxy", supervisor.Add(proxy.NewSutureService(globalCtx, r.c.Proxy)))
 	addServiceToken("store", supervisor.Add(store.NewSutureService(globalCtx, r.c.Store)))
+	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -40,6 +42,8 @@ type Config struct {
 	Server    Server
 	Tracing   Tracing
 	Thumbnail Thumbnail
+
+	Context context.Context
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.

@@ -13,23 +13,20 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-level",
-			Value:       "info",
 			Usage:       "Set logging level",
-			EnvVars:     []string{"THUMBNAILS_LOG_LEVEL"},
+			EnvVars:     []string{"THUMBNAILS_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
-			Value:       true,
 			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"THUMBNAILS_LOG_PRETTY"},
+			EnvVars:     []string{"THUMBNAILS_LOG_PRETTY", "OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
-			Value:       true,
 			Usage:       "Enable colored logging",
-			EnvVars:     []string{"THUMBNAILS_LOG_COLOR"},
+			EnvVars:     []string{"THUMBNAILS_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 	}
