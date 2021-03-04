@@ -5,28 +5,23 @@ import (
 	"os"
 	"os/signal"
 
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
+	"github.com/asim/go-micro/v3/logger"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
+	"github.com/owncloud/ocis/ocis/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
-
-	"github.com/thejerf/suture"
-
 	"github.com/rs/zerolog"
-
-	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
-	"github.com/asim/go-micro/v3/logger"
-
-	"github.com/owncloud/ocis/ocis/pkg/config"
-
-	storage "github.com/owncloud/ocis/storage/pkg/command"
+	"github.com/thejerf/suture"
 )
 
 var (
@@ -60,7 +55,7 @@ var (
 		"storage-public-link",
 		"thumbnails", // done
 		"web",        // done
-		"webdav",
+		"webdav",     // done
 	}
 
 	dependants = []string{
