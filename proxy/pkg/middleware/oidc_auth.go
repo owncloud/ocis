@@ -91,7 +91,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 			oauth2.StaticTokenSource(oauth2Token),
 		)
 		if err != nil {
-			m.logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
+			m.logger.Error().Err(err).Msg("Failed to get userinfo")
 			status = http.StatusUnauthorized
 			return
 		}
