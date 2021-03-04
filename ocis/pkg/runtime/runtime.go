@@ -57,13 +57,6 @@ var (
 		"web",                   // done
 		"webdav",                // done
 	}
-
-	dependants = []string{
-		"storage-sharing",
-		"accounts", // done
-	}
-	// Maximum number of retries until getting a connection to the rpc runtime service.
-	maxRetries = 10
 )
 
 // Runtime represents an oCIS runtime environment.
@@ -141,12 +134,11 @@ func (r *Runtime) Start() error {
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
 
-	select {
-	case <-halt:
-		globalCancel()
-		close(halt)
-		return nil
-	}
+	<-halt
+
+	globalCancel()
+	close(halt)
+	return nil
 }
 
 // addServiceToken adds a service token to a global slice of service tokens that contains services managed by the supervisor.
