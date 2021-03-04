@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -19,8 +20,7 @@ var (
 )
 
 // Execute is the entry point for the ocis-accounts command.
-func Execute() error {
-	cfg := config.New()
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-accounts",
 		Version:  version.String,
@@ -117,4 +117,32 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+// SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewSutureService creates a new settings.SutureService
+func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx // propagate the context down to the go-micro services.
+	return SutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s SutureService) Serve() {
+	if err := Execute(s.cfg); err != nil {
+		panic(err)
+	}
+}
+
+func (s SutureService) Stop() {
+	s.cancel()
 }

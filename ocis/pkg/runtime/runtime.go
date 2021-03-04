@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
@@ -78,14 +79,15 @@ func New(cfg *config.Config) Runtime {
 // within the service Stop() method. Services should cancel their context.
 type serviceTokens map[string][]suture.ServiceToken
 
+// tokens are used to keep track of the services
+var tokens = serviceTokens{}
+
 // Start rpc runtime
 func (r *Runtime) Start() error {
 	setMicroLogger(r.c.Log)
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, os.Interrupt)
 
-	// tokens are used to keep track of the services
-	tokens := serviceTokens{}
 	supervisor := suture.NewSimple("ocis")
 	globalCtx, globalCancel := context.WithCancel(context.Background())
 
@@ -106,6 +108,7 @@ func (r *Runtime) Start() error {
 
 	tokens["settings"] = append(tokens["settings"], supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
 	tokens["storagemetadata"] = append(tokens["storagemetadata"], supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
+	tokens["accounts"] = append(tokens["accounts"], supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
 
 	go supervisor.ServeBackground()
 
