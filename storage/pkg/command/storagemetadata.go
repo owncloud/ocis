@@ -220,7 +220,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 	}
 }
 
-// SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
+// SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	ctx    context.Context
 	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.

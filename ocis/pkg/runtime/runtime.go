@@ -9,6 +9,7 @@ import (
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
 	"github.com/thejerf/suture"
@@ -35,10 +36,10 @@ var (
 
 	// Extensions are oCIS extension services
 	Extensions = []string{
-		"glauth", // done
-		"idp",    // done
-		"ocs",    // done
-		"onlyoffice",
+		"glauth",     // done
+		"idp",        // done
+		"ocs",        // done
+		"onlyoffice", // done
 		"proxy",
 		"settings", // done
 		"store",
@@ -118,6 +119,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("glauth", supervisor.Add(glauth.NewSutureService(globalCtx, r.c.GLAuth)))
 	addServiceToken("idp", supervisor.Add(idp.NewSutureService(globalCtx, r.c.IDP)))
 	addServiceToken("ocs", supervisor.Add(ocs.NewSutureService(globalCtx, r.c.OCS)))
+	addServiceToken("onlyoffice", supervisor.Add(onlyoffice.NewSutureService(globalCtx, r.c.Onlyoffice)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
