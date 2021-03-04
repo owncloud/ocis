@@ -128,7 +128,7 @@ func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
 
 func (s SutureService) Serve() {
 	if err := Execute(s.cfg); err != nil {
-		panic(err)
+		return
 	}
 }
 

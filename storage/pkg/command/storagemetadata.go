@@ -242,17 +242,17 @@ func (s SutureService) Serve() {
 	f := &flag.FlagSet{}
 	for k := range StorageMetadata(s.cfg).Flags {
 		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
-			panic(err)
+			return
 		}
 	}
 	ctx := cli.NewContext(nil, f, nil)
 	if StorageMetadata(s.cfg).Before != nil {
 		if err := StorageMetadata(s.cfg).Before(ctx); err != nil {
-			panic(err)
+			return
 		}
 	}
 	if err := StorageMetadata(s.cfg).Action(ctx); err != nil {
-		panic(err)
+		return
 	}
 }
 
