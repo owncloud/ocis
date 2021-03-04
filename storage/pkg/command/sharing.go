@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -187,4 +188,44 @@ func Sharing(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// SharingSutureService allows for the storage-sharing command to be embedded and supervised by a suture supervisor tree.
+type SharingSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewSharingSutureService creates a new store.SharingSutureService
+func NewSharing(ctx context.Context, cfg *config.Config) SharingSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return SharingSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s SharingSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range Sharing(s.cfg).Flags {
+		if err := Sharing(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if Sharing(s.cfg).Before != nil {
+		if err := Sharing(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := Sharing(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s SharingSutureService) Stop() {
+	s.cancel()
 }

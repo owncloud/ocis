@@ -52,10 +52,10 @@ var (
 		"storage-auth-bearer",   // done
 		"storage-home",          // done
 		"storage-users",         // done
-		"storage-public-link",
-		"thumbnails", // done
-		"web",        // done
-		"webdav",     // done
+		"storage-public-link",   // done
+		"thumbnails",            // done
+		"web",                   // done
+		"webdav",                // done
 	}
 
 	dependants = []string{
@@ -136,6 +136,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx, r.c.Storage)))
 	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx, r.c.Storage)))
 	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx, r.c.Storage)))
+	addServiceToken("storage-sharing", supervisor.Add(storage.NewSharing(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
