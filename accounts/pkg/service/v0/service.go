@@ -57,24 +57,11 @@ func New(opts ...Option) (s *Service, err error) {
 		repo:        createMetadataStorage(cfg, logger),
 	}
 
-	retries := 20
-	var current int
 	r := oreg.GetRegistry()
 	if cfg.Repo.Disk.Path == "" {
-		for {
-			if current >= retries {
-				panic("metadata service failed to start.")
-			}
-			s, err := r.GetService("com.owncloud.storage.metadata")
-			if err != nil {
-				logger.Error().Err(err).Msg("error getting metadata service from service registry")
-			}
-			if len(s) > 0 {
-				break
-			}
-			logger.Info().Msg("accounts blocked waiting for metadata service to be up and running...")
-			time.Sleep(2 * time.Second)
-			current++
+		if _, err := r.GetService("com.owncloud.storage.metadata"); err != nil {
+			logger.Error().Err(err).Msg("index: storage-metadata service not present")
+			return nil, err
 		}
 	}
 

@@ -100,6 +100,7 @@ func (r *Runtime) Start() error {
 	// - config file parsing with Viper is no longer possible as viper is not thread-safe (https://github.com/spf13/viper/issues/19)
 	// - replace occurrences of log.Fatal in favor of panic() since the supervisor relies on panics.
 	// - the runtime should ideally run as an rpc service one can do requests, like the good ol' pman, rest in pieces.
+	// - establish on suture a max number of retries before all initialization comes to a halt.
 
 	// propagate reva log config to storage services
 	r.c.Storage.Log.Level = r.c.Log.Level

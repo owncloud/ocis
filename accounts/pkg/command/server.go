@@ -125,7 +125,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
 			if err != nil {
-				logger.Fatal().Err(err).Msg("could not initialize service handler")
+				logger.Error().Err(err).Msg("handler init")
+				return err
 			}
 
 			{
