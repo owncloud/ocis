@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -177,4 +178,44 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// AuthBearerSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type AuthBearerSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
+func NewAuthBearer(ctx context.Context, cfg *config.Config) AuthBearerSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return AuthBearerSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s AuthBearerSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range AuthBearer(s.cfg).Flags {
+		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if AuthBearer(s.cfg).Before != nil {
+		if err := AuthBearer(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := AuthBearer(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s AuthBearerSutureService) Stop() {
+	s.cancel()
 }

@@ -49,7 +49,7 @@ var (
 		"storage-userprovider",  // done
 		"storage-groupprovider", // done
 		"storage-auth-basic",    // done
-		"storage-auth-bearer",
+		"storage-auth-bearer",   // done
 		"storage-home",
 		"storage-users",
 		"storage-public-link",
@@ -132,6 +132,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("users", supervisor.Add(storage.NewUsersProviderService(globalCtx, r.c.Storage)))
 	addServiceToken("groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx, r.c.Storage))) // TODO(refs) panic? are we sending to a nil / closed channel?
 	addServiceToken("authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx, r.c.Storage)))
+	addServiceToken("authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
