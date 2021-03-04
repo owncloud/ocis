@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -64,7 +65,15 @@ func Groups(cfg *config.Config) *cli.Command {
 				ctx, cancel = context.WithCancel(context.Background())
 				//metrics     = metrics.New()
 			)
+
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.Groups.Driver == "json" && cfg.Reva.Groups.JSON != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Groups.JSON), os.ModeExclusive); err != nil {
+					return err
+				}
+			}
 
 			{
 				uuid := uuid.Must(uuid.NewV4())

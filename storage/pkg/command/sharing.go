@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -66,6 +67,18 @@ func Sharing(cfg *config.Config) *cli.Command {
 			)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.Sharing.UserDriver == "json" && cfg.Reva.Sharing.UserJSONFile != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.UserJSONFile), os.ModeExclusive); err != nil {
+					return err
+				}
+			}
+			if cfg.Reva.Sharing.PublicDriver == "json" && cfg.Reva.Sharing.PublicJSONFile != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.PublicJSONFile), os.ModeExclusive); err != nil {
+					return err
+				}
+			}
 
 			{
 

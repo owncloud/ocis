@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -66,6 +67,13 @@ func Users(cfg *config.Config) *cli.Command {
 			)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.Users.Driver == "json" && cfg.Reva.Users.JSON != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Users.JSON), os.ModeExclusive); err != nil {
+					return err
+				}
+			}
 
 			{
 				uuid := uuid.Must(uuid.NewV4())

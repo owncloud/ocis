@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -66,6 +67,13 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.AuthProvider.Driver == "json" && cfg.Reva.AuthProvider.JSON != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.AuthProvider.JSON), os.ModeExclusive); err != nil {
+					return err
+				}
+			}
 
 			{
 
