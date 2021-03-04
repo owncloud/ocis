@@ -51,7 +51,7 @@ var (
 		"storage-auth-basic",    // done
 		"storage-auth-bearer",   // done
 		"storage-home",          // done
-		"storage-users",
+		"storage-users",         // done
 		"storage-public-link",
 		"thumbnails", // done
 		"web",        // done
@@ -135,6 +135,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx, r.c.Storage)))
 	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx, r.c.Storage)))
 	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx, r.c.Storage)))
+	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

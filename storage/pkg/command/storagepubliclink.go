@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -174,4 +175,44 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// StoragePublicLinkSutureService allows for the storage-public-link command to be embedded and supervised by a suture supervisor tree.
+type StoragePublicLinkSutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
+func NewStoragePublicLink(ctx context.Context, cfg *config.Config) StoragePublicLinkSutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return StoragePublicLinkSutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s StoragePublicLinkSutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range StoragePublicLink(s.cfg).Flags {
+		if err := StoragePublicLink(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if StoragePublicLink(s.cfg).Before != nil {
+		if err := StoragePublicLink(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := StoragePublicLink(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s StoragePublicLinkSutureService) Stop() {
+	s.cancel()
 }
