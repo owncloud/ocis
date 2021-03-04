@@ -36,17 +36,17 @@ var (
 
 	// Extensions are oCIS extension services
 	Extensions = []string{
-		"glauth",           // done
-		"idp",              // done
-		"ocs",              // done
-		"onlyoffice",       // done
-		"proxy",            // done
-		"settings",         // done
-		"store",            // done
-		"storage-metadata", // done
-		"storage-frontend", // done
-		"storage-gateway",
-		"storage-userprovider",
+		"glauth",               // done
+		"idp",                  // done
+		"ocs",                  // done
+		"onlyoffice",           // done
+		"proxy",                // done
+		"settings",             // done
+		"store",                // done
+		"storage-metadata",     // done
+		"storage-frontend",     // done
+		"storage-gateway",      // done
+		"storage-userprovider", // done
 		"storage-groupprovider",
 		"storage-auth-basic",
 		"storage-auth-bearer",
@@ -129,6 +129,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
 	addServiceToken("frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
 	addServiceToken("gateway", supervisor.Add(storage.NewGateway(globalCtx, r.c.Storage)))
+	addServiceToken("users", supervisor.Add(storage.NewUsersProviderService(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()
