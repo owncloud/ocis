@@ -16,7 +16,7 @@ So we are trying to reflect this in the tooling. It should be kept simple and qu
 
 Besides standard development tools like git and a text editor, you need the following software for development:
 
-- Go >= v1.13 ([install instructions](https://golang.org/doc/install))
+- Go >= v1.15 ([install instructions](https://golang.org/doc/install))
 - Yarn ([install instructions](https://classic.yarnpkg.com/en/docs/install))
 - docker ([install instructions](https://docs.docker.com/get-docker/))
 - docker-compose ([install instructions](https://docs.docker.com/compose/install/))
@@ -25,17 +25,15 @@ If you find tools needed besides the mentioned above, please feel free to open a
 
 ## Repository structure
 
-This repository follows the [golang-standard project-layout](https://github.com/golang-standards/project-layout).
-
 oCIS consists of multiple micro services, also called extensions. We started by having standalone repositories for each of them but quickly noticed, that this adds a time consuming overhead for developers. So we ended up with a monorepo housing all the extensions in one repository.
 
-Each of the extensions live in a subfolder (eg. `accounts` or `settings`) in this repository, technically creating independent Go modules.
+Each extension lives in a subfolder (eg. `accounts` or `settings`) in this respository as an independent Go module, following the [golang-standard project-layout](https://github.com/golang-standards/project-layout). They have common Makefile targets and can be used to change, build and run individual extensions.
 
-The `ocis` folder does also contain a Go module but is no extension at all. Instead this module is used to import all extensions and furthermore implement commands to start the extensions. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
+The `ocis` folder contains our [go-micro](https://github.com/asim/go-micro/) and [suture](https://github.com/thejerf/suture) based runtime. It is used to import all extensions and implements commands to manage them, similar to a small orchestrator. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 
 The `docs` folder contains the source for the [oCIS documentation](https://owncloud.github.io/ocis/).
 
-The `deployments` folder contains documented deployment configurations and templates.
+The `deployments` folder contains documented deployment configurations and templates. On a single node, running a single ocis runtime is a resource efficient way to deploy ocis. For multiple nodes docker compose or helm charts for kubernetes examples can be found here.
 
 The `scripts` folder contains scripts to perform various build, install, analysis, etc operations.
 
