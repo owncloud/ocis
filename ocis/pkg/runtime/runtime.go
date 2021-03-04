@@ -44,7 +44,7 @@ var (
 		"settings",         // done
 		"store",            // done
 		"storage-metadata", // done
-		"storage-frontend",
+		"storage-frontend", // done
 		"storage-gateway",
 		"storage-userprovider",
 		"storage-groupprovider",
@@ -128,6 +128,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
 	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
 	addServiceToken("frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
+	addServiceToken("gateway", supervisor.Add(storage.NewGateway(globalCtx, r.c.Storage)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

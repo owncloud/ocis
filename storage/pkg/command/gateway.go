@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"path"
@@ -101,8 +102,8 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"storageregistrysvc": cfg.Reva.Gateway.Endpoint,
 								"appregistrysvc":     cfg.Reva.Gateway.Endpoint,
 								// user metadata is located on the users services
-								"preferencessvc":  cfg.Reva.Users.Endpoint,
-								"userprovidersvc": cfg.Reva.Users.Endpoint,
+								"preferencessvc":   cfg.Reva.Users.Endpoint,
+								"userprovidersvc":  cfg.Reva.Users.Endpoint,
 								"groupprovidersvc": cfg.Reva.Groups.Endpoint,
 								// sharing is located on the sharing service
 								"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
@@ -254,4 +255,44 @@ func rules(cfg *config.Config) map[string]interface{} {
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
+}
+
+// GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type GatewaySutureService struct {
+	ctx    context.Context
+	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cfg    *config.Config
+}
+
+// NewGatewaySutureService creates a new gateway.GatewaySutureService
+func NewGateway(ctx context.Context, cfg *config.Config) GatewaySutureService {
+	sctx, cancel := context.WithCancel(ctx)
+	cfg.Context = sctx
+	return GatewaySutureService{
+		ctx:    sctx,
+		cancel: cancel,
+		cfg:    cfg,
+	}
+}
+
+func (s GatewaySutureService) Serve() {
+	f := &flag.FlagSet{}
+	for k := range Gateway(s.cfg).Flags {
+		if err := Gateway(s.cfg).Flags[k].Apply(f); err != nil {
+			return
+		}
+	}
+	ctx := cli.NewContext(nil, f, nil)
+	if Gateway(s.cfg).Before != nil {
+		if err := Gateway(s.cfg).Before(ctx); err != nil {
+			return
+		}
+	}
+	if err := Gateway(s.cfg).Action(ctx); err != nil {
+		return
+	}
+}
+
+func (s GatewaySutureService) Stop() {
+	s.cancel()
 }
