@@ -12,6 +12,7 @@ import (
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
+	store "github.com/owncloud/ocis/store/pkg/command"
 
 	"github.com/thejerf/suture"
 
@@ -41,8 +42,8 @@ var (
 		"idp",        // done
 		"ocs",        // done
 		"onlyoffice", // done
-		"proxy",
-		"settings", // done
+		"proxy",      // done
+		"settings",   // done
 		"store",
 		"storage-metadata", // done
 		"storage-frontend",
@@ -122,6 +123,7 @@ func (r *Runtime) Start() error {
 	addServiceToken("ocs", supervisor.Add(ocs.NewSutureService(globalCtx, r.c.OCS)))
 	addServiceToken("onlyoffice", supervisor.Add(onlyoffice.NewSutureService(globalCtx, r.c.Onlyoffice)))
 	addServiceToken("proxy", supervisor.Add(proxy.NewSutureService(globalCtx, r.c.Proxy)))
+	addServiceToken("store", supervisor.Add(store.NewSutureService(globalCtx, r.c.Store)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

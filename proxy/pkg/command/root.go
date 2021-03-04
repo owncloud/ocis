@@ -109,14 +109,14 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	return nil
 }
 
-// SutureService allows for the onlyoffice command to be embedded and supervised by a suture supervisor tree.
+// SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	ctx    context.Context
 	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
 	cfg    *config.Config
 }
 
-// NewSutureService creates a new onlyoffice.SutureService
+// NewSutureService creates a new proxy.SutureService
 func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Context = sctx // propagate the context down to the go-micro services.

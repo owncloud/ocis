@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -46,6 +48,8 @@ type Config struct {
 	Tracing  Tracing
 	Datapath string
 	Service  Service
+
+	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.
