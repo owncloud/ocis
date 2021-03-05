@@ -24,41 +24,6 @@ import (
 	"github.com/thejerf/suture"
 )
 
-var (
-	// OwncloudNamespace is the base path for micro' services to use
-	OwncloudNamespace = "com.owncloud."
-
-	// MicroServices to start as part of the fullstack option
-	MicroServices = []string{
-		"api",      // :8080
-		"registry", // :8000
-	}
-
-	// Extensions are oCIS extension services
-	Extensions = []string{
-		"glauth",                // done
-		"idp",                   // done
-		"ocs",                   // done
-		"onlyoffice",            // done
-		"proxy",                 // done
-		"settings",              // done
-		"store",                 // done
-		"storage-metadata",      // done
-		"storage-frontend",      // done
-		"storage-gateway",       // done
-		"storage-userprovider",  // done
-		"storage-groupprovider", // done
-		"storage-auth-basic",    // done
-		"storage-auth-bearer",   // done
-		"storage-home",          // done
-		"storage-users",         // done
-		"storage-public-link",   // done
-		"thumbnails",            // done
-		"web",                   // done
-		"webdav",                // done
-	}
-)
-
 // Runtime represents an oCIS runtime environment.
 type Runtime struct {
 	c *config.Config
@@ -134,7 +99,7 @@ func addServiceToken(service string, token suture.ServiceToken) {
 }
 
 // for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
-// want to expose to the end user the internal framework logs unless explicitly specified.a
+// want to expose to the end user the internal framework logs unless explicitly specified.
 func setMicroLogger(log config.Log) {
 	if os.Getenv("MICRO_LOG_LEVEL") == "" {
 		os.Setenv("MICRO_LOG_LEVEL", "error")
