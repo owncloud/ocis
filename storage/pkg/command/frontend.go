@@ -336,8 +336,9 @@ type FrontendSutureService struct {
 }
 
 // NewFrontendSutureService creates a new frontend.FrontendSutureService
-func NewFrontend(ctx context.Context, cfg *config.Config) FrontendSutureService {
+func NewFrontend(ctx context.Context) FrontendSutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return FrontendSutureService{
 		ctx:    sctx,

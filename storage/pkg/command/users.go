@@ -70,7 +70,7 @@ func Users(cfg *config.Config) *cli.Command {
 
 			// precreate folders
 			if cfg.Reva.Users.Driver == "json" && cfg.Reva.Users.JSON != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Users.JSON), os.ModeExclusive); err != nil {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Users.JSON), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
@@ -223,8 +223,9 @@ type UsersProviderService struct {
 }
 
 // NewUsersProviderService creates a new storage.UsersProviderService
-func NewUsersProviderService(ctx context.Context, cfg *config.Config) UsersProviderService {
+func NewUsersProviderService(ctx context.Context) UsersProviderService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return UsersProviderService{
 		ctx:    sctx,

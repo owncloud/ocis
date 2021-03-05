@@ -70,12 +70,12 @@ func Sharing(cfg *config.Config) *cli.Command {
 
 			// precreate folders
 			if cfg.Reva.Sharing.UserDriver == "json" && cfg.Reva.Sharing.UserJSONFile != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.UserJSONFile), os.ModeExclusive); err != nil {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.UserJSONFile), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
 			if cfg.Reva.Sharing.PublicDriver == "json" && cfg.Reva.Sharing.PublicJSONFile != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.PublicJSONFile), os.ModeExclusive); err != nil {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Sharing.PublicJSONFile), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
@@ -211,8 +211,9 @@ type SharingSutureService struct {
 }
 
 // NewSharingSutureService creates a new store.SharingSutureService
-func NewSharing(ctx context.Context, cfg *config.Config) SharingSutureService {
+func NewSharing(ctx context.Context) SharingSutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return SharingSutureService{
 		ctx:    sctx,

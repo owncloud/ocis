@@ -207,8 +207,9 @@ type StorageUsersSutureService struct {
 }
 
 // NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
-func NewStorageUsers(ctx context.Context, cfg *config.Config) StorageUsersSutureService {
+func NewStorageUsers(ctx context.Context) StorageUsersSutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return StorageUsersSutureService{
 		ctx:    sctx,

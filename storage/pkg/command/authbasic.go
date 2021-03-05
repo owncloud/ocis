@@ -70,7 +70,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 
 			// precreate folders
 			if cfg.Reva.AuthProvider.Driver == "json" && cfg.Reva.AuthProvider.JSON != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.AuthProvider.JSON), os.ModeExclusive); err != nil {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.AuthProvider.JSON), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
@@ -208,8 +208,9 @@ type AuthBasicSutureService struct {
 }
 
 // NewAuthBasicSutureService creates a new store.AuthBasicSutureService
-func NewAuthBasic(ctx context.Context, cfg *config.Config) AuthBasicSutureService {
+func NewAuthBasic(ctx context.Context) AuthBasicSutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return AuthBasicSutureService{
 		ctx:    sctx,

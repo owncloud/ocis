@@ -109,7 +109,7 @@ func (r *Runtime) Start() error {
 	r.c.Storage.Log.Pretty = r.c.Log.Pretty
 
 	addServiceToken("settings", supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
-	addServiceToken("storage-metadata", supervisor.Add(storage.NewStorageMetadata(globalCtx, r.c.Storage)))
+	addServiceToken("storage-metadata", supervisor.Add(storage.NewStorageMetadata(globalCtx)))
 	addServiceToken("accounts", supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
 	addServiceToken("glauth", supervisor.Add(glauth.NewSutureService(globalCtx, r.c.GLAuth)))
 	addServiceToken("idp", supervisor.Add(idp.NewSutureService(globalCtx, r.c.IDP)))
@@ -120,16 +120,16 @@ func (r *Runtime) Start() error {
 	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
 	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
 	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
-	addServiceToken("storage-frontend", supervisor.Add(storage.NewFrontend(globalCtx, r.c.Storage)))
-	addServiceToken("storage-gateway", supervisor.Add(storage.NewGateway(globalCtx, r.c.Storage)))
-	addServiceToken("storage-users", supervisor.Add(storage.NewUsersProviderService(globalCtx, r.c.Storage)))
-	addServiceToken("storage-groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx, r.c.Storage))) // TODO(refs) panic? are we sending to a nil / closed channel?
-	addServiceToken("storage-authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx, r.c.Storage)))
-	addServiceToken("storage-authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx, r.c.Storage)))
-	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx, r.c.Storage)))
-	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx, r.c.Storage)))
-	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx, r.c.Storage)))
-	addServiceToken("storage-sharing", supervisor.Add(storage.NewSharing(globalCtx, r.c.Storage)))
+	addServiceToken("storage-frontend", supervisor.Add(storage.NewFrontend(globalCtx)))
+	addServiceToken("storage-gateway", supervisor.Add(storage.NewGateway(globalCtx)))
+	addServiceToken("storage-users", supervisor.Add(storage.NewUsersProviderService(globalCtx)))
+	addServiceToken("storage-groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx))) // TODO(refs) panic? are we sending to a nil / closed channel?
+	addServiceToken("storage-authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx)))
+	addServiceToken("storage-authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx)))
+	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx)))
+	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx)))
+	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx)))
+	addServiceToken("storage-sharing", supervisor.Add(storage.NewSharing(globalCtx)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

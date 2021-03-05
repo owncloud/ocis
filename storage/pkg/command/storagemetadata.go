@@ -228,8 +228,9 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new storagemetadata.SutureService
-func NewStorageMetadata(ctx context.Context, cfg *config.Config) SutureService {
+func NewStorageMetadata(ctx context.Context) SutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return SutureService{
 		ctx:    sctx,

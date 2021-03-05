@@ -265,8 +265,9 @@ type GatewaySutureService struct {
 }
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
-func NewGateway(ctx context.Context, cfg *config.Config) GatewaySutureService {
+func NewGateway(ctx context.Context) GatewaySutureService {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return GatewaySutureService{
 		ctx:    sctx,

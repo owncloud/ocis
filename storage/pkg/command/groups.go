@@ -70,7 +70,7 @@ func Groups(cfg *config.Config) *cli.Command {
 
 			// precreate folders
 			if cfg.Reva.Groups.Driver == "json" && cfg.Reva.Groups.JSON != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Groups.JSON), os.ModeExclusive); err != nil {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Groups.JSON), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
@@ -222,8 +222,9 @@ type GroupsProvider struct {
 }
 
 // NewGroupsProvider creates a new storage.GroupsProvider
-func NewGroupsProvider(ctx context.Context, cfg *config.Config) GroupsProvider {
+func NewGroupsProvider(ctx context.Context) GroupsProvider {
 	sctx, cancel := context.WithCancel(ctx)
+	cfg := config.New()
 	cfg.Context = sctx
 	return GroupsProvider{
 		ctx:    sctx,
