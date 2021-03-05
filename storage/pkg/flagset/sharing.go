@@ -70,6 +70,27 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_JSON_FILE"},
 			Destination: &cfg.Reva.Sharing.PublicJSONFile,
 		},
+		&cli.IntFlag{
+			Name:        "public-password-hash-cost",
+			Value:       11,
+			Usage:       "the cost of hashing the public shares passwords",
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_PASSWORD_HASH_COST"},
+			Destination: &cfg.Reva.Sharing.PublicPasswordHashCost,
+		},
+		&cli.BoolFlag{
+			Name:        "public-enable-expired-shares-cleanup",
+			Value:       true,
+			Usage:       "whether to periodically delete expired public shares",
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_ENABLE_EXPIRED_SHARES_CLEANUP"},
+			Destination: &cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
+		},
+		&cli.IntFlag{
+			Name:        "public-janitor-run-interval",
+			Value:       60,
+			Usage:       "the time period in seconds after which to start a janitor run",
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_JANITOR_RUN_INTERVAL"},
+			Destination: &cfg.Reva.Sharing.PublicJanitorRunInterval,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)

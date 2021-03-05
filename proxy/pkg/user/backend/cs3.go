@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -76,6 +77,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "basic",
 		ClientId:     username,
 		ClientSecret: password,
 	})

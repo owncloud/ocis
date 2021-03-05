@@ -8,8 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/go-cs3apis v0.0.0-20210209082852-35ace33082f5
-	github.com/cs3org/reva v1.6.1-0.20210226135958-06aa61fcd366
+	github.com/cs3org/go-cs3apis v0.0.0-20210209091240-d16c30974508
+	github.com/cs3org/reva v1.6.1-0.20210305144241-2011cb557105
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gofrs/uuid v3.3.0+incompatible

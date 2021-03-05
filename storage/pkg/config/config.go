@@ -38,15 +38,18 @@ type StorageRegistry struct {
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver      string
-	UserJSONFile    string
-	UserSQLUsername string
-	UserSQLPassword string
-	UserSQLHost     string
-	UserSQLPort     int
-	UserSQLName     string
-	PublicDriver    string
-	PublicJSONFile  string
+	UserDriver                       string
+	UserJSONFile                     string
+	UserSQLUsername                  string
+	UserSQLPassword                  string
+	UserSQLHost                      string
+	UserSQLPort                      int
+	UserSQLName                      string
+	PublicDriver                     string
+	PublicJSONFile                   string
+	PublicPasswordHashCost           int
+	PublicEnableExpiredSharesCleanup bool
+	PublicJanitorRunInterval         int
 }
 
 // Port defines the available port configuration.
