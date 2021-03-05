@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-04T10:39:23+0000"
+date: "2021-03-05T07:57:46+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -51,18 +51,6 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 : Enable colored logging. Default: `true`.
 
 ## Sub Commands
-
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `webdav`.
 
 ### webdav health
 
@@ -120,4 +108,16 @@ Usage: `webdav server [command options] [arguments...]`
 
 -http-root |  $WEBDAV_HTTP_ROOT
 : Root path of http server. Default: `/`.
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `webdav`.
 
