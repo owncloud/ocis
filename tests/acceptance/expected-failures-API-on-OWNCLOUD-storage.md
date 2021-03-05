@@ -367,12 +367,6 @@ Scenario Outline: try to create a folder that already exists
     Scenario Outline: Propfind the size of a folder using webdav api `Property "oc:size" found with value "10", expected "#^0$#" or "#^0$#"`
 -   [apiWebdavProperties2/getFileProperties.feature:376](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L376)
 -   [apiWebdavProperties2/getFileProperties.feature:377](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L377)
-    Scenario Outline: Propfind the permissions on a file using webdav api `Property "oc:permissions" found with value "DNVWR", expected "/RM{0,1}DNVW/"`
--   [apiWebdavProperties2/getFileProperties.feature:441](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L441)
--   [apiWebdavProperties2/getFileProperties.feature:442](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L442)
-    Scenario Outline: Propfind the permissions on a folder using webdav api `Property "oc:permissions" found with value "DNVCKR", expected "/RM{0,1}DNVCK/"`
--   [apiWebdavProperties2/getFileProperties.feature:454](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L454)
--   [apiWebdavProperties2/getFileProperties.feature:455](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L455)
 
 #### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis/issues/1297)
 _ocdav: double check the webdav property parsing when custom namespaces are used_
@@ -877,7 +871,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L305)
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L306)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L46)
--   [apiShareManagementToShares/mergeShare.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L42)
 -   [apiShareManagementToShares/mergeShare.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L89)
 
 #### [Shares are not deleted when user is deleted](https://github.com/owncloud/ocis/issues/1258)
@@ -1363,9 +1356,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 #### [share permissions are not enforced](https://github.com/owncloud/product/issues/270)
 
--   [apiShareManagementToShares/mergeShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L24)
--   [apiShareManagementToShares/mergeShare.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L52)
--   [apiShareManagementToShares/mergeShare.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L79)
 -   [apiShareManagementToShares/mergeShare.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L99)
 -   [apiShareReshareToShares3/reShareUpdate.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L59)
 -   [apiShareReshareToShares3/reShareUpdate.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L60)
