@@ -228,10 +228,19 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new storagemetadata.SutureService
-func NewStorageMetadata(ctx context.Context) SutureService {
+func NewStorageMetadata(ctx context.Context, o ...Option) SutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
 	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,

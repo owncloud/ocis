@@ -265,9 +265,19 @@ type GatewaySutureService struct {
 }
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
-func NewGateway(ctx context.Context) GatewaySutureService {
+func NewGateway(ctx context.Context, o ...Option) GatewaySutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return GatewaySutureService{
 		ctx:    sctx,

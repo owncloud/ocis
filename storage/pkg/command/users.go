@@ -223,9 +223,19 @@ type UsersProviderService struct {
 }
 
 // NewUsersProviderService creates a new storage.UsersProviderService
-func NewUsersProviderService(ctx context.Context) UsersProviderService {
+func NewUsersProviderService(ctx context.Context, o ...Option) UsersProviderService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return UsersProviderService{
 		ctx:    sctx,

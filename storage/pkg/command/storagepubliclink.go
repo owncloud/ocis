@@ -185,9 +185,19 @@ type StoragePublicLinkSutureService struct {
 }
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
-func NewStoragePublicLink(ctx context.Context) StoragePublicLinkSutureService {
+func NewStoragePublicLink(ctx context.Context, o ...Option) StoragePublicLinkSutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return StoragePublicLinkSutureService{
 		ctx:    sctx,

@@ -208,9 +208,19 @@ type AuthBasicSutureService struct {
 }
 
 // NewAuthBasicSutureService creates a new store.AuthBasicSutureService
-func NewAuthBasic(ctx context.Context) AuthBasicSutureService {
+func NewAuthBasic(ctx context.Context, o ...Option) AuthBasicSutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return AuthBasicSutureService{
 		ctx:    sctx,

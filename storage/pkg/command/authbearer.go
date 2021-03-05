@@ -188,9 +188,19 @@ type AuthBearerSutureService struct {
 }
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
-func NewAuthBearer(ctx context.Context) AuthBearerSutureService {
+func NewAuthBearer(ctx context.Context, o ...Option) AuthBearerSutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return AuthBearerSutureService{
 		ctx:    sctx,

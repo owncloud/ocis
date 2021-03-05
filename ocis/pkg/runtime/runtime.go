@@ -88,28 +88,15 @@ func (r *Runtime) Start() error {
 	supervisor := suture.NewSimple("ocis")
 	globalCtx, globalCancel := context.WithCancel(context.Background())
 
-	// TODO(refs + jfd)
-	// - to avoid this getting out of hands, a supervisor would need to be injected on each supervised service.
-	// - each service would then add its execute func to the supervisor, and return its token (?)
-	// - this runtime should only care about start / stop services, for that we use serviceTokens.
-	// - normalize the use of panics so that suture can restart services that die.
-	// - shutting down a service implies iterating over all the serviceToken for the given service name and terminating them.
-	// - config file parsing with Viper is no longer possible as viper is not thread-safe (https://github.com/spf13/viper/issues/19)
-	// - replace occurrences of log.Fatal in favor of panic() since the supervisor relies on panics.
-	// - the runtime should ideally run as an rpc service one can do requests, like the good ol' pman, rest in pieces.
-	// - establish on suture a max number of retries before all initialization comes to a halt.
-	// -  remove default log flagset values.
-	// - subcommands MUST also set MICRO_LOG_LEVEL to error.
-	// - 2021-03-04T14:06:37+01:00 FTL failed to read config error="open /Users/aunger/.ocis/idp.env: no such file or directory" service=idp still exists
-	// - normalize flag parsing (and fix hack of renaming ocis top level for the destination side effect)
-
 	// propagate reva log config to storage services
-	r.c.Storage.Log.Level = r.c.Log.Level
-	r.c.Storage.Log.Color = r.c.Log.Color
-	r.c.Storage.Log.Pretty = r.c.Log.Pretty
+	inheritedOptions := []storage.Option{
+		storage.WithLogPretty(r.c.Log.Pretty),
+		storage.WithLogColor(r.c.Log.Color),
+		storage.WithLogLevel(r.c.Log.Level),
+	}
 
 	addServiceToken("settings", supervisor.Add(settings.NewSutureService(globalCtx, r.c.Settings)))
-	addServiceToken("storage-metadata", supervisor.Add(storage.NewStorageMetadata(globalCtx)))
+	addServiceToken("storage-metadata", supervisor.Add(storage.NewStorageMetadata(globalCtx, inheritedOptions...)))
 	addServiceToken("accounts", supervisor.Add(accounts.NewSutureService(globalCtx, r.c.Accounts)))
 	addServiceToken("glauth", supervisor.Add(glauth.NewSutureService(globalCtx, r.c.GLAuth)))
 	addServiceToken("idp", supervisor.Add(idp.NewSutureService(globalCtx, r.c.IDP)))
@@ -120,16 +107,16 @@ func (r *Runtime) Start() error {
 	addServiceToken("thumbnails", supervisor.Add(thumbnails.NewSutureService(globalCtx, r.c.Thumbnails)))
 	addServiceToken("web", supervisor.Add(web.NewSutureService(globalCtx, r.c.Web)))
 	addServiceToken("webdav", supervisor.Add(webdav.NewSutureService(globalCtx, r.c.WebDAV)))
-	addServiceToken("storage-frontend", supervisor.Add(storage.NewFrontend(globalCtx)))
-	addServiceToken("storage-gateway", supervisor.Add(storage.NewGateway(globalCtx)))
-	addServiceToken("storage-users", supervisor.Add(storage.NewUsersProviderService(globalCtx)))
-	addServiceToken("storage-groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx))) // TODO(refs) panic? are we sending to a nil / closed channel?
-	addServiceToken("storage-authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx)))
-	addServiceToken("storage-authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx)))
-	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx)))
-	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx)))
-	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx)))
-	addServiceToken("storage-sharing", supervisor.Add(storage.NewSharing(globalCtx)))
+	addServiceToken("storage-frontend", supervisor.Add(storage.NewFrontend(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-gateway", supervisor.Add(storage.NewGateway(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-users", supervisor.Add(storage.NewUsersProviderService(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-groupsprovider", supervisor.Add(storage.NewGroupsProvider(globalCtx, inheritedOptions...))) // TODO(refs) panic? are we sending to a nil / closed channel?
+	addServiceToken("storage-authbasic", supervisor.Add(storage.NewAuthBasic(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-authbearer", supervisor.Add(storage.NewAuthBearer(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-home", supervisor.Add(storage.NewStorageHome(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-users", supervisor.Add(storage.NewStorageUsers(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-public-link", supervisor.Add(storage.NewStoragePublicLink(globalCtx, inheritedOptions...)))
+	addServiceToken("storage-sharing", supervisor.Add(storage.NewSharing(globalCtx, inheritedOptions...)))
 
 	// TODO(refs) debug line with supervised services.
 	go supervisor.ServeBackground()

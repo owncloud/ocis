@@ -207,9 +207,19 @@ type StorageHomeSutureService struct {
 }
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
-func NewStorageHome(ctx context.Context) StorageHomeSutureService {
+func NewStorageHome(ctx context.Context, o ...Option) StorageHomeSutureService {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg := config.New()
+
+	opts := newOptions(o...)
+
+	// merge config and options
+	cfg.Context = sctx
+
+	cfg.Log.Level = opts.LogLevel
+	cfg.Log.Pretty = opts.LogPretty
+	cfg.Log.Color = opts.LogColor
+
 	cfg.Context = sctx
 	return StorageHomeSutureService{
 		ctx:    sctx,
