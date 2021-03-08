@@ -110,6 +110,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 }
 
 func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
+	p.logger.Info().
+		Interface("request", r).
+		Msg("%%%%%%%%%%%%% DIRECTING %%%%%%%%%%%%%%%%")
+
 	pol, err := p.PolicySelector(r.Context(), r)
 	if err != nil {
 		p.logger.Error().Msgf("Error while selecting pol %v", err)
@@ -146,12 +150,12 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 					Str("routeType", string(rt)).
 					Msg("director found")
 
-				p.logger.
-					Info().Fields(map[string]interface{}{
-					"method": r.Method,
-					"path":   r.URL.Path,
-					"from":   r.RemoteAddr,
-				}).Msg("access-log")
+				p.logger.Info().
+					Str("method", r.Method).
+					Str("path", r.Method).
+					Str("from", r.RemoteAddr).
+					Msg("access-log")
+
 				p.Directors[pol][rt][endpoint](r)
 				return
 			}
