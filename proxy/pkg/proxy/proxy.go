@@ -111,7 +111,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 
 func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 	p.logger.Info().
-		Interface("request", r).
+		Str("request", r.URL.Path).
 		Msg("%%%%%%%%%%%%% DIRECTING %%%%%%%%%%%%%%%%")
 
 	pol, err := p.PolicySelector(r.Context(), r)
