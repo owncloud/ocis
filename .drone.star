@@ -1348,7 +1348,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'PROXY_ENABLE_BASIC_AUTH': True,
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
-    'IDP_TLS': 'true',
     'OCIS_LOG_LEVEL': 'debug',
     'OCIS_LOG_PRETTY': 'true',
   }
