@@ -1378,7 +1378,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       'image': 'thegeeklab/wait-for:latest',
       'pull': 'always',
       'commands': [
-        'wait-for ocis-server:9200 -t 300',
+        'wait-for ocis-server:9200 -t 300 && sleep 5',
       ],
     },
   ]
