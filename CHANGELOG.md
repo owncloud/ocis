@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
+* Change - Update ownCloud Web to v2.0.2: [#1776](https://github.com/owncloud/ocis/pull/1776)
 * Enhancement - Remove the JWT from the log: [#1758](https://github.com/owncloud/ocis/pull/1758)
 * Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
 * Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
@@ -74,6 +75,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1683
    https://github.com/owncloud/web/releases/tag/v2.0.1
+
+* Change - Update ownCloud Web to v2.0.2: [#1776](https://github.com/owncloud/ocis/pull/1776)
+
+   Tags: web
+
+   We updated ownCloud Web to v2.0.2. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/1776
+   https://github.com/owncloud/web/releases/tag/v2.0.2
 
 * Enhancement - Remove the JWT from the log: [#1758](https://github.com/owncloud/ocis/pull/1758)
 
