@@ -11,7 +11,7 @@ geekdocFilePath: extensions.md
 
 ## How to build and run ocis-simple
 
-ocis uses build tags to build different flavors of the binary. In order to work on a new extension we are going to reduce the scope a little and use the `simple` tag. Let us begin by creating a dedicated folder:
+oCIS uses build tags to build different flavors of the binary. In order to work on a new extension we are going to reduce the scope a little and use the `simple` tag. Let us begin by creating a dedicated folder:
 
 ```console
 mkdir ocis-extension-workshop && ocis-extension-workshop
@@ -76,7 +76,7 @@ ps ax | grep ocis
 
 Try to kill `ocis hello`
 
-Remember: for now, killing a service will cause ocis to restart it. This is subject to change.
+Remember: For now, killing a service will cause ocis to restart it. This is subject to change.
 
 In order to be able to manage the processes ourselves we need to start them independently:
 

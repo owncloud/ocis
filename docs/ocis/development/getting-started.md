@@ -25,9 +25,9 @@ If you find tools needed besides the mentioned above, please feel free to open a
 
 ## Repository structure
 
-oCIS consists of multiple micro services, also called extensions. We started by having standalone repositories for each of them but quickly noticed, that this adds a time consuming overhead for developers. So we ended up with a monorepo housing all the extensions in one repository.
+oCIS consists of multiple micro services, also called extensions. We started by having standalone repositories for each of them, but quickly noticed that this adds a time consuming overhead for developers. So we ended up with a monorepo housing all the extensions in one repository.
 
-Each extension lives in a subfolder (eg. `accounts` or `settings`) in this respository as an independent Go module, following the [golang-standard project-layout](https://github.com/golang-standards/project-layout). They have common Makefile targets and can be used to change, build and run individual extensions.
+Each extension lives in a subfolder (eg. `accounts` or `settings`) within this respository as an independent Go module, following the [golang-standard project-layout](https://github.com/golang-standards/project-layout). They have common Makefile targets and can be used to change, build and run individual extensions.
 
 The `ocis` folder contains our [go-micro](https://github.com/asim/go-micro/) and [suture](https://github.com/thejerf/suture) based runtime. It is used to import all extensions and implements commands to manage them, similar to a small orchestrator. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 
