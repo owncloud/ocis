@@ -31,10 +31,8 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
 	"github.com/rs/zerolog"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -46,34 +44,14 @@ var (
 type Service struct {
 	Supervisor       *suture.Supervisor
 	ServicesRegistry map[string]func(context.Context, *ociscfg.Config) suture.Service
-	serviceToken     map[string][]suture.ServiceToken
-	context          context.Context
-	cancel           context.CancelFunc
 	Log              zerolog.Logger
-	wg               *sync.WaitGroup
-	done             bool
-	cfg              *ociscfg.Config
-}
 
-// TODO(refs) think of a less confusing naming
-type RuntimeSutureService struct {
-	Context    context.Context
-	CancelFunc context.CancelFunc
-}
-
-// loadFromEnv would set cmd global variables. This is a workaround spf13/viper since pman used as a library does not
-// parse flags.
-func loadFromEnv() (*config.Config, error) {
-	cfg := config.NewConfig()
-	viper.AutomaticEnv()
-	if err := viper.BindEnv("port", "RUNTIME_PORT"); err != nil {
-		return nil, err
-	}
-	if viper.GetString("port") != "" {
-		cfg.Port = viper.GetString("port")
-	}
-
-	return cfg, nil
+	serviceToken map[string][]suture.ServiceToken
+	context      context.Context
+	cancel       context.CancelFunc
+	wg           *sync.WaitGroup
+	done         bool
+	cfg          *ociscfg.Config
 }
 
 // NewService returns a configured service with a controller and a default logger.
@@ -131,7 +109,8 @@ func NewService(options ...Option) (*Service, error) {
 	return s, nil
 }
 
-// Start an rpc service.
+// Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
+// oCIS instance.
 func Start(o ...Option) error {
 	s, err := NewService(o...)
 	if err != nil {
@@ -183,20 +162,6 @@ func Start(o ...Option) error {
 	return http.Serve(l, nil)
 }
 
-// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
-// want to expose to the end user the internal framework logs unless explicitly specified.
-func setMicroLogger() {
-	if os.Getenv("MICRO_LOG_LEVEL") == "" {
-		os.Setenv("MICRO_LOG_LEVEL", "error")
-	}
-
-	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
-	if err != nil {
-		lev = zerolog.ErrorLevel
-	}
-	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
-}
-
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
 	if _, ok := s.ServicesRegistry[name]; !ok {
@@ -241,4 +206,18 @@ func trap(s *Service) {
 	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
 	close(done)
 	os.Exit(0)
+}
+
+// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// want to expose to the end user the internal framework logs unless explicitly specified.
+func setMicroLogger() {
+	if os.Getenv("MICRO_LOG_LEVEL") == "" {
+		os.Setenv("MICRO_LOG_LEVEL", "error")
+	}
+
+	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
+	if err != nil {
+		lev = zerolog.ErrorLevel
+	}
+	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
 }
