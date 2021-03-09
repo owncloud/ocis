@@ -1348,8 +1348,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'PROXY_ENABLE_BASIC_AUTH': True,
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
-    'OCIS_LOG_LEVEL': 'debug',
-    'OCIS_LOG_PRETTY': 'true',
+    'OCIS_LOG_LEVEL': 'warn',
   }
 
   # Pass in "default" accounts_hash_difficulty to not set this environment variable.
@@ -1377,7 +1376,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
       'image': 'thegeeklab/wait-for:latest',
       'pull': 'always',
       'commands': [
-        'wait-for ocis-server:9200 -t 300 && sleep 5',
+        'wait-for ocis-server:9200 -t 300',
       ],
     },
   ]
