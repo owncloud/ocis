@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -11,10 +12,13 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/thejerf/suture"
+
+	settings "github.com/owncloud/ocis/settings/pkg/command"
+
+	ociscfg "github.com/owncloud/ocis/ocis/pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/config"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/controller"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
@@ -26,10 +30,21 @@ var (
 
 // Service represents a RPC service.
 type Service struct {
-	Controller controller.Controller
-	Log        zerolog.Logger
-	wg         *sync.WaitGroup
-	done       bool
+	Supervisor       *suture.Supervisor
+	ServicesRegistry map[string]func(context.Context, interface{}) suture.Service
+	serviceToken     map[string][]suture.ServiceToken
+	context          context.Context
+	cancel           context.CancelFunc
+	Log              zerolog.Logger
+	wg               *sync.WaitGroup
+	done             bool
+	cfg              *ociscfg.Config
+}
+
+// TODO(refs) think of a less confusing naming
+type RuntimeSutureService struct {
+	Context    context.Context
+	CancelFunc context.CancelFunc
 }
 
 // loadFromEnv would set cmd global variables. This is a workaround spf13/viper since pman used as a library does not
@@ -37,16 +52,9 @@ type Service struct {
 func loadFromEnv() (*config.Config, error) {
 	cfg := config.NewConfig()
 	viper.AutomaticEnv()
-
-	if err := viper.BindEnv("keep-alive", "RUNTIME_KEEP_ALIVE"); err != nil {
-		return nil, err
-	}
 	if err := viper.BindEnv("port", "RUNTIME_PORT"); err != nil {
 		return nil, err
 	}
-
-	cfg.KeepAlive = viper.GetBool("keep-alive")
-
 	if viper.GetString("port") != "" {
 		cfg.Port = viper.GetString("port")
 	}
@@ -66,39 +74,50 @@ func NewService(options ...Option) (*Service, error) {
 		f(opts)
 	}
 
-	cfg, err := loadFromEnv()
-	if err != nil {
-		return nil, err
-	}
 	l := log.NewLogger(
 		log.WithPretty(opts.Log.Pretty),
 	)
 
-	return &Service{
-		wg:  &sync.WaitGroup{},
-		Log: l,
-		Controller: controller.NewController(
-			controller.WithConfig(cfg),
-			controller.WithLog(&l),
-		),
-	}, nil
+	globalCtx, cancelGlobal := context.WithCancel(context.Background())
+
+	s := &Service{
+		ServicesRegistry: make(map[string]func(context.Context, interface{}) suture.Service),
+		Log:              l,
+
+		serviceToken: make(map[string][]suture.ServiceToken),
+		context:      globalCtx,
+		cancel:       cancelGlobal,
+		wg:           &sync.WaitGroup{},
+		cfg:          opts.Config,
+	}
+
+	s.ServicesRegistry["settings"] = settings.NewSutureService
+
+	return s, nil
 }
 
 // Start an rpc service.
 func Start(o ...Option) error {
 	s, err := NewService(o...)
 	if err != nil {
-		s.Log.Fatal().Err(err)
+		if s != nil {
+			s.Log.Fatal().Err(err)
+		}
 	}
 
+	s.Supervisor = suture.NewSimple("ocis")
+
 	if err := rpc.Register(s); err != nil {
-		s.Log.Fatal().Err(err)
+		if s != nil {
+			s.Log.Fatal().Err(err)
+		}
 	}
 	rpc.HandleHTTP()
 
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	l, err := net.Listen("tcp", fmt.Sprintf("%v:%v", s.Controller.Config.Hostname, s.Controller.Config.Port))
+	// TODO(refs) change default port
+	l, err := net.Listen("tcp", fmt.Sprintf("%v:%v", "localhost", "6060"))
 	if err != nil {
 		s.Log.Fatal().Err(err)
 	}
@@ -107,7 +126,8 @@ func Start(o ...Option) error {
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
-			if _, err := net.Dial("localhost", s.Controller.Config.Port); err != nil {
+			// TODO(refs) change default port
+			if _, err := net.Dial("localhost", "6060"); err != nil {
 				reason.WriteString("runtime address already in use")
 			}
 
@@ -115,45 +135,42 @@ func Start(o ...Option) error {
 		}
 	}()
 
+	for k, _ := range s.ServicesRegistry {
+		s.serviceToken[k] = append(s.serviceToken[k], s.Supervisor.Add(s.ServicesRegistry[k](s.context, s.cfg.Settings)))
+	}
+
+	go s.Supervisor.ServeBackground()
 	go trap(s)
 
 	return http.Serve(l, nil)
 }
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
-func (s *Service) Start(args process.ProcEntry, reply *int) error {
-	if !s.done {
-		s.wg.Add(1)
-		s.Log.Info().Str("service", args.Extension).Msgf("%v", "started")
-		if err := s.Controller.Start(args); err != nil {
-			*reply = 1
-			return err
-		}
-
-		*reply = 0
-		s.wg.Done()
+func (s *Service) Start(name string, reply *int) error {
+	if _, ok := s.ServicesRegistry[name]; !ok {
+		*reply = 1
+		return nil
 	}
-
+	//s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name]))
+	s.serviceToken["settings"] = append(s.serviceToken[name], s.Supervisor.Add(settings.NewSutureService(s.context, s.cfg.Settings)))
+	*reply = 0
 	return nil
 }
 
 // List running processes for the Service Controller.
 func (s *Service) List(args struct{}, reply *string) error {
-	*reply = s.Controller.List()
 	return nil
 }
 
 // Kill a supervised process by subcommand name.
-func (s *Service) Kill(args *string, reply *int) error {
-	pe := process.ProcEntry{
-		Extension: *args,
+func (s *Service) Kill(name string, reply *int) error {
+	if len(s.serviceToken[name]) > 0 {
+		for _, v := range s.serviceToken[name] {
+			if err := s.Supervisor.Remove(v); err != nil {
+				return err
+			}
+		}
 	}
-	if err := s.Controller.Kill(pe); err != nil {
-		*reply = 1
-		return err
-	}
-
-	*reply = 0
 	return nil
 }
 
@@ -163,12 +180,8 @@ func trap(s *Service) {
 	<-halt
 	s.done = true
 	s.wg.Wait()
-	s.Log.Debug().
-		Str("service", "runtime service").
-		Msgf("terminating with signal: %v", s)
-	if err := s.Controller.Shutdown(done); err != nil {
-		s.Log.Err(err)
-	}
+	s.cancel()
+	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
 	close(done)
 	os.Exit(0)
 }

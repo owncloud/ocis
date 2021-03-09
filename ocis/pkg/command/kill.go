@@ -27,7 +27,7 @@ func KillCommand(cfg *config.Config) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:        "port",
-				Value:       "10666",
+				Value:       "6060",
 				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
 				Destination: &cfg.Runtime.Port,
 			},

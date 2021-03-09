@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/thejerf/suture"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/settings/pkg/config"
@@ -111,18 +113,18 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 // SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
+	cancel context.CancelFunc
 	cfg    *config.Config
 }
 
 // NewSutureService creates a new settings.SutureService
-func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+func NewSutureService(ctx context.Context, cfg interface{}) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.Context = sctx // propagate the context down to the go-micro services.
+	cfg.(*config.Config).Context = sctx
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.(*config.Config),
 	}
 }
 

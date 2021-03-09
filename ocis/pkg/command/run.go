@@ -1,6 +1,11 @@
 package command
 
 import (
+	"fmt"
+	"log"
+	"net"
+	"net/rpc"
+
 	cli "github.com/micro/cli/v2"
 
 	"github.com/owncloud/ocis/ocis/pkg/config"
@@ -22,20 +27,25 @@ func RunCommand(cfg *config.Config) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:        "port",
-				Value:       "10666",
+				Value:       "6060",
 				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
 				Destination: &cfg.Runtime.Port,
 			},
 		},
 		Action: func(c *cli.Context) error {
 			// TODO(refs) this implementation changes as we don't depend on os threads anymore.
-			//client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Hostname, cfg.Runtime.Port))
-			//if err != nil {
-			//	log.Fatal("dialing:", err)
-			//}
-			//
-			//res := runtime.RunService(client, os.Args[2])
-			//fmt.Println(res)
+			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Hostname, cfg.Runtime.Port))
+			if err != nil {
+				log.Fatal("dialing:", err)
+			}
+
+			var reply int
+
+			if err := client.Call("Service.Start", "settings", &reply); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(reply)
+
 			return nil
 		},
 	}

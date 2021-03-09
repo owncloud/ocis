@@ -1197,6 +1197,7 @@ github.com/ory/x v0.0.162/go.mod h1:sj3z/MeCrAyNFFTfN6yK1nTmHXGSFnw+QwIIQ/Rowec=
 github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY3JAOEMcoOp05CnZzsx4scTxi95DHyQ=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20210204050952-c291e4c5b73f h1:yvJWb/wBKb0WLcdamuhND5jZNfh1SoFnql6RZ7pUStU=
 github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20210204050952-c291e4c5b73f/go.mod h1:pCTUK78ioY3VPV0kMz3GzD6ZHL9E1R7+dMoMMBBA2eQ=
+github.com/owncloud/ocis/ocis v0.0.0-20210305133343-0eda3b882b7c/go.mod h1:0PwZqflEkL3M6P0FXuIrEuHX9SJ0zA2MGYEjGAz0Aak=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=

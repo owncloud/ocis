@@ -22,6 +22,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.7.0
+	github.com/thejerf/suture v4.0.0+incompatible
 	go.opencensus.io v0.22.6
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/mod v0.4.1 // indirect
