@@ -10,7 +10,7 @@ geekdocFilePath: login-flow.md
 
 ## Login Flow
 
-The following sequence diagram describes the [openid connect auth code flow](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth). The eight numbered steps and notes correspond to the [openid connect auth code flow steps](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowSteps). Example requests are based on the spec as well.:
+The following sequence diagram describes the [openid connect auth code flow](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth). The eight numbered steps and notes correspond to the [openid connect auth code flow steps](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowSteps). Example requests are based on the spec as well:
 
 {{< mermaid class="text-center">}}
 sequenceDiagram

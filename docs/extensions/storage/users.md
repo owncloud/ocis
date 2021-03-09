@@ -12,7 +12,7 @@ geekdocFilePath: users.md
 This is a simple user driver for testing. It contains three users:
 ```
 einstein:relativity
-marie:radioactivty
+marie:radioactivity
 richard:superfluidity
 ```
 In order to use the `demo` driver you need to export the relevant environment variable:

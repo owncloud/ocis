@@ -9,7 +9,7 @@ geekdocFilePath: eos.md
 
 {{< toc >}}
 
-oCIS can be configured to run on top of [eos](https://eos.web.cern.ch/). While the [eos documentation](http://eos-docs.web.cern.ch/) does cover a lot of topics it leaves out some details that you may have to either pull from various [docker containers](https://gitlab.cern.ch/eos/eos-docker), the [forums](https://eos-community.web.cern.ch/) or even the [source](https://github.com/cern-eos/eos) itself.
+oCIS can be configured to run on top of [eos](https://eos.web.cern.ch/). While the [eos documentation](http://eos-docs.web.cern.ch/) does cover a lot of topics, it leaves out some details that you may have to either pull from various [docker containers](https://gitlab.cern.ch/eos/eos-docker), the [forums](https://eos-community.web.cern.ch/) or even the [source](https://github.com/cern-eos/eos) itself.
 
 This document is a work in progress of the current setup.
 
