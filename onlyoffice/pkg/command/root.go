@@ -5,8 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/thejerf/suture"
-
 	"github.com/micro/cli/v2"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -14,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/onlyoffice/pkg/flagset"
 	"github.com/owncloud/ocis/onlyoffice/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture"
 )
 
 // Execute is the entry point for the ocis-onlyoffice command.

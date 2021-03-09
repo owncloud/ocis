@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/thejerf/suture"
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
@@ -265,24 +267,13 @@ type GatewaySutureService struct {
 }
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
-func NewGateway(ctx context.Context, o ...Option) GatewaySutureService {
+func NewGateway(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg := config.New()
-
-	opts := newOptions(o...)
-
-	// merge config and options
-	cfg.Context = sctx
-
-	cfg.Log.Level = opts.LogLevel
-	cfg.Log.Pretty = opts.LogPretty
-	cfg.Log.Color = opts.LogColor
-
-	cfg.Context = sctx
+	cfg.Storage.Reva.Gateway.Context = sctx
 	return GatewaySutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.Storage,
 	}
 }
 

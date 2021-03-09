@@ -76,6 +76,8 @@ type Port struct {
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}
+
+	Context context.Context
 }
 
 // Users defines the available users configuration.
@@ -378,8 +380,6 @@ type Config struct {
 	Reva    Reva
 	Tracing Tracing
 	Asset   Asset
-
-	Context context.Context
 }
 
 // New initializes a new configuration with or without defaults.

@@ -14,8 +14,18 @@ import (
 
 	"github.com/thejerf/suture"
 
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	idp "github.com/owncloud/ocis/idp/pkg/command"
+	ocs "github.com/owncloud/ocis/ocs/pkg/command"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
+	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
+	store "github.com/owncloud/ocis/store/pkg/command"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
+	web "github.com/owncloud/ocis/web/pkg/command"
+	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/config"
@@ -92,8 +102,28 @@ func NewService(options ...Option) (*Service, error) {
 		cfg:          opts.Config,
 	}
 
-	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
 	s.ServicesRegistry["settings"] = settings.NewSutureService
+	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
+	s.ServicesRegistry["accounts"] = accounts.NewSutureService
+	s.ServicesRegistry["glauth"] = glauth.NewSutureService
+	s.ServicesRegistry["idp"] = idp.NewSutureService
+	s.ServicesRegistry["ocs"] = ocs.NewSutureService
+	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
+	s.ServicesRegistry["proxy"] = proxy.NewSutureService
+	s.ServicesRegistry["store"] = store.NewSutureService
+	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
+	s.ServicesRegistry["web"] = web.NewSutureService
+	s.ServicesRegistry["webdav"] = webdav.NewSutureService
+	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
+	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
+	s.ServicesRegistry["storage-users"] = storage.NewUsersProviderService
+	s.ServicesRegistry["storage-groupsprovider"] = storage.NewGroupsProvider
+	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
+	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
+	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
+	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
+	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
+	s.ServicesRegistry["storage-sharing"] = storage.NewSharing
 
 	return s, nil
 }

@@ -6,11 +6,13 @@ import (
 	"strings"
 
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/flagset"
 	"github.com/owncloud/ocis/store/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture"
 )
 
 // Execute is the entry point for the ocis-store command.
@@ -116,13 +118,13 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new store.SutureService
-func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.Context = sctx // propagate the context down to the go-micro services.
+	cfg.Store.Context = sctx
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.Store,
 	}
 }
 

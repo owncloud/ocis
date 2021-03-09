@@ -9,8 +9,10 @@ import (
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/flagset"
 	"github.com/owncloud/ocis/idp/pkg/version"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture"
 )
 
 // Execute is the entry point for the ocis-idp command.
@@ -116,13 +118,13 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new idp.SutureService
-func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.Context = sctx // propagate the context down to the go-micro services.
+	cfg.IDP.Context = sctx
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.IDP,
 	}
 }
 

@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
+	
 	"github.com/thejerf/suture"
-
 	"github.com/micro/cli/v2"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"time"
 
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/thejerf/suture"
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
@@ -222,24 +224,13 @@ type GroupsProvider struct {
 }
 
 // NewGroupsProvider creates a new storage.GroupsProvider
-func NewGroupsProvider(ctx context.Context, o ...Option) GroupsProvider {
+func NewGroupsProvider(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg := config.New()
-
-	opts := newOptions(o...)
-
-	// merge config and options
-	cfg.Context = sctx
-
-	cfg.Log.Level = opts.LogLevel
-	cfg.Log.Pretty = opts.LogPretty
-	cfg.Log.Color = opts.LogColor
-
-	cfg.Context = sctx
+	cfg.Storage.Reva.Groups.Context = sctx
 	return GroupsProvider{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.Storage,
 	}
 }
 

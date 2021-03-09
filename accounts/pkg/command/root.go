@@ -7,6 +7,8 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 
+	"github.com/thejerf/suture"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/version"
@@ -127,13 +129,13 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new accounts.SutureService
-func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.Context = sctx // propagate the context down to the go-micro services.
+	cfg.Accounts.Context = sctx // propagate the context down to the go-micro services.
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.Accounts,
 	}
 }
 
