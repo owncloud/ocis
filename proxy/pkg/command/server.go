@@ -154,15 +154,19 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
-			)
+			stop := make(chan os.Signal, 1)
+			gr := run.Group{}
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Context == nil {
+					return context.WithCancel(context.Background())
+				}
+				return context.WithCancel(cfg.Context)
+			}()
+			m := metrics.New()
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			m.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
@@ -175,7 +179,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
-					proxyHTTP.Metrics(metrics),
+					proxyHTTP.Metrics(m),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
@@ -195,6 +199,7 @@ func Server(cfg *config.Config) *cli.Command {
 						Str("server", "http").
 						Msg("Shutting down server")
 
+					close(stop)
 					cancel()
 				})
 			}
@@ -212,6 +217,7 @@ func Server(cfg *config.Config) *cli.Command {
 						Str("server", "debug").
 						Msg("Failed to initialize server")
 
+					close(stop)
 					return err
 				}
 
@@ -233,17 +239,15 @@ func Server(cfg *config.Config) *cli.Command {
 							Str("server", "debug").
 							Msg("Shutting down server")
 					}
+					close(stop)
 				})
 			}
 
 			{
-				stop := make(chan os.Signal, 1)
 
 				gr.Add(func() error {
 					signal.Notify(stop, os.Interrupt)
-
 					<-stop
-
 					return nil
 				}, func(err error) {
 					close(stop)

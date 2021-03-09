@@ -168,7 +168,7 @@ func (s *Service) Start(name string, reply *int) error {
 		*reply = 1
 		return nil
 	}
-	//s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name]))
+	s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, s.cfg)))
 	//s.serviceToken["settings"] = append(s.serviceToken[name], s.Supervisor.Add(settings.NewSutureService(s.context, s.cfg)))
 	*reply = 0
 	return nil
