@@ -65,7 +65,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
 	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		Filetype:      extensionToFiletype(tr.Filetype),
+		Filetype:      extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
 		Etag:          tr.Etag,
 		Width:         int32(tr.Width),
 		Height:        int32(tr.Height),
@@ -90,11 +90,17 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 }
 
 func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
-	val, ok := thumbnails.GetRequest_FileType_value[strings.ToUpper(ext)]
-	if !ok {
+	ext = strings.ToUpper(ext)
+	switch ext {
+	case "JPG", "PNG":
+		val := thumbnails.GetRequest_FileType_value[ext]
+		return thumbnails.GetRequest_FileType(val)
+	case "JPEG":
+		val := thumbnails.GetRequest_FileType_value["JPG"]
+		return thumbnails.GetRequest_FileType(val)
+	default:
 		return thumbnails.GetRequest_FileType(-1)
 	}
-	return thumbnails.GetRequest_FileType(val)
 }
 
 func mustWrite(logger log.Logger, w io.Writer, val []byte) {
