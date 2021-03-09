@@ -169,7 +169,6 @@ func (s *Service) Start(name string, reply *int) error {
 		return nil
 	}
 	s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, s.cfg)))
-	//s.serviceToken["settings"] = append(s.serviceToken[name], s.Supervisor.Add(settings.NewSutureService(s.context, s.cfg)))
 	*reply = 0
 	return nil
 }
@@ -183,12 +182,11 @@ func (s *Service) List(args struct{}, reply *string) error {
 func (s *Service) Kill(name string, reply *int) error {
 	if len(s.serviceToken[name]) > 0 {
 		for i := range s.serviceToken[name] {
-			fmt.Printf("\n\n%s\n%+v\n\n", name, s.serviceToken[name])
 			if err := s.Supervisor.Remove(s.serviceToken[name][i]); err != nil {
 				return err
 			}
-			delete(s.serviceToken, name)
 		}
+		delete(s.serviceToken, name)
 	} else {
 		return fmt.Errorf("service %s not found", name)
 	}

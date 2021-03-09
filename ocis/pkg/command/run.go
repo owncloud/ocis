@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/rpc"
+	"os"
 
 	cli "github.com/micro/cli/v2"
 
@@ -38,7 +39,7 @@ func RunCommand(cfg *config.Config) *cli.Command {
 
 			var reply int
 
-			if err := client.Call("Service.Start", "settings", &reply); err != nil {
+			if err := client.Call("Service.Start", os.Args[2], &reply); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Println(reply)

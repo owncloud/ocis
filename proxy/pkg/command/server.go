@@ -154,6 +154,10 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("Tracing is not enabled")
 			}
 
+			var (
+				m = metrics.New()
+			)
+
 			stop := make(chan os.Signal, 1)
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
@@ -162,7 +166,6 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				return context.WithCancel(cfg.Context)
 			}()
-			m := metrics.New()
 
 			defer cancel()
 
@@ -179,7 +182,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
-					proxyHTTP.Metrics(m),
+					proxyHTTP.Metrics(metrics.New()),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
