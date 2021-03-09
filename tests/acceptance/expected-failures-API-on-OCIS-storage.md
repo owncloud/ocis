@@ -1906,8 +1906,8 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v2/getSubAdminGroups.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L11)
 -   [apiProvisioningGroups-v2/getSubAdminGroups.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L25)
 -   [apiProvisioningGroups-v2/getSubAdminGroups.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L34)
--   [apiProvisioningGroups-v2/getSubAdminGroups.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L51)
--   [apiProvisioningGroups-v2/getSubAdminGroups.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L66)
+-   [apiProvisioningGroups-v2/getSubAdminGroups.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L47)
+-   [apiProvisioningGroups-v2/getSubAdminGroups.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getSubAdminGroups.feature#L62)
 -   [apiProvisioningGroups-v2/getUserGroups.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L56)
 -   [apiProvisioningGroups-v2/getUserGroups.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L133)
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:110](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L110)
@@ -2310,3 +2310,16 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L25)
 -   [apiTranslation/translation.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L26)
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
+
+#### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
+[apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
+
+#### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
+[apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
+[apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
+
+#### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
+-   [apiWebdavUploadTUS/checksums.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L59)
+-   [apiWebdavUploadTUS/checksums.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L60)
+-   [apiWebdavUploadTUS/checksums.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L61)
+-   [apiWebdavUploadTUS/checksums.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L62)
