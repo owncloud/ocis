@@ -8,11 +8,11 @@ geekdocFilePath: release_notes.md
 ---
 
 ## ownCloud Infinite Scale 1.3.0 Technology Preview
-Version 1.3.0 is regular maintenance and bugfix release. It provides the latest improvements to users and administrators.
+Version 1.3.0 is a regular maintenance and bugfix release. It provides the latest improvements to users and administrators.
 
 ### Changes in Reva
 
-[Reva](https://github.com/cs3org/Reva) is one of the fundamental components of oCIS. It got this significant changes:
+[Reva](https://github.com/cs3org/Reva) is one of the fundamental components of oCIS. It has these significant changes:
 
 - Align href URL encoding with oc10 [#1425](https://github.com/cs3org/Reva/pull/1425)
 - Fix public link webdav permissions [#1461](https://github.com/cs3org/Reva/pull/1461)
