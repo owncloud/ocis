@@ -130,10 +130,17 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				mtrcs       = metrics.New()
+				gr     = run.Group{}
+				ctx    = cfg.Context
+				cancel context.CancelFunc
+				mtrcs  = metrics.New()
 			)
+
+			if ctx == nil {
+				ctx, cancel = context.WithCancel(context.Background())
+			} else {
+				ctx, cancel = context.WithCancel(cfg.Context)
+			}
 
 			defer cancel()
 
@@ -146,7 +153,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(mtrcs),
-					http.Context(cfg.Context),
 				)
 
 				gr.Add(server.Run, func(_ error) {

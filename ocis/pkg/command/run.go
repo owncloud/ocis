@@ -8,7 +8,7 @@ import (
 
 	cli "github.com/micro/cli/v2"
 
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
@@ -20,21 +20,18 @@ func RunCommand(cfg *config.Config) *cli.Command {
 		Category: "Runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "hostname",
-				Value:       "localhost",
-				EnvVars:     []string{"OCIS_RUNTIME_HOSTNAME"},
-				Destination: &cfg.Runtime.Hostname,
+				Name:    "hostname",
+				Value:   "localhost",
+				EnvVars: []string{"OCIS_RUNTIME_HOSTNAME"},
 			},
 			&cli.StringFlag{
-				Name:        "port",
-				Value:       "6060",
-				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
-				Destination: &cfg.Runtime.Port,
+				Name:    "port",
+				Value:   "6060",
+				EnvVars: []string{"OCIS_RUNTIME_PORT"},
 			},
 		},
 		Action: func(c *cli.Context) error {
-			// TODO(refs) this implementation changes as we don't depend on os threads anymore.
-			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Hostname, cfg.Runtime.Port))
+			client, err := rpc.DialHTTP("tcp", net.JoinHostPort("localhost", "6060"))
 			if err != nil {
 				log.Fatal("dialing:", err)
 			}

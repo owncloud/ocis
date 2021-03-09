@@ -2,7 +2,7 @@ package register
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 )
 
 var (

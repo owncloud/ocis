@@ -8,6 +8,7 @@ import (
 	"github.com/thejerf/suture"
 
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/flagset"
@@ -118,13 +119,13 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new settings.SutureService
-func NewSutureService(ctx context.Context, cfg interface{}) suture.Service {
+func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.(*config.Config).Context = sctx
+	cfg.Settings.Context = sctx
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg.(*config.Config),
+		cfg:    cfg.Settings,
 	}
 }
 

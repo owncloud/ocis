@@ -14,9 +14,10 @@ import (
 
 	"github.com/thejerf/suture"
 
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 
-	ociscfg "github.com/owncloud/ocis/ocis/pkg/config"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
 	"github.com/rs/zerolog"
@@ -31,7 +32,7 @@ var (
 // Service represents a RPC service.
 type Service struct {
 	Supervisor       *suture.Supervisor
-	ServicesRegistry map[string]func(context.Context, interface{}) suture.Service
+	ServicesRegistry map[string]func(context.Context, *ociscfg.Config) suture.Service
 	serviceToken     map[string][]suture.ServiceToken
 	context          context.Context
 	cancel           context.CancelFunc
@@ -81,7 +82,7 @@ func NewService(options ...Option) (*Service, error) {
 	globalCtx, cancelGlobal := context.WithCancel(context.Background())
 
 	s := &Service{
-		ServicesRegistry: make(map[string]func(context.Context, interface{}) suture.Service),
+		ServicesRegistry: make(map[string]func(context.Context, *ociscfg.Config) suture.Service),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -91,6 +92,7 @@ func NewService(options ...Option) (*Service, error) {
 		cfg:          opts.Config,
 	}
 
+	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 
 	return s, nil
@@ -134,9 +136,8 @@ func Start(o ...Option) error {
 			fmt.Println(reason.String())
 		}
 	}()
-
 	for k, _ := range s.ServicesRegistry {
-		s.serviceToken[k] = append(s.serviceToken[k], s.Supervisor.Add(s.ServicesRegistry[k](s.context, s.cfg.Settings)))
+		s.serviceToken[k] = append(s.serviceToken[k], s.Supervisor.Add(s.ServicesRegistry[k](s.context, s.cfg)))
 	}
 
 	go s.Supervisor.ServeBackground()
@@ -152,7 +153,7 @@ func (s *Service) Start(name string, reply *int) error {
 		return nil
 	}
 	//s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name]))
-	s.serviceToken["settings"] = append(s.serviceToken[name], s.Supervisor.Add(settings.NewSutureService(s.context, s.cfg.Settings)))
+	//s.serviceToken["settings"] = append(s.serviceToken[name], s.Supervisor.Add(settings.NewSutureService(s.context, s.cfg)))
 	*reply = 0
 	return nil
 }
@@ -165,12 +166,17 @@ func (s *Service) List(args struct{}, reply *string) error {
 // Kill a supervised process by subcommand name.
 func (s *Service) Kill(name string, reply *int) error {
 	if len(s.serviceToken[name]) > 0 {
-		for _, v := range s.serviceToken[name] {
-			if err := s.Supervisor.Remove(v); err != nil {
+		for i := range s.serviceToken[name] {
+			fmt.Printf("\n\n%s\n%+v\n\n", name, s.serviceToken[name])
+			if err := s.Supervisor.Remove(s.serviceToken[name][i]); err != nil {
 				return err
 			}
+			delete(s.serviceToken, name)
 		}
+	} else {
+		return fmt.Errorf("service %s not found", name)
 	}
+
 	return nil
 }
 

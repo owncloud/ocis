@@ -5,7 +5,7 @@ import (
 
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
 	"github.com/asim/go-micro/v3/logger"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/service"
 	"github.com/rs/zerolog"
 	"github.com/thejerf/suture"

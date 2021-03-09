@@ -5,7 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/thejerf/suture"
+
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/onlyoffice/pkg/config"
 	"github.com/owncloud/ocis/onlyoffice/pkg/flagset"
@@ -114,13 +117,13 @@ type SutureService struct {
 }
 
 // NewSutureService creates a new onlyoffice.SutureService
-func NewSutureService(ctx context.Context, cfg *config.Config) SutureService {
+func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
-	cfg.Context = sctx // propagate the context down to the go-micro services.
+	cfg.Onlyoffice.Context = sctx // propagate the context down to the go-micro services.
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,
-		cfg:    cfg,
+		cfg:    cfg.Onlyoffice,
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 	"github.com/owncloud/ocis/glauth/pkg/command"
 	svcconfig "github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 )

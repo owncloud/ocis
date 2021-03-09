@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 )

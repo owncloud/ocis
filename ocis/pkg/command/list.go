@@ -1,13 +1,8 @@
 package command
 
 import (
-	"fmt"
-	"log"
-	"net"
-	"net/rpc"
-
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 )
 
@@ -19,31 +14,29 @@ func ListCommand(cfg *config.Config) *cli.Command {
 		Category: "Runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "hostname",
-				Value:       "localhost",
-				EnvVars:     []string{"OCIS_RUNTIME_HOSTNAME"},
-				Destination: &cfg.Runtime.Hostname,
+				Name:    "hostname",
+				Value:   "localhost",
+				EnvVars: []string{"OCIS_RUNTIME_HOSTNAME"},
 			},
 			&cli.StringFlag{
-				Name:        "port",
-				Value:       "10666",
-				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
-				Destination: &cfg.Runtime.Port,
+				Name:    "port",
+				Value:   "10666",
+				EnvVars: []string{"OCIS_RUNTIME_PORT"},
 			},
 		},
 		Action: func(c *cli.Context) error {
-			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Hostname, cfg.Runtime.Port))
-			if err != nil {
-				log.Fatal("dialing:", err)
-			}
-
-			var arg1 string
-
-			if err := client.Call("Service.List", struct{}{}, &arg1); err != nil {
-				log.Fatal(err)
-			}
-
-			fmt.Println(arg1)
+			//client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Hostname, cfg.Runtime.Port))
+			//if err != nil {
+			//	log.Fatal("dialing:", err)
+			//}
+			//
+			//var arg1 string
+			//
+			//if err := client.Call("Service.List", struct{}{}, &arg1); err != nil {
+			//	log.Fatal(err)
+			//}
+			//
+			//fmt.Println(arg1)
 
 			return nil
 		},

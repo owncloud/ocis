@@ -124,10 +124,17 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				gr      = run.Group{}
+				ctx     = cfg.Context
+				cancel  context.CancelFunc
+				metrics = metrics.New()
 			)
+
+			if ctx == nil {
+				ctx, cancel = context.WithCancel(context.Background())
+			} else {
+				ctx, cancel = context.WithCancel(cfg.Context)
+			}
 
 			defer cancel()
 
