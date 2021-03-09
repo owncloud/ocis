@@ -12,6 +12,9 @@ import (
 	"sync"
 	"syscall"
 
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
+
+	"github.com/asim/go-micro/v3/logger"
 	"github.com/thejerf/suture"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
@@ -137,7 +140,11 @@ func Start(o ...Option) error {
 		}
 	}
 
+	setMicroLogger()
 	s.Supervisor = suture.NewSimple("ocis")
+	s.cfg.Storage.Log.Color = s.cfg.Log.Color
+	s.cfg.Storage.Log.Level = s.cfg.Log.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
 
 	if err := rpc.Register(s); err != nil {
 		if s != nil {
@@ -154,7 +161,6 @@ func Start(o ...Option) error {
 		s.Log.Fatal().Err(err)
 	}
 
-	// handle panic within the Service scope.
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
@@ -166,6 +172,7 @@ func Start(o ...Option) error {
 			fmt.Println(reason.String())
 		}
 	}()
+
 	for k, _ := range s.ServicesRegistry {
 		s.serviceToken[k] = append(s.serviceToken[k], s.Supervisor.Add(s.ServicesRegistry[k](s.context, s.cfg)))
 	}
@@ -174,6 +181,20 @@ func Start(o ...Option) error {
 	go trap(s)
 
 	return http.Serve(l, nil)
+}
+
+// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// want to expose to the end user the internal framework logs unless explicitly specified.
+func setMicroLogger() {
+	if os.Getenv("MICRO_LOG_LEVEL") == "" {
+		os.Setenv("MICRO_LOG_LEVEL", "error")
+	}
+
+	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
+	if err != nil {
+		lev = zerolog.ErrorLevel
+	}
+	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
 }
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
