@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 	"syscall"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/asim/go-micro/v3/logger"
 	"github.com/thejerf/suture"
 
+	"github.com/olekukonko/tablewriter"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
@@ -193,6 +195,25 @@ func (s *Service) Start(name string, reply *int) error {
 
 // List running processes for the Service Controller.
 func (s *Service) List(args struct{}, reply *string) error {
+	tableString := &strings.Builder{}
+	table := tablewriter.NewWriter(tableString)
+	table.SetHeader([]string{"Extension"})
+
+	names := []string{}
+	for t := range s.serviceToken {
+		if len(s.serviceToken[t]) > 0 {
+			names = append(names, t)
+		}
+	}
+
+	sort.Strings(names)
+
+	for n := range names {
+		table.Append([]string{names[n]})
+	}
+
+	table.Render()
+	*reply = tableString.String()
 	return nil
 }
 
