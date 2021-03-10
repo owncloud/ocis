@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-10T13:16:41+0000"
+date: "2021-03-10T13:33:13+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -52,27 +52,6 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `com.owncloud.web`.
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `webdav`.
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9119`.
-
 ### webdav server
 
 Start integrated server
@@ -120,4 +99,25 @@ Usage: `webdav server [command options] [arguments...]`
 
 -http-root |  $WEBDAV_HTTP_ROOT
 : Root path of http server. Default: `/`.
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `com.owncloud.web`.
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `webdav`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9119`.
 
