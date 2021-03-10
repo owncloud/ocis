@@ -20,7 +20,7 @@ const (
 // Request combines all parameters provided when requesting a thumbnail
 type Request struct {
 	Filepath      string
-	Filetype      string
+	Extension      string
 	Etag          string
 	Width         int
 	Height        int
@@ -50,7 +50,7 @@ func NewRequest(r *http.Request) (Request, error) {
 
 	tr := Request{
 		Filepath:      path,
-		Filetype:      strings.Replace(filepath.Ext(path), ".", "", 1),
+		Extension:     filepath.Ext(path),
 		Etag:          etag,
 		Width:         width,
 		Height:        height,

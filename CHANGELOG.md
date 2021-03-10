@@ -2,7 +2,40 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.2.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.3.0...master
+
+## Summary
+
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+
+## Details
+
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+
+   Images with the extension `.jpeg` were not properly supported.
+
+   https://github.com/owncloud/ocis/issues/1490
+   https://github.com/owncloud/ocis/pull/1785
+
+* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+
+   Some features, while covered by the ownCloud 10 acceptance tests, will not be implmented for
+   now: - blacklisted / ignored files, because ocis does not need to blacklist `.htaccess` files -
+   `OC-LazyOps` support was [removed from the
+   clients](https://github.com/owncloud/client/pull/8398). We are thinking about [a state
+   machine for uploads to properly solve that scenario and also list the state of files in progress
+   in the web ui](https://github.com/owncloud/ocis/issues/214). The expected failures
+   files now have a dedicated _Won't fix_ section for these items.
+
+   https://github.com/owncloud/ocis/issues/214
+   https://github.com/owncloud/ocis/pull/1790
+   https://github.com/owncloud/client/pull/8398
+# Changelog for [1.3.0] (2021-03-09)
+
+The following sections list the changes for 1.3.0.
+
+[1.3.0]: https://github.com/owncloud/ocis/compare/v1.2.0...v1.3.0
 
 ## Summary
 
