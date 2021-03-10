@@ -7,17 +7,47 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.3.0 Technology Preview
+Version 1.3.0 is a regular maintenance and bugfix release. It provides the latest improvements to users and administrators.
+
+### Changes in Reva
+
+[Reva](https://github.com/cs3org/Reva) is one of the fundamental components of oCIS. It has these significant changes:
+
+- Align href URL encoding with oc10 [#1425](https://github.com/cs3org/Reva/pull/1425)
+- Fix public link webdav permissions [#1461](https://github.com/cs3org/Reva/pull/1461)
+- Purge non-empty dirs from trash-bin [#1429](https://github.com/cs3org/Reva/pull/1429)
+- Checksum support [#1400](https://github.com/cs3org/Reva/pull/1400)
+- Set quota when creating home directory in EOS [#1477](https://github.com/cs3org/Reva/pull/1477)
+- Add functionality to share resources with groups [#1453](https://github.com/cs3org/Reva/pull/1453)
+- Add s3ng storage driver, storing blobs in a s3-compatible blobstore [#1428](https://github.com/cs3org/Reva/pull/1428)
+
+### Changes in oCIS
+
+These are the major changes in oCIS:
+
+- Update ownCloud Web to v2.0.2: [#1776](https://github.com/owncloud/ocis/pull/1776)
+- Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
+- Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+- Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
+
+More details about this release can be found in the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-202-2021-03-08).
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+{{< /hint >}}
 
 ## ownCloud Infinite Scale 1.2.0 Technology Preview
 Version 1.2.0 brings more functionality and stability to ownCloud Infinite Scale. ownCloud Web now loads a lot faster and is prepared for the introduction of accessibility features. An initial implementation for S3 storage support is available and file integrity checking has been introduced.
 
 The most prominent changes in version 1.2.0 comprise:
 
-- The initial loading time for ownCloud Web has been reduced by handling dependencies more efficiently (the bundle size of ownCloud Web has been drastically reduced) https://github.com/owncloud/web/pull/4584
-- Preparations for accessibility features have been implemented to work towards WCAG 2.1 compliance https://github.com/owncloud/web/pull/4594
-- Initial S3 storage support is available https://github.com/cs3org/reva/issues/1429
-- File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums https://github.com/cs3org/reva/issues/1400
-- Public link passwords are now stored as hashes to improve security https://github.com/cs3org/reva/issues/1462
+- The initial loading time for ownCloud Web has been reduced by handling dependencies more efficiently (the bundle size of ownCloud Web has been drastically reduced) [#4584](https://github.com/owncloud/web/pull/4584)
+- Preparations for accessibility features have been implemented to work towards WCAG 2.1 compliance [#4594](https://github.com/owncloud/web/pull/4594)
+- Initial S3 storage support is available [#1429](https://github.com/cs3org/reva/issues/1429)
+- File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums [#1400](https://github.com/cs3org/reva/issues/1400)
+- Public link passwords are now stored as hashes to improve security [#1462](https://github.com/cs3org/reva/issues/1462)
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
 
