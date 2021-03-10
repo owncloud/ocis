@@ -5,6 +5,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"image"
+	_ "image/gif"  // Import the gif package so that image.Decode can understand gifs
+	_ "image/jpeg" // Import the jpeg package so that image.Decode can understand jpegs
+	_ "image/png"  // Import the png package so that image.Decode can understand pngs
 	"net/http"
 	"net/url"
 	"path"
