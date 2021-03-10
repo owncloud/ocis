@@ -159,8 +159,10 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiWebdavUploadTUS/uploadFile.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L156)
 
 #### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
--   [apiWebdavUploadTUS/optionsRequest.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L29)
--   [apiWebdavUploadTUS/optionsRequest.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L40)
+
+#### [OPTION request for TUS upload does not have checksum headers in it's response](https://github.com/owncloud/ocis/issues/1747)
+-   [apiWebdavUploadTUS/optionsRequest.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L31)
+-   [apiWebdavUploadTUS/optionsRequest.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L43)
 
 #### [Range Header is not obeyed when downloading a file](https://github.com/owncloud/ocis/issues/1346)
 
@@ -2162,18 +2164,23 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
 
 #### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
-[apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
+-   [apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 -   [apiWebdavUploadTUS/checksums.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L59)
 -   [apiWebdavUploadTUS/checksums.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L60)
 -   [apiWebdavUploadTUS/checksums.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L61)
 -   [apiWebdavUploadTUS/checksums.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L62)
+-   [apiWebdavUploadTUS/checksums.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L117)
+-   [apiWebdavUploadTUS/checksums.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L118)
 
+### [OPTION request for TUS upload does not have checksum headers in it's response](https://github.com/owncloud/ocis/issues/1747)
+-   [apiWebdavUploadTUS/optionsRequest.feature:7](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L7)
+-   [apiWebdavUploadTUS/optionsRequest.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L19)
 
 ### Won't fix
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.

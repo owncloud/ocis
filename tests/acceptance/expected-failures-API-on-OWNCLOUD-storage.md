@@ -186,9 +186,16 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiWebdavUploadTUS/uploadFile.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L155)
 -   [apiWebdavUploadTUS/uploadFile.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L156)
 
+<<<<<<< HEAD
 #### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
 -   [apiWebdavUploadTUS/optionsRequest.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L29)
 -   [apiWebdavUploadTUS/optionsRequest.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L40)
+=======
+### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
+### [OPTION request for TUS upload does not have checksum headers in it's response](https://github.com/owncloud/ocis/issues/1747)
+-   [apiWebdavUploadTUS/optionsRequest.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L31)
+-   [apiWebdavUploadTUS/optionsRequest.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L43)
+>>>>>>> add failing tests for OPTIONS request in expected failure file
 
 #### [renaming to banned name works](https://github.com/owncloud/ocis/issues/1295)
 -   [apiWebdavMove1/moveFolder.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L21)
@@ -2311,11 +2318,11 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
 
 #### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
-[apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
+-   [apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 -   [apiWebdavUploadTUS/checksums.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L32)
@@ -2475,3 +2482,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiMain/checksums.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L158) Scenario: Upload new dav chunked file using async MOVE where checksum matches
 -   [apiMain/checksums.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L174) Scenario: Upload new dav chunked file using async MOVE where checksum does not match
 -   [apiMain/checksums.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L192) Scenario: Upload new dav chunked file using async MOVE where checksum does not match - retry with correct checksum
+
+### [OPTION request for TUS upload does not have checksum headers in it's response](https://github.com/owncloud/ocis/issues/1747)
+-   [apiWebdavUploadTUS/optionsRequest.feature:7](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L7)
+-   [apiWebdavUploadTUS/optionsRequest.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L19)
