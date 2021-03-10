@@ -10,7 +10,7 @@ geekdocFilePath: metrics.md
 
 ## Metrics
 
-This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which got to be configured through one of the flag `--debug-token` or the environment variable `OCIS_DEBUG_TOKEN` mentioned above. By default the metrics endpoint is bound to `http://0.0.0.0:8001/metrics`.
+This service provides some [Prometheus](https://prometheus.io/) metrics through the debug endpoint, you can optionally secure the metrics endpoint by some random token, which has to be configured either through the flag `--debug-token` or the environment variable `OCIS_DEBUG_TOKEN` mentioned above. By default, the metrics endpoint is bound to `http://0.0.0.0:8001/metrics`.
 
 go_gc_duration_seconds
 : A summary of the GC invocation durations
