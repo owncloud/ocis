@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -69,6 +71,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads store configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

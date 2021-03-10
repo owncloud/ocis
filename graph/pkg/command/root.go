@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/flagset"
@@ -66,6 +68,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig reads graph configuration from fs.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

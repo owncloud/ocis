@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
@@ -37,6 +38,7 @@ import (
 type Service struct {
 	Supervisor       *suture.Supervisor
 	ServicesRegistry map[string]func(context.Context, *ociscfg.Config) suture.Service
+	Delayed          map[string]func(context.Context, *ociscfg.Config) suture.Service
 	Log              zerolog.Logger
 
 	serviceToken map[string][]suture.ServiceToken
@@ -65,6 +67,7 @@ func NewService(options ...Option) (*Service, error) {
 
 	s := &Service{
 		ServicesRegistry: make(map[string]func(context.Context, *ociscfg.Config) suture.Service),
+		Delayed:          make(map[string]func(context.Context, *ociscfg.Config) suture.Service),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -94,7 +97,9 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
-	s.ServicesRegistry["storage-sharing"] = storage.NewSharing
+
+	// populate delayed services
+	s.Delayed["storage-sharing"] = storage.NewSharing
 
 	return s, nil
 }
@@ -158,6 +163,12 @@ func Start(o ...Option) error {
 
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
+
+	time.Sleep(1 * time.Second)
+	// add delayed
+	for name := range s.Delayed {
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, s.cfg)))
+	}
 
 	return http.Serve(l, nil)
 }
