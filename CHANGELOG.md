@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Purposely delay accounts service startup: [#1734](https://github.com/owncloud/ocis/pull/1734)
 * Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Change - Update ownCloud Web to v2.0.2: [#1776](https://github.com/owncloud/ocis/pull/1776)
@@ -58,6 +59,13 @@ The following sections list the changes for unreleased.
    more information on how it works further read [here](https://github.com/sony/gobreaker)
 
    https://github.com/owncloud/ocis/pull/1696
+
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+
+   Images with the extension `.jpeg` were not properly supported.
+
+   https://github.com/owncloud/ocis/issues/1490
+   https://github.com/owncloud/ocis/pull/1785
 
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 
