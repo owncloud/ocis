@@ -163,15 +163,12 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
 				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
 					cancel()
 				})
 			}

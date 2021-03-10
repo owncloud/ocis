@@ -213,6 +213,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
 					cancel()
 				})
 			}

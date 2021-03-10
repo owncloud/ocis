@@ -5,7 +5,6 @@ import (
 	"flag"
 	"os"
 	"path"
-	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
@@ -74,7 +73,12 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Reva.StorageMetadata.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Reva.StorageMetadata.Context)
+				}()
 			)
 
 			defer cancel()
@@ -174,21 +178,8 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				gr.Add(func() error {
 					return server.ListenAndServe()
 				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", c.Command.Name+"-debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", c.Command.Name+"-debug").
-							Msg("Shutting down server")
-					}
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 

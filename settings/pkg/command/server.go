@@ -193,19 +193,8 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(server.ListenAndServe, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-					defer timeout()
-					defer cancel()
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Error().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 

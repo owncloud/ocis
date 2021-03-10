@@ -195,32 +195,13 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("transport", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("transport", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
