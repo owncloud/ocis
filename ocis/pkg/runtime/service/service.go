@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/mohae/deepcopy"
+
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
@@ -165,7 +167,8 @@ func Start(o ...Option) error {
 	}()
 
 	for name := range s.ServicesRegistry {
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, s.cfg)))
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
 	}
 
 	go s.Supervisor.ServeBackground()
@@ -176,7 +179,8 @@ func Start(o ...Option) error {
 	time.Sleep(2 * time.Second)
 	// add delayed
 	for name := range s.Delayed {
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, s.cfg)))
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, swap.(*ociscfg.Config))))
 	}
 
 	return http.Serve(l, nil)
@@ -188,7 +192,8 @@ func (s *Service) Start(name string, reply *int) error {
 		*reply = 1
 		return nil
 	}
-	s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, s.cfg)))
+	swap := deepcopy.Copy(s.cfg)
+	s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
 	*reply = 0
 	return nil
 }
