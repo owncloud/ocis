@@ -78,7 +78,6 @@ func NewService(options ...Option) (*Service, error) {
 
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
-	s.ServicesRegistry["accounts"] = accounts.NewSutureService
 	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
@@ -100,6 +99,7 @@ func NewService(options ...Option) (*Service, error) {
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
+	s.Delayed["accounts"] = accounts.NewSutureService
 
 	return s, nil
 }
