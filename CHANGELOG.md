@@ -2,18 +2,49 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.2.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.3.0...master
+
+## Summary
+
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+
+## Details
+
+* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+
+   Images with the extension `.jpeg` were not properly supported.
+
+   https://github.com/owncloud/ocis/issues/1490
+   https://github.com/owncloud/ocis/pull/1785
+
+* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+
+   Some features, while covered by the ownCloud 10 acceptance tests, will not be implmented for
+   now: - blacklisted / ignored files, because ocis does not need to blacklist `.htaccess` files -
+   `OC-LazyOps` support was [removed from the
+   clients](https://github.com/owncloud/client/pull/8398). We are thinking about [a state
+   machine for uploads to properly solve that scenario and also list the state of files in progress
+   in the web ui](https://github.com/owncloud/ocis/issues/214). The expected failures
+   files now have a dedicated _Won't fix_ section for these items.
+
+   https://github.com/owncloud/ocis/issues/214
+   https://github.com/owncloud/ocis/pull/1790
+   https://github.com/owncloud/client/pull/8398
+# Changelog for [1.3.0] (2021-03-09)
+
+The following sections list the changes for 1.3.0.
+
+[1.3.0]: https://github.com/owncloud/ocis/compare/v1.2.0...v1.3.0
 
 ## Summary
 
 * Bugfix - Purposely delay accounts service startup: [#1734](https://github.com/owncloud/ocis/pull/1734)
 * Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 * Bugfix - Fix accounts initialization: [#1696](https://github.com/owncloud/ocis/pull/1696)
-* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 * Change - Update ownCloud Web to v2.0.1: [#1683](https://github.com/owncloud/ocis/pull/1683)
 * Change - Update ownCloud Web to v2.0.2: [#1776](https://github.com/owncloud/ocis/pull/1776)
-* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 * Enhancement - Remove the JWT from the log: [#1758](https://github.com/owncloud/ocis/pull/1758)
 * Enhancement - Update go-micro to v3.5.1-0.20210217182006-0f0ace1a44a9: [#1670](https://github.com/owncloud/ocis/pull/1670)
 * Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
@@ -61,13 +92,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1696
 
-* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
-
-   Images with the extension `.jpeg` were not properly supported.
-
-   https://github.com/owncloud/ocis/issues/1490
-   https://github.com/owncloud/ocis/pull/1785
-
 * Bugfix - Fix the ttl of the authentication middleware cache: [#1699](https://github.com/owncloud/ocis/pull/1699)
 
    The authentication cache ttl was multiplied with `time.Second` multiple times. This
@@ -94,20 +118,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1776
    https://github.com/owncloud/web/releases/tag/v2.0.2
-
-* Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
-
-   Some features, while covered by the ownCloud 10 acceptance tests, will not be implmented for
-   now: - blacklisted / ignored files, because ocis does not need to blacklist `.htaccess` files -
-   `OC-LazyOps` support was [removed from the
-   clients](https://github.com/owncloud/client/pull/8398). We are thinking about [a state
-   machine for uploads to properly solve that scenario and also list the state of files in progress
-   in the web ui](https://github.com/owncloud/ocis/issues/214). The expected failures
-   files now have a dedicated _Won't fix_ section for these items.
-
-   https://github.com/owncloud/ocis/issues/214
-   https://github.com/owncloud/ocis/pull/1790
-   https://github.com/owncloud/client/pull/8398
 
 * Enhancement - Remove the JWT from the log: [#1758](https://github.com/owncloud/ocis/pull/1758)
 
