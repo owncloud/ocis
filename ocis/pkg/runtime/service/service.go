@@ -28,7 +28,7 @@ import (
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
 	"github.com/rs/zerolog"
@@ -39,7 +39,7 @@ type Service struct {
 	Supervisor       *suture.Supervisor
 	ServicesRegistry map[string]func(context.Context, *ociscfg.Config) suture.Service
 	Delayed          map[string]func(context.Context, *ociscfg.Config) suture.Service
-	Log              zerolog.Logger
+	Log              log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
 	context      context.Context
@@ -60,7 +60,9 @@ func NewService(options ...Option) (*Service, error) {
 	}
 
 	l := log.NewLogger(
-		log.WithPretty(opts.Log.Pretty),
+		log.Color(opts.Config.Log.Color),
+		log.Pretty(opts.Config.Log.Pretty),
+		log.Level(opts.Config.Log.Level),
 	)
 
 	globalCtx, cancelGlobal := context.WithCancel(context.Background())
@@ -82,7 +84,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
 	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
-	s.ServicesRegistry["proxy"] = proxy.NewSutureService
+	//s.ServicesRegistry["proxy"] = proxy.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
 	s.ServicesRegistry["web"] = web.NewSutureService
@@ -100,6 +102,7 @@ func NewService(options ...Option) (*Service, error) {
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
 	s.Delayed["accounts"] = accounts.NewSutureService
+	s.Delayed["proxy"] = proxy.NewSutureService
 
 	return s, nil
 }
@@ -116,7 +119,11 @@ func Start(o ...Option) error {
 	setMicroLogger()
 
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
-	s.Supervisor = suture.NewSimple("ocis")
+	s.Supervisor = suture.New("ocis", suture.Spec{
+		Log: func(msg string) {
+			s.Log.Info().Str("message", msg).Msg("supervisor: ")
+		},
+	})
 
 	// reva storages have their own logging. For consistency sake the top level logging will be cascade to reva.
 	s.cfg.Storage.Log.Color = s.cfg.Log.Color
@@ -164,7 +171,7 @@ func Start(o ...Option) error {
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 	// add delayed
 	for name := range s.Delayed {
 		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, s.cfg)))
