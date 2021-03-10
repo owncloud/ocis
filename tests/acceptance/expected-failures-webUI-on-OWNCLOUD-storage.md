@@ -18,7 +18,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIPreview/imageMediaViewer.feature:174](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L174)
 
 ### [Media Viewer preview not visible for files with .jpeg, .ogg, .webm and .gif formats](https://github.com/owncloud/ocis/issues/1490)
--   [webUIPreview/imageMediaViewer.feature:127](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L127)
 -   [webUIPreview/imageMediaViewer.feature:136](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L136)
 -   [webUIPreview/imageMediaViewer.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L145)
 -   [webUIPreview/imageMediaViewer.feature:154](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L154)
@@ -198,9 +197,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### Image-Media-Viewer-Issue
 -   [webUIPreview/imageMediaViewer.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L33)
-
-### [media viewer does not display jpeg file](https://github.com/owncloud/web/issues/4296)
--   [webUIPreview/imageMediaViewer.feature:15](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L15)
 
 ### webUI-Private-Links
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:8](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L8)
