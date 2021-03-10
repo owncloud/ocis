@@ -188,14 +188,21 @@ func Start(o ...Option) error {
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
-	if _, ok := s.ServicesRegistry[name]; !ok {
-		*reply = 1
+	swap := deepcopy.Copy(s.cfg)
+	if _, ok := s.ServicesRegistry[name]; ok {
+		*reply = 0
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
 		return nil
 	}
-	swap := deepcopy.Copy(s.cfg)
-	s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
+
+	if _, ok := s.Delayed[name]; ok {
+		*reply = 0
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, swap.(*ociscfg.Config))))
+		return nil
+	}
+
 	*reply = 0
-	return nil
+	return fmt.Errorf("cannot start service %s: unknown service", name)
 }
 
 // List running processes for the Service Controller.
