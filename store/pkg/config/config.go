@@ -49,7 +49,8 @@ type Config struct {
 	Datapath string
 	Service  Service
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

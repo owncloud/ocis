@@ -119,6 +119,9 @@ type SutureService struct {
 func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Onlyoffice.Context = sctx // propagate the context down to the go-micro services.
+	if cfg.Mode == 0 {
+		cfg.Onlyoffice.Supervised = true
+	}
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,

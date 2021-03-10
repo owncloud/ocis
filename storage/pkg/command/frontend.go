@@ -5,21 +5,21 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/signal"
 	"path"
 	"strings"
-	"time"
 
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/thejerf/suture"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -264,40 +264,13 @@ func Frontend(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.Frontend.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
@@ -341,6 +314,9 @@ type FrontendSutureService struct {
 func NewFrontend(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Storage.Reva.Frontend.Context = sctx
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.Frontend.Supervised = true
+	}
 	return FrontendSutureService{
 		ctx:    sctx,
 		cancel: cancel,

@@ -4,19 +4,18 @@ import (
 	"context"
 	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
 
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/thejerf/suture"
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture"
 )
 
 // StoragePublicLink is the entrypoint for the reva-storage-public-link command.
@@ -130,48 +129,17 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", c.Command.Name+"-debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", c.Command.Name+"-debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", c.Command.Name+"-debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
@@ -190,6 +158,9 @@ type StoragePublicLinkSutureService struct {
 func NewStoragePublicLink(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Storage.Reva.StoragePublicLink.Context = sctx
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.StoragePublicLink.Supervised = true
+	}
 	return StoragePublicLinkSutureService{
 		ctx:    sctx,
 		cancel: cancel,

@@ -69,7 +69,8 @@ type Config struct {
 	Asset        Asset
 	TokenManager TokenManager
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

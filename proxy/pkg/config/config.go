@@ -122,7 +122,8 @@ type Config struct {
 	EnableBasicAuth       bool
 	InsecureBackends      bool
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request

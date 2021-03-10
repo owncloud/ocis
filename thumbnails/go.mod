@@ -18,6 +18,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	github.com/thejerf/suture v4.0.0+incompatible
 	go.opencensus.io v0.23.0
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	google.golang.org/protobuf v1.25.0

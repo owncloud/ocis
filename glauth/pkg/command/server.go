@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
@@ -138,8 +138,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+				metrics = metrics.New()
 			)
 
 			defer cancel()
@@ -260,11 +265,7 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
@@ -289,19 +290,8 @@ func Server(cfg *config.Config) *cli.Command {
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

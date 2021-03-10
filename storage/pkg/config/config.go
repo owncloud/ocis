@@ -77,7 +77,11 @@ type Port struct {
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}
 
+	// Context allows for context cancellation and propagation
 	Context context.Context
+
+	// Supervised is used when running under an oCIS runtime supervision tree
+	Supervised bool
 }
 
 // Users defines the available users configuration.

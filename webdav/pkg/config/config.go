@@ -48,7 +48,8 @@ type Config struct {
 	Tracing Tracing
 	Service Service
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/owncloud/ocis/settings/pkg/metrics"
 
@@ -130,17 +130,15 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				gr     = run.Group{}
-				ctx    = cfg.Context
-				cancel context.CancelFunc
-				mtrcs  = metrics.New()
+				gr          = run.Group{}
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+				mtrcs = metrics.New()
 			)
-
-			if ctx == nil {
-				ctx, cancel = context.WithCancel(context.Background())
-			} else {
-				ctx, cancel = context.WithCancel(cfg.Context)
-			}
 
 			defer cancel()
 
@@ -190,20 +188,14 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
 				gr.Add(server.ListenAndServe, func(_ error) {
 					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
 					defer timeout()
 					defer cancel()
-
 					if err := server.Shutdown(ctx); err != nil {
 						logger.Error().
 							Err(err).
@@ -217,19 +209,8 @@ func Server(cfg *config.Config) *cli.Command {
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

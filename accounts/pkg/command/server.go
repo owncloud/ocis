@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -140,10 +140,7 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				gr.Add(server.Run, func(_ error) {
-					logger.Info().
-						Str("server", "http").
-						Msg("Shutting down server")
-
+					logger.Info().Str("server", "http").Msg("Shutting down server")
 					cancel()
 				})
 			}
@@ -158,30 +155,14 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Handler(handler),
 				)
 
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
-					logger.Info().
-						Str("server", "grpc").
-						Msg("Shutting down server")
-
+				gr.Add(server.Run, func(_ error) {
+					logger.Info().Str("server", "grpc").Msg("Shutting down server")
 					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

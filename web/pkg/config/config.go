@@ -96,7 +96,8 @@ type Config struct {
 	OIDC    OIDC
 	Web     Web
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

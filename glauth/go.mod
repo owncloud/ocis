@@ -20,6 +20,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
+	github.com/thejerf/suture v4.0.0+incompatible
 	go.opencensus.io v0.23.0
 )
 

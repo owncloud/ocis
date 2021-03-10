@@ -43,7 +43,8 @@ type Config struct {
 	Tracing Tracing
 	Asset   Asset
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // Asset defines the available asset configuration.

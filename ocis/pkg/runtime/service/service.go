@@ -9,35 +9,28 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
-
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/thejerf/suture"
-
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
-	glauth "github.com/owncloud/ocis/glauth/pkg/command"
-	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
-	settings "github.com/owncloud/ocis/settings/pkg/command"
-	storage "github.com/owncloud/ocis/storage/pkg/command"
 	store "github.com/owncloud/ocis/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/web/pkg/command"
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 
+	"github.com/asim/go-micro/v3/logger"
+	"github.com/thejerf/suture"
+
+	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
+	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
 	"github.com/rs/zerolog"
-)
-
-var (
-	halt = make(chan os.Signal, 1)
-	done = make(chan struct{}, 1)
 )
 
 // Service represents a RPC service.
@@ -49,8 +42,6 @@ type Service struct {
 	serviceToken map[string][]suture.ServiceToken
 	context      context.Context
 	cancel       context.CancelFunc
-	wg           *sync.WaitGroup
-	done         bool
 	cfg          *ociscfg.Config
 }
 
@@ -79,7 +70,6 @@ func NewService(options ...Option) (*Service, error) {
 		serviceToken: make(map[string][]suture.ServiceToken),
 		context:      globalCtx,
 		cancel:       cancelGlobal,
-		wg:           &sync.WaitGroup{},
 		cfg:          opts.Config,
 	}
 
@@ -112,18 +102,24 @@ func NewService(options ...Option) (*Service, error) {
 // Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
 // oCIS instance.
 func Start(o ...Option) error {
+	// prepare a new rpc Service struct.
 	s, err := NewService(o...)
 	if err != nil {
-		if s != nil {
-			s.Log.Fatal().Err(err)
-		}
+		return err
 	}
 
 	setMicroLogger()
+
+	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
 	s.Supervisor = suture.NewSimple("ocis")
+
+	// reva storages have their own logging. For consistency sake the top level logging will be cascade to reva.
 	s.cfg.Storage.Log.Color = s.cfg.Log.Color
 	s.cfg.Storage.Log.Level = s.cfg.Log.Level
 	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
+
+	// notify goroutines that they are running on supervised mode
+	s.cfg.Mode = ociscfg.SUPERVISED
 
 	if err := rpc.Register(s); err != nil {
 		if s != nil {
@@ -132,6 +128,8 @@ func Start(o ...Option) error {
 	}
 	rpc.HandleHTTP()
 
+	// halt listens for interrupt signals and blocks.
+	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
 	// TODO(refs) change default port
@@ -152,12 +150,14 @@ func Start(o ...Option) error {
 		}
 	}()
 
-	for k, _ := range s.ServicesRegistry {
-		s.serviceToken[k] = append(s.serviceToken[k], s.Supervisor.Add(s.ServicesRegistry[k](s.context, s.cfg)))
+	for name := range s.ServicesRegistry {
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, s.cfg)))
 	}
 
 	go s.Supervisor.ServeBackground()
-	go trap(s)
+
+	// trap will block on halt channel for interruptions.
+	go trap(s, halt)
 
 	return http.Serve(l, nil)
 }
@@ -196,13 +196,17 @@ func (s *Service) Kill(name string, reply *int) error {
 
 // trap blocks on halt channel. When the runtime is interrupted it
 // signals the controller to stop any supervised process.
-func trap(s *Service) {
+func trap(s *Service, halt chan os.Signal) {
 	<-halt
-	s.done = true
-	s.wg.Wait()
 	s.cancel()
+	for sName := range s.serviceToken {
+		for i := range s.serviceToken[sName] {
+			if err := s.Supervisor.Remove(s.serviceToken[sName][i]); err != nil {
+				// TODO(refs) deal with me
+			}
+		}
+	}
 	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
-	close(done)
 	os.Exit(0)
 }
 

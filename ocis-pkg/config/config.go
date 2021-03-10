@@ -57,8 +57,20 @@ type TokenManager struct {
 	JWTSecret string
 }
 
+const (
+	// SUPERVISED sets the runtime mode as supervised threads.
+	SUPERVISED = iota
+
+	// UNSUPERVISED sets the runtime mode as a single thread.
+	UNSUPERVISED
+)
+
+type Mode int
+
 // Config combines all available configuration parts.
 type Config struct {
+	Mode Mode
+
 	Registry     string
 	Log          Log
 	Debug        Debug

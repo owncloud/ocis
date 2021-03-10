@@ -208,7 +208,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 					return nil
 				}, func(err error) {
-					close(stop)
+					//close(stop)
 					cancel()
 				})
 			}

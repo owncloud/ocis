@@ -124,7 +124,8 @@ type Config struct {
 	ServiceUser  ServiceUser
 	Tracing      Tracing
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // New returns a new config.

@@ -5,10 +5,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
@@ -158,7 +158,6 @@ func Server(cfg *config.Config) *cli.Command {
 				m = metrics.New()
 			)
 
-			stop := make(chan os.Signal, 1)
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
 				if cfg.Context == nil {
@@ -202,7 +201,6 @@ func Server(cfg *config.Config) *cli.Command {
 						Str("server", "http").
 						Msg("Shutting down server")
 
-					close(stop)
 					cancel()
 				})
 			}
@@ -215,47 +213,17 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
-					close(stop)
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Error().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
-					close(stop)
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-					<-stop
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

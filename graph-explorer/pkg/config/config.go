@@ -46,6 +46,7 @@ type Config struct {
 	HTTP          HTTP
 	Tracing       Tracing
 	GraphExplorer GraphExplorer
+	Supervised    bool
 }
 
 // New initializes a new configuration with or without defaults.

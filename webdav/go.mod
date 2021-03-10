@@ -18,6 +18,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/viper v1.7.1
+	github.com/thejerf/suture v4.0.0+incompatible
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/text v0.3.5 // indirect

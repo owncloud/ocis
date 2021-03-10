@@ -114,6 +114,9 @@ type SutureService struct {
 func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Web.Context = sctx
+	if cfg.Mode == 0 {
+		cfg.Web.Supervised = true
+	}
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,

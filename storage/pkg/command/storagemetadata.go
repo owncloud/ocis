@@ -4,20 +4,21 @@ import (
 	"context"
 	"flag"
 	"os"
-	"os/signal"
 	"path"
 	"time"
 
-	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/storage/pkg/service/external"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/thejerf/suture"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/cs3org/reva/cmd/revad/runtime"
+	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/thejerf/suture"
 )
 
 // StorageMetadata the entrypoint for the storage-storage-metadata command.
@@ -74,7 +75,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			var (
 				gr          = run.Group{}
 				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
 			)
 
 			defer cancel()
@@ -192,18 +192,8 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			if err := external.RegisterGRPCEndpoint(
@@ -232,6 +222,9 @@ type SutureService struct {
 func NewStorageMetadata(ctx context.Context, cfg *ociscfg.Config) suture.Service {
 	sctx, cancel := context.WithCancel(ctx)
 	cfg.Storage.Reva.StorageMetadata.Context = sctx
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.StorageMetadata.Supervised = true
+	}
 	return SutureService{
 		ctx:    sctx,
 		cancel: cancel,

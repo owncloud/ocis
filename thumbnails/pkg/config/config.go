@@ -43,7 +43,8 @@ type Config struct {
 	Tracing   Tracing
 	Thumbnail Thumbnail
 
-	Context context.Context
+	Context    context.Context
+	Supervised bool
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.
