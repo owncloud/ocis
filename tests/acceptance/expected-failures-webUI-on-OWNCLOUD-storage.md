@@ -19,7 +19,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [Media Viewer preview not visible for files with .jpeg, .ogg, .webm and .gif formats](https://github.com/owncloud/ocis/issues/1490)
 -   [webUIPreview/imageMediaViewer.feature:136](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L136)
--   [webUIPreview/imageMediaViewer.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L145)
 -   [webUIPreview/imageMediaViewer.feature:154](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L154)
 
 ### [Media viewer previews are not visible in public share](https://github.com/owncloud/ocis/issues/1370)

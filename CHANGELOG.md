@@ -7,7 +7,9 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+* Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
 ## Details
 
@@ -17,6 +19,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/1490
    https://github.com/owncloud/ocis/pull/1785
+
+* Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
+
+   https://github.com/owncloud/web/issues/4322
+   https://github.com/owncloud/ocis/pull/1792
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
@@ -31,6 +38,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/214
    https://github.com/owncloud/ocis/pull/1790
    https://github.com/owncloud/client/pull/8398
+
+* Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
+
+   Added support for gifs to the thumbnails service.
+
+   https://github.com/owncloud/ocis/pull/1791
 # Changelog for [1.3.0] (2021-03-09)
 
 The following sections list the changes for 1.3.0.
