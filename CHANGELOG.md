@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
 ## Details
@@ -17,6 +18,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/1490
    https://github.com/owncloud/ocis/pull/1785
+
+* Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
+
+   https://github.com/owncloud/web/issues/4322
+   https://github.com/owncloud/ocis/pull/1792
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
