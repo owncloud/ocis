@@ -95,7 +95,7 @@ func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
 	case "JPG", "PNG":
 		val := thumbnails.GetRequest_FileType_value[ext]
 		return thumbnails.GetRequest_FileType(val)
-	case "JPEG":
+	case "JPEG", "GIF":
 		val := thumbnails.GetRequest_FileType_value["JPG"]
 		return thumbnails.GetRequest_FileType(val)
 	default:
