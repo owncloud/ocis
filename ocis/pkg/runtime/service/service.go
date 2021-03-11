@@ -253,7 +253,7 @@ func trap(s *Service, halt chan os.Signal) {
 	for sName := range s.serviceToken {
 		for i := range s.serviceToken[sName] {
 			if err := s.Supervisor.Remove(s.serviceToken[sName][i]); err != nil {
-				// TODO(refs) deal with me
+				s.Log.Error().Err(err).Str("service", "runtime service").Msgf("terminating with signal: %v", s)
 			}
 		}
 	}
@@ -265,7 +265,7 @@ func trap(s *Service, halt chan os.Signal) {
 // want to expose to the end user the internal framework logs unless explicitly specified.
 func setMicroLogger() {
 	if os.Getenv("MICRO_LOG_LEVEL") == "" {
-		os.Setenv("MICRO_LOG_LEVEL", "error")
+		_ = os.Setenv("MICRO_LOG_LEVEL", "error")
 	}
 
 	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
