@@ -29,10 +29,15 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
-		Before: func(c *cli.Context) error {
-			cfg.Thumbnail.Resolutions = c.StringSlice("thumbnail-resolution")
+		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
+			cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
 
-			return ParseConfig(c, cfg)
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "thumbnails").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

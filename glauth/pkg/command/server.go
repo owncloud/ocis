@@ -37,15 +37,18 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
-		Before: func(c *cli.Context) error {
+		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-
-			cfg.Backend.Servers = c.StringSlice("backend-server")
-			cfg.Fallback.Servers = c.StringSlice("fallback-server")
-
-			return ParseConfig(c, cfg)
+			cfg.Backend.Servers = ctx.StringSlice("backend-server")
+			cfg.Fallback.Servers = ctx.StringSlice("fallback-server")
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "glauth").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

@@ -30,11 +30,16 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return ParseConfig(ctx, cfg)
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "onlyoffice").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

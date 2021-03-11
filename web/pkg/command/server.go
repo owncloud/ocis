@@ -31,22 +31,25 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
-		Before: func(c *cli.Context) error {
+		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
 
-			cfg.Web.Config.Apps = c.StringSlice("web-config-app")
+			cfg.Web.Config.Apps = ctx.StringSlice("web-config-app")
 
-			if err := ParseConfig(c, cfg); err != nil {
-				return err
+			if !cfg.Supervised {
+				if err := ParseConfig(ctx, cfg); err != nil {
+					return err
+				}
 			}
+			logger.Debug().Str("service", "web").Msg("ignoring config file parsing when running supervised")
 
 			// build well known openid-configuration endpoint if it is not set
 			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
 				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
 			}
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
