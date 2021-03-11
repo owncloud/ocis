@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // StorageMetadata the entrypoint for the storage-storage-metadata command.
@@ -204,43 +204,36 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 // SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewSutureService creates a new storagemetadata.SutureService
-func NewStorageMetadata(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.StorageMetadata.Context = sctx
+func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.StorageMetadata.Supervised = true
 	}
 	return SutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s SutureService) Serve() {
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageMetadata.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range StorageMetadata(s.cfg).Flags {
 		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if StorageMetadata(s.cfg).Before != nil {
-		if err := StorageMetadata(s.cfg).Before(ctx); err != nil {
-			return
+		if err := StorageMetadata(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := StorageMetadata(s.cfg).Action(ctx); err != nil {
-		return
+	if err := StorageMetadata(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s SutureService) Stop() {
-	s.cancel()
+	return nil
 }

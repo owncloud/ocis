@@ -15,7 +15,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // StoragePublicLink is the entrypoint for the reva-storage-public-link command.
@@ -149,43 +149,36 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 
 // StoragePublicLinkSutureService allows for the storage-public-link command to be embedded and supervised by a suture supervisor tree.
 type StoragePublicLinkSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
-func NewStoragePublicLink(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.StoragePublicLink.Context = sctx
+func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.StoragePublicLink.Supervised = true
 	}
 	return StoragePublicLinkSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s StoragePublicLinkSutureService) Serve() {
+func (s StoragePublicLinkSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StoragePublicLink.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range StoragePublicLink(s.cfg).Flags {
 		if err := StoragePublicLink(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if StoragePublicLink(s.cfg).Before != nil {
-		if err := StoragePublicLink(s.cfg).Before(ctx); err != nil {
-			return
+		if err := StoragePublicLink(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := StoragePublicLink(s.cfg).Action(ctx); err != nil {
-		return
+	if err := StoragePublicLink(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s StoragePublicLinkSutureService) Stop() {
-	s.cancel()
+	return nil
 }

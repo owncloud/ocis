@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis/settings/pkg/flagset"
 	"github.com/owncloud/ocis/settings/pkg/version"
 	"github.com/spf13/viper"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the ocis-settings command.
@@ -116,31 +116,24 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 // SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewSutureService creates a new settings.SutureService
-func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Settings.Context = sctx
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Settings.Supervised = true
 	}
 	return SutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Settings,
+		cfg: cfg.Settings,
 	}
 }
 
-func (s SutureService) Serve() {
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
 	if err := Execute(s.cfg); err != nil {
-		return
+		return err
 	}
-}
 
-func (s SutureService) Stop() {
-	s.cancel()
+	return nil
 }

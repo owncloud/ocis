@@ -23,6 +23,7 @@ require (
 	github.com/iancoleman/strcase v0.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
+	github.com/oklog/run v1.1.0
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/glauth v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/graph v0.0.0-20210216094451-dc73176dc62d

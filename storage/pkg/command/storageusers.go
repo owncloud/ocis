@@ -15,7 +15,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // StorageUsers is the entrypoint for the storage-users command.
@@ -171,43 +171,36 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 
 // StorageUsersSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
 type StorageUsersSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
-func NewStorageUsers(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.StorageUsers.Context = sctx
+func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.StorageUsers.Supervised = true
 	}
 	return StorageUsersSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s StorageUsersSutureService) Serve() {
+func (s StorageUsersSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageUsers.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range StorageUsers(s.cfg).Flags {
 		if err := StorageUsers(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if StorageUsers(s.cfg).Before != nil {
-		if err := StorageUsers(s.cfg).Before(ctx); err != nil {
-			return
+		if err := StorageUsers(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := StorageUsers(s.cfg).Action(ctx); err != nil {
-		return
+	if err := StorageUsers(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s StorageUsersSutureService) Stop() {
-	s.cancel()
+	return nil
 }

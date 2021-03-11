@@ -19,7 +19,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -305,43 +305,36 @@ func loadUserAgent(c *cli.Context, cfg *config.Config) error {
 
 // FrontendSutureService allows for the storage-frontend command to be embedded and supervised by a suture supervisor tree.
 type FrontendSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewFrontendSutureService creates a new frontend.FrontendSutureService
-func NewFrontend(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.Frontend.Context = sctx
+func NewFrontend(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Frontend.Supervised = true
 	}
 	return FrontendSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s FrontendSutureService) Serve() {
+func (s FrontendSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.Frontend.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range Frontend(s.cfg).Flags {
 		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if Frontend(s.cfg).Before != nil {
-		if err := Frontend(s.cfg).Before(ctx); err != nil {
-			return
+		if err := Frontend(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := Frontend(s.cfg).Action(ctx); err != nil {
-		return
+	if err := Frontend(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s FrontendSutureService) Stop() {
-	s.cancel()
+	return nil
 }

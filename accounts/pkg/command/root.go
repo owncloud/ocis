@@ -15,7 +15,7 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/spf13/viper"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 var (
@@ -127,31 +127,24 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 // SutureService allows for the accounts command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewSutureService creates a new accounts.SutureService
-func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Accounts.Context = sctx // propagate the context down to the go-micro services.
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Accounts.Supervised = true
 	}
 	return SutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Accounts,
+		cfg: cfg.Accounts,
 	}
 }
 
-func (s SutureService) Serve() {
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
 	if err := Execute(s.cfg); err != nil {
-		return
+		return err
 	}
-}
 
-func (s SutureService) Stop() {
-	s.cancel()
+	return nil
 }

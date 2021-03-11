@@ -13,7 +13,7 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/spf13/viper v1.7.1
-	github.com/thejerf/suture v4.0.0+incompatible
+	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/mod v0.4.1 // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b

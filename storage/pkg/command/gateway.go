@@ -18,7 +18,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Gateway is the entrypoint for the gateway command.
@@ -230,43 +230,36 @@ func rules(cfg *config.Config) map[string]interface{} {
 
 // GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
 type GatewaySutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
-func NewGateway(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.Gateway.Context = sctx
+func NewGateway(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Gateway.Supervised = true
 	}
 	return GatewaySutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s GatewaySutureService) Serve() {
+func (s GatewaySutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.Gateway.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range Gateway(s.cfg).Flags {
 		if err := Gateway(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if Gateway(s.cfg).Before != nil {
-		if err := Gateway(s.cfg).Before(ctx); err != nil {
-			return
+		if err := Gateway(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := Gateway(s.cfg).Action(ctx); err != nil {
-		return
+	if err := Gateway(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s GatewaySutureService) Stop() {
-	s.cancel()
+	return nil
 }

@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Groups is the entrypoint for the sharing command.
@@ -187,43 +187,36 @@ func Groups(cfg *config.Config) *cli.Command {
 
 // GroupsProvider allows for the storage-groupsprovider command to be embedded and supervised by a suture supervisor tree.
 type GroupsProvider struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewGroupsProvider creates a new storage.GroupsProvider
-func NewGroupsProvider(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.Groups.Context = sctx
+func NewGroupsProvider(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Groups.Supervised = true
 	}
 	return GroupsProvider{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s GroupsProvider) Serve() {
+func (s GroupsProvider) Serve(ctx context.Context) error {
+	s.cfg.Reva.Groups.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range Groups(s.cfg).Flags {
 		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if Groups(s.cfg).Before != nil {
-		if err := Groups(s.cfg).Before(ctx); err != nil {
-			return
+		if err := Groups(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := Groups(s.cfg).Action(ctx); err != nil {
-		return
+	if err := Groups(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s GroupsProvider) Stop() {
-	s.cancel()
+	return nil
 }

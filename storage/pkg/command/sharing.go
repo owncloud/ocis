@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Sharing is the entrypoint for the sharing command.
@@ -180,43 +180,36 @@ func Sharing(cfg *config.Config) *cli.Command {
 
 // SharingSutureService allows for the storage-sharing command to be embedded and supervised by a suture supervisor tree.
 type SharingSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewSharingSutureService creates a new store.SharingSutureService
-func NewSharing(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.Sharing.Context = sctx
+func NewSharing(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Sharing.Supervised = true
 	}
 	return SharingSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s SharingSutureService) Serve() {
+func (s SharingSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.Sharing.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range Sharing(s.cfg).Flags {
 		if err := Sharing(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if Sharing(s.cfg).Before != nil {
-		if err := Sharing(s.cfg).Before(ctx); err != nil {
-			return
+		if err := Sharing(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := Sharing(s.cfg).Action(ctx); err != nil {
-		return
+	if err := Sharing(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s SharingSutureService) Stop() {
-	s.cancel()
+	return nil
 }

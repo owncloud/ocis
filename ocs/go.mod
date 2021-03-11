@@ -25,6 +25,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture v4.0.0+incompatible
+	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
 	google.golang.org/protobuf v1.25.0

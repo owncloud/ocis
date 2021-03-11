@@ -15,7 +15,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
@@ -152,43 +152,36 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 
 // AuthBearerSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
 type AuthBearerSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
-func NewAuthBearer(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.AuthBearer.Context = sctx
+func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.AuthBearer.Supervised = true
 	}
 	return AuthBearerSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s AuthBearerSutureService) Serve() {
+func (s AuthBearerSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.AuthBearer.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range AuthBearer(s.cfg).Flags {
 		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if AuthBearer(s.cfg).Before != nil {
-		if err := AuthBearer(s.cfg).Before(ctx); err != nil {
-			return
+		if err := AuthBearer(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := AuthBearer(s.cfg).Action(ctx); err != nil {
-		return
+	if err := AuthBearer(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s AuthBearerSutureService) Stop() {
-	s.cancel()
+	return nil
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/owncloud/ocis/web/pkg/config"
 	"github.com/owncloud/ocis/web/pkg/version"
 	"github.com/spf13/viper"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the web command.
@@ -109,31 +109,24 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 // SutureService allows for the web command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewSutureService creates a new web.SutureService
-func NewSutureService(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Web.Context = sctx
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Web.Supervised = true
 	}
 	return SutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Web,
+		cfg: cfg.Web,
 	}
 }
 
-func (s SutureService) Serve() {
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
 	if err := Execute(s.cfg); err != nil {
-		return
+		return err
 	}
-}
 
-func (s SutureService) Stop() {
-	s.cancel()
+	return nil
 }

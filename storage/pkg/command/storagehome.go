@@ -16,7 +16,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/thejerf/suture"
+	"github.com/thejerf/suture/v4"
 )
 
 // StorageHome is the entrypoint for the storage-home command.
@@ -172,43 +172,36 @@ func StorageHome(cfg *config.Config) *cli.Command {
 
 // StorageHomeSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
 type StorageHomeSutureService struct {
-	ctx    context.Context
-	cancel context.CancelFunc // used to cancel the context go-micro services used to shutdown a service.
-	cfg    *config.Config
+	cfg *config.Config
 }
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
-func NewStorageHome(ctx context.Context, cfg *ociscfg.Config) suture.Service {
-	sctx, cancel := context.WithCancel(ctx)
-	cfg.Storage.Reva.StorageHome.Context = sctx
+func NewStorageHome(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.StorageHome.Supervised = true
 	}
 	return StorageHomeSutureService{
-		ctx:    sctx,
-		cancel: cancel,
-		cfg:    cfg.Storage,
+		cfg: cfg.Storage,
 	}
 }
 
-func (s StorageHomeSutureService) Serve() {
+func (s StorageHomeSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageHome.Context = ctx
 	f := &flag.FlagSet{}
 	for k := range StorageHome(s.cfg).Flags {
 		if err := StorageHome(s.cfg).Flags[k].Apply(f); err != nil {
-			return
+			return err
 		}
 	}
-	ctx := cli.NewContext(nil, f, nil)
+	cliCtx := cli.NewContext(nil, f, nil)
 	if StorageHome(s.cfg).Before != nil {
-		if err := StorageHome(s.cfg).Before(ctx); err != nil {
-			return
+		if err := StorageHome(s.cfg).Before(cliCtx); err != nil {
+			return err
 		}
 	}
-	if err := StorageHome(s.cfg).Action(ctx); err != nil {
-		return
+	if err := StorageHome(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
-}
 
-func (s StorageHomeSutureService) Stop() {
-	s.cancel()
+	return nil
 }

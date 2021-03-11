@@ -13,36 +13,33 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mohae/deepcopy"
-
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
-	accounts "github.com/owncloud/ocis/accounts/pkg/command"
-	ocs "github.com/owncloud/ocis/ocs/pkg/command"
-	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
-	proxy "github.com/owncloud/ocis/proxy/pkg/command"
-	store "github.com/owncloud/ocis/store/pkg/command"
-	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
-	web "github.com/owncloud/ocis/web/pkg/command"
-	webdav "github.com/owncloud/ocis/webdav/pkg/command"
-
 	"github.com/asim/go-micro/v3/logger"
-	"github.com/thejerf/suture"
-
+	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	ocs "github.com/owncloud/ocis/ocs/pkg/command"
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
+	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
+	store "github.com/owncloud/ocis/store/pkg/command"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
+	web "github.com/owncloud/ocis/web/pkg/command"
+	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/rs/zerolog"
+	"github.com/thejerf/suture/v4"
 )
 
 // Service represents a RPC service.
 type Service struct {
 	Supervisor       *suture.Supervisor
-	ServicesRegistry map[string]func(context.Context, *ociscfg.Config) suture.Service
-	Delayed          map[string]func(context.Context, *ociscfg.Config) suture.Service
+	ServicesRegistry map[string]func(*ociscfg.Config) suture.Service
+	Delayed          map[string]func(*ociscfg.Config) suture.Service
 	Log              log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
@@ -72,8 +69,8 @@ func NewService(options ...Option) (*Service, error) {
 	globalCtx, cancelGlobal := context.WithCancel(context.Background())
 
 	s := &Service{
-		ServicesRegistry: make(map[string]func(context.Context, *ociscfg.Config) suture.Service),
-		Delayed:          make(map[string]func(context.Context, *ociscfg.Config) suture.Service),
+		ServicesRegistry: make(map[string]func(*ociscfg.Config) suture.Service),
+		Delayed:          make(map[string]func(*ociscfg.Config) suture.Service),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -88,7 +85,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
 	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
-	//s.ServicesRegistry["proxy"] = proxy.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
 	s.ServicesRegistry["web"] = web.NewSutureService
@@ -124,8 +120,8 @@ func Start(o ...Option) error {
 
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
 	s.Supervisor = suture.New("ocis", suture.Spec{
-		Log: func(msg string) {
-			s.Log.Info().Str("message", msg).Msg("supervisor: ")
+		EventHook: func(e suture.Event) {
+			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
 		},
 	})
 
@@ -168,19 +164,25 @@ func Start(o ...Option) error {
 
 	for name := range s.ServicesRegistry {
 		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
 	}
 
-	go s.Supervisor.ServeBackground()
+	// there are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
+	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
+	// go supervisor.Serve()
+	// because that will briefly create a race condition as it starts up, if you try to .Add() services immediately afterward.
+	// https://pkg.go.dev/github.com/thejerf/suture/v4@v4.0.0#Supervisor
+	go s.Supervisor.ServeBackground(s.context)
 
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
 
-	time.Sleep(2 * time.Second)
-	// add delayed
+	time.Sleep(1 * time.Second)
+
+	// add services with delayed execution.
 	for name := range s.Delayed {
 		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, swap.(*ociscfg.Config))))
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
 	}
 
 	return http.Serve(l, nil)
@@ -191,13 +193,13 @@ func (s *Service) Start(name string, reply *int) error {
 	swap := deepcopy.Copy(s.cfg)
 	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](s.context, swap.(*ociscfg.Config))))
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
 		return nil
 	}
 
 	if _, ok := s.Delayed[name]; ok {
 		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](s.context, swap.(*ociscfg.Config))))
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
 		return nil
 	}
 
