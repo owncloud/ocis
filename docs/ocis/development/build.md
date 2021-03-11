@@ -30,7 +30,7 @@ make generate
 make build
 {{< / highlight >}}
 
-After building you have the binary within the `bin/` folder. Try to run it: `./bin/ocis -h`
+After building you have the binary within the `bin/` folder. Try to run it: `./bin/ocis h`
 
 ## Build a local oCIS docker image
 
