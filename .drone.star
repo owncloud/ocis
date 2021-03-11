@@ -205,10 +205,6 @@ def testPipelines(ctx):
     localApiTests(ctx, 'ocis', 'apiAccountsHashDifficulty', 'default')
   ]
 
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'owncloud'))
-    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'ocis'))
-
   pipelines += uiTests(ctx)
   pipelines.append(accountsUITests(ctx))
   return pipelines
@@ -417,54 +413,6 @@ def localApiTests(ctx, storage = 'owncloud', suite = 'apiBugDemonstration', acco
         },
         'commands': [
           'make test-acceptance-api',
-        ],
-        'volumes': [stepVolumeOC10Tests],
-      },
-    ],
-    'services':
-      redis(),
-    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/v*',
-        'refs/pull/**',
-      ],
-    },
-    'volumes': [pipelineVolumeOC10Tests],
-  }
-
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud', accounts_hash_difficulty = 4):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'Core-API-Tests-%s-storage-%s' % (storage, part_number),
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps':
-      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
-      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
-      cloneCoreRepos() + [
-      {
-        'name': 'oC10ApiTests-%s-storage-%s' % (storage, part_number),
-        'image': 'owncloudci/php:7.4',
-        'pull': 'always',
-        'environment' : {
-          'TEST_SERVER_URL': 'https://ocis-server:9200',
-          'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
-          'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
-          'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
-          'TEST_OCIS':'true',
-          'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
-          'DIVIDE_INTO_NUM_PARTS': number_of_parts,
-          'RUN_PART': part_number,
-          'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md' % (storage.upper()),
-        },
-        'commands': [
-          'make -C /srv/app/testrunner test-acceptance-api',
         ],
         'volumes': [stepVolumeOC10Tests],
       },
