@@ -150,7 +150,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-uri",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.URI, "http://localhost:9125"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.URI, "ldap://localhost:9125"),
 			Usage:       "URI of the LDAP server (glauth)",
 			EnvVars:     []string{"IDP_LDAP_URI"},
 			Destination: &cfg.Ldap.URI,
