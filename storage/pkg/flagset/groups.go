@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
@@ -12,7 +13,7 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9161",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.DebugAddr, "0.0.0.0:9161"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Groups.DebugAddr,
@@ -24,21 +25,21 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "network",
-			Value:       "tcp",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.GRPCNetwork, "tcp"),
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_NETWORK"},
 			Destination: &cfg.Reva.Groups.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       "0.0.0.0:9160",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.GRPCAddr, "0.0.0.0:9160"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ADDR"},
 			Destination: &cfg.Reva.Groups.GRPCAddr,
 		},
 		&cli.StringFlag{
 			Name:        "endpoint",
-			Value:       "localhost:9160",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.Endpoint, "0.0.0.0:9160"),
 			Usage:       "URL to use for the storage service",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
 			Destination: &cfg.Reva.Groups.Endpoint,
@@ -52,21 +53,21 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "driver",
-			Value:       "ldap",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.Driver, "ldap"),
 			Usage:       "group driver: 'json', 'ldap', or 'rest'",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DRIVER"},
 			Destination: &cfg.Reva.Groups.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "json-config",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.JSON, ""),
 			Usage:       "Path to groups.json file",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_JSON"},
 			Destination: &cfg.Reva.Groups.JSON,
 		},
 		&cli.IntFlag{
 			Name:        "group-members-cache-expiration",
-			Value:       5,
+			Value:       flags.OverrideDefaultInt(cfg.Reva.Groups.GroupMembersCacheExpiration, 5),
 			Usage:       "Time in minutes for redis cache expiration.",
 			EnvVars:     []string{"STORAGE_GROUP_CACHE_EXPIRATION"},
 			Destination: &cfg.Reva.Groups.GroupMembersCacheExpiration,

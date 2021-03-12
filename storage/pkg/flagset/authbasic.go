@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
@@ -12,7 +13,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9147",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.DebugAddr, "0.0.0.0:9147"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AuthBasic.DebugAddr,
@@ -22,14 +23,14 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "auth-driver",
-			Value:       "ldap",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthProvider.Driver, "ldap"),
 			Usage:       "auth driver: 'demo', 'json' or 'ldap'",
 			EnvVars:     []string{"STORAGE_AUTH_DRIVER"},
 			Destination: &cfg.Reva.AuthProvider.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "auth-json",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthProvider.JSON, ""),
 			Usage:       "Path to users.json file",
 			EnvVars:     []string{"STORAGE_AUTH_JSON"},
 			Destination: &cfg.Reva.AuthProvider.JSON,
@@ -41,14 +42,14 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "network",
-			Value:       "tcp",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCNetwork, "tcp"),
 			Usage:       "Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'",
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_GRPC_NETWORK"},
 			Destination: &cfg.Reva.AuthBasic.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       "0.0.0.0:9146",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCAddr, "0.0.0.0:9146"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_GRPC_ADDR"},
 			Destination: &cfg.Reva.AuthBasic.GRPCAddr,
@@ -64,7 +65,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "gateway-url",
-			Value:       "localhost:9142",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
 			Usage:       "URL to use for the storage gateway service",
 			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
