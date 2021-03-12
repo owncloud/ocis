@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/web/pkg/config"
 )
 
@@ -60,42 +61,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"WEB_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"WEB_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"WEB_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "web",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "web"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"WEB_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9104",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"WEB_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Token, ""),
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"WEB_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -114,63 +115,63 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9100",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9100"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"WEB_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       "/",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"WEB_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
 			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the http namespace",
 			EnvVars:     []string{"WEB_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
 		&cli.IntFlag{
 			Name:        "http-cache-ttl",
-			Value:       604800, // 7 days
+			Value:       flags.OverrideDefaultInt(cfg.HTTP.CacheTTL, 604800), // 7 days
 			Usage:       "Set the static assets caching duration in seconds",
 			EnvVars:     []string{"WEB_CACHE_TTL"},
 			Destination: &cfg.HTTP.CacheTTL,
 		},
 		&cli.StringFlag{
 			Name:        "asset-path",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
 			Usage:       "Path to custom assets",
 			EnvVars:     []string{"WEB_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "web-config",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Web.Path, ""),
 			Usage:       "Path to web config",
 			EnvVars:     []string{"WEB_UI_CONFIG"},
 			Destination: &cfg.Web.Path,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-server",
-			Value:       "https://localhost:9200",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.Server, "https://localhost:9200"),
 			Usage:       "Server URL",
 			EnvVars:     []string{"WEB_UI_CONFIG_SERVER", "OCIS_URL"}, // WEB_UI_CONFIG_SERVER takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.Server,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-theme",
-			Value:       "owncloud",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.Theme, "owncloud"),
 			Usage:       "Theme",
 			EnvVars:     []string{"WEB_UI_CONFIG_THEME"},
 			Destination: &cfg.Web.Config.Theme,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-version",
-			Value:       "0.1.0",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.Version, "0.1.0"),
 			Usage:       "Version",
 			EnvVars:     []string{"WEB_UI_CONFIG_VERSION"},
 			Destination: &cfg.Web.Config.Version,
@@ -183,35 +184,35 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-metadata-url",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.MetadataURL, ""),
 			Usage:       "OpenID Connect metadata URL, defaults to <WEB_OIDC_AUTHORITY>/.well-known/openid-configuration",
 			EnvVars:     []string{"WEB_OIDC_METADATA_URL"},
 			Destination: &cfg.Web.Config.OpenIDConnect.MetadataURL,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-authority",
-			Value:       "https://localhost:9200",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.Authority, "https://localhost:9200"),
 			Usage:       "OpenID Connect authority",                 // TODO rename to Issuer
 			EnvVars:     []string{"WEB_OIDC_AUTHORITY", "OCIS_URL"}, // WEB_OIDC_AUTHORITY takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.OpenIDConnect.Authority,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-client-id",
-			Value:       "web",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.ClientID, "web"),
 			Usage:       "OpenID Connect client ID",
 			EnvVars:     []string{"WEB_OIDC_CLIENT_ID"},
 			Destination: &cfg.Web.Config.OpenIDConnect.ClientID,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-response-type",
-			Value:       "code",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.ResponseType, "code"),
 			Usage:       "OpenID Connect response type",
 			EnvVars:     []string{"WEB_OIDC_RESPONSE_TYPE"},
 			Destination: &cfg.Web.Config.OpenIDConnect.ResponseType,
 		},
 		&cli.StringFlag{
 			Name:        "oidc-scope",
-			Value:       "openid profile email",
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.Scope, "openid profile email"),
 			Usage:       "OpenID Connect scope",
 			EnvVars:     []string{"WEB_OIDC_SCOPE"},
 			Destination: &cfg.Web.Config.OpenIDConnect.Scope,
