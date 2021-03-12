@@ -2,7 +2,9 @@ SHELL := bash
 NAME := onlyoffice
 
 ############ tooling ############
+ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
+endif
 
 ############ go tooling ############
 include ../.make/go.mk
