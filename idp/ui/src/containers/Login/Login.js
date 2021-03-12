@@ -62,9 +62,25 @@ class Login extends React.PureComponent {
       : (errors.username
         ? <ErrorMessage error={errors.username}></ErrorMessage>
         : <ErrorMessage error={errors.password}></ErrorMessage>);
+    const extraPropsUsername = {
+      "aria-invalid" : (errors.username || errors.http) ? 'true' : 'false'
+    };
+    const extraPropsPassword = {
+      "aria-invalid" : (errors.password || errors.http) ? 'true' : 'false',
+    };
 
-    return (
-      <form action="" onSubmit={(event) => this.logon(event)}>
+    if(errors.username || errors.http){
+      extraPropsUsername['extraClassName'] = 'error';
+      extraPropsUsername['aria-describedby'] = 'oc-login-error-message';
+    }
+
+    if(errors.password || errors.http){
+      extraPropsPassword['extraClassName'] = 'error';
+      extraPropsPassword['aria-describedby'] = 'oc-login-error-message';
+    }
+
+      return (
+      <form action="" className="oc-login-form" onSubmit={(event) => this.logon(event)}>
         <TextInput
           autoFocus
           autoCapitalize="off"
@@ -73,6 +89,9 @@ class Login extends React.PureComponent {
           onChange={this.handleChange('username')}
           autoComplete="kopano-account username"
           placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Username" })}
+          label={({ id: "konnect.login.usernameField.label", defaultMessage: "Username" })}
+          id="oc-login-username"
+          {...extraPropsUsername}
         />
         <TextInput
           type="password"
@@ -80,8 +99,11 @@ class Login extends React.PureComponent {
           onChange={this.handleChange('password')}
           autoComplete="kopano-account current-password"
           placeholder={({ id: "konnect.login.usernameField.label", defaultMessage: "Password" })}
+          label={({ id: "konnect.login.usernameField.label", defaultMessage: "Password" })}
+          id="oc-login-password"
+          {...extraPropsPassword}
         />
-        {hasError && <Typography variant="subtitle2" color="error" className={classes.message}>{errorMessage}</Typography>}
+        {hasError && <Typography id="oc-login-error-message" variant="subtitle2" color="error" className={classes.message}>{errorMessage}</Typography>}
         <div className={classes.wrapper}>
           <Button
             type="submit"
