@@ -103,7 +103,7 @@ services:
       STORAGE_TRANSFER_EXPIRES: 86400
     volumes:
       - ./config/ocis:/config
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=http"
@@ -201,12 +201,7 @@ volumes:
   certs:
   ocis-data:
   files:
-    driver: local
   mysql:
-    driver: local
   backup:
-    driver: local
   redis:
-    driver: local
   tmp:
-    driver: local

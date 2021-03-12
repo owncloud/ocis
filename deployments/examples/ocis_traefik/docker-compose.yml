@@ -59,7 +59,7 @@ services:
       OCIS_JWT_SECRET: ${STORAGE_JWT_SECRET:-Pive-Fumkiu4}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=http"

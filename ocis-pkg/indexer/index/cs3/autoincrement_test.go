@@ -11,7 +11,7 @@ package cs3
 //	"github.com/stretchr/testify/assert"
 //)
 //
-//const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+//const cs3RootFolder = "/tmp/ocis/storage/users/data"
 //
 //func TestAutoincrementIndexAdd(t *testing.T) {
 //	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)

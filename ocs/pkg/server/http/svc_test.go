@@ -222,7 +222,7 @@ func getFormatString(format string) string {
 }
 
 func createTmpDir() string {
-	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-")
+	name, err := ioutil.TempDir("/tmp", "ocis-accounts-store-")
 	if err != nil {
 		panic(err)
 	}

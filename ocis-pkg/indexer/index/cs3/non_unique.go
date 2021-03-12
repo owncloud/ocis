@@ -45,14 +45,14 @@ type NonUnique struct {
 }
 
 // NewNonUniqueIndexWithOptions instantiates a new NonUniqueIndex instance.
-// /var/tmp/ocis/accounts/index.cs3/Pets/Bro*
+// /tmp/ocis-accounts/index.cs3/Pets/Bro*
 // ├── Brown/
-// │   └── rebef-123 -> /var/tmp/testfiles-395764020/pets/rebef-123
+// │   └── rebef-123 -> /tmp/testfiles-395764020/pets/rebef-123
 // ├── Green/
-// │    ├── goefe-789 -> /var/tmp/testfiles-395764020/pets/goefe-789
-// │    └── xadaf-189 -> /var/tmp/testfiles-395764020/pets/xadaf-189
+// │    ├── goefe-789 -> /tmp/testfiles-395764020/pets/goefe-789
+// │    └── xadaf-189 -> /tmp/testfiles-395764020/pets/xadaf-189
 // └── White/
-//     └── wefwe-456 -> /var/tmp/testfiles-395764020/pets/wefwe-456
+//     └── wefwe-456 -> /tmp/testfiles-395764020/pets/wefwe-456
 func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 	opts := &option.Options{}
 	for _, opt := range o {

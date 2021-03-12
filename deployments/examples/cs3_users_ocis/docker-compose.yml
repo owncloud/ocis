@@ -78,7 +78,7 @@ services:
       OCIS_JWT_SECRET: ${STORAGE_JWT_SECRET:-Pive-Fumkiu4}
     volumes:
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=http"

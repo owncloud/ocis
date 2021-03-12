@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const dataPath = "/var/tmp/ocis-accounts-tests"
+const dataPath = "/tmp/ocis-accounts-tests"
 
 var (
 	roleServiceMock settings.RoleService

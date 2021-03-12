@@ -10,7 +10,7 @@ import (
 
 // CreateTmpDir creates a temporary dir for tests data.
 func CreateTmpDir() (string, error) {
-	name, err := ioutil.TempDir("/var/tmp", "testfiles-")
+	name, err := ioutil.TempDir("/tmp", "testfiles-")
 	if err != nil {
 		return "", err
 	}

@@ -290,7 +290,7 @@ func BenchmarkAdd(b *testing.B) {
 }
 
 func createTmpDirStr() (string, error) {
-	name, err := ioutil.TempDir("/var/tmp", "testfiles-*")
+	name, err := ioutil.TempDir("/tmp", "testfiles-*")
 	if err != nil {
 		return "", err
 	}

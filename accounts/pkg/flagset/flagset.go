@@ -142,8 +142,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-disk-path",
-			Value:       "",
-			Usage:       "Path on the local disk, e.g. /var/tmp/ocis/accounts",
+			Value:       "", // TODO: add default here. select storage provider by explicit flag
+			Usage:       "Path on the local disk, e.g. ./data/accounts",
 			EnvVars:     []string{"ACCOUNTS_STORAGE_DISK_PATH"},
 			Destination: &cfg.Repo.Disk.Path,
 		},

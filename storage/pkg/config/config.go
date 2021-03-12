@@ -95,7 +95,6 @@ type Groups struct {
 // FrontendPort defines the available frontend configuration.
 type FrontendPort struct {
 	Port
-
 	DatagatewayPrefix string
 	OCDavPrefix       string
 	OCSPrefix         string

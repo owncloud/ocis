@@ -1,10 +1,16 @@
 package command
 
 import (
+	"path/filepath"
+
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
 func drivers(cfg *config.Config) map[string]interface{} {
+
+	// UploadInfoDir must always be absolute for REVA
+	uploadInfoDir, _ := filepath.Abs(cfg.Reva.Storages.OwnCloud.UploadInfoDir)
+
 	return map[string]interface{}{
 		"eos": map[string]interface{}{
 			"namespace":              cfg.Reva.Storages.EOS.Root,
@@ -77,7 +83,7 @@ func drivers(cfg *config.Config) map[string]interface{} {
 		},
 		"owncloud": map[string]interface{}{
 			"datadirectory":   cfg.Reva.Storages.OwnCloud.Root,
-			"upload_info_dir": cfg.Reva.Storages.OwnCloud.UploadInfoDir,
+			"upload_info_dir": uploadInfoDir,
 			"sharedirectory":  cfg.Reva.Storages.OwnCloud.ShareFolder,
 			"user_layout":     cfg.Reva.Storages.OwnCloud.UserLayout,
 			"redis":           cfg.Reva.Storages.OwnCloud.Redis,
