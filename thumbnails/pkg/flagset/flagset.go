@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/owncloud/ocis/ocis-pkg/flags"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
 )
@@ -13,7 +15,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9189",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -57,42 +59,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"THUMBNAILS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"THUMBNAILS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"THUMBNAILS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "thumbnails",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "thumbnails"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"THUMBNAILS_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9189",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Token, ""),
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -111,42 +113,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-name",
-			Value:       "thumbnails",
+			Value:       flags.OverrideDefaultString(cfg.Server.Name, "thumbnails"),
 			Usage:       "Name of the service",
 			EnvVars:     []string{"THUMBNAILS_GRPC_NAME"},
 			Destination: &cfg.Server.Name,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       "0.0.0.0:9185",
+			Value:       flags.OverrideDefaultString(cfg.Server.Address, "0.0.0.0:9185"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"THUMBNAILS_GRPC_ADDR"},
 			Destination: &cfg.Server.Address,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
-			Value:       "com.owncloud.api",
+			Value:       flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api"),
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"THUMBNAILS_GRPC_NAMESPACE"},
 			Destination: &cfg.Server.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "filesystemstorage-root",
-			Value:       filepath.Join(os.TempDir(), "ocis-thumbnails/"),
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.FileSystemStorage.RootDirectory, filepath.Join(os.TempDir(), "ocis-thumbnails/")),
 			Usage:       "Root path of the filesystem storage directory",
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
 			Destination: &cfg.Thumbnail.FileSystemStorage.RootDirectory,
 		},
 		&cli.StringFlag{
 			Name:        "webdavsource-baseurl",
-			Value:       "https://localhost:9200/remote.php/webdav/",
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.WebDavSource.BaseURL, "https://localhost:9200/remote.php/webdav/"),
 			Usage:       "Base url for a webdav api",
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_BASEURL"},
 			Destination: &cfg.Thumbnail.WebDavSource.BaseURL,
 		},
 		&cli.BoolFlag{
 			Name:        "webdavsource-insecure",
-			Value:       true,
+			Value:       flags.OverrideDefaultBool(cfg.Thumbnail.WebDavSource.Insecure, true),
 			Usage:       "Whether to skip certificate checks",
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_INSECURE"},
 			Destination: &cfg.Thumbnail.WebDavSource.Insecure,
@@ -165,14 +167,14 @@ func ListThumbnailsWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "grpc-name",
-			Value:       "thumbnails",
+			Value:       flags.OverrideDefaultString(cfg.Server.Name, "thumbnails"),
 			Usage:       "Name of the service",
 			EnvVars:     []string{"THUMBNAILS_GRPC_NAME"},
 			Destination: &cfg.Server.Name,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
-			Value:       "com.owncloud.api",
+			Value:       flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api"),
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"THUMBNAILS_GRPC_NAMESPACE"},
 			Destination: &cfg.Server.Namespace,
