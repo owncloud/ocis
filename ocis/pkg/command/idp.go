@@ -20,6 +20,9 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.IDP),
 		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			idpCommand := command.Server(configureIDP(cfg))
 
