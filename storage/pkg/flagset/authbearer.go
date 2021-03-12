@@ -92,7 +92,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "gateway-url",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "0.0.0.0:9142"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
 			Usage:       "URL to use for the storage gateway service",
 			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
 			Destination: &cfg.Reva.Gateway.Endpoint,

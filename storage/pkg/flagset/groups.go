@@ -39,7 +39,7 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.Endpoint, "0.0.0.0:9160"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Groups.Endpoint, "localhost:9160"),
 			Usage:       "URL to use for the storage service",
 			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
 			Destination: &cfg.Reva.Groups.Endpoint,

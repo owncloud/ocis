@@ -32,7 +32,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "data-server-url",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DataServerURL, "0.0.0.0:9216"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DataServerURL, "http://localhost:9216"),
 			Usage:       "URL of the data-provider the storage-provider uses",
 			EnvVars:     []string{"STORAGE_METADATA_DATA_SERVER_URL"},
 			Destination: &cfg.Reva.StorageMetadata.DataServerURL,

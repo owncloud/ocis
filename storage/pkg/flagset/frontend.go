@@ -31,13 +31,14 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 
 		// OCDav
 
-		&cli.StringFlag{
-			Name:        "chunk-folder",
-			Value:       flags.OverrideDefaultString(cfg.Reva.OCDav.WebdavNamespace, "/var/tmp/ocis/tmp/chunks"),
-			Usage:       "temp directory for chunked uploads",
-			EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
-			Destination: &cfg.Reva.OCDav.WebdavNamespace,
-		},
+		//&cli.StringFlag{
+		//	Name:        "chunk-folder",
+		//	Value:       flags.OverrideDefaultString(cfg.Reva.OCDav.WebdavNamespace, "/var/tmp/ocis/tmp/chunks"),
+		//	Usage:       "temp directory for chunked uploads",
+		//	EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
+		//	Destination: &cfg.Reva.OCDav.WebdavNamespace,
+		//},
+
 		&cli.StringFlag{
 			Name:        "webdav-namespace",
 			Value:       flags.OverrideDefaultString(cfg.Reva.OCDav.WebdavNamespace, "/home/"),
@@ -46,7 +47,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.OCDav.WebdavNamespace,
 		},
 
-		// the /dav/files endpoint expects a username as the first path segment
+		// th/dav/files endpoint expects a username as the first path segment
 		// this can eg. be set to /eos/users
 		&cli.StringFlag{
 			Name:        "dav-files-namespace",

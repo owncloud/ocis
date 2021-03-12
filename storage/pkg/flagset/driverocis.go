@@ -11,7 +11,7 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-ocis-root",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Local.Root, "/var/tmp/ocis/storage/users"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Common.Root, "/var/tmp/ocis/storage/users"),
 			Usage:       "the path to the local storage root",
 			EnvVars:     []string{"STORAGE_DRIVER_OCIS_ROOT"},
 			Destination: &cfg.Reva.Storages.Common.Root,
@@ -25,7 +25,7 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-ocis-layout",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Local.Root, "{{.Id.OpaqueId}}"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Common.UserLayout, "{{.Id.OpaqueId}}"),
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.Mail}}, {{.Id.OpaqueId}}, {{.Id.Idp}} also supports prefixing dirs: "{{substr 0 1 .Username}}/{{.Username}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"STORAGE_DRIVER_OCIS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.Common.UserLayout,
