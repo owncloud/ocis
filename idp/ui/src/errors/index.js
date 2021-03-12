@@ -11,11 +11,11 @@ export const ERROR_HTTP_UNEXPECTED_RESPONSE_STATE = 'konnect.error.http.unexpect
 const translations = defineMessages({
   [ERROR_LOGIN_VALIDATE_MISSINGUSERNAME]: {
     id: ERROR_LOGIN_VALIDATE_MISSINGUSERNAME,
-    defaultMessage: 'Enter an username'
+    defaultMessage: 'Please enter a valid username'
   },
   [ERROR_LOGIN_VALIDATE_MISSINGPASSWORD]: {
     id: ERROR_LOGIN_VALIDATE_MISSINGPASSWORD,
-    defaultMessage: 'Enter a password'
+    defaultMessage: 'Please enter a valid password'
   },
   [ERROR_LOGIN_FAILED]: {
     id: ERROR_LOGIN_FAILED,
