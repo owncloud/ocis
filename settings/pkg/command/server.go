@@ -3,26 +3,17 @@ package command
 import (
 	"context"
 	"strings"
-	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
-	"github.com/owncloud/ocis/settings/pkg/metrics"
-
-	"contrib.go.opencensus.io/exporter/jaeger"
-	"contrib.go.opencensus.io/exporter/ocagent"
-	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	openzipkin "github.com/openzipkin/zipkin-go"
-	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/flagset"
+	"github.com/owncloud/ocis/settings/pkg/metrics"
 	"github.com/owncloud/ocis/settings/pkg/server/debug"
 	"github.com/owncloud/ocis/settings/pkg/server/grpc"
 	"github.com/owncloud/ocis/settings/pkg/server/http"
-	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
+	"github.com/owncloud/ocis/settings/pkg/tracing"
 )
 
 // Server is the entrypoint for the server command.
@@ -48,166 +39,60 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					exporter, err := ocagent.NewExporter(
-						ocagent.WithReconnectionPeriod(5*time.Second),
-						ocagent.WithAddress(cfg.Tracing.Endpoint),
-						ocagent.WithServiceName(cfg.Tracing.Service),
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create agent tracing")
-
-						return err
-					}
-
-					trace.RegisterExporter(exporter)
-					view.RegisterExporter(exporter)
-
-				case "jaeger":
-					exporter, err := jaeger.NewExporter(
-						jaeger.Options{
-							AgentEndpoint:     cfg.Tracing.Endpoint,
-							CollectorEndpoint: cfg.Tracing.Collector,
-							Process: jaeger.Process{
-								ServiceName: cfg.Tracing.Service,
-							},
-						},
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create jaeger tracing")
-
-						return err
-					}
-
-					trace.RegisterExporter(exporter)
-
-				case "zipkin":
-					endpoint, err := openzipkin.NewEndpoint(
-						cfg.Tracing.Service,
-						cfg.Tracing.Endpoint,
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create zipkin tracing")
-
-						return err
-					}
-
-					exporter := zipkin.NewExporter(
-						zipkinhttp.NewReporter(
-							cfg.Tracing.Collector,
-						),
-						endpoint,
-					)
-
-					trace.RegisterExporter(exporter)
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-				trace.ApplyConfig(
-					trace.Config{
-						DefaultSampler: trace.AlwaysSample(),
-					},
-				)
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
+			err := tracing.Configure(cfg, logger)
+			if err != nil {
+				return err
 			}
 
-			var (
-				gr          = run.Group{}
-				ctx, cancel = func() (context.Context, context.CancelFunc) {
-					if cfg.Context == nil {
-						return context.WithCancel(context.Background())
-					}
-					return context.WithCancel(cfg.Context)
-				}()
-				mtrcs = metrics.New()
-			)
-
+			servers := run.Group{}
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Context == nil {
+					return context.WithCancel(context.Background())
+				}
+				return context.WithCancel(cfg.Context)
+			}()
 			defer cancel()
 
+			mtrcs := metrics.New()
 			mtrcs.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
-			{
-				server := http.Server(
-					http.Name(cfg.Service.Name),
-					http.Logger(logger),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(mtrcs),
-				)
+			// prepare an HTTP server and add it to the group run.
+			httpServer := http.Server(
+				http.Name(cfg.Service.Name),
+				http.Logger(logger),
+				http.Context(ctx),
+				http.Config(cfg),
+				http.Metrics(mtrcs),
+			)
+			servers.Add(httpServer.Run, func(_ error) {
+				logger.Info().Str("server", "http").Msg("Shutting down server")
+				cancel()
+			})
 
-				gr.Add(server.Run, func(_ error) {
-					logger.Info().
-						Str("server", "http").
-						Msg("Shutting down server")
+			// prepare a gRPC server and add it to the group run.
+			grpcServer := grpc.Server(grpc.Name(cfg.Service.Name), grpc.Logger(logger), grpc.Context(ctx), grpc.Config(cfg), grpc.Metrics(mtrcs))
+			servers.Add(grpcServer.Run, func(_ error) {
+				logger.Info().Str("server", "grpc").Msg("Shutting down server")
+				cancel()
+			})
 
-					cancel()
-				})
+			// prepare a debug server and add it to the group run.
+			debugServer, err := debug.Server(debug.Logger(logger), debug.Context(ctx), debug.Config(cfg))
+			if err != nil {
+				logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+				return err
 			}
 
-			{
-				server := grpc.Server(
-					grpc.Name(cfg.Service.Name),
-					grpc.Logger(logger),
-					grpc.Context(ctx),
-					grpc.Config(cfg),
-					grpc.Metrics(mtrcs),
-				)
-
-				gr.Add(server.Run, func(_ error) {
-					logger.Info().
-						Str("server", "grpc").
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
-				)
-
-				if err != nil {
-					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
-					return err
-				}
-
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
-					cancel()
-				})
-			}
+			servers.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
+				cancel()
+			})
 
 			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
+				sync.Trap(&servers, cancel)
 			}
 
-			return gr.Run()
+			return servers.Run()
 		},
 	}
 }
