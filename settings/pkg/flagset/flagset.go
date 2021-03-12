@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/settings/pkg/config"
 )
 
@@ -34,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9194",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -60,42 +61,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"SETTINGS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"SETTINGS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"SETTINGS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "settings",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "settings"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"SETTINGS_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9194",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Token, ""),
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"SETTINGS_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -114,70 +115,70 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9190",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9190"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"SETTINGS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the http namespace",
 			EnvVars:     []string{"SETTINGS_HTTP_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       "/",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"SETTINGS_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.IntFlag{
 			Name:        "http-cache-ttl",
-			Value:       604800, // 7 days
+			Value:       flags.OverrideDefaultInt(cfg.HTTP.CacheTTL, 604800), // 10 days
 			Usage:       "Set the static assets caching duration in seconds",
 			EnvVars:     []string{"SETTINGS_CACHE_TTL"},
 			Destination: &cfg.HTTP.CacheTTL,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       "0.0.0.0:9191",
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9191"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"SETTINGS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "asset-path",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
 			Usage:       "Path to custom assets",
 			EnvVars:     []string{"SETTINGS_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
-			Value:       "com.owncloud.api",
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api"),
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"SETTINGS_GRPC_NAMESPACE"},
 			Destination: &cfg.GRPC.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       "settings",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "settings"),
 			Usage:       "service name",
 			EnvVars:     []string{"SETTINGS_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
-			Value:       "/var/tmp/ocis/settings",
+			Value:       flags.OverrideDefaultString(cfg.Service.DataPath, "/var/tmp/ocis/settings"),
 			Usage:       "Mount path for the storage",
 			EnvVars:     []string{"SETTINGS_DATA_PATH"},
 			Destination: &cfg.Service.DataPath,
 		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",
-			Value:       "Pive-Fumkiu4",
+			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
 			EnvVars:     []string{"SETTINGS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
@@ -190,14 +191,14 @@ func ListSettingsWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
-			Value:       "com.owncloud.api",
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api"),
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"SETTINGS_GRPC_NAMESPACE"},
 			Destination: &cfg.GRPC.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       "settings",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "settings"),
 			Usage:       "service name",
 			EnvVars:     []string{"SETTINGS_NAME"},
 			Destination: &cfg.Service.Name,
