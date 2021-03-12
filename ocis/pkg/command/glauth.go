@@ -17,6 +17,9 @@ func GLAuthCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start glauth server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.GLAuth),
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureGLAuth(cfg))
 			return handleOriginalAction(c, origCmd)
