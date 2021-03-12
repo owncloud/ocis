@@ -16,6 +16,9 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start web server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Web),
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureWeb(cfg))
 			return handleOriginalAction(c, origCmd)

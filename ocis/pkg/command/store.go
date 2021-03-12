@@ -22,6 +22,9 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Store),
 		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureStore(cfg))
 			return handleOriginalAction(c, origCmd)

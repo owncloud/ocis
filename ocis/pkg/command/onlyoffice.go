@@ -16,6 +16,9 @@ func OnlyofficeCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start onlyoffice server",
 		Category: "Extensions",
 		Flags:    flagset.ServerWithConfig(cfg.Onlyoffice),
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureOnlyoffice(cfg))
 			return handleOriginalAction(c, origCmd)
