@@ -33,7 +33,7 @@
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^2.3.0",
-    "archiver": "^5.2.0",
+    "archiver": "^5.3.0",
     "axios": "^0.21.1",
     "core-js": "3",
     "cross-env": "^7.0.3",
