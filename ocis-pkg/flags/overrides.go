@@ -15,7 +15,7 @@ func OverrideDefaultString(v, def string) string {
 // value by providing one. A value different than zero would mean that it was read from a config file either from an
 // extension or from a higher source (i.e: ocis command).
 func OverrideDefaultBool(v, def bool) bool {
-	if v != false {
+	if v {
 		return v
 	}
 
