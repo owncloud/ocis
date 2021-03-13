@@ -22,8 +22,8 @@ cd ocis
 
 ## Build the oCIS binary
 
-Only if you have changed protobuf definitions or the frontend part in one of the extensions, you need to run following command in the root directory of the repository. Otherwise you can skip this step and proceed building the oCIS binary.
-This will at least modify multiple `embed.go` files because we embed the frontend build output in these `embed.go` files and a timestamp will be updated and also minor differences are expected between different Node.js versions.
+You only need to run following command if you have changed protobuf definitions or the frontend part in one of the extensions. Run the command in the root directory of the repository. Otherwise you can skip this step and proceed to build the oCIS binary.
+This will usually modify multiple `embed.go` files because we embed the frontend build output in these `embed.go` files and a timestamp will be updated and also minor differences are expected between different Node.js versions.
 
 {{< highlight txt >}}
 make generate
