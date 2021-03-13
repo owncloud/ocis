@@ -22,15 +22,23 @@ cd ocis
 
 ## Build the oCIS binary
 
-The oCIS binary source is in the `ocis` folder inside the oCIS repository. In this folder you can build the oCIS binary:
+You only need to run following command if you have changed protobuf definitions or the frontend part in one of the extensions. Run the command in the root directory of the repository. Otherwise you can skip this step and proceed to build the oCIS binary.
+This will usually modify multiple `embed.go` files because we embed the frontend build output in these `embed.go` files and a timestamp will be updated and also minor differences are expected between different Node.js versions.
+
+{{< highlight txt >}}
+make generate
+{{< / highlight >}}
+
+The next step is to build the actual oCIS binary. Therefore you need to navigate to the subdirectory `ocis` and start the build process.
 
 {{< highlight txt >}}
 cd ocis
-make generate
 make build
 {{< / highlight >}}
 
-After building you have the binary within the `bin/` folder. Try to run it: `./bin/ocis h`
+After the build process finished, you can find the binary within the `bin/` folder (in `ocis/bin` relative to the oCIS repository root folder).
+
+Try to run it: `./bin/ocis h`
 
 ## Build a local oCIS docker image
 
