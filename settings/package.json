@@ -41,7 +41,7 @@
     "cucumber-pretty": ">=6.0.0",
     "debounce": "^1.2.1",
     "easygettext": "^2.7.0",
-    "eslint": "7.21.0",
+    "eslint": "7.22.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-node": "11.1.0",
