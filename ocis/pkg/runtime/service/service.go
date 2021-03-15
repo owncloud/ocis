@@ -1,57 +1,53 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
-	"sync"
 	"syscall"
+	"time"
 
-	"github.com/owncloud/ocis/ocis/pkg/runtime/config"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/controller"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/log"
-	"github.com/owncloud/ocis/ocis/pkg/runtime/process"
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
+	"github.com/asim/go-micro/v3/logger"
+	"github.com/mohae/deepcopy"
+	"github.com/olekukonko/tablewriter"
+	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	graph "github.com/owncloud/ocis/graph/pkg/command"
+	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
+	idp "github.com/owncloud/ocis/idp/pkg/command"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	ocs "github.com/owncloud/ocis/ocs/pkg/command"
+	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
+	proxy "github.com/owncloud/ocis/proxy/pkg/command"
+	settings "github.com/owncloud/ocis/settings/pkg/command"
+	storage "github.com/owncloud/ocis/storage/pkg/command"
+	store "github.com/owncloud/ocis/store/pkg/command"
+	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/command"
+	web "github.com/owncloud/ocis/web/pkg/command"
+	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/rs/zerolog"
-	"github.com/spf13/viper"
-)
-
-var (
-	halt = make(chan os.Signal, 1)
-	done = make(chan struct{}, 1)
+	"github.com/thejerf/suture/v4"
 )
 
 // Service represents a RPC service.
 type Service struct {
-	Controller controller.Controller
-	Log        zerolog.Logger
-	wg         *sync.WaitGroup
-	done       bool
-}
+	Supervisor       *suture.Supervisor
+	ServicesRegistry map[string]func(*ociscfg.Config) suture.Service
+	Delayed          map[string]func(*ociscfg.Config) suture.Service
+	Log              log.Logger
 
-// loadFromEnv would set cmd global variables. This is a workaround spf13/viper since pman used as a library does not
-// parse flags.
-func loadFromEnv() (*config.Config, error) {
-	cfg := config.NewConfig()
-	viper.AutomaticEnv()
-
-	if err := viper.BindEnv("keep-alive", "RUNTIME_KEEP_ALIVE"); err != nil {
-		return nil, err
-	}
-	if err := viper.BindEnv("port", "RUNTIME_PORT"); err != nil {
-		return nil, err
-	}
-
-	cfg.KeepAlive = viper.GetBool("keep-alive")
-
-	if viper.GetString("port") != "" {
-		cfg.Port = viper.GetString("port")
-	}
-
-	return cfg, nil
+	serviceToken map[string][]suture.ServiceToken
+	context      context.Context
+	cancel       context.CancelFunc
+	cfg          *ociscfg.Config
 }
 
 // NewService returns a configured service with a controller and a default logger.
@@ -66,48 +62,103 @@ func NewService(options ...Option) (*Service, error) {
 		f(opts)
 	}
 
-	cfg, err := loadFromEnv()
-	if err != nil {
-		return nil, err
-	}
 	l := log.NewLogger(
-		log.WithPretty(opts.Log.Pretty),
+		log.Color(opts.Config.Log.Color),
+		log.Pretty(opts.Config.Log.Pretty),
+		log.Level(opts.Config.Log.Level),
 	)
 
-	return &Service{
-		wg:  &sync.WaitGroup{},
-		Log: l,
-		Controller: controller.NewController(
-			controller.WithConfig(cfg),
-			controller.WithLog(&l),
-		),
-	}, nil
-}
+	globalCtx, cancelGlobal := context.WithCancel(context.Background())
 
-// Start an rpc service.
-func Start(o ...Option) error {
-	s, err := NewService(o...)
-	if err != nil {
-		s.Log.Fatal().Err(err)
+	s := &Service{
+		ServicesRegistry: make(map[string]func(*ociscfg.Config) suture.Service),
+		Delayed:          make(map[string]func(*ociscfg.Config) suture.Service),
+		Log:              l,
+
+		serviceToken: make(map[string][]suture.ServiceToken),
+		context:      globalCtx,
+		cancel:       cancelGlobal,
+		cfg:          opts.Config,
 	}
 
+	s.ServicesRegistry["settings"] = settings.NewSutureService
+	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
+	s.ServicesRegistry["glauth"] = glauth.NewSutureService
+	s.ServicesRegistry["graph"] = graph.NewSutureService
+	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
+	s.ServicesRegistry["idp"] = idp.NewSutureService
+	s.ServicesRegistry["ocs"] = ocs.NewSutureService
+	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
+	s.ServicesRegistry["store"] = store.NewSutureService
+	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
+	s.ServicesRegistry["web"] = web.NewSutureService
+	s.ServicesRegistry["webdav"] = webdav.NewSutureService
+	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
+	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
+	s.ServicesRegistry["storage-users-provider"] = storage.NewUsersProviderService
+	s.ServicesRegistry["storage-groupsprovider"] = storage.NewGroupsProvider
+	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
+	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
+	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
+	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
+	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
+
+	// populate delayed services
+	s.Delayed["storage-sharing"] = storage.NewSharing
+	s.Delayed["accounts"] = accounts.NewSutureService
+	s.Delayed["proxy"] = proxy.NewSutureService
+
+	return s, nil
+}
+
+// Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
+// oCIS instance.
+func Start(o ...Option) error {
+	// prepare a new rpc Service struct.
+	s, err := NewService(o...)
+	if err != nil {
+		return err
+	}
+
+	setMicroLogger()
+
+	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
+	s.Supervisor = suture.New("ocis", suture.Spec{
+		EventHook: func(e suture.Event) {
+			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
+		},
+	})
+
+	// reva storages have their own logging. For consistency sake the top level logging will be cascade to reva.
+	s.cfg.Storage.Log.Color = s.cfg.Log.Color
+	s.cfg.Storage.Log.Level = s.cfg.Log.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
+
+	// notify goroutines that they are running on supervised mode
+	s.cfg.Mode = ociscfg.SUPERVISED
+
 	if err := rpc.Register(s); err != nil {
-		s.Log.Fatal().Err(err)
+		if s != nil {
+			s.Log.Fatal().Err(err)
+		}
 	}
 	rpc.HandleHTTP()
 
+	// halt listens for interrupt signals and blocks.
+	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	l, err := net.Listen("tcp", fmt.Sprintf("%v:%v", s.Controller.Config.Hostname, s.Controller.Config.Port))
+	// TODO(refs) change default port
+	l, err := net.Listen("tcp", fmt.Sprintf("%v:%v", "localhost", "6060"))
 	if err != nil {
 		s.Log.Fatal().Err(err)
 	}
 
-	// handle panic within the Service scope.
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
-			if _, err := net.Dial("localhost", s.Controller.Config.Port); err != nil {
+			// TODO(refs) change default port
+			if _, err := net.Dial("localhost", "6060"); err != nil {
 				reason.WriteString("runtime address already in use")
 			}
 
@@ -115,60 +166,117 @@ func Start(o ...Option) error {
 		}
 	}()
 
-	go trap(s)
+	for name := range s.ServicesRegistry {
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
+	}
+
+	// there are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
+	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
+	// go supervisor.Serve()
+	// because that will briefly create a race condition as it starts up, if you try to .Add() services immediately afterward.
+	// https://pkg.go.dev/github.com/thejerf/suture/v4@v4.0.0#Supervisor
+	go s.Supervisor.ServeBackground(s.context)
+
+	// trap will block on halt channel for interruptions.
+	go trap(s, halt)
+
+	time.Sleep(1 * time.Second)
+
+	// add services with delayed execution.
+	for name := range s.Delayed {
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
+	}
 
 	return http.Serve(l, nil)
 }
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
-func (s *Service) Start(args process.ProcEntry, reply *int) error {
-	if !s.done {
-		s.wg.Add(1)
-		s.Log.Info().Str("service", args.Extension).Msgf("%v", "started")
-		if err := s.Controller.Start(args); err != nil {
-			*reply = 1
-			return err
-		}
-
+func (s *Service) Start(name string, reply *int) error {
+	swap := deepcopy.Copy(s.cfg)
+	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
-		s.wg.Done()
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
+		return nil
 	}
 
-	return nil
+	if _, ok := s.Delayed[name]; ok {
+		*reply = 0
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
+		return nil
+	}
+
+	*reply = 0
+	return fmt.Errorf("cannot start service %s: unknown service", name)
 }
 
 // List running processes for the Service Controller.
 func (s *Service) List(args struct{}, reply *string) error {
-	*reply = s.Controller.List()
+	tableString := &strings.Builder{}
+	table := tablewriter.NewWriter(tableString)
+	table.SetHeader([]string{"Extension"})
+
+	names := []string{}
+	for t := range s.serviceToken {
+		if len(s.serviceToken[t]) > 0 {
+			names = append(names, t)
+		}
+	}
+
+	sort.Strings(names)
+
+	for n := range names {
+		table.Append([]string{names[n]})
+	}
+
+	table.Render()
+	*reply = tableString.String()
 	return nil
 }
 
 // Kill a supervised process by subcommand name.
-func (s *Service) Kill(args *string, reply *int) error {
-	pe := process.ProcEntry{
-		Extension: *args,
-	}
-	if err := s.Controller.Kill(pe); err != nil {
-		*reply = 1
-		return err
+func (s *Service) Kill(name string, reply *int) error {
+	if len(s.serviceToken[name]) > 0 {
+		for i := range s.serviceToken[name] {
+			if err := s.Supervisor.Remove(s.serviceToken[name][i]); err != nil {
+				return err
+			}
+		}
+		delete(s.serviceToken, name)
+	} else {
+		return fmt.Errorf("service %s not found", name)
 	}
 
-	*reply = 0
 	return nil
 }
 
 // trap blocks on halt channel. When the runtime is interrupted it
 // signals the controller to stop any supervised process.
-func trap(s *Service) {
+func trap(s *Service, halt chan os.Signal) {
 	<-halt
-	s.done = true
-	s.wg.Wait()
-	s.Log.Debug().
-		Str("service", "runtime service").
-		Msgf("terminating with signal: %v", s)
-	if err := s.Controller.Shutdown(done); err != nil {
-		s.Log.Err(err)
+	s.cancel()
+	for sName := range s.serviceToken {
+		for i := range s.serviceToken[sName] {
+			if err := s.Supervisor.Remove(s.serviceToken[sName][i]); err != nil {
+				s.Log.Error().Err(err).Str("service", "runtime service").Msgf("terminating with signal: %v", s)
+			}
+		}
 	}
-	close(done)
+	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
 	os.Exit(0)
+}
+
+// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// want to expose to the end user the internal framework logs unless explicitly specified.
+func setMicroLogger() {
+	if os.Getenv("MICRO_LOG_LEVEL") == "" {
+		_ = os.Setenv("MICRO_LOG_LEVEL", "error")
+	}
+
+	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
+	if err != nil {
+		lev = zerolog.ErrorLevel
+	}
+	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
 }

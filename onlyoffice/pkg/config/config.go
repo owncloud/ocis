@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -40,6 +42,9 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Asset   Asset
+
+	Context    context.Context
+	Supervised bool
 }
 
 // Asset defines the available asset configuration.

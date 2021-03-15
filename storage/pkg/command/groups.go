@@ -2,18 +2,22 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
+	"path/filepath"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture/v4"
 )
 
 // Groups is the entrypoint for the sharing command.
@@ -65,6 +69,13 @@ func Groups(cfg *config.Config) *cli.Command {
 			)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.Groups.Driver == "json" && cfg.Reva.Groups.JSON != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.Groups.JSON), os.FileMode(0700)); err != nil {
+					return err
+				}
+			}
 
 			{
 				uuid := uuid.Must(uuid.NewV4())
@@ -156,51 +167,56 @@ func Groups(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", c.Command.Name+"-debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", c.Command.Name+"-debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", c.Command.Name+"-debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
 		},
 	}
+}
+
+// GroupsProvider allows for the storage-groupsprovider command to be embedded and supervised by a suture supervisor tree.
+type GroupsProvider struct {
+	cfg *config.Config
+}
+
+// NewGroupsProvider creates a new storage.GroupsProvider
+func NewGroupsProvider(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.Groups.Supervised = true
+	}
+	return GroupsProvider{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s GroupsProvider) Serve(ctx context.Context) error {
+	s.cfg.Reva.Groups.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range Groups(s.cfg).Flags {
+		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if Groups(s.cfg).Before != nil {
+		if err := Groups(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := Groups(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

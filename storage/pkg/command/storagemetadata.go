@@ -2,20 +2,22 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
 
-	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
+	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/thejerf/suture/v4"
 )
 
 // StorageMetadata the entrypoint for the storage-storage-metadata command.
@@ -23,9 +25,10 @@ import (
 // It provides a ocis-specific storage store metadata (shares,account,settings...)
 func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-metadata",
-		Usage:    "Start storage-metadata service",
-		Flags:    flagset.StorageMetadata(cfg),
+		Name:  "storage-metadata",
+		Usage: "Start storage-metadata service",
+		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
+		Flags:    append(flagset.StorageMetadata(cfg), flagset.RootWithConfig(cfg)...),
 		Category: "Extensions",
 		Before: func(c *cli.Context) error {
 			storageRoot := c.String("storage-root")
@@ -70,8 +73,12 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Reva.StorageMetadata.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Reva.StorageMetadata.Context)
+				}()
 			)
 
 			defer cancel()
@@ -171,36 +178,13 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				gr.Add(func() error {
 					return server.ListenAndServe()
 				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", c.Command.Name+"-debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", c.Command.Name+"-debug").
-							Msg("Shutting down server")
-					}
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			if err := external.RegisterGRPCEndpoint(
@@ -216,4 +200,40 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new storagemetadata.SutureService
+func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.StorageMetadata.Supervised = true
+	}
+	return SutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageMetadata.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range StorageMetadata(s.cfg).Flags {
+		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if StorageMetadata(s.cfg).Before != nil {
+		if err := StorageMetadata(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := StorageMetadata(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/owncloud/ocis/idp/pkg/command"
 	svcconfig "github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 )
@@ -19,6 +19,9 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 		Flags:    flagset.ServerWithConfig(cfg.IDP),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.IDP),
+		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			idpCommand := command.Server(configureIDP(cfg))

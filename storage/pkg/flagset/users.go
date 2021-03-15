@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
@@ -12,7 +13,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9145",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.DebugAddr, "0.0.0.0:9145"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Users.DebugAddr,
@@ -24,21 +25,21 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "network",
-			Value:       "tcp",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.GRPCNetwork, "tcp"),
 			Usage:       "Network to use for the storage service, can be 'tcp', 'udp' or 'unix'",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_NETWORK"},
 			Destination: &cfg.Reva.Users.GRPCNetwork,
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       "0.0.0.0:9144",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.GRPCAddr, "0.0.0.0:9144"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_ADDR"},
 			Destination: &cfg.Reva.Users.GRPCAddr,
 		},
 		&cli.StringFlag{
 			Name:        "endpoint",
-			Value:       "localhost:9144",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.Endpoint, "localhost:9144"),
 			Usage:       "URL to use for the storage service",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
 			Destination: &cfg.Reva.Users.Endpoint,
@@ -52,21 +53,21 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "driver",
-			Value:       "ldap",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.Driver, "ldap"),
 			Usage:       "user driver: 'demo', 'json', 'ldap', or 'rest'",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_DRIVER"},
 			Destination: &cfg.Reva.Users.Driver,
 		},
 		&cli.StringFlag{
 			Name:        "json-config",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.JSON, ""),
 			Usage:       "Path to users.json file",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_JSON"},
 			Destination: &cfg.Reva.Users.JSON,
 		},
 		&cli.IntFlag{
 			Name:        "user-groups-cache-expiration",
-			Value:       5,
+			Value:       flags.OverrideDefaultInt(cfg.Reva.Users.UserGroupsCacheExpiration, 5),
 			Usage:       "Time in minutes for redis cache expiration.",
 			EnvVars:     []string{"STORAGE_USER_CACHE_EXPIRATION"},
 			Destination: &cfg.Reva.Users.UserGroupsCacheExpiration,

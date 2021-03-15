@@ -2,20 +2,23 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
 	"strings"
-	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/thejerf/suture/v4"
 )
 
 // Gateway is the entrypoint for the gateway command.
@@ -101,8 +104,8 @@ func Gateway(cfg *config.Config) *cli.Command {
 								"storageregistrysvc": cfg.Reva.Gateway.Endpoint,
 								"appregistrysvc":     cfg.Reva.Gateway.Endpoint,
 								// user metadata is located on the users services
-								"preferencessvc":  cfg.Reva.Users.Endpoint,
-								"userprovidersvc": cfg.Reva.Users.Endpoint,
+								"preferencessvc":   cfg.Reva.Users.Endpoint,
+								"userprovidersvc":  cfg.Reva.Users.Endpoint,
 								"groupprovidersvc": cfg.Reva.Groups.Endpoint,
 								// sharing is located on the sharing service
 								"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
@@ -183,48 +186,17 @@ func Gateway(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
@@ -254,4 +226,40 @@ func rules(cfg *config.Config) map[string]interface{} {
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
+}
+
+// GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type GatewaySutureService struct {
+	cfg *config.Config
+}
+
+// NewGatewaySutureService creates a new gateway.GatewaySutureService
+func NewGateway(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.Gateway.Supervised = true
+	}
+	return GatewaySutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s GatewaySutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.Gateway.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range Gateway(s.cfg).Flags {
+		if err := Gateway(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if Gateway(s.cfg).Before != nil {
+		if err := Gateway(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := Gateway(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

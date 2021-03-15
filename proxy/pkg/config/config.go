@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -119,6 +121,9 @@ type Config struct {
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool
+
+	Context    context.Context
+	Supervised bool
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request

@@ -4,10 +4,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
@@ -77,6 +79,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig load configuration for every extension
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

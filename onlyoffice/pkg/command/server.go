@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -30,11 +30,16 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return ParseConfig(ctx, cfg)
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "onlyoffice").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -125,9 +130,20 @@ func Server(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+				metrics = metrics.New()
 			)
+
+			if ctx == nil {
+				ctx, cancel = context.WithCancel(context.Background())
+			} else {
+				ctx, cancel = context.WithCancel(cfg.Context)
+			}
 
 			defer cancel()
 
@@ -138,8 +154,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
 				)
 
 				if err != nil {
@@ -170,48 +184,18 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Error().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

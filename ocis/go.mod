@@ -10,6 +10,7 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/micro/cli/v2 v2.1.2
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20210204050952-c291e4c5b73f
@@ -32,6 +33,8 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	github.com/thejerf/suture v4.0.0+incompatible
+	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b
 )

@@ -2,6 +2,7 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/store/pkg/config"
 )
 
@@ -17,23 +18,20 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "log-level",
-			Value:       "info",
 			Usage:       "Set logging level",
-			EnvVars:     []string{"STORE_LOG_LEVEL"},
+			EnvVars:     []string{"STORE_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
-			Value:       true,
 			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"STORE_LOG_PRETTY"},
+			EnvVars:     []string{"STORE_LOG_PRETTY", "OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
-			Value:       true,
 			Usage:       "Enable colored logging",
-			EnvVars:     []string{"STORE_LOG_COLOR"},
+			EnvVars:     []string{"STORE_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 	}
@@ -44,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9460",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -63,42 +61,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"STORE_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"STORE_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"STORE_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "store",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "store"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"STORE_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9460",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Token, ""),
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"STORE_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -117,21 +115,21 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
-			Value:       "com.owncloud.api",
+			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api"),
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       "store",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "store"),
 			Usage:       "Service name",
 			EnvVars:     []string{"STORE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
-			Value:       "/var/tmp/ocis/store",
+			Value:       flags.OverrideDefaultString(cfg.Datapath, "/var/tmp/ocis/store"),
 			Usage:       "location of the store data path",
 			EnvVars:     []string{"STORE_DATA_PATH"},
 			Destination: &cfg.Datapath,
@@ -143,14 +141,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 func ListStoreWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{&cli.StringFlag{
 		Name:        "grpc-namespace",
-		Value:       "com.owncloud.api",
+		Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api"),
 		Usage:       "Set the base namespace for the grpc namespace",
 		EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
 		Destination: &cfg.Service.Namespace,
 	},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       "store",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "store"),
 			Usage:       "Service name",
 			EnvVars:     []string{"STORE_NAME"},
 			Destination: &cfg.Service.Name,

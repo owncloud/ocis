@@ -2,21 +2,24 @@ package command
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
-	"os/signal"
 	"path"
 	"strings"
-	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture/v4"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -261,40 +264,13 @@ func Frontend(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.Frontend.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
@@ -322,6 +298,42 @@ func loadUserAgent(c *cli.Context, cfg *config.Config) error {
 		}
 
 		cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
+	}
+
+	return nil
+}
+
+// FrontendSutureService allows for the storage-frontend command to be embedded and supervised by a suture supervisor tree.
+type FrontendSutureService struct {
+	cfg *config.Config
+}
+
+// NewFrontendSutureService creates a new frontend.FrontendSutureService
+func NewFrontend(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.Frontend.Supervised = true
+	}
+	return FrontendSutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s FrontendSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.Frontend.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range Frontend(s.cfg).Flags {
+		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if Frontend(s.cfg).Before != nil {
+		if err := Frontend(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := Frontend(s.cfg).Action(cliCtx); err != nil {
+		return err
 	}
 
 	return nil

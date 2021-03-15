@@ -1,21 +1,23 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/owncloud/ocis/thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis/thumbnails/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the ocis-thumbnails command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-thumbnails",
 		Version:  version.String,
@@ -28,8 +30,6 @@ func Execute() error {
 				Email: "support@owncloud.com",
 			},
 		},
-
-		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
@@ -68,6 +68,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -104,6 +106,30 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		logger.Fatal().
 			Err(err).
 			Msg("failed to parse config")
+	}
+
+	return nil
+}
+
+// SutureService allows for the thumbnails command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new thumbnails.SutureService
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Thumbnails.Supervised = true
+	}
+	return SutureService{
+		cfg: cfg.Thumbnails,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
+	if err := Execute(s.cfg); err != nil {
+		return err
 	}
 
 	return nil

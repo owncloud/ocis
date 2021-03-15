@@ -2,18 +2,20 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture/v4"
 )
 
 // StorageUsers is the entrypoint for the storage-users command.
@@ -149,51 +151,56 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", c.Command.Name+"-debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", c.Command.Name+"-debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", c.Command.Name+"-debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
 		},
 	}
+}
+
+// StorageUsersSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
+type StorageUsersSutureService struct {
+	cfg *config.Config
+}
+
+// NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
+func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.StorageUsers.Supervised = true
+	}
+	return StorageUsersSutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s StorageUsersSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageUsers.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range StorageUsers(s.cfg).Flags {
+		if err := StorageUsers(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if StorageUsers(s.cfg).Before != nil {
+		if err := StorageUsers(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := StorageUsers(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

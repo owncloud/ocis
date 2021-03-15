@@ -2,18 +2,21 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
+	"path/filepath"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture/v4"
 )
 
 // AuthBasic is the entrypoint for the auth-basic command.
@@ -65,6 +68,13 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.Reva.AuthProvider.Driver == "json" && cfg.Reva.AuthProvider.JSON != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.Reva.AuthProvider.JSON), os.FileMode(0700)); err != nil {
+					return err
+				}
+			}
 
 			{
 
@@ -142,51 +152,56 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
 		},
 	}
+}
+
+// AuthBasicSutureService allows for the storage-authbasic command to be embedded and supervised by a suture supervisor tree.
+type AuthBasicSutureService struct {
+	cfg *config.Config
+}
+
+// NewAuthBasicSutureService creates a new store.AuthBasicSutureService
+func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.AuthBasic.Supervised = true
+	}
+	return AuthBasicSutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s AuthBasicSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.AuthBasic.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range AuthBasic(s.cfg).Flags {
+		if err := AuthBasic(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if AuthBasic(s.cfg).Before != nil {
+		if err := AuthBasic(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := AuthBasic(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

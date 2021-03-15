@@ -2,14 +2,14 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 )
 
 // RootWithConfig applies cfg to the root flagset
 func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:        "log-level",
+			Name:        "ocis-log-level",
 			Value:       "info",
 			Usage:       "Set logging level",
 			EnvVars:     []string{"OCIS_LOG_LEVEL"},
@@ -17,14 +17,14 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Value:       false,
-			Name:        "log-pretty",
+			Name:        "ocis-log-pretty",
 			Usage:       "Enable pretty logging",
 			EnvVars:     []string{"OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Value:       true,
-			Name:        "log-color",
+			Name:        "ocis-log-color",
 			Usage:       "Enable colored logging",
 			EnvVars:     []string{"OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,

@@ -1,23 +1,26 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/thejerf/suture/v4"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/flagset"
 	"github.com/owncloud/ocis/graph/pkg/version"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/spf13/viper"
 )
 
 // Execute is the entry point for the ocis-graph command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
-		Name:     "graph",
+		Name:     "ocis-graph",
 		Version:  version.String,
 		Usage:    "Serve Graph API for oCIS",
 		Compiled: version.Compiled(),
@@ -32,6 +35,7 @@ func Execute() error {
 		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
+			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
 
@@ -66,6 +70,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig reads graph configuration from fs.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -102,6 +108,30 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		logger.Fatal().
 			Err(err).
 			Msg("Failed to parse config")
+	}
+
+	return nil
+}
+
+// SutureService allows for the graph command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new graph.SutureService
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Graph.Supervised = true
+	}
+	return SutureService{
+		cfg: cfg.Graph,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
+	if err := Execute(s.cfg); err != nil {
+		return err
 	}
 
 	return nil

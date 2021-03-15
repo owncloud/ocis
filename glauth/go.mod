@@ -20,12 +20,14 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
-	go.opencensus.io v0.22.6
+	github.com/thejerf/suture/v4 v4.0.0
+	go.opencensus.io v0.23.0
 )
 
 replace (
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	github.com/owncloud/ocis/store => ../store
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd

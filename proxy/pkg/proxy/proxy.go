@@ -146,12 +146,12 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 					Str("routeType", string(rt)).
 					Msg("director found")
 
-				p.logger.
-					Info().Fields(map[string]interface{}{
-					"method": r.Method,
-					"path":   r.URL.Path,
-					"from":   r.RemoteAddr,
-				}).Msg("access-log")
+				p.logger.Info().
+					Str("method", r.Method).
+					Str("path", r.Method).
+					Str("from", r.RemoteAddr).
+					Msg("access-log")
+
 				p.Directors[pol][rt][endpoint](r)
 				return
 			}
@@ -321,6 +321,14 @@ func defaultPolicies() []config.Policy {
 				{
 					Endpoint: "/data",
 					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/graph/",
+					Backend:  "http://localhost:9120",
+				},
+				{
+					Endpoint: "/graph-explorer/",
+					Backend:  "http://localhost:9135",
 				},
 				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
 				{

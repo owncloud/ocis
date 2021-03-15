@@ -5,10 +5,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
@@ -45,8 +45,9 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -56,13 +57,10 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
 			}
-
-			// TODO we could parse OCIS_URL and set the PROXY_HTTP_ADDR port but that would make it harder to deploy with a
-			// reverse proxy ... wouldn't it?
-
+			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -155,14 +153,20 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				m = metrics.New()
 			)
+
+			gr := run.Group{}
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Context == nil {
+					return context.WithCancel(context.Background())
+				}
+				return context.WithCancel(cfg.Context)
+			}()
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			m.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
@@ -175,9 +179,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
-					proxyHTTP.Metrics(metrics),
-					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
-					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
+					proxyHTTP.Metrics(metrics.New()),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
@@ -209,48 +211,18 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Error().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

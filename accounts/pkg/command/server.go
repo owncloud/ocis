@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -32,13 +32,18 @@ func Server(cfg *config.Config) *cli.Command {
 		Description: "uses an LDAP server as the storage backend",
 		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
 			// When running on single binary mode the before hook from the root command won't get called. We manually
 			// call this before hook from ocis command, so the configuration can be loaded.
-			return ParseConfig(ctx, cfg)
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "accounts").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -115,8 +120,13 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				mtrcs       = metrics.New()
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+				mtrcs = metrics.New()
 			)
 
 			defer cancel()
@@ -125,7 +135,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
 			if err != nil {
-				logger.Fatal().Err(err).Msg("could not initialize service handler")
+				logger.Error().Err(err).Msg("handler init")
+				return err
 			}
 
 			{
@@ -135,16 +146,11 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Metrics(mtrcs),
-					http.Flags(flagset.RootWithConfig(config.New())),
-					http.Flags(flagset.ServerWithConfig(config.New())),
 					http.Handler(handler),
 				)
 
 				gr.Add(server.Run, func(_ error) {
-					logger.Info().
-						Str("server", "http").
-						Msg("Shutting down server")
-
+					logger.Info().Str("server", "http").Msg("Shutting down server")
 					cancel()
 				})
 			}
@@ -159,30 +165,14 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Handler(handler),
 				)
 
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
-					logger.Info().
-						Str("server", "grpc").
-						Msg("Shutting down server")
-
+				gr.Add(server.Run, func(_ error) {
+					logger.Info().Str("server", "grpc").Msg("Shutting down server")
 					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

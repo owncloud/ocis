@@ -7,7 +7,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/command"
 	svcconfig "github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 )
@@ -26,6 +26,9 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 			command.RemoveAccount(cfg.Accounts),
 			command.InspectAccount(cfg.Accounts),
 			command.PrintVersion(cfg.Accounts),
+		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureAccounts(cfg))

@@ -2,18 +2,20 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/thejerf/suture/v4"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
@@ -130,51 +132,56 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
 		},
 	}
+}
+
+// AuthBearerSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type AuthBearerSutureService struct {
+	cfg *config.Config
+}
+
+// NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
+func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.AuthBearer.Supervised = true
+	}
+	return AuthBearerSutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s AuthBearerSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.AuthBearer.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range AuthBearer(s.cfg).Flags {
+		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if AuthBearer(s.cfg).Before != nil {
+		if err := AuthBearer(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := AuthBearer(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

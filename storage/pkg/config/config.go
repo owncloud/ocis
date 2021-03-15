@@ -1,5 +1,7 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
@@ -74,6 +76,12 @@ type Port struct {
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}
+
+	// Context allows for context cancellation and propagation
+	Context context.Context
+
+	// Supervised is used when running under an oCIS runtime supervision tree
+	Supervised bool
 }
 
 // Users defines the available users configuration.

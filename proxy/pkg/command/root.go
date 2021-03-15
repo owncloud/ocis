@@ -1,21 +1,24 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
 	"github.com/owncloud/ocis/proxy/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the ocis-proxy command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-proxy",
 		Version:  version.String,
@@ -34,7 +37,6 @@ func Execute() error {
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return nil
-			//return ParseConfig(c, cfg)
 		},
 
 		Commands: []*cli.Command{
@@ -69,6 +71,8 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads proxy configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -105,6 +109,30 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		logger.Fatal().
 			Err(err).
 			Msg("Failed to parse config")
+	}
+
+	return nil
+}
+
+// SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new proxy.SutureService
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Proxy.Supervised = true
+	}
+	return SutureService{
+		cfg: cfg.Proxy,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
+	if err := Execute(s.cfg); err != nil {
+		return err
 	}
 
 	return nil

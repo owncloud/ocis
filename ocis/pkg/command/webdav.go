@@ -4,7 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/webdav/pkg/command"
@@ -21,6 +21,9 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 		Flags:    flagset.ServerWithConfig(cfg.WebDAV),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.WebDAV),
+		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureWebDAV(cfg))

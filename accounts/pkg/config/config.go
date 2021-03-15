@@ -1,6 +1,8 @@
 // Package config should be moved to internal
 package config
 
+import "context"
+
 // LDAP defines the available ldap configuration.
 type LDAP struct {
 	Hostname     string
@@ -121,6 +123,9 @@ type Config struct {
 	Index        Index
 	ServiceUser  ServiceUser
 	Tracing      Tracing
+
+	Context    context.Context
+	Supervised bool
 }
 
 // New returns a new config.
