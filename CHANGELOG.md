@@ -30,6 +30,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/4319
    https://github.com/owncloud/ocis/pull/1794
+   https://github.com/owncloud/ocis/pull/1811
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
