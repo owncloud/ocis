@@ -13,11 +13,9 @@ const TextInput = (props) => {
 
     return (
         <div>
-            <label id={`${props.id}-label`}
-                   className="oc-label"
+            <label className="oc-label"
                    htmlFor={props.id}>{intl.formatMessage(label)}</label>
             <input className={`oc-input ${extraClassName ? extraClassName : ''}`} {...props}
-                   aria-labelledby={`${props.id}-label`}
                    placeholder={props.placeholder ? intl.formatMessage(props.placeholder) : null}/>
         </div>);
 };
