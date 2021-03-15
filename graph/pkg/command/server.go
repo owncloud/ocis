@@ -2,8 +2,6 @@ package command
 
 import (
 	"context"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
 
@@ -19,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/metrics"
 	"github.com/owncloud/ocis/graph/pkg/server/debug"
 	"github.com/owncloud/ocis/graph/pkg/server/http"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
@@ -29,12 +28,19 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
-		Before: func(c *cli.Context) error {
+		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return ParseConfig(c, cfg)
+			// When running on single binary mode the before hook from the root command won't get called. We manually
+			// call this before hook from ocis command, so the configuration can be loaded.
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
+			}
+			logger.Debug().Str("service", "graph").Msg("ignoring config file parsing when running supervised")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -125,28 +131,29 @@ func Server(cfg *config.Config) *cli.Command {
 
 			var (
 				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+				mtrcs = metrics.New()
 			)
 
 			defer cancel()
+
+			mtrcs.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
 
 			{
 				server, err := http.Server(
 					http.Logger(logger),
 					http.Context(ctx),
 					http.Config(cfg),
-					http.Metrics(metrics),
-					http.Flags(flagset.RootWithConfig(cfg)),
-					http.Flags(flagset.ServerWithConfig(cfg)),
+					http.Metrics(mtrcs),
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "http").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")
 					return err
 				}
 
@@ -169,48 +176,18 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("transport", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("transport", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("transport", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					//close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

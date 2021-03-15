@@ -27,7 +27,8 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
-		filter := fmt.Sprintf("(entryuuid=%s)", userID)
+		// TODO make filter configurable
+		filter := fmt.Sprintf("(&(objectClass=posixAccount)(ownCloudUUID=%s))", userID)
 		user, err = g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
@@ -45,7 +46,8 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	claims := oidc.FromContext(r.Context())
 	g.logger.Info().Interface("Claims", claims).Msg("Claims in /me")
 
-	filter := fmt.Sprintf("(uid=%s)", claims.PreferredUsername)
+	// TODO make filter configurable
+	filter := fmt.Sprintf("(&(objectClass=posixAccount)(cn=%s))", claims.PreferredUsername)
 	user, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
 	if err != nil {
 		g.logger.Info().Err(err).Msgf("Failed to read user %s", claims.PreferredUsername)
@@ -68,10 +70,11 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := g.ldapSearch(con, "(objectclass=*)", g.config.Ldap.BaseDNUsers)
+	// TODO make filter configurable
+	result, err := g.ldapSearch(con, "(objectClass=posixAccount)", g.config.Ldap.BaseDNUsers)
 
 	if err != nil {
-		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectclass=*)'")
+		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectClass=posixAccount)'")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
 		return
 	}

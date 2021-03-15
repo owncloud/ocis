@@ -122,7 +122,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/graph"),
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"GRAPH_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
@@ -178,9 +178,9 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "oidc-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Endpoint, "https://localhost:9130"),
+			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Endpoint, "https://localhost:9200"),
 			Usage:       "OpenIDConnect endpoint",
-			EnvVars:     []string{"GRAPH_OIDC_ENDPOINT"},
+			EnvVars:     []string{"GRAPH_OIDC_ENDPOINT", "OCIS_URL"},
 			Destination: &cfg.OpenIDConnect.Endpoint,
 		},
 		&cli.BoolFlag{

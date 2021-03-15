@@ -23,7 +23,8 @@ func (g Graph) GroupCtx(next http.Handler) http.Handler {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
 			return
 		}
-		filter := fmt.Sprintf("(entryuuid=%s)", groupID)
+		// TODO make filter configurable
+		filter := fmt.Sprintf("(&(objectClass=posixGroup)(ownCloudUUID=%s))", groupID)
 		group, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNGroups, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read group %s", groupID)
@@ -45,10 +46,11 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := g.ldapSearch(con, "(objectclass=*)", g.config.Ldap.BaseDNGroups)
+	// TODO make filter configurable
+	result, err := g.ldapSearch(con, "(objectClass=posixGroup)", g.config.Ldap.BaseDNGroups)
 
 	if err != nil {
-		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectclass=*)'")
+		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectClass=posixGroup)'")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
 		return
 	}
