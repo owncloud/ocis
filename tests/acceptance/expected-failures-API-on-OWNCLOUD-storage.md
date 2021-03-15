@@ -705,6 +705,18 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiSharees/sharees.feature:538](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L538)
 -   [apiSharees/sharees.feature:560](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L560)
 -   [apiSharees/sharees.feature:561](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L561)
+-   [apiSharees/sharees.feature:586](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L586)
+-   [apiSharees/sharees.feature:587](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L587)
+-   [apiSharees/sharees.feature:607](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L607)
+-   [apiSharees/sharees.feature:608](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L608)
+-   [apiSharees/sharees.feature:632](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L632)
+-   [apiSharees/sharees.feature:633](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L633)
+-   [apiSharees/sharees.feature:657](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L657)
+-   [apiSharees/sharees.feature:658](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L658)
+-   [apiSharees/sharees.feature:682](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L682)
+-   [apiSharees/sharees.feature:683](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L683)
+-   [apiSharees/sharees.feature:702](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L702)
+-   [apiSharees/sharees.feature:703](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L703)
 
 #### [sharing with group not available](https://github.com/owncloud/product/issues/293)
 -   [apiShareManagementToShares/acceptShares.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L223)
@@ -726,6 +738,13 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L141)
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:176](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L176)
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L177)
+-   [apiShareReshareToShares1/reShare.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L256)
+-   [apiShareReshareToShares1/reShare.feature:257](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L257)
+-   [apiShareReshareToShares1/reShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L273)
+-   [apiShareReshareToShares1/reShare.feature:274](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L274)
+-   [apiShareReshareToShares1/reShare.feature:290](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L274)
+-   [apiShareReshareToShares1/reShare.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L274)
+
 
 #### [file_target in share response](https://github.com/owncloud/product/issues/203)
 
@@ -2311,11 +2330,11 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
 
 #### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
-[apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
+-   [apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
-[apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:679](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L679)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L680)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 -   [apiWebdavUploadTUS/checksums.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L32)
