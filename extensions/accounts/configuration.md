@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:13:28+0000"
+date: "2021-03-15T16:29:39+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -41,18 +41,6 @@ Create a new account
 
 Usage: `accounts add [command options] [arguments...]`
 
-### accounts list
-
-List existing accounts
-
-Usage: `accounts list [command options] [arguments...]`
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `accounts`.
-
 ### accounts rebuildIndex
 
 Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
@@ -66,16 +54,25 @@ Removes an existing account
 Usage: `accounts remove [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
 -name |  $ACCOUNTS_NAME
-: service name. Default: `accounts`.
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
-### accounts update
+### accounts ocis-accounts
 
-Make changes to an existing account
+Provide accounts and groups for oCIS
 
-Usage: `accounts update [command options] [arguments...]`
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### accounts version
 
@@ -84,10 +81,10 @@ Print the versions of the running instances
 Usage: `accounts version [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
 -name |  $ACCOUNTS_NAME
-: service name. Default: `accounts`.
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
 ### accounts inspect
 
@@ -96,25 +93,22 @@ Show detailed data on an existing account
 Usage: `accounts inspect [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
 -name |  $ACCOUNTS_NAME
-: service name. Default: `accounts`.
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
-### accounts ocis-accounts
+### accounts list
 
-Provide accounts and groups for oCIS
+List existing accounts
 
-Usage: `accounts ocis-accounts [command options] [arguments...]`
+Usage: `accounts list [command options] [arguments...]`
 
--log-level |  $ACCOUNTS_LOG_LEVEL
-: Set logging level. Default: `info`.
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
--log-pretty |  $ACCOUNTS_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $ACCOUNTS_LOG_COLOR
-: Enable colored logging. Default: `true`.
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
 ### accounts server
 
@@ -126,59 +120,65 @@ Usage: `accounts server [command options] [arguments...]`
 : Enable sending traces.
 
 -tracing-type |  $ACCOUNTS_TRACING_TYPE
-: Tracing backend type. Default: `jaeger`.
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
 
 -tracing-endpoint |  $ACCOUNTS_TRACING_ENDPOINT
-: Endpoint for the agent.
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
 
 -tracing-collector |  $ACCOUNTS_TRACING_COLLECTOR
-: Endpoint for the collector.
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
 
 -tracing-service |  $ACCOUNTS_TRACING_SERVICE
-: Service name for tracing. Default: `accounts`.
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "accounts")`.
 
 -http-namespace |  $ACCOUNTS_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web")`.
 
 -http-addr |  $ACCOUNTS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9181`.
+: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9181")`.
 
 -http-root |  $ACCOUNTS_HTTP_ROOT
-: Root path of http server. Default: `/`.
+: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
 -grpc-addr |  $ACCOUNTS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9180`.
+: Address to bind grpc server. Default: `flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9180")`.
 
 -name |  $ACCOUNTS_NAME
-: service name. Default: `accounts`.
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
 -asset-path |  $ACCOUNTS_ASSET_PATH
-: Path to custom assets.
+: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
 
 -jwt-secret |  $ACCOUNTS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4")`.
 
 -storage-disk-path |  $ACCOUNTS_STORAGE_DISK_PATH
-: Path on the local disk, e.g. /var/tmp/ocis/accounts.
+: Path on the local disk, e.g. /var/tmp/ocis/accounts. Default: `flags.OverrideDefaultString(cfg.Repo.Disk.Path, "")`.
 
 -storage-cs3-provider-addr |  $ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR
-: bind address for the metadata storage provider. Default: `localhost:9215`.
+: bind address for the metadata storage provider. Default: `flags.OverrideDefaultString(cfg.Repo.CS3.ProviderAddr, "localhost:9215")`.
 
 -storage-cs3-data-url |  $ACCOUNTS_STORAGE_CS3_DATA_URL
-: http endpoint of the metadata storage. Default: `http://localhost:9216`.
+: http endpoint of the metadata storage. Default: `flags.OverrideDefaultString(cfg.Repo.CS3.DataURL, "http://localhost:9216")`.
 
 -storage-cs3-data-prefix |  $ACCOUNTS_STORAGE_CS3_DATA_PREFIX
-: path prefix for the http endpoint of the metadata storage, without leading slash. Default: `data`.
+: path prefix for the http endpoint of the metadata storage, without leading slash. Default: `flags.OverrideDefaultString(cfg.Repo.CS3.DataPrefix, "data")`.
 
 -storage-cs3-jwt-secret |  $ACCOUNTS_STORAGE_CS3_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.Repo.CS3.JWTSecret, "Pive-Fumkiu4")`.
 
 -service-user-uuid |  $ACCOUNTS_SERVICE_USER_UUID
-: uuid of the internal service user (required on EOS). Default: `95cb8724-03b2-11eb-a0a6-c33ef8ef53ad`.
+: uuid of the internal service user (required on EOS). Default: `flags.OverrideDefaultString(cfg.ServiceUser.UUID, "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad")`.
 
 -service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
-: username of the internal service user (required on EOS).
+: username of the internal service user (required on EOS). Default: `flags.OverrideDefaultString(cfg.ServiceUser.Username, "")`.
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:14:22+0000"
+date: "2021-03-15T16:30:38+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -48,14 +48,14 @@ Usage: `onlyoffice [global options] command [command options] [arguments...]`
 -config-file |  $ONLYOFFICE_CONFIG_FILE
 : Path to config file.
 
--log-level |  $ONLYOFFICE_LOG_LEVEL
-: Set logging level. Default: `info`.
+-log-level |  $ONLYOFFICE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
 
--log-pretty |  $ONLYOFFICE_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
+-log-pretty |  $ONLYOFFICE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
 
--log-color |  $ONLYOFFICE_LOG_COLOR
-: Enable colored logging. Default: `true`.
+-log-color |  $ONLYOFFICE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ## Sub Commands
 
@@ -66,7 +66,7 @@ Check health status
 Usage: `onlyoffice health [command options] [arguments...]`
 
 -debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9224`.
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
 
 ### onlyoffice server
 
@@ -78,22 +78,22 @@ Usage: `onlyoffice server [command options] [arguments...]`
 : Enable sending traces.
 
 -tracing-type |  $ONLYOFFICE_TRACING_TYPE
-: Tracing backend type. Default: `jaeger`.
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
 
 -tracing-endpoint |  $ONLYOFFICE_TRACING_ENDPOINT
-: Endpoint for the agent.
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
 
 -tracing-collector |  $ONLYOFFICE_TRACING_COLLECTOR
-: Endpoint for the collector.
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
 
 -tracing-service |  $ONLYOFFICE_TRACING_SERVICE
-: Service name for tracing. Default: `onlyoffice`.
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "onlyoffice")`.
 
 -debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9224`.
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
 
 -debug-token |  $ONLYOFFICE_DEBUG_TOKEN
-: Token to grant metrics access.
+: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
 
 -debug-pprof |  $ONLYOFFICE_DEBUG_PPROF
 : Enable pprof debugging.
@@ -102,14 +102,14 @@ Usage: `onlyoffice server [command options] [arguments...]`
 : Enable zpages debugging.
 
 -http-addr |  $ONLYOFFICE_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9220`.
+: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9220")`.
 
 -http-namespace |  $ONLYOFFICE_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web")`.
 
 -http-root |  $ONLYOFFICE_HTTP_ROOT
-: Root path of http server. Default: `/`.
+: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
 
 -asset-path |  $ONLYOFFICE_ASSET_PATH
-: Path to custom assets.
+: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:14:21+0000"
+date: "2021-03-15T16:30:37+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -42,7 +42,7 @@ Check health status
 Usage: `glauth health [command options] [arguments...]`
 
 -debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9129`.
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129")`.
 
 ### glauth ocis-glauth
 
@@ -50,14 +50,14 @@ Serve GLAuth API for oCIS
 
 Usage: `glauth ocis-glauth [command options] [arguments...]`
 
--log-level |  $GLAUTH_LOG_LEVEL
-: Set logging level. Default: `info`.
+-log-level |  $GLAUTH_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
 
--log-pretty |  $GLAUTH_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
+-log-pretty |  $GLAUTH_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
 
--log-color |  $GLAUTH_LOG_COLOR
-: Enable colored logging. Default: `true`.
+-log-color |  $GLAUTH_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### glauth server
 
@@ -66,28 +66,28 @@ Start integrated server
 Usage: `glauth server [command options] [arguments...]`
 
 -config-file |  $GLAUTH_CONFIG_FILE
-: Path to config file.
+: Path to config file. Default: `flags.OverrideDefaultString(cfg.File, "")`.
 
 -tracing-enabled |  $GLAUTH_TRACING_ENABLED
 : Enable sending traces.
 
 -tracing-type |  $GLAUTH_TRACING_TYPE
-: Tracing backend type. Default: `jaeger`.
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
 
 -tracing-endpoint |  $GLAUTH_TRACING_ENDPOINT
-: Endpoint for the agent.
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
 
 -tracing-collector |  $GLAUTH_TRACING_COLLECTOR
-: Endpoint for the collector.
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
 
 -tracing-service |  $GLAUTH_TRACING_SERVICE
-: Service name for tracing. Default: `glauth`.
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "glauth")`.
 
 -debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9129`.
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129")`.
 
 -debug-token |  $GLAUTH_DEBUG_TOKEN
-: Token to grant metrics access.
+: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
 
 -debug-pprof |  $GLAUTH_DEBUG_PPROF
 : Enable pprof debugging.
@@ -96,65 +96,65 @@ Usage: `glauth server [command options] [arguments...]`
 : Enable zpages debugging.
 
 -role-bundle-id |  $GLAUTH_ROLE_BUNDLE_ID
-: roleid used to make internal grpc requests. Default: `71881883-1768-46bd-a24d-a356a2afdf7f`.
+: roleid used to make internal grpc requests. Default: `flags.OverrideDefaultString(cfg.RoleBundleUUID, "71881883-1768-46bd-a24d-a356a2afdf7f")`.
 
 -ldap-addr |  $GLAUTH_LDAP_ADDR
-: Address to bind ldap server. Default: `0.0.0.0:9125`.
+: Address to bind ldap server. Default: `flags.OverrideDefaultString(cfg.Ldap.Address, "0.0.0.0:9125")`.
 
 -ldap-enabled |  $GLAUTH_LDAP_ENABLED
-: Enable ldap server. Default: `true`.
+: Enable ldap server. Default: `flags.OverrideDefaultBool(cfg.Ldap.Enabled, true)`.
 
 -ldaps-addr |  $GLAUTH_LDAPS_ADDR
-: Address to bind ldap server. Default: `0.0.0.0:9126`.
+: Address to bind ldap server. Default: `flags.OverrideDefaultString(cfg.Ldaps.Address, "0.0.0.0:9126")`.
 
 -ldaps-enabled |  $GLAUTH_LDAPS_ENABLED
-: Enable ldap server. Default: `true`.
+: Enable ldap server. Default: `flags.OverrideDefaultBool(cfg.Ldaps.Enabled, true)`.
 
 -ldaps-cert |  $GLAUTH_LDAPS_CERT
-: path to ldaps certificate in PEM format. Default: `./ldap.crt`.
+: path to ldaps certificate in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Cert, "./ldap.crt")`.
 
 -ldaps-key |  $GLAUTH_LDAPS_KEY
-: path to ldaps key in PEM format. Default: `./ldap.key`.
+: path to ldaps key in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Key, "./ldap.key")`.
 
 -backend-basedn |  $GLAUTH_BACKEND_BASEDN
-: base distinguished name to expose. Default: `dc=example,dc=org`.
+: base distinguished name to expose. Default: `flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=example,dc=org")`.
 
 -backend-name-format |  $GLAUTH_BACKEND_NAME_FORMAT
-: name attribute for entries to expose. typically cn or uid. Default: `cn`.
+: name attribute for entries to expose. typically cn or uid. Default: `flags.OverrideDefaultString(cfg.Backend.NameFormat, "cn")`.
 
 -backend-group-format |  $GLAUTH_BACKEND_GROUP_FORMAT
-: name attribute for entries to expose. typically ou, cn or dc. Default: `ou`.
+: name attribute for entries to expose. typically ou, cn or dc. Default: `flags.OverrideDefaultString(cfg.Backend.GroupFormat, "ou")`.
 
 -backend-ssh-key-attr |  $GLAUTH_BACKEND_SSH_KEY_ATTR
-: ssh key attribute for entries to expose. Default: `sshPublicKey`.
+: ssh key attribute for entries to expose. Default: `flags.OverrideDefaultString(cfg.Backend.SSHKeyAttr, "sshPublicKey")`.
 
 -backend-datastore |  $GLAUTH_BACKEND_DATASTORE
-: datastore to use as the backend. one of accounts, ldap or owncloud. Default: `accounts`.
+: datastore to use as the backend. one of accounts, ldap or owncloud. Default: `flags.OverrideDefaultString(cfg.Backend.Datastore, "accounts")`.
 
 -backend-insecure |  $GLAUTH_BACKEND_INSECURE
-: Allow insecure requests to the datastore. Default: `false`.
+: Allow insecure requests to the datastore. Default: `flags.OverrideDefaultBool(cfg.Backend.Insecure, false)`.
 
 -backend-use-graphapi |  $GLAUTH_BACKEND_USE_GRAPHAPI
-: use Graph API, only for owncloud datastore. Default: `true`.
+: use Graph API, only for owncloud datastore. Default: `flags.OverrideDefaultBool(cfg.Backend.UseGraphAPI, true)`.
 
 -fallback-basedn |  $GLAUTH_FALLBACK_BASEDN
-: base distinguished name to expose. Default: `dc=example,dc=org`.
+: base distinguished name to expose. Default: `flags.OverrideDefaultString(cfg.Fallback.BaseDN, "dc=example,dc=org")`.
 
 -fallback-name-format |  $GLAUTH_FALLBACK_NAME_FORMAT
-: name attribute for entries to expose. typically cn or uid. Default: `cn`.
+: name attribute for entries to expose. typically cn or uid. Default: `flags.OverrideDefaultString(cfg.Fallback.NameFormat, "cn")`.
 
 -fallback-group-format |  $GLAUTH_FALLBACK_GROUP_FORMAT
-: name attribute for entries to expose. typically ou, cn or dc. Default: `ou`.
+: name attribute for entries to expose. typically ou, cn or dc. Default: `flags.OverrideDefaultString(cfg.Fallback.GroupFormat, "ou")`.
 
 -fallback-ssh-key-attr |  $GLAUTH_FALLBACK_SSH_KEY_ATTR
-: ssh key attribute for entries to expose. Default: `sshPublicKey`.
+: ssh key attribute for entries to expose. Default: `flags.OverrideDefaultString(cfg.Fallback.SSHKeyAttr, "sshPublicKey")`.
 
 -fallback-datastore |  $GLAUTH_FALLBACK_DATASTORE
-: datastore to use as the fallback. one of accounts, ldap or owncloud.
+: datastore to use as the fallback. one of accounts, ldap or owncloud. Default: `flags.OverrideDefaultString(cfg.Fallback.Datastore, "")`.
 
 -fallback-insecure |  $GLAUTH_FALLBACK_INSECURE
-: Allow insecure requests to the datastore. Default: `false`.
+: Allow insecure requests to the datastore. Default: `flags.OverrideDefaultBool(cfg.Fallback.Insecure, false)`.
 
 -fallback-use-graphapi |  $GLAUTH_FALLBACK_USE_GRAPHAPI
-: use Graph API, only for owncloud datastore. Default: `true`.
+: use Graph API, only for owncloud datastore. Default: `flags.OverrideDefaultBool(cfg.Fallback.UseGraphAPI, true)`.
 

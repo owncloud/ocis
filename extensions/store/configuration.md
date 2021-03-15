@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:14:22+0000"
+date: "2021-03-15T16:30:39+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -35,60 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### store server
-
-Start integrated server
-
-Usage: `store server [command options] [arguments...]`
-
--tracing-enabled |  $STORE_TRACING_ENABLED
-: Enable sending traces.
-
--tracing-type |  $STORE_TRACING_TYPE
-: Tracing backend type. Default: `jaeger`.
-
--tracing-endpoint |  $STORE_TRACING_ENDPOINT
-: Endpoint for the agent.
-
--tracing-collector |  $STORE_TRACING_COLLECTOR
-: Endpoint for the collector.
-
--tracing-service |  $STORE_TRACING_SERVICE
-: Service name for tracing. Default: `store`.
-
--debug-addr |  $STORE_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9460`.
-
--debug-token |  $STORE_DEBUG_TOKEN
-: Token to grant metrics access.
-
--debug-pprof |  $STORE_DEBUG_PPROF
-: Enable pprof debugging.
-
--debug-zpages |  $STORE_DEBUG_ZPAGES
-: Enable zpages debugging.
-
--grpc-namespace |  $STORE_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
--name |  $STORE_NAME
-: Service name. Default: `store`.
-
--data-path |  $STORE_DATA_PATH
-: location of the store data path. Default: `/var/tmp/ocis/store`.
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
--grpc-namespace |  $STORE_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `com.owncloud.api`.
-
--name |  $STORE_NAME
-: Service name. Default: `store`.
-
 ### store health
 
 Check health status
@@ -96,7 +42,7 @@ Check health status
 Usage: `store health [command options] [arguments...]`
 
 -debug-addr |  $STORE_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9460`.
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460")`.
 
 ### store ocis-store
 
@@ -107,12 +53,66 @@ Usage: `store ocis-store [command options] [arguments...]`
 -config-file |  $STORE_CONFIG_FILE
 : Path to config file.
 
--log-level |  $STORE_LOG_LEVEL
-: Set logging level. Default: `info`.
+-log-level |  $STORE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
 
--log-pretty |  $STORE_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
+-log-pretty |  $STORE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
 
--log-color |  $STORE_LOG_COLOR
-: Enable colored logging. Default: `true`.
+-log-color |  $STORE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+### store server
+
+Start integrated server
+
+Usage: `store server [command options] [arguments...]`
+
+-tracing-enabled |  $STORE_TRACING_ENABLED
+: Enable sending traces.
+
+-tracing-type |  $STORE_TRACING_TYPE
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+
+-tracing-endpoint |  $STORE_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+
+-tracing-collector |  $STORE_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+
+-tracing-service |  $STORE_TRACING_SERVICE
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "store")`.
+
+-debug-addr |  $STORE_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460")`.
+
+-debug-token |  $STORE_DEBUG_TOKEN
+: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+
+-debug-pprof |  $STORE_DEBUG_PPROF
+: Enable pprof debugging.
+
+-debug-zpages |  $STORE_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api")`.
+
+-name |  $STORE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "store")`.
+
+-data-path |  $STORE_DATA_PATH
+: location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, "/var/tmp/ocis/store")`.
+
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api")`.
+
+-name |  $STORE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "store")`.
 

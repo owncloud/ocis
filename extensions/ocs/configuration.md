@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:14:22+0000"
+date: "2021-03-15T16:30:38+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -35,71 +35,44 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
--http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
-
--name |  $OCS_NAME
-: Service name. Default: `ocs`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9114`.
-
-### ocs ocis-ocs
-
-Serve OCS API for oCIS
-
-Usage: `ocs ocis-ocs [command options] [arguments...]`
-
--log-level |  $OCS_LOG_LEVEL
-: Set logging level. Default: `info`.
-
--log-pretty |  $OCS_LOG_PRETTY
-: Enable pretty logging. Default: `true`.
-
--log-color |  $OCS_LOG_COLOR
-: Enable colored logging. Default: `true`.
-
 ### ocs server
 
 Start integrated server
 
 Usage: `ocs server [command options] [arguments...]`
 
+-log-level |  $OCS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+-log-pretty |  $OCS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+-log-color |  $OCS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
 -config-file |  $OCS_CONFIG_FILE
 : Path to config file.
 
 -tracing-enabled |  $OCS_TRACING_ENABLED
-: Enable sending traces. Default: `false`.
+: Enable sending traces. Default: `flags.OverrideDefaultBool(cfg.Tracing.Enabled, false)`.
 
 -tracing-type |  $OCS_TRACING_TYPE
-: Tracing backend type. Default: `jaeger`.
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
 
 -tracing-endpoint |  $OCS_TRACING_ENDPOINT
-: Endpoint for the agent.
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
 
 -tracing-collector |  $OCS_TRACING_COLLECTOR
-: Endpoint for the collector.
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
 
 -tracing-service |  $OCS_TRACING_SERVICE
-: Service name for tracing. Default: `ocs`.
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "ocs")`.
 
 -debug-addr |  $OCS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9114`.
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
 
 -debug-token |  $OCS_DEBUG_TOKEN
-: Token to grant metrics access.
+: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
 
 -debug-pprof |  $OCS_DEBUG_PPROF
 : Enable pprof debugging.
@@ -108,17 +81,44 @@ Usage: `ocs server [command options] [arguments...]`
 : Enable zpages debugging.
 
 -http-addr |  $OCS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9110`.
+: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9110")`.
 
 -http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `com.owncloud.web`.
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
 
 -name |  $OCS_NAME
-: Service name. Default: `ocs`.
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
 
 -http-root |  $OCS_HTTP_ROOT
-: Root path of http server. Default: `/ocs`.
+: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/ocs")`.
 
 -jwt-secret |  $OCS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
+: Used to dismantle the access token, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4")`.
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+-http-namespace |  $OCS_NAMESPACE
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+-name |  $OCS_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
+
+### ocs ocis-ocs
+
+Serve OCS API for oCIS
+
+Usage: `ocs ocis-ocs [command options] [arguments...]`
 

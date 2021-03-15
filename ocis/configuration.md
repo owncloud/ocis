@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-15T15:14:22+0000"
+date: "2021-03-15T16:30:37+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -45,13 +45,13 @@ ownCloud Infinite Scale Stack
 
 Usage: `ocis [global options] command [command options] [arguments...]`
 
--log-level |  $OCIS_LOG_LEVEL
+-ocis-log-level |  $OCIS_LOG_LEVEL
 : Set logging level. Default: `info`.
 
--log-pretty |  $OCIS_LOG_PRETTY
+-ocis-log-pretty |  $OCIS_LOG_PRETTY
 : Enable pretty logging. Default: `false`.
 
--log-color |  $OCIS_LOG_COLOR
+-ocis-log-color |  $OCIS_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
 -tracing-enabled |  $OCIS_TRACING_ENABLED
@@ -74,20 +74,17 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
 ### ocis kill
 
 Kill an extension by name
 
 Usage: `ocis kill [command options] [arguments...]`
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
 
 ### ocis run
 
@@ -122,79 +119,54 @@ Usage: `ocis server [command options] [arguments...]`
 -grpc-addr |  $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
-### ocis list
+### ocis health
 
-Lists running ocis extensions
+Check health status
 
-Usage: `ocis list [command options] [arguments...]`
+Usage: `ocis health [command options] [arguments...]`
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
 
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis store
+#### ocis storage-auth-basic
 
-Start a go-micro store
+Start storage auth-basic service
 
-#### ocis idp
+#### ocis storage-home
 
-Start idp server
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis thumbnails
-
-Start thumbnails server
+Start storage and data provider for /home mount
 
 #### ocis settings
 
 Start settings server
 
-#### ocis storage-auth-basic
+#### ocis storage-groupprovider
 
-Start storage auth-basic service
+Start storage groupprovider service
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis accounts
+
+Start accounts server
 
 #### ocis storage-public-link
 
 Start storage public link storage
 
-#### ocis storage-sharing
+#### ocis version
 
-Start storage sharing service
+Lists running services with version
 
 #### ocis webdav
 
@@ -204,23 +176,51 @@ Start webdav server
 
 Start onlyoffice server
 
-#### ocis storage-home
+#### ocis proxy
 
-Start storage and data provider for /home mount
+Start proxy server
 
-#### ocis version
+#### ocis storage-metadata
 
-Lists running services with version
+Start storage and data service for metadata
 
 #### ocis web
 
 Start web server
 
-#### ocis glauth
+#### ocis storage-sharing
 
-Start glauth server
+Start storage sharing service
 
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
+
+#### ocis idp
+
+Start idp server
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-gateway
+
+Start storage gateway
 
