@@ -23,6 +23,12 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			Name:        "log-file",
+			Usage:       "Enable log to file",
+			EnvVars:     []string{"WEBDAV_LOG_FILE", "OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
+		&cli.StringFlag{
 			Name:        "log-level",
 			Usage:       "Set logging level",
 			EnvVars:     []string{"WEBDAV_LOG_LEVEL", "OCIS_LOG_LEVEL"},
