@@ -29,6 +29,12 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
+		&cli.StringFlag{
+			Name:        "ocis-log-file",
+			Usage:       "Enable log to file",
+			EnvVars:     []string{"OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",

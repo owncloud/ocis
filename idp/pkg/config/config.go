@@ -11,6 +11,7 @@ type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.

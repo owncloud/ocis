@@ -19,8 +19,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
-	graph "github.com/owncloud/ocis/graph/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
+	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -133,6 +133,7 @@ func Start(o ...Option) error {
 	s.cfg.Storage.Log.Color = s.cfg.Log.Color
 	s.cfg.Storage.Log.Level = s.cfg.Log.Level
 	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Log.File
 
 	// notify goroutines that they are running on supervised mode
 	s.cfg.Mode = ociscfg.SUPERVISED
