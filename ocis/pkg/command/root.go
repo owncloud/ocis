@@ -66,6 +66,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Level(cfg.Log.Level),
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
+		log.File(cfg.Log.File),
 	)
 }
 

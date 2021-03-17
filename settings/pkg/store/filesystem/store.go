@@ -28,6 +28,7 @@ func New(cfg *config.Config) settings.Manager {
 			olog.Color(cfg.Log.Color),
 			olog.Pretty(cfg.Log.Pretty),
 			olog.Level(cfg.Log.Level),
+			olog.File(cfg.Log.File),
 		),
 	}
 

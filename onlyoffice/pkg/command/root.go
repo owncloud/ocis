@@ -64,6 +64,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Level(cfg.Log.Level),
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
+		log.File(cfg.Log.File),
 	)
 }
 
@@ -122,6 +123,7 @@ func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Onlyoffice.Supervised = true
 	}
+	cfg.Onlyoffice.Log.File = cfg.Log.File
 	return SutureService{
 		cfg: cfg.Onlyoffice,
 	}

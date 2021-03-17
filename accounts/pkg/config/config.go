@@ -62,6 +62,7 @@ type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Repo defines which storage implementation is to be used.

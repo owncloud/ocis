@@ -46,6 +46,12 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "log-file",
+			Usage:       "Enable log to file",
+			EnvVars:     []string{"GRAPH_EXPLORER_LOG_FILE", "OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
