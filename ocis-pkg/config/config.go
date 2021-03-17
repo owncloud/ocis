@@ -71,6 +71,7 @@ type Mode int
 // Config combines all available configuration parts.
 type Config struct {
 	Mode Mode
+	File string
 
 	Registry     string
 	Log          Log
