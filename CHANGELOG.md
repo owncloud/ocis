@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve accessibility to input elements on login page: [#1794](https://github.com/owncloud/ocis/pull/1794)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 * Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
+* Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
 ## Details
@@ -50,6 +51,16 @@ The following sections list the changes for unreleased.
 * Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
 
    https://github.com/owncloud/ocis/pull/1813
+
+* Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
+
+   When running supervised, support for configuring all logs to a single log file:
+   `OCIS_LOG_FILE=/Users/foo/bar/ocis.log MICRO_REGISTRY=etcd bin/ocis server`
+
+   Supports directing log from single extensions to a log file:
+   `PROXY_LOG_FILE=/Users/foo/bar/proxy.log MICRO_REGISTRY=etcd bin/ocis proxy`
+
+   https://github.com/owncloud/ocis/pull/1816
 
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
