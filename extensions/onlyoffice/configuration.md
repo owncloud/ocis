@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T14:29:12+0000"
+date: "2021-03-17T21:53:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -73,6 +73,9 @@ Usage: `onlyoffice health [command options] [arguments...]`
 Start integrated server
 
 Usage: `onlyoffice server [command options] [arguments...]`
+
+-log-file |  $ONLYOFFICE_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
 
 -tracing-enabled |  $ONLYOFFICE_TRACING_ENABLED
 : Enable sending traces.

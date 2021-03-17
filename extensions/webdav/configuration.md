@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T14:29:14+0000"
+date: "2021-03-17T21:53:05+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -43,20 +43,14 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
-
 ### webdav server
 
 Start integrated server
 
 Usage: `webdav server [command options] [arguments...]`
+
+-log-file |  $WEBDAV_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
 
 -log-level |  $WEBDAV_LOG_LEVEL , $OCIS_LOG_LEVEL
 : Set logging level.
@@ -120,4 +114,13 @@ Usage: `webdav version [command options] [arguments...]`
 
 -service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
 

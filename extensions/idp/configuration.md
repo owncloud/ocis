@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T14:29:12+0000"
+date: "2021-03-17T21:53:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -64,6 +64,9 @@ Usage: `idp ocis-idp [command options] [arguments...]`
 Start integrated server
 
 Usage: `idp server [command options] [arguments...]`
+
+-log-file |  $IDP_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
 
 -config-file |  $IDP_CONFIG_FILE
 : Path to config file. Default: `flags.OverrideDefaultString(cfg.File, "")`.

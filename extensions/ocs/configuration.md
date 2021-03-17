@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T14:29:12+0000"
+date: "2021-03-17T21:53:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -55,6 +55,9 @@ Usage: `ocs ocis-ocs [command options] [arguments...]`
 Start integrated server
 
 Usage: `ocs server [command options] [arguments...]`
+
+-log-file |  $OCS_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
 
 -log-level |  $OCS_LOG_LEVEL , $OCIS_LOG_LEVEL
 : Set logging level.
