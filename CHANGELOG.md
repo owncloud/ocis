@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Improve accessibility to input elements on login page: [#1794](https://github.com/owncloud/ocis/pull/1794)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
+* Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
 ## Details
@@ -45,6 +46,10 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/214
    https://github.com/owncloud/ocis/pull/1790
    https://github.com/owncloud/client/pull/8398
+
+* Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
+
+   https://github.com/owncloud/ocis/pull/1813
 
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
