@@ -9,6 +9,12 @@ import (
 func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			Name:        "config-file",
+			Usage:       "Load config file from a non standard location.",
+			EnvVars:     []string{"OCIS_CONFIG_FILE"},
+			Destination: &cfg.File,
+		},
+		&cli.StringFlag{
 			Name:        "ocis-log-level",
 			Value:       "info",
 			Usage:       "Set logging level",
