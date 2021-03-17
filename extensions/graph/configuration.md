@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T08:47:39+0000"
+date: "2021-03-17T14:29:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -53,13 +53,13 @@ Usage: `graph ocis-graph [command options] [arguments...]`
 -config-file |  $GRAPH_CONFIG_FILE
 : Path to config file. Default: `flags.OverrideDefaultString(cfg.File, "")`.
 
--log-level |  $GRAPH_LOG_LEVEL
+-log-level |  $GRAPH_LOG_LEVEL , $OCIS_LOG_LEVEL
 : Set logging level.
 
--log-pretty |  $GRAPH_LOG_PRETTY
+-log-pretty |  $GRAPH_LOG_PRETTY , $OCIS_LOG_PRETTY
 : Enable pretty logging.
 
--log-color |  $GRAPH_LOG_COLOR
+-log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
 
 ### graph server

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-17T08:47:39+0000"
+date: "2021-03-17T14:29:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -41,13 +41,13 @@ Serve Graph-Explorer for oCIS
 
 Usage: `graph-explorer [global options] command [command options] [arguments...]`
 
--log-level |  $GRAPH_EXPLORER_LOG_LEVEL
+-log-level |  $GRAPH_EXPLORER_LOG_LEVEL , $OCIS_LOG_LEVEL
 : Set logging level.
 
--log-pretty |  $GRAPH_EXPLORER_LOG_PRETTY
+-log-pretty |  $GRAPH_EXPLORER_LOG_PRETTY , $OCIS_LOG_PRETTY
 : Enable pretty logging.
 
--log-color |  $GRAPH_EXPLORER_LOG_COLOR
+-log-color |  $GRAPH_EXPLORER_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
 
 ## Sub Commands
