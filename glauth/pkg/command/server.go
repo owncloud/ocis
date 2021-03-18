@@ -41,7 +41,9 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			tracing.Configure(cfg, logger)
+			if err := tracing.Configure(cfg, logger); err != nil {
+				return err
+			}
 
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
