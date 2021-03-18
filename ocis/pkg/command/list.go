@@ -21,7 +21,7 @@ func ListCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:        "hostname",
 				Value:       "localhost",
-				EnvVars:     []string{"OCIS_RUNTIME_HOSTNAME"},
+				EnvVars:     []string{"OCIS_RUNTIME_HOST"},
 				Destination: &cfg.Runtime.Host,
 			},
 			&cli.StringFlag{
