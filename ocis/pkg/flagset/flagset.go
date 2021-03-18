@@ -84,7 +84,7 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "runtime-port",
-			Value:       "6060",
+			Value:       "9250",
 			Usage:       "Configures which port the runtime starts",
 			EnvVars:     []string{"OCIS_RUNTIME_PORT"},
 			Destination: &cfg.Runtime.Port,

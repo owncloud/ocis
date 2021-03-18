@@ -1,6 +1,6 @@
 Enhancement: Runtime Hostname and Port are now configurable
 
-Without any configuration the ocis runtime will start on `localhost:6060` unless specified otherwise. Usage:
+Without any configuration the ocis runtime will start on `localhost:9250` unless specified otherwise. Usage:
 
 - `OCIS_RUNTIME_PORT=6061 bin/ocis server`
   - overrides the oCIS runtime and starts on port 6061

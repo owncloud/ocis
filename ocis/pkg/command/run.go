@@ -28,7 +28,7 @@ func RunCommand(cfg *config.Config) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:        "port",
-				Value:       "6060",
+				Value:       "9250",
 				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
 				Destination: &cfg.Runtime.Port,
 			},
