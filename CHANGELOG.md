@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 * Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
 * Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
+* Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
 ## Details
@@ -61,6 +62,21 @@ The following sections list the changes for unreleased.
    `PROXY_LOG_FILE=/Users/foo/bar/proxy.log MICRO_REGISTRY=etcd bin/ocis proxy`
 
    https://github.com/owncloud/ocis/pull/1816
+
+* Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
+
+   Without any configuration the ocis runtime will start on `localhost:9250` unless specified
+   otherwise. Usage:
+
+   - `OCIS_RUNTIME_PORT=6061 bin/ocis server` - overrides the oCIS runtime and starts on port
+   6061 - `OCIS_RUNTIME_PORT=6061 bin/ocis list` - lists running extensions for the runtime on
+   `localhost:6061`
+
+   All subcommands are updated and expected to work with the following environment variables:
+
+   ``` OCIS_RUNTIME_HOST OCIS_RUNTIME_PORT ```
+
+   https://github.com/owncloud/ocis/pull/1822
 
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
