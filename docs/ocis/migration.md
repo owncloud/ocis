@@ -18,25 +18,29 @@ As an admin I want to migrate certain groups of users before others.
 As a user, I need a seamless migration and not lose data by any chance.
 
 ### Stage-0
-Is the pre-migration stage having a functional ownCloud 10 instance
+Is the pre-migration stage having a functional ownCloud 10 instance.
 
 ### Stage-1
 Introduce OpenID Connect to server and Clients
 
 ### Stage-2
-Introduce new web ui, let end users get used to it voluntarily
+Install and introduce ownCloud Web and let users test it voluntarily.
 
 ### Stage-3
-start oCIS backend and make read only tests on existing data using owncloud storage driver and database backed share manager
+Start oCIS backend and make read only tests on existing data using the `owncloud` storage driver which will read (and write)
+- blobs from the same datadirectory layout as in ownCloud 10 and
+- metadata from the ownCloud 10 databas
+The oCIS share manager will read share infomation from the owncloud database as well.
+- [ ] *we need a share manager that can read from the oc 10 db as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. ~~~~ jfd*
 
 ### Stage-4
-test updating data using oCIS backend
+Test writing data with oCIS into the existing ownCloud 10 datafolder using the `owncloud` storage driver.
 
 ### Stage-5
-introduce reverse proxy and switch over early adoptors, let admins gain trust in the new backend
+Introduce reverse proxy and switch over early adoptors, let admins gain trust in the new backend by comparing metrics of the two systems and having it running in parallel.
 
 ### Stage-6
-voluntary transition period and subsequent hard deadline for all users
+Voluntary transition period and subsequent hard deadline for all users
 
 ### Stage-7
 disable oc10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
@@ -58,7 +62,11 @@ The fundamental difference between ownCloud 10 and oCIS is that the file metadat
 
 ## Data that will be migrated
 
-Currently, oCIS focuses on file sync and share use cases. In ownCloud 10 the files are laid out on disk in the *data directory* using the following layout:
+Currently, oCIS focuses on file sync and share use cases. 
+
+### Blob data
+
+In ownCloud 10 the files are laid out on disk in the *data directory* using the following layout:
 ```
 data
 ├── einstein
@@ -101,6 +109,13 @@ The *data directory* may also contain subfolders for owncloud 10 applications li
 
 When an objectstorage is used as the primary storage all file blobs are stored by their file id and a prefix, eg.: `urn:oid:<fileid>`.
 
+The three types of blobs we need to migrate are stored in 
+- `files` for file blobs, the current file content,
+- `files_trashbin` for trashed files (and their versions) and 
+- `files_versions` for file blobs of older versions.
+
+### Filecache table
+
 In both cases the file metadata, including a full replication of the file tree, is stored in the `oc_filecache`  table of an ownCloud 10 database. The primary key of a row is the file id. It is used to attach additional metadata like shares, tags, favorites or arbitrary file properties.
 
 The `filecache` table itself has more metadata:
@@ -127,34 +142,17 @@ The `filecache` table itself has more metadata:
 
 > Note: for EOS a hot migration only works seamlessly if file ids in oc10 are already read from eos. otherwise either a mapping from the oc10 filecache file id to the new eos file id has to be created under the assumption that these id sets do not intersect or files and corresponding shares need to be exported and imported offline to generate a new set of ids. While this will preserve public links, user, group and even federated shares, old internal links may still point to different files because they contain the oc10 fileid 
 
-### File blob data
+### share table
 
-
-## Goal
-
-This ticket is about to decide which data of a typical oC10 installation can and will be migrated to oCIS.
-
-Examples:
-- User files
-- Trash
-- Versions
-- Users, groups and permissions
 - Public links
 - Private shares with users and groups
-- Federated shares
+- Federated shares *incoming shares table ~~~~ jfd*
 - Guest shares
-- Activities
 
-## User Stories
+### user data
 
-- As an admin I need a time efficient way of migration.
-- As an admin I need to be able to explain which data was migrated and which not, to which consequences.
-- As a user I want a seamless migration of my data.
-- As a user I do not want to loose work that I put into the system, ie. by setting up shares.
-- As a user I want to understand which data can not be migrated.
+- Users, groups and permissions (who is admin)
 
-## Acceptance Criteria
+### activities
 
-- ADR that describes which data from oC10 will be migrated and which not. 
-- If data changes it's meaning or used differently (ie. Groups vs Roles) that is explained and the consequences are clear.
-- It is explained which data is not migrated.
+*dedicated service, not yet implemented, requires decisions about an event system ~~~~ jfd*
