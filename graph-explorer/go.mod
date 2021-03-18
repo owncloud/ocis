@@ -13,7 +13,9 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
+	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.1
+	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/mod v0.4.1 // indirect

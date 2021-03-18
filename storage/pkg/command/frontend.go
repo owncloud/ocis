@@ -72,7 +72,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			revaCfg := revaConfigFromStruct(c, cfg, filesCfg)
+			revaCfg := frontendConfigFromStruct(c, cfg, filesCfg)
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(revaCfg, pidFile, runtime.WithLogger(&logger.Logger))
@@ -114,8 +114,8 @@ func Frontend(cfg *config.Config) *cli.Command {
 	}
 }
 
-// revaConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func revaConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) map[string]interface{} {
+// frontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
 			"max_cpus":             cfg.Reva.Users.MaxCPUs,
