@@ -15,7 +15,7 @@ The migration happens in subsequent stages while the service is online.
 ### User Stories
 As an admin I need to avoid downtime.
 As an admin I want to migrate certain groups of users before others.
-As a user I need a seamless migration and not loose data by any chance.
+As a user, I need a seamless migration and not lose data by any chance.
 
 ### Stage-0
 Is the pre-migration stage having a functional ownCloud 10 instance
