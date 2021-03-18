@@ -19,18 +19,20 @@ func ListCommand(cfg *config.Config) *cli.Command {
 		Category: "Runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "hostname",
-				Value:   "localhost",
-				EnvVars: []string{"OCIS_RUNTIME_HOSTNAME"},
+				Name:        "hostname",
+				Value:       "localhost",
+				EnvVars:     []string{"OCIS_RUNTIME_HOSTNAME"},
+				Destination: &cfg.Runtime.Host,
 			},
 			&cli.StringFlag{
-				Name:    "port",
-				Value:   "6060",
-				EnvVars: []string{"OCIS_RUNTIME_PORT"},
+				Name:        "port",
+				Value:       "6060",
+				EnvVars:     []string{"OCIS_RUNTIME_PORT"},
+				Destination: &cfg.Runtime.Port,
 			},
 		},
 		Action: func(c *cli.Context) error {
-			client, err := rpc.DialHTTP("tcp", net.JoinHostPort("localhost", "6060"))
+			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Host, cfg.Runtime.Port))
 			if err != nil {
 				log.Fatal("dialing:", err)
 			}

@@ -82,6 +82,20 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+		&cli.StringFlag{
+			Name:        "runtime-port",
+			Value:       "6060",
+			Usage:       "Configures which port the runtime starts",
+			EnvVars:     []string{"OCIS_RUNTIME_PORT"},
+			Destination: &cfg.Runtime.Port,
+		},
+		&cli.StringFlag{
+			Name:        "runtime-host",
+			Value:       "localhost",
+			Usage:       "Configures the host where the runtime process is running",
+			EnvVars:     []string{"OCIS_RUNTIME_HOST"},
+			Destination: &cfg.Runtime.Host,
+		},
 	}
 }
 
