@@ -68,6 +68,12 @@ const (
 
 type Mode int
 
+// Runtime configures the oCIS runtime when running in supervised mode.
+type Runtime struct {
+	Port string
+	Host string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	Mode Mode
@@ -80,6 +86,7 @@ type Config struct {
 	GRPC         GRPC
 	Tracing      Tracing
 	TokenManager TokenManager
+	Runtime      Runtime
 
 	Accounts      *accounts.Config
 	GLAuth        *glauth.Config
