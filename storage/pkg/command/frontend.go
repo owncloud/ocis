@@ -8,17 +8,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -36,215 +36,51 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+			tracing.Configure(cfg, logger)
 
-				case "jaeger":
-					logger.Info().
-						Str("type", t).
-						Msg("configuring storage to use the jaeger tracing backend")
-
-				case "zipkin":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
-			}
-
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
-			)
+			gr := run.Group{}
+			ctx, cancel := context.WithCancel(context.Background())
+			//metrics     = metrics.New()
 
 			defer cancel()
 
-			{
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			uuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-				// pregenerate list of valid localhost ports for the desktop redirect_uri
-				// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
-				var desktopRedirectURIs [65535 - 1024]string
-				for port := 0; port < len(desktopRedirectURIs); port++ {
-					desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
-				}
-
-				filesCfg := map[string]interface{}{
-					"private_links":     false,
-					"bigfilechunking":   false,
-					"blacklisted_files": []string{},
-					"undelete":          true,
-					"versioning":        true,
-				}
-
-				if cfg.Reva.DefaultUploadProtocol == "tus" {
-					filesCfg["tus_support"] = map[string]interface{}{
-						"version":              "1.0.0",
-						"resumable":            "1.0.0",
-						"extension":            "creation,creation-with-upload",
-						"http_method_override": cfg.Reva.UploadHTTPMethodOverride,
-						"max_chunk_size":       int(cfg.Reva.UploadMaxChunkSize),
-					}
-				}
-
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Users.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": c.Command.Name,
-					},
-					"shared": map[string]interface{}{
-						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.Endpoint, // Todo or address?
-					},
-					"http": map[string]interface{}{
-						"network": cfg.Reva.Frontend.HTTPNetwork,
-						"address": cfg.Reva.Frontend.HTTPAddr,
-						"middlewares": map[string]interface{}{
-							"cors": map[string]interface{}{
-								"allow_credentials": true,
-							},
-							"auth": map[string]interface{}{
-								"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
-							},
-						},
-						// TODO build services dynamically
-						"services": map[string]interface{}{
-							"datagateway": map[string]interface{}{
-								"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
-								"transfer_shared_secret": cfg.Reva.TransferSecret,
-								"timeout":                86400,
-								"insecure":               true,
-							},
-							"ocdav": map[string]interface{}{
-								"prefix":           cfg.Reva.Frontend.OCDavPrefix,
-								"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
-								"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
-								"timeout":          86400,
-								"insecure":         true,
-							},
-							"ocs": map[string]interface{}{
-								"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
-								"prefix":       cfg.Reva.Frontend.OCSPrefix,
-								"config": map[string]interface{}{
-									"version": "1.8",
-									"website": "reva",
-									"host":    cfg.Reva.Frontend.PublicURL,
-									"contact": "admin@localhost",
-									"ssl":     "false",
-								},
-								"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,
-								"capabilities": map[string]interface{}{
-									"capabilities": map[string]interface{}{
-										"core": map[string]interface{}{
-											"poll_interval": 60,
-											"webdav_root":   "remote.php/webdav",
-											"status": map[string]interface{}{
-												"installed":      true,
-												"maintenance":    false,
-												"needsDbUpgrade": false,
-												"version":        "10.0.11.5",
-												"versionstring":  "10.0.11",
-												"edition":        "community",
-												"productname":    "reva",
-												"hostname":       "",
-											},
-											"support_url_signing": true,
-										},
-										"checksums": map[string]interface{}{
-											"supported_types":       cfg.Reva.ChecksumSupportedTypes,
-											"preferred_upload_type": cfg.Reva.ChecksumPreferredUploadType,
-										},
-										"files": filesCfg,
-										"dav":   map[string]interface{}{},
-										"files_sharing": map[string]interface{}{
-											"api_enabled":                       true,
-											"resharing":                         true,
-											"group_sharing":                     true,
-											"auto_accept_share":                 true,
-											"share_with_group_members_only":     true,
-											"share_with_membership_groups_only": true,
-											"default_permissions":               22,
-											"search_min_length":                 3,
-											"public": map[string]interface{}{
-												"enabled":              true,
-												"send_mail":            true,
-												"social_share":         true,
-												"upload":               true,
-												"multiple":             true,
-												"supports_upload_only": true,
-												"password": map[string]interface{}{
-													"enforced": true,
-													"enforced_for": map[string]interface{}{
-														"read_only":   true,
-														"read_write":  true,
-														"upload_only": true,
-													},
-												},
-												"expire_date": map[string]interface{}{
-													"enabled": false,
-												},
-											},
-											"user": map[string]interface{}{
-												"send_mail": true,
-											},
-											"user_enumeration": map[string]interface{}{
-												"enabled":            true,
-												"group_members_only": true,
-											},
-											"federation": map[string]interface{}{
-												"outgoing": true,
-												"incoming": true,
-											},
-										},
-										"notifications": map[string]interface{}{
-											"endpoints": []string{"disable"},
-										},
-									},
-									"version": map[string]interface{}{
-										"edition": "reva",
-										"major":   10,
-										"minor":   0,
-										"micro":   11,
-										"string":  "10.0.11",
-									},
-								},
-							},
-						},
-					},
-				}
-
-				gr.Add(func() error {
-					runtime.RunWithOptions(
-						rcfg,
-						pidFile,
-						runtime.WithLogger(&logger.Logger),
-					)
-					return nil
-				}, func(_ error) {
-					logger.Info().
-						Str("server", c.Command.Name).
-						Msg("Shutting down server")
-
-					cancel()
-				})
+			// pregenerate list of valid localhost ports for the desktop redirect_uri
+			// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
+			var desktopRedirectURIs [65535 - 1024]string
+			for port := 0; port < len(desktopRedirectURIs); port++ {
+				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 			}
+
+			filesCfg := map[string]interface{}{
+				"private_links":     false,
+				"bigfilechunking":   false,
+				"blacklisted_files": []string{},
+				"undelete":          true,
+				"versioning":        true,
+			}
+
+			if cfg.Reva.DefaultUploadProtocol == "tus" {
+				filesCfg["tus_support"] = map[string]interface{}{
+					"version":              "1.0.0",
+					"resumable":            "1.0.0",
+					"extension":            "creation,creation-with-upload",
+					"http_method_override": cfg.Reva.UploadHTTPMethodOverride,
+					"max_chunk_size":       cfg.Reva.UploadMaxChunkSize,
+				}
+			}
+
+			revaCfg := revaConfigFromStruct(c, cfg, filesCfg)
+
+			gr.Add(func() error {
+				runtime.RunWithOptions(revaCfg, pidFile, runtime.WithLogger(&logger.Logger))
+				return nil
+			}, func(_ error) {
+				logger.Info().Str("server", c.Command.Name).Msg("Shutting down server")
+				cancel()
+			})
 
 			{
 				server, err := debug.Server(
@@ -274,6 +110,138 @@ func Frontend(cfg *config.Config) *cli.Command {
 			}
 
 			return gr.Run()
+		},
+	}
+}
+
+// revaConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func revaConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) map[string]interface{} {
+	return map[string]interface{}{
+		"core": map[string]interface{}{
+			"max_cpus":             cfg.Reva.Users.MaxCPUs,
+			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_endpoint":     cfg.Tracing.Endpoint,
+			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service_name": c.Command.Name,
+		},
+		"shared": map[string]interface{}{
+			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint, // Todo or address?
+		},
+		"http": map[string]interface{}{
+			"network": cfg.Reva.Frontend.HTTPNetwork,
+			"address": cfg.Reva.Frontend.HTTPAddr,
+			"middlewares": map[string]interface{}{
+				"cors": map[string]interface{}{
+					"allow_credentials": true,
+				},
+				"auth": map[string]interface{}{
+					"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
+				},
+			},
+			// TODO build services dynamically
+			"services": map[string]interface{}{
+				"datagateway": map[string]interface{}{
+					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
+					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"timeout":                86400,
+					"insecure":               true,
+				},
+				"ocdav": map[string]interface{}{
+					"prefix":           cfg.Reva.Frontend.OCDavPrefix,
+					"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
+					"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
+					"timeout":          86400,
+					"insecure":         true,
+				},
+				"ocs": map[string]interface{}{
+					"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
+					"prefix":       cfg.Reva.Frontend.OCSPrefix,
+					"config": map[string]interface{}{
+						"version": "1.8",
+						"website": "reva",
+						"host":    cfg.Reva.Frontend.PublicURL,
+						"contact": "admin@localhost",
+						"ssl":     "false",
+					},
+					"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,
+					"capabilities": map[string]interface{}{
+						"capabilities": map[string]interface{}{
+							"core": map[string]interface{}{
+								"poll_interval": 60,
+								"webdav_root":   "remote.php/webdav",
+								"status": map[string]interface{}{
+									"installed":      true,
+									"maintenance":    false,
+									"needsDbUpgrade": false,
+									"version":        "10.0.11.5",
+									"versionstring":  "10.0.11",
+									"edition":        "community",
+									"productname":    "reva",
+									"hostname":       "",
+								},
+								"support_url_signing": true,
+							},
+							"checksums": map[string]interface{}{
+								"supported_types":       cfg.Reva.ChecksumSupportedTypes,
+								"preferred_upload_type": cfg.Reva.ChecksumPreferredUploadType,
+							},
+							"files": filesCfg,
+							"dav":   map[string]interface{}{},
+							"files_sharing": map[string]interface{}{
+								"api_enabled":                       true,
+								"resharing":                         true,
+								"group_sharing":                     true,
+								"auto_accept_share":                 true,
+								"share_with_group_members_only":     true,
+								"share_with_membership_groups_only": true,
+								"default_permissions":               22,
+								"search_min_length":                 3,
+								"public": map[string]interface{}{
+									"enabled":              true,
+									"send_mail":            true,
+									"social_share":         true,
+									"upload":               true,
+									"multiple":             true,
+									"supports_upload_only": true,
+									"password": map[string]interface{}{
+										"enforced": true,
+										"enforced_for": map[string]interface{}{
+											"read_only":   true,
+											"read_write":  true,
+											"upload_only": true,
+										},
+									},
+									"expire_date": map[string]interface{}{
+										"enabled": false,
+									},
+								},
+								"user": map[string]interface{}{
+									"send_mail": true,
+								},
+								"user_enumeration": map[string]interface{}{
+									"enabled":            true,
+									"group_members_only": true,
+								},
+								"federation": map[string]interface{}{
+									"outgoing": true,
+									"incoming": true,
+								},
+							},
+							"notifications": map[string]interface{}{
+								"endpoints": []string{"disable"},
+							},
+						},
+						"version": map[string]interface{}{
+							"edition": "reva",
+							"major":   10,
+							"minor":   0,
+							"micro":   11,
+							"string":  "10.0.11",
+						},
+					},
+				},
+			},
 		},
 	}
 }
