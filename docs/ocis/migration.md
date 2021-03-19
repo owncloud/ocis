@@ -31,7 +31,7 @@ Start oCIS backend and make read only tests on existing data using the `owncloud
 - blobs from the same datadirectory layout as in ownCloud 10 and
 - metadata from the ownCloud 10 databas
 The oCIS share manager will read share infomation from the owncloud database as well.
-- [ ] *we need a share manager that can read from the oc 10 db as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. ~~~~ jfd*
+- [ ] *we need a share manager that can read from the oc 10 db as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
 
 ### Stage-4
 Test writing data with oCIS into the existing ownCloud 10 datafolder using the `owncloud` storage driver.
@@ -146,7 +146,7 @@ The `filecache` table itself has more metadata:
 
 - Public links
 - Private shares with users and groups
-- Federated shares *incoming shares table ~~~~ jfd*
+- Federated shares *incoming shares table -- jfd*
 - Guest shares
 
 ### user data
@@ -155,4 +155,4 @@ The `filecache` table itself has more metadata:
 
 ### activities
 
-*dedicated service, not yet implemented, requires decisions about an event system ~~~~ jfd*
+*dedicated service, not yet implemented, requires decisions about an event system -- jfd*
