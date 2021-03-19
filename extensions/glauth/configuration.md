@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-18T16:38:05+0000"
+date: "2021-03-19T03:10:58+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -34,15 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
--debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129")`.
 
 ### glauth ocis-glauth
 
@@ -160,4 +151,13 @@ Usage: `glauth server [command options] [arguments...]`
 
 -fallback-use-graphapi |  $GLAUTH_FALLBACK_USE_GRAPHAPI
 : use Graph API, only for owncloud datastore. Default: `flags.OverrideDefaultBool(cfg.Fallback.UseGraphAPI, true)`.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+-debug-addr |  $GLAUTH_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129")`.
 
