@@ -10,7 +10,7 @@ geekdocFilePath: migration.md
 
 ## Migration
 
-The migration happens in subsequent stages while the service is online.
+The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the data on disk can be migrated user by user by switching the storage driver.
 
 ### User Stories
 As an admin I need to avoid downtime.
@@ -43,21 +43,21 @@ Introduce reverse proxy and switch over early adoptors, let admins gain trust in
 Voluntary transition period and subsequent hard deadline for all users
 
 ### Stage-7
-disable oc10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
+Disable oc10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
 
 ### Stage-8
-user by user storage migration from owncloud driver to `ocis`/`s3ng`/`cephfs`...
+User by user storage migration from owncloud driver to `ocis`/`s3ng`/`cephfs`...
 
 ### Stage-9
-migrate share data to &lt;yet to determine&gt; share manager backend and shut down owncloud database
+Migrate share data to &lt;yet to determine&gt; share manager backend and shut down owncloud database
 
 ### Stage-10
-profit! (db for file metadata no longer necessary, less maintenance effort)
+Profit! (db for file metadata no longer necessary, less maintenance effort)
 
 
 ## Architectural differences
 
-The fundamental difference between ownCloud 10 and oCIS is that the file metadata is moved from the database in the `oc_filecache` table (which is misnamed, as it actually is an index) to the storage provider who can place metadata as close to the underlying storage system as possible. In effect the file metadata is sharded over multiple specialized services.
+The fundamental difference between ownCloud 10 and oCIS is that the file metadata is moved from the database in the `oc_filecache` table (which is misnamed, as it actually is an index) to the storage provider who can place metadata as close to the underlying storage system as possible. In effect, the file metadata is sharded over multiple specialized services.
 
 
 ## Data that will be migrated
@@ -150,32 +150,37 @@ used to store
 - Federated shares *partly*
 - Guest shares
 
-| Field         | Type         | Null | Key | Default | Extra          |
-|---------------|--------------|------|-----|---------|----------------|
-| `id`            | int(11)      | NO   | PRI | NULL    | auto_increment |
-| `share_type`    | smallint(6)  | NO   |     | 0       |                |
-| `share_with`    | varchar(255) | YES  | MUL | NULL    |                |
-| `uid_owner`     | varchar(64)  | NO   |     |         |                |
-| `parent`        | int(11)      | YES  |     | NULL    |                |
-| `item_type`     | varchar(64)  | NO   | MUL |         |                |
-| `item_source`   | varchar(255) | YES  | MUL | NULL    |                |
-| `item_target`   | varchar(255) | YES  |     | NULL    |                |
-| `file_source`   | bigint(20)   | YES  | MUL | NULL    |                |
-| `file_target`   | varchar(512) | YES  |     | NULL    |                |
-| `permissions`   | smallint(6)  | NO   |     | 0       |                |
-| `stime`         | bigint(20)   | NO   |     | 0       |                |
-| `accepted`      | smallint(6)  | NO   |     | 0       |                |
-| `expiration`    | datetime     | YES  |     | NULL    |                |
-| `token`         | varchar(32)  | YES  | MUL | NULL    |                |
-| `mail_send`     | smallint(6)  | NO   |     | 0       |                |
-| `uid_initiator` | varchar(64)  | YES  |     | NULL    |                |
-| `share_name`    | varchar(64)  | YES  |     | NULL    |                |
-| `attributes`    | longtext     | YES  |     | NULL    |                |
+| Field         | Type         | Null | Key | Default | Extra          | Comment | [CS3 API](https://cs3org.github.io/cs3apis/) |
+|---------------|--------------|------|-----|---------|----------------|---------|-|
+| `id`            | int(11)      | NO   | PRI | NULL    | auto_increment | | `ShareId.opaqueid` string |
+| `share_type`    | smallint(6)  | NO   |     | 0       |                | *in CS3 every type is handled by a dedicated API. See below the table* | does NOT map to [`Share.ShareType`](https://cs3org.github.io/cs3apis/#cs3.sharing.ocm.v1beta1.Share.ShareType) *TODO clarify* |
+| `share_with`    | varchar(255) | YES  | MUL | NULL    |                | | `Share.grantee` [`Grantee`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.Grantee) |
+| `uid_owner`     | varchar(64)  | NO   |     |         |                | | `ShareId.owner` [`UserID`](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserId) |
+| `parent`        | int(11)      | YES  |     | NULL    |                | | - |
+| `item_type`     | varchar(64)  | NO   | MUL |         |                | | `Share.resource_id` [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId) |
+| `item_source`   | varchar(255) | YES  | MUL | NULL    |                | | `Share.resource_id` [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId) |
+| `item_target`   | varchar(255) | YES  |     | NULL    |                | | `Share.resource_id` [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId) |
+| `file_source`   | bigint(20)   | YES  | MUL | NULL    |  | *cannot store uuid style file ids from ocis. when all users have migrated to ocis the share manager needs to be updated / migrated to a version that does.* | `Share.resource_id` [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId) |
+| `file_target`   | varchar(512) | YES  |     | NULL    |                | | `Share.resource_id` [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId) |
+| `permissions`   | smallint(6)  | NO   |     | 0       |                | | `Share.Permissions` [`SharePermissions`](https://cs3org.github.io/cs3apis/#cs3.sharing.ocm.v1beta1.SharePermissions) |
+| `stime`         | bigint(20)   | NO   |     | 0       |                | | `Share.ctime`, `Share.mtime` |
+| `accepted`      | smallint(6)  | NO   |     | 0       |                | | `ReceivedShare.ShareState` [`ShareState`](https://cs3org.github.io/cs3apis/#cs3.sharing.collaboration.v1beta1.ShareState) |
+| `expiration`    | datetime     | YES  |     | NULL    |                | *only used for the Link API and storage provider api, currently cannot be added using the Collaboration or OCM API* | [`Grant`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.Grant)  |
+| `token`         | varchar(32)  | YES  | MUL | NULL    |                | | [`PublicShare.token`](https://cs3org.github.io/cs3apis/#cs3.sharing.link.v1beta1.PublicShare) |
+| `mail_send`     | smallint(6)  | NO   |     | 0       |                | | - |
+| `uid_initiator` | varchar(64)  | YES  |     | NULL    |                | | `ShareId.creator` [`UserID`](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserId) |
+| `share_name`    | varchar(64)  | YES  |     | NULL    |                | *only exists for public shares* | [`PublicShare.display_name`](https://cs3org.github.io/cs3apis/#cs3.sharing.link.v1beta1.PublicShare)  |
+| `attributes`    | longtext     | YES  |     | NULL    |                | *additional share attributes* | *could be implemented using opaque data, but should be added to the CS3 api* |
+
+In the CS3 API
+1. public links are handled by the PublicShareProvider using the [Link API](https://cs3org.github.io/cs3apis/#cs3.sharing.link.v1beta1.LinkAPI)
+2. internal shares are handled by the UserShareProvider using the [Collaboration API](https://cs3org.github.io/cs3apis/#cs3.sharing.collaboration.v1beta1.CollaborationAPI). This covers user and group shares.
+3. federated shares are handled by the OcmShareProvider using the [OCM Share Provider AP](https://cs3org.github.io/cs3apis/#cs3.sharing.ocm.v1beta1.OcmAPI) aka. Open Cloud Mesh.
+
 
 ### share_external
 
-used to store additional metadata for federated shares
-
+Used to store additional metadata for federated shares.
 
 | Field           | Type          | Null | Key | Default | Extra          | Comment |
 |-----------------|---------------|------|-----|---------|----------------|---------|
@@ -191,12 +196,14 @@ used to store additional metadata for federated shares
 | `remote_id`       | varchar(255)  | NO   |     | -1      |                | |
 | `accepted`        | int(11)       | NO   |     | 0       |                | |
 
+*TODO document how the reva OCM service currently persists the data*
+
 ### trusted_servers
 
 used to determine if federated shares can automatically be accepted
 
 | Field         | Type         | Null | Key | Default | Extra          | Comment |
-|---------------|--------------|------|-----|---------|----------------|---|
+|---------------|--------------|------|-----|---------|----------------|---------|
 | `id`            | int(11)      | NO   | PRI | NULL    | auto_increment | |
 | `url`           | varchar(512) | NO   |     | NULL    |                | Url of trusted server |
 | `url_hash`      | varchar(255) | NO   | UNI |         |                | sha1 hash of the url without the protocol |
@@ -205,20 +212,21 @@ used to determine if federated shares can automatically be accepted
 | `status`        | int(11)      | NO   |     | 2       |                | current status of the connection |
 | `sync_token`    | varchar(512) | YES  |     | NULL    |                | cardDav sync token |
 
+*TODO clarify how OCM handles this andt where we store / configure this. It seems related to trusted IdPs*
+
 ### user data
 
-users:
+Users are migrated in two steps:
+1. They should all be authenticated using openid connect, which already moves them to a common identity management system.
+2. To search share recipients, both, ownCloud 10 and oCIS need acces to the same user directory using eg. LDAP.
 
-| Field       | Type         | Null | Key | Default | Extra |
-|-------------|--------------|------|-----|---------|-------|
-| `uid`         | varchar(64)  | NO   | PRI |         |       |
-| `password`    | varchar(255) | NO   |     |         |       |
-| `displayname` | varchar(64)  | YES  |     | NULL    |       |
+*TODO: add state to CS3 API, so we can 'disable' users*
+*TODO: how do we map (sub) admins? -> map to roles & permissions*
 
 accounts:
 
-| Field         | Type                | Null | Key | Default | Extra          | |
-|---------------|---------------------|------|-----|---------|----------------|-|
+| Field         | Type                | Null | Key | Default | Extra          | Comment |
+|---------------|---------------------|------|-----|---------|----------------|---------|
 | `id`            | bigint(20) unsigned | NO   | PRI | NULL    | auto_increment | |
 | `email`         | varchar(255)        | YES  | MUL | NULL    |                | |
 | `user_id`       | varchar(255)        | NO   | UNI | NULL    |                | |
@@ -230,21 +238,36 @@ accounts:
 | `home`          | varchar(1024)       | NO   |     | NULL    |                | |
 | `state`         | smallint(6)         | NO   |     | 0       |                | |
 
+users:
+
+| Field       | Type         | Null | Key | Default | Extra | Comment |
+|-------------|--------------|------|-----|---------|-------|---------|
+| `uid`         | varchar(64)  | NO   | PRI |         |       |
+| `password`    | varchar(255) | NO   |     |         |       |
+| `displayname` | varchar(64)  | YES  |     | NULL    |       |
+
 groups:
 
+The groups table really only contains the group name.
+
 | Field | Type        | Null | Key | Default | Extra |
-+-------+-------------+------+-----+---------+-------+
+|-------|-------------|------|-----|---------|-------|
 | `gid`   | varchar(64) | NO   | PRI |         |       |
 
-- Users, groups and permissions (who is admin)
+### LDAP
+
+TODO clarify if metadata from ldap & user_shibboleth needs to be migrated
+-  the `dn` -> *owncloud internal username* mapping that currently lives in the `oc_ldap_user_mapping` table needs to move into a dedicated ownclouduuid attribute in the LDAP server. The idp should send it as a claim so the proxy does not have to look up the user using LDAP again. The username cannot be changed in ownCloud 10 and the oCIS provisioning API will not allow changing it as well. When we introduce the graph api we may allow changing usernames when all clients have moved to that api.
+
+The problem is that the username in owncloud 10 and in oCIS also need to be the same, which might not be the case when the ldap mapping used a different column. In that case we should add another owncloudusername attribute to the ldap server ...
 
 
 ### activities
 
 *dedicated service, not yet implemented, requires decisions about an event system -- jfd*
 
-| Field         | Type          | Null | Key | Default | Extra          |
-|---------------|---------------|------|-----|---------|----------------|
+| Field         | Type          | Null | Key | Default | Extra          | Comment |
+|---------------|---------------|------|-----|---------|----------------|---------|
 | `activity_id`   | bigint(20)    | NO   | PRI | NULL    | auto_increment |
 | `timestamp`     | int(11)       | NO   | MUL | 0       |                |
 | `priority`      | int(11)       | NO   |     | 0       |                |
@@ -260,3 +283,7 @@ groups:
 | `link`          | varchar(4000) | YES  |     | NULL    |                |
 | `object_type`   | varchar(255)  | YES  | MUL | NULL    |                |
 | `object_id`     | bigint(20)    | NO   |     | 0       |                |
+
+## Links
+
+The [data_exporter](https://github.com/owncloud/data_exporter) has logic that allows exporting and importing users, including shares. The [model classes](https://github.com/owncloud/data_exporter/tree/master/lib/Model) contain the exact mapping.
