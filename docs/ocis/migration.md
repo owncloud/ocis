@@ -144,15 +144,119 @@ The `filecache` table itself has more metadata:
 
 ### share table
 
+used to store
 - Public links
 - Private shares with users and groups
-- Federated shares *incoming shares table -- jfd*
+- Federated shares *partly*
 - Guest shares
+
+| Field         | Type         | Null | Key | Default | Extra          |
+|---------------|--------------|------|-----|---------|----------------|
+| `id`            | int(11)      | NO   | PRI | NULL    | auto_increment |
+| `share_type`    | smallint(6)  | NO   |     | 0       |                |
+| `share_with`    | varchar(255) | YES  | MUL | NULL    |                |
+| `uid_owner`     | varchar(64)  | NO   |     |         |                |
+| `parent`        | int(11)      | YES  |     | NULL    |                |
+| `item_type`     | varchar(64)  | NO   | MUL |         |                |
+| `item_source`   | varchar(255) | YES  | MUL | NULL    |                |
+| `item_target`   | varchar(255) | YES  |     | NULL    |                |
+| `file_source`   | bigint(20)   | YES  | MUL | NULL    |                |
+| `file_target`   | varchar(512) | YES  |     | NULL    |                |
+| `permissions`   | smallint(6)  | NO   |     | 0       |                |
+| `stime`         | bigint(20)   | NO   |     | 0       |                |
+| `accepted`      | smallint(6)  | NO   |     | 0       |                |
+| `expiration`    | datetime     | YES  |     | NULL    |                |
+| `token`         | varchar(32)  | YES  | MUL | NULL    |                |
+| `mail_send`     | smallint(6)  | NO   |     | 0       |                |
+| `uid_initiator` | varchar(64)  | YES  |     | NULL    |                |
+| `share_name`    | varchar(64)  | YES  |     | NULL    |                |
+| `attributes`    | longtext     | YES  |     | NULL    |                |
+
+### share_external
+
+used to store additional metadata for federated shares
+
+
+| Field           | Type          | Null | Key | Default | Extra          | Comment |
+|-----------------|---------------|------|-----|---------|----------------|---------|
+| `id`              | bigint(20)    | NO   | PRI | NULL    | auto_increment | |
+| `remote`          | varchar(512)  | NO   |     | NULL    |                | Url of the remote owncloud instance |
+| `share_token`     | varchar(64)   | NO   |     | NULL    |                | Public share token |
+| `password`        | varchar(64)   | YES  |     | NULL    |                | Optional password for the public share |
+| `name`            | varchar(64)   | NO   |     | NULL    |                | Original name on the remote server |
+| `owner`           | varchar(64)   | NO   |     | NULL    |                | User that owns the public share on the remote server |
+| `user`            | varchar(64)   | NO   | MUL | NULL    |                | Local user which added the external share |
+| `mountpoint`      | varchar(4000) | NO   |     | NULL    |                | Full path where the share is mounted |
+| `mountpoint_hash` | varchar(32)   | NO   |     | NULL    |                | md5 hash of the mountpoint |
+| `remote_id`       | varchar(255)  | NO   |     | -1      |                | |
+| `accepted`        | int(11)       | NO   |     | 0       |                | |
+
+### trusted_servers
+
+used to determine if federated shares can automatically be accepted
+
+| Field         | Type         | Null | Key | Default | Extra          | Comment |
+|---------------|--------------|------|-----|---------|----------------|---|
+| `id`            | int(11)      | NO   | PRI | NULL    | auto_increment | |
+| `url`           | varchar(512) | NO   |     | NULL    |                | Url of trusted server |
+| `url_hash`      | varchar(255) | NO   | UNI |         |                | sha1 hash of the url without the protocol |
+| `token`         | varchar(128) | YES  |     | NULL    |                | token used to exchange the shared secret |
+| `shared_secret` | varchar(256) | YES  |     | NULL    |                | shared secret used to authenticate |
+| `status`        | int(11)      | NO   |     | 2       |                | current status of the connection |
+| `sync_token`    | varchar(512) | YES  |     | NULL    |                | cardDav sync token |
 
 ### user data
 
+users:
+
+| Field       | Type         | Null | Key | Default | Extra |
+|-------------|--------------|------|-----|---------|-------|
+| `uid`         | varchar(64)  | NO   | PRI |         |       |
+| `password`    | varchar(255) | NO   |     |         |       |
+| `displayname` | varchar(64)  | YES  |     | NULL    |       |
+
+accounts:
+
+| Field         | Type                | Null | Key | Default | Extra          | |
+|---------------|---------------------|------|-----|---------|----------------|-|
+| `id`            | bigint(20) unsigned | NO   | PRI | NULL    | auto_increment | |
+| `email`         | varchar(255)        | YES  | MUL | NULL    |                | |
+| `user_id`       | varchar(255)        | NO   | UNI | NULL    |                | |
+| `lower_user_id` | varchar(255)        | NO   | UNI | NULL    |                | |
+| `display_name`  | varchar(255)        | YES  | MUL | NULL    |                | |
+| `quota`         | varchar(32)         | YES  |     | NULL    |                | |
+| `last_login`    | int(11)             | NO   |     | 0       |                | |
+| `backend`       | varchar(64)         | NO   |     | NULL    |                | |
+| `home`          | varchar(1024)       | NO   |     | NULL    |                | |
+| `state`         | smallint(6)         | NO   |     | 0       |                | |
+
+groups:
+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| `gid`   | varchar(64) | NO   | PRI |         |       |
+
 - Users, groups and permissions (who is admin)
+
 
 ### activities
 
 *dedicated service, not yet implemented, requires decisions about an event system -- jfd*
+
+| Field         | Type          | Null | Key | Default | Extra          |
+|---------------|---------------|------|-----|---------|----------------|
+| `activity_id`   | bigint(20)    | NO   | PRI | NULL    | auto_increment |
+| `timestamp`     | int(11)       | NO   | MUL | 0       |                |
+| `priority`      | int(11)       | NO   |     | 0       |                |
+| `type`          | varchar(255)  | YES  |     | NULL    |                |
+| `user`          | varchar(64)   | YES  |     | NULL    |                |
+| `affecteduser`  | varchar(64)   | NO   | MUL | NULL    |                |
+| `app`           | varchar(255)  | NO   |     | NULL    |                |
+| `subject`       | varchar(255)  | NO   |     | NULL    |                |
+| `subjectparams` | longtext      | NO   |     | NULL    |                |
+| `message`       | varchar(255)  | YES  |     | NULL    |                |
+| `messageparams` | longtext      | YES  |     | NULL    |                |
+| `file`          | varchar(4000) | YES  |     | NULL    |                |
+| `link`          | varchar(4000) | YES  |     | NULL    |                |
+| `object_type`   | varchar(255)  | YES  | MUL | NULL    |                |
+| `object_id`     | bigint(20)    | NO   |     | 0       |                |
