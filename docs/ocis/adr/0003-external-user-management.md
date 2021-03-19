@@ -1,16 +1,22 @@
-# 3. Use external User Management
+---
+title: "3. Use external User Management"
+date: 2020-12-09T20:21:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0003-external-user-management.md
+---
 
-* Status: accepted <!-- optional -->
-* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1 <!-- optional -->
-* Date: 2020-12-09 <!-- optional -->
+* Status: accepted
+* Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
+* Date: 2020-12-09
 
-Technical Story: [Skip account-service by talking to CS3 user-api](https://github.com/owncloud/ocis/pull/1020) <!-- optional -->
+Technical Story: [Skip account-service by talking to CS3 user-api](https://github.com/owncloud/ocis/pull/1020)
 
 ## Context and Problem Statement
 
 To attach metadata like shares to users ownCloud relies on persistent, non-reassignable, unique identifiers for users (and files). Email and username can change when a user changes his name. But even the OIDC sub+iss combination may change when the IdP changes. While there is [an account porting protocol](https://openid.net/specs/openid-connect-account-porting-1_0.html) that describes how a relying party (RP) such as ownCloud should behave, it still requires the RP to maintain its own user identifiers.
 
-## Decision Drivers <!-- optional -->
+## Decision Drivers
 
 * oCIS should be a single binary that can run out of the box without external dependencies like an LDAP server.
 * Time: we want to build a release candidate asap.
@@ -55,20 +61,20 @@ Chosen option: "Move accounts functionality to GLAuth and name it accounts", by 
 - The current CS3 API for user management should be enriched with pagination, field mask and a query language as needed
 - properly register an [auxiliary LDAP schema that adds an ownCloudUUID attribute to users and groups](https://github.com/owncloud/ocis/blob/c8668e8cb171860c70fec29e5ae945bca44f1fb7/deployments/examples/cs3_users_ocis/config/ldap/ldif/10_owncloud_schema.ldif)
 
-### Positive Consequences <!-- optional -->
+### Positive Consequences
 
 * The accounts service (which is our drop in LDAP solution) can be dropped. The CS3 userprovider service becomes the only service dealing with users.
 * No sync
 
-### Negative Consequences <!-- optional -->
+### Negative Consequences
 
 * If users want to store users in their IDM and at the same time guests in a seperate user management we need to implement GLAuth backends that support more than one LDAP server.
 
-## Pros and Cons of the Options <!-- optional -->
+## Pros and Cons of the Options
 
 ### GLAuth wraps accounts service
 
-Currently, the accounts service is the source of truth and we use it to implement user management. <!-- optional -->
+Currently, the accounts service is the source of truth and we use it to implement user management.
 
 * Good, because it solves the problem of storing and looking up an owncloud UUID for a user (and group)
 * Good, because we can manage users out of the box
@@ -77,7 +83,7 @@ Currently, the accounts service is the source of truth and we use it to implemen
 
 ### Move accounts functionality to GLAuth and name it accounts
 
-We should use an existing LDAP server and make GLAuth a drop in replacement for it. <!-- optional -->
+We should use an existing LDAP server and make GLAuth a drop in replacement for it.
 
 * Good, because we can use an existing user repository (an LDAP server), no need to sync or learn users.
 * Good, because admins can rely on existing user management tools.
@@ -102,3 +108,6 @@ We should use an existing LDAP server and make GLAuth a drop in replacement for 
 * Good, because we can use the CS3 user provider with the existing LDAP / rest driver.
 * Bad, because oCIS admins may not have the rights to manage role assignments. (But this is handled at a different department.) 
 * Bad, because oCIS admins may not have the rights to disable users if an external LDAP is used instead of the drop in GLAuth.
+
+## Links
+* supersedes [ADR-0001]({{< ref "0001-introduce-accounts-service.md" >}})
