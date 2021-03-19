@@ -94,6 +94,9 @@ go-coverage:
 install: $(SOURCES)
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)
 
+.PHONY: build-all
+build-all: build build-debug
+
 .PHONY: build
 build: $(BIN)/$(EXECUTABLE)
 
