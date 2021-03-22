@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-19T09:14:30+0000"
+date: "2021-03-22T07:42:39+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,6 +34,15 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+-debug-addr |  $SETTINGS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
 
 ### settings ocis-settings
 
@@ -124,13 +133,4 @@ Usage: `settings version [command options] [arguments...]`
 
 -name |  $SETTINGS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
-
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
--debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
 
