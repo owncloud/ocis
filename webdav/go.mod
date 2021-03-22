@@ -15,14 +15,13 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/thumbnails v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.9.0
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/text v0.3.5 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 replace (

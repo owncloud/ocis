@@ -268,6 +268,7 @@ def testOcisModule(ctx, module):
       'image': 'webhippie/golang:1.15',
       'pull': 'always',
       'commands': [
+        'apk add libc-dev',
         'mkdir -p cache/checkstyle',
         'make -C %s ci-golangci-lint' % (module),
         'mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml' % (module, module),
