@@ -31,10 +31,10 @@ TAGS=simple make generate build
 
 `bin/ocis server`
 
-Open the browser at http://localhost:9100
+Open the browser at https://localhost:9200
 
 1. You land on the login screen. click login
-2. You are redirected to an idp at http://localhost:9140/oauth2/auth with a login mask. Use `einstein:relativity`to login (one of the three demo users)
+2. You are redirected to an idp at https://localhost:9200/signin/v1/identifier with a login mask. Use `einstein:relativity` (one of the three demo users) to log in 
 3. You are redirected to http://localhost:9100/#/hello the ocis-hello app
 4. Replace `World` with something else and submit. You should see `Hello %something else%`
 
@@ -132,12 +132,12 @@ This is what hello is: copy and extend!
 
 ```json
 {
-  "server": "http://localhost:9140",
+  "server": "https://localhost:9200",
   "theme": "owncloud",
   "version": "0.1.0",
   "openIdConnect": {
-    "metadata_url": "http://localhost:9140/.well-known/openid-configuration",
-    "authority": "http://localhost:9140",
+    "metadata_url": "https://localhost:9200/.well-known/openid-configuration",
+    "authority": "https://localhost:9200",
     "client_id": "web",
     "response_type": "code",
     "scope": "openid profile email"
