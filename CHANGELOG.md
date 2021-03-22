@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
 * Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Improve accessibility to input elements on login page: [#1794](https://github.com/owncloud/ocis/pull/1794)
+* Enhancement - Add new build targets: [#1824](https://github.com/owncloud/ocis/pull/1824)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 * Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
 * Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
@@ -34,6 +35,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/issues/4319
    https://github.com/owncloud/ocis/pull/1794
    https://github.com/owncloud/ocis/pull/1811
+
+* Enhancement - Add new build targets: [#1824](https://github.com/owncloud/ocis/pull/1824)
+
+   Make build target `build` used to build a binary twice, the second occurrence having symbols
+   for debugging. We split this step in two and added `build-all` and `build-debug` targets.
+
+   - `build-all` now behaves as the previous `build` target, it will generate 2 binaries, one for
+   debug. - `build-debug` will build a single binary for debugging.
+
+   https://github.com/owncloud/ocis/pull/1824
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
