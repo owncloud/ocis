@@ -265,7 +265,7 @@ def testOcisModule(ctx, module):
   steps = makeGenerate(module) + [
     {
       'name': 'golangci-lint',
-      'image': 'webhippie/golang:1.15',
+      'image': 'webhippie/golang:1.16',
       'pull': 'always',
       'commands': [
         'apk add libc-dev',
@@ -277,7 +277,7 @@ def testOcisModule(ctx, module):
     },
     {
         'name': 'test',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'pull': 'always',
         'commands': [
           'mkdir -p cache/coverage',
@@ -882,7 +882,7 @@ def binaryRelease(ctx, name):
       makeGenerate('') + [
       {
         'name': 'build',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'pull': 'always',
         'commands': [
           'make -C ocis release-%s' % (name),
@@ -890,7 +890,7 @@ def binaryRelease(ctx, name):
       },
       {
         'name': 'finish',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'pull': 'always',
         'commands': [
           'make -C ocis release-finish',
@@ -916,7 +916,7 @@ def binaryRelease(ctx, name):
       },
       {
         'name': 'changelog',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'pull': 'always',
         'commands': [
           'make changelog CHANGELOG_VERSION=%s' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
@@ -1053,7 +1053,7 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'pull': 'always',
         'commands': [
           'make -C ocis changelog',
@@ -1191,19 +1191,19 @@ def docs(ctx):
     'steps': [
       {
         'name': 'docs-generate',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'commands': ['make -C %s docs-generate' % (module) for module in config['modules']],
       },
       {
         'name': 'prepare',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'commands': [
           'make -C docs docs-copy'
         ],
       },
       {
         'name': 'test',
-        'image': 'webhippie/golang:1.15',
+        'image': 'webhippie/golang:1.16',
         'commands': [
           'make -C docs test'
         ],
@@ -1284,7 +1284,7 @@ def makeGenerate(module):
     },
     {
       'name': 'generate go',
-      'image': 'webhippie/golang:1.15',
+      'image': 'webhippie/golang:1.16',
       'pull': 'always',
       'commands': [
         '%s ci-go-generate' % (make),
@@ -1428,7 +1428,7 @@ def build():
   return [
     {
       'name': 'build',
-      'image': 'webhippie/golang:1.15',
+      'image': 'webhippie/golang:1.16',
       'pull': 'always',
       'commands': [
         'make -C ocis build',

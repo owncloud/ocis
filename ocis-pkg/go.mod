@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/ocis-pkg
 
-go 1.15
+go 1.16
 
 require (
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
