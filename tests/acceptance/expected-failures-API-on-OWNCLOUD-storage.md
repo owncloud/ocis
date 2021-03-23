@@ -102,12 +102,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbin/trashbinRestore.feature:338](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L338)
 -   [apiTrashbin/trashbinRestore.feature:339](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinRestore.feature#L339)
 
-#### [requesting propfind with invalid fileid gives 502 error](https://github.com/owncloud/ocis/issues/771)
--   [apiVersions/fileVersions.feature:395](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L395)
--   [apiVersions/fileVersions.feature:396](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L396)
--   [apiVersions/fileVersions.feature:397](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L397)
--   [apiVersions/fileVersions.feature:398](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L398)
-
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
 -   [apiVersions/fileVersions.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L15)
@@ -139,10 +133,7 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiVersions/fileVersions.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L104)
 
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
--   [apiVersions/fileVersions.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L373)
 -   [apiVersions/fileVersions.feature:409](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L409)
--   [apiVersions/fileVersions.feature:420](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L420)
--   [apiVersions/fileVersions.feature:426](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L426)
 
 #### [Version cannot be restored when file has been renamed](https://github.com/owncloud/ocis/issues/1633)
 -   [apiVersions/fileVersions.feature:400](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L400)
@@ -237,11 +228,6 @@ Scenario Outline: try to create a folder that already exists
 -   [apiWebdavProperties2/getFileProperties.feature:376](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L376)
 -   [apiWebdavProperties2/getFileProperties.feature:377](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L377)
     Scenario Outline: Propfind the permissions on a file using webdav api `Property "oc:permissions" found with value "DNVWR", expected "/RM{0,1}DNVW/"`
--   [apiWebdavProperties2/getFileProperties.feature:441](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L441)
--   [apiWebdavProperties2/getFileProperties.feature:442](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L442)
-    Scenario Outline: Propfind the permissions on a folder using webdav api `Property "oc:permissions" found with value "DNVCKR", expected "/RM{0,1}DNVCK/"`
--   [apiWebdavProperties2/getFileProperties.feature:454](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L454)
--   [apiWebdavProperties2/getFileProperties.feature:455](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L455)
 
 #### [Some failing tests with Webdav custom properties](https://github.com/owncloud/ocis/issues/1297)
 _ocdav: double check the webdav property parsing when custom namespaces are used_
@@ -1519,9 +1505,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 
 #### [getting the metadata without permission results in a 403 error](https://github.com/owncloud/ocis/issues/773)
 -   [apiVersions/fileVersionsSharingToShares.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L256)
-
-#### [The version number of a file is incorrect because of the incorrect number of `<d:getetag>` and `<d:getlastmodified>` element](https://github.com/owncloud/ocis/issues/1234)
--   [apiVersions/fileVersionsSharingToShares.feature:267](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L267)
 
 #### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 #### [Expiration date for user shares is not implemented](https://github.com/owncloud/ocis/issues/1250)

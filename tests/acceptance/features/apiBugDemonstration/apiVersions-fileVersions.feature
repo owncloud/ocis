@@ -109,17 +109,3 @@ Feature: dav-versions
       | old         |
       | new         |
 
-  @skipOnStorage:ceph @files_primary_s3-issue-161 @files_sharing-app-required
-  @issue-ocis-reva-376
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-  Scenario: Receiver tries get file versions of shared file from the sharer
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"
-    And user "Alice" has uploaded file with content "version 3" to "textfile0.txt"
-    And user "Alice" has shared file "textfile0.txt" with user "Brian"
-    When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
-    Then the HTTP status code should be "207"
-    And the number of versions should be "4"
-#    And the number of versions should be "3"
