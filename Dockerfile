@@ -1,4 +1,4 @@
-FROM webhippie/golang:1.15 as build
+FROM golang:1.16-alpine as build
 
 COPY ./ /ocis/
 ENV CGO_ENABLED=0
