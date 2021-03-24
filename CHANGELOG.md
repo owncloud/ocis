@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
 * Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
 
 ## Details
 
@@ -94,6 +95,13 @@ The following sections list the changes for unreleased.
    Added support for gifs to the thumbnails service.
 
    https://github.com/owncloud/ocis/pull/1791
+
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+
+  * quota querying and tree accounting [cs3org/reva#1405](https://github.com/cs3org/reva/pull/1405)
+
+   https://github.com/owncloud/ocis/pull/1683
+   https://github.com/cs3org/reva/pull/1405
 # Changelog for [1.3.0] (2021-03-09)
 
 The following sections list the changes for 1.3.0.
