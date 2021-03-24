@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-24T23:39:15+0000"
+date: "2021-03-24T23:40:20+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -34,6 +34,12 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### proxy server
+
+Start integrated server
+
+Usage: `proxy server [command options] [arguments...]`
 
 ### proxy version
 
@@ -70,10 +76,4 @@ Usage: `proxy ocis-proxy [command options] [arguments...]`
 
 --log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
-
-### proxy server
-
-Start integrated server
-
-Usage: `proxy server [command options] [arguments...]`
 
