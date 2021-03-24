@@ -35,3 +35,5 @@ Apache-2.0
 ```console
 Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
 ```
+
+Trigger CI
