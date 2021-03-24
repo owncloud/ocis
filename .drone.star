@@ -108,16 +108,16 @@ config = {
 
 
 # volume for steps to cache Go dependencies between steps of a pipeline
-# GOPATH must be set to /srv/app inside the image, which is the case for webhippie/golang
-stepVolumeGoWebhippie = \
+# GOPATH must be set to /go inside the image, which is the case
+stepVolumeGo = \
   {
   'name': 'gopath',
-  'path': '/srv/app',
+  'path': '/go',
   }
 
 # volume for pipeline to cache Go dependencies between steps of a pipeline
-# to be used in combination with stepVolumeGoWebhippie
-pipelineVolumeGoWebhippie = \
+# to be used in combination with stepVolumeGo
+pipelineVolumeGo = \
   {
   'name': 'gopath',
   'temp': {},
@@ -268,24 +268,24 @@ def testOcisModule(ctx, module):
       'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
-        'apk add  gcc musl-dev make git binutils-gold bash curl',
+        'apk add bash make git curl gcc musl-dev',
         'mkdir -p cache/checkstyle',
         'make -C %s ci-golangci-lint' % (module),
         'mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml' % (module, module),
       ],
-      'volumes': [stepVolumeGoWebhippie,],
+      'volumes': [stepVolumeGo,],
     },
     {
         'name': 'test',
         'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'mkdir -p cache/coverage',
           'make -C %s test' % (module),
           'mv %s/coverage.out cache/coverage/%s_coverage.out' % (module, module),
         ],
-        'volumes': [stepVolumeGoWebhippie,],
+        'volumes': [stepVolumeGo,],
       },
       {
         'name': 'scan-result-cache',
@@ -325,7 +325,7 @@ def testOcisModule(ctx, module):
         'refs/pull/**',
       ],
     },
-    'volumes': [pipelineVolumeGoWebhippie],
+    'volumes': [pipelineVolumeGo],
   }
 
 def buildOcisBinaryForTesting(ctx):
@@ -348,7 +348,7 @@ def buildOcisBinaryForTesting(ctx):
         'refs/pull/**',
       ],
     },
-    'volumes': [pipelineVolumeGoWebhippie],
+    'volumes': [pipelineVolumeGo],
   }
 
 def uploadScanResults(ctx):
@@ -768,7 +768,7 @@ def dockerRelease(ctx, arch):
         'refs/pull/**',
       ],
     },
-    'volumes': [pipelineVolumeGoWebhippie],
+    'volumes': [pipelineVolumeGo],
   }
 
 def dockerEos(ctx):
@@ -835,7 +835,7 @@ def dockerEos(ctx):
         'refs/pull/**',
       ],
     },
-    'volumes': [pipelineVolumeGoWebhippie],
+    'volumes': [pipelineVolumeGo],
   }
 
 def binaryReleases(ctx):
@@ -886,7 +886,7 @@ def binaryRelease(ctx, name):
         'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make -C ocis release-%s' % (name),
         ],
       },
@@ -895,7 +895,7 @@ def binaryRelease(ctx, name):
         'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make -C ocis release-finish',
         ],
         'when': {
@@ -922,7 +922,7 @@ def binaryRelease(ctx, name):
         'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make changelog CHANGELOG_VERSION=%s' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
@@ -962,7 +962,7 @@ def binaryRelease(ctx, name):
         'refs/pull/**',
       ],
     },
-    'volumes': [pipelineVolumeGoWebhippie],
+    'volumes': [pipelineVolumeGo],
   }
 
 def releaseSubmodule(ctx):
@@ -1060,7 +1060,7 @@ def changelog(ctx):
         'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make -C ocis changelog',
         ],
       },
@@ -1197,13 +1197,13 @@ def docs(ctx):
       {
         'name': 'docs-generate',
         'image': 'golang:1.16-alpine',
-        'commands': ['apk add  gcc musl-dev make git binutils-gold bash curl'] + ['make -C %s docs-generate' % (module) for module in config['modules']],
+        'commands': ['apk add bash make git curl gcc musl-dev'] + ['make -C %s docs-generate' % (module) for module in config['modules']],
       },
       {
         'name': 'prepare',
         'image': 'golang:1.16-alpine',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make -C docs docs-copy'
         ],
       },
@@ -1211,7 +1211,7 @@ def docs(ctx):
         'name': 'test',
         'image': 'golang:1.16-alpine',
         'commands': [
-          'apk add  gcc musl-dev make git binutils-gold bash curl',
+          'apk add bash make git curl gcc musl-dev',
           'make -C docs test'
         ],
       },
@@ -1287,17 +1287,17 @@ def makeGenerate(module):
       'commands': [
         '%s ci-node-generate' % (make),
       ],
-      'volumes': [stepVolumeGoWebhippie,],
+      'volumes': [stepVolumeGo,],
     },
     {
       'name': 'generate go',
       'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
-        'apk add  gcc musl-dev make git binutils-gold bash curl',
+        'apk add bash make git curl gcc musl-dev',
         '%s ci-go-generate' % (make),
       ],
-      'volumes': [stepVolumeGoWebhippie,],
+      'volumes': [stepVolumeGo,],
     }
   ]
 
@@ -1439,10 +1439,10 @@ def build():
       'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
-        'apk add  gcc musl-dev make git binutils-gold bash curl',
+        'apk add bash make git curl gcc musl-dev',
         'make -C ocis build',
       ],
-      'volumes': [stepVolumeGoWebhippie,],
+      'volumes': [stepVolumeGo,],
     },
   ]
 
