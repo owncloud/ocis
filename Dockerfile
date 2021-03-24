@@ -1,19 +1,12 @@
-FROM golang:1.16-alpine as build
+FROM owncloudci/golang:1.16 as build
 
 COPY ./ /ocis/
-ENV CGO_ENABLED=0
-ENV GOOS=linux
-
-RUN apk update && \
-	apk upgrade --ignore musl-dev && \
-	apk add make gcc bash && \
-	rm -rf /var/cache/apk/*
 
 WORKDIR /ocis/ocis
 RUN make clean generate build
 
 
-FROM alpine:3
+FROM alpine:3.13
 
 RUN apk update && \
 	apk upgrade && \
