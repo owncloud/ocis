@@ -6,7 +6,7 @@ WORKDIR /ocis/ocis
 RUN make clean generate build
 
 
-FROM alpine:3.14
+FROM alpine:3.13
 
 RUN apk update && \
 	apk upgrade && \
