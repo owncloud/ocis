@@ -265,10 +265,9 @@ def testOcisModule(ctx, module):
   steps = makeGenerate(module) + [
     {
       'name': 'golangci-lint',
-      'image': 'golang:1.16-alpine',
+      'image': 'owncloudci/golang:1.16',
       'pull': 'always',
       'commands': [
-        'apk add bash make git curl gcc musl-dev',
         'mkdir -p cache/checkstyle',
         'make -C %s ci-golangci-lint' % (module),
         'mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml' % (module, module),
@@ -277,10 +276,9 @@ def testOcisModule(ctx, module):
     },
     {
         'name': 'test',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'mkdir -p cache/coverage',
           'make -C %s test' % (module),
           'mv %s/coverage.out cache/coverage/%s_coverage.out' % (module, module),
@@ -883,19 +881,17 @@ def binaryRelease(ctx, name):
       makeGenerate('') + [
       {
         'name': 'build',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make -C ocis release-%s' % (name),
         ],
       },
       {
         'name': 'finish',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make -C ocis release-finish',
         ],
         'when': {
@@ -919,10 +915,9 @@ def binaryRelease(ctx, name):
       },
       {
         'name': 'changelog',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make changelog CHANGELOG_VERSION=%s' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
@@ -1057,10 +1052,9 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make -C ocis changelog',
         ],
       },
@@ -1196,22 +1190,20 @@ def docs(ctx):
     'steps': [
       {
         'name': 'docs-generate',
-        'image': 'golang:1.16-alpine',
-        'commands': ['apk add bash make git curl gcc musl-dev'] + ['make -C %s docs-generate' % (module) for module in config['modules']],
+        'image': 'owncloudci/golang:1.16',
+        'commands': ['make -C %s docs-generate' % (module) for module in config['modules']],
       },
       {
         'name': 'prepare',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make -C docs docs-copy'
         ],
       },
       {
         'name': 'test',
-        'image': 'golang:1.16-alpine',
+        'image': 'owncloudci/golang:1.16',
         'commands': [
-          'apk add bash make git curl gcc musl-dev',
           'make -C docs test'
         ],
       },
@@ -1291,10 +1283,9 @@ def makeGenerate(module):
     },
     {
       'name': 'generate go',
-      'image': 'golang:1.16-alpine',
+      'image': 'owncloudci/golang:1.16',
       'pull': 'always',
       'commands': [
-        'apk add bash make git curl gcc musl-dev',
         '%s ci-go-generate' % (make),
       ],
       'volumes': [stepVolumeGo,],
@@ -1436,10 +1427,9 @@ def build():
   return [
     {
       'name': 'build',
-      'image': 'golang:1.16-alpine',
+      'image': 'owncloudci/golang:1.16',
       'pull': 'always',
       'commands': [
-        'apk add bash make git curl gcc musl-dev',
         'make -C ocis build',
       ],
       'volumes': [stepVolumeGo,],
