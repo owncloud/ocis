@@ -265,10 +265,10 @@ def testOcisModule(ctx, module):
   steps = makeGenerate(module) + [
     {
       'name': 'golangci-lint',
-      'image': 'webhippie/golang:1.16',
+      'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
-        'apk add libc-dev',
+        'apk add  gcc musl-dev make git binutils-gold bash curl',
         'mkdir -p cache/checkstyle',
         'make -C %s ci-golangci-lint' % (module),
         'mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml' % (module, module),
@@ -277,9 +277,10 @@ def testOcisModule(ctx, module):
     },
     {
         'name': 'test',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'mkdir -p cache/coverage',
           'make -C %s test' % (module),
           'mv %s/coverage.out cache/coverage/%s_coverage.out' % (module, module),
@@ -882,17 +883,19 @@ def binaryRelease(ctx, name):
       makeGenerate('') + [
       {
         'name': 'build',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make -C ocis release-%s' % (name),
         ],
       },
       {
         'name': 'finish',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make -C ocis release-finish',
         ],
         'when': {
@@ -916,9 +919,10 @@ def binaryRelease(ctx, name):
       },
       {
         'name': 'changelog',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make changelog CHANGELOG_VERSION=%s' % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
         ],
         'when': {
@@ -1053,9 +1057,10 @@ def changelog(ctx):
     'steps': [
       {
         'name': 'generate',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'pull': 'always',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make -C ocis changelog',
         ],
       },
@@ -1191,20 +1196,22 @@ def docs(ctx):
     'steps': [
       {
         'name': 'docs-generate',
-        'image': 'webhippie/golang:1.16',
-        'commands': ['make -C %s docs-generate' % (module) for module in config['modules']],
+        'image': 'golang:1.16-alpine',
+        'commands': ['apk add  gcc musl-dev make git binutils-gold bash curl'] + ['make -C %s docs-generate' % (module) for module in config['modules']],
       },
       {
         'name': 'prepare',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make -C docs docs-copy'
         ],
       },
       {
         'name': 'test',
-        'image': 'webhippie/golang:1.16',
+        'image': 'golang:1.16-alpine',
         'commands': [
+          'apk add  gcc musl-dev make git binutils-gold bash curl',
           'make -C docs test'
         ],
       },
@@ -1284,9 +1291,10 @@ def makeGenerate(module):
     },
     {
       'name': 'generate go',
-      'image': 'webhippie/golang:1.16',
+      'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
+        'apk add  gcc musl-dev make git binutils-gold bash curl',
         '%s ci-go-generate' % (make),
       ],
       'volumes': [stepVolumeGoWebhippie,],
@@ -1428,9 +1436,10 @@ def build():
   return [
     {
       'name': 'build',
-      'image': 'webhippie/golang:1.16',
+      'image': 'golang:1.16-alpine',
       'pull': 'always',
       'commands': [
+        'apk add  gcc musl-dev make git binutils-gold bash curl',
         'make -C ocis build',
       ],
       'volumes': [stepVolumeGoWebhippie,],
