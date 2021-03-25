@@ -156,6 +156,11 @@ ifndef CHANGELOG_VERSION
 endif
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
+.PHONY: l10n-push
+l10n-push:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-push; \
+	done
 
 .PHONY: l10n-pull
 l10n-pull:
