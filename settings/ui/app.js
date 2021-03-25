@@ -1,6 +1,7 @@
 import 'regenerator-runtime/runtime'
 import SettingsApp from './components/SettingsApp.vue'
 import store from './store'
+import translations from './../l10n/translations.json'
 
 // just a dummy function to trick gettext tools
 function $gettext (msg) {
@@ -41,5 +42,6 @@ export default {
   appInfo,
   store,
   routes,
-  navItems
+  navItems,
+  translations
 }
