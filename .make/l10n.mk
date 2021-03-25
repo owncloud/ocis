@@ -1,7 +1,7 @@
 # On OSX the PATH variable isn't exported unless "SHELL" is also set, see: http://stackoverflow.com/a/25506676
 SHELL = /bin/bash
 NODE_BINDIR = ./node_modules/.bin
-export PATH := $(NODE_BINDIR):$(PATH)
+export PATH := $(PATH):$(NODE_BINDIR)
 
 INPUT_FILES = ./ui
 
