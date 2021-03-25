@@ -24,9 +24,8 @@ l10n-pull:
 
 .PHONY: l10n-clean
 l10n-clean:
-	rm -rf $(OUTPUT_DIR)/locale
-	rm -rf $(OUTPUT_DIR)/translations.json
 	rm -f $(TEMPLATE_FILE)
+	rm -rf $(OUTPUT_DIR)/locale
 
 .PHONY: l10n-read
 l10n-read: node_modules $(TEMPLATE_FILE)
@@ -44,6 +43,7 @@ $(TEMPLATE_FILE):
 
 # Generate translations.json file from .pot template.
 $(OUTPUT_DIR)/translations.json:
+	rm -rf $(OUTPUT_DIR)/translations.json
 	gettext-compile --output $(OUTPUT_DIR)/translations.json $(LOCALE_FILES);
 
 
