@@ -15,12 +15,14 @@ endif
 include ../.make/go.mk
 
 
-
 ############ release ############
 include ../.make/release.mk
 
 ############ docs generate ############
 include ../.make/docs.mk
+
+############ l10n ############
+include ../.make/l10n.mk
 
 .PHONY: docs-generate
 docs-generate: config-docs-generate \

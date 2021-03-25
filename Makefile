@@ -12,6 +12,8 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
+L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||')
+
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	accounts \
@@ -153,3 +155,28 @@ ifndef CHANGELOG_VERSION
 	$(error CHANGELOG_VERSION is undefined)
 endif
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
+
+
+.PHONY: l10n-pull
+l10n-pull:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-pull; \
+	done
+
+.PHONY: l10n-clean
+l10n-clean:
+	@for extension in $(L10N_MODULES); do \
+		make -C $$extension l10n-clean; \
+	done
+
+.PHONY: l10n-read
+l10n-read:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-read; \
+    done
+
+.PHONY: l10n-write
+l10n-write:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-write; \
+    done

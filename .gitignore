@@ -25,3 +25,6 @@ vendor-bin/**/composer.lock
 
 # drone CI is in .drone.star, do not let someone accidentally commit a local .drone.yml
 .drone.yml
+
+**/l10n/locale
+**/l10n/template.pot
