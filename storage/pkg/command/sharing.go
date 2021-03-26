@@ -7,6 +7,8 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/owncloud/ocis/storage/pkg/tracing"
+
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -34,39 +36,10 @@ func Sharing(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+			tracing.Configure(cfg, logger)
 
-				case "jaeger":
-					logger.Info().
-						Str("type", t).
-						Msg("configuring storage to use the jaeger tracing backend")
-
-				case "zipkin":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
-			}
-
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
-			)
+			gr := run.Group{}
+			ctx, cancel := context.WithCancel(context.Background())
 
 			defer cancel()
 
@@ -82,92 +55,42 @@ func Sharing(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			{
+			uuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			rcfg := sharingConfigFromStruct(c, cfg)
 
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.Sharing.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": c.Command.Name,
-					},
-					"shared": map[string]interface{}{
-						"jwt_secret": cfg.Reva.JWTSecret,
-					},
-					"grpc": map[string]interface{}{
-						"network": cfg.Reva.Sharing.GRPCNetwork,
-						"address": cfg.Reva.Sharing.GRPCAddr,
-						// TODO build services dynamically
-						"services": map[string]interface{}{
-							"usershareprovider": map[string]interface{}{
-								"driver": cfg.Reva.Sharing.UserDriver,
-								"drivers": map[string]interface{}{
-									"json": map[string]interface{}{
-										"file": cfg.Reva.Sharing.UserJSONFile,
-									},
-									"sql": map[string]interface{}{
-										"db_username": cfg.Reva.Sharing.UserSQLUsername,
-										"db_password": cfg.Reva.Sharing.UserSQLPassword,
-										"db_host":     cfg.Reva.Sharing.UserSQLHost,
-										"db_port":     cfg.Reva.Sharing.UserSQLPort,
-										"db_name":     cfg.Reva.Sharing.UserSQLName,
-									},
-								},
-							},
-							"publicshareprovider": map[string]interface{}{
-								"driver": cfg.Reva.Sharing.PublicDriver,
-								"drivers": map[string]interface{}{
-									"json": map[string]interface{}{
-										"file": cfg.Reva.Sharing.PublicJSONFile,
-									},
-								},
-							},
-						},
-					},
-				}
-
-				gr.Add(func() error {
-					runtime.RunWithOptions(
-						rcfg,
-						pidFile,
-						runtime.WithLogger(&logger.Logger),
-					)
-					return nil
-				}, func(_ error) {
-					logger.Info().
-						Str("server", c.Command.Name).
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.Sharing.DebugAddr),
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
+			gr.Add(func() error {
+				runtime.RunWithOptions(
+					rcfg,
+					pidFile,
+					runtime.WithLogger(&logger.Logger),
 				)
+				return nil
+			}, func(_ error) {
+				logger.Info().
+					Str("server", c.Command.Name).
+					Msg("Shutting down server")
 
-				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", c.Command.Name+"-debug").
-						Msg("Failed to initialize server")
+				cancel()
+			})
 
-					return err
-				}
+			debug, err := debug.Server(
+				debug.Name(c.Command.Name+"-debug"),
+				debug.Addr(cfg.Reva.Sharing.DebugAddr),
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					cancel()
-				})
+			if err != nil {
+				logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
+				return err
 			}
+
+			gr.Add(debug.ListenAndServe, func(_ error) {
+				cancel()
+			})
 
 			if !cfg.Reva.StorageMetadata.Supervised {
 				sync.Trap(&gr, cancel)
@@ -176,6 +99,53 @@ func Sharing(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// sharingConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+	rcfg := map[string]interface{}{
+		"core": map[string]interface{}{
+			"max_cpus":             cfg.Reva.Sharing.MaxCPUs,
+			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_endpoint":     cfg.Tracing.Endpoint,
+			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service_name": c.Command.Name,
+		},
+		"shared": map[string]interface{}{
+			"jwt_secret": cfg.Reva.JWTSecret,
+		},
+		"grpc": map[string]interface{}{
+			"network": cfg.Reva.Sharing.GRPCNetwork,
+			"address": cfg.Reva.Sharing.GRPCAddr,
+			// TODO build services dynamically
+			"services": map[string]interface{}{
+				"usershareprovider": map[string]interface{}{
+					"driver": cfg.Reva.Sharing.UserDriver,
+					"drivers": map[string]interface{}{
+						"json": map[string]interface{}{
+							"file": cfg.Reva.Sharing.UserJSONFile,
+						},
+						"sql": map[string]interface{}{
+							"db_username": cfg.Reva.Sharing.UserSQLUsername,
+							"db_password": cfg.Reva.Sharing.UserSQLPassword,
+							"db_host":     cfg.Reva.Sharing.UserSQLHost,
+							"db_port":     cfg.Reva.Sharing.UserSQLPort,
+							"db_name":     cfg.Reva.Sharing.UserSQLName,
+						},
+					},
+				},
+				"publicshareprovider": map[string]interface{}{
+					"driver": cfg.Reva.Sharing.PublicDriver,
+					"drivers": map[string]interface{}{
+						"json": map[string]interface{}{
+							"file": cfg.Reva.Sharing.PublicJSONFile,
+						},
+					},
+				},
+			},
+		},
+	}
+	return rcfg
 }
 
 // SharingSutureService allows for the storage-sharing command to be embedded and supervised by a suture supervisor tree.

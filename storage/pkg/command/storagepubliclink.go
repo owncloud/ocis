@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -27,116 +28,45 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
-
-				case "jaeger":
-					logger.Info().
-						Str("type", t).
-						Msg("configuring storage to use the jaeger tracing backend")
-
-				case "zipkin":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
-			}
-
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
-			)
-
+			tracing.Configure(cfg, logger)
+			gr := run.Group{}
+			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			{
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+			rcfg := storagePublicLinkConfigFromStruct(c, cfg)
 
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.StoragePublicLink.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": c.Command.Name,
-					},
-					"shared": map[string]interface{}{
-						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
-					},
-					"grpc": map[string]interface{}{
-						"network": cfg.Reva.StoragePublicLink.GRPCNetwork,
-						"address": cfg.Reva.StoragePublicLink.GRPCAddr,
-						"interceptors": map[string]interface{}{
-							"log": map[string]interface{}{},
-						},
-						"services": map[string]interface{}{
-							"publicstorageprovider": map[string]interface{}{
-								"mount_path":   cfg.Reva.StoragePublicLink.MountPath,
-								"gateway_addr": cfg.Reva.Gateway.Endpoint,
-							},
-							"authprovider": map[string]interface{}{
-								"auth_manager": "publicshares",
-								"auth_managers": map[string]interface{}{
-									"publicshares": map[string]interface{}{
-										"gateway_addr": cfg.Reva.Gateway.Endpoint,
-									},
-								},
-							},
-						},
-					},
-				}
-
-				gr.Add(func() error {
-					runtime.RunWithOptions(
-						rcfg,
-						pidFile,
-						runtime.WithLogger(&logger.Logger),
-					)
-					return nil
-				}, func(_ error) {
-					logger.Info().
-						Str("server", c.Command.Name).
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.StoragePublicLink.DebugAddr),
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
+			gr.Add(func() error {
+				runtime.RunWithOptions(
+					rcfg,
+					pidFile,
+					runtime.WithLogger(&logger.Logger),
 				)
+				return nil
+			}, func(_ error) {
+				logger.Info().
+					Str("server", c.Command.Name).
+					Msg("Shutting down server")
 
-				if err != nil {
-					logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
-					return err
-				}
+				cancel()
+			})
 
-				gr.Add(server.ListenAndServe, func(_ error) {
-					cancel()
-				})
+			debugServer, err := debug.Server(
+				debug.Name(c.Command.Name+"-debug"),
+				debug.Addr(cfg.Reva.StoragePublicLink.DebugAddr),
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
+
+			if err != nil {
+				logger.Info().Err(err).Str("server", c.Command.Name+"-debug").Msg("Failed to initialize server")
+				return err
 			}
+
+			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				cancel()
+			})
 
 			if !cfg.Reva.StorageMetadata.Supervised {
 				sync.Trap(&gr, cancel)
@@ -145,6 +75,45 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// storagePublicLinkConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+	rcfg := map[string]interface{}{
+		"core": map[string]interface{}{
+			"max_cpus":             cfg.Reva.StoragePublicLink.MaxCPUs,
+			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_endpoint":     cfg.Tracing.Endpoint,
+			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service_name": c.Command.Name,
+		},
+		"shared": map[string]interface{}{
+			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+		},
+		"grpc": map[string]interface{}{
+			"network": cfg.Reva.StoragePublicLink.GRPCNetwork,
+			"address": cfg.Reva.StoragePublicLink.GRPCAddr,
+			"interceptors": map[string]interface{}{
+				"log": map[string]interface{}{},
+			},
+			"services": map[string]interface{}{
+				"publicstorageprovider": map[string]interface{}{
+					"mount_path":   cfg.Reva.StoragePublicLink.MountPath,
+					"gateway_addr": cfg.Reva.Gateway.Endpoint,
+				},
+				"authprovider": map[string]interface{}{
+					"auth_manager": "publicshares",
+					"auth_managers": map[string]interface{}{
+						"publicshares": map[string]interface{}{
+							"gateway_addr": cfg.Reva.Gateway.Endpoint,
+						},
+					},
+				},
+			},
+		},
+	}
+	return rcfg
 }
 
 // StoragePublicLinkSutureService allows for the storage-public-link command to be embedded and supervised by a suture supervisor tree.

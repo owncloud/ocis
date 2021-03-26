@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -43,145 +44,69 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
+			tracing.Configure(cfg, logger)
 
-				case "jaeger":
-					logger.Info().
-						Str("type", t).
-						Msg("configuring storage to use the jaeger tracing backend")
-
-				case "zipkin":
-					logger.Error().
-						Str("type", t).
-						Msg("Reva only supports the jaeger tracing backend")
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
+			gr := run.Group{}
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Reva.StorageMetadata.Context == nil {
+					return context.WithCancel(context.Background())
 				}
-
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
-			}
-
-			var (
-				gr          = run.Group{}
-				ctx, cancel = func() (context.Context, context.CancelFunc) {
-					if cfg.Reva.StorageMetadata.Context == nil {
-						return context.WithCancel(context.Background())
-					}
-					return context.WithCancel(cfg.Reva.StorageMetadata.Context)
-				}()
-			)
+				return context.WithCancel(cfg.Reva.StorageMetadata.Context)
+			}()
 
 			defer cancel()
 
-			{
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 
-				// Disable home because the metadata is stored independently
-				// of the user. This also means that a valid-token without any user-id
-				// is allowed to write to the metadata-storage.
-				cfg.Reva.Storages.Common.EnableHome = false
-				cfg.Reva.Storages.EOS.EnableHome = false
-				cfg.Reva.Storages.Local.EnableHome = false
-				cfg.Reva.Storages.OwnCloud.EnableHome = false
-				cfg.Reva.Storages.S3.EnableHome = false
+			// Disable home because the metadata is stored independently
+			// of the user. This also means that a valid-token without any user-id
+			// is allowed to write to the metadata-storage.
+			cfg.Reva.Storages.Common.EnableHome = false
+			cfg.Reva.Storages.EOS.EnableHome = false
+			cfg.Reva.Storages.Local.EnableHome = false
+			cfg.Reva.Storages.OwnCloud.EnableHome = false
+			cfg.Reva.Storages.S3.EnableHome = false
 
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.StorageMetadata.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": c.Command.Name,
-					},
-					"shared": map[string]interface{}{
-						"jwt_secret": cfg.Reva.JWTSecret,
-						"gatewaysvc": cfg.Reva.Gateway.Endpoint,
-					},
-					"grpc": map[string]interface{}{
-						"network": cfg.Reva.StorageMetadata.GRPCNetwork,
-						"address": cfg.Reva.StorageMetadata.GRPCAddr,
-						"interceptors": map[string]interface{}{
-							"log": map[string]interface{}{},
-						},
-						"services": map[string]interface{}{
-							"storageprovider": map[string]interface{}{
-								"mount_path":      "/meta",
-								"driver":          cfg.Reva.StorageMetadata.Driver,
-								"drivers":         drivers(cfg),
-								"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
-								"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
-							},
-						},
-					},
-					"http": map[string]interface{}{
-						"network": cfg.Reva.StorageMetadata.HTTPNetwork,
-						"address": cfg.Reva.StorageMetadata.HTTPAddr,
-						// TODO build services dynamically
-						"services": map[string]interface{}{
-							"dataprovider": map[string]interface{}{
-								"prefix":      "data",
-								"driver":      cfg.Reva.StorageMetadata.Driver,
-								"drivers":     drivers(cfg),
-								"timeout":     86400,
-								"insecure":    true,
-								"disable_tus": true,
-							},
-						},
-					},
-				}
+			rcfg := storageMetadataFromStruct(c, cfg)
 
-				gr.Add(func() error {
-					runtime.RunWithOptions(
-						rcfg,
-						pidFile,
-						runtime.WithLogger(&logger.Logger),
-					)
-					return nil
-				}, func(_ error) {
-					logger.Info().
-						Str("server", c.Command.Name).
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.StorageMetadata.DebugAddr),
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
+			gr.Add(func() error {
+				runtime.RunWithOptions(
+					rcfg,
+					pidFile,
+					runtime.WithLogger(&logger.Logger),
 				)
+				return nil
+			}, func(_ error) {
+				logger.Info().
+					Str("server", c.Command.Name).
+					Msg("Shutting down server")
 
-				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", c.Command.Name+"-debug").
-						Msg("Failed to initialize server")
+				cancel()
+			})
 
-					return err
-				}
+			debugServer, err := debug.Server(
+				debug.Name(c.Command.Name+"-debug"),
+				debug.Addr(cfg.Reva.StorageMetadata.DebugAddr),
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					_ = server.Shutdown(ctx)
-					cancel()
-				})
+			if err != nil {
+				logger.Info().
+					Err(err).
+					Str("server", c.Command.Name+"-debug").
+					Msg("Failed to initialize server")
+
+				return err
 			}
+
+			gr.Add(func() error {
+				return debugServer.ListenAndServe()
+			}, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
+				cancel()
+			})
 
 			if !cfg.Reva.StorageMetadata.Supervised {
 				sync.Trap(&gr, cancel)
@@ -200,6 +125,55 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// storageMetadataFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+	rcfg := map[string]interface{}{
+		"core": map[string]interface{}{
+			"max_cpus":             cfg.Reva.StorageMetadata.MaxCPUs,
+			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_endpoint":     cfg.Tracing.Endpoint,
+			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service_name": c.Command.Name,
+		},
+		"shared": map[string]interface{}{
+			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+		},
+		"grpc": map[string]interface{}{
+			"network": cfg.Reva.StorageMetadata.GRPCNetwork,
+			"address": cfg.Reva.StorageMetadata.GRPCAddr,
+			"interceptors": map[string]interface{}{
+				"log": map[string]interface{}{},
+			},
+			"services": map[string]interface{}{
+				"storageprovider": map[string]interface{}{
+					"mount_path":      "/meta",
+					"driver":          cfg.Reva.StorageMetadata.Driver,
+					"drivers":         drivers(cfg),
+					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
+					"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
+				},
+			},
+		},
+		"http": map[string]interface{}{
+			"network": cfg.Reva.StorageMetadata.HTTPNetwork,
+			"address": cfg.Reva.StorageMetadata.HTTPAddr,
+			// TODO build services dynamically
+			"services": map[string]interface{}{
+				"dataprovider": map[string]interface{}{
+					"prefix":      "data",
+					"driver":      cfg.Reva.StorageMetadata.Driver,
+					"drivers":     drivers(cfg),
+					"timeout":     86400,
+					"insecure":    true,
+					"disable_tus": true,
+				},
+			},
+		},
+	}
+	return rcfg
 }
 
 // SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
