@@ -153,6 +153,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 					"timeout":          86400,
 					"insecure":         true,
+					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{
 					"share_prefix": cfg.Reva.Frontend.OCSSharePrefix,
