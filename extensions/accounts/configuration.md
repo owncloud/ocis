@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-26T10:47:25+0000"
+date: "2021-03-26T10:47:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -34,18 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 ### accounts server
 
@@ -128,6 +116,12 @@ Usage: `accounts version [command options] [arguments...]`
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
+### accounts add
+
+Create a new account
+
+Usage: `accounts add [command options] [arguments...]`
+
 ### accounts inspect
 
 Show detailed data on an existing account
@@ -151,6 +145,12 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 ### accounts remove
 
