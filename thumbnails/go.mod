@@ -1,13 +1,13 @@
 module github.com/owncloud/ocis/thumbnails
 
-go 1.15
+go 1.16
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
@@ -15,14 +15,13 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.9.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	github.com/thejerf/suture v4.0.0+incompatible
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.26.0
 )
 
 replace (

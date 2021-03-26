@@ -149,8 +149,7 @@ func Start(o ...Option) error {
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	// TODO(refs) change default port
-	l, err := net.Listen("tcp", fmt.Sprintf("%v:%v", "localhost", "6060"))
+	l, err := net.Listen("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port))
 	if err != nil {
 		s.Log.Fatal().Err(err)
 	}
@@ -158,8 +157,7 @@ func Start(o ...Option) error {
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
-			// TODO(refs) change default port
-			if _, err := net.Dial("localhost", "6060"); err != nil {
+			if _, err := net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
 				reason.WriteString("runtime address already in use")
 			}
 

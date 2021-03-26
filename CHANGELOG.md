@@ -9,10 +9,13 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
 * Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Improve accessibility to input elements on login page: [#1794](https://github.com/owncloud/ocis/pull/1794)
+* Enhancement - Add new build targets: [#1824](https://github.com/owncloud/ocis/pull/1824)
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 * Enhancement - Replace special character in login page title with a regular minus: [#1813](https://github.com/owncloud/ocis/pull/1813)
 * Enhancement - File Logging: [#1816](https://github.com/owncloud/ocis/pull/1816)
+* Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
 
 ## Details
 
@@ -33,6 +36,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/issues/4319
    https://github.com/owncloud/ocis/pull/1794
    https://github.com/owncloud/ocis/pull/1811
+
+* Enhancement - Add new build targets: [#1824](https://github.com/owncloud/ocis/pull/1824)
+
+   Make build target `build` used to build a binary twice, the second occurrence having symbols
+   for debugging. We split this step in two and added `build-all` and `build-debug` targets.
+
+   - `build-all` now behaves as the previous `build` target, it will generate 2 binaries, one for
+   debug. - `build-debug` will build a single binary for debugging.
+
+   https://github.com/owncloud/ocis/pull/1824
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
@@ -62,11 +75,33 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1816
 
+* Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
+
+   Without any configuration the ocis runtime will start on `localhost:9250` unless specified
+   otherwise. Usage:
+
+   - `OCIS_RUNTIME_PORT=6061 bin/ocis server` - overrides the oCIS runtime and starts on port
+   6061 - `OCIS_RUNTIME_PORT=6061 bin/ocis list` - lists running extensions for the runtime on
+   `localhost:6061`
+
+   All subcommands are updated and expected to work with the following environment variables:
+
+   ``` OCIS_RUNTIME_HOST OCIS_RUNTIME_PORT ```
+
+   https://github.com/owncloud/ocis/pull/1822
+
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 
    Added support for gifs to the thumbnails service.
 
    https://github.com/owncloud/ocis/pull/1791
+
+* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+
+  * quota querying and tree accounting [cs3org/reva#1405](https://github.com/cs3org/reva/pull/1405)
+
+   https://github.com/owncloud/ocis/pull/1683
+   https://github.com/cs3org/reva/pull/1405
 # Changelog for [1.3.0] (2021-03-09)
 
 The following sections list the changes for 1.3.0.
