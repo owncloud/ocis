@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/reva v1.6.1-0.20210322092416-280aa1906e77
+	github.com/cs3org/reva v1.6.1-0.20210326165326-e8a00d9b2368
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mitchellh/copystructure v1.1.1 // indirect

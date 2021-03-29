@@ -172,25 +172,25 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 	return rcfg
 }
 
-func rules(cfg *config.Config) map[string]interface{} {
+func rules(cfg *config.Config) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
-		rules := map[string]interface{}{}
+		rules := map[string]map[string]interface{}{}
 		for i := range cfg.Reva.StorageRegistry.Rules {
 			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
-			rules[parts[0]] = parts[1]
+			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
 		}
 		return rules
 	}
 
 	// generate rules based on default config
-	return map[string]interface{}{
-		cfg.Reva.StorageHome.MountPath:       cfg.Reva.StorageHome.Endpoint,
-		cfg.Reva.StorageHome.MountID:         cfg.Reva.StorageHome.Endpoint,
-		cfg.Reva.StorageUsers.MountPath:      cfg.Reva.StorageUsers.Endpoint,
-		cfg.Reva.StorageUsers.MountID:        cfg.Reva.StorageUsers.Endpoint,
-		cfg.Reva.StoragePublicLink.MountPath: cfg.Reva.StoragePublicLink.Endpoint,
+	return map[string]map[string]interface{}{
+		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageHome.MountID:         {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StorageUsers.MountID:        {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
