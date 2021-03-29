@@ -8,7 +8,9 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
+	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/olekukonko/tablewriter v0.0.5
@@ -29,10 +31,11 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/web v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/webdav v0.0.0-20210216094451-dc73176dc62d
-	github.com/rs/zerolog v1.20.0
+	github.com/rs/zerolog v1.21.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b
