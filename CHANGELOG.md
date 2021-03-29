@@ -16,7 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Runtime Hostname and Port are now configurable: [#1822](https://github.com/owncloud/ocis/pull/1822)
 * Enhancement - Generate thumbnails for .gif files: [#1791](https://github.com/owncloud/ocis/pull/1791)
 * Enhancement - Tracing Refactor: [#1819](https://github.com/owncloud/ocis/pull/1819)
-* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+* Enhancement - Update reva to v1.6.1-0.20210326165326-e8a00d9b2368: [#1683](https://github.com/owncloud/ocis/pull/1683)
 
 ## Details
 
@@ -103,12 +103,17 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1819
 
-* Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
+* Enhancement - Update reva to v1.6.1-0.20210326165326-e8a00d9b2368: [#1683](https://github.com/owncloud/ocis/pull/1683)
 
   * quota querying and tree accounting [cs3org/reva#1405](https://github.com/cs3org/reva/pull/1405)
+  * Fix webdav file versions endpoint bugs [cs3org/reva#1526](https://github.com/cs3org/reva/pull/1526)
+  * Fix etag changing only once a second [cs3org/reva#1576](https://github.com/cs3org/reva/pull/1576)
+  * Trashbin API parity [cs3org/reva#1552](https://github.com/cs3org/reva/pull/1552)
+  * Signature authentication for public links [cs3org/reva#1590](https://github.com/cs3org/reva/pull/1590)
 
    https://github.com/owncloud/ocis/pull/1683
    https://github.com/cs3org/reva/pull/1405
+   https://github.com/owncloud/ocis/pull/1861
 # Changelog for [1.3.0] (2021-03-09)
 
 The following sections list the changes for 1.3.0.
