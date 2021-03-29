@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-27T12:27:32+0000"
+date: "2021-03-29T07:53:24+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -35,24 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### proxy server
-
-Start integrated server
-
-Usage: `proxy server [command options] [arguments...]`
-
-### proxy version
-
-Print the versions of the running instances
-
-Usage: `proxy version [command options] [arguments...]`
-
---service-namespace |  $PROXY_SERVICE_NAMESPACE
-: Set the base namespace for the service namespace. Default: `flags.OverrideDefaultString(cfg.OIDC.Issuer, "com.owncloud.web")`.
-
---service-name |  $PROXY_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "proxy")`.
-
 ### proxy health
 
 Check health status
@@ -76,4 +58,22 @@ Usage: `proxy ocis-proxy [command options] [arguments...]`
 
 --log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
+### proxy server
+
+Start integrated server
+
+Usage: `proxy server [command options] [arguments...]`
+
+### proxy version
+
+Print the versions of the running instances
+
+Usage: `proxy version [command options] [arguments...]`
+
+--service-namespace |  $PROXY_SERVICE_NAMESPACE
+: Set the base namespace for the service namespace. Default: `flags.OverrideDefaultString(cfg.OIDC.Issuer, "com.owncloud.web")`.
+
+--service-name |  $PROXY_SERVICE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "proxy")`.
 
