@@ -9,7 +9,7 @@ require (
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
-	github.com/cs3org/reva v1.6.1-0.20210326165326-e8a00d9b2368
+	github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/golang/protobuf v1.5.1
