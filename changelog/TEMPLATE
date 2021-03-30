@@ -7,5 +7,5 @@ The text in the paragraphs is written in past tense. The last section is a list
 of issue URLs, PR URLs and other URLs. The first issue ID (or the first PR ID,
 in case there aren't any issue links) is used as the primary ID.
 
-https://github.com/owncloud/ocis/issues/1234
 https://github.com/owncloud/ocis/pull/55555
+https://github.com/owncloud/ocis/issues/1234
