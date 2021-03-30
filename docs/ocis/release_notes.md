@@ -13,11 +13,10 @@ Version 1.4.0 brings new features, bug fixes and further improvements. The acces
 
 The most prominent changes in version 1.4.0 comprise:
 
-- ownCloud Web has received many further improvements regarding accessibility and WCAG 2.1 compliance
+- ownCloud Web is now able to use pre-signed url downloads for password protected shares
 - Reduced the memory consumption of the runtime drastically (by a factor of 24) [#1762](https://github.com/owncloud/ocis/pull/1762)
 - Initial quota support to impose storage space restrictions for users (query / set) [#1405](https://github.com/cs3org/reva/pull/1405)
 - Folder sizes are now calculated correctly (tree size accounting) [#1405](https://github.com/cs3org/reva/pull/1405)
-- The media viewer now also works with upper case file extensions (e.g., JPG) [#4627](https://github.com/owncloud/web/pull/4627)
 - Added the possibility to write the log to a file with the option to write separated log files by service [#1816](https://github.com/owncloud/ocis/pull/1816)
 - Added the possibility to specify configuration values for the entire platform in a single config file [#1762](https://github.com/owncloud/ocis/pull/1762)
 - Added GIF and JPEG file types for thumbnail generation (allows to display thumbnails and use the media viewer for GIF/JPEG images) [#1791](https://github.com/owncloud/ocis/pull/1791)
