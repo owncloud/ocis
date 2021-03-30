@@ -6,35 +6,32 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
-	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210329103359-9b41d1bf0888
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
 	github.com/cs3org/reva v1.6.1-0.20210326165326-e8a00d9b2368
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
-	github.com/gofrs/uuid v3.3.0+incompatible
-	github.com/golang/protobuf v1.5.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
-	github.com/mattn/go-runewidth v0.0.10 // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/golang/protobuf v1.5.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.3.0
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.9.0
-	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/rs/zerolog v1.20.0
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210329140112-169962b4cfc1
+	github.com/owncloud/ocis/settings v0.0.0-20210329140112-169962b4cfc1
+	github.com/prometheus/client_golang v1.10.0
+	github.com/rs/zerolog v1.21.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
-	golang.org/x/text v0.3.5 // indirect
-	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
-	google.golang.org/grpc v1.36.0
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/net v0.0.0-20210330075724-22f4162a9025
+	google.golang.org/genproto v0.0.0-20210329143202-679c6ae281ee
+	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 )
 

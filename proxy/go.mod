@@ -6,7 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
-	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210329103359-9b41d1bf0888
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
@@ -18,18 +18,18 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/store v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.9.0
-	github.com/rs/zerolog v1.20.0
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210329140112-169962b4cfc1
+	github.com/owncloud/ocis/settings v0.0.0-20210329140112-169962b4cfc1
+	github.com/owncloud/ocis/store v0.0.0-20210329140112-169962b4cfc1
+	github.com/prometheus/client_golang v1.10.0
+	github.com/rs/zerolog v1.21.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
-	google.golang.org/grpc v1.36.0
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
+	google.golang.org/grpc v1.36.1
 )
 
 replace (

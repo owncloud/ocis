@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/graph-explorer
 
-go 1.13
+go 1.16
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
@@ -11,14 +11,14 @@ require (
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.5
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.9.0
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210329140112-169962b4cfc1
+	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
-	golang.org/x/mod v0.4.1 // indirect
-	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
+	golang.org/x/mod v0.4.2 // indirect
+	golang.org/x/net v0.0.0-20210330075724-22f4162a9025
 )
 
 replace (

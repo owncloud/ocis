@@ -7,15 +7,15 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/blevesearch/bleve v1.0.9
-	github.com/golang/protobuf v1.5.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
+	github.com/blevesearch/bleve v1.0.14
+	github.com/golang/protobuf v1.5.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.3.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
-	github.com/olekukonko/tablewriter v0.0.4
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.9.0
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210329140112-169962b4cfc1
+	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
