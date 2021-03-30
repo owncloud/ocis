@@ -7,6 +7,28 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.4.0 Technology Preview
+
+Version 1.4.0 brings new features, bug fixes and further improvements. The accessibility of ownCloud Web has greatly improved, paving the way for WCAG 2.1 compliance. The Infinite Scale platform has received major improvements regarding memory consumption. The user storage quota feature has been implemented and folder sizes are now properly calculated. It is now possible to write log messages to log files and to specify configuration values using a config file.
+
+The most prominent changes in version 1.4.0 comprise:
+
+- ownCloud Web is now able to use pre-signed url downloads for password protected shares [#38376](https://github.com/owncloud/core/pull/38376)
+- Reduced the memory consumption of the runtime drastically (by a factor of 24) [#1762](https://github.com/owncloud/ocis/pull/1762)
+- Initial quota support to impose storage space restrictions for users (query / set) [#1405](https://github.com/cs3org/reva/pull/1405)
+- Folder sizes are now calculated correctly (tree size accounting) [#1405](https://github.com/cs3org/reva/pull/1405)
+- Added the possibility to write the log to a file with the option to write separated log files by service [#1816](https://github.com/owncloud/ocis/pull/1816)
+- Added the possibility to specify configuration values for the entire platform in a single config file [#1762](https://github.com/owncloud/ocis/pull/1762)
+- Added GIF and JPEG file types for thumbnail generation (allows to display thumbnails and use the media viewer for GIF/JPEG images) [#1791](https://github.com/owncloud/ocis/pull/1791)
+- Fixes for the trash bin feature [#1552](https://github.com/cs3org/reva/pull/1552)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.3.0 Technology Preview
 Version 1.3.0 is a regular maintenance and bugfix release. It provides the latest improvements to users and administrators.
 

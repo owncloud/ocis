@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-29T14:02:04+0000"
+date: "2021-03-30T14:26:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,18 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### thumbnails version
-
-Print the versions of the running instances
-
-Usage: `thumbnails version [command options] [arguments...]`
-
--grpc-name |  $THUMBNAILS_GRPC_NAME
-: Name of the service. Default: `flags.OverrideDefaultString(cfg.Server.Name, "thumbnails")`.
-
--grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
 
 ### thumbnails health
 
@@ -127,4 +115,16 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 -webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
 : Whether to skip certificate checks. Default: `flags.OverrideDefaultBool(cfg.Thumbnail.WebDavSource.Insecure, true)`.
+
+### thumbnails version
+
+Print the versions of the running instances
+
+Usage: `thumbnails version [command options] [arguments...]`
+
+-grpc-name |  $THUMBNAILS_GRPC_NAME
+: Name of the service. Default: `flags.OverrideDefaultString(cfg.Server.Name, "thumbnails")`.
+
+-grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
 
