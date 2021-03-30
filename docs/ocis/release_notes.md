@@ -13,7 +13,7 @@ Version 1.4.0 brings new features, bug fixes and further improvements. The acces
 
 The most prominent changes in version 1.4.0 comprise:
 
-- ownCloud Web is now able to use pre-signed url downloads for password protected shares
+- ownCloud Web is now able to use pre-signed url downloads for password protected shares [#38376](https://github.com/owncloud/core/pull/38376)
 - Reduced the memory consumption of the runtime drastically (by a factor of 24) [#1762](https://github.com/owncloud/ocis/pull/1762)
 - Initial quota support to impose storage space restrictions for users (query / set) [#1405](https://github.com/cs3org/reva/pull/1405)
 - Folder sizes are now calculated correctly (tree size accounting) [#1405](https://github.com/cs3org/reva/pull/1405)
