@@ -119,7 +119,7 @@ Then again wait for the ci if still everything works as expected and then create
 
 Now it's time to notify marketing so that they can start to update all links, create a blog post and communicate the news.
 
-## Notify Marketing
+## FIN
 **Task:** close release pr and bring back to master
 
 As a final step you need to take care that the PR gets back to master.
