@@ -1,12 +1,12 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [1.4.0] (2021-03-30)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.4.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.3.0...master
+[1.4.0]: https://github.com/owncloud/ocis/compare/v1.3.0...v1.4.0
 
 ## Summary
 
-* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Bugfix - Fix thumbnail generation for jpegs: [#1785](https://github.com/owncloud/ocis/pull/1785)
 * Change - Update ownCloud Web to v2.1.0: [#1870](https://github.com/owncloud/ocis/pull/1870)
 * Enhancement - Add focus to input elements on login page: [#1792](https://github.com/owncloud/ocis/pull/1792)
 * Enhancement - Improve accessibility to input elements on login page: [#1794](https://github.com/owncloud/ocis/pull/1794)
@@ -21,7 +21,7 @@ The following sections list the changes for unreleased.
 
 ## Details
 
-* Bugfix - Fix thumbnail generation for jpegs: [#1490](https://github.com/owncloud/ocis/issues/1490)
+* Bugfix - Fix thumbnail generation for jpegs: [#1785](https://github.com/owncloud/ocis/pull/1785)
 
    Images with the extension `.jpeg` were not properly supported.
 
