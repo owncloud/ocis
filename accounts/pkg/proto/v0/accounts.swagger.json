@@ -43,7 +43,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsAccount"
+              "$ref": "#/definitions/v0Account"
             }
           },
           "default": {
@@ -59,7 +59,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsCreateAccountRequest"
+              "$ref": "#/definitions/v0CreateAccountRequest"
             }
           }
         ],
@@ -92,7 +92,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsDeleteAccountRequest"
+              "$ref": "#/definitions/v0DeleteAccountRequest"
             }
           }
         ],
@@ -109,7 +109,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsAccount"
+              "$ref": "#/definitions/v0Account"
             }
           },
           "default": {
@@ -125,7 +125,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsGetAccountRequest"
+              "$ref": "#/definitions/v0GetAccountRequest"
             }
           }
         ],
@@ -142,7 +142,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsListAccountsResponse"
+              "$ref": "#/definitions/v0ListAccountsResponse"
             }
           },
           "default": {
@@ -158,7 +158,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsListAccountsRequest"
+              "$ref": "#/definitions/v0ListAccountsRequest"
             }
           }
         ],
@@ -175,7 +175,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsAccount"
+              "$ref": "#/definitions/v0Account"
             }
           },
           "default": {
@@ -191,7 +191,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsUpdateAccountRequest"
+              "$ref": "#/definitions/v0UpdateAccountRequest"
             }
           }
         ],
@@ -208,7 +208,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsGroup"
+              "$ref": "#/definitions/v0Group"
             }
           },
           "default": {
@@ -224,7 +224,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsCreateGroupRequest"
+              "$ref": "#/definitions/v0CreateGroupRequest"
             }
           }
         ],
@@ -257,7 +257,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsDeleteGroupRequest"
+              "$ref": "#/definitions/v0DeleteGroupRequest"
             }
           }
         ],
@@ -274,7 +274,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsGroup"
+              "$ref": "#/definitions/v0Group"
             }
           },
           "default": {
@@ -290,7 +290,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsGetGroupRequest"
+              "$ref": "#/definitions/v0GetGroupRequest"
             }
           }
         ],
@@ -307,7 +307,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsListGroupsResponse"
+              "$ref": "#/definitions/v0ListGroupsResponse"
             }
           },
           "default": {
@@ -323,7 +323,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsListGroupsRequest"
+              "$ref": "#/definitions/v0ListGroupsRequest"
             }
           }
         ],
@@ -340,7 +340,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsGroup"
+              "$ref": "#/definitions/v0Group"
             }
           },
           "default": {
@@ -356,7 +356,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsUpdateGroupRequest"
+              "$ref": "#/definitions/v0UpdateGroupRequest"
             }
           }
         ],
@@ -373,7 +373,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsGroup"
+              "$ref": "#/definitions/v0Group"
             }
           },
           "default": {
@@ -396,7 +396,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsAddMemberRequest"
+              "$ref": "#/definitions/v0AddMemberRequest"
             }
           }
         ],
@@ -413,7 +413,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsGroup"
+              "$ref": "#/definitions/v0Group"
             }
           },
           "default": {
@@ -443,7 +443,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsRemoveMemberRequest"
+              "$ref": "#/definitions/v0RemoveMemberRequest"
             }
           }
         ],
@@ -460,7 +460,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsListMembersResponse"
+              "$ref": "#/definitions/v0ListMembersResponse"
             }
           },
           "default": {
@@ -483,7 +483,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsListMembersRequest"
+              "$ref": "#/definitions/v0ListMembersRequest"
             }
           }
         ],
@@ -499,7 +499,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/accountsRebuildIndexResponse"
+              "$ref": "#/definitions/v0RebuildIndexResponse"
             }
           },
           "default": {
@@ -515,7 +515,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/accountsRebuildIndexRequest"
+              "$ref": "#/definitions/v0RebuildIndexRequest"
             }
           }
         ],
@@ -526,7 +526,37 @@
     }
   },
   "definitions": {
-    "accountsAccount": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v0Account": {
       "type": "object",
       "properties": {
         "id": {
@@ -548,7 +578,7 @@
         "identities": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsIdentities"
+            "$ref": "#/definitions/v0Identities"
           },
           "description": "Represents the identities that can be used to sign in to this account.\nAn identity can be provided by oCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.\nMay contain multiple items with the same signInType value. Supports $filter."
         },
@@ -579,13 +609,13 @@
           "title": "A description, useful for resource accounts\nposixaccount MAY description"
         },
         "passwordProfile": {
-          "$ref": "#/definitions/accountsPasswordProfile",
+          "$ref": "#/definitions/v0PasswordProfile",
           "title": "Specifies the password profile for the user.\nThe profile contains the user’s password. This property is required when a user is created.\nThe password in the profile must satisfy minimum requirements as specified by the passwordPolicies property.\nBy default, a strong password is required.\nposixaccount MAY authPassword"
         },
         "memberOf": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsGroup"
+            "$ref": "#/definitions/v0Group"
           },
           "title": "The groups, directory roles and administrative units that the user is a member of. Read-only. Nullable.\nshould we only respond with repeated strings of ids? no clients should a proper filter mask!"
         },
@@ -635,7 +665,7 @@
         "onPremisesProvisioningErrors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsOnPremisesProvisioningError"
+            "$ref": "#/definitions/v0OnPremisesProvisioningError"
           },
           "description": "Errors when using synchronization during provisioning."
         },
@@ -661,7 +691,7 @@
       },
       "title": "Account follows the properties of the ms graph api user resuorce.\nSee https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties"
     },
-    "accountsAddMemberRequest": {
+    "v0AddMemberRequest": {
       "type": "object",
       "properties": {
         "groupId": {
@@ -674,25 +704,25 @@
         }
       }
     },
-    "accountsCreateAccountRequest": {
+    "v0CreateAccountRequest": {
       "type": "object",
       "properties": {
         "account": {
-          "$ref": "#/definitions/accountsAccount",
+          "$ref": "#/definitions/v0Account",
           "title": "The account resource to create"
         }
       }
     },
-    "accountsCreateGroupRequest": {
+    "v0CreateGroupRequest": {
       "type": "object",
       "properties": {
         "group": {
-          "$ref": "#/definitions/accountsGroup",
+          "$ref": "#/definitions/v0Group",
           "title": "The account resource to create"
         }
       }
     },
-    "accountsDeleteAccountRequest": {
+    "v0DeleteAccountRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -700,7 +730,7 @@
         }
       }
     },
-    "accountsDeleteGroupRequest": {
+    "v0DeleteGroupRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -708,7 +738,7 @@
         }
       }
     },
-    "accountsGetAccountRequest": {
+    "v0GetAccountRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -716,7 +746,7 @@
         }
       }
     },
-    "accountsGetGroupRequest": {
+    "v0GetGroupRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -724,7 +754,7 @@
         }
       }
     },
-    "accountsGroup": {
+    "v0Group": {
       "type": "object",
       "properties": {
         "id": {
@@ -738,14 +768,14 @@
         "members": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsAccount"
+            "$ref": "#/definitions/v0Account"
           },
           "title": "Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.\nTODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later"
         },
         "owners": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsAccount"
+            "$ref": "#/definitions/v0Account"
           },
           "title": "groupofnames MAY businessCategory\ngroupofnames MAY o\ngroupofnames MAY ou\ngroupofnames MAY owner, SINGLE-VALUE but there might be multiple owners"
         },
@@ -816,13 +846,13 @@
         "onPremisesProvisioningErrors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsOnPremisesProvisioningError"
+            "$ref": "#/definitions/v0OnPremisesProvisioningError"
           },
           "description": "Errors when using synchronization during provisioning."
         }
       }
     },
-    "accountsIdentities": {
+    "v0Identities": {
       "type": "object",
       "properties": {
         "signInType": {
@@ -840,7 +870,7 @@
       },
       "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by oCIS, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
     },
-    "accountsListAccountsRequest": {
+    "v0ListAccountsRequest": {
       "type": "object",
       "properties": {
         "pageSize": {
@@ -863,13 +893,13 @@
         }
       }
     },
-    "accountsListAccountsResponse": {
+    "v0ListAccountsResponse": {
       "type": "object",
       "properties": {
         "accounts": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsAccount"
+            "$ref": "#/definitions/v0Account"
           },
           "title": "The field name should match the noun \"accounts\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
         },
@@ -879,7 +909,7 @@
         }
       }
     },
-    "accountsListGroupsRequest": {
+    "v0ListGroupsRequest": {
       "type": "object",
       "properties": {
         "pageSize": {
@@ -902,13 +932,13 @@
         }
       }
     },
-    "accountsListGroupsResponse": {
+    "v0ListGroupsResponse": {
       "type": "object",
       "properties": {
         "groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsGroup"
+            "$ref": "#/definitions/v0Group"
           },
           "title": "The field name should match the noun \"group\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
         },
@@ -918,7 +948,7 @@
         }
       }
     },
-    "accountsListMembersRequest": {
+    "v0ListMembersRequest": {
       "type": "object",
       "properties": {
         "pageSize": {
@@ -944,13 +974,13 @@
         }
       }
     },
-    "accountsListMembersResponse": {
+    "v0ListMembersResponse": {
       "type": "object",
       "properties": {
         "members": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/accountsAccount"
+            "$ref": "#/definitions/v0Account"
           },
           "title": "The field name should match the noun \"members\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
         },
@@ -960,7 +990,7 @@
         }
       }
     },
-    "accountsOnPremisesProvisioningError": {
+    "v0OnPremisesProvisioningError": {
       "type": "object",
       "properties": {
         "category": {
@@ -982,7 +1012,7 @@
         }
       }
     },
-    "accountsPasswordProfile": {
+    "v0PasswordProfile": {
       "type": "object",
       "properties": {
         "password": {
@@ -1011,13 +1041,13 @@
         }
       }
     },
-    "accountsRebuildIndexRequest": {
+    "v0RebuildIndexRequest": {
       "type": "object"
     },
-    "accountsRebuildIndexResponse": {
+    "v0RebuildIndexResponse": {
       "type": "object"
     },
-    "accountsRemoveMemberRequest": {
+    "v0RemoveMemberRequest": {
       "type": "object",
       "properties": {
         "groupId": {
@@ -1030,11 +1060,11 @@
         }
       }
     },
-    "accountsUpdateAccountRequest": {
+    "v0UpdateAccountRequest": {
       "type": "object",
       "properties": {
         "account": {
-          "$ref": "#/definitions/accountsAccount",
+          "$ref": "#/definitions/v0Account",
           "title": "The account resource which replaces the resource on the server"
         },
         "updateMask": {
@@ -1043,46 +1073,16 @@
         }
       }
     },
-    "accountsUpdateGroupRequest": {
+    "v0UpdateGroupRequest": {
       "type": "object",
       "properties": {
         "group": {
-          "$ref": "#/definitions/accountsGroup",
+          "$ref": "#/definitions/v0Group",
           "title": "The group resource which replaces the resource on the server"
         },
         "updateMask": {
           "type": "string",
           "title": "The update mask applies to the resource. For the `FieldMask` definition,\nsee https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"
-        }
-      }
-    },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "typeUrl": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "rpcStatus": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
         }
       }
     }

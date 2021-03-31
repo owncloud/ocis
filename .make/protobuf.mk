@@ -11,18 +11,18 @@ $(PROTO_SRC)/${NAME}.pb.go: $(BUF) protoc-gen-openapiv2 $(PROTOC_GEN_GO)
 		-I=../third_party/ \
 		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		--plugin protoc-gen-go=$(PROTOC_GEN_GO) \
-		--go_out=. \
+		--go_out=$(PROTO_SRC) --go_opt=paths=source_relative \
 		$(PROTO_SRC)/${NAME}.proto
 
 .PHONY: $(PROTO_SRC)/${NAME}.pb.micro.go
 $(PROTO_SRC)/${NAME}.pb.micro.go: $(BUF) protoc-gen-openapiv2 $(PROTOC_GEN_MICRO)
-@echo "$(NAME): generating $(PROTO_SRC)/${NAME}.pb.micro.go"
+	@echo "$(NAME): generating $(PROTO_SRC)/${NAME}.pb.micro.go"
 	@$(BUF) protoc \
 		-I=$(PROTO_SRC)/ \
 		-I=../third_party/ \
 		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		--plugin protoc-gen-micro=$(PROTOC_GEN_MICRO) \
-		--micro_out=. \
+		--micro_out=$(PROTO_SRC) --micro_opt=paths=source_relative \
 		$(PROTO_SRC)/${NAME}.proto
 
 .PHONY: $(PROTO_SRC)/${NAME}.pb.web.go
@@ -33,7 +33,7 @@ $(PROTO_SRC)/${NAME}.pb.web.go: $(BUF) protoc-gen-openapiv2 $(PROTOC_GEN_MICROWE
 		-I=../third_party/ \
 		-I=$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		--plugin protoc-gen-microweb=$(PROTOC_GEN_MICROWEB) \
-		--microweb_out=. \
+		--microweb_out=$(PROTO_SRC) --microweb_opt=paths=source_relative \
 		$(PROTO_SRC)/${NAME}.proto
 
 .PHONY: $(PROTO_SRC)/${NAME}.swagger.json

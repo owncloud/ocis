@@ -31,10 +31,10 @@ ci-node-generate:
 
 
 ############ protobuf ############
-include ../.make/protobuf.mk
-
 PROTO_VERSION := v0
 PROTO_SRC := pkg/proto/$(PROTO_VERSION)
+
+include ../.make/protobuf.mk
 
 .PHONY: protobuf
 protobuf: $(PROTO_SRC)/${NAME}.pb.go \
