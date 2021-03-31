@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-30T14:26:11+0000"
+date: "2021-03-31T10:27:13+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -101,12 +101,6 @@ Usage: `ocis health [command options] [arguments...]`
 -debug-addr |  $OCIS_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9010`.
 
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
 ### ocis run
 
 Runs an extension
@@ -140,37 +134,59 @@ Usage: `ocis server [command options] [arguments...]`
 -grpc-addr |  $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
 
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis proxy
+#### ocis settings
 
-Start proxy server
+Start settings server
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis version
+
+Lists running services with version
 
 #### ocis webdav
 
 Start webdav server
 
-#### ocis storage-public-link
+#### ocis thumbnails
 
-Start storage public link storage
+Start thumbnails server
 
-#### ocis store
+#### ocis storage-auth-bearer
 
-Start a go-micro store
+Start storage auth-bearer service
 
 #### ocis web
 
 Start web server
 
-#### ocis idp
+#### ocis store
 
-Start idp server
+Start a go-micro store
 
-#### ocis storage-auth-bearer
+#### ocis accounts
 
-Start storage auth-bearer service
+Start accounts server
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
+#### ocis storage-gateway
+
+Start storage gateway
 
 #### ocis storage-home
 
@@ -180,59 +196,43 @@ Start storage and data provider for /home mount
 
 Start storage sharing service
 
-#### ocis glauth
-
-Start glauth server
-
 #### ocis storage-userprovider
 
 Start storage userprovider service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis version
-
-Lists running services with version
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis thumbnails
-
-Start thumbnails server
 
 #### ocis ocs
 
 Start ocs server
 
-#### ocis onlyoffice
+#### ocis proxy
 
-Start onlyoffice server
-
-#### ocis settings
-
-Start settings server
+Start proxy server
 
 #### ocis storage-frontend
 
 Start storage frontend
 
-#### ocis storage-gateway
+#### ocis storage-users
 
-Start storage gateway
+Start storage and data provider for /users mount
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
 
 #### ocis storage-metadata
 
 Start storage and data service for metadata
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis idp
+
+Start idp server
 
