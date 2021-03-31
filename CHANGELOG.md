@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.4.0...master
+
+## Summary
+
+* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+
+## Details
+
+* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+
+  * enforce quota (https://github.com/cs3org/reva/pull/1557)
+
+   https://github.com/owncloud/ocis/pull/1872
 # Changelog for [1.4.0] (2021-03-30)
 
 The following sections list the changes for 1.4.0.
