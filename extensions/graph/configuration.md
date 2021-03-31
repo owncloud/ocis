@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-03-31T10:27:13+0000"
+date: "2021-03-31T10:38:57+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -34,6 +34,24 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### graph ocis-graph
+
+Serve Graph API for oCIS
+
+Usage: `graph ocis-graph [command options] [arguments...]`
+
+-config-file |  $GRAPH_CONFIG_FILE
+: Path to config file. Default: `flags.OverrideDefaultString(cfg.File, "")`.
+
+-log-level |  $GRAPH_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+-log-pretty |  $GRAPH_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+-log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### graph server
 
@@ -118,22 +136,4 @@ Usage: `graph health [command options] [arguments...]`
 
 -debug-addr |  $GRAPH_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124")`.
-
-### graph ocis-graph
-
-Serve Graph API for oCIS
-
-Usage: `graph ocis-graph [command options] [arguments...]`
-
--config-file |  $GRAPH_CONFIG_FILE
-: Path to config file. Default: `flags.OverrideDefaultString(cfg.File, "")`.
-
--log-level |  $GRAPH_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
--log-pretty |  $GRAPH_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
--log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
 
