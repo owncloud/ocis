@@ -18,7 +18,7 @@ require (
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/prometheus/client_golang v1.9.0
-	github.com/rs/zerolog v1.20.0
+	github.com/rs/zerolog v1.21.0
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0

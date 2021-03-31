@@ -18,7 +18,7 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
-	github.com/cs3org/reva v1.6.1-0.20210326165326-e8a00d9b2368
+	github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/iancoleman/strcase v0.1.2
 	github.com/justinas/alice v1.2.0
@@ -39,12 +39,12 @@ require (
 	github.com/owncloud/ocis/web v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/webdav v0.0.0-20210216094451-dc73176dc62d
 	github.com/prometheus/client_golang v1.9.0
-	github.com/rs/zerolog v1.20.0
+	github.com/rs/zerolog v1.21.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	go.opencensus.io v0.23.0
 	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
-	google.golang.org/grpc v1.36.0
+	google.golang.org/grpc v1.36.1
 )
 
 replace (
