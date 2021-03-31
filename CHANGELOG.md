@@ -6,9 +6,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 * Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
+
+* Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
+
+   Introduce unique `package` and `go_package` names for our Protobuf definitions
+
+   https://github.com/owncloud/ocis/pull/1875
 
 * Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
