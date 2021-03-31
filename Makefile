@@ -143,6 +143,12 @@ go-coverage:
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
 
+.PHONY: protobuf
+protobuf:
+	@for mod in $(OCIS_MODULES); do \
+        echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf; \
+    done
+
 .PHONY: bingo-update
 bingo-update: $(BINGO)
 	$(BINGO) get -u

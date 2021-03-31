@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package com.owncloud.ocis.store.v0;
 
-option go_package = "github.com/owncloud/ocis/store/pkg/proto/v0";
+option go_package = "github.com/owncloud/ocis/store/pkg/proto/v0;proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 

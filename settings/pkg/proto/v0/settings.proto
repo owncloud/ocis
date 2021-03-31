@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package com.owncloud.ocis.settings.v0;
 
-option go_package = "github.com/owncloud/ocis/settings/pkg/proto/v0";
+option go_package = "github.com/owncloud/ocis/settings/pkg/proto/v0;proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
