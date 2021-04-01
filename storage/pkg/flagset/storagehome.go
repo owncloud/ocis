@@ -156,6 +156,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DriverLocalWithConfig(cfg)...)
 	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
 	flags = append(flags, DriverOCISWithConfig(cfg)...)
+	flags = append(flags, DriverS3NGWithConfig(cfg)...)
 
 	return flags
 }

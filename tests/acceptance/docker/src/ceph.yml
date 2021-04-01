@@ -1,0 +1,17 @@
+services:
+  start_ceph:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - ceph
+    command: ceph:5000
+  ceph:
+    image: ceph/daemon
+    command: demo
+    environment:
+      MON_IP: 127.0.0.1
+      CEPH_PUBLIC_NETWORK: 0.0.0.0/0
+      CEPH_DEMO_UID: test-user
+      CEPH_DEMO_ACCESS_KEY: test
+      CEPH_DEMO_SECRET_KEY: test
+      CEPH_DEMO_BUCKET: test
+      RGW_NAME: ceph

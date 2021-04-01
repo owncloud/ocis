@@ -62,6 +62,12 @@ then
         export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
         export OCIS_REVA_DATA_ROOT=''
         export OCIS_SKELETON_STRATEGY='upload'
+    elif [ "$STORAGE" = "s3ng" ]
+    then
+        export BEHAT_FILTER_TAGS='~@skipOnOcis-S3NG-Storage'
+        export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
+        export OCIS_REVA_DATA_ROOT=''
+        export OCIS_SKELETON_STRATEGY='upload'
     else
         echo "non existing storage selected"
         exit 1
