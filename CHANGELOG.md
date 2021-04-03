@@ -6,10 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 * Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
+
+* Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
+
+   Sync/cache had uint64s that were not 64-bit aligned causing panics on 32-bit systems during
+   atomic access
+
+   https://github.com/owncloud/ocis/issues/1887
+   https://github.com/owncloud/ocis/pull/1888
 
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 
