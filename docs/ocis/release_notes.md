@@ -29,6 +29,35 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
 {{< /hint >}}
 
+#### Changed oCIS storage driver file layout
+
+Related: [#1452](https://github.com/cs3org/reva/pull/1452)
+
+Despite a breaking change in the oCIS storage driver file layout, data is not automatically migrated. You will be affected if you plan to update from a previous version of oCIS to oCIS 1.4.0 and are using the oCIS storage driver, which is currently the default storage driver.
+
+Implications:
+- manual action required
+
+Our recommended update strategy to oCIS 1.4.0 is:
+1. let users backup all their data stored in oCIS
+1. stop oCIS
+1. prune all oCIS data in `/var/tmp/ocis`
+1. update to oCIS 1.4.0
+1. recreate user accounts (can be skipped if an external IDP is used)
+1. let users upload all their data again
+1. let users recreate their shares
+
+If you already updated to oCIS 1.4.0 without our recommended update strategy you will see no data in oCIS anymore, even after a downgrade to your previous version of oCIS. But be assured that your data is still there.
+
+You have to follow these steps to be able to access your data again in oCIS:
+1. stop oCIS
+1. navigate to `/var/tmp/ocis/storage/users/nodes/root/`
+1. in this directory you will find directories with UUID as names. These are the home folders of the oCIS users. Find the ones with content your oCIS users uploaded to oCIS.
+1. create an temporary directory eg. `/tmp/dereferenced-ocis-storage`
+1. copy the data from oCIS to the temporary directory while dereferencing symlinks. On Linux you can do this by running `cp --recursive --dereference /var/tmp/ocis/storage/users/nodes/root/ /tmp/dereferenced-ocis-storage`
+1. you now have a backup of all users data in `/tmp/dereferenced-ocis-storage` and can follow our recommended update strategy above
+
+
 ## ownCloud Infinite Scale 1.3.0 Technology Preview
 Version 1.3.0 is a regular maintenance and bugfix release. It provides the latest improvements to users and administrators.
 
