@@ -4,37 +4,30 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/pkg/errors"
 	"image"
 	_ "image/gif"  // Import the gif package so that image.Decode can understand gifs
 	_ "image/jpeg" // Import the jpeg package so that image.Decode can understand jpegs
 	_ "image/png"  // Import the png package so that image.Decode can understand pngs
 	"net/http"
-	"net/url"
-	"path"
-
-	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/pkg/errors"
 )
 
 // NewWebDavSource creates a new webdav instance.
-func NewWebDavSource(cfg config.WebDavSource) WebDav {
+func NewWebDavSource(cfg config.Thumbnail) WebDav {
 	return WebDav{
-		baseURL:  cfg.BaseURL,
-		insecure: cfg.Insecure,
+		insecure: cfg.WebdavAllowInsecure,
 	}
 }
 
 // WebDav implements the Source interface for webdav services
 type WebDav struct {
-	baseURL  string
 	insecure bool
 }
 
 // Get downloads the file from a webdav service
 func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
-	u, _ := url.Parse(s.baseURL)
-	u.Path = path.Join(u.Path, file)
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, file, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
 	}

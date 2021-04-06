@@ -2,11 +2,10 @@ package thumbnail
 
 import (
 	"bytes"
-	"image"
-
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 	"golang.org/x/image/draw"
+	"image"
 )
 
 // Request bundles information needed to generate a thumbnail for afile
@@ -14,16 +13,15 @@ type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
 	ETag       string
-	Username   string
 }
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
 	// Get will return a thumbnail for a file
-	Get(Request, image.Image) ([]byte, error)
+	Generate(Request, image.Image) ([]byte, error)
 	// GetStored loads the thumbnail from the storage.
 	// It will return nil if no image is stored for the given context.
-	GetStored(Request) []byte
+	Get(Request) ([]byte, bool)
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
@@ -43,31 +41,29 @@ type SimpleManager struct {
 }
 
 // Get implements the Get Method of Manager
-func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
+func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
 	thumbnail := s.generate(match, img)
 
-	key := s.storage.BuildKey(mapToStorageRequest(r))
-
-	buf := new(bytes.Buffer)
-	err := r.Encoder.Encode(buf, thumbnail)
+	dst := new(bytes.Buffer)
+	err := r.Encoder.Encode(dst, thumbnail)
 	if err != nil {
 		return nil, err
 	}
-	bytes := buf.Bytes()
-	err = s.storage.Set(r.Username, key, bytes)
+
+	key := s.storage.BuildKey(mapToStorageRequest(r))
+	err = s.storage.Put(key, dst.Bytes())
 	if err != nil {
 		s.logger.Warn().Err(err).Msg("could not store thumbnail")
 	}
-	return bytes, nil
+	return dst.Bytes(), nil
 }
 
 // GetStored tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
-func (s SimpleManager) GetStored(r Request) []byte {
+func (s SimpleManager) Get(r Request) ([]byte, bool) {
 	key := s.storage.BuildKey(mapToStorageRequest(r))
-	stored := s.storage.Get(r.Username, key)
-	return stored
+	return s.storage.Get(key)
 }
 
 func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {

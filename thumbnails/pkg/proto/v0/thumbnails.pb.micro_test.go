@@ -52,10 +52,10 @@ func init() {
 }
 
 func TestGetThumbnailInvalidImage(t *testing.T) {
-	req := proto.GetRequest{
+	req := proto.GetThumbnailRequest{
 		Filepath: "invalid.png",
-		Filetype: proto.GetRequest_PNG,
-		Etag:     "33a64df551425fcc55e4d42a148795d9f25f89d4",
+		ThumbnailType: proto.GetThumbnailRequest_PNG,
+		Checksum:     "33a64df551425fcc55e4d42a148795d9f25f89d4",
 		Height:   32,
 		Width:    32,
 		Username: "user1",
@@ -68,13 +68,12 @@ func TestGetThumbnailInvalidImage(t *testing.T) {
 }
 
 func TestGetThumbnail(t *testing.T) {
-	req := proto.GetRequest{
+	req := proto.GetThumbnailRequest{
 		Filepath:      "oc.png",
-		Filetype:      proto.GetRequest_PNG,
-		Etag:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
+		ThumbnailType:      proto.GetThumbnailRequest_PNG,
+		Checksum:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
 		Height:        32,
 		Width:         32,
-		Authorization: "Bearer eyJhbGciOiJQUzI1NiIsImtpZCI6IiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwaG9lbml4IiwiZXhwIjoxNTkwNTc1Mzk4LCJqdGkiOiJqUEw5c1A3UUEzY0diYi1yRnhkSjJCWnFPc1BDTDg1ZyIsImlhdCI6MTU5MDU3NDc5OCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6OTIwMCIsInN1YiI6Ilh0U2lfbWl5V1NCLXBrdkdueFBvQzVBNGZsaWgwVUNMZ3ZVN2NMd2ptakNLWDdGWW4ySFdrNnJSQ0V1eTJHNXFBeV95TVFjX0ZLOWFORmhVTXJYMnBRQGtvbm5lY3QiLCJrYy5pc0FjY2Vzc1Rva2VuIjp0cnVlLCJrYy5hdXRob3JpemVkU2NvcGVzIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJlbWFpbCJdLCJrYy5pZGVudGl0eSI6eyJrYy5pLmRuIjoiRWluc3RlaW4iLCJrYy5pLmlkIjoiY249ZWluc3RlaW4sb3U9dXNlcnMsZGM9ZXhhbXBsZSxkYz1vcmciLCJrYy5pLnVuIjoiZWluc3RlaW4ifSwia2MucHJvdmlkZXIiOiJpZGVudGlmaWVyLWxkYXAifQ.FSDe4vzwYpHbNfckBON5EI-01MS_dYFxenddqfJPzjlAEMEH2FFn2xQHCsxhC7wSxivhjV7Z5eRoNUR606keA64Tjs8pJBNECSptBMmE_xfAlc6X5IFILgDnR5bBu6Z2hhu-dVj72Hcyvo_X__OeWekYu7oyoXW41Mw3ayiUAwjCAzV3WPOAJ_r0zbW68_m29BgH3BoSxaF6lmjStIIAIyw7IBZ2QXb_FvGouknmfeWlGL9lkFPGL_dYKwjWieG947nY4Kg8IvHByEbw-xlY3L2EdA7Q8ZMbqdX7GzjtEIVYvCT4-TxWRcmB3SmO-Z8CVq27NHlKm3aZ0k2PS8Ga1w",
 		Username:      "user1",
 	}
 	client := service.Client()

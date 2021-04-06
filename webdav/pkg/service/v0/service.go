@@ -1,6 +1,8 @@
 package svc
 
 import (
+	"github.com/asim/go-micro/v3/metadata"
+	"github.com/cs3org/reva/pkg/token"
 	"io"
 	"net/http"
 	"strings"
@@ -35,6 +37,7 @@ func NewService(opts ...Option) Service {
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Get("/remote.php/dav/files/{user}/*", svc.Thumbnail)
+		r.Get("/remote.php/dav/public-files/{token}/*", svc.Thumbnail)
 	})
 
 	return svc
@@ -62,15 +65,22 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	t := r.Header.Get("X-Access-Token")
+	md := make(metadata.Metadata)
+	md.Set(token.TokenHeader, t)
+	ctx := metadata.NewContext(r.Context(), md)
+
 	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
-	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetRequest{
+	rsp, err := c.GetThumbnail(ctx, &thumbnails.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		Filetype:      extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
-		Etag:          tr.Etag,
+		ThumbnailType: extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
 		Width:         int32(tr.Width),
 		Height:        int32(tr.Height),
-		Authorization: tr.Authorization,
-		Username:      tr.Username,
+		Source:	&thumbnails.GetThumbnailRequest_Cs3Source{
+			Cs3Source: &thumbnails.CS3Source{
+				Path: "/home" + tr.Filepath,
+			},
+		},
 	})
 	if err != nil {
 		g.log.Error().Err(err).Msg("could not get thumbnail")
@@ -89,17 +99,17 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	mustWrite(g.log, w, rsp.Thumbnail)
 }
 
-func extensionToFiletype(ext string) thumbnails.GetRequest_FileType {
+func extensionToFiletype(ext string) thumbnails.GetThumbnailRequest_FileType {
 	ext = strings.ToUpper(ext)
 	switch ext {
 	case "JPG", "PNG":
-		val := thumbnails.GetRequest_FileType_value[ext]
-		return thumbnails.GetRequest_FileType(val)
+		val := thumbnails.GetThumbnailRequest_FileType_value[ext]
+		return thumbnails.GetThumbnailRequest_FileType(val)
 	case "JPEG", "GIF":
-		val := thumbnails.GetRequest_FileType_value["JPG"]
-		return thumbnails.GetRequest_FileType(val)
+		val := thumbnails.GetThumbnailRequest_FileType_value["JPG"]
+		return thumbnails.GetThumbnailRequest_FileType(val)
 	default:
-		return thumbnails.GetRequest_FileType(-1)
+		return thumbnails.GetThumbnailRequest_FileType(-1)
 	}
 }
 

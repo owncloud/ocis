@@ -53,12 +53,6 @@ type FileSystemStorage struct {
 	RootDirectory string
 }
 
-// WebDavSource defines the available webdav source configuration.
-type WebDavSource struct {
-	BaseURL  string
-	Insecure bool
-}
-
 // FileSystemSource defines the available filesystem source configuration.
 type FileSystemSource struct {
 	BasePath string
@@ -66,9 +60,10 @@ type FileSystemSource struct {
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions       []string
-	FileSystemStorage FileSystemStorage
-	WebDavSource      WebDavSource
+	Resolutions         []string
+	FileSystemStorage   FileSystemStorage
+	WebdavAllowInsecure bool
+	RevaGateway         string
 }
 
 // New initializes a new configuration with or without defaults.

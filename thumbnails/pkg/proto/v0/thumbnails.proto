@@ -33,34 +33,43 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // A Service for handling thumbnail generation
 service ThumbnailService {
     // Generates the thumbnail and returns it.
-    rpc GetThumbnail(GetRequest) returns (GetResponse);
+    rpc GetThumbnail(GetThumbnailRequest) returns (GetThumbnailResponse);
 }
 
 // A request to retrieve a thumbnail
-message GetRequest {
+message GetThumbnailRequest {
     // The path to the source image
     string filepath = 1;
-    // The file types to which the thumbnail cna get encoded to.
+    // The file types to which the thumbnail can get encoded to.
     enum FileType {
         PNG = 0; // Represents PNG type
         JPG = 1; // Represents JPG type
     }
     // The type to which the thumbnail should get encoded to.
-    FileType filetype = 2;
-    // The etag of the source image
-    string etag = 3;
+    FileType thumbnail_type = 2;
     // The width of the thumbnail
-    int32 width = 4;
+    int32 width = 3;
     // The height of the thumbnail
-    int32 height = 5;
-    // The authorization token
-    string authorization = 6;
-    // The user requesting the resource.
-    string username = 7;
+    int32 height = 4;
+    oneof source {
+      WebdavSource webdav_source = 5;
+      CS3Source cs3_source = 6;
+    }
+}
+
+message WebdavSource {
+  // REQUIRED.
+  string url = 1;
+  // OPTIONAL.
+  string authorization = 2;
+}
+
+message CS3Source {
+  string path = 1;
 }
 
 // The service response
-message GetResponse {
+message GetThumbnailResponse {
     // The thumbnail as a binary
     bytes thumbnail = 1;
     // The mimetype of the thumbnail

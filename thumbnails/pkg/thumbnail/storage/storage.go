@@ -13,7 +13,7 @@ type Request struct {
 
 // Storage defines the interface for a thumbnail store.
 type Storage interface {
-	Get(string, string) []byte
-	Set(string, string, []byte) error
+	Get(string) ([]byte, bool)
+	Put(string, []byte) error
 	BuildKey(Request) string
 }
