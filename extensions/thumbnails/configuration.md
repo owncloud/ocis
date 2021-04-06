@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-06T11:32:14+0000"
+date: "2021-04-06T11:38:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -108,7 +108,7 @@ Usage: `thumbnails server [command options] [arguments...]`
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
 
 -filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
-: Root path of the filesystem storage directory. Default: `flags.OverrideDefaultString(cfg.Thumbnail.FileSystemStorage.RootDirectory, filepath.Join(os.TempDir(), "ocis-thumbnails/"))`.
+: Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
 
 -webdavsource-baseurl |  $THUMBNAILS_WEBDAVSOURCE_BASEURL
 : Base url for a webdav api. Default: `flags.OverrideDefaultString(cfg.Thumbnail.WebDavSource.BaseURL, "https://localhost:9200/remote.php/webdav/")`.
