@@ -132,7 +132,7 @@ func (s *FileSystem) createUserDir(username string) (string, error) {
 }
 
 // linkImageToUserDir links the stored images to the user directory.
-// The goal is to minimize disk usage by linking to the images if they already exist and avoid file duplicaiton.
+// The goal is to minimize disk usage by linking to the images if they already exist and avoid file duplication.
 func (s *FileSystem) linkImageToUserDir(key string, userDir string) error {
 	imgRootDir := s.rootDir(key)
 
