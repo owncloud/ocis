@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
+* Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 * Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
@@ -25,6 +26,14 @@ The following sections list the changes for unreleased.
    Introduce unique `package` and `go_package` names for our Protobuf definitions
 
    https://github.com/owncloud/ocis/pull/1875
+
+* Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
+
+   Changes the default path for thumbnails from `<os tmp dir>/ocis-thumbnails` to
+   `/var/tmp/ocis/thumbnails`
+
+   https://github.com/owncloud/ocis/issues/1891
+   https://github.com/owncloud/ocis/pull/1892
 
 * Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
