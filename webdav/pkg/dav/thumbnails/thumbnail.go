@@ -1,7 +1,6 @@
 package thumbnail
 
 import (
-	"fmt"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -42,9 +41,9 @@ func NewRequest(r *http.Request) (Request, error) {
 	}
 
 	etag := query.Get("c")
-	if strings.TrimSpace(etag) == "" {
-		return Request{}, fmt.Errorf("c (etag) is missing in query")
-	}
+	//if strings.TrimSpace(etag) == "" {
+	//	return Request{}, fmt.Errorf("c (etag) is missing in query")
+	//}
 
 	authorization := r.Header.Get("Authorization")
 

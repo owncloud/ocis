@@ -37,6 +37,9 @@ type FileSystem struct {
 
 // Get loads the image from the file system.
 func (s *FileSystem) Get(username string, key string) []byte {
+	if key == "" {
+		return nil
+	}
 	userDir := s.userDir(username)
 	img := filepath.Join(userDir, key)
 	content, err := ioutil.ReadFile(img)
@@ -49,6 +52,9 @@ func (s *FileSystem) Get(username string, key string) []byte {
 
 // Set writes the image to the file system.
 func (s *FileSystem) Set(username string, key string, img []byte) error {
+	if key == "" {
+		return nil
+	}
 	_, err := s.storeImage(key, img)
 	if err != nil {
 		return errors.Wrap(err, "could not store image")
@@ -70,6 +76,10 @@ func (s *FileSystem) Set(username string, key string, img []byte) error {
 // The key also represents the path to the thumbnail in the filesystem under the configured root directory.
 func (s *FileSystem) BuildKey(r Request) string {
 	etag := r.ETag
+	if etag == "" {
+		return ""
+	}
+
 	filetype := r.Types[0]
 	filename := strconv.Itoa(r.Resolution.Dx()) + "x" + strconv.Itoa(r.Resolution.Dy()) + "." + filetype
 
