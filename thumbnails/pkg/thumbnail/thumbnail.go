@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"image"
 
+	"github.com/disintegration/imaging"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
-	"golang.org/x/image/draw"
 )
 
 // Request bundles information needed to generate a thumbnail for afile
@@ -44,8 +44,8 @@ type SimpleManager struct {
 
 // Get implements the Get Method of Manager
 func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
-	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
-	thumbnail := s.generate(match, img)
+	//match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
+	thumbnail := s.generate(r.Resolution, img)
 
 	key := s.storage.BuildKey(mapToStorageRequest(r))
 
@@ -70,10 +70,8 @@ func (s SimpleManager) GetStored(r Request) []byte {
 	return stored
 }
 
-func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {
-	targetResolution := mapRatio(img.Bounds(), r)
-	thumbnail := image.NewRGBA(targetResolution)
-	draw.ApproxBiLinear.Scale(thumbnail, targetResolution, img, img.Bounds(), draw.Over, nil)
+func (s SimpleManager) generate(r image.Rectangle, img image.Image) (thumbnail image.Image) {
+	thumbnail = imaging.Fill(img, r.Dx(), r.Dy(), imaging.Center, imaging.Lanczos)
 	return thumbnail
 }
 

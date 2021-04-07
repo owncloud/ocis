@@ -19,7 +19,7 @@ const (
 // Request combines all parameters provided when requesting a thumbnail
 type Request struct {
 	Filepath      string
-	Extension      string
+	Extension     string
 	Etag          string
 	Width         int
 	Height        int
@@ -40,10 +40,8 @@ func NewRequest(r *http.Request) (Request, error) {
 		height = DefaultHeight
 	}
 
+	// etag is optional and can be an empty string
 	etag := query.Get("c")
-	//if strings.TrimSpace(etag) == "" {
-	//	return Request{}, fmt.Errorf("c (etag) is missing in query")
-	//}
 
 	authorization := r.Header.Get("Authorization")
 

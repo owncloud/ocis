@@ -7,6 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
+	github.com/disintegration/imaging v1.6.2
 	github.com/golang/protobuf v1.5.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/micro/cli/v2 v2.1.2
@@ -20,7 +21,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	google.golang.org/protobuf v1.26.0
 )
 
