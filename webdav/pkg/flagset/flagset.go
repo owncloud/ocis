@@ -141,6 +141,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"WEBDAV_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
+		&cli.StringFlag{
+			Name: "ocis-public-url",
+			Value: flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200"),
+			Usage: "The domain under which oCIS is reachable",
+			EnvVars: []string{"WEBDAV_OCIS_PUBLIC_URL", "OCIS_URL"},
+			Destination: &cfg.OcisPublicURL,
+		},
 	}
 }
 

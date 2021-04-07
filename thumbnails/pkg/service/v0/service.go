@@ -11,8 +11,12 @@ import (
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 	"image"
+	"net/url"
+	"path"
+	"strings"
 )
 
 // NewService returns a service implementation for Service.
@@ -53,82 +57,162 @@ type Thumbnail struct {
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
 	_, ok := v0proto.GetThumbnailRequest_FileType_value[req.ThumbnailType.String()]
 	if !ok {
-		g.logger.Debug().Str("filetype", req.ThumbnailType.String()).Msg("unsupported filetype")
+		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
 	}
 	encoder := thumbnail.EncoderForType(req.ThumbnailType.String())
 	if encoder == nil {
-		g.logger.Debug().Str("filetype", req.ThumbnailType.String()).Msg("unsupported filetype")
-		return nil
-	}
-	sReq := &provider.StatRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: "/home/" + req.Filepath},
-		},
-	}
-
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return merrors.Unauthorized(g.serviceID, "authorization is missing")
-	}
-	auth, ok := md[token.TokenHeader]
-	if !ok {
-		return merrors.Unauthorized(g.serviceID, "authorization is missing")
-	}
-
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, auth[0])
-	sRes, err := g.cs3Client.Stat(ctx, sReq)
-	if err != nil {
-		g.logger.Error().Err(err).Msg("could stat file")
-		return merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())
-	}
-
-	if sRes.Status.Code != rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("could not create Request")
-		return merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())
-	}
-
-	tr := thumbnail.Request{
-		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
-		Encoder:    encoder,
-		ETag:       sRes.GetInfo().GetChecksum().GetSum(),
-	}
-
-	thumb, ok := g.manager.Get(tr)
-	if ok {
-		rsp.Thumbnail = thumb
-		rsp.Mimetype = tr.Encoder.MimeType()
+		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
 	}
 
-	var img image.Image
+	var thumb []byte
+	var err error
 	switch {
 	case req.GetWebdavSource() != nil:
-		src := req.GetWebdavSource()
-		src.GetAuthorization()
-
-		sCtx := imgsource.ContextSetAuthorization(ctx, src.GetAuthorization())
-		img, err = g.webdavSource.Get(sCtx, src.GetUrl())
+		thumb, err = g.handleWebdavSource(ctx, req, encoder)
 	case req.GetCs3Source() != nil:
-		src := req.GetCs3Source()
-
-		sCtx := imgsource.ContextSetAuthorization(ctx, auth[0])
-		img, err = g.cs3Source.Get(sCtx, src.Path)
+		thumb, err = g.handleCS3Source(ctx, req, encoder)
 	default:
 		g.logger.Error().Msg("no image source provided")
 		return merrors.BadRequest(g.serviceID, "image source is missing")
 	}
 	if err != nil {
-		return merrors.InternalServerError(g.serviceID, "could not get image from source: %v", err.Error())
-	}
-	if img == nil {
-		return merrors.InternalServerError(g.serviceID, "could not get image from source")
-	}
-	if thumb, err = g.manager.Generate(tr, img); err != nil {
 		return err
 	}
 
 	rsp.Thumbnail = thumb
-	rsp.Mimetype = tr.Encoder.MimeType()
+	rsp.Mimetype = encoder.MimeType()
 	return nil
+}
+
+func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+	src := req.GetCs3Source()
+	sRes, err := g.stat(src.Path, src.Authorization)
+	if err != nil {
+		return nil, err
+	}
+
+	tr := thumbnail.Request{
+		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Encoder:    encoder,
+		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
+	}
+
+	thumb, ok := g.manager.Get(tr)
+	if ok {
+		return thumb, nil
+	}
+
+	ctx = imgsource.ContextSetAuthorization(ctx, src.Authorization)
+	img, err := g.cs3Source.Get(ctx, src.Path)
+	if err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
+	}
+	if img == nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	}
+	if thumb, err = g.manager.Generate(tr, img); err != nil {
+		return nil, err
+	}
+
+	return thumb, nil
+}
+
+func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+	src := req.GetWebdavSource()
+	imgURL, err := url.Parse(src.Url)
+	if err != nil {
+		return nil, errors.Wrap(err, "source url is invalid")
+	}
+
+	var auth, statPath string
+	if src.IsPublicLink {
+		q := imgURL.Query()
+		var rsp *gateway.AuthenticateResponse
+		if q.Get("signature") != "" && q.Get("expiration") != "" {
+			// Handle pre-signed public links
+			sig := q.Get("signature")
+			exp := q.Get("expiration")
+			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+				Type:         "publicshares",
+				ClientId:     src.PublicLinkToken,
+				ClientSecret: strings.Join([]string{"signature", sig, exp}, "|"),
+			})
+		} else {
+			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+				Type:     "publicshares",
+				ClientId: src.PublicLinkToken,
+				// We pass an empty password because we expect non pre-signed public links
+				// to not be password protected
+				ClientSecret: "password|",
+			})
+		}
+
+		if err != nil {
+			return nil, merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
+		}
+		auth = rsp.Token
+		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
+	} else {
+		auth = src.RevaAuthorization
+		statPath = path.Join("/home", req.Filepath)
+	}
+	sRes, err := g.stat(statPath, auth)
+	if err != nil {
+		return nil, err
+	}
+	tr := thumbnail.Request{
+		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Encoder:    encoder,
+		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
+	}
+	thumb, ok := g.manager.Get(tr)
+	if ok {
+		return thumb, nil
+	}
+
+	if src.WebdavAuthorization != "" {
+		ctx = imgsource.ContextSetAuthorization(ctx, src.WebdavAuthorization)
+	}
+	imgURL.RawQuery = ""
+	img, err := g.webdavSource.Get(ctx, imgURL.String())
+	if err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
+	}
+	if img == nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	}
+	if thumb, err = g.manager.Generate(tr, img); err != nil {
+		return nil, err
+	}
+
+	return thumb, nil
+}
+
+func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
+	ctx := metadata.AppendToOutgoingContext(context.Background(), token.TokenHeader, auth)
+
+	req := &provider.StatRequest{
+		Ref: &provider.Reference{
+			Spec: &provider.Reference_Path{Path: path},
+		},
+	}
+	rsp, err := g.cs3Client.Stat(ctx, req)
+	if err != nil {
+		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
+		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())
+	}
+
+	if rsp.Status.Code != rpc.Code_CODE_OK {
+		g.logger.Error().Str("status_message", rsp.Status.Message).Str("path", path).Msg("could not stat file")
+		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+	}
+
+	if rsp.Info.GetChecksum().GetSum() == "" {
+		g.logger.Error().Msg("resource info is missing checksum")
+		return nil, merrors.InternalServerError(g.serviceID, "resource info is missing a checksum")
+	}
+
+	return rsp, nil
 }

@@ -6,7 +6,7 @@ import (
 
 // Request combines different attributes needed for storage operations.
 type Request struct {
-	ETag       string
+	Checksum   string
 	Types      []string
 	Resolution image.Rectangle
 }

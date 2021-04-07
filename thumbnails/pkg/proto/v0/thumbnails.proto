@@ -60,12 +60,19 @@ message GetThumbnailRequest {
 message WebdavSource {
   // REQUIRED.
   string url = 1;
+  // REQUIRED.
+  bool is_public_link = 2;
   // OPTIONAL.
-  string authorization = 2;
+  string webdav_authorization = 3;
+  // OPTIONAL.
+  string reva_authorization = 4;
+  // OPTIONAL.
+  string public_link_token = 5;
 }
 
 message CS3Source {
   string path = 1;
+  string authorization = 2;
 }
 
 // The service response

@@ -31,7 +31,7 @@ func (s InMemory) Put(key string, thumbnail []byte) error {
 // BuildKey generates a unique key to store and retrieve the thumbnail.
 func (s InMemory) BuildKey(r Request) string {
 	parts := []string{
-		r.ETag,
+		r.Checksum,
 		r.Resolution.String(),
 		strings.Join(r.Types, ","),
 	}

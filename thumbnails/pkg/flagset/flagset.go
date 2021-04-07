@@ -144,7 +144,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
-			Value:       flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "localhost:9142"),
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "127.0.0.1:9142"),
 			Usage:       "Reva gateway address",
 			EnvVars:     []string{"THUMBNAILS_REVA_GATEWAY", "PROXY_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Thumbnail.RevaGateway,

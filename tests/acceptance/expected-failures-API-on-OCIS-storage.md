@@ -823,8 +823,6 @@ cannot share a folder with create permission
 -   [apiWebdavPreviews/previews.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L71)
 -   [apiWebdavPreviews/previews.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L72)
 -   [apiWebdavPreviews/previews.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L73)
--   [apiWebdavPreviews/previews.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L83)
--   [apiWebdavPreviews/previews.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L84)
 -   [apiWebdavPreviews/previews.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L87)
 -   [apiWebdavPreviews/previews.feature:95](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L95)
 -   [apiWebdavPreviews/previews.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L104)

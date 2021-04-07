@@ -2,9 +2,9 @@ package thumbnail
 
 import (
 	"bytes"
+	"github.com/disintegration/imaging"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
-	"golang.org/x/image/draw"
 	"image"
 )
 
@@ -12,14 +12,14 @@ import (
 type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
-	ETag       string
+	Checksum   string
 }
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
-	// Get will return a thumbnail for a file
+	// Generate will return a thumbnail for a file
 	Generate(Request, image.Image) ([]byte, error)
-	// GetStored loads the thumbnail from the storage.
+	// Get loads the thumbnail from the storage.
 	// It will return nil if no image is stored for the given context.
 	Get(Request) ([]byte, bool)
 }
@@ -40,7 +40,7 @@ type SimpleManager struct {
 	resolutions Resolutions
 }
 
-// Get implements the Get Method of Manager
+// Generate implements the Get Method of Manager
 func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
 	thumbnail := s.generate(match, img)
@@ -51,33 +51,29 @@ func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 		return nil, err
 	}
 
-	key := s.storage.BuildKey(mapToStorageRequest(r))
-	err = s.storage.Put(key, dst.Bytes())
+	k := s.storage.BuildKey(mapToStorageRequest(r))
+	err = s.storage.Put(k, dst.Bytes())
 	if err != nil {
 		s.logger.Warn().Err(err).Msg("could not store thumbnail")
 	}
 	return dst.Bytes(), nil
 }
 
-// GetStored tries to get the stored thumbnail and return it.
+// Get tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
 func (s SimpleManager) Get(r Request) ([]byte, bool) {
-	key := s.storage.BuildKey(mapToStorageRequest(r))
-	return s.storage.Get(key)
+	k := s.storage.BuildKey(mapToStorageRequest(r))
+	return s.storage.Get(k)
 }
 
 func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {
-	targetResolution := mapRatio(img.Bounds(), r)
-	thumbnail := image.NewRGBA(targetResolution)
-	draw.ApproxBiLinear.Scale(thumbnail, targetResolution, img, img.Bounds(), draw.Over, nil)
-	return thumbnail
+	return imaging.Thumbnail(img, r.Dx(), r.Dy(), imaging.Lanczos)
 }
 
 func mapToStorageRequest(r Request) storage.Request {
-	sR := storage.Request{
-		ETag:       r.ETag,
+	return storage.Request{
+		Checksum:   r.Checksum,
 		Resolution: r.Resolution,
 		Types:      r.Encoder.Types(),
 	}
-	return sR
 }

@@ -1,10 +1,9 @@
 package svc
 
 import (
-	"github.com/asim/go-micro/v3/metadata"
-	"github.com/cs3org/reva/pkg/token"
 	"io"
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -13,7 +12,11 @@ import (
 	"github.com/go-chi/chi"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
-	thumbnail "github.com/owncloud/ocis/webdav/pkg/dav/thumbnails"
+	"github.com/owncloud/ocis/webdav/pkg/dav/requests"
+)
+
+const (
+	TokenHeader = "X-Access-Token"
 )
 
 // Service defines the extension handlers.
@@ -37,7 +40,8 @@ func NewService(opts ...Option) Service {
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Get("/remote.php/dav/files/{user}/*", svc.Thumbnail)
-		r.Get("/remote.php/dav/public-files/{token}/*", svc.Thumbnail)
+		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
+		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 	})
 
 	return svc
@@ -57,7 +61,7 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Thumbnail implements the Service interface.
 func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
-	tr, err := thumbnail.NewRequest(r)
+	tr, err := requests.ParseThumbnailRequest(r)
 	if err != nil {
 		g.log.Error().Err(err).Msg("could not create Request")
 		w.WriteHeader(http.StatusBadRequest)
@@ -65,20 +69,17 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := r.Header.Get("X-Access-Token")
-	md := make(metadata.Metadata)
-	md.Set(token.TokenHeader, t)
-	ctx := metadata.NewContext(r.Context(), md)
-
 	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
-	rsp, err := c.GetThumbnail(ctx, &thumbnails.GetThumbnailRequest{
+	t := r.Header.Get("X-Access-Token")
+	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
-		Width:         int32(tr.Width),
-		Height:        int32(tr.Height),
-		Source:	&thumbnails.GetThumbnailRequest_Cs3Source{
+		Width:         tr.Width,
+		Height:        tr.Height,
+		Source: &thumbnails.GetThumbnailRequest_Cs3Source{
 			Cs3Source: &thumbnails.CS3Source{
-				Path: "/home" + tr.Filepath,
+				Path:          path.Join("/home", tr.Filepath),
+				Authorization: t,
 			},
 		},
 	})
@@ -99,15 +100,89 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	mustWrite(g.log, w, rsp.Thumbnail)
 }
 
+func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
+	tr, err := requests.ParseThumbnailRequest(r)
+	if err != nil {
+		g.log.Error().Err(err).Msg("could not create Request")
+		w.WriteHeader(http.StatusBadRequest)
+		mustWrite(g.log, w, []byte(err.Error()))
+		return
+	}
+
+	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
+	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
+		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
+		ThumbnailType: extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
+		Width:         tr.Width,
+		Height:        tr.Height,
+		Source: &thumbnails.GetThumbnailRequest_WebdavSource{
+			WebdavSource: &thumbnails.WebdavSource{
+				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
+				IsPublicLink:    true,
+				PublicLinkToken: tr.PublicLinkToken,
+			},
+		},
+	})
+	if err != nil {
+		g.log.Error().Err(err).Msg("could not get thumbnail")
+		w.WriteHeader(http.StatusBadRequest)
+		mustWrite(g.log, w, []byte(err.Error()))
+		return
+	}
+
+	if len(rsp.Thumbnail) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", rsp.GetMimetype())
+	w.WriteHeader(http.StatusOK)
+	mustWrite(g.log, w, rsp.Thumbnail)
+}
+
+func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
+	tr, err := requests.ParseThumbnailRequest(r)
+	if err != nil {
+		g.log.Error().Err(err).Msg("could not create Request")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	c := thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient)
+	rsp, err := c.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
+		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
+		ThumbnailType: extensionToFiletype(strings.TrimLeft(tr.Extension, ".")),
+		Width:         tr.Width,
+		Height:        tr.Height,
+		Source: &thumbnails.GetThumbnailRequest_WebdavSource{
+			WebdavSource: &thumbnails.WebdavSource{
+				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
+				IsPublicLink:    true,
+				PublicLinkToken: tr.PublicLinkToken,
+			},
+		},
+	})
+	if err != nil {
+		g.log.Error().Err(err).Msg("could not get thumbnail")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if len(rsp.Thumbnail) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", rsp.GetMimetype())
+	w.WriteHeader(http.StatusOK)
+}
+
 func extensionToFiletype(ext string) thumbnails.GetThumbnailRequest_FileType {
-	ext = strings.ToUpper(ext)
-	switch ext {
-	case "JPG", "PNG":
-		val := thumbnails.GetThumbnailRequest_FileType_value[ext]
-		return thumbnails.GetThumbnailRequest_FileType(val)
-	case "JPEG", "GIF":
-		val := thumbnails.GetThumbnailRequest_FileType_value["JPG"]
-		return thumbnails.GetThumbnailRequest_FileType(val)
+	switch strings.ToUpper(ext) {
+	case "GIF", "PNG":
+		return thumbnails.GetThumbnailRequest_PNG
+	case "JPEG", "JPG":
+		return thumbnails.GetThumbnailRequest_JPG
 	default:
 		return thumbnails.GetThumbnailRequest_FileType(-1)
 	}

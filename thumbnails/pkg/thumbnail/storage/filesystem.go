@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -67,20 +66,15 @@ func (s *FileSystem) Put(key string, img []byte) error {
 // BuildKey generate the unique key for a thumbnail.
 // The key is structure as follows:
 //
-// <first two letters of etag>/<next two letters of etag>/<rest of etag>/<width>x<height>.<filetype>
+// <first two letters of checksum>/<next two letters of checksum>/<rest of checksum>/<width>x<height>.<filetype>
 //
 // e.g. 97/9f/4c8db98f7b82e768ef478d3c8612/500x300.png
 //
 // The key also represents the path to the thumbnail in the filesystem under the configured root directory.
 func (s *FileSystem) BuildKey(r Request) string {
-	etag := r.ETag
+	checksum := r.Checksum
 	filetype := r.Types[0]
 	filename := strconv.Itoa(r.Resolution.Dx()) + "x" + strconv.Itoa(r.Resolution.Dy()) + "." + filetype
 
-	return filepath.Join(etag[:2], etag[2:4], etag[4:], filename)
-}
-
-func (s *FileSystem) rootDir(key string) string {
-	p := strings.Split(key, string(os.PathSeparator))
-	return p[0]
+	return filepath.Join(checksum[:2], checksum[2:4], checksum[4:], filename)
 }

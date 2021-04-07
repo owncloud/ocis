@@ -33,7 +33,7 @@ func BenchmarkGet(b *testing.B) {
 	res, _ := ParseResolution("32x32")
 	req := Request{
 		Resolution: res,
-		ETag:       "1872ade88f3013edeb33decd74a4f947",
+		Checksum:       "1872ade88f3013edeb33decd74a4f947",
 	}
 	cwd, _ := os.Getwd()
 	p := filepath.Join(cwd, "../../testdata/oc.png")
@@ -42,6 +42,6 @@ func BenchmarkGet(b *testing.B) {
 	img, ext, _ := image.Decode(f)
 	req.Encoder = EncoderForType(ext)
 	for i := 0; i < b.N; i++ {
-		_, _ = sut.Get(req, img)
+		_, _ = sut.Generate(req, img)
 	}
 }

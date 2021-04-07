@@ -11,10 +11,9 @@ type TestRequest struct {
 	testDataName  string
 	filepath      string
 	filetype      proto.GetThumbnailRequest_FileType
-	etag          string
+	Checksum      string
 	width         int32
 	height        int32
-	authorization string
 	expected      proto.GetThumbnailRequest
 }
 
@@ -35,11 +34,9 @@ func TestRequestString(t *testing.T) {
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
 			proto.GetThumbnailRequest{
 				Filepath:      "Foo.jpg",
-				ThumbnailType:      proto.GetThumbnailRequest_JPG,
-				Checksum:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
+				ThumbnailType: proto.GetThumbnailRequest_JPG,
 				Width:         24,
 				Height:        24,
 			},
@@ -51,11 +48,9 @@ func TestRequestString(t *testing.T) {
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
 			proto.GetThumbnailRequest{
 				Filepath:      "\340\244\256\340\244\277\340\244\262\340\244\250.jpg",
-				ThumbnailType:      proto.GetThumbnailRequest_JPG,
-				Checksum:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
+				ThumbnailType: proto.GetThumbnailRequest_JPG,
 				Width:         24,
 				Height:        24,
 			},
@@ -67,12 +62,10 @@ func TestRequestString(t *testing.T) {
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
 			proto.GetThumbnailRequest{
-				Filepath:      "Foo.png",
-				Checksum:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
-				Width:         24,
-				Height:        24,
+				Filepath: "Foo.png",
+				Width:    24,
+				Height:   24,
 			},
 		},
 	}
@@ -81,8 +74,7 @@ func TestRequestString(t *testing.T) {
 		t.Run(testCase.testDataName, func(t *testing.T) {
 			req := proto.GetThumbnailRequest{
 				Filepath:      testCase.filepath,
-				ThumbnailType:      testCase.filetype,
-				Checksum:          testCase.etag,
+				ThumbnailType: testCase.filetype,
 				Height:        testCase.height,
 				Width:         testCase.width,
 			}

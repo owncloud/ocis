@@ -26,34 +26,32 @@ type WebDav struct {
 }
 
 // Get downloads the file from a webdav service
-func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
-	req, err := http.NewRequest(http.MethodGet, file, nil)
+func (s WebDav) Get(ctx context.Context, url string) (image.Image, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure} //nolint:gosec
 
-	auth, ok := ContextGetAuthorization(ctx)
-	if !ok {
-		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
+	if auth, ok := ContextGetAuthorization(ctx); ok {
+		req.Header.Add("Authorization", auth)
 	}
-	req.Header.Add("Authorization", auth)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", file, resp.StatusCode)
+		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", url, resp.StatusCode)
 	}
 
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not decode the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not decode the image "%s"`, url)
 	}
 	return img, nil
 }
