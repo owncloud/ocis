@@ -21,4 +21,4 @@ Just run `make -C docs docs-serve` from within the root level of the oCIS git re
 
 Please keep this documentation in sync with the oCIS source code.
 
-Changes on the documentation are automatically applied to [this site](https://owncloud.github.io) when merged to the master branch.
+Changes on the documentation are automatically applied to [this site]({{< ref "../" >}}) when merged to the master branch.

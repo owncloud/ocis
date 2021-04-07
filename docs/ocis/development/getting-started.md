@@ -31,7 +31,7 @@ Each extension lives in a subfolder (eg. `accounts` or `settings`) within this r
 
 The `ocis` folder contains our [go-micro](https://github.com/asim/go-micro/) and [suture](https://github.com/thejerf/suture) based runtime. It is used to import all extensions and implements commands to manage them, similar to a small orchestrator. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 
-The `docs` folder contains the source for the [oCIS documentation](https://owncloud.github.io/ocis/).
+The `docs` folder contains the source for the [oCIS documentation](https://owncloud.dev/ocis/).
 
 The `deployments` folder contains documented deployment configurations and templates. On a single node, running a single ocis runtime is a resource efficient way to deploy ocis. For multiple nodes docker compose or helm charts for kubernetes examples can be found here.
 

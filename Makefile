@@ -42,7 +42,7 @@ help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo
 	@echo -e "${GREEN}Testing with test suite natively installed:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
 	@echo -e "\tmake test-acceptance-api\t${BLUE}run API acceptance tests${RESET}"
 	@echo -e "\tmake clean-tests\t\t${BLUE}delete API tests framework dependencies${RESET}"
 	@echo
@@ -51,17 +51,17 @@ help:
 	@echo -e "${RED}You also should have a look at other available Makefiles:${RESET}"
 	@echo
 	@echo -e "${GREEN}oCIS:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/building/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build/${RESET}\n"
 	@echo -e "\tsee ./ocis/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C ocis help${RESET}"
 	@echo
 	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/building-docs/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build-docs/${RESET}\n"
 	@echo -e "\tsee ./docs/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C docs help${RESET}"
 	@echo
 	@echo -e "${GREEN}Testing with test suite in docker:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo -e "\tsee ./tests/acceptance/docker/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C tests/acceptance/docker help${RESET}"
 	@echo

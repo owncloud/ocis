@@ -240,6 +240,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/store/"
+    "url": "https://owncloud.dev/extensions/store/"
   }
 }

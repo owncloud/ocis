@@ -36,7 +36,7 @@ COMPOSE_PROJECT_NAME := ocis-acceptance-tests
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo
-	@echo -e "${PURPLE}docs: https://owncloud.github.io/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
+	@echo -e "${PURPLE}docs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo
 	@echo -e "oCIS feature tests and test suites can be found here:"
 	@echo -e "\thttps://github.com/owncloud/ocis/tree/master/tests/acceptance/features"

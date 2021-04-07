@@ -49,7 +49,7 @@ PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 ./ocis server
 ```
 
-For more configuration options check the configuration section in [oCIS](https://owncloud.github.io/ocis/configuration/) and the oCIS extensions.
+For more configuration options check the configuration section in [oCIS]({{< ref "../configuration.md" >}}) and the oCIS extensions.
 
 ## Start the oCIS fullstack server with Docker Compose
 

@@ -1089,6 +1089,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/accounts/"
+    "url": "https://owncloud.dev/extensions/accounts/"
   }
 }

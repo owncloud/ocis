@@ -87,6 +87,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/thumbnails/"
+    "url": "https://owncloud.dev/extensions/thumbnails/"
   }
 }
