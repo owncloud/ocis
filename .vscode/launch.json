@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "oCIS server",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/ocis/cmd/ocis",
+            "args": ["server"],
+            "env": {
+                "OCIS_LOG_LEVEL": "debug",
+                "OCIS_LOG_PRETTY": "true",
+                "OCIS_LOG_COLOR": "true",
+                "PROXY_ENABLE_BASIC_AUTH": "true"
+            }
+        },
+    ]
+}

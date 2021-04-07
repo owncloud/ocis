@@ -9,6 +9,9 @@ dist/
 *crt
 node_modules/
 */assets
+ocis/ocis
+ocis/cmd/ocis/__debug_bin
+ocis/cmd/ocis/config/
 
 .idea
 
