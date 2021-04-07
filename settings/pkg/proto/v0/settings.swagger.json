@@ -1112,6 +1112,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/settings/"
+    "url": "https://owncloud.dev/extensions/settings/"
   }
 }

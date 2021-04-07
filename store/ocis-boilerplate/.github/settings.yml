@@ -2,7 +2,7 @@
 repository:
   name: ocis-store
   description: ':atom_symbol: Store Service for oCIS'
-  homepage: https://owncloud.github.io/extensions/ocis_store/
+  homepage: https://owncloud.dev/extensions/ocis_store/
   topics: reva, ocis
 
   private: false

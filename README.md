@@ -12,11 +12,11 @@
 
 ## Run ownCloud Infinite Scale
 
-Please see [Getting Started](https://owncloud.github.io/ocis/getting-started/)
+Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
 
 ## Development
 
-Please see [Development - Getting Started](https://owncloud.github.io/ocis/development/getting-started/)
+Please see [Development - Getting Started](https://owncloud.dev/ocis/development/getting-started/)
 
 ## Security
 

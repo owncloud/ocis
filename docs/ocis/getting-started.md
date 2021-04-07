@@ -13,7 +13,7 @@ geekdocFilePath: getting-started.md
 
 We are distributing oCIS as binaries and Docker images.
 
-You can find more deployment examples in the [deployment section](https://owncloud.github.io/ocis/deployment/).
+You can find more deployment examples in the [deployment section]({{< ref "./deployment/_index.md" >}}).
 
 ### Binaries
 You can find the latest official release of oCIS at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).

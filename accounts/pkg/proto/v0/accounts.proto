@@ -13,27 +13,27 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {	
-    title: "ownCloud Infinite Scale accounts";	
-    version: "1.0.0";	
-    contact: {	
-      name: "ownCloud GmbH";	
-      url: "https://github.com/owncloud/ocis";	
-      email: "support@owncloud.com";	
-    };	
-    license: {	
-      name: "Apache-2.0";	
-      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";	
-    };	
-  };	
-  schemes: HTTP;	
-  schemes: HTTPS;	
-  consumes: "application/json";	
-  produces: "application/json";	
-  external_docs: {	
-    description: "Developer Manual";	
-    url: "https://owncloud.github.io/extensions/accounts/";	
-  };	
+  info: {
+    title: "ownCloud Infinite Scale accounts";
+    version: "1.0.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "https://owncloud.dev/extensions/accounts/";
+  };
 };
 
 // Follow recommended Methods for rpc APIs https://cloud.google.com/apis/design/resources?hl=de#methods

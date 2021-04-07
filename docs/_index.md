@@ -8,7 +8,7 @@ title: ownCloud
 
 Welcome to our developer documentation. Here you can find developer documentation on:
 
-- [oCIS](https://owncloud.github.io/ocis/) server
+- [oCIS]({{< ref "./ocis/_index.md" >}}) server
 - oCIS extensions
 - Clients like:
     - [ownCloud Web](https://github.com/owncloud/web) - the new web frontend for oCIS and ownCloud

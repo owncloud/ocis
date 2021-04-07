@@ -4,7 +4,7 @@ _extends: gh-labels
 repository:
   name: ocis
   description: ':atom_symbol: ownCloud Infinite Scale Stack'
-  homepage: https://owncloud.github.io/ocis/
+  homepage: https://owncloud.dev/ocis/
   topics: reva, ocis
 
   private: false
