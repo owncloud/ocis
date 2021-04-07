@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-07T07:23:40+0000"
+date: "2021-04-07T13:07:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -13,7 +13,7 @@ geekdocFilePath: CONFIGURATION.tmpl
 
 oCIS Single Binary is not responsible for configuring extensions. Instead, each extension could either be configured by environment variables, cli flags or config files.
 
-Each extension has its dedicated documentation page (e.g. https://owncloud.github.io/extensions/onlyoffice/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
+Each extension has its dedicated documentation page (e.g. https://owncloud.dev/extensions/onlyoffice/configuration) which lists all possible configurations. Config files and environment variables are picked up if you use the `./bin/ocis server` command within the oCIS single binary. Command line flags must be set explicitly on the extensions subcommands.
 
 ### Configuration using config files
 
@@ -58,6 +58,15 @@ Usage: `onlyoffice [global options] command [command options] [arguments...]`
 : Enable colored logging.
 
 ## Sub Commands
+
+### onlyoffice health
+
+Check health status
+
+Usage: `onlyoffice health [command options] [arguments...]`
+
+-debug-addr |  $ONLYOFFICE_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
 
 ### onlyoffice server
 
@@ -106,13 +115,4 @@ Usage: `onlyoffice server [command options] [arguments...]`
 
 -asset-path |  $ONLYOFFICE_ASSET_PATH
 : Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
-
-### onlyoffice health
-
-Check health status
-
-Usage: `onlyoffice health [command options] [arguments...]`
-
--debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
 

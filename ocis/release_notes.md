@@ -208,7 +208,7 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 - a built-in IdP
 - an application gateway/proxy
 
-These components can be deployed in a multi-tier deployment architecture. See the [documentation](https://owncloud.github.io/ocis/) for an overview of the services.
+These components can be deployed in a multi-tier deployment architecture. See the [documentation]({{< ref "./_index.md" >}}) for an overview of the services.
 
 ### Operation modes
 
@@ -230,7 +230,7 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 - The [Graph API](https://marketplace.owncloud.com/apps/graphapi) app is installed on ownCloud Server
 - The latest client versions are rolled-out to users (required for OpenID Connect support). See the [documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
 
-See the [documentation](https://owncloud.github.io/ocis/deployment/owncloud10_with_oc_web/) on how to deploy Infinite Scale in bridge mode.
+See the [documentation]({{< ref "./deployment/owncloud10_with_oc_web" >}}) on how to deploy Infinite Scale in bridge mode.
 
 {{< hint "warning" >}}
 **Technology Preview**
@@ -276,13 +276,13 @@ The single binary is the best option to test the new ownCloud Infinite Scale 1.0
 
 4. Navigate to <https://localhost:9200> and log in to ownCloud Web (admin:admin)
 
-Production environments will need a more sophisticated setup, see <https://owncloud.github.io/ocis/deployment/> for more information.
+Production environments will need a more sophisticated setup, see <{{< ref "./deployment" >}}> for more information.
 
 {{< /tab >}}
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](https://owncloud.github.io/ocis/deployment/ocis_traefik/) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](<{{< ref "./deployment/ocis_traefik.md" >}}>) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
 {{< /tab >}}
 {{< /tabs >}}
