@@ -684,12 +684,10 @@ def dockerReleases(ctx):
   for arch in config['dockerReleases']['architectures']:
     pipelines.append(dockerRelease(ctx, arch))
 
-  manifest = releaseDockerManifest(ctx)
-  manifest['depends_on'] = getPipelineNames(pipelines)
-  pipelines.append(manifest)
+  manifests = pipelinesDependsOn(releaseDockerManifests(ctx), pipelines)
+  pipelines = pipelines + manifests
 
-  readme = releaseDockerReadme(ctx)
-  readme['depends_on'] = getPipelineNames(pipelines)
+  readme = pipelineDependsOn(releaseDockerReadme(ctx), pipelines)
   pipelines.append(readme)
 
   return pipelines
@@ -1004,41 +1002,75 @@ def releaseSubmodule(ctx):
     },
   }
 
-
-def releaseDockerManifest(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'manifest',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps': [
-      {
-        'name': 'execute',
-        'image': 'plugins/manifest:1',
-        'pull': 'always',
-        'settings': {
-          'username': {
-            'from_secret': 'docker_username',
-          },
-          'password': {
-            'from_secret': 'docker_password',
-          },
-          'spec': 'ocis/docker/manifest.tmpl',
-          'auto_tag': True,
-          'ignore_missing': True,
-        },
+def releaseDockerManifests(ctx):
+  return [
+    {
+      'kind': 'pipeline',
+      'type': 'docker',
+      'name': 'manifest-release',
+      'platform': {
+        'os': 'linux',
+        'arch': 'amd64',
       },
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/v*',
+      'steps': [
+        {
+          'name': 'execute',
+          'image': 'plugins/manifest:1',
+          'pull': 'always',
+          'settings': {
+            'username': {
+              'from_secret': 'docker_username',
+            },
+            'password': {
+              'from_secret': 'docker_password',
+            },
+            'spec': 'ocis/docker/manifest.tmpl',
+            'auto_tag': True,
+            'ignore_missing': True,
+          },
+        },
       ],
+      'trigger': {
+        'ref': [
+          'refs/heads/master',
+          'refs/tags/v*',
+        ],
+      },
     },
-  }
+    {
+      'kind': 'pipeline',
+      'type': 'docker',
+      'name': 'manifest-git',
+      'platform': {
+        'os': 'linux',
+        'arch': 'amd64',
+      },
+      'steps': [
+        {
+          'name': 'execute',
+          'image': 'plugins/manifest:1',
+          'pull': 'always',
+          'settings': {
+            'username': {
+              'from_secret': 'docker_username',
+            },
+            'password': {
+              'from_secret': 'docker_password',
+            },
+            'spec': 'ocis/docker/manifest-git.tmpl',
+            'auto_tag': True,
+            'ignore_missing': True,
+          },
+        },
+      ],
+      'trigger': {
+        'ref': [
+          'refs/heads/master',
+          'refs/tags/v*',
+        ],
+      },
+    }
+  ]
 
 def changelog(ctx):
   return {

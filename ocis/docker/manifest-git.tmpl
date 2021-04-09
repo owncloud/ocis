@@ -1,0 +1,16 @@
+image: owncloud/ocis:git-{{build.commit}}
+manifests:
+  - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm64
+    platform:
+      architecture: arm64
+      variant: v8
+      os: linux
+  - image: owncloud/ocis:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}linux-arm
+    platform:
+      architecture: arm
+      variant: v6
+      os: linux
