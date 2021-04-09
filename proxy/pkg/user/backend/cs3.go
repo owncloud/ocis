@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -57,7 +58,10 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	}
 
 	if len(roleIDs) == 0 {
-		return user, nil
+		roleIDs = append(roleIDs, "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11")
+		// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
+		// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
+		//return user, nil
 	}
 
 	enc, err := encodeRoleIDs(roleIDs)
