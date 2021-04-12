@@ -120,7 +120,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 * You now can visit oCIS, Keycloak and Traefik dashboard on your configured domains
 
 ## Local setup
-For a more simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
+For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
