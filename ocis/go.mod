@@ -9,6 +9,7 @@ require (
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
+	github.com/cernbox/ocis-canary v0.0.0-20210412121333-dc524af13947
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect

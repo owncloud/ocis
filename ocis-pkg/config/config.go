@@ -3,6 +3,7 @@ package config
 import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
+	cernboxCanary "github.com/cernbox/ocis-canary/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
@@ -105,6 +106,7 @@ type Config struct {
 	Store         *store.Config
 	Thumbnails    *thumbnails.Config
 	WebDAV        *webdav.Config
+	CernboxCanary *cernboxCanary.Config
 }
 
 // New initializes a new configuration with or without defaults.
@@ -124,5 +126,6 @@ func New() *Config {
 		Store:         store.New(),
 		Thumbnails:    thumbnails.New(),
 		WebDAV:        webdav.New(),
+		CernboxCanary: cernboxCanary.New(),
 	}
 }

@@ -25,6 +25,7 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
+	cernboxCanary "github.com/cernbox/ocis-canary/pkg/command"
 	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
@@ -102,6 +103,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
+	s.ServicesRegistry["ocis-canary"] = cernboxCanary.NewCERNBoxCanaryService
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
