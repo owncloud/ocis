@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -181,6 +183,17 @@ func rules(cfg *config.Config) map[string]map[string]interface{} {
 			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
 			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
 		}
+		return rules
+	}
+
+	// check if the rules have to be read from a json file
+	if cfg.Reva.StorageRegistry.JSON != "" {
+		data, err := ioutil.ReadFile(cfg.Reva.StorageRegistry.JSON)
+		if err != nil {
+			return nil
+		}
+		var rules map[string]map[string]interface{}
+		_ = json.Unmarshal(data, &rules)
 		return rules
 	}
 

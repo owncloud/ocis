@@ -36,6 +36,7 @@ type StorageRegistry struct {
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
 	HomeProvider string
 	Rules        []string
+	JSON         string
 }
 
 // Sharing defines the available sharing configuration.
@@ -109,6 +110,7 @@ type FrontendPort struct {
 	OCDavPrefix       string
 	OCSPrefix         string
 	OCSSharePrefix    string
+	OCSHomeNamespace  string
 	PublicURL         string
 	Middleware        Middleware
 }
