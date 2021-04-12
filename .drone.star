@@ -573,8 +573,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage.md' % (storage.upper()),
         },
         'commands': [
-          '/bin/bash',
-          'source /drone/src/.drone.env',
+          '. /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
@@ -641,8 +640,7 @@ def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
           'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
         },
         'commands': [
-          '/bin/bash',
-          'source /drone/src/.drone.env',
+          '. /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
