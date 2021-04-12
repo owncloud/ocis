@@ -557,7 +557,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'webUITests',
-        'image': 'owncloudci/nodejs:15',
+        'image': 'owncloudci/nodejs:14',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
@@ -624,7 +624,7 @@ def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'WebUIAcceptanceTests',
-        'image': 'owncloudci/nodejs:15',
+        'image': 'owncloudci/nodejs:14',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
@@ -1274,7 +1274,7 @@ def makeGenerate(module):
   return [
     {
       'name': 'generate nodejs',
-      'image': 'owncloudci/nodejs:15',
+      'image': 'owncloudci/nodejs:14',
       'pull': 'always',
       'commands': [
         '%s ci-node-generate' % (make),
