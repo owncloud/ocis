@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 
-	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -20,6 +19,7 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
@@ -157,7 +157,10 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, _ := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	revaClient, err := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	if err != nil {
+		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.RevaAddress)
+	}
 	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
 }
 
