@@ -1124,21 +1124,19 @@ def releaseDockerReadme(ctx):
     'steps': [
       {
         'name': 'execute',
-        'image': 'sheogorath/readme-to-dockerhub:latest',
+        'image': 'chko/docker-pushrm:1',
         'pull': 'always',
         'environment': {
-          'DOCKERHUB_USERNAME': {
+          'DOCKER_USER': {
             'from_secret': 'docker_username',
           },
-          'DOCKERHUB_PASSWORD': {
+          'DOCKER_PASS': {
             'from_secret': 'docker_password',
           },
-          'DOCKERHUB_REPO_PREFIX': ctx.repo.namespace,
-          'DOCKERHUB_REPO_NAME': ctx.repo.name,
-          'SHORT_DESCRIPTION': 'Docker images for %s' % (ctx.repo.name),
-          'README_PATH': 'README.md',
+          'PUSHRM_FILE': 'README.md',
+          'PUSHRM_TARGET': 'owncloud/${DRONE_REPO_NAME}',
         },
-      },
+      }
     ],
     'trigger': {
       'ref': [
