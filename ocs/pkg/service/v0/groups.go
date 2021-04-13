@@ -28,8 +28,10 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 
 	// short circuit if there is a user already in the context
 	if u, ok := user.ContextGetUser(r.Context()); ok {
-		mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
-		return
+		if len(u.Groups) > 0 {
+			mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
+			return
+		}
 	}
 
 	if isValidUUID(userid) {
