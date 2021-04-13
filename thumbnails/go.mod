@@ -11,11 +11,11 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
-	github.com/olekukonko/tablewriter v0.0.4
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.9.0
+	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0

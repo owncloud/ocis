@@ -15,27 +15,27 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis-hello v0.1.0-alpha1.0.20210204050952-c291e4c5b73f
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/glauth v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/graph v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/graph-explorer v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/idp v0.0.0-20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/graph-explorer v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/idp v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/ocs v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/onlyoffice v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/proxy v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/storage v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/store v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/thumbnails v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/web v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/webdav v0.0.0-20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/ocs v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/onlyoffice v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/proxy v0.0.0-20210412105747-9b95e9b1191b
+	github.com/owncloud/ocis/settings v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/storage v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/store v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/thumbnails v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/web v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
 	github.com/rs/zerolog v1.21.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/sys v0.0.0-20210218155724-8ebf48af031b
+	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2
 )
 
 replace (

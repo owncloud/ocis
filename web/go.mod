@@ -15,8 +15,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
-	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
+	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
 )
 
 replace (
