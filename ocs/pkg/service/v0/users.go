@@ -34,19 +34,27 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch o.config.AccountBackend {
-	case "accounts":
-		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-			Id: u.Id.OpaqueId,
-		})
-	case "cs3":
-		account, err = o.fetchAccountFromCS3BackendByID(r.Context(), u.Id)
-	default:
-		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
-	}
+	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		Id: u.Id.OpaqueId,
+	})
 
 	if err != nil {
 		merr := merrors.FromError(err)
+		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
+		// cs3, we cannot count with the accounts service.
+		if u != nil {
+			uid, gid := o.extractUIDAndGID(u)
+			d := &data.User{
+				UserID:            u.Username,
+				DisplayName:       u.DisplayName,
+				LegacyDisplayName: u.DisplayName,
+				Email:             u.Mail,
+				UIDNumber:         uid,
+				GIDNumber:         gid,
+			}
+			mustNotFail(render.Render(w, r, response.DataRender(d)))
+			return
+		}
 		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
 		return
 	}
@@ -81,7 +89,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	case o.config.AccountBackend == "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case o.config.AccountBackend == "cs3":
-		account, err = o.fetchAccountFromCS3BackendByUsername(r.Context(), userid)
+		account, err = o.fetchAccountFromCS3Backend(r.Context(), userid)
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -599,25 +607,9 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 	return nil, merrors.NotFound("", "The requested user could not be found")
 }
 
-func (o Ocs) fetchAccountFromCS3BackendByUsername(ctx context.Context, name string) (*accounts.Account, error) {
+func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
 	backend := o.getCS3Backend()
 	u, err := backend.GetUserByClaims(ctx, "username", name, false)
-	if err != nil {
-		return nil, err
-	}
-	uid, gid := o.extractUIDAndGID(u)
-	return &accounts.Account{
-		OnPremisesSamAccountName: u.Username,
-		DisplayName:              u.DisplayName,
-		Mail:                     u.Mail,
-		UidNumber:                uid,
-		GidNumber:                gid,
-	}, nil
-}
-
-func (o Ocs) fetchAccountFromCS3BackendByID(ctx context.Context, id *cs3.UserId) (*accounts.Account, error) {
-	backend := o.getCS3Backend()
-	u, err := backend.GetUser(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
