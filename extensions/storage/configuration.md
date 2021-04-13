@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-13T06:36:29+0000"
+date: "2021-04-13T08:29:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/storage/templates
@@ -54,48 +54,6 @@ Usage: `storage [global options] command [command options] [arguments...]`
 : Enable colored logging.
 
 ## Sub Commands
-
-### storage auth-basic
-
-Start authprovider for basic auth
-
-Usage: `storage auth-basic [command options] [arguments...]`
-
--debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.DebugAddr, "0.0.0.0:9147")`.
-
--auth-driver |  $STORAGE_AUTH_DRIVER
-: auth driver: 'demo', 'json' or 'ldap'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthProvider.Driver, "ldap")`.
-
--auth-json |  $STORAGE_AUTH_JSON
-: Path to users.json file. Default: `flags.OverrideDefaultString(cfg.Reva.AuthProvider.JSON, "")`.
-
--network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
-: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCNetwork, "tcp")`.
-
--addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCAddr, "0.0.0.0:9146")`.
-
--gateway-url |  $STORAGE_GATEWAY_ENDPOINT
-: URL to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
-
-### storage storage
-
-Storage service for oCIS
-
-Usage: `storage storage [command options] [arguments...]`
-
--config-file |  $STORAGE_CONFIG_FILE
-: Path to config file.
-
--log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
--log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
--log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
 
 ### storage frontend
 
@@ -235,30 +193,6 @@ Usage: `storage gateway [command options] [arguments...]`
 -storage-public-link-mount-path |  $STORAGE_PUBLIC_LINK_MOUNT_PATH
 : mount path. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.MountPath, "/public")`.
 
-### storage groups
-
-Start groups service
-
-Usage: `storage groups [command options] [arguments...]`
-
--debug-addr |  $STORAGE_GROUPPROVIDER_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.DebugAddr, "0.0.0.0:9161")`.
-
--network |  $STORAGE_GROUPPROVIDER_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.GRPCNetwork, "tcp")`.
-
--addr |  $STORAGE_GROUPPROVIDER_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.GRPCAddr, "0.0.0.0:9160")`.
-
--endpoint |  $STORAGE_GROUPPROVIDER_ENDPOINT
-: URL to use for the storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.Endpoint, "localhost:9160")`.
-
--driver |  $STORAGE_GROUPPROVIDER_DRIVER
-: group driver: 'json', 'ldap', or 'rest'. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.Driver, "ldap")`.
-
--json-config |  $STORAGE_GROUPPROVIDER_JSON
-: Path to groups.json file. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.JSON, "")`.
-
 ### storage health
 
 Check health status
@@ -268,59 +202,29 @@ Usage: `storage health [command options] [arguments...]`
 -debug-addr |  $STORAGE_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109")`.
 
-### storage storage-public-link
+### storage storage-metadata
 
-Start storage-public-link service
+Start storage-metadata service
 
-Usage: `storage storage-public-link [command options] [arguments...]`
+Usage: `storage storage-metadata [command options] [arguments...]`
 
--debug-addr |  $STORAGE_PUBLIC_LINK_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "0.0.0.0:9179")`.
+### storage storage
 
--network |  $STORAGE_PUBLIC_LINK_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCNetwork, "tcp")`.
+Storage service for oCIS
 
--addr |  $STORAGE_PUBLIC_LINK_GRPC_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "0.0.0.0:9178")`.
+Usage: `storage storage [command options] [arguments...]`
 
--mount-path |  $STORAGE_PUBLIC_LINK_MOUNT_PATH
-: mount path. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.MountPath, "/public")`.
+-config-file |  $STORAGE_CONFIG_FILE
+: Path to config file.
 
--gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
+-log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
 
-### storage auth-bearer
+-log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
 
-Start authprovider for bearer auth
-
-Usage: `storage auth-bearer [command options] [arguments...]`
-
--debug-addr |  $STORAGE_AUTH_BEARER_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.DebugAddr, "0.0.0.0:9149")`.
-
--oidc-issuer |  $STORAGE_OIDC_ISSUER , $OCIS_URL
-: OIDC issuer. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.Issuer, "https://localhost:9200")`.
-
--oidc-insecure |  $STORAGE_OIDC_INSECURE
-: OIDC allow insecure communication. Default: `flags.OverrideDefaultBool(cfg.Reva.OIDC.Insecure, true)`.
-
--oidc-id-claim |  $STORAGE_OIDC_ID_CLAIM
-: OIDC id claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.IDClaim, "preferred_username")`.
-
--oidc-uid-claim |  $STORAGE_OIDC_UID_CLAIM
-: OIDC uid claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.UIDClaim, "")`.
-
--oidc-gid-claim |  $STORAGE_OIDC_GID_CLAIM
-: OIDC gid claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.GIDClaim, "")`.
-
--network |  $STORAGE_AUTH_BEARER_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCNetwork, "tcp")`.
-
--addr |  $STORAGE_AUTH_BEARER_GRPC_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCAddr, "0.0.0.0:9148")`.
-
--gateway-url |  $STORAGE_GATEWAY_ENDPOINT
-: URL to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
+-log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### storage sharing
 
@@ -349,62 +253,53 @@ Usage: `storage sharing [command options] [arguments...]`
 -public-json-file |  $STORAGE_SHARING_PUBLIC_JSON_FILE
 : file used to persist shares for the PublicShareProvider. Default: `flags.OverrideDefaultString(cfg.Reva.Sharing.PublicJSONFile, "/var/tmp/ocis/storage/publicshares.json")`.
 
-### storage storage-home
+### storage auth-basic
 
-Start storage-home service
+Start authprovider for basic auth
 
-Usage: `storage storage-home [command options] [arguments...]`
+Usage: `storage auth-basic [command options] [arguments...]`
 
--debug-addr |  $STORAGE_HOME_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "0.0.0.0:9156")`.
+-debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.DebugAddr, "0.0.0.0:9147")`.
 
--grpc-network |  $STORAGE_HOME_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCNetwork, "tcp")`.
+-auth-driver |  $STORAGE_AUTH_DRIVER
+: auth driver: 'demo', 'json' or 'ldap'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthProvider.Driver, "ldap")`.
 
--grpc-addr |  $STORAGE_HOME_GRPC_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "0.0.0.0:9154")`.
+-auth-json |  $STORAGE_AUTH_JSON
+: Path to users.json file. Default: `flags.OverrideDefaultString(cfg.Reva.AuthProvider.JSON, "")`.
 
--http-network |  $STORAGE_HOME_HTTP_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPNetwork, "tcp")`.
+-network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
+: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCNetwork, "tcp")`.
 
--http-addr |  $STORAGE_HOME_HTTP_ADDR
-: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "0.0.0.0:9155")`.
+-addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCAddr, "0.0.0.0:9146")`.
 
--driver |  $STORAGE_HOME_DRIVER
-: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.Driver, "ocis")`.
+-gateway-url |  $STORAGE_GATEWAY_ENDPOINT
+: URL to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
 
--mount-path |  $STORAGE_HOME_MOUNT_PATH
-: mount path. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.MountPath, "/home")`.
+### storage groups
 
--mount-id |  $STORAGE_HOME_MOUNT_ID
-: mount id. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.MountID, "1284d238-aa92-42ce-bdc4-0b0000009157")`.
+Start groups service
 
--expose-data-server |  $STORAGE_HOME_EXPOSE_DATA_SERVER
-: exposes a dedicated data server. Default: `flags.OverrideDefaultBool(cfg.Reva.StorageHome.ExposeDataServer, false)`.
+Usage: `storage groups [command options] [arguments...]`
 
--data-server-url |  $STORAGE_HOME_DATA_SERVER_URL
-: data server url. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.DataServerURL, "http://localhost:9155/data")`.
+-debug-addr |  $STORAGE_GROUPPROVIDER_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.DebugAddr, "0.0.0.0:9161")`.
 
--http-prefix |  $STORAGE_HOME_HTTP_PREFIX
-: prefix for the http endpoint, without leading slash. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPPrefix, "data")`.
+-network |  $STORAGE_GROUPPROVIDER_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.GRPCNetwork, "tcp")`.
 
--tmp-folder |  $STORAGE_HOME_TMP_FOLDER
-: path to tmp folder. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.TempFolder, "/var/tmp/ocis/tmp/home")`.
+-addr |  $STORAGE_GROUPPROVIDER_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.GRPCAddr, "0.0.0.0:9160")`.
 
--enable-home |  $STORAGE_HOME_ENABLE_HOME
-: enable the creation of home directories. Default: `flags.OverrideDefaultBool(cfg.Reva.Storages.Home.EnableHome, true)`.
+-endpoint |  $STORAGE_GROUPPROVIDER_ENDPOINT
+: URL to use for the storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.Endpoint, "localhost:9160")`.
 
--gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
+-driver |  $STORAGE_GROUPPROVIDER_DRIVER
+: group driver: 'json', 'ldap', or 'rest'. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.Driver, "ldap")`.
 
--users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: endpoint to use for the storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Users.Endpoint, "localhost:9144")`.
-
-### storage storage-metadata
-
-Start storage-metadata service
-
-Usage: `storage storage-metadata [command options] [arguments...]`
+-json-config |  $STORAGE_GROUPPROVIDER_JSON
+: Path to groups.json file. Default: `flags.OverrideDefaultString(cfg.Reva.Groups.JSON, "")`.
 
 ### storage storage-users
 
@@ -477,6 +372,111 @@ Usage: `storage users [command options] [arguments...]`
 
 -json-config |  $STORAGE_USERPROVIDER_JSON
 : Path to users.json file. Default: `flags.OverrideDefaultString(cfg.Reva.Users.JSON, "")`.
+
+### storage auth-bearer
+
+Start authprovider for bearer auth
+
+Usage: `storage auth-bearer [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_AUTH_BEARER_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.DebugAddr, "0.0.0.0:9149")`.
+
+-oidc-issuer |  $STORAGE_OIDC_ISSUER , $OCIS_URL
+: OIDC issuer. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.Issuer, "https://localhost:9200")`.
+
+-oidc-insecure |  $STORAGE_OIDC_INSECURE
+: OIDC allow insecure communication. Default: `flags.OverrideDefaultBool(cfg.Reva.OIDC.Insecure, true)`.
+
+-oidc-id-claim |  $STORAGE_OIDC_ID_CLAIM
+: OIDC id claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.IDClaim, "preferred_username")`.
+
+-oidc-uid-claim |  $STORAGE_OIDC_UID_CLAIM
+: OIDC uid claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.UIDClaim, "")`.
+
+-oidc-gid-claim |  $STORAGE_OIDC_GID_CLAIM
+: OIDC gid claim. Default: `flags.OverrideDefaultString(cfg.Reva.OIDC.GIDClaim, "")`.
+
+-network |  $STORAGE_AUTH_BEARER_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCNetwork, "tcp")`.
+
+-addr |  $STORAGE_AUTH_BEARER_GRPC_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCAddr, "0.0.0.0:9148")`.
+
+-gateway-url |  $STORAGE_GATEWAY_ENDPOINT
+: URL to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
+
+### storage storage-home
+
+Start storage-home service
+
+Usage: `storage storage-home [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_HOME_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "0.0.0.0:9156")`.
+
+-grpc-network |  $STORAGE_HOME_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCNetwork, "tcp")`.
+
+-grpc-addr |  $STORAGE_HOME_GRPC_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "0.0.0.0:9154")`.
+
+-http-network |  $STORAGE_HOME_HTTP_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPNetwork, "tcp")`.
+
+-http-addr |  $STORAGE_HOME_HTTP_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "0.0.0.0:9155")`.
+
+-driver |  $STORAGE_HOME_DRIVER
+: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.Driver, "ocis")`.
+
+-mount-path |  $STORAGE_HOME_MOUNT_PATH
+: mount path. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.MountPath, "/home")`.
+
+-mount-id |  $STORAGE_HOME_MOUNT_ID
+: mount id. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.MountID, "1284d238-aa92-42ce-bdc4-0b0000009157")`.
+
+-expose-data-server |  $STORAGE_HOME_EXPOSE_DATA_SERVER
+: exposes a dedicated data server. Default: `flags.OverrideDefaultBool(cfg.Reva.StorageHome.ExposeDataServer, false)`.
+
+-data-server-url |  $STORAGE_HOME_DATA_SERVER_URL
+: data server url. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.DataServerURL, "http://localhost:9155/data")`.
+
+-http-prefix |  $STORAGE_HOME_HTTP_PREFIX
+: prefix for the http endpoint, without leading slash. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPPrefix, "data")`.
+
+-tmp-folder |  $STORAGE_HOME_TMP_FOLDER
+: path to tmp folder. Default: `flags.OverrideDefaultString(cfg.Reva.StorageHome.TempFolder, "/var/tmp/ocis/tmp/home")`.
+
+-enable-home |  $STORAGE_HOME_ENABLE_HOME
+: enable the creation of home directories. Default: `flags.OverrideDefaultBool(cfg.Reva.Storages.Home.EnableHome, true)`.
+
+-gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
+: endpoint to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
+
+-users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: endpoint to use for the storage service. Default: `flags.OverrideDefaultString(cfg.Reva.Users.Endpoint, "localhost:9144")`.
+
+### storage storage-public-link
+
+Start storage-public-link service
+
+Usage: `storage storage-public-link [command options] [arguments...]`
+
+-debug-addr |  $STORAGE_PUBLIC_LINK_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "0.0.0.0:9179")`.
+
+-network |  $STORAGE_PUBLIC_LINK_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCNetwork, "tcp")`.
+
+-addr |  $STORAGE_PUBLIC_LINK_GRPC_ADDR
+: Address to bind storage service. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "0.0.0.0:9178")`.
+
+-mount-path |  $STORAGE_PUBLIC_LINK_MOUNT_PATH
+: mount path. Default: `flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.MountPath, "/public")`.
+
+-gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
+: endpoint to use for the storage gateway service. Default: `flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142")`.
 
 ## Config for the different Storage Drivers
 
