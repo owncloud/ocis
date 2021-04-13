@@ -28,9 +28,14 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 
 	// short circuit if there is a user already in the context
 	if u, ok := user.ContextGetUser(r.Context()); ok {
-		if len(u.Groups) > 0 {
-			mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
-			return
+		// we are not sure whether the current user in the context is the admin or the authenticated user.
+		if u.Username == userid {
+			// the OCS API is a REST API and it uses the username to look for groups. If the id from the user in the context
+			// differs from that of the url we can assume we are an admin because we are past the selfOrAdmin middleware.
+			if len(u.Groups) > 0 {
+				mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
+				return
+			}
 		}
 	}
 
