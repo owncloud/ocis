@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 
+	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -19,6 +20,7 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
@@ -152,6 +154,11 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 
 func (o Ocs) getAccountService() accounts.AccountsService {
 	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient)
+}
+
+func (o Ocs) getCS3Backend() backend.UserBackend {
+	revaClient, err := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {

@@ -34,27 +34,19 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
-		Id: u.Id.OpaqueId,
-	})
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+			Id: u.Id.OpaqueId,
+		})
+	case "cs3":
+		account, err = o.fetchAccountFromCS3BackendByID(r.Context(), u.Id)
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
 
 	if err != nil {
 		merr := merrors.FromError(err)
-		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
-		// cs3, we cannot count with the accounts service.
-		if u != nil {
-			uid, gid := o.extractUIDAndGID(u)
-			d := &data.User{
-				UserID:            u.Username,
-				DisplayName:       u.DisplayName,
-				LegacyDisplayName: u.DisplayName,
-				Email:             u.Mail,
-				UIDNumber:         uid,
-				GIDNumber:         gid,
-			}
-			mustNotFail(render.Render(w, r, response.DataRender(d)))
-			return
-		}
 		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
 		return
 	}
@@ -83,39 +75,23 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
 
-	if userid == "" {
+	switch {
+	case userid == "":
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
-	} else {
+	case o.config.AccountBackend == "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case o.config.AccountBackend == "cs3":
+		account, err = o.fetchAccountFromCS3BackendByUsername(r.Context(), userid)
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
-		u, ok := user.ContextGetUser(r.Context())
-		if !ok || u.Id == nil || u.Id.OpaqueId == "" {
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
-			return
-		}
-		if u != nil {
-			uid, gid := o.extractUIDAndGID(u)
-			d := &data.User{
-				UserID:            u.Username,
-				DisplayName:       u.DisplayName,
-				LegacyDisplayName: u.DisplayName,
-				Email:             u.Mail,
-				UIDNumber:         uid,
-				GIDNumber:         gid,
-				Enabled:           "true", // Assume true for CS3 backend?
-				// TODO query storage registry for free space? of home storage, maybe...
-				Quota: &data.Quota{
-					Free:       2840756224000,
-					Used:       5059416668,
-					Total:      2845815640668,
-					Relative:   0.18,
-					Definition: "default",
-				},
-			}
-			mustNotFail(render.Render(w, r, response.DataRender(d)))
-			return
+		if merr.Code == http.StatusNotFound {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
+		} else {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
 		}
 		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
@@ -212,9 +188,20 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		newAccount.GidNumber = gidNumber
 	}
 
-	account, err := o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
-		Account: newAccount,
-	})
+	var account *accounts.Account
+	var err error
+
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
+			Account: newAccount,
+		})
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support adding users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		switch merr.Code {
@@ -263,7 +250,18 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err := o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support editing users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -330,7 +328,18 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err := o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support deleting users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -365,7 +374,18 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // EnableUser enables a user
 func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err := o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support enabling users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -405,7 +425,18 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 // DisableUser disables a user
 func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err := o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support disabling users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -522,9 +553,20 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 		query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(search))
 	}
 
-	res, err := o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
-		Query: query,
-	})
+	var res *accounts.ListAccountsResponse
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		res, err = o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
+			Query: query,
+		})
+	case "cs3":
+		// TODO
+		o.logger.Fatal().Msg("cs3 backend doesn't support listing users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		o.logger.Err(err).Msg("could not list users")
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users")))
@@ -556,6 +598,38 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 		return res.Accounts[0], nil
 	}
 	return nil, merrors.NotFound("", "The requested user could not be found")
+}
+
+func (o Ocs) fetchAccountFromCS3BackendByUsername(ctx context.Context, name string) (*accounts.Account, error) {
+	backend := o.getCS3Backend()
+	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	if err != nil {
+		return nil, err
+	}
+	uid, gid := o.extractUIDAndGID(u)
+	return &accounts.Account{
+		OnPremisesSamAccountName: u.Username,
+		DisplayName:              u.DisplayName,
+		Mail:                     u.Mail,
+		UIDNumber:                uid,
+		GIDNumber:                gid,
+	}
+}
+
+func (o Ocs) fetchAccountFromCS3BackendByID(ctx context.Context, id *cs3.UserId) (*accounts.Account, error) {
+	backend := o.getCS3Backend()
+	u, err := backend.GetUser(ctx, id, false)
+	if err != nil {
+		return nil, err
+	}
+	uid, gid := o.extractUIDAndGID(u)
+	return &accounts.Account{
+		OnPremisesSamAccountName: u.Username,
+		DisplayName:              u.DisplayName,
+		Mail:                     u.Mail,
+		UIDNumber:                uid,
+		GIDNumber:                gid,
+	}
 }
 
 func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
