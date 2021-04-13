@@ -18,6 +18,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/proxy v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/store v0.0.0-20210216094451-dc73176dc62d
@@ -32,6 +33,7 @@ require (
 
 replace (
 	github.com/owncloud/ocis/accounts => ../accounts
+	github.com/owncloud/ocis/proxy => ../proxy
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/store => ../store
