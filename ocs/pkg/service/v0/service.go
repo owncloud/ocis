@@ -157,7 +157,7 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, err := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	revaClient, _ := cs3.GetGatewayServiceClient(o.config.RevaAddress)
 	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
 }
 

@@ -262,7 +262,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
-		account, err := o.fetchAccountByUsername(r.Context(), userid)
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
 		o.logger.Fatal().Msg("cs3 backend doesn't support editing users")
 	default:
@@ -340,7 +340,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
-		account, err := o.fetchAccountByUsername(r.Context(), userid)
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
 		o.logger.Fatal().Msg("cs3 backend doesn't support deleting users")
 	default:
@@ -386,7 +386,7 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
-		account, err := o.fetchAccountByUsername(r.Context(), userid)
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
 		o.logger.Fatal().Msg("cs3 backend doesn't support enabling users")
 	default:
@@ -437,7 +437,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
-		account, err := o.fetchAccountByUsername(r.Context(), userid)
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
 		o.logger.Fatal().Msg("cs3 backend doesn't support disabling users")
 	default:
