@@ -1133,10 +1133,11 @@ def releaseDockerReadme(ctx):
           'DOCKER_PASS': {
             'from_secret': 'docker_password',
           },
-          'PUSHRM_FILE': 'README.md',
           'PUSHRM_TARGET': 'owncloud/${DRONE_REPO_NAME}',
+          'PUSHRM_SHORT': 'Docker images for %s' % (ctx.repo.name),
+          'PUSHRM_FILE': 'README.md',
         },
-      }
+      },
     ],
     'trigger': {
       'ref': [
