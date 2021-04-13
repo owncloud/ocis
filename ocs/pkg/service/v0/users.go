@@ -9,13 +9,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
@@ -39,11 +39,19 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		merr := merrors.FromError(err)
-		if merr.Code == http.StatusNotFound {
-			// if the user was authenticated why was he not found?!? log error?
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
-		} else {
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
+		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
+		// cs3, we cannot count with the accounts service.
+		if u != nil {
+			d := &data.User{
+				UserID:            u.Username,
+				DisplayName:       u.DisplayName,
+				LegacyDisplayName: u.DisplayName,
+				Email:             u.Mail,
+				UIDNumber:         u.UidNumber,
+				GIDNumber:         u.GidNumber,
+			}
+			mustNotFail(render.Render(w, r, response.DataRender(d)))
+			return
 		}
 		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
 		return

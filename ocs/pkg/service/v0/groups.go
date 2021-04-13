@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/cs3org/reva/pkg/user"
+
 	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -23,6 +25,12 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 	var account *accounts.Account
 	var err error
+
+	// short circuit if there is a user already in the context
+	if u, ok := user.ContextGetUser(r.Context()); ok {
+		mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
+		return
+	}
 
 	if isValidUUID(userid) {
 		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{

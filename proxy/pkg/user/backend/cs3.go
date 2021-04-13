@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 type cs3backend struct {
@@ -58,7 +59,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	}
 
 	if len(roleIDs) == 0 {
-		roleIDs = append(roleIDs, "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11")
+		roleIDs = append(roleIDs, settingsSvc.BundleUUIDRoleUser, settingsSvc.SelfManagementPermissionID)
 		// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
 		// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
 		//return user, nil
