@@ -31,7 +31,7 @@ Each extension lives in a subfolder (eg. `accounts` or `settings`) within this r
 
 The `ocis` folder contains our [go-micro](https://github.com/asim/go-micro/) and [suture](https://github.com/thejerf/suture) based runtime. It is used to import all extensions and implements commands to manage them, similar to a small orchestrator. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 
-The `docs` folder contains the source for the [oCIS documentation](https://owncloud.dev/ocis/).
+The `docs` folder contains the source for the [oCIS documentation]({{< ref "../" >}}).
 
 The `deployments` folder contains documented deployment configurations and templates. On a single node, running a single ocis runtime is a resource efficient way to deploy ocis. For multiple nodes docker compose or helm charts for kubernetes examples can be found here.
 
@@ -46,10 +46,10 @@ Depending on what you want to develop there are different starting points. These
 If you want to contribute to oCIS:
 
 - see [contribution guidelines](https://github.com/owncloud/ocis#contributing)
-- make sure the tooling is set up by [building oCIS]({{< relref "build.md" >}}) and [building the docs]({{< relref "build-docs.md" >}})
+- make sure the tooling is set up by [building oCIS]({{< ref "build" >}}) and [building the docs]({{< ref "build-docs" >}})
 - create or pick an [open issue](https://github.com/owncloud/ocis/issues) to develop on and mention in the issue that you are working on it
 - open a PR and get things done
 
 ### Developing extensions
 
-If you want to develop an extension, start here: [Extensions]({{< relref "extensions.md">}})
+If you want to develop an extension, start here: [Extensions]({{< ref "extensions">}})

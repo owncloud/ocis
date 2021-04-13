@@ -11,7 +11,7 @@ geekdocFilePath: build.md
 
 ## Build requirements
 
-see [Development - Getting Started]({{< relref "getting-started.md/#requirements">}})
+see [Development - Getting Started]({{< ref "getting-started/#requirements">}})
 
 ## Get the sources
 

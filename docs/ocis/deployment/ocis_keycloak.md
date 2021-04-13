@@ -19,9 +19,9 @@ geekdocFilePath: ocis_keycloak.md
 
 The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [Konnectd]({{< ref "../../extensions/idp/_index.md" >}})
+Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [Konnectd]({{< ref "../../extensions/idp" >}})
 
-The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
 
 ## Server Deployment
 
@@ -33,7 +33,7 @@ The other container is oCIS itself running all extensions in one container. In t
   - keycloak.* for serving Keycloak
   - traefik.* for serving the Traefik dashboard
 
-See also [example server setup]({{< ref "preparing_server.md" >}})
+See also [example server setup]({{< ref "preparing_server" >}})
 
 
 ### Install oCIS and Traefik
@@ -103,7 +103,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
 
-  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}}).
+  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
@@ -120,7 +120,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 * You now can visit oCIS, Keycloak and Traefik dashboard on your configured domains
 
 ## Local setup
-For a more simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
+For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
