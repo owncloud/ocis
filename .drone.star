@@ -378,7 +378,7 @@ def uploadScanResults(ctx):
     'steps': [
       {
         'name': 'clone',
-        'image': 'alpine/git',
+        'image': 'alpine/git:latest',
         'commands': [
           'git clone https://github.com/%s.git .' % (repo_slug),
           'git checkout $DRONE_COMMIT',
@@ -386,7 +386,7 @@ def uploadScanResults(ctx):
       },
       {
         'name': 'sync-from-cache',
-        'image': 'minio/mc:RELEASE.2021-02-19T05-34-40Z',
+        'image': 'minio/mc:RELEASE.2021-03-23T05-46-11Z',
         'environment': {
           'MC_HOST_cachebucket': {
             'from_secret': 'cache_s3_connection_url'
@@ -409,13 +409,13 @@ def uploadScanResults(ctx):
       },
       {
         'name': 'sonarcloud',
-        'image': 'sonarsource/sonar-scanner-cli',
+        'image': 'sonarsource/sonar-scanner-cli:latest',
         'pull': 'always',
         'environment': sonar_env,
       },
       {
         'name': 'purge-cache',
-        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
+        'image': 'minio/mc:RELEASE.2021-03-23T05-46-11Z',
         'environment': {
           'MC_HOST_cachebucket': {
             'from_secret': 'cache_s3_connection_url'
@@ -557,7 +557,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'webUITests',
-        'image': 'webhippie/nodejs:latest',
+        'image': 'owncloudci/nodejs:14',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
@@ -573,7 +573,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'EXPECTED_FAILURES_FILE': '/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage.md' % (storage.upper()),
         },
         'commands': [
-          'source /drone/src/.drone.env',
+          '. /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
@@ -624,7 +624,7 @@ def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
       ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
       {
         'name': 'WebUIAcceptanceTests',
-        'image': 'webhippie/nodejs:latest',
+        'image': 'owncloudci/nodejs:14',
         'pull': 'always',
         'environment': {
           'SERVER_HOST': 'https://ocis-server:9200',
@@ -640,7 +640,7 @@ def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
           'FEATURE_PATH': '/drone/src/accounts/ui/tests/acceptance/features',
         },
         'commands': [
-          'source /drone/src/.drone.env',
+          '. /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cd /srv/app/web',
@@ -1274,7 +1274,7 @@ def makeGenerate(module):
   return [
     {
       'name': 'generate nodejs',
-      'image': 'owncloudci/nodejs:12',
+      'image': 'owncloudci/nodejs:14',
       'pull': 'always',
       'commands': [
         '%s ci-node-generate' % (make),
@@ -1566,7 +1566,7 @@ def genericCachePurge(ctx, name, cache_key):
     'steps': [
       {
         'name': 'purge-cache',
-        'image': 'minio/mc:RELEASE.2020-12-10T01-26-17Z',
+        'image': 'minio/mc:RELEASE.2021-03-23T05-46-11Z',
         'failure': 'ignore',
         'environment': {
           'MC_HOST_cache': {

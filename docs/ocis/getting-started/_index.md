@@ -3,8 +3,8 @@ title: "Getting Started"
 date: 2020-02-27T20:35:00+01:00
 weight: 0
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/ocis
-geekdocFilePath: getting-started.md
+geekdocEditPath: edit/master/docs/ocis/getting-started
+geekdocFilePath: _index.md
 ---
 
 {{< toc >}}
@@ -13,7 +13,7 @@ geekdocFilePath: getting-started.md
 
 We are distributing oCIS as binaries and Docker images.
 
-You can find more deployment examples in the [deployment section]({{< ref "./deployment/_index.md" >}}).
+You can find more deployment examples in the [deployment section]({{< ref "../deployment" >}}).
 
 ### Binaries
 You can find the latest official release of oCIS at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).
@@ -55,23 +55,11 @@ docker run --rm -ti -p 9200:9200 owncloud/ocis
 
 ### Login to ownCloud Web
 
-Open [https://localhost:9200](https://localhost:9200) and login using one of the demo accounts:
-
-```console
-einstein:relativity
-marie:radioactivity
-richard:superfluidity
-```
-
-There are admin demo accounts:
-```console
-moss:vista
-admin:admin
-```
+Open [https://localhost:9200](https://localhost:9200) and [login using one of the demo accounts]({{< ref "./demo-users" >}}).
 
 ### Basic Management Commands
 
-The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< relref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< relref "configuration.md" >}}).
+The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< ref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< ref "../configuration" >}}).
 
 To start oCIS server:
 

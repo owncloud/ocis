@@ -26,7 +26,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 #### Changed oCIS storage driver file layout
@@ -86,7 +86,7 @@ More details about this release can be found in the full [ownCloud Infinite Scal
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 ## ownCloud Infinite Scale 1.2.0 Technology Preview
@@ -104,7 +104,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 #### Fix IDP service user
@@ -208,7 +208,7 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 - a built-in IdP
 - an application gateway/proxy
 
-These components can be deployed in a multi-tier deployment architecture. See the [documentation]({{< ref "./_index.md" >}}) for an overview of the services.
+These components can be deployed in a multi-tier deployment architecture. See the [documentation]({{< ref "./" >}}) for an overview of the services.
 
 ### Operation modes
 
@@ -282,7 +282,7 @@ Production environments will need a more sophisticated setup, see <{{< ref "./de
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](<{{< ref "./deployment/ocis_traefik.md" >}}>) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](<{{< ref "./deployment/ocis_traefik" >}}>) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
 {{< /tab >}}
 {{< /tabs >}}

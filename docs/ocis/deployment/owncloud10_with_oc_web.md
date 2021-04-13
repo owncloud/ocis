@@ -39,7 +39,7 @@ In this setup relies on graph-api app to be installed in ownCloud 10. This app i
   - oc10.* for serving
   - traefik.* for serving the Traefik dashboard
 
-See also [example server setup]({{< ref "preparing_server.md" >}})
+See also [example server setup]({{< ref "preparing_server" >}})
 
 ### Install oCIS and Traefik
 
@@ -103,7 +103,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
 
 ## Local setup
-For a more simple local ocis setup see [Getting started]({{< ref "../getting-started.md" >}})
+For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
