@@ -39,7 +39,7 @@ In this setup relies on graph-api app to be installed in ownCloud 10. This app i
   - oc10.* for serving
   - traefik.* for serving the Traefik dashboard
 
-See also [example server setup]({{< ref "preparing_server.md" >}})
+See also [example server setup]({{< ref "preparing_server" >}})
 
 ### Install oCIS and Traefik
 

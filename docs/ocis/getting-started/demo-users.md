@@ -19,4 +19,4 @@ Following users are available in the demo set:
 | moss     | vista         | moss@example.org     | admin | users                                                                   |
 | richard  | superfluidity | richard@example.org  | user  | users, philosophy-haters, physics-lovers, quantum-lovers                |
 
-You may also want to run oCIS with only your custom users by [deleting the demo users]({{< ref "../deployment/_index.md#delete-demo-users" >}}).
+You may also want to run oCIS with only your custom users by [deleting the demo users]({{< ref "../deployment#delete-demo-users" >}}).

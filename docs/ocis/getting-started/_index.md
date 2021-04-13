@@ -13,7 +13,7 @@ geekdocFilePath: _index.md
 
 We are distributing oCIS as binaries and Docker images.
 
-You can find more deployment examples in the [deployment section]({{< ref "../deployment/_index.md" >}}).
+You can find more deployment examples in the [deployment section]({{< ref "../deployment" >}}).
 
 ### Binaries
 You can find the latest official release of oCIS at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).
@@ -59,7 +59,7 @@ Open [https://localhost:9200](https://localhost:9200) and [login using one of th
 
 ### Basic Management Commands
 
-The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< relref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< relref "../configuration.md" >}}).
+The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< ref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< ref "../configuration" >}}).
 
 To start oCIS server:
 

@@ -18,7 +18,7 @@ geekdocFilePath: ocis_traefik.md
 
 The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/idp/_index.md" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages.md#storage-drivers" >}})
+The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
 
 ## Server Deployment
 
@@ -29,7 +29,7 @@ The other one is oCIS itself running all extensions in one container. In this ex
   - ocis.* for serving oCIS
   - traefik.* for serving the Traefik dashboard
 
-See also [example server setup]({{< ref "preparing_server.md" >}})
+See also [example server setup]({{< ref "preparing_server" >}})
 
 
 ### Install oCIS and Traefik
@@ -84,7 +84,7 @@ See also [example server setup]({{< ref "preparing_server.md" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}}).
+  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   Now you have configured everything and can save the file.
 

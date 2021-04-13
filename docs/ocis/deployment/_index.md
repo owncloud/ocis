@@ -16,14 +16,14 @@ This section handles deployments and operations for admins and people who are in
 ### Setup oCIS on your server
 oCIS deployments are super simple, yet there are many configurations possible for advanced setups.
 
-- [Basic oCIS setup]({{< ref "basic-remote-setup.md" >}}) - configure domain, certificates and port
-- [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik.md" >}})
-- [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak.md" >}})
+- [Basic oCIS setup]({{< ref "basic-remote-setup" >}}) - configure domain, certificates and port
+- [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
+- [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
 
 ### Migrate an existing ownCloud 10
 You can run ownCloud 10 and oCIS together. This allows you to use new parts of oCIS already with ownCloud 10 and also to have a smooth transition for users from ownCloud 10 to oCIS.
 
-- [ownCloud 10 setup with oCIS serving ownCloud Web and acting as OIDC provider]({{< ref "owncloud10_with_oc_web.md" >}}) - This allows you to switch between the traditional ownCloud 10 frontend and the new ownCloud Web frontend
+- [ownCloud 10 setup with oCIS serving ownCloud Web and acting as OIDC provider]({{< ref "owncloud10_with_oc_web" >}}) - This allows you to switch between the traditional ownCloud 10 frontend and the new ownCloud Web frontend
 - Run ownCloud 10 and oCIS in parallel - together
 - Migrate users from ownCloud 10 to oCIS
 
@@ -56,4 +56,4 @@ oCIS ships with a few demo users besides the system users:
 - Marie Curie (f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c)
 
 You can view them in ownCloud Web if you log in as Admin user or list them by running `ocis accounts list`.
-After adding your own user it is safe to delete the demo users in the web UI or with the command `ocis accounts remove <id>`. Please do not delete the system users (see [change default secrets]({{< ref "_index.md#change-default-secrets" >}})) or oCIS will not function properly anymore.
+After adding your own user it is safe to delete the demo users in the web UI or with the command `ocis accounts remove <id>`. Please do not delete the system users (see [change default secrets]({{< ref "./#change-default-secrets" >}})) or oCIS will not function properly anymore.
