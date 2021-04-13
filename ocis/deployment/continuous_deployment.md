@@ -18,7 +18,7 @@ The configuration for the continuous deployment can be found in the [oCIS reposi
 # oCIS with Traefik
 
 Credentials:
-- oCIS: see [default demo users]({{< ref "../getting-started.md#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
 
 ## Latest
 
@@ -31,7 +31,7 @@ Credentials:
 # oCIS with Keycloak
 
 Credentials:
-- oCIS: see [default demo users]({{< ref "../getting-started.md#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
 - Keycloak:
     - username: admin
     - password: admin
@@ -49,7 +49,7 @@ Credentials:
 # oCIS with CS3 users
 
 Credentials:
-- oCIS: see [default demo users]({{< ref "../getting-started.md#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
 - LDAP admin: 
     - username: cn=admin,dc=owncloud,dc=com
     - password: admin
