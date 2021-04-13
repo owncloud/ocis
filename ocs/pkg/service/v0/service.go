@@ -59,6 +59,10 @@ func NewService(opts ...Option) Service {
 		logger:      options.Logger,
 	}
 
+	if svc.config.AccountBackend == "" {
+		svc.config.AccountBackend = "accounts"
+	}
+
 	requireUser := ocsm.RequireUser()
 
 	requireAdmin := ocsm.RequireAdmin(
