@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 
-	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"

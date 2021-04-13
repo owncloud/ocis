@@ -189,7 +189,6 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var account *accounts.Account
-	var err error
 
 	switch o.config.AccountBackend {
 	case "accounts":
@@ -611,9 +610,9 @@ func (o Ocs) fetchAccountFromCS3BackendByUsername(ctx context.Context, name stri
 		OnPremisesSamAccountName: u.Username,
 		DisplayName:              u.DisplayName,
 		Mail:                     u.Mail,
-		UIDNumber:                uid,
-		GIDNumber:                gid,
-	}
+		UidNumber:                uid,
+		GidNumber:                gid,
+	}, nil
 }
 
 func (o Ocs) fetchAccountFromCS3BackendByID(ctx context.Context, id *cs3.UserId) (*accounts.Account, error) {
@@ -627,9 +626,9 @@ func (o Ocs) fetchAccountFromCS3BackendByID(ctx context.Context, id *cs3.UserId)
 		OnPremisesSamAccountName: u.Username,
 		DisplayName:              u.DisplayName,
 		Mail:                     u.Mail,
-		UIDNumber:                uid,
-		GIDNumber:                gid,
-	}
+		UidNumber:                uid,
+		GidNumber:                gid,
+	}, nil
 }
 
 func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
