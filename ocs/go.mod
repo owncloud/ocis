@@ -6,7 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
-	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210217182006-0f0ace1a44a9
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
 	github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc
@@ -19,9 +19,9 @@ require (
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/settings v0.0.0-20210216094451-dc73176dc62d
-	github.com/owncloud/ocis/store v0.0.0-20210216094451-dc73176dc62d
-	github.com/prometheus/client_golang v1.9.0
+	github.com/owncloud/ocis/settings v0.0.0-20210413063522-955bd60edf33
+	github.com/owncloud/ocis/store v0.0.0-20210413063522-955bd60edf33
+	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
