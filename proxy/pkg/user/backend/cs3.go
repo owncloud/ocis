@@ -70,10 +70,14 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		c.logger.Error().Err(err).Msg("Could not encode loaded roles")
 	}
 
-	user.Opaque = &types.Opaque{
-		Map: map[string]*types.OpaqueEntry{
-			"roles": enc,
-		},
+	if user.Opaque == nil {
+		user.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"roles": enc,
+			},
+		}
+	} else {
+		user.Opaque.Map["roles"] = enc
 	}
 
 	return res.User, nil

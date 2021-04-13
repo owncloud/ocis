@@ -47,13 +47,15 @@ type TokenManager struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File         string
-	Log          Log
-	Debug        Debug
-	HTTP         HTTP
-	Tracing      Tracing
-	TokenManager TokenManager
-	Service      Service
+	File           string
+	Log            Log
+	Debug          Debug
+	HTTP           HTTP
+	Tracing        Tracing
+	TokenManager   TokenManager
+	Service        Service
+	AccountBackend string
+	RevaAddress    string
 
 	Context    context.Context
 	Supervised bool
