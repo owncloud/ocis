@@ -300,7 +300,6 @@ github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535/go.mod h1:UXha4T
 github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc h1:/16ib5caXBq9iFiYG4pysrgJ+AtNaS+zMqLXId8V9C4=
 github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc/go.mod h1:exwJqEJ8lVVnmdY0GrGwuPRQ018xUU9mKVXQBiO0ZlQ=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
-github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -878,7 +877,6 @@ github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
-github.com/jmhodges/levigo v1.0.0/go.mod h1:Q6Qx+uH3RAqyK4rFQroq9RL7mdkABMcfhEI+nNuzMJQ=
 github.com/jmoiron/sqlx v0.0.0-20180614180643-0dae4fefe7c0/go.mod h1:IiEW3SEiiErVyFdH8NTuWjSifiEQKUoyK3LNqr2kCHU=
 github.com/jmoiron/sqlx v1.2.0/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
 github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901/go.mod h1:Z86h9688Y0wesXCyonoVr47MasHilkuLMqGhRZ4Hpak=
@@ -1217,8 +1215,6 @@ github.com/owncloud/ocis/idp v0.0.0-20210413063522-955bd60edf33/go.mod h1:xRLkgE
 github.com/owncloud/ocis/ocs v0.0.0-20210413063522-955bd60edf33/go.mod h1:QOeC8KOc96RUK3SV11N3Sn0IP7yuzN+fb9lt2yLMMEw=
 github.com/owncloud/ocis/onlyoffice v0.0.0-20210413063522-955bd60edf33 h1:uglH9MrbihxUZKX1/RtHRwo8vkZ9st1Vwi9qXa9Xed4=
 github.com/owncloud/ocis/onlyoffice v0.0.0-20210413063522-955bd60edf33/go.mod h1:f+nnBcAuvW+wgySKnv+uvtUHkjk2f5w64Zcgb4vC8+E=
-github.com/owncloud/ocis/proxy v0.0.0-20210412105747-9b95e9b1191b h1:6OZBAng7McgOF4m+D3fJLkFFG/2ekM2h70Epql0eDE8=
-github.com/owncloud/ocis/proxy v0.0.0-20210412105747-9b95e9b1191b/go.mod h1:7m3UEC7ep4heIYJr9Farq3YzkUtAOPdNDfz+fMoeWuU=
 github.com/owncloud/ocis/storage v0.0.0-20210413063522-955bd60edf33 h1:ao+LJU/QDdzu2lYRW9ZCL3vGq3xixrFgS6/vAGmALKA=
 github.com/owncloud/ocis/storage v0.0.0-20210413063522-955bd60edf33/go.mod h1:2GPFqG7mD4qVbyLJNYM73hxwmJzcAtQCr/fIAYsOU3Q=
 github.com/owncloud/ocis/thumbnails v0.0.0-20210216094451-dc73176dc62d/go.mod h1:IU4JjxsasmAxreD7LckETo3Bmy6cYIkTuDweE7JPVTE=
@@ -1485,7 +1481,6 @@ github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07/go.mod h1:kDXzergiv9cbyO7IOYJZWg1U88JhDg3PB6klq9Hg2pA=
-github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c/go.mod h1:ahpPrc7HpcfEWDQRZEmnXMzHY03mLDYMCxeDzy46i+8=
 github.com/technoweenie/multipartstreamer v1.0.1/go.mod h1:jNVxdtShOxzAsukZwTSw6MDx5eUJoiEBsSvzDU9uzog=
 github.com/thejerf/suture/v4 v4.0.0 h1:GX3X+1Qaewtj9flL2wgoTBfLA5NcmrCY39TJRpPbUrI=
 github.com/thejerf/suture/v4 v4.0.0/go.mod h1:g0e8vwskm9tI0jRjxrnA6lSr0q6OfPdWJVX7G5bVWRs=

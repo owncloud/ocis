@@ -150,6 +150,21 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+
+		&cli.StringFlag{
+			Name:        "account-backend-type",
+			Value:       flags.OverrideDefaultString(cfg.AccountBackend, "accounts"),
+			Usage:       "account-backend-type",
+			EnvVars:     []string{"OCS_ACCOUNT_BACKEND_TYPE"},
+			Destination: &cfg.AccountBackend,
+		},
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.RevaAddress, "127.0.0.1:9142"),
+			Usage:       "REVA Gateway Endpoint",
+			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
+			Destination: &cfg.RevaAddress,
+		},
 	}
 }
 

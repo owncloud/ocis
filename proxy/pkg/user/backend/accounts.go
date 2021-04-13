@@ -3,15 +3,16 @@ package backend
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // NewAccountsServiceUserBackend creates a user-provider which fetches users from the ocis accounts-service
