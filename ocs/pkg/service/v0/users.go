@@ -17,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	merrors "github.com/asim/go-micro/v3/errors"
+	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
@@ -42,13 +43,14 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
 		// cs3, we cannot count with the accounts service.
 		if u != nil {
+			uid, gid := o.extractUIDAndGID(u)
 			d := &data.User{
 				UserID:            u.Username,
 				DisplayName:       u.DisplayName,
 				LegacyDisplayName: u.DisplayName,
 				Email:             u.Mail,
-				UIDNumber:         u.UidNumber,
-				GIDNumber:         u.GidNumber,
+				UIDNumber:         uid,
+				GIDNumber:         gid,
 			}
 			mustNotFail(render.Render(w, r, response.DataRender(d)))
 			return
@@ -88,10 +90,32 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		merr := merrors.FromError(err)
-		if merr.Code == http.StatusNotFound {
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
-		} else {
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
+		u, ok := user.ContextGetUser(r.Context())
+		if !ok || u.Id == nil || u.Id.OpaqueId == "" {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
+			return
+		}
+		if u != nil {
+			uid, gid := o.extractUIDAndGID(u)
+			d := &data.User{
+				UserID:            u.Username,
+				DisplayName:       u.DisplayName,
+				LegacyDisplayName: u.DisplayName,
+				Email:             u.Mail,
+				UIDNumber:         uid,
+				GIDNumber:         gid,
+				Enabled:           "true", // Assume true for CS3 backend?
+				// TODO query storage registry for free space? of home storage, maybe...
+				Quota: &data.Quota{
+					Free:       2840756224000,
+					Used:       5059416668,
+					Total:      2845815640668,
+					Relative:   0.18,
+					Definition: "default",
+				},
+			}
+			mustNotFail(render.Render(w, r, response.DataRender(d)))
+			return
 		}
 		o.logger.Error().Err(merr).Str("userid", userid).Msg("could not get account for user")
 		return
@@ -532,4 +556,28 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 		return res.Accounts[0], nil
 	}
 	return nil, merrors.NotFound("", "The requested user could not be found")
+}
+
+func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
+	var uid, gid int64
+	var err error
+	if u.Opaque != nil && u.Opaque.Map != nil {
+		if uidObj, ok := u.Opaque.Map["uid"]; ok {
+			if uidObj.Decoder == "plain" {
+				uid, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
+				if err != nil {
+					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract uid for user")
+				}
+			}
+		}
+		if gidObj, ok := u.Opaque.Map["gid"]; ok {
+			if gidObj.Decoder == "plain" {
+				gid, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
+				if err != nil {
+					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract gid for user")
+				}
+			}
+		}
+	}
+	return uid, gid
 }
