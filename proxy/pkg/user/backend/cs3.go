@@ -85,6 +85,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "basic",
 		ClientId:     username,
 		ClientSecret: password,
 	})

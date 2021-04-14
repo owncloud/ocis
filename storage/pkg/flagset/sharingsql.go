@@ -41,7 +41,7 @@ func SharingSQLWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "user-sql-name",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserSQLName, ""),
 			Usage:       "Name of the SQL database",
-			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_Name"},
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_NAME"},
 			Destination: &cfg.Reva.Sharing.UserSQLName,
 		},
 	}
