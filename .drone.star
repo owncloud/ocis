@@ -188,7 +188,6 @@ def main(ctx):
   build_release_helpers = [
     changelog(ctx),
     docs(ctx),
-    refreshDockerBadges(ctx)
   ]
 
   if ctx.build.event == "cron":
@@ -1146,36 +1145,6 @@ def releaseDockerReadme(ctx):
         'refs/tags/v*',
       ],
     },
-  }
-
-def refreshDockerBadges(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'badges',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps': [
-      {
-        'name': 'execute',
-        'image': 'plugins/webhook:1',
-        'pull': 'always',
-        'settings': {
-          'urls': {
-            'from_secret': 'microbadger_url',
-          },
-        },
-      },
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/v*',
-      ],
-    },
-    'depends_on': getPipelineNames(dockerReleases(ctx)),
   }
 
 def docs(ctx):
