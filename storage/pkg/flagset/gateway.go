@@ -140,13 +140,19 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   `Replaces the generated storage registry rules with this set: --storage-registry-rule "/eos=localhost:9158" [--storage-registry-rule "1284d238-aa92-42ce-bdc4-0b0000009162=localhost:9162"]`,
 			EnvVars: []string{"STORAGE_STORAGE_REGISTRY_RULES"},
 		},
-
 		&cli.StringFlag{
 			Name:        "storage-home-provider",
 			Value:       flags.OverrideDefaultString(cfg.Reva.StorageRegistry.HomeProvider, "/home"),
 			Usage:       "mount point of the storage provider for user homes in the global namespace",
-			EnvVars:     []string{"STORAGE_REGISTRY_HOME_PROVIDER"},
+			EnvVars:     []string{"STORAGE_STORAGE_REGISTRY_HOME_PROVIDER"},
 			Destination: &cfg.Reva.StorageRegistry.HomeProvider,
+		},
+		&cli.StringFlag{
+			Name:        "storage-registry-json",
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageRegistry.JSON, ""),
+			Usage:       "JSON file containing the storage registry rules",
+			EnvVars:     []string{"STORAGE_STORAGE_REGISTRY_JSON"},
+			Destination: &cfg.Reva.StorageRegistry.JSON,
 		},
 
 		// please note that STORAGE_FRONTEND_PUBLIC_URL is also defined in
