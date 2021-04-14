@@ -1211,6 +1211,14 @@ Scenario Outline: delete a folder when there is a default folder for received sh
 -   [apiMain/quota.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L70) Scenario: Overwriting a file in received folder having insufficient quota
 -   [apiMain/quota.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L84) Scenario: Overwriting a received file having enough quota
 -   [apiMain/quota.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L94) Scenario: Overwriting a received file having insufficient quota
+-   [apiMain/quota.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#105) Scenario: User with zero quota cannot upload a file
+-   [apiMain/quota.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#112) Scenario: User with zero quota can create a folder
+-   [apiMain/quota.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#119) Scenario: user cannot create file on shared folder by a user with zero quota
+-   [apiMain/quota.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#134) Scenario: share receiver with 0 quota should not be able to move file from shared folder to home folder
+-   [apiMain/quota.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#148) Scenario: sharer should be able to upload to a folder shared with user having zero quota
+-   [apiMain/quota.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#164) Scenario: share receiver with 0 quota should be able to upload on shared folder
+-   [apiMain/quota.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#178) Scenario: User should retain their old files even if their quota is set to 0
+-   [apiMain/quota.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#184) Scenario: User should be able to restore their deleted file when their quota is set to zero
     Scenario Outline: Retrieving folder quota of shared folder with quota when no quota is set for recipient
 -   [apiWebdavProperties1/getQuota.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L48)
 -   [apiWebdavProperties1/getQuota.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L49)
@@ -1940,14 +1948,16 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiAuth/cors.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L37)
 -   [apiAuth/cors.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L38)
 -   [apiAuth/cors.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L39)
--   [apiAuth/cors.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L43)
--   [apiAuth/cors.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L44)
+-   [apiAuth/cors.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L40)
+-   [apiAuth/cors.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L41)
+-   [apiAuth/cors.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L60)
+-   [apiAuth/cors.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L61)
 -   [apiAuth/cors.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L62)
 -   [apiAuth/cors.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L63)
 -   [apiAuth/cors.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L64)
 -   [apiAuth/cors.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L65)
--   [apiAuth/cors.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L66)
--   [apiAuth/cors.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L67)
+-   [apiAuth/cors.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L84)
+-   [apiAuth/cors.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L85)
 -   [apiAuth/cors.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L86)
 -   [apiAuth/cors.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L87)
 -   [apiAuth/cors.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L88)
@@ -1964,14 +1974,13 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiAuth/cors.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L99)
 -   [apiAuth/cors.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L100)
 -   [apiAuth/cors.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L101)
--   [apiAuth/cors.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L102)
--   [apiAuth/cors.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L103)
+-   [apiAuth/cors.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L120)
 -   [apiAuth/cors.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L121)
 -   [apiAuth/cors.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L122)
 -   [apiAuth/cors.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L123)
 -   [apiAuth/cors.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L124)
 -   [apiAuth/cors.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L125)
--   [apiAuth/cors.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L126)
+-   [apiAuth/cors.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L144)
 -   [apiAuth/cors.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L145)
 -   [apiAuth/cors.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L146)
 -   [apiAuth/cors.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L147)
@@ -1987,13 +1996,12 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiAuth/cors.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L157)
 -   [apiAuth/cors.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L158)
 -   [apiAuth/cors.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L159)
--   [apiAuth/cors.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L160)
+-   [apiAuth/cors.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L180)
 -   [apiAuth/cors.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L181)
 -   [apiAuth/cors.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L182)
 -   [apiAuth/cors.feature:183](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L183)
 -   [apiAuth/cors.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L184)
 -   [apiAuth/cors.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L185)
--   [apiAuth/cors.feature:186](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L186)
 
 #### [HTTP 401 Unauthorized responses don't contain a body](https://github.com/owncloud/ocis/issues/1337)
 #### [app passwords are not possible](https://github.com/owncloud/ocis/issues/1320)
