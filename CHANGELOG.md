@@ -11,7 +11,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 * Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
-* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+* Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
 
@@ -45,9 +45,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1917
 
-* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+* Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
   * enforce quota (https://github.com/cs3org/reva/pull/1557)
+  * Make additional info attribute configureable (https://github.com/cs3org/reva/pull/1588)
+  * check ENOTDIR for readlink (https://github.com/cs3org/reva/pull/1597)
+  * Add wrappers for EOS and EOS Home storage drivers (https://github.com/cs3org/reva/pull/1624)
+  * eos: fixes for enabling file sharing (https://github.com/cs3org/reva/pull/1619)
+  * implement checksums in the owncloud storage driver (https://github.com/cs3org/reva/pull/1629)
 
    https://github.com/owncloud/ocis/pull/1872
 # Changelog for [1.4.0] (2021-03-30)
