@@ -579,25 +579,8 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
--   [apiMain/checksums.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L24) Scenario Outline: Uploading a file with checksum should return the checksum in the propfind
--   [apiMain/checksums.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L25) Scenario Outline: Uploading a file with checksum should return the checksum in the propfind
--   [apiMain/checksums.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L35) Scenario Outline: Uploading a file with checksum should return the checksum in the download header
--   [apiMain/checksums.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L36) Scenario Outline: Uploading a file with checksum should return the checksum in the download header
--   [apiMain/checksums.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L46) Scenario Outline: Moving a file with checksum should return the checksum in the propfind
--   [apiMain/checksums.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L47) Scenario Outline: Moving a file with checksum should return the checksum in the propfind
--   [apiMain/checksums.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L50) Scenario: Downloading a file with checksum should return the checksum in the download header
--   [apiMain/checksums.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L99) Scenario Outline: Moving file with checksum should return the checksum in the download header
--   [apiMain/checksums.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L100) Scenario Outline: Moving file with checksum should return the checksum in the download header
--   [apiMain/checksums.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L103) Scenario: Copying a file with checksum should return the checksum in the propfind using new DAV path
--   [apiMain/checksums.feature:110](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L110) Scenario: Copying file with checksum should return the checksum in the download header using new DAV path
 -   [apiMain/checksums.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L217) Scenario Outline: Upload a file where checksum does not match
 -   [apiMain/checksums.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L218) Scenario Outline: Upload a file where checksum does not match
--   [apiMain/checksums.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L239) Scenario Outline: Uploaded file should have the same checksum when downloaded
--   [apiMain/checksums.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L240) Scenario Outline: Uploaded file should have the same checksum when downloaded
--   [apiMain/checksums.feature:280](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L280) Scenario Outline: Uploading a file with MD5 checksum overwriting an existing file
--   [apiMain/checksums.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L281) Scenario Outline: Uploading a file with MD5 checksum overwriting an existing file
--   [apiMain/checksums.feature:297](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L297) Scenario Outline: Uploading a file with SHA1 checksum overwriting an existing file
--   [apiMain/checksums.feature:298](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L298) Scenario Outline: Uploading a file with SHA1 checksum overwriting an existing file
 -   [apiMain/checksums.feature:310](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L310) Scenario Outline: Uploading a file with invalid SHA1 checksum overwriting an existing file
 -   [apiMain/checksums.feature:311](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L311) Scenario Outline: Uploading a file with invalid SHA1 checksum overwriting an existing file
 
@@ -2266,32 +2249,16 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:690](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L690)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
--   [apiWebdavUploadTUS/checksums.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L35)
--   [apiWebdavUploadTUS/checksums.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L36)
--   [apiWebdavUploadTUS/checksums.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L50)
--   [apiWebdavUploadTUS/checksums.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L51)
 -   [apiWebdavUploadTUS/checksums.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L65)
 -   [apiWebdavUploadTUS/checksums.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L66)
 -   [apiWebdavUploadTUS/checksums.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L67)
 -   [apiWebdavUploadTUS/checksums.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L68)
--   [apiWebdavUploadTUS/checksums.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L99)
--   [apiWebdavUploadTUS/checksums.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L100)
--   [apiWebdavUploadTUS/checksums.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L115)
--   [apiWebdavUploadTUS/checksums.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L116)
 -   [apiWebdavUploadTUS/checksums.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L131)
 -   [apiWebdavUploadTUS/checksums.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L132)
--   [apiWebdavUploadTUS/checksums.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L151)
--   [apiWebdavUploadTUS/checksums.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L152)
--   [apiWebdavUploadTUS/checksums.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L153)
--   [apiWebdavUploadTUS/checksums.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L154)
 -   [apiWebdavUploadTUS/checksums.feature:172](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L172)
 -   [apiWebdavUploadTUS/checksums.feature:173](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L173)
 -   [apiWebdavUploadTUS/checksums.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L174)
 -   [apiWebdavUploadTUS/checksums.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L175)
--   [apiWebdavUploadTUS/checksums.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L194)
--   [apiWebdavUploadTUS/checksums.feature:195](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L195)
--   [apiWebdavUploadTUS/checksums.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L196)
--   [apiWebdavUploadTUS/checksums.feature:197](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L197)
 -   [apiWebdavUploadTUS/checksums.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L215)
 -   [apiWebdavUploadTUS/checksums.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L216)
 -   [apiWebdavUploadTUS/checksums.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L217)
@@ -2300,14 +2267,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiWebdavUploadTUS/optionsRequest.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L20)
 -   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
 -   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
--   [apiWebdavUploadTUS/uploadToShare.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L101)
--   [apiWebdavUploadTUS/uploadToShare.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L102)
--   [apiWebdavUploadTUS/uploadToShare.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L119)
--   [apiWebdavUploadTUS/uploadToShare.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L120)
--   [apiWebdavUploadTUS/uploadToShare.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L136)
--   [apiWebdavUploadTUS/uploadToShare.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L137)
--   [apiWebdavUploadTUS/uploadToShare.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L153)
--   [apiWebdavUploadTUS/uploadToShare.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L154)
 -   [apiWebdavUploadTUS/uploadToShare.feature:172](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L172)
 -   [apiWebdavUploadTUS/uploadToShare.feature:173](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L173)
 -   [apiWebdavUploadTUS/uploadToShare.feature:191](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L191)

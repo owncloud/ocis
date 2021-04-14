@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/blevesearch/bleve v1.0.9
-	github.com/golang/protobuf v1.5.1
+	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
