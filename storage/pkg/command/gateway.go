@@ -18,6 +18,7 @@ import (
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -48,7 +49,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-			rcfg := gatewayConfigFromStruct(c, cfg)
+			rcfg := gatewayConfigFromStruct(c, cfg, logger)
 			defer cancel()
 
 			gr.Add(func() error {
@@ -105,7 +106,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 }
 
 // gatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logger) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"max_cpus":             cfg.Reva.Users.MaxCPUs,
@@ -164,7 +165,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         rules(cfg),
+							"rules":         rules(cfg, logger),
 						},
 					},
 				},
@@ -174,7 +175,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 	return rcfg
 }
 
-func rules(cfg *config.Config) map[string]map[string]interface{} {
+func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
@@ -190,10 +191,14 @@ func rules(cfg *config.Config) map[string]map[string]interface{} {
 	if cfg.Reva.StorageRegistry.JSON != "" {
 		data, err := ioutil.ReadFile(cfg.Reva.StorageRegistry.JSON)
 		if err != nil {
+			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.Reva.StorageRegistry.JSON)
 			return nil
 		}
 		var rules map[string]map[string]interface{}
-		_ = json.Unmarshal(data, &rules)
+		if err = json.Unmarshal(data, &rules); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
+			return nil
+		}
 		return rules
 	}
 
