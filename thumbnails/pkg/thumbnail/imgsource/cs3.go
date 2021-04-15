@@ -16,7 +16,7 @@ import (
 )
 
 type CS3 struct {
-		client gateway.GatewayAPIClient
+	client gateway.GatewayAPIClient
 }
 
 func NewCS3Source(c gateway.GatewayAPIClient) CS3 {
@@ -26,14 +26,17 @@ func NewCS3Source(c gateway.GatewayAPIClient) CS3 {
 }
 
 func (s CS3) Get(ctx context.Context, path string) (image.Image, error) {
-	auth, _ := ContextGetAuthorization(ctx)
+	auth, ok := ContextGetAuthorization(ctx)
+	if !ok {
+		return nil, errors.New("cs3source: authorization missing")
+	}
 	ctx = metadata.AppendToOutgoingContext(context.Background(), token.TokenHeader, auth)
 	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			Spec: &provider.Reference_Path{
 				Path: path,
 			},
-		} ,
+		},
 	})
 
 	if err != nil {

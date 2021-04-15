@@ -6,6 +6,16 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 	"image"
+	"strings"
+)
+
+var (
+	SupportedMimeTypes = [...]string{
+		"image/png",
+		"image/jpg",
+		"image/jpeg",
+		"image/gif",
+	}
 )
 
 // Request bundles information needed to generate a thumbnail for afile
@@ -40,7 +50,8 @@ type SimpleManager struct {
 	resolutions Resolutions
 }
 
-// Generate implements the Get Method of Manager
+// Generate creates a thumbnail and stores it.
+// The created thumbnail is also being returned.
 func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
 	thumbnail := s.generate(match, img)
@@ -76,4 +87,13 @@ func mapToStorageRequest(r Request) storage.Request {
 		Resolution: r.Resolution,
 		Types:      r.Encoder.Types(),
 	}
+}
+
+func IsMimeTypeSupported(m string) bool {
+	for _, mt := range SupportedMimeTypes {
+		if strings.EqualFold(mt, m) {
+			return true
+		}
+	}
+	return false
 }

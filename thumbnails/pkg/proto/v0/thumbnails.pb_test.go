@@ -10,7 +10,7 @@ import (
 type TestRequest struct {
 	testDataName  string
 	filepath      string
-	filetype      proto.GetThumbnailRequest_FileType
+	filetype      proto.GetThumbnailRequest_ThumbnailType
 	Checksum      string
 	width         int32
 	height        int32

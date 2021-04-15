@@ -41,12 +41,12 @@ message GetThumbnailRequest {
     // The path to the source image
     string filepath = 1;
     // The file types to which the thumbnail can get encoded to.
-    enum FileType {
+    enum ThumbnailType {
         PNG = 0; // Represents PNG type
         JPG = 1; // Represents JPG type
     }
     // The type to which the thumbnail should get encoded to.
-    FileType thumbnail_type = 2;
+    ThumbnailType thumbnail_type = 2;
     // The width of the thumbnail
     int32 width = 3;
     // The height of the thumbnail

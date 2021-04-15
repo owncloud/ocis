@@ -55,7 +55,7 @@ type Thumbnail struct {
 
 // GetThumbnail retrieves a thumbnail for an image
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
-	_, ok := v0proto.GetThumbnailRequest_FileType_value[req.ThumbnailType.String()]
+	_, ok := v0proto.GetThumbnailRequest_ThumbnailType_value[req.ThumbnailType.String()]
 	if !ok {
 		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
@@ -205,14 +205,26 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	}
 
 	if rsp.Status.Code != rpc.Code_CODE_OK {
-		g.logger.Error().Str("status_message", rsp.Status.Message).Str("path", path).Msg("could not stat file")
-		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+		switch rsp.Status.Code {
+		case rpc.Code_CODE_NOT_FOUND:
+			return nil, merrors.NotFound(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+		default:
+			g.logger.Error().Str("status_message", rsp.Status.Message).Str("path", path).Msg("could not stat file")
+			return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
+		}
 	}
-
+	if  rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+		return nil, merrors.BadRequest(g.serviceID, "Unsupported file type")
+	}
 	if rsp.Info.GetChecksum().GetSum() == "" {
 		g.logger.Error().Msg("resource info is missing checksum")
-		return nil, merrors.InternalServerError(g.serviceID, "resource info is missing a checksum")
+		return nil, merrors.NotFound(g.serviceID, "resource info is missing a checksum")
 	}
+	if !thumbnail.IsMimeTypeSupported(rsp.Info.MimeType) {
+		return nil, merrors.NotFound(g.serviceID, "Unsupported file type")
+	}
+
+
 
 	return rsp, nil
 }
