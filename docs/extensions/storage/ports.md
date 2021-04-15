@@ -8,9 +8,9 @@ geekdocFilePath: ports.md
 geekdocCollapseSection: true
 ---
 
-Currently, every service needs to be configured with a port so ocis can start them on localhost. We will automate this by using a service registry for more services until only the proxy has to be configured with a public port.
+Currently, every service needs to be configured with a port so oCIS can start them on localhost. We will automate this by using a service registry for more services, until eventually only the proxy has to be configured with a public port.
 
-For now, tho storage service uses these ports to preconfigure the services:
+For now, the storage service uses these ports to preconfigure those services:
 
 | port      | service                                       |
 |-----------|-----------------------------------------------|
