@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
+* Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
 * Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
 * Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
@@ -40,6 +41,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 
    https://github.com/owncloud/ocis/pull/1916
+
+* Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
+
+   When moving from the old runtime to the new one there were lots of files left behind that are
+   essentially dead code and should be removed. The original code lives here
+   github.com/refs/pman/ if someone finds it interesting to read.
+
+   https://github.com/owncloud/ocis/pull/1923
 
 * Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
 
