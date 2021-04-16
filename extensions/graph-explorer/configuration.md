@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-16T09:58:48+0000"
+date: "2021-04-16T12:48:28+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -51,15 +51,6 @@ Usage: `graph-explorer [global options] command [command options] [arguments...]
 : Enable colored logging.
 
 ## Sub Commands
-
-### graph-explorer health
-
-Check health status
-
-Usage: `graph-explorer health [command options] [arguments...]`
-
--debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9136")`.
 
 ### graph-explorer server
 
@@ -114,4 +105,13 @@ Usage: `graph-explorer server [command options] [arguments...]`
 
 -graph-url |  $GRAPH_EXPLORER_GRAPH_URL
 : Set the url to the graph api service. Default: `flags.OverrideDefaultString(cfg.GraphExplorer.GraphURL, "https://localhost:9200/graph")`.
+
+### graph-explorer health
+
+Check health status
+
+Usage: `graph-explorer health [command options] [arguments...]`
+
+-debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9136")`.
 
