@@ -1,6 +1,6 @@
 <template>
   <div class="oc-p">
-    <div class="uk-flex uk-flex-column" id="settings-app">
+    <main class="uk-flex uk-flex-column" id="settings-app">
       <template v-if="initialized">
         <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
           <p class="uk-flex uk-flex-middle">
@@ -34,7 +34,7 @@
         </template>
       </template>
       <oc-loader v-else />
-    </div>
+    </main>
   </div>
 </template>
 
