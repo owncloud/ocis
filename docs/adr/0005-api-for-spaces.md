@@ -44,9 +44,9 @@ See [Drive item in Microsoft Graph API](https://docs.microsoft.com/de-de/graph/a
 
 ### Get "Home folder"
 
-Retrieve information about the home space of a user. Note: This is only a subset of the spaces the user might have access to.
+Retrieve information about the home space of a user. Note: The user has access to more spaces. This call only returns the home space to provide API parity with the Graph API.
 
-API Call: `/me/drive`: Returns the information of the users home folder.
+API Call: `/me/drive`: Returns the information about the users home folder.
 
 ### Get All Spaces of a User
 
@@ -68,7 +68,8 @@ The reply to both calls is either one or a list of [Drive representation objects
   "lastModifiedDateTime": "string (timestamp)",
   "name": "string",
   "owner": { "@odata.type": "microsoft.graph.identitySet" },
-  "webUrl": "url"
+  "webUrl": "url",
+  "coowner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
 }
 
 ```
@@ -78,14 +79,14 @@ The meaning of the object are in ownClouds context:
 1. **id** - a unique ID identifying the space
 2. **driveType** - describing the type of the space.
 3. **eTag** - the current ETag of the space
-4. **owner** - an owner object to whom the space belong
+4. **owner** - an owner object to whom the space belongs
 5. **webUrl** - the relative Webdav path in ownCloud. It must include the `remote.php` part in oC10 installations.
-
+6. **coowner** - optional array owner objects of the co-owners of a space (*)
 
 The following driveType values are available in the first step, but might be enhanced later:
 
 * **personal**: The users home space
-* **documentLibrary**: The project spaces available for the user
+* **projectSpaces**: The project spaces available for the user (*)
 * **shares**: The share jail, contains all shares for the user (*)
 
 The (*) marked types are not defined in the official MS API.
@@ -104,4 +105,6 @@ The (*) marked types are not defined in the official MS API.
 
 - Do we need a new WebDAV endpoint?
 - What are the WebDAV pathes for Trashbin, Versions
-	+ option: additional entries in the reply struct
+    + option: additional entries in the reply struct
+- The identitySet object used for "owner" and "coowner" require to implement the [https://docs.microsoft.com/de-de/graph/api/resources/identityset?view=graph-rest-1.0](IdentitySet) JSON object, which contains information that seems to be of limited benefit for oCIS. An alternative would be to implement a simpler identity object for oCIS and use that.
+
