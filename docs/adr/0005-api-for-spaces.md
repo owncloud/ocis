@@ -63,7 +63,8 @@ The reply to both calls is either one or a list of [Drive representation objects
   "id": "string",
   "createdDateTime": "string (timestamp)",
   "description": "string",
-  "driveType": "personal | business | documentLibrary",
+  "driveType": "personal | projectSpaces | shares",
+  "driveStatus": "accepted | pending | mandatory",
   "eTag": "string",
   "lastModifiedDateTime": "string (timestamp)",
   "name": "string",
@@ -78,18 +79,25 @@ The meaning of the object are in ownClouds context:
 
 1. **id** - a unique ID identifying the space
 2. **driveType** - describing the type of the space.
-3. **eTag** - the current ETag of the space
-4. **owner** - an owner object to whom the space belongs
-5. **webUrl** - the relative Webdav path in ownCloud. It must include the `remote.php` part in oC10 installations.
-6. **coowner** - optional array owner objects of the co-owners of a space (*)
+3. **driveStatus** - telling the status
+4. **eTag** - the current ETag of the space
+5. **owner** - an owner object to whom the space belongs
+6. **webUrl** - the relative Webdav path in ownCloud. It must include the `remote.php` part in oC10 installations.
+7. **coowner** - optional array owner objects of the co-owners of a space (*)
 
-The following driveType values are available in the first step, but might be enhanced later:
+The following *driveType* values are available in the first step, but might be enhanced later:
 
 * **personal**: The users home space
 * **projectSpaces**: The project spaces available for the user (*)
 * **shares**: The share jail, contains all shares for the user (*)
 
 The (*) marked types are not defined in the official MS API.
+
+The following *driveStatus* values are available:
+
+* **accepted**: The user has accepted the space and uses it
+* **pending**: The user has not yet accepted the space , but can use it after having it accepted.
+* **mandatory**: This is an mandatory space. Used for the personal- and shares-space. The user can not influence if it is visible or not, it is always available.
 
 ### Positive Consequences
 
