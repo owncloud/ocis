@@ -1,7 +1,6 @@
 package config
 
 import (
-	hello "github.com/owncloud/ocis-hello/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
@@ -73,7 +72,6 @@ type Config struct {
 	GLAuth        *glauth.Config
 	Graph         *graph.Config
 	GraphExplorer *graphExplorer.Config
-	Hello         *hello.Config
 	IDP           *idp.Config
 	OCS           *ocs.Config
 	Onlyoffice    *onlyoffice.Config
@@ -94,7 +92,6 @@ func New() *Config {
 		GLAuth:        glauth.New(),
 		Graph:         graph.New(),
 		GraphExplorer: graphExplorer.New(),
-		Hello:         hello.New(),
 		IDP:           idp.New(),
 		OCS:           ocs.New(),
 		Onlyoffice:    onlyoffice.New(),
