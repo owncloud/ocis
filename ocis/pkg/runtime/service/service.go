@@ -194,6 +194,7 @@ func Start(o ...Option) error {
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
 	swap := deepcopy.Copy(s.cfg)
+	swap.(*ociscfg.Config).Mode = ociscfg.UNSUPERVISED
 	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
 		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
