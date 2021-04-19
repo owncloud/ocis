@@ -1,50 +1,45 @@
 <template>
   <div>
     <oc-grid v-if="isFormInProgress" gutter="small">
-      <label>
-        <oc-text-input
-          id="accounts-new-account-input-username"
-          type="text"
-          v-model="formData.username"
-          :error-message="formValidation.usernameError"
-          :placeholder="$gettext('Username')"
-          :disabled="isRequestInProgress"
-          @keydown.enter="createAccount"
-        />
-      </label>
-      <label>
-        <oc-text-input
-          id="accounts-new-account-input-email"
-          type="email"
-          v-model="formData.email"
-          :error-message="formValidation.emailError"
-          :placeholder="$gettext('Email')"
-          :disabled="isRequestInProgress"
-          @keydown.enter="createAccount"
-        />
-      </label>
-      <label>
-        <oc-text-input
-          id="accounts-new-account-input-password"
-          type="password"
-          v-model="formData.password"
-          :error-message="formValidation.passwordError"
-          :placeholder="$gettext('Password')"
-          :disabled="isRequestInProgress"
-          @keydown.enter="createAccount"
-        />
-      </label>
-      <div>
+      <oc-text-input
+        id="accounts-new-account-input-username"
+        type="text"
+        v-model="formData.username"
+        :error-message="formValidation.usernameError"
+        :label="$gettext('Username')"
+        :disabled="isRequestInProgress"
+        @keydown.enter="createAccount"
+      />
+      <oc-text-input
+        id="accounts-new-account-input-email"
+        type="email"
+        v-model="formData.email"
+        :error-message="formValidation.emailError"
+        :label="$gettext('Email')"
+        :disabled="isRequestInProgress"
+        @keydown.enter="createAccount"
+      />
+      <oc-text-input
+        id="accounts-new-account-input-password"
+        type="password"
+        v-model="formData.password"
+        :error-message="formValidation.passwordError"
+        :label="$gettext('Password')"
+        :disabled="isRequestInProgress"
+        @keydown.enter="createAccount"
+      />
+      <div class="uk-flex">
         <oc-button
+          class="oc-mr-s oc-mb-s"
           v-text="$gettext('Cancel')"
           @click="cancelForm"
           :disabled="isRequestInProgress"
         />
-      </div>
-      <div>
         <oc-button
           id="accounts-new-account-button-confirm"
+          class="oc-mr-s oc-mb-s"
           variation="primary"
+          appearance="filled"
           :disabled="isRequestInProgress"
           @click="createAccount"
           gap-size="small"
@@ -66,6 +61,7 @@
           id="accounts-new-account-trigger"
           key="create-accounts-button"
           variation="primary"
+          appearance="filled"
           gap-size="small"
           @click="setFormInProgress(true)"
         >
@@ -192,11 +188,5 @@ export default {
 #accounts-new-account-button-confirm > span {
   display: flex;
   align-items: center;
-}
-</style>
-<style scoped>
-.border-ods-tmp-fix {
-  /* TODO: somehow the primary button receives a 2px border-width. remove it until we fix it in ODS. */
-  border-width: 0 !important;
 }
 </style>
