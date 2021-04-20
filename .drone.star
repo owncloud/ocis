@@ -172,64 +172,10 @@ def main(ctx):
     none
   """
 
-  pipelines = []
-
-  test_pipelines = \
-    [ buildOcisBinaryForTesting(ctx) ] + \
-    testOcisModules(ctx) + \
-    testPipelines(ctx)
-
-  build_release_pipelines = \
+  pipelines = \
     dockerReleases(ctx) + \
     [dockerEos(ctx)] + \
-    binaryReleases(ctx) + \
-    [releaseSubmodule(ctx)]
-
-  build_release_helpers = [
-    changelog(ctx),
-    docs(ctx),
-  ]
-
-  if ctx.build.event == "cron":
-    pipelines = test_pipelines + [
-      pipelineDependsOn(
-        purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
-        testPipelines(ctx)
-      )
-    ] + example_deploys(ctx)
-
-  elif \
-  (ctx.build.event == "pull_request" and '[docs-only]' in ctx.build.title) \
-  or \
-  (ctx.build.event != "pull_request" and '[docs-only]' in (ctx.build.title + ctx.build.message)):
-  # [docs-only] is not taken from PR messages, but from commit messages
-    pipelines = [docs(ctx)]
-
-  else:
-    test_pipelines.append(
-      pipelineDependsOn(
-        purgeBuildArtifactCache(ctx, 'ocis-binary-amd64'),
-        testPipelines(ctx)
-      )
-    )
-
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
-
-
-    pipelines = \
-      pipelines + \
-      pipelinesDependsOn(
-        example_deploys(ctx),
-        pipelines
-      )
-
-  # always append notification step
-  pipelines.append(
-    pipelineDependsOn(
-      notify(ctx),
-      pipelines
-    )
-  )
+    binaryReleases(ctx)
 
   pipelineSanityChecks(ctx, pipelines)
   return pipelines
@@ -757,7 +703,7 @@ def dockerRelease(ctx, arch):
         },
       },
     ],
-    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+    #'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -824,7 +770,7 @@ def dockerEos(ctx):
           },
         },
       ],
-    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+    #'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -948,7 +894,7 @@ def binaryRelease(ctx, name):
         },
       },
     ],
-    'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+    #'depends_on': getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
     'trigger': {
       'ref': [
         'refs/heads/master',
@@ -1390,6 +1336,14 @@ def selenium():
 
 def build():
   return [
+    {
+      'name': 'debug',
+      'image': 'owncloudci/golang:1.16',
+      'pull': 'always',
+      'commands': [
+        'go env',
+      ],
+    },
     {
       'name': 'build',
       'image': 'owncloudci/golang:1.16',
