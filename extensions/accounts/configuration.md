@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-19T14:11:54+0000"
+date: "2021-04-20T07:03:30+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -41,18 +41,6 @@ Create a new account
 
 Usage: `accounts add [command options] [arguments...]`
 
-### accounts inspect
-
-Show detailed data on an existing account
-
-Usage: `accounts inspect [command options] [arguments...]`
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
 ### accounts list
 
 List existing accounts
@@ -80,17 +68,29 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 -log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
 
+### accounts version
+
+Print the versions of the running instances
+
+Usage: `accounts version [command options] [arguments...]`
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
 ### accounts update
 
 Make changes to an existing account
 
 Usage: `accounts update [command options] [arguments...]`
 
-### accounts version
+### accounts inspect
 
-Print the versions of the running instances
+Show detailed data on an existing account
 
-Usage: `accounts version [command options] [arguments...]`
+Usage: `accounts inspect [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
