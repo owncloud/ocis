@@ -114,11 +114,17 @@ func NewService(options ...Option) (*Service, error) {
 // Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
 // oCIS instance.
 func Start(o ...Option) error {
+	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect
+	// from the caller, the previous statement holds truth.
+
 	// prepare a new rpc Service struct.
 	s, err := NewService(o...)
 	if err != nil {
 		return err
 	}
+
+	// notify goroutines that they are running on supervised mode
+	s.cfg.Mode = ociscfg.SUPERVISED
 
 	setMicroLogger()
 
@@ -129,14 +135,11 @@ func Start(o ...Option) error {
 		},
 	})
 
-	// reva storages have their own logging. For consistency sake the top level logging will be cascade to reva.
+	// reva storages have their own logging. For consistency sake the top level logging will cascade to reva.
 	s.cfg.Storage.Log.Color = s.cfg.Log.Color
 	s.cfg.Storage.Log.Level = s.cfg.Log.Level
 	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
 	s.cfg.Storage.Log.File = s.cfg.Log.File
-
-	// notify goroutines that they are running on supervised mode
-	s.cfg.Mode = ociscfg.SUPERVISED
 
 	if err := rpc.Register(s); err != nil {
 		if s != nil {
@@ -193,6 +196,11 @@ func Start(o ...Option) error {
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
+	// RPC calls to a Service object will allow for parsing config. Mind that since the runtime is running on a different
+	// machine, the configuration needs to be present in the given machine. RPC does not yet allow providing a config
+	// during transport.
+	s.cfg.Mode = ociscfg.UNSUPERVISED
+
 	swap := deepcopy.Copy(s.cfg)
 	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
