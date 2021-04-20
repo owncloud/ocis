@@ -1370,11 +1370,8 @@ def redis():
   return [
     {
       'name': 'redis',
-      'image': 'webhippie/redis',
+      'image': 'redis:6-alpine',
       'pull': 'always',
-      'environment': {
-        'REDIS_DATABASES': 1
-      },
     }
   ]
 

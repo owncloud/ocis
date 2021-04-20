@@ -1,5 +1,4 @@
 services:
   redis:
-    image: webhippie/redis
-    environment:
-      REDIS_DATABASES: 1
+    image: redis:6
+    command: ["--databases", "1"]
