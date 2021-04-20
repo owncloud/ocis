@@ -708,8 +708,15 @@ def dockerRelease(ctx, arch):
       'arch': arch,
     },
     'steps':
-      makeGenerate('') +
-      build() + [
+      makeGenerate('') + [
+      {
+        'name': 'build',
+        'image': 'owncloudci/golang:1.16',
+        'pull': 'always',
+        'commands': [
+          'make -C ocis release-linux',
+        ],
+      },
       {
         'name': 'dryrun',
         'image': 'plugins/docker:latest',

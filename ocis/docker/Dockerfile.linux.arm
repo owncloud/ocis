@@ -26,6 +26,6 @@ EXPOSE 9200/tcp
 ENTRYPOINT ["/usr/bin/ocis"]
 CMD ["server"]
 
-COPY bin/ocis /usr/bin/ocis
+COPY dist/binaries/ocis-testing-linux-arm /usr/bin/ocis
 
 VOLUME [ "/var/tmp/ocis" ]
