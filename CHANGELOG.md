@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
+* Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 * Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
 * Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
@@ -37,6 +38,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/1891
    https://github.com/owncloud/ocis/pull/1892
+
+* Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
+
+   Currenntly it is not possible to parse a single config file from an extension when running on
+   supervised mode.
+
+   https://github.com/owncloud/ocis/pull/1931
 
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 
