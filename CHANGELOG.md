@@ -8,8 +8,10 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
+* Change - Update ownCloud Web to v3.0.0: [#1938](https://github.com/owncloud/ocis/pull/1938)
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 * Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
+* Enhancement - Update ODS in accounts & settings extension: [#1934](https://github.com/owncloud/ocis/pull/1934)
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 * Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
 * Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
@@ -31,6 +33,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1875
 
+* Change - Update ownCloud Web to v3.0.0: [#1938](https://github.com/owncloud/ocis/pull/1938)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.0.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/1938
+   https://github.com/owncloud/web/releases/tag/v3.0.0
+
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 
    Changes the default path for thumbnails from `<os tmp dir>/ocis-thumbnails` to
@@ -45,6 +57,14 @@ The following sections list the changes for unreleased.
    supervised mode.
 
    https://github.com/owncloud/ocis/pull/1931
+
+* Enhancement - Update ODS in accounts & settings extension: [#1934](https://github.com/owncloud/ocis/pull/1934)
+
+   The accounts and settings extensions were updated to reflect the latest changes in the
+   ownCloud design system. In addition, a couple of quick wins in terms of accessibility are
+   included.
+
+   https://github.com/owncloud/ocis/pull/1934
 
 * Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
 
