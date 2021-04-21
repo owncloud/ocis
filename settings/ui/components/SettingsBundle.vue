@@ -1,8 +1,8 @@
 <template>
   <div class="uk-width-1-1 uk-width-2-3@m uk-width-1-2@l uk-width-1-3@xl">
-    <div class="oc-text-bold oc-mb-s">
+    <h2 class="oc-mb-s">
       <translate>{{ bundle.displayName }}</translate>
-    </div>
+    </h2>
     <oc-grid gutter="small">
       <template>
         <div class="uk-width-1-1" v-for="setting in bundle.settings" :key="setting.id">

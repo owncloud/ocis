@@ -74,7 +74,7 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^1.7.0"
+    "owncloud-design-system": "^6.0.1"
   },
   "dependencies": {
     "lodash": "^4.17.15",

@@ -563,7 +563,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
-          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
+          'TESTING_DATA_DIR': '/srv/app/testing/data',
           'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip and not @notToImplementOnOCIS',
           'LOCAL_UPLOAD_DIR': '/uploads',
