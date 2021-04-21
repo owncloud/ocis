@@ -119,7 +119,7 @@ module.exports = {
       locateStrategy: 'xpath'
     },
     roleInRolesDropdown: {
-      selector: '//label[contains(@class, "accounts-roles-dropdown-role")]/span[normalize-space()="%s"]',
+      selector: '//span[contains(@class, "accounts-roles-dropdown-role")]/label[normalize-space()="%s"]',
       locateStrategy: 'xpath'
     },
     rolesDropdownTrigger: {
