@@ -14,7 +14,7 @@ geekdocFilePath: 0004-cs3api-user-management.md
 
 Technical Story: [Write only management API for User and Group resources](https://github.com/cs3org/cs3apis/pull/119)
 
-## Context and Problem Statementf
+## Context and Problem Statement
 
 What would be a more effective way of using network resources and handle account management within the oCIS-Reva ecosystem? Separating account management at the service level is pragmatic and allows for fast iterations, but also steadily accumulates inconsistencies and bloats technical debt.
 
