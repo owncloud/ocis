@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-22T08:46:49+0000"
+date: "2021-04-22T15:12:05+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -42,18 +42,6 @@ Serve WebDAV API for oCIS
 Usage: `webdav [global options] command [command options] [arguments...]`
 
 ## Sub Commands
-
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
 
 ### webdav health
 
@@ -123,4 +111,16 @@ Usage: `webdav server [command options] [arguments...]`
 
 -http-root |  $WEBDAV_HTTP_ROOT
 : Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
 
