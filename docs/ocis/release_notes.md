@@ -17,6 +17,8 @@ The most prominent changes in version 1.5.0 comprise:
 - A dedicated view for "Shared by link" has been added [#4881](https://github.com/owncloud/web/pull/4881)
 - The file list table has been replaced and is now more performant and accessible [#4627](https://github.com/owncloud/web/pull/4627)
 - Many further accessibility improvements have been added, e.g., around the app switcher, sidebar, sharing list and focus management
+- User storage quotas will now be enforced [#1557](https://github.com/cs3org/reva/pull/1557)
+- The "owncloud" storage driver now supports file integrity checking with checksums [#1629](https://github.com/cs3org/reva/pull/1629)
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
 
