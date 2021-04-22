@@ -10,7 +10,7 @@ Technical Story: API to enable the concept of [Spaces](https://github.com/ownclo
 
 As one of the building blocks for Spaces in oCIS we plan to add an API that returns information about available spaces.
 
-> Note: The term "spaces" is used here in the context of "a space where files can be saved", similar to a directory. It is not to be confused with space in the sense of file space for example.
+> Note: The term "spaces" is used here in the context of "a space where files can be saved", similar to a directory. It is not to be confused with space in the sense of free file space for example.
 
 The purpose of this new API is to give clients a very simple way to query the dynamic list of spaces, that the user has access to. Clients can provide a way better user experience with that.
 
@@ -115,4 +115,3 @@ The following *driveStatus* values are available:
 - What are the WebDAV pathes for Trashbin, Versions
     + option: additional entries in the reply struct
 - The identitySet object used for "owner" and "coowner" require to implement the [https://docs.microsoft.com/de-de/graph/api/resources/identityset?view=graph-rest-1.0](IdentitySet) JSON object, which contains information that seems to be of limited benefit for oCIS. An alternative would be to implement a simpler identity object for oCIS and use that.
-
