@@ -714,7 +714,7 @@ def dockerRelease(ctx, arch):
         'image': 'owncloudci/golang:1.16',
         'pull': 'always',
         'commands': [
-          'make -C ocis release-linux',
+          'make -C ocis release-linux-docker',
         ],
       },
       {
