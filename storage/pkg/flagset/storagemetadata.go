@@ -89,13 +89,6 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 	}
 
-	f = append(f, TracingWithConfig(cfg)...)
-	f = append(f, DebugWithConfig(cfg)...)
-	f = append(f, SecretWithConfig(cfg)...)
-	f = append(f, DriverEOSWithConfig(cfg)...)
-	f = append(f, DriverLocalWithConfig(cfg)...)
-	f = append(f, DriverOwnCloudWithConfig(cfg)...)
-	f = append(f, DriverOCISWithConfig(cfg)...)
 	f = append(f,
 		&cli.StringFlag{
 			Name:        "storage-root",
@@ -105,6 +98,13 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Storages.Common.Root,
 		},
 	)
+	f = append(f, TracingWithConfig(cfg)...)
+	f = append(f, DebugWithConfig(cfg)...)
+	f = append(f, SecretWithConfig(cfg)...)
+	f = append(f, DriverEOSWithConfig(cfg)...)
+	f = append(f, DriverLocalWithConfig(cfg)...)
+	f = append(f, DriverOwnCloudWithConfig(cfg)...)
+	f = append(f, DriverOCISWithConfig(cfg)...)
 	return f
 
 }
