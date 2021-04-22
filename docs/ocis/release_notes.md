@@ -7,6 +7,24 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.5.0 Technology Preview
+
+Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
+
+The most prominent changes in version 1.5.0 comprise:
+
+- Config file based theming for ownCloud Web (see https://owncloud.dev/clients/web/theming/ for more information) [#4822](https://github.com/owncloud/web/pull/4822)
+- A dedicated view for "Shared by link" has been added [#4881](https://github.com/owncloud/web/pull/4881)
+- The file list table has been replaced and is now more performant and accessible [#4627](https://github.com/owncloud/web/pull/4627)
+- Many further accessibility improvements have been added, e.g., around the app switcher, sidebar, sharing list and focus management
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.4.0 Technology Preview
 
 Version 1.4.0 brings new features, bug fixes and further improvements. The accessibility of ownCloud Web has greatly improved, paving the way for WCAG 2.1 compliance. The Infinite Scale platform has received major improvements regarding memory consumption. The user storage quota feature has been implemented and folder sizes are now properly calculated. It is now possible to write log messages to log files and to specify configuration values using a config file.
