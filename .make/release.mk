@@ -13,6 +13,9 @@ release-dirs:
 release-linux: $(GOX) release-dirs
 	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
+release-linux-docker: $(GOX) release-dirs
+	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+
 .PHONY: release-windows
 release-windows: $(GOX) release-dirs
 	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'windows' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
