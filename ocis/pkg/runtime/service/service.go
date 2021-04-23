@@ -132,14 +132,23 @@ func Start(o ...Option) error {
 
 	setMicroLogger()
 
+	// tolerance controls backoff cycles from the supervisor.
+	tolerance := 5
+	totalBackoff := 0
+
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
 	s.Supervisor = suture.New("ocis", suture.Spec{
 		EventHook: func(e suture.Event) {
-			if e.Type() == suture.EventTypeServiceTerminate {
-				halt <- os.Interrupt
+			if e.Type() == suture.EventTypeBackoff {
+				totalBackoff++
+				if totalBackoff == tolerance {
+					halt <- os.Interrupt
+				}
 			}
 			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
 		},
+		FailureThreshold: 5,
+		FailureBackoff:   3 * time.Second,
 	})
 
 	// reva storages have their own logging. For consistency sake the top level logging will cascade to reva.
