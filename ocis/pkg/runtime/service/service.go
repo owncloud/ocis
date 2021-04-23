@@ -123,6 +123,10 @@ func Start(o ...Option) error {
 		return err
 	}
 
+	// halt listens for interrupt signals and blocks.
+	halt := make(chan os.Signal, 1)
+	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
 	// notify goroutines that they are running on supervised mode
 	s.cfg.Mode = ociscfg.SUPERVISED
 
@@ -131,6 +135,9 @@ func Start(o ...Option) error {
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
 	s.Supervisor = suture.New("ocis", suture.Spec{
 		EventHook: func(e suture.Event) {
+			if e.Type() == suture.EventTypeServiceTerminate {
+				halt <- os.Interrupt
+			}
 			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
 		},
 	})
@@ -147,10 +154,6 @@ func Start(o ...Option) error {
 		}
 	}
 	rpc.HandleHTTP()
-
-	// halt listens for interrupt signals and blocks.
-	halt := make(chan os.Signal, 1)
-	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
 	l, err := net.Listen("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port))
 	if err != nil {
