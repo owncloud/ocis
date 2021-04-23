@@ -366,68 +366,70 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Note that the previous conditional is short circuiting this. This logic will NOT run when the user's backend is
-	// configured to use any other than the accounts service.
-	t, err := o.mintTokenForUser(r.Context(), account)
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
-		return
-	}
+	if o.config.RevaAddress != "" {
+		// Note that the previous conditional is short circuiting this. This logic will NOT run when the user's backend is
+		// configured to use any other than the accounts service.
+		t, err := o.mintTokenForUser(r.Context(), account)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
+			return
+		}
 
-	ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+		ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
 
-	gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
-	if err != nil {
-		o.logger.Error().Err(err).Msg("error securing a connection to the reva gateway, could not delete user home")
-	}
+		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
+		if err != nil {
+			o.logger.Error().Err(err).Msg("error securing a connection to the reva gateway, could not delete user home")
+		}
 
-	homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
-		return
-	}
+		homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
+			return
+		}
 
-	statResp, err := gwc.Stat(ctx, &provider.StatRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{
-				Path: homeResp.Path,
+		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{
+					Path: homeResp.Path,
+				},
 			},
-		},
-	})
+		})
 
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
-		return
-	}
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
+			return
+		}
 
-	if statResp.Status.Code != rpcv1beta1.Code_CODE_OK {
-		o.logger.Error().
-			Str("stat_status_code", statResp.Status.Code.String()).
-			Str("stat_message", statResp.Status.Message).
-			Msg("DeleteUser: could not delete user home: stat failed")
-		return
-	}
+		if statResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user home: stat failed")
+			return
+		}
 
-	delReq := &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Id{
-				Id: statResp.Info.Id,
+		delReq := &provider.DeleteRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Id{
+					Id: statResp.Info.Id,
+				},
 			},
-		},
-	}
+		}
 
-	delResp, err := gwc.Delete(ctx, delReq)
-	if err != nil {
-		render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
-		return
-	}
+		delResp, err := gwc.Delete(ctx, delReq)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
+			return
+		}
 
-	if delResp.Status.Code != rpcv1beta1.Code_CODE_OK {
-		o.logger.Error().
-			Str("stat_status_code", statResp.Status.Code.String()).
-			Str("stat_message", statResp.Status.Message).
-			Msg("DeleteUser: could not delete user home: delete failed")
-		return
+		if delResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user home: delete failed")
+			return
+		}
 	}
 
 	req := accounts.DeleteAccountRequest{
