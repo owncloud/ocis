@@ -2,11 +2,28 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.4.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.5.0...master
 
 ## Summary
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
+
+## Details
+
+* Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
+
+   The way the value was being set ensured that it was NOT being overridden where it should have
+   been. This patch ensures the correct loading order of values.
+
+   https://github.com/owncloud/ocis/pull/1956
+# Changelog for [1.5.0] (2021-04-21)
+
+The following sections list the changes for 1.5.0.
+
+[1.5.0]: https://github.com/owncloud/ocis/compare/v1.4.0...v1.5.0
+
+## Summary
+
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
 * Change - Update ownCloud Web to v3.0.0: [#1938](https://github.com/owncloud/ocis/pull/1938)
@@ -19,13 +36,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
-
-* Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
-
-   The way the value was being set ensured that it was NOT being overridden where it should have
-   been. This patch ensures the correct loading order of values.
-
-   https://github.com/owncloud/ocis/pull/1956
 
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 
