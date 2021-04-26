@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
+* Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
 
 ## Details
 
@@ -16,6 +17,14 @@ The following sections list the changes for unreleased.
    been. This patch ensures the correct loading order of values.
 
    https://github.com/owncloud/ocis/pull/1956
+
+* Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+
+   Steps to make the supervisor fail:
+
+   `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
+
+   https://github.com/owncloud/ocis/pull/1963
 # Changelog for [1.5.0] (2021-04-21)
 
 The following sections list the changes for 1.5.0.
