@@ -54,6 +54,8 @@ Retrieve a list of available spaces of a user. This includes all spaces the user
 
 API Call: `/me/drives`: Returns a list of spaces.
 
+There is also `/drives`, returning the list of spaces the user has access to. This endpoint is used to access any space by id using `/drives/{drive-id}`.
+
 ### Common Reply
 
 The reply to both calls is either one or a list of [Drive representation objects](https://docs.microsoft.com/de-de/graph/api/resources/drive?view=graph-rest-1.0):
