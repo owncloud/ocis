@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-26T06:15:09+0000"
+date: "2021-04-26T06:20:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -34,27 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
--http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
--name |  $OCS_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
 
 ### ocs ocis-ocs
 
@@ -130,4 +109,25 @@ Usage: `ocs server [command options] [arguments...]`
 
 -reva-gateway-addr |  $OCS_REVA_GATEWAY_ADDR
 : REVA Gateway Endpoint. Default: `flags.OverrideDefaultString(cfg.RevaAddress, "127.0.0.1:9142")`.
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+-http-namespace |  $OCS_NAMESPACE
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+-name |  $OCS_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
 

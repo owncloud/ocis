@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-26T06:15:10+0000"
+date: "2021-04-26T06:20:37+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -34,6 +34,18 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api")`.
+
+-name |  $STORE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "store")`.
 
 ### store health
 
@@ -106,16 +118,4 @@ Usage: `store server [command options] [arguments...]`
 
 -data-path |  $STORE_DATA_PATH
 : location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, "/var/tmp/ocis/store")`.
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
--grpc-namespace |  $STORE_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.api")`.
-
--name |  $STORE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "store")`.
 
