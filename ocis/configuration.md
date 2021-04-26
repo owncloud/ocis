@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-26T09:28:29+0000"
+date: "2021-04-26T13:28:52+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -86,6 +86,12 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
 ### ocis health
 
 Check health status
@@ -100,12 +106,6 @@ Usage: `ocis health [command options] [arguments...]`
 Lists running ocis extensions
 
 Usage: `ocis list [command options] [arguments...]`
-
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
 
 ### ocis run
 
@@ -148,13 +148,13 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start accounts server
 
+#### ocis glauth
+
+Start glauth server
+
 #### ocis idp
 
 Start idp server
-
-#### ocis ocs
-
-Start ocs server
 
 #### ocis storage-home
 
@@ -164,21 +164,13 @@ Start storage and data provider for /home mount
 
 Start storage userprovider service
 
-#### ocis glauth
+#### ocis settings
 
-Start glauth server
+Start settings server
 
-#### ocis storage-gateway
+#### ocis storage-public-link
 
-Start storage gateway
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
+Start storage public link storage
 
 #### ocis proxy
 
@@ -188,51 +180,59 @@ Start proxy server
 
 Start storage auth-bearer service
 
-#### ocis storage-sharing
+#### ocis storage-groupprovider
 
-Start storage sharing service
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis onlyoffice
-
-Start onlyoffice server
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
+Start storage groupprovider service
 
 #### ocis version
 
 Lists running services with version
 
-#### ocis storage-frontend
+#### ocis webdav
 
-Start storage frontend
+Start webdav server
 
-#### ocis storage-auth-basic
+#### ocis storage-gateway
 
-Start storage auth-basic service
+Start storage gateway
 
-#### ocis storage-public-link
+#### ocis storage-sharing
 
-Start storage public link storage
+Start storage sharing service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
 
 #### ocis store
 
 Start a go-micro store
 
-#### ocis webdav
+#### ocis onlyoffice
 
-Start webdav server
+Start onlyoffice server
 
-#### ocis settings
+#### ocis storage-auth-basic
 
-Start settings server
+Start storage auth-basic service
+
+#### ocis thumbnails
+
+Start thumbnails server
 
 #### ocis web
 
 Start web server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
 
