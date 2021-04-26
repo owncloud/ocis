@@ -108,6 +108,9 @@ The following *driveStatus* values are available:
 ### Negative Consequences
 
 - Migration impact on existing installations. Still to be investigated.
+- Requires additional webdav endpoint that allows accessing an arbitrary storage space, either
+  - with an id: `/dav/spaces/<spaceid>/relative/path/to/file.ext`, or
+  - with a global path: `/dav/global/<accessible>/<mount>/<point>/relative/path/to/file.ext`, e.g. `/dav/global/projects/Golive 2021/Resources/slides.odt`
 
 ### Open Topics
 
