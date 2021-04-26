@@ -200,9 +200,9 @@ The new account management workflow will result in:
 │                                                   │
 │                                                   │
 │                                                   │
-│ (1) solidify driver interfaces with write         │
 │                                                   │
-│ (2) an example of a driver could be GLAuth        │
+│                                                   │
+│ an example of a driver could be GLAuth            │
 │ implementing the user management portion of the   │
 │ GraphAPI                                          │
 └───────────────────────────────────────────────────┘
