@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -366,9 +367,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if o.config.RevaAddress != "" {
-		// Note that the previous conditional is short circuiting this. This logic will NOT run when the user's backend is
-		// configured to use any other than the accounts service.
+	if o.config.RevaAddress != "" && os.Getenv("STORAGE_USERS_DRIVER") != "owncloud" {
 		t, err := o.mintTokenForUser(r.Context(), account)
 		if err != nil {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
@@ -385,6 +384,14 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
 		if err != nil {
 			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
+			return
+		}
+
+		if homeResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", homeResp.Status.Code.String()).
+				Str("stat_message", homeResp.Status.Message).
+				Msg("DeleteUser: could not get user home: get failed")
 			return
 		}
 
