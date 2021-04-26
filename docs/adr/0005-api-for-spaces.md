@@ -8,15 +8,15 @@ Technical Story: API to enable the concept of [Spaces](https://github.com/ownclo
 
 ## Context and Problem Statement
 
-As one of the building blocks for Spaces in oCIS we plan to add an API that returns information about available spaces.
+As one of the building blocks for Spaces in oCIS we plan to add an API that returns information about available spaces. This ADR discusses the API design oriented on the Microsoft Graph API.
 
 > Note: The term "spaces" is used here in the context of "a space where files can be saved", similar to a directory. It is not to be confused with space in the sense of free file space for example.
 
-The purpose of this new API is to give clients a very simple way to query the dynamic list of spaces, that the user has access to. Clients can provide a way better user experience with that.
+The purpose of this new API is to give clients a very simple way to query the dynamic list of spaces, that the user has access to. Clients can provide a better user experience with that.
+
+This API is supposed to be queried often, to give clients a condensed view of the available spaces for a user, but also their eTags and cTags. Hence the clients do not have to perform a PROPFIND for every space separately.
 
 This API would even allow to provide (WebDAV-) endpoints depending on the kind and version of the client asking for it.
-
-This ADR discusses how this API could be designed.
 
 ## Decision Drivers
 
@@ -66,13 +66,15 @@ The reply to both calls is either one or a list of [Drive representation objects
   "createdDateTime": "string (timestamp)",
   "description": "string",
   "driveType": "personal | projectSpaces | shares",
-  "driveStatus": "accepted | pending | mandatory",
+  "oCDriveStatus": "accepted | pending | mandatory",
   "eTag": "string",
   "lastModifiedDateTime": "string (timestamp)",
   "name": "string",
   "owner": { "@odata.type": "microsoft.graph.identitySet" },
+  "quota": { "@odata.type": "microsoft.graph.quota" },
+  "root":  { "@odata.type": "microsoft.graph.driveItem" },
   "webUrl": "url",
-  "coowner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
+  "oCCoOwner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
 }
 
 ```
@@ -81,11 +83,15 @@ The meaning of the object are in ownClouds context:
 
 1. **id** - a unique ID identifying the space
 2. **driveType** - describing the type of the space.
-3. **driveStatus** - telling the status
+3. **oCDriveStatus** - telling the status (*)
 4. **eTag** - the current ETag of the space
 5. **owner** - an owner object to whom the space belongs
-6. **webUrl** - the relative Webdav path in ownCloud. It must include the `remote.php` part in oC10 installations.
-7. **coowner** - optional array owner objects of the co-owners of a space (*)
+6. **quota** - quota information about this space
+7. **root**  - the root driveItem object.
+6. **webUrl** - The URL to make this space visible in the browser.
+7. **oCCoOwner** - optional array owner objects of the co-owners of a space (*)
+
+> Note: the **root** object is a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root of the space. Especially important is the member `webDavUrl` in the root object which provides the full URL to be used by clients to address items within the space. Also it contains the fields `eTag` and `cTag`.
 
 The following *driveType* values are available in the first step, but might be enhanced later:
 
@@ -93,13 +99,17 @@ The following *driveType* values are available in the first step, but might be e
 * **projectSpaces**: The project spaces available for the user (*)
 * **shares**: The share jail, contains all shares for the user (*)
 
-The (*) marked types are not defined in the official MS API.
+Other space types such as backup, hidden etc. can be added later as requested.
+
+The (*) marked types are not defined in the official MS API. They are prefixed with `oC` to avoid namespace clashes.
+
 
 The following *driveStatus* values are available:
 
 * **accepted**: The user has accepted the space and uses it
 * **pending**: The user has not yet accepted the space , but can use it after having it accepted.
 * **mandatory**: This is an mandatory space. Used for the personal- and shares-space. The user can not influence if it is visible or not, it is always available.
+* **offline**: The space is currently not available.
 
 ### Positive Consequences
 
@@ -116,7 +126,6 @@ The following *driveStatus* values are available:
 
 ### Open Topics
 
-- Do we need a new WebDAV endpoint?
 - What are the WebDAV pathes for Trashbin, Versions
     + option: additional entries in the reply struct
 - The identitySet object used for "owner" and "coowner" require to implement the [https://docs.microsoft.com/de-de/graph/api/resources/identityset?view=graph-rest-1.0](IdentitySet) JSON object, which contains information that seems to be of limited benefit for oCIS. An alternative would be to implement a simpler identity object for oCIS and use that.
