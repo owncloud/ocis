@@ -208,4 +208,4 @@ The new account management workflow will result in:
 └───────────────────────────────────────────────────┘
 ```
 
-This flow allows Reva and oCIS Proxy to runs any middleware logic in order to validate a request. The communication between the proposed Admin api (CS3 API messages) with the IDM (GLAuth) are specific to the _drivers_.
+This flow allows Reva and oCIS Proxy to run any middleware logic in order to validate a request. The communication between the proposed Admin api (CS3 API messages) and the IDM (GLAuth) are specific to the _drivers_.
