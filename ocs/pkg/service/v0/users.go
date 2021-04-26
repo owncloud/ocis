@@ -12,6 +12,7 @@ import (
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -435,6 +436,54 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				Str("stat_status_code", statResp.Status.Code.String()).
 				Str("stat_message", statResp.Status.Message).
 				Msg("DeleteUser: could not delete user home: delete failed")
+			return
+		}
+
+		// delete trash is a combination of ListRecycle + PurgeRecycle (iterative)
+		listRecycle := &gateway.ListRecycleRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{
+					Path: homeResp.Path,
+				},
+			},
+		}
+
+		listRecycleResponse, err := gwc.ListRecycle(ctx, listRecycle)
+		if err != nil {
+			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete trash").Error()))
+			return
+		}
+
+		if listRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user trash: delete failed")
+			return
+		}
+
+		// now that we've got the items, we iterate, create references and fire PurgeRecycleRequests to the Reva gateway.
+		//for i := range listRecycleResponse.RecycleItems {
+		// craft purge request
+		req := &gateway.PurgeRecycleRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{
+					Path: homeResp.Path,
+				},
+			},
+		}
+
+		// do request
+		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
+		if err != nil {
+
+		}
+
+		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user trash: delete failed")
 			return
 		}
 	}
