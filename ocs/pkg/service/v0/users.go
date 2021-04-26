@@ -455,14 +455,14 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // TODO(refs) this to ocis-pkg ... we are minting tokens all over the place ... or use a service? ... like reva?
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
-		"secret":  "Pive-Fumkiu4", // TODO(refs) this MUST not be hardcoded
+		"secret":  o.config.TokenManager.JWTSecret,
 		"expires": int64(60),
 	})
 
 	u := &revauser.User{
 		Id: &revauser.UserId{
 			OpaqueId: account.Id,
-			Idp:      "https://localhost:9200", // TODO(refs) this MUST not be hardcoded
+			Idp:      o.config.IdentityManagement.Address,
 		},
 		Groups: []string{},
 		Opaque: &types.Opaque{

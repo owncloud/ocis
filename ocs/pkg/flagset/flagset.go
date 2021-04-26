@@ -165,6 +165,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.RevaAddress,
 		},
+		&cli.StringFlag{
+			Name:        "idm-address",
+			Value:       flags.OverrideDefaultString(cfg.IdentityManagement.Address, "https://localhost:9200"),
+			EnvVars:     []string{"OCS_IDM_ADDRESS", "OCIS_URL"},
+			Usage:       "keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users",
+			Destination: &cfg.IdentityManagement.Address,
+		},
 	}
 }
 
