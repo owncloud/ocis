@@ -501,7 +501,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
+          #'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
