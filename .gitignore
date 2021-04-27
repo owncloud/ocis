@@ -16,6 +16,7 @@ ocis/cmd/ocis/config/
 .idea
 
 yarn-error.log
+yarn.lock
 
 # Konnectd
 idp/assets/identifier
