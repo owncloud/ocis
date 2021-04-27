@@ -172,6 +172,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users",
 			Destination: &cfg.IdentityManagement.Address,
 		},
+		&cli.StringFlag{
+			Name:        "users-driver",
+			Value:       flags.OverrideDefaultString(cfg.StorageUsersDriver, "ocis"),
+			Usage:       "storage driver for users mount: eg. local, eos, owncloud, ocis or s3",
+			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
+			Destination: &cfg.StorageUsersDriver,
+		},
 	}
 }
 

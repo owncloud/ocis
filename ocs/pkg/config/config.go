@@ -63,6 +63,7 @@ type Config struct {
 	Service            Service
 	AccountBackend     string
 	RevaAddress        string
+	StorageUsersDriver string
 	IdentityManagement IdentityManagement
 
 	Context    context.Context

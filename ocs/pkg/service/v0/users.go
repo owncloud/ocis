@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
@@ -368,10 +367,10 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if o.config.RevaAddress != "" && os.Getenv("STORAGE_USERS_DRIVER") != "owncloud" {
+	if o.config.RevaAddress != "" && o.config.StorageUsersDriver != "owncloud" {
 		t, err := o.mintTokenForUser(r.Context(), account)
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not mint token").Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "error minting token").Error())))
 			return
 		}
 
@@ -379,12 +378,12 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
 		if err != nil {
-			o.logger.Error().Err(err).Msg("error securing a connection to the reva gateway, could not delete user home")
+			o.logger.Error().Err(err).Msg("error securing a connection to Reva gateway")
 		}
 
 		homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error())))
 			return
 		}
 
@@ -405,7 +404,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error())))
 			return
 		}
 
@@ -427,7 +426,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		delResp, err := gwc.Delete(ctx, delReq)
 		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error())))
 			return
 		}
 
@@ -439,32 +438,6 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// delete trash is a combination of ListRecycle + PurgeRecycle (iterative)
-		listRecycle := &gateway.ListRecycleRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
-			},
-		}
-
-		listRecycleResponse, err := gwc.ListRecycle(ctx, listRecycle)
-		if err != nil {
-			render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete trash").Error()))
-			return
-		}
-
-		if listRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			o.logger.Error().
-				Str("stat_status_code", statResp.Status.Code.String()).
-				Str("stat_message", statResp.Status.Message).
-				Msg("DeleteUser: could not delete user trash: delete failed")
-			return
-		}
-
-		// now that we've got the items, we iterate, create references and fire PurgeRecycleRequests to the Reva gateway.
-		//for i := range listRecycleResponse.RecycleItems {
-		// craft purge request
 		req := &gateway.PurgeRecycleRequest{
 			Ref: &provider.Reference{
 				Spec: &provider.Reference_Path{
@@ -473,10 +446,10 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		// do request
 		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
 		if err != nil {
-
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete trash").Error())))
+			return
 		}
 
 		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
