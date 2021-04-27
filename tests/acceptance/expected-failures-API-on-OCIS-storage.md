@@ -1562,6 +1562,8 @@ special character username not valid
 -   [apiProvisioning-v2/enableUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L20)
 -   [apiProvisioning-v2/getUser.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L34)
 -   [apiProvisioning-v2/getUser.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L35)
+-   [apiTrashbin/trashbinFilesFolders.feature:201](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L201)
+-   [apiTrashbin/trashbinFilesFolders.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L202)
 -   [apiTrashbin/trashbinFilesFolders.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L246)
 -   [apiTrashbin/trashbinFilesFolders.feature:247](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L247)
 -   [apiTrashbin/trashbinFilesFolders.feature:248](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L248)
