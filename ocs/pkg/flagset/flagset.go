@@ -176,7 +176,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "users-driver",
 			Value:       flags.OverrideDefaultString(cfg.StorageUsersDriver, "ocis"),
 			Usage:       "storage driver for users mount: eg. local, eos, owncloud, ocis or s3",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
+			EnvVars:     []string{"OCS_STORAGE_USERS_DRIVER", "STORAGE_USERS_DRIVER"},
 			Destination: &cfg.StorageUsersDriver,
 		},
 	}
