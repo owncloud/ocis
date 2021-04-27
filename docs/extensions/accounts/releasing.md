@@ -12,7 +12,7 @@ geekdocFilePath: releasing.md
 
 After adding changes to the Accounts package within oCIS and testing them locally, you want to update the compiled assets to the oCIS binary. 
 
-To achieve this, you have run a Go command and add the results to your PR.
+To achieve this, you have to run a Go command and add the results to your PR.
 
 ### Package Hierarchy
 
