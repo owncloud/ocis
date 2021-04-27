@@ -5,7 +5,6 @@ weight: 41
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: ports.md
-geekdocCollapseSection: true
 ---
 
 Currently, every service needs to be configured with a port so oCIS can start them on localhost. We will automate this by using a service registry for more services, until eventually only the proxy has to be configured with a public port.
