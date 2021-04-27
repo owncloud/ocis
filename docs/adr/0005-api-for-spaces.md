@@ -66,8 +66,7 @@ The reply to both calls is either one or a list of [Drive representation objects
   "createdDateTime": "string (timestamp)",
   "description": "string",
   "driveType": "personal | projectSpaces | shares",
-  "oCDriveStatus": "accepted | pending | mandatory",
-  "eTag": "string",
+  "oCDriveStatus": "accepted | pending | mandatory | offline",
   "lastModifiedDateTime": "string (timestamp)",
   "name": "string",
   "owner": { "@odata.type": "microsoft.graph.identitySet" },
@@ -84,12 +83,11 @@ The meaning of the object are in ownClouds context:
 1. **id** - a unique ID identifying the space
 2. **driveType** - describing the type of the space.
 3. **oCDriveStatus** - telling the status (*)
-4. **eTag** - the current ETag of the space
-5. **owner** - an owner object to whom the space belongs
-6. **quota** - quota information about this space
-7. **root**  - the root driveItem object.
-6. **webUrl** - The URL to make this space visible in the browser.
-7. **oCCoOwner** - optional array owner objects of the co-owners of a space (*)
+4. **owner** - an owner object to whom the space belongs
+5. **quota** - quota information about this space
+6. **root**  - the root driveItem object.
+7. **webUrl** - The URL to make this space visible in the browser.
+8. **oCCoOwner** - optional array owner objects of the co-owners of a space (*)
 
 > Note: the **root** object is a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root of the space. Especially important is the member `webDavUrl` in the root object which provides the full URL to be used by clients to address items within the space. Also it contains the fields `eTag` and `cTag`.
 
