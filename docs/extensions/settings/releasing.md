@@ -21,7 +21,7 @@ of the repository and then commit the resulting changes to your branch/PR. See b
 
 ### Package Hierarchy
 
-- [ocis](https://githug.com/owncloud/ocis)
+- [ocis](https://github.com/owncloud/ocis)
     - [ocis-settings](https://github.com/owncloud/ocis/tree/master/settings)
 
 #### Updating ocis-settings
