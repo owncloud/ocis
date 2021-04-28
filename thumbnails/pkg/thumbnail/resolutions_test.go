@@ -119,20 +119,3 @@ func TestParseResolution(t *testing.T) {
 		t.Errorf("Expected resolution %s got %s", rStr, r.String())
 	}
 }
-
-func TestMapRatio(t *testing.T) {
-	testData := [][]image.Rectangle{
-		{image.Rect(0, 0, 1920, 1080), image.Rect(0, 0, 32, 32), image.Rect(0, 0, 32, 18)},
-		{image.Rect(0, 0, 1080, 1920), image.Rect(0, 0, 32, 32), image.Rect(0, 0, 18, 32)},
-		{image.Rect(0, 0, 1024, 735), image.Rect(0, 0, 32, 32), image.Rect(0, 0, 32, 22)},
-	}
-	for _, row := range testData {
-		given := row[0]
-		other := row[1]
-		expected := row[2]
-		mapped := mapRatio(given, other)
-		if mapped.Dx() != expected.Dx() || mapped.Dy() != expected.Dy() {
-			t.Errorf("Expected %dx%d got %dx%d", expected.Dx(), expected.Dy(), mapped.Dx(), mapped.Dy())
-		}
-	}
-}

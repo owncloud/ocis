@@ -93,15 +93,6 @@ func (rs Resolutions) ClosestMatch(requested image.Rectangle, sourceSize image.R
 	return match
 }
 
-func mapRatio(given image.Rectangle, other image.Rectangle) image.Rectangle {
-	isLandscape := given.Dx() > given.Dy()
-	ratio := float64(given.Dx()) / float64(given.Dy())
-	if isLandscape {
-		return image.Rect(0, 0, other.Dx(), int(float64(other.Dx())/ratio))
-	}
-	return image.Rect(0, 0, int(float64(other.Dy())*ratio), other.Dy())
-}
-
 func dimensionLength(rect image.Rectangle, isLandscape bool) int {
 	if isLandscape {
 		return rect.Dx()

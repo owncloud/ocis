@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/render v1.0.1
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5

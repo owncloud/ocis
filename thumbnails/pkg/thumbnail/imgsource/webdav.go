@@ -4,63 +4,54 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/pkg/errors"
 	"image"
 	_ "image/gif"  // Import the gif package so that image.Decode can understand gifs
 	_ "image/jpeg" // Import the jpeg package so that image.Decode can understand jpegs
 	_ "image/png"  // Import the png package so that image.Decode can understand pngs
 	"net/http"
-	"net/url"
-	"path"
-
-	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/pkg/errors"
 )
 
 // NewWebDavSource creates a new webdav instance.
-func NewWebDavSource(cfg config.WebDavSource) WebDav {
+func NewWebDavSource(cfg config.Thumbnail) WebDav {
 	return WebDav{
-		baseURL:  cfg.BaseURL,
-		insecure: cfg.Insecure,
+		insecure: cfg.WebdavAllowInsecure,
 	}
 }
 
 // WebDav implements the Source interface for webdav services
 type WebDav struct {
-	baseURL  string
 	insecure bool
 }
 
 // Get downloads the file from a webdav service
-func (s WebDav) Get(ctx context.Context, file string) (image.Image, error) {
-	u, _ := url.Parse(s.baseURL)
-	u.Path = path.Join(u.Path, file)
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+func (s WebDav) Get(ctx context.Context, url string) (image.Image, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure} //nolint:gosec
 
-	auth, ok := ContextGetAuthorization(ctx)
-	if !ok {
-		return nil, fmt.Errorf("could not get image \"%s\" error: authorization is missing", file)
+	if auth, ok := ContextGetAuthorization(ctx); ok {
+		req.Header.Add("Authorization", auth)
 	}
-	req.Header.Add("Authorization", auth)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not get the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", file, resp.StatusCode)
+		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", url, resp.StatusCode)
 	}
 
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		return nil, errors.Wrapf(err, `could not decode the image "%s"`, file)
+		return nil, errors.Wrapf(err, `could not decode the image "%s"`, url)
 	}
 	return img, nil
 }

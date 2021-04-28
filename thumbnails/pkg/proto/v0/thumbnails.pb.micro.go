@@ -44,7 +44,7 @@ func NewThumbnailServiceEndpoints() []*api.Endpoint {
 
 type ThumbnailService interface {
 	// Generates the thumbnail and returns it.
-	GetThumbnail(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*GetResponse, error)
+	GetThumbnail(ctx context.Context, in *GetThumbnailRequest, opts ...client.CallOption) (*GetThumbnailResponse, error)
 }
 
 type thumbnailService struct {
@@ -59,9 +59,9 @@ func NewThumbnailService(name string, c client.Client) ThumbnailService {
 	}
 }
 
-func (c *thumbnailService) GetThumbnail(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*GetResponse, error) {
+func (c *thumbnailService) GetThumbnail(ctx context.Context, in *GetThumbnailRequest, opts ...client.CallOption) (*GetThumbnailResponse, error) {
 	req := c.c.NewRequest(c.name, "ThumbnailService.GetThumbnail", in)
-	out := new(GetResponse)
+	out := new(GetThumbnailResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,12 +73,12 @@ func (c *thumbnailService) GetThumbnail(ctx context.Context, in *GetRequest, opt
 
 type ThumbnailServiceHandler interface {
 	// Generates the thumbnail and returns it.
-	GetThumbnail(context.Context, *GetRequest, *GetResponse) error
+	GetThumbnail(context.Context, *GetThumbnailRequest, *GetThumbnailResponse) error
 }
 
 func RegisterThumbnailServiceHandler(s server.Server, hdlr ThumbnailServiceHandler, opts ...server.HandlerOption) error {
 	type thumbnailService interface {
-		GetThumbnail(ctx context.Context, in *GetRequest, out *GetResponse) error
+		GetThumbnail(ctx context.Context, in *GetThumbnailRequest, out *GetThumbnailResponse) error
 	}
 	type ThumbnailService struct {
 		thumbnailService
@@ -91,6 +91,6 @@ type thumbnailServiceHandler struct {
 	ThumbnailServiceHandler
 }
 
-func (h *thumbnailServiceHandler) GetThumbnail(ctx context.Context, in *GetRequest, out *GetResponse) error {
+func (h *thumbnailServiceHandler) GetThumbnail(ctx context.Context, in *GetThumbnailRequest, out *GetThumbnailResponse) error {
 	return h.ThumbnailServiceHandler.GetThumbnail(ctx, in, out)
 }
