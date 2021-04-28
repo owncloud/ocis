@@ -22,14 +22,14 @@ require (
 	github.com/owncloud/ocis/proxy v0.0.0-20210412105747-9b95e9b1191b
 	github.com/owncloud/ocis/settings v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/store v0.0.0-20210413063522-955bd60edf33
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
-	google.golang.org/grpc v1.37.0 // indirect
+	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0
 )
 

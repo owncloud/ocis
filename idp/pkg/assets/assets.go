@@ -1,6 +1,7 @@
 package assets
 
 import (
+	"github.com/owncloud/ocis/idp"
 	"net/http"
 	"os"
 	"path"
@@ -8,8 +9,6 @@ import (
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
-
-//go:generate make -C ../.. embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {
@@ -42,12 +41,7 @@ func (a assets) Open(original string) (http.File, error) {
 		}
 	}
 
-	return FS.OpenFile(
-		CTX,
-		original,
-		os.O_RDONLY,
-		0644,
-	)
+	return idp.Assets.Open(original)
 }
 
 // New returns a new http filesystem to serve assets.

@@ -1,14 +1,11 @@
 package assets
 
 import (
-	"net/http"
-	"os"
-
+	graph_explorer "github.com/owncloud/ocis/graph-explorer"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"net/http"
 )
-
-//go:generate make -C ../.. embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {
@@ -18,12 +15,7 @@ type assets struct {
 
 // Open just implements the HTTP filesystem interface.
 func (a assets) Open(original string) (http.File, error) {
-	return FS.OpenFile(
-		CTX,
-		original,
-		os.O_RDONLY,
-		0644,
-	)
+	return graph_explorer.Assets.Open(original)
 }
 
 // New returns a new http filesystem to serve assets.

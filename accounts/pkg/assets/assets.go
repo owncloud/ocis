@@ -1,21 +1,14 @@
 package assets
 
 import (
+	"github.com/owncloud/ocis/accounts"
 	"net/http"
 	"os"
 	"path"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-
-	// Fake the import to make the dep tree happy.
-	_ "golang.org/x/net/context"
-
-	// Fake the import to make the dep tree happy.
-	_ "golang.org/x/net/webdav"
 )
-
-//go:generate make -C ../.. embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {
@@ -48,12 +41,7 @@ func (a assets) Open(original string) (http.File, error) {
 		}
 	}
 
-	return FS.OpenFile(
-		CTX,
-		original,
-		os.O_RDONLY,
-		0644,
-	)
+	return accounts.Assets.Open(original)
 }
 
 // New returns a new http filesystem to serve assets.
