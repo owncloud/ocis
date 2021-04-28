@@ -15,7 +15,7 @@ This service provides an oCIS extension that wraps [reva](https://github.com/cs3
 ## Architecture Overview
 
 The below diagram shows the oCIS services and the contained reva services within as dashed boxes. In general:
-1. A request comes in at the proxy and is authenticated using oidc.
+1. A request comes in at the proxy and is authenticated using OIDC.
 2. It is forwarded to the oCIS frontend which handles ocs and ocdav requests by talking to the reva gateway using the CS3 API.
 3. The gateway acts as a facade to the actual CS3 services: storage providers, user providers, group providers and sharing providers.
 
@@ -32,5 +32,5 @@ The bottom part is lighter because we will deprecate it in favor of using only t
 ## Endpoints and references
 
 In order to reason about the request flow, two aspects in the architecture need to be understood well:
-1. The endpoints that are handling requests: what resources are presented at the available URL endpoints?
-2. The resource identifiers that are exposed or required: path or id based?
+1. What kind of [*namespaces*]({{< ref "./namespaces.md" >}}) are presented at the different WebDAV and CS3 endpoints?
+2. What kind of [*resource*]({{< ref "./terminology.md#resources" >}}) [*references*]({{< ref "./terminology.md#references" >}}) are exposed or required: path or id based?

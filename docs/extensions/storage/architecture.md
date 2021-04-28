@@ -9,9 +9,9 @@ geekdocFilePath: architecture.md
 
 ## Frontend
 
-The ocis frontend service starts all services that handle incoming HTTP requests:
+The oCIS frontend service starts all services that handle incoming HTTP requests:
 - *ocdav* for ownCloud flavoured WebDAV
-- *ocs* for sharing, user management, capabilities and other OCS API endpoints 
+- *ocs* for sharing, user provisioning, capabilities and other OCS API endpoints 
 - *datagateway* for up and downloads
 - TODO: *ocm*
 

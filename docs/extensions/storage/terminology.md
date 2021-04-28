@@ -10,26 +10,26 @@ geekdocFilePath: terminology.md
 Communication is hard. And clear communication is even harder. You may encounter the following terms throughout the documentation, in the code or when talking to other developers. Just keep in mind that whenever you hear or read *storage*, that term needs to be clarified, because on its own it is too vague. PR welcome.
 
 ## Resources
-A *resource* is a logical concept. Ressources can be of [different types](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceType):
+A *resource* is a logical concept. Resources can be of [different types](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceType):
 - an actual *file*
 - a *container*, e.g. a folder or bucket
 - a *symlink*, or
-- a *reference* which can point to a resource in another *storage provider*
+- a [*reference*]({{< ref "#references" >}}) which can point to a resource in another [*storage provider*]({{< ref "#storage-providers" >}})
 
 ## References
 
-A [*reference*](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.Reference) is a logical concept. It identifies a *resource* and consists of either
-- a *path* based reference, used to identify a *resource* in the *namespace* of a *storage provider*. It must start with a `/`.
-- an [*id* based reference](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId), uniquely identifying a *resource* in the *namespace* of a *storage provider*. It consists of a `storage provider id` and an `opaque id`. The `storage provider id` must NOT start with a `/`.
+A *reference* is a logical concept that identifies a [*resource*]({{< ref "#resources" >}}). A [*CS3 reference*](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.Reference) consists of either
+- a *path* based reference, used to identify a [*resource*]({{< ref "#resources" >}}) in the [*namespace*]({{< ref "./namespaces.md" >}}) of a [*storage provider*]({{< ref "#storage-providers" >}}). It must start with a `/`.
+- a [CS3 *id* based reference](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId), uniquely identifying a [*resource*]({{< ref "#resources" >}}) in the [*namespace*]({{< ref "./namespaces.md" >}}) of a [*storage provider*]({{< ref "#storage-providers" >}}). It consists of a `storage provider id` and an `opaque id`. The `storage provider id` must NOT start with a `/`.
 
 {{< hint info >}}
-The `/` is important because currently the static *storage registry* uses a map to look up which *storage provider* is responsible for the resource. Paths must be prefixed with `/` so there can be no collisions between paths and storage provider ids in the same map.
+The `/` is important because currently the static [*storage registry*]({{< ref "#storage-registries" >}}) uses a map to look up which [*storage provider*]({{< ref "#storage-providers" >}}) is responsible for the resource. Paths must be prefixed with `/` so there can be no collisions between paths and storage provider ids in the same map.
 {{< /hint >}}
 
 
 {{< hint warning >}}
 ### Alternative: reference triple ####
-A *reference* is a logical concept. It identifies a *resource* and consists of
+A *reference* is a logical concept. It identifies a [*resource*]({{< ref "#resources" >}}) and consists of
 a `storage_space`, a `<root_id>` and a `<path>`
 ```
 <storage_space>!<root_id>:<path>
@@ -41,7 +41,7 @@ While all components are optional, only three cases are used:
 | `<storage_space>!:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:path/to/file.ext` | path relative to the root of the storage space | 
 | `<storage_space>!<root>:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!c3cf23bb-8f47-4719-a150-1d25a1f6fb56:to/file.ext` | path relative to the specified node in the storage space, used to reference resources without disclosing parent paths |
 
-`<storage_space>` should be a uuid to prevent references from breaking when a *user* or *storage space* gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
+`<storage_space>` should be a UUID to prevent references from breaking when a *user* or [*storage space*]({{< ref "#storage-space" >}}) gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
 
 A reference will often start as an absolute/global path, e.g. `!:/home/Projects/Foo`. The gateway will look up the storage provider that is responsible for the path
 
@@ -57,7 +57,7 @@ Now, the same file is accessed as a share
 | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a:` | `56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a` is the id of `Foo`, the path is empty |
 
 
-The `:`, `!` and `$` are chosen deliberately from the set of [RFC3986 sub delimiters](https://tools.ietf.org/html/rfc3986#section-2.2), so they can be used in URLs without having to being encoded. In some cases, a delimiter can be left out if a component is not set:
+The `:`, `!` and `$` are chosen from the set of [RFC3986 sub delimiters](https://tools.ietf.org/html/rfc3986#section-2.2) on purpose. They can be used in URLs without having to be encoded. In some cases, a delimiter can be left out if a component is not set:
 | reference | interpretation |
 |-|-|
 | `/absolute/path/to/file.ext` | absolute path, all delimiters omitted |
@@ -70,62 +70,68 @@ The `:`, `!` and `$` are chosen deliberately from the set of [RFC3986 sub delimi
 
 ## Storage Drivers
 
-A *storage driver* implements access to a *storage system*:
+A *storage driver* implements access to a [*storage system*]({{< ref "#storage-systems" >}}):
 
-It maps the *path* and *id* based CS3 *references* to an appropriate *storage system* specific reference, e.g.:
+It maps the *path* and *id* based CS3 *references* to an appropriate [*storage system*]({{< ref "#storage-systems" >}}) specific reference, e.g.:
 - eos file ids
 - posix inodes or paths
 - deconstructed filesystem nodes
 
-## Storage Provider
+## Storage Providers
 
-A *storage provider* manages *resources* identified by a *reference*
-by accessing a *storage system* with a *storage driver*.
+A *storage provider* manages [*resources*]({{< ref "#resources" >}}) identified by a [*reference*]({{< ref "#references" >}})
+by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "#storage-drivers" >}}).
 
 {{< svg src="extensions/storage/static/storageprovider.drawio.svg" >}}
 
 {{< hint warning >}}
 **Proposed Change**
-A *storage provider* manages multiple *storage spaces*
-by accessing a *storage system* with a *storage driver*.
+A *storage provider* manages multiple [*storage spaces*]({{< ref "#storage-space" >}})
+by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "#storage-drivers" >}}).
 {{< /hint >}}
 {{< svg src="extensions/storage/static/storageprovider-spaces.drawio.svg" >}}
 {{< hint warning >}}
-By making *storage providers* aware of *storage spaces* we can get rid of the current `enablehome` flag / hack in reva. Furthermore, provisioning a new *storage space* becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
+By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can get rid of the current `enablehome` flag / hack in reva. Furthermore, provisioning a new [*storage space*]({{< ref "#storage-space" >}}) becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
 {{< /hint >}}
 
 ## Storage Registries
 
-A *storage registry* manages the global *namespace*:
+A *storage registry* manages the global [*namespace*]({{< ref "./namespaces.md" >}}):
 It is used by the *gateway*
-to look up `address` and `port` of the *storage provider*
-that should handle a *reference*.
+to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
+that should handle a [*reference*]({{< ref "#references" >}}).
 
 {{< svg src="extensions/storage/static/storageregistry.drawio.svg" >}}
 
 {{< hint warning >}}
 **Proposed Change**
-A *storage registry* manages the *namespace* for a *user*:
+A *storage registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*:
 It is used by the *gateway*
-to look up `address` and `port` of the *storage provider*
-that is currently serving a *storage space*.
+to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
+that is currently serving a [*storage space*]({{< ref "#storage-space" >}}).
 {{< /hint >}}
 {{< svg src="extensions/storage/static/storageregistry-spaces.drawio.svg" >}}
 {{< hint warning >}}
-By making *storage registries* aware of *storage spaces* we can query them for a listing of all *storage spaces* a user has access to. Including his home, received shares, project folders or group drives. See [a WIP PR for spaces in the oCIS repo (#1827)](https://github.com/owncloud/ocis/pull/1827) for more info.
+By making *storage registries* aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can query them for a listing of all [*storage spaces*]({{< ref "#storage-spaces" >}}) a user has access to. Including his home, received shares, project folders or group drives. See [a WIP PR for spaces in the oCIS repo (#1827)](https://github.com/owncloud/ocis/pull/1827) for more info.
 {{< /hint >}}
 
 ## Storage Spaces
 A *storage space* is a logical concept:
-It is a tree of *resources*
+It is a tree of [*resources*]({{< ref "#resources" >}})*resources*
 with a single *owner* (*user* or *group*), 
 a *quota* and *permissions*, identified by a `storage space id`.
 
 {{< svg src="extensions/storage/static/storagespace.drawio.svg" >}}
 
-Examples would be every user's home storage space, project storage spaces or group storage spaces. While they all serve different purposes and may or may not have workflows like anti virus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A *storage registry* then allows listing the properties of storage spaces, e.g. free space, quota, owner, syncable, root etag, uploed workflow steps, ...
+Examples would be every user's home storage space, project storage spaces or group storage spaces. While they all serve different purposes and may or may not have workflows like anti virus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A [*storage registry*]({{< ref "#storage-registries" >}}) then allows listing the capabilities of [*storage spaces*]({{< ref "#storage-spaces" >}}), e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
 
-Finally, a logical `storage space id` is not tied to a specific storage provider. If the *storage driver* supports it, we can import existing files including their *file id*, which makes it possible to move storage spaces between storage spaces to implement storage classes, e.g. with or without archival, workflows, on SSDs or HDDs.
+Finally, a logical `storage space id` is not tied to a specific [*storage provider*]({{< ref "#storage-providers" >}}). If the [*storage driver*]({{< ref "#storage-drivers" >}}) supports it, we can import existing files including their `file id`, which makes it possible to move [*storage spaces*]({{< ref "#storage-spaces" >}}) between [*storage providers*]({{< ref "#storage-providers" >}}) to implement storage classes, e.g. with or without archival, workflows, on SSDs or HDDs.
 
 ## Shares
-*To be clarified: we are aware that storage spaces may be to 'heavywheight' for ad hoc sharing with groups. That being said there is no technical reason why group shares should notd be treated like storage spaces that users can provision themselves. They would share the quota with the users home storage space and the share initiator would be the sole owner but the mechanism of treating a share like a new storage space would be the same. This obviously also extends to user shares and even file indvidual shares that would be wrapped in a virtual collection. Something new that would become possible would be collections of arbitrary files in a single storage space, e.g. the ten best pictures from a large album.*
+*To be clarified: we are aware that [*storage spaces*]({{< ref "#storage-spaces" >}}) may be too 'heavywheight' for ad hoc sharing with groups. That being said, there is no technical reason why group shares should not be treated like [*storage spaces*]({{< ref "#storage-spaces" >}}) that users can provision themselves. They would share the quota with the users home [*storage space*]({{< ref "#storage-spaces" >}}) and the share initiator would be the sole owner. Technically, the mechanism of treating a share like a new [*storage space*]({{< ref "#storage-spaces" >}}) would be the same. This obviously also extends to user shares and even file indvidual shares that would be wrapped in a virtual collection. It would also become possible to share collections of arbitrary files in a single storage space, e.g. the ten best pictures from a large album.*
+
+
+## Storage Systems
+Every *storage system* has different native capabilities like id and path based lookups, recursive change time propagation, permissions, trash, versions, archival and more.
+A [*storage provider*]({{< ref "#storage-providers" >}}) makes the storage system available in the CS3 API by wrapping the capabilities as good as possible using a [*storage driver*]({{< ref "#storage-drivers" >}}).
+There migt be multiple [*storage drivers*]({{< ref "#storage-drivers" >}}) for a *storage system*, implementing different tradeoffs to match varying requirements.
