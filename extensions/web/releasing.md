@@ -16,7 +16,7 @@ To update this package within all the deliveries, we need to update the package 
 
 ### Package Hierarchy
 
-- [ocis](https://githug.com/owncloud/ocis)
+- [ocis](https://github.com/owncloud/ocis)
     - [ocis-web](https://github.com/owncloud/ocis/tree/master/web)
       - [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg)
       - [ownCloud Web](https://github.com/owncloud/web)
