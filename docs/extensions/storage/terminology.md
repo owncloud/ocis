@@ -41,7 +41,7 @@ While all components are optional, only three cases are used:
 | `<storage_space>!:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:path/to/file.ext` | path relative to the root of the storage space | 
 | `<storage_space>!<root>:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!c3cf23bb-8f47-4719-a150-1d25a1f6fb56:to/file.ext` | path relative to the specified node in the storage space, used to reference resources without disclosing parent paths |
 
-`<storage_space>` should be a UUID to prevent references from breaking when a *user* or [*storage space*]({{< ref "#storage-space" >}}) gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
+`<storage_space>` should be a UUID to prevent references from breaking when a *user* or [*storage space*]({{< ref "#storage-spaces" >}}) gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
 
 A reference will often start as an absolute/global path, e.g. `!:/home/Projects/Foo`. The gateway will look up the storage provider that is responsible for the path
 
@@ -88,10 +88,10 @@ by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*stora
 **Proposed Change**
 A *storage provider* manages multiple [*storage spaces*]({{< ref "#storage-space" >}})
 by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "#storage-drivers" >}}).
-{{< /hint >}}
+
 {{< svg src="extensions/storage/static/storageprovider-spaces.drawio.svg" >}}
-{{< hint warning >}}
-By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can get rid of the current `enablehome` flag / hack in reva. Furthermore, provisioning a new [*storage space*]({{< ref "#storage-space" >}}) becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
+
+By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can get rid of the current `enablehome` flag / hack in reva, which lead to the [spawn of `*home` drivers](https://github.com/cs3org/reva/tree/master/pkg/storage/fs). Furthermore, provisioning a new [*storage space*]({{< ref "#storage-space" >}}) becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
 {{< /hint >}}
 
 ## Storage Registries
@@ -109,9 +109,9 @@ A *storage registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) fo
 It is used by the *gateway*
 to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
 that is currently serving a [*storage space*]({{< ref "#storage-space" >}}).
-{{< /hint >}}
+
 {{< svg src="extensions/storage/static/storageregistry-spaces.drawio.svg" >}}
-{{< hint warning >}}
+
 By making *storage registries* aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can query them for a listing of all [*storage spaces*]({{< ref "#storage-spaces" >}}) a user has access to. Including his home, received shares, project folders or group drives. See [a WIP PR for spaces in the oCIS repo (#1827)](https://github.com/owncloud/ocis/pull/1827) for more info.
 {{< /hint >}}
 

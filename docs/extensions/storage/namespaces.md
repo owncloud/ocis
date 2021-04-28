@@ -12,7 +12,7 @@ In ownCloud 10 all paths are considered relative to the users home. The CS3 API 
 
 {{< svg src="extensions/storage/static/namespaces.drawio.svg" >}}
 
-The different paths in the namespaces need to be translated while passing *references* from service to service. While the oc10 endpoints all work on paths we internally reference  shared resources by id, so the shares don't break when a file is renamed or moved inside a *storage space*.
+The different paths in the namespaces need to be translated while passing [*references*]({{< ref "./terminology.md#references" >}}) from service to service. While the oc10 endpoints all work on paths we internally reference shared resources by id, so the shares don't break when a file is renamed or moved inside a [*storage space*]({{< ref "./terminology.md#storage-spaces" >}}). The following table lists the various namespaces, paths and id based references:
 
 | oc10 namespace                                   | CS3 global namespace                          | storage provider | reference |  content |
 |--------------------------------------------------|----------------------------------------|---------|-------------------|-----------------|
@@ -29,3 +29,5 @@ oCIS currently is configured to jail users into the CS3 `/home` namespace in the
 {{< hint warning >}}
 In the global CS3 namespaces we plan to move `/home/Shares`, which currently lists all mounted shares of the currently logged in user to a dedicated `/shares` namespace. See [Move shares folder out from home directory to a separate mount reva#1584](https://github.com/cs3org/reva/pull/1584).
 {{< /hint >}}
+
+TODO link frontend / webdav because it contains more details

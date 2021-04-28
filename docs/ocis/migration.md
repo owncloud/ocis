@@ -26,6 +26,40 @@ Introduce OpenID Connect to server and Clients
 ### Stage-2
 Install and introduce ownCloud Web and let users test it voluntarily.
 
+
+{{< hint warning >}}
+**Alternative 1**
+Add a routable prefix to fileids in oc10, and replicate the prefix in ocis.
+### Stage-2.1
+Let oc10 render file ids with prefixes: `<instance name>$<numeric storageid>!<fileid>`. This will allow clients to handle moved files.
+
+### Stage-2.2
+Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
+One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API.
+Files can be identified using `<instance name>$<numeric storageid>!<fileid>` and moved to the correct sync pair.
+
+### Stage-2.3
+Enable spaces API in oc10:
+- New clients will get a response from the spaces API and can set up new sync pairs.
+- Legacy clients will still poll `/webdav` or `/dav/files/<username>` where they will see new subfolders instead of the users home. They will move down the users files into `/home` and shares into `/shares`. Custom sync pairs will no longer be available, causing the legacy client to leave local files in place. They can be picked up manually when installing a new client.
+
+{{< /hint >}}
+
+{{< hint warning >}}
+**Alternative 2**
+An additional `uuid` property used only to detect moves. A lookup by uuid is not necessary for this. The `/dav/meta` endpoint would still take the fileid. Clients  would use the `uuid` to detect moves and set up new sync pairs when migrating to a global namespace.
+### Stage-2.1
+Generate a `uuid` for every file as a file property. Clients can submit a `uuid` when creating files. The server will create a `uuid` if the client did not provide one.
+
+### Stage-2.2
+Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
+One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API. Files can be identified using the `uuid`  and moved to the correct sync pair.
+
+### Stage-3.1
+When reading the files from ocis return the same `uuid`. It can be migrated to an extended attribute or it can be read from oc10. If users change it the client will not be able to detect a move and maybe other weird stuff happens. *What if the uuid gets lost on the server side due to a partial restore?* 
+
+{{< /hint >}}
+
 ### Stage-3
 Start oCIS backend and make read only tests on existing data using the `owncloud` storage driver which will read (and write)
 - blobs from the same datadirectory layout as in ownCloud 10 and
