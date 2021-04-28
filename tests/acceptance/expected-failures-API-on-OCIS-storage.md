@@ -182,9 +182,9 @@ _ocdav: return checksum in upload response for chunked upload_
 -   [apiMain/checksums.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L67) Scenario: Uploading a chunked file with checksum should return the checksum in the download header
 -   [apiMain/checksums.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L138) Scenario: Upload new dav chunked file where checksum matches
 -   [apiMain/checksums.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L147) Scenario: Upload new dav chunked file where checksum does not match
--   [apiMain/checksums.feature:258](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L258) Scenario: Uploading an old method chunked file with checksum should fail using new DAV path
--   [apiMain/checksums.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L314) Scenario: Upload overwriting a file with new chunking and correct checksum
--   [apiMain/checksums.feature:326](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L326) Scenario: Upload overwriting a file with new chunking and invalid checksum
+-   [apiMain/checksums.feature:257](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L257) Scenario: Uploading an old method chunked file with checksum should fail using new DAV path
+-   [apiMain/checksums.feature:313](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L313) Scenario: Upload overwriting a file with new chunking and correct checksum
+-   [apiMain/checksums.feature:325](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L325) Scenario: Upload overwriting a file with new chunking and invalid checksum
 
 #### [Preserve mtime after TUS upload](https://github.com/owncloud/ocis-reva/issues/174)
 Scenario Outline: upload file with mtime `expected -'1565237893', actual +'1611153591'`
