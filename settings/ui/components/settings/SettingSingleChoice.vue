@@ -1,36 +1,11 @@
 <template>
   <div>
-    <oc-button :id="buttonElementId" class="uk-width-expand" justify-content="space-between">
-      <span v-if="selectedOption">
-        {{ selectedOption.displayValue }}
-      </span>
-      <span v-else>
-        {{ setting.placeholder || $gettext('Please select') }}
-      </span>
-      <oc-icon name="expand_more" />
-    </oc-button>
-    <oc-drop
-      :drop-id="dropElementId"
-      :toggle="`#${buttonElementId}`"
-      mode="click"
-      close-on-click
-      position="bottom-justify"
-      :options="{ offset: 0, delayHide: 200, flip: false }"
-      >
-      <ul class="uk-list">
-        <li
-          v-for="(option, index) in setting.singleChoiceValue.options"
-          :key="getOptionElementId(index)"
-        >
-          <oc-radio
-            v-model="selectedOption"
-            :option="option"
-            @input="onSelectedOption"
-            :label="option.displayValue"
-          />
-        </li>
-      </ul>
-    </oc-drop>
+    <oc-select
+        v-model="selectedOption"
+        :clearable="false"
+        :options="displayOptions"
+        @input="onSelectedOption"
+       />
   </div>
 </template>
 
@@ -58,25 +33,21 @@ export default {
     }
   },
   computed: {
-    dropElementId () {
-      return `single-choice-drop-${this.setting.id}`
-    },
-    buttonElementId () {
-      return `single-choice-toggle-${this.setting.id}`
+    displayOptions () {
+      return this.setting.singleChoiceValue.options.map(val => val.displayValue)
     }
   },
   methods: {
-    getOptionElementId (index) {
-      return `${this.setting.id}-${index}`
-    },
     async onSelectedOption () {
       const values = []
       if (!isNil(this.selectedOption)) {
-        if (this.selectedOption.value.intValue) {
-          values.push({ intValue: this.selectedOption.value.intValue })
+        const option = this.setting.singleChoiceValue.options.find(val => val.displayValue === this.selectedOption)
+
+        if (option.value.intValue) {
+          values.push({ intValue: option.value.intValue })
         }
-        if (this.selectedOption.value.stringValue) {
-          values.push({ stringValue: this.selectedOption.value.stringValue })
+        if (option.value.stringValue) {
+          values.push({ stringValue: option.value.stringValue })
         }
       }
       const payload = {
@@ -106,14 +77,14 @@ export default {
         }
       })
       if (filtered.length > 0) {
-        this.selectedOption = filtered[0]
+        this.selectedOption = filtered[0].displayValue
       }
     }
     // if not set, yet, apply default from settings bundle definition
     if (isNil(this.selectedOption)) {
       const defaults = this.setting.singleChoiceValue.options.filter(option => option.default)
       if (defaults.length === 1) {
-        this.selectedOption = defaults[0]
+        this.selectedOption = defaults[0].displayValue
       }
     }
   }
