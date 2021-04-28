@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-27T15:30:01+0000"
+date: "2021-04-28T07:55:42+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,21 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### thumbnails health
-
-Check health status
-
-Usage: `thumbnails health [command options] [arguments...]`
-
--debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
 
 ### thumbnails server
 
@@ -110,11 +95,11 @@ Usage: `thumbnails server [command options] [arguments...]`
 -filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
 : Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
 
--webdavsource-baseurl |  $THUMBNAILS_WEBDAVSOURCE_BASEURL
-: Base url for a webdav api. Default: `flags.OverrideDefaultString(cfg.Thumbnail.WebDavSource.BaseURL, "https://localhost:9200/remote.php/webdav/")`.
+-reva-gateway-addr |  $THUMBNAILS_REVA_GATEWAY , $PROXY_REVA_GATEWAY_ADDR
+: Reva gateway address. Default: `flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "127.0.0.1:9142")`.
 
 -webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
-: Whether to skip certificate checks. Default: `flags.OverrideDefaultBool(cfg.Thumbnail.WebDavSource.Insecure, true)`.
+: Whether to skip certificate checks. Default: `flags.OverrideDefaultBool(cfg.Thumbnail.WebdavAllowInsecure, true)`.
 
 ### thumbnails version
 
@@ -127,4 +112,19 @@ Usage: `thumbnails version [command options] [arguments...]`
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
+
+### thumbnails health
+
+Check health status
+
+Usage: `thumbnails health [command options] [arguments...]`
+
+-debug-addr |  $THUMBNAILS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
 

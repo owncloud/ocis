@@ -11,21 +11,29 @@ geekdocFilePath: grpc.md
 
 ## thumbnails.proto
 
-### GetRequest
+### CS3Source
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| path | [string](#string) |  |  |
+| authorization | [string](#string) |  |  |
+
+### GetThumbnailRequest
 
 A request to retrieve a thumbnail
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | filepath | [string](#string) |  | The path to the source image |
-| filetype | [GetRequest.FileType](#getrequestfiletype) |  | The type to which the thumbnail should get encoded to. |
-| etag | [string](#string) |  | The etag of the source image |
+| thumbnail_type | [GetThumbnailRequest.ThumbnailType](#getthumbnailrequestthumbnailtype) |  | The type to which the thumbnail should get encoded to. |
 | width | [int32](#int32) |  | The width of the thumbnail |
 | height | [int32](#int32) |  | The height of the thumbnail |
-| authorization | [string](#string) |  | The authorization token |
-| username | [string](#string) |  | The user requesting the resource. |
+| webdav_source | [WebdavSource](#webdavsource) |  |  |
+| cs3_source | [CS3Source](#cs3source) |  |  |
 
-### GetResponse
+### GetThumbnailResponse
 
 The service response
 
@@ -34,9 +42,21 @@ The service response
 | thumbnail | [bytes](#bytes) |  | The thumbnail as a binary |
 | mimetype | [string](#string) |  | The mimetype of the thumbnail |
 
-### GetRequest.FileType
+### WebdavSource
 
-The file types to which the thumbnail cna get encoded to.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| url | [string](#string) |  | REQUIRED. |
+| is_public_link | [bool](#bool) |  | REQUIRED. |
+| webdav_authorization | [string](#string) |  | OPTIONAL. |
+| reva_authorization | [string](#string) |  | OPTIONAL. |
+| public_link_token | [string](#string) |  | OPTIONAL. |
+
+### GetThumbnailRequest.ThumbnailType
+
+The file types to which the thumbnail can get encoded to.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -49,7 +69,7 @@ A Service for handling thumbnail generation
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetThumbnail | [GetRequest](#getrequest) | [GetResponse](#getresponse) | Generates the thumbnail and returns it. |
+| GetThumbnail | [GetThumbnailRequest](#getthumbnailrequest) | [GetThumbnailResponse](#getthumbnailresponse) | Generates the thumbnail and returns it. |
 
 ## Scalar Value Types
 

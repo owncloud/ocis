@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-27T15:30:02+0000"
+date: "2021-04-28T07:55:42+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -111,6 +111,9 @@ Usage: `webdav server [command options] [arguments...]`
 
 -http-root |  $WEBDAV_HTTP_ROOT
 : Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+
+-ocis-public-url |  $OCIS_PUBLIC_URL , $OCIS_URL
+: The domain under which oCIS is reachable. Default: `flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200")`.
 
 ### webdav version
 
