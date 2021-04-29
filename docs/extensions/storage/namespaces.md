@@ -36,9 +36,9 @@ In contrast to the global namespace of CS3, ownCloud always presented a user spe
 
 With the spaces concept we are planning to introduce a global namespace to the ownCloud webdav endpoints. This will push the users private space down in the hierarchy: it will move from `/webdav` to `/webdav/home` or `/webdav/users/<username>`. The related [migration stages]({{< ref "../../ocis/migration.md" >}}) are subject to change.
 
-## CS3 namespaces
+## CS3 global namespaces
 
-The CS3 namespace in oCIS is configured in the [*storage registry*]({{< ref "./terminology.md#storage-registries" >}}). oCIS uses these defaults:
+The *CS3 global namespace* in oCIS is configured in the [*storage registry*]({{< ref "./terminology.md#storage-registries" >}}). oCIS uses these defaults:
 
 | global namespace | description |
 |-|-|

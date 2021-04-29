@@ -110,7 +110,7 @@ By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*sto
 
 ## Storage Registries
 
-A *storage registry* manages the global [*namespace*]({{< ref "./namespaces.md" >}}):
+A *storage registry* manages the [*CS3 global namespace*]({{< ref "./namespaces.md#cs3-global-namespaces" >}}):
 It is used by the *gateway*
 to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
 that should handle a [*reference*]({{< ref "#references" >}}).
@@ -149,3 +149,33 @@ Finally, a logical `storage space id` is not tied to a specific [*storage provid
 Every *storage system* has different native capabilities like id and path based lookups, recursive change time propagation, permissions, trash, versions, archival and more.
 A [*storage provider*]({{< ref "#storage-providers" >}}) makes the storage system available in the CS3 API by wrapping the capabilities as good as possible using a [*storage driver*]({{< ref "#storage-drivers" >}}).
 There migt be multiple [*storage drivers*]({{< ref "#storage-drivers" >}}) for a *storage system*, implementing different tradeoffs to match varying requirements.
+
+## Gateways
+A *gateway* acts as a facade to the storage related services. It authenticates and forwards API calls that are publicly accessible.
+
+
+{{< hint warning >}}
+**Proposed Change**
+Currently, the *gateway* treats `/home/shares` different than any other path: it will stat all children and calculate an etag to allow clients to discover changes in accepted shares. This requires the storage provider to cooperate and provide this special `/shares` folder in the root of a users home when it is accessed as a home storage, which is a config flag that needs to be set for every storage driver.
+
+The `enable_home` flag will cause drivers to jail path based requests into a `<userlayout>` subfolder. In effect it divides a storage provider into multiple [*storage spaces*]({{< ref "#storage-spaces" >}}): when calling `CreateHome` a subfolder following the `<userlayout>` is created and market as the root of a users home. Both, the eos and ocis storage drivers use extended attributes to mark the folder as the end of the size aggregation and tree mtime propagation mechanism. Even setting the quota is possible like that. All this literally is a [*storage space*]({{< ref "#storage-spaces" >}}).
+
+We can implement [ListStorageSpaces](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ListStorageSpacesRequest) by either
+- iterating over the root of the storage and treating every folder following the `<userlayout>` as a `home` *storage space*, 
+- iterating over the root of the storage and treating every folder following a new `<projectlayout>` as a `project` *storage space*, or
+- iterating over the root of the storage and treating every folder following a generic `<layout>` as a *storage space* for a configurable space type, or
+- we allow configuring a map of `space type` to `layout` (based on the [CreateStorageSpaceRequest](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.CreateStorageSpaceRequest)) which would allow things like
+```
+home=/var/lib/ocis/storage/home/{{substr 0 1 .Owner.Username}}/{{.Owner.Username}}
+spaces=/spaces/var/lib/ocis/storage/projects/{{.Name}}
+```
+
+This would make the `GetHome()` call return the path to the *storage provider* including the relative path to the *storage space*. No need for a *storage provider* mounted at `/home`. This is just a UI alias for `/users/<userlayout>`. Just like a normal `/home/<username>` on a linux machine.
+
+But if we have no `/home` where do we find the shares, and how can clients discover changes in accepted shares?
+
+The `/shares` namespace should be provided by a *storage provider* that lists all accepted shares for the current user... but what about copy pasting links from the browser? Well this storage is only really needed to have a path to ocm shares that actually reside on other instances. In the UI the shares would be listed by querying a *share manager*. It returns ResourceIds, which can be stated to fetch a path that is then accessible in the CS3 global namespace. Two caveats:
+- This only works for resources that are actually hosted by the current instance. For those it would leak the parent path segments to a shared resource.
+- For accepted OCM shares there must be a path in the [*CS3 global namespace*]({{< ref "./namespaces.md#cs3-global-namespaces" >}}) that has to be the same for all users, otherwise they cannot copy and share those URLs.
+
+{{< /hint >}}
