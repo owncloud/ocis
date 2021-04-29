@@ -20,8 +20,6 @@ The migration happens in subsequent stages while the service is online. First al
 
 ## Migration Stages
 
-## Stages
-
 ### Stage-0
 Is the pre-migration stage when having a functional ownCloud 10 instance.
 
