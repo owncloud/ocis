@@ -77,6 +77,20 @@ It maps the *path* and *id* based CS3 *references* to an appropriate [*storage s
 - posix inodes or paths
 - deconstructed filesystem nodes
 
+{{< hint warning >}}
+**Proposed Change**
+iOS clients can only queue single requests to be executed in the background. The queue an upload and need to be able to identify the uploaded file after it has been uploaded to the server. The disconnected nature of the connection might cause worksflows or manual user interaction with the file on the server to move the file to a different place or changing the content while the device is offline. However, on the device users might have marked the file as favorite or added it to other iOS specific collections. To be able to reliably identify the file the client can generate a `uuid` and attach it to the file metadata during the upload. While it is not necessary to look up files by this `uuid` having a second file id that serves exactly the same purpose as the `file id` is redundant.
+
+Another aspect for the `file id` / `uuid` is that it must be a logical identifier that can be set, at least by internal systems. Without a writeable fileid we cannot restore backups or migrate storage spaces from one storage provider to another storage provider.
+
+Technically, this means that every storage driler needs to have a map of a `uuid` to in internal resource identifier. This internal resource identifier can be
+- an eos fileid, because eos can look up files by id
+- an inode if the filesystem and the storage driver support lookung up by inode
+- a path if the storage driver has no way of looking up files by id.
+  - In this case other mechanisms like inotify, kernel audit or a fuse overlay might be used to keep the paths up to date.
+  - to prevent excessive writes when deep folders are renamed a reverse map might be used: it will map the `uuid` to `<parentuuid>:<childname>`, allowing to trade writes for reads
+
+{{< /hint >}}
 ## Storage Providers
 
 A *storage provider* manages [*resources*]({{< ref "#resources" >}}) identified by a [*reference*]({{< ref "#references" >}})
