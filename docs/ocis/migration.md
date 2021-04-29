@@ -7,18 +7,21 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: migration.md
 ---
 
+The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the global namespace needs to be introduced. Finally, the data on disk can be migrated user by user by switching the storage driver.
 
-## Migration
+{{< hint warning >}}
+@jfd: It might be easier to introduce the spaces api in oc10 and then migrate to ocis. We cannot migrate both at the same time, the architecture to ocis (which will change fileids) and introduce a global namespace (which requires stable fileids to let clients handle moves without redownloading). Either we implement arbitrary mounting of shares in ocis / reva or we make clients and oc10 spaces aware.
+{{< /hint >}}
 
-The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the data on disk can be migrated user by user by switching the storage driver.
-
-### User Stories
+## User Stories
 As an admin I need to avoid downtime.
 As an admin I want to migrate certain groups of users before others.
 As a user, I need a seamless migration and not lose data by any chance.
 
+## Stages
+
 ### Stage-0
-Is the pre-migration stage having a functional ownCloud 10 instance.
+Is the pre-migration stage when having a functional ownCloud 10 instance.
 
 ### Stage-1
 Introduce OpenID Connect to server and Clients
