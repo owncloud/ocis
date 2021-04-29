@@ -1,6 +1,7 @@
 package svc
 
 import (
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"net/http"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -19,6 +20,8 @@ type Options struct {
 	Middleware       []func(http.Handler) http.Handler
 	ThumbnailStorage storage.Storage
 	ImageSource      imgsource.Source
+	CS3Source        imgsource.Source
+	CS3Client        gateway.GatewayAPIClient
 }
 
 // newOptions initializes the available default options.
@@ -64,5 +67,17 @@ func ThumbnailStorage(val storage.Storage) Option {
 func ThumbnailSource(val imgsource.Source) Option {
 	return func(o *Options) {
 		o.ImageSource = val
+	}
+}
+
+func CS3Source(val imgsource.Source) Option {
+	return func(o *Options) {
+		o.CS3Source = val
+	}
+}
+
+func CS3Client(c gateway.GatewayAPIClient) Option {
+	return func(o *Options) {
+		o.CS3Client = c
 	}
 }

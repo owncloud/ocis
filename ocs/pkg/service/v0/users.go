@@ -9,18 +9,28 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	merrors "github.com/asim/go-micro/v3/errors"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"google.golang.org/genproto/protobuf/field_mask"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
-
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	merrors "github.com/asim/go-micro/v3/errors"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
+	"github.com/pkg/errors"
+	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 // GetSelf returns the currently logged in user
@@ -39,11 +49,20 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		merr := merrors.FromError(err)
-		if merr.Code == http.StatusNotFound {
-			// if the user was authenticated why was he not found?!? log error?
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found")))
-		} else {
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error())))
+		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
+		// cs3, we cannot count with the accounts service.
+		if u != nil {
+			uid, gid := o.extractUIDAndGID(u)
+			d := &data.User{
+				UserID:            u.Username,
+				DisplayName:       u.DisplayName,
+				LegacyDisplayName: u.DisplayName,
+				Email:             u.Mail,
+				UIDNumber:         uid,
+				GIDNumber:         gid,
+			}
+			mustNotFail(render.Render(w, r, response.DataRender(d)))
+			return
 		}
 		o.logger.Error().Err(merr).Interface("user", u).Msg("could not get account for user")
 		return
@@ -73,11 +92,17 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
 
-	if userid == "" {
+	switch {
+	case userid == "":
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
-	} else {
+	case o.config.AccountBackend == "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case o.config.AccountBackend == "cs3":
+		account, err = o.fetchAccountFromCS3Backend(r.Context(), userid)
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -180,9 +205,19 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		newAccount.GidNumber = gidNumber
 	}
 
-	account, err := o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
-		Account: newAccount,
-	})
+	var account *accounts.Account
+
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
+			Account: newAccount,
+		})
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support adding users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		switch merr.Code {
@@ -231,7 +266,18 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support editing users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -298,7 +344,18 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support deleting users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -308,6 +365,100 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 		o.logger.Error().Err(err).Str("userid", userid).Msg("could not delete user")
 		return
+	}
+
+	if o.config.RevaAddress != "" && o.config.StorageUsersDriver != "owncloud" {
+		t, err := o.mintTokenForUser(r.Context(), account)
+		if err != nil {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "error minting token").Error())))
+			return
+		}
+
+		ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+
+		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
+		if err != nil {
+			o.logger.Error().Err(err).Msg("error securing a connection to Reva gateway")
+		}
+
+		homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
+		if err != nil {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error())))
+			return
+		}
+
+		if homeResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", homeResp.Status.Code.String()).
+				Str("stat_message", homeResp.Status.Message).
+				Msg("DeleteUser: could not get user home: get failed")
+			return
+		}
+
+		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{
+					Path: homeResp.Path,
+				},
+			},
+		})
+
+		if err != nil {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error())))
+			return
+		}
+
+		if statResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user home: stat failed")
+			return
+		}
+
+		delReq := &provider.DeleteRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Id{
+					Id: statResp.Info.Id,
+				},
+			},
+		}
+
+		delResp, err := gwc.Delete(ctx, delReq)
+		if err != nil {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error())))
+			return
+		}
+
+		if delResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user home: delete failed")
+			return
+		}
+
+		req := &gateway.PurgeRecycleRequest{
+			Ref: &provider.Reference{
+				Spec: &provider.Reference_Path{
+					Path: homeResp.Path,
+				},
+			},
+		}
+
+		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
+		if err != nil {
+			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete trash").Error())))
+			return
+		}
+
+		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Str("stat_status_code", statResp.Status.Code.String()).
+				Str("stat_message", statResp.Status.Message).
+				Msg("DeleteUser: could not delete user trash: delete failed")
+			return
+		}
 	}
 
 	req := accounts.DeleteAccountRequest{
@@ -330,10 +481,50 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	mustNotFail(render.Render(w, r, response.DataRender(struct{}{})))
 }
 
+// TODO(refs) this to ocis-pkg ... we are minting tokens all over the place ... or use a service? ... like reva?
+func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
+	tm, _ := jwt.New(map[string]interface{}{
+		"secret":  o.config.TokenManager.JWTSecret,
+		"expires": int64(60),
+	})
+
+	u := &revauser.User{
+		Id: &revauser.UserId{
+			OpaqueId: account.Id,
+			Idp:      o.config.IdentityManagement.Address,
+		},
+		Groups: []string{},
+		Opaque: &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"uid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
+				},
+				"gid": {
+					Decoder: "plain",
+					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
+				},
+			},
+		},
+	}
+	return tm.MintToken(ctx, u)
+}
+
 // EnableUser enables a user
 func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support enabling users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -373,7 +564,18 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 // DisableUser disables a user
 func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-	account, err := o.fetchAccountByUsername(r.Context(), userid)
+
+	var account *accounts.Account
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
+	case "cs3":
+		o.logger.Fatal().Msg("cs3 backend doesn't support disabling users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
@@ -490,9 +692,20 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 		query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(search))
 	}
 
-	res, err := o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
-		Query: query,
-	})
+	var res *accounts.ListAccountsResponse
+	var err error
+	switch o.config.AccountBackend {
+	case "accounts":
+		res, err = o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
+			Query: query,
+		})
+	case "cs3":
+		// TODO
+		o.logger.Fatal().Msg("cs3 backend doesn't support listing users")
+	default:
+		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
+	}
+
 	if err != nil {
 		o.logger.Err(err).Msg("could not list users")
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, "could not list users")))
@@ -524,4 +737,44 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 		return res.Accounts[0], nil
 	}
 	return nil, merrors.NotFound("", "The requested user could not be found")
+}
+
+func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
+	backend := o.getCS3Backend()
+	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	if err != nil {
+		return nil, err
+	}
+	uid, gid := o.extractUIDAndGID(u)
+	return &accounts.Account{
+		OnPremisesSamAccountName: u.Username,
+		DisplayName:              u.DisplayName,
+		Mail:                     u.Mail,
+		UidNumber:                uid,
+		GidNumber:                gid,
+	}, nil
+}
+
+func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
+	var uid, gid int64
+	var err error
+	if u.Opaque != nil && u.Opaque.Map != nil {
+		if uidObj, ok := u.Opaque.Map["uid"]; ok {
+			if uidObj.Decoder == "plain" {
+				uid, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
+				if err != nil {
+					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract uid for user")
+				}
+			}
+		}
+		if gidObj, ok := u.Opaque.Map["gid"]; ok {
+			if gidObj.Decoder == "plain" {
+				gid, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
+				if err != nil {
+					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract gid for user")
+				}
+			}
+		}
+	}
+	return uid, gid
 }

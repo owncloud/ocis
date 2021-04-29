@@ -14,9 +14,11 @@ The migration happens in subsequent stages while the service is online. First al
 {{< /hint >}}
 
 ## User Stories
-As an admin I need to avoid downtime.
-As an admin I want to migrate certain groups of users before others.
-As a user, I need a seamless migration and not lose data by any chance.
+- As an admin, I need to avoid downtime.
+- As an admin, I want to migrate certain groups of users before others.
+- As a user, I need a seamless migration and not lose data by any chance.
+
+## Migration Stages
 
 ## Stages
 
@@ -24,7 +26,7 @@ As a user, I need a seamless migration and not lose data by any chance.
 Is the pre-migration stage when having a functional ownCloud 10 instance.
 
 ### Stage-1
-Introduce OpenID Connect to server and Clients
+Introduce OpenID Connect to ownCloud 10 server and clients.
 
 ### Stage-2
 Install and introduce ownCloud Web and let users test it voluntarily.
@@ -65,28 +67,30 @@ When reading the files from ocis return the same `uuid`. It can be migrated to a
 
 ### Stage-3
 Start oCIS backend and make read only tests on existing data using the `owncloud` storage driver which will read (and write)
-- blobs from the same datadirectory layout as in ownCloud 10 and
-- metadata from the ownCloud 10 databas
-The oCIS share manager will read share infomation from the owncloud database as well.
-- [ ] *we need a share manager that can read from the oc 10 db as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
+- blobs from the same datadirectory layout as in ownCloud 10
+- metadata from the ownCloud 10 database: 
+The oCIS share manager will read share information from the ownCloud database as well.
+
+Therefore we need:
+- [ ] *a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
 
 ### Stage-4
-Test writing data with oCIS into the existing ownCloud 10 datafolder using the `owncloud` storage driver.
+Test writing data with oCIS into the existing ownCloud 10 data directory using the `owncloud` storage driver.
 
 ### Stage-5
-Introduce reverse proxy and switch over early adoptors, let admins gain trust in the new backend by comparing metrics of the two systems and having it running in parallel.
+Introduce reverse proxy and switch over early adopters, let admins gain trust in the new backend by comparing metrics of the two systems and having it running in parallel.
 
 ### Stage-6
 Voluntary transition period and subsequent hard deadline for all users
 
 ### Stage-7
-Disable oc10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
+Disable ownCloud 10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
 
 ### Stage-8
-User by user storage migration from owncloud driver to `ocis`/`s3ng`/`cephfs`...
+User by user storage migration from `owncloud` driver to `ocis`/`s3ng`/`cephfs`...
 
 ### Stage-9
-Migrate share data to &lt;yet to determine&gt; share manager backend and shut down owncloud database
+Migrate share data to &lt;yet to determine&gt; share manager backend and shut down ownCloud database
 
 ### Stage-10
 Profit! (db for file metadata no longer necessary, less maintenance effort)
@@ -133,18 +137,21 @@ data
 │   │   │   ├── 2048-1536-max.png
 │   │   │   └── 32-32.png                 // the file id, eg. of /Photos/Portugal.jpg
 │   └── uploads
-├── einstein
-│   ├── files
-│   ├── files_trash
-│   └── files_versions
-│   …
 ├── marie
+│   ├── cache
+│   ├── files
+│   ├── files_external
+│   ├── files_trashbin
+│   ├── files_versions
+│   └── thumbnails
+│   …
+├── moss
 …
 ```
 
-The *data directory* may also contain subfolders for owncloud 10 applications like `avatars`, `gallery`, `files_external` and `cache`.
+The *data directory* may also contain subfolders for ownCloud 10 applications like `avatars`, `gallery`, `files_external` and `cache`.
 
-When an objectstorage is used as the primary storage all file blobs are stored by their file id and a prefix, eg.: `urn:oid:<fileid>`.
+When an object storage is used as the primary storage all file blobs are stored by their file id and a prefix, eg.: `urn:oid:<fileid>`.
 
 The three types of blobs we need to migrate are stored in 
 - `files` for file blobs, the current file content,
@@ -165,7 +172,7 @@ The `filecache` table itself has more metadata:
 | `path_hash`        | varchar(32)   | NO   |     |         |                | *mysql once had problems indexing long paths, so we stored a hash for lookup by path. | - |
 | `parent`           | bigint(20)    | NO   | MUL | 0       |                | *used to implement the hierarchy and listing children of a folder by id. redundant with `path`* | - |
 | `name`             | varchar(250)  | YES  |     | NULL    |                | *basename of `path`*               | - |
-| `mimetype`         | int(11)       | NO   |     | 0       |                | *joined with the `oc_mimetypes` table. only relevant for objectstorage deployments* | can be determined from blob / file extension |
+| `mimetype`         | int(11)       | NO   |     | 0       |                | *joined with the `oc_mimetypes` table. only relevant for object storage deployments* | can be determined from blob / file extension |
 | `mimepart`         | int(11)       | NO   |     | 0       |                | *"*               | can be determined from blob / file extension |
 | `size`             | bigint(20)    | NO   |     | 0       |                | *same as blob size unless encryption is used*               | MAY become size, can be determined from blob |
 | `mtime`            | bigint(20)    | NO   |     | 0       |                | *same as blob mtime*               | for files MAY become mtime (can be determined from blob as well), for directories MUST become tmtime |
@@ -174,7 +181,7 @@ The `filecache` table itself has more metadata:
 | `unencrypted_size` | bigint(20)    | NO   |     | 0       |                | *same as blob size* | oCIS currently does not support encryption |
 | `storage_mtime`    | bigint(20)    | NO   |     | 0       |                | *used to detect external storage changes* | oCIS delegates that to the storage providers and drivers |
 | `permissions`      | int(11)       | YES  |     | 0       |                | *used as the basis for permissions. synced from disk when running a file scan. * | oCIS delegates that to the storage providers and drivers |
-| `checksum`         | varchar(255)  | YES  |     | NULL    |                | *same as blob checksum* | SHOULD become the checksum in the storage provider. eos calculates it itself, `ocis` driver stores it in extendetd attributes |
+| `checksum`         | varchar(255)  | YES  |     | NULL    |                | *same as blob checksum* | SHOULD become the checksum in the storage provider. eos calculates it itself, `ocis` driver stores it in extended attributes |
 
 
 > Note: for EOS a hot migration only works seamlessly if file ids in oc10 are already read from eos. otherwise either a mapping from the oc10 filecache file id to the new eos file id has to be created under the assumption that these id sets do not intersect or files and corresponding shares need to be exported and imported offline to generate a new set of ids. While this will preserve public links, user, group and even federated shares, old internal links may still point to different files because they contain the oc10 fileid 
@@ -249,13 +256,13 @@ used to determine if federated shares can automatically be accepted
 | `status`        | int(11)      | NO   |     | 2       |                | current status of the connection |
 | `sync_token`    | varchar(512) | YES  |     | NULL    |                | cardDav sync token |
 
-*TODO clarify how OCM handles this andt where we store / configure this. It seems related to trusted IdPs*
+*TODO clarify how OCM handles this and where we store / configure this. It seems related to trusted IdPs*
 
 ### user data
 
 Users are migrated in two steps:
 1. They should all be authenticated using openid connect, which already moves them to a common identity management system.
-2. To search share recipients, both, ownCloud 10 and oCIS need acces to the same user directory using eg. LDAP.
+2. To search share recipients, both, ownCloud 10 and oCIS need access to the same user directory using eg. LDAP.
 
 *TODO: add state to CS3 API, so we can 'disable' users*
 *TODO: how do we map (sub) admins? -> map to roles & permissions*

@@ -45,15 +45,26 @@ type TokenManager struct {
 	JWTSecret string
 }
 
+// IdentityManagement keeps track of the OIDC address. This is because Reva requisite of uniqueness for users
+// is based in the combination of IDP hostname + UserID. For more information see:
+// https://github.com/cs3org/reva/blob/4fd0229f13fae5bc9684556a82dbbd0eced65ef9/pkg/storage/utils/decomposedfs/node/node.go#L856-L865
+type IdentityManagement struct {
+	Address string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
-	File         string
-	Log          Log
-	Debug        Debug
-	HTTP         HTTP
-	Tracing      Tracing
-	TokenManager TokenManager
-	Service      Service
+	File               string
+	Log                Log
+	Debug              Debug
+	HTTP               HTTP
+	Tracing            Tracing
+	TokenManager       TokenManager
+	Service            Service
+	AccountBackend     string
+	RevaAddress        string
+	StorageUsersDriver string
+	IdentityManagement IdentityManagement
 
 	Context    context.Context
 	Supervised bool

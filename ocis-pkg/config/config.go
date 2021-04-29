@@ -76,6 +76,9 @@ type Runtime struct {
 
 // Config combines all available configuration parts.
 type Config struct {
+	// Mode is mostly used whenever we need to run an extension. The technical debt this introduces is in regards of
+	// what it does. Supervised (0) loads configuration from a unified config file because of known limitations of Viper; whereas
+	// Unsupervised (1) MUST parse config from all known sources.
 	Mode Mode
 	File string
 

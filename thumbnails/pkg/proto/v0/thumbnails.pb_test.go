@@ -10,19 +10,18 @@ import (
 type TestRequest struct {
 	testDataName  string
 	filepath      string
-	filetype      proto.GetRequest_FileType
-	etag          string
+	filetype      proto.GetThumbnailRequest_ThumbnailType
+	Checksum      string
 	width         int32
 	height        int32
-	authorization string
-	expected      proto.GetRequest
+	expected      proto.GetThumbnailRequest
 }
 
 type TestResponse struct {
 	testDataName string
 	img          []byte
 	mimetype     string
-	expected     proto.GetResponse
+	expected     proto.GetThumbnailResponse
 }
 
 func TestRequestString(t *testing.T) {
@@ -31,64 +30,53 @@ func TestRequestString(t *testing.T) {
 		{
 			"ASCII",
 			"Foo.jpg",
-			proto.GetRequest_JPG,
+			proto.GetThumbnailRequest_JPG,
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
-			proto.GetRequest{
+			proto.GetThumbnailRequest{
 				Filepath:      "Foo.jpg",
-				Filetype:      proto.GetRequest_JPG,
-				Etag:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
+				ThumbnailType: proto.GetThumbnailRequest_JPG,
 				Width:         24,
 				Height:        24,
-				Authorization: "Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
 			},
 		},
 		{
 			"UTF",
 			"मिलन.jpg",
-			proto.GetRequest_JPG,
+			proto.GetThumbnailRequest_JPG,
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
-			proto.GetRequest{
+			proto.GetThumbnailRequest{
 				Filepath:      "\340\244\256\340\244\277\340\244\262\340\244\250.jpg",
-				Filetype:      proto.GetRequest_JPG,
-				Etag:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
+				ThumbnailType: proto.GetThumbnailRequest_JPG,
 				Width:         24,
 				Height:        24,
-				Authorization: "Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
 			},
 		},
 		{
 			"PNG",
 			"Foo.png",
-			proto.GetRequest_PNG,
+			proto.GetThumbnailRequest_PNG,
 			"33a64df551425fcc55e4d42a148795d9f25f89d4",
 			24,
 			24,
-			"Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
-			proto.GetRequest{
-				Filepath:      "Foo.png",
-				Etag:          "33a64df551425fcc55e4d42a148795d9f25f89d4",
-				Width:         24,
-				Height:        24,
-				Authorization: "Basic SGVXaG9SZWFkc1RoaXM6SXNTdHVwaWQK",
+			proto.GetThumbnailRequest{
+				Filepath: "Foo.png",
+				Width:    24,
+				Height:   24,
 			},
 		},
 	}
 
 	for _, testCase := range tests {
 		t.Run(testCase.testDataName, func(t *testing.T) {
-			req := proto.GetRequest{
+			req := proto.GetThumbnailRequest{
 				Filepath:      testCase.filepath,
-				Filetype:      testCase.filetype,
-				Etag:          testCase.etag,
+				ThumbnailType: testCase.filetype,
 				Height:        testCase.height,
 				Width:         testCase.width,
-				Authorization: testCase.authorization,
 			}
 			assert.Equal(t, testCase.expected.String(), req.String())
 		})
@@ -101,7 +89,7 @@ func TestResponseString(t *testing.T) {
 			"ASCII",
 			[]byte("image data"),
 			"image/png",
-			proto.GetResponse{
+			proto.GetThumbnailResponse{
 				Thumbnail: []byte("image data"),
 				Mimetype:  "image/png",
 			},
@@ -110,7 +98,7 @@ func TestResponseString(t *testing.T) {
 
 	for _, testCase := range tests {
 		t.Run(testCase.testDataName, func(t *testing.T) {
-			response := proto.GetResponse{
+			response := proto.GetThumbnailResponse{
 				Thumbnail: testCase.img,
 				Mimetype:  testCase.mimetype,
 			}

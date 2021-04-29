@@ -7,4 +7,4 @@ geekdocEditPath: edit/master/docs/extensions/onlyoffice
 geekdocFilePath: license.md
 ---
 
-This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis/onlyoffice/blob/master/LICENSE) license. For the license of the used libraries you have to check the respective sources.
+This project is licensed under the [Apache 2.0](https://github.com/owncloud/ocis/blob/master/onlyoffice/LICENSE) license. For the license of the used libraries you have to check the respective sources.

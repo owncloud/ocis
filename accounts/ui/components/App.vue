@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div class="uk-flex uk-flex-column uk-height-1-1" id="accounts-app">
+    <main class="uk-flex uk-flex-column uk-height-1-1" id="accounts-app">
       <template v-if="isInitialized">
+        <h1 class="oc-invisible-sr">
+          <translate>Accounts</translate>
+        </h1>
         <div class="oc-app-bar">
           <accounts-batch-actions
             v-if="isAnyAccountSelected"
@@ -23,7 +26,7 @@
         </oc-alert>
       </template>
       <oc-loader id="accounts-list-loader" v-else />
-    </div>
+    </main>
   </div>
 </template>
 
@@ -55,17 +58,3 @@ export default {
   }
 }
 </script>
-
-<style>
-/* TODO: After https://github.com/owncloud/owncloud-design-system/pull/418 gets merged
-there won't be an extra span and this won't be needed anymore */
-.accounts-selection-actions-btn > span {
-  display: flex;
-  align-items: center;
-}
-
-/* TODO: Adjust in ODS */
-.oc-dropdown-menu {
-  width: 150px;
-}
-</style>

@@ -2,14 +2,47 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.4.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.5.0...master
+
+## Summary
+
+* Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
+* Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+
+## Details
+
+* Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
+
+   The way the value was being set ensured that it was NOT being overridden where it should have
+   been. This patch ensures the correct loading order of values.
+
+   https://github.com/owncloud/ocis/pull/1956
+
+* Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+
+   Steps to make the supervisor fail:
+
+   `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
+
+   https://github.com/owncloud/ocis/pull/1963
+# Changelog for [1.5.0] (2021-04-21)
+
+The following sections list the changes for 1.5.0.
+
+[1.5.0]: https://github.com/owncloud/ocis/compare/v1.4.0...v1.5.0
 
 ## Summary
 
 * Bugfix - Fixes "unaligned 64-bit atomic operation" panic on 32-bit ARM: [#1888](https://github.com/owncloud/ocis/pull/1888)
 * Change - Make Protobuf package names unique: [#1875](https://github.com/owncloud/ocis/pull/1875)
+* Change - Update ownCloud Web to v3.0.0: [#1938](https://github.com/owncloud/ocis/pull/1938)
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
-* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+* Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
+* Enhancement - Update ODS in accounts & settings extension: [#1934](https://github.com/owncloud/ocis/pull/1934)
+* Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
+* Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
+* Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
+* Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
 ## Details
 
@@ -27,6 +60,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/1875
 
+* Change - Update ownCloud Web to v3.0.0: [#1938](https://github.com/owncloud/ocis/pull/1938)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.0.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/1938
+   https://github.com/owncloud/web/releases/tag/v3.0.0
+
 * Enhancement - Change default path for thumbnails: [#1892](https://github.com/owncloud/ocis/pull/1892)
 
    Changes the default path for thumbnails from `<os tmp dir>/ocis-thumbnails` to
@@ -35,9 +78,45 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/1891
    https://github.com/owncloud/ocis/pull/1892
 
-* Enhancement - Update reva to v1.6.1-0.20210329145723-ed244aac4ddc: [#1872](https://github.com/owncloud/ocis/pull/1872)
+* Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
+
+   Currenntly it is not possible to parse a single config file from an extension when running on
+   supervised mode.
+
+   https://github.com/owncloud/ocis/pull/1931
+
+* Enhancement - Update ODS in accounts & settings extension: [#1934](https://github.com/owncloud/ocis/pull/1934)
+
+   The accounts and settings extensions were updated to reflect the latest changes in the
+   ownCloud design system. In addition, a couple of quick wins in terms of accessibility are
+   included.
+
+   https://github.com/owncloud/ocis/pull/1934
+
+* Enhancement - Add config for public share SQL driver: [#1916](https://github.com/owncloud/ocis/pull/1916)
+
+   https://github.com/owncloud/ocis/pull/1916
+
+* Enhancement - Remove dead runtime code: [#1923](https://github.com/owncloud/ocis/pull/1923)
+
+   When moving from the old runtime to the new one there were lots of files left behind that are
+   essentially dead code and should be removed. The original code lives here
+   github.com/refs/pman/ if someone finds it interesting to read.
+
+   https://github.com/owncloud/ocis/pull/1923
+
+* Enhancement - Add option to reading registry rules from json file: [#1917](https://github.com/owncloud/ocis/pull/1917)
+
+   https://github.com/owncloud/ocis/pull/1917
+
+* Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
   * enforce quota (https://github.com/cs3org/reva/pull/1557)
+  * Make additional info attribute configureable (https://github.com/cs3org/reva/pull/1588)
+  * check ENOTDIR for readlink (https://github.com/cs3org/reva/pull/1597)
+  * Add wrappers for EOS and EOS Home storage drivers (https://github.com/cs3org/reva/pull/1624)
+  * eos: fixes for enabling file sharing (https://github.com/cs3org/reva/pull/1619)
+  * implement checksums in the owncloud storage driver (https://github.com/cs3org/reva/pull/1629)
 
    https://github.com/owncloud/ocis/pull/1872
 # Changelog for [1.4.0] (2021-03-30)

@@ -13,7 +13,7 @@ To release a new version of the storage submodule, you have to follow a few simp
 
 ## Preparation
 
-1. Before releasing, make sure that reva has been [updated to the desired version]({{< ref "updating.md" >}})
+1. Before releasing, make sure that reva has been [updated to the desired version]({{< ref "updating" >}})
 
 ## Release
 1. Check out master

@@ -7,6 +7,26 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.5.0 Technology Preview
+
+Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
+
+The most prominent changes in version 1.5.0 comprise:
+
+- Config file based theming for ownCloud Web (see https://owncloud.dev/clients/web/theming/ for more information) [#4822](https://github.com/owncloud/web/pull/4822)
+- A dedicated view for "Shared by link" has been added [#4881](https://github.com/owncloud/web/pull/4881)
+- The file list table has been replaced and is now more performant and accessible [#4627](https://github.com/owncloud/web/pull/4627)
+- Many further accessibility improvements have been added, e.g., around the app switcher, sidebar, sharing list and focus management
+- User storage quotas will now be enforced [#1557](https://github.com/cs3org/reva/pull/1557)
+- The "owncloud" storage driver now supports file integrity checking with checksums [#1629](https://github.com/cs3org/reva/pull/1629)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.4.0 Technology Preview
 
 Version 1.4.0 brings new features, bug fixes and further improvements. The accessibility of ownCloud Web has greatly improved, paving the way for WCAG 2.1 compliance. The Infinite Scale platform has received major improvements regarding memory consumption. The user storage quota feature has been implemented and folder sizes are now properly calculated. It is now possible to write log messages to log files and to specify configuration values using a config file.
@@ -26,7 +46,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 #### Changed oCIS storage driver file layout
@@ -86,7 +106,7 @@ More details about this release can be found in the full [ownCloud Infinite Scal
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 ## ownCloud Infinite Scale 1.2.0 Technology Preview
@@ -104,7 +124,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap.md" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
 #### Fix IDP service user
@@ -208,7 +228,7 @@ ownCloud Infinite Scale is built as a modular framework in which components can 
 - a built-in IdP
 - an application gateway/proxy
 
-These components can be deployed in a multi-tier deployment architecture. See the [documentation]({{< ref "./_index.md" >}}) for an overview of the services.
+These components can be deployed in a multi-tier deployment architecture. See the [documentation]({{< ref "./" >}}) for an overview of the services.
 
 ### Operation modes
 
@@ -282,7 +302,7 @@ Production environments will need a more sophisticated setup, see <{{< ref "./de
 {{< tab "Docker" >}}
 #### Containerized Setup
 
-For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](<{{< ref "./deployment/ocis_traefik.md" >}}>) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
+For more sophisticated setups we recommend using one of our docker setup examples. See the [documentation](<{{< ref "./deployment/ocis_traefik" >}}>) for a setup with [Traefik](https://traefik.io/traefik/) as a reverse proxy which also includes automated SSL certificate provisioning using Letsencrypt tools.
 
 {{< /tab >}}
 {{< /tabs >}}

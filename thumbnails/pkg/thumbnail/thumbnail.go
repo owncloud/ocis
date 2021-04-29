@@ -2,28 +2,36 @@ package thumbnail
 
 import (
 	"bytes"
-	"image"
-
+	"github.com/disintegration/imaging"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
-	"golang.org/x/image/draw"
+	"image"
+	"strings"
+)
+
+var (
+	SupportedMimeTypes = [...]string{
+		"image/png",
+		"image/jpg",
+		"image/jpeg",
+		"image/gif",
+	}
 )
 
 // Request bundles information needed to generate a thumbnail for afile
 type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
-	ETag       string
-	Username   string
+	Checksum   string
 }
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
-	// Get will return a thumbnail for a file
-	Get(Request, image.Image) ([]byte, error)
-	// GetStored loads the thumbnail from the storage.
+	// Generate will return a thumbnail for a file
+	Generate(Request, image.Image) ([]byte, error)
+	// Get loads the thumbnail from the storage.
 	// It will return nil if no image is stored for the given context.
-	GetStored(Request) []byte
+	Get(Request) ([]byte, bool)
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
@@ -42,46 +50,50 @@ type SimpleManager struct {
 	resolutions Resolutions
 }
 
-// Get implements the Get Method of Manager
-func (s SimpleManager) Get(r Request, img image.Image) ([]byte, error) {
+// Generate creates a thumbnail and stores it.
+// The created thumbnail is also being returned.
+func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
 	thumbnail := s.generate(match, img)
 
-	key := s.storage.BuildKey(mapToStorageRequest(r))
-
-	buf := new(bytes.Buffer)
-	err := r.Encoder.Encode(buf, thumbnail)
+	dst := new(bytes.Buffer)
+	err := r.Encoder.Encode(dst, thumbnail)
 	if err != nil {
 		return nil, err
 	}
-	bytes := buf.Bytes()
-	err = s.storage.Set(r.Username, key, bytes)
+
+	k := s.storage.BuildKey(mapToStorageRequest(r))
+	err = s.storage.Put(k, dst.Bytes())
 	if err != nil {
 		s.logger.Warn().Err(err).Msg("could not store thumbnail")
 	}
-	return bytes, nil
+	return dst.Bytes(), nil
 }
 
-// GetStored tries to get the stored thumbnail and return it.
+// Get tries to get the stored thumbnail and return it.
 // If there is no cached thumbnail it will return nil
-func (s SimpleManager) GetStored(r Request) []byte {
-	key := s.storage.BuildKey(mapToStorageRequest(r))
-	stored := s.storage.Get(r.Username, key)
-	return stored
+func (s SimpleManager) Get(r Request) ([]byte, bool) {
+	k := s.storage.BuildKey(mapToStorageRequest(r))
+	return s.storage.Get(k)
 }
 
 func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {
-	targetResolution := mapRatio(img.Bounds(), r)
-	thumbnail := image.NewRGBA(targetResolution)
-	draw.ApproxBiLinear.Scale(thumbnail, targetResolution, img, img.Bounds(), draw.Over, nil)
-	return thumbnail
+	return imaging.Thumbnail(img, r.Dx(), r.Dy(), imaging.Lanczos)
 }
 
 func mapToStorageRequest(r Request) storage.Request {
-	sR := storage.Request{
-		ETag:       r.ETag,
+	return storage.Request{
+		Checksum:   r.Checksum,
 		Resolution: r.Resolution,
 		Types:      r.Encoder.Types(),
 	}
-	return sR
+}
+
+func IsMimeTypeSupported(m string) bool {
+	for _, mt := range SupportedMimeTypes {
+		if strings.EqualFold(mt, m) {
+			return true
+		}
+	}
+	return false
 }

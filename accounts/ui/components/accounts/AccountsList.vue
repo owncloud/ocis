@@ -2,7 +2,7 @@
   <div>
     <oc-table-simple id="accounts-user-list">
       <oc-thead>
-        <oc-tr class="fix-table-header">
+        <oc-tr>
           <oc-th shrink type="head" align-h="center">
             <oc-checkbox
               class="oc-ml-s"
@@ -58,9 +58,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.fix-table-header > th {
-  text-transform: none;
-}
-</style>

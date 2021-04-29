@@ -28,7 +28,7 @@ export STORAGE_USERS_DRIVER=json
 export STORAGE_USERS_JSON=/path/to/users.json
 ```
 
-For the format of the users.json have a look at the [reva examples](https://github.com/cs3org/reva/blob/master/examples/separate/users.demo.json)
+For the format of the users.json have a look at the [reva examples](https://github.com/cs3org/reva/blob/master/examples/oc-phoenix/users.demo.json)
 
 ### LDAP driver
 

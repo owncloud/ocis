@@ -3,20 +3,20 @@
     <span v-text="selectionInfoText" />
     <span>|</span>
     <div>
-      <oc-button v-text="$gettext('Clear selection')" variation="raw" @click="RESET_ACCOUNTS_SELECTION" />
+      <oc-button v-text="$gettext('Clear selection')" appearance="raw" @click="RESET_ACCOUNTS_SELECTION" />
     </div>
     <oc-grid gutter="small" id="accounts-batch-actions">
       <div v-for="action in actions" :key="action.label">
-        <oc-alert v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'default'" noClose class="uk-flex uk-flex-middle tmp-alert-fixes">
+        <div v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'primary'" noClose class="uk-flex uk-flex-middle tmp-alert-fixes">
           <span>{{ action.confirmation.message }}</span>
-          <oc-button size="small" :id="action.confirmation.cancel.id" @click="action.confirmation.cancel.handler" :variation="action.confirmation.cancel.variation || 'default'">
+          <oc-button :id="action.confirmation.cancel.id" @click="action.confirmation.cancel.handler" :variation="action.confirmation.cancel.variation || 'passive'">
             {{ action.confirmation.cancel.label }}
           </oc-button>
-          <oc-button size="small" :id="action.confirmation.confirm.id" @click="action.confirmation.confirm.handler" :variation="action.confirmation.confirm.variation || 'default'">
+          <oc-button :id="action.confirmation.confirm.id" @click="action.confirmation.confirm.handler" :variation="action.confirmation.confirm.variation || 'primary'">
             {{ action.confirmation.confirm.label }}
           </oc-button>
-        </oc-alert>
-        <oc-button v-else :id="action.id" @click="action.handler" :variation="action.variation || 'default'" :icon="action.icon">
+        </div>
+        <oc-button v-else :id="action.id" @click="action.handler" :variation="action.variation || 'primary'" :icon="action.icon">
           {{ action.label }}
         </oc-button>
       </div>
@@ -78,6 +78,7 @@ export default {
         id: idDeleteAction,
         label: this.$gettext('Delete'),
         icon: 'delete',
+        variation: 'danger',
         handler: () => this.showConfirmationRequest(idDeleteAction),
         confirmation: {
           variation: 'danger',
@@ -89,7 +90,6 @@ export default {
           cancel: {
             id: 'accounts-batch-action-delete-cancel',
             label: this.$gettext('Cancel'),
-            variation: 'secondary',
             handler: () => this.hideConfirmationRequest(idDeleteAction)
           },
           confirm: {
@@ -119,13 +119,9 @@ export default {
 
 <style lang="scss" scoped>
 .tmp-alert-fixes {
-  padding: 4px 11px 5px !important;
-  border-radius: 3px !important;
-  background-color: #fff !important;
-  border: 1px solid rgb(224, 0, 0) !important;
   color: rgb(224, 0, 0) !important;
 
-  font-size: 1.1rem !important;
+  font-size: 1.125rem !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
 }

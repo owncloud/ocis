@@ -18,7 +18,7 @@
     <oc-td v-text="account.displayName || '-'" />
     <oc-td v-text="account.mail" />
     <oc-td>
-      <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" variation="raw">
+      <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" appearance="outline">
         <span class="uk-flex uk-flex-middle accounts-roles-current-role">
           {{ currentRole ? currentRole.displayName : $gettext('Select role') }}
           <oc-icon name="expand_more" aria-hidden="true" />

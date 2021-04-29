@@ -67,6 +67,13 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			cfg.Reva.Storages.OwnCloud.EnableHome = false
 			cfg.Reva.Storages.S3.EnableHome = false
 
+			// We need this hack because the metadata storage can define STORAGE_METADATA_ROOT which has the same destination as
+			// STORAGE_DRIVER_OCIS_ROOT. When both variables are set one storage will always be out of sync. Ensure the
+			// metadata storage root is never overridden. This is the kind of stateful code that make you want to cry blood.
+			if os.Getenv("STORAGE_METADATA_ROOT") != "" && os.Getenv("STORAGE_DRIVER_OCIS_ROOT") != "" {
+				cfg.Reva.Storages.Common.Root = os.Getenv("STORAGE_METADATA_ROOT")
+			}
+
 			rcfg := storageMetadataFromStruct(c, cfg)
 
 			gr.Add(func() error {

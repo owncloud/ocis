@@ -15,7 +15,7 @@ for other extensions to register new settings within oCIS. It is responsible for
 settings values as well.
 
 For ease of use, this extension provides an ocis-web extension which allows users to change their settings values.
-Please refer to the [ocis-web extension docs]({{< relref "../../ocis/development/extensions/#external-ownCloud-Web-apps" >}})
+Please refer to the [ocis-web extension docs]({{< ref "../../ocis/development/extensions/#external-ownCloud-Web-apps" >}})
 for running ocis-web extensions.
 
 {{< mermaid class="text-center">}}

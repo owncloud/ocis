@@ -366,7 +366,6 @@ File and sync features in a shared scenario
 #### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 #### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 #### [Fields missing in delete share OCS response](https://github.com/owncloud/ocis-reva/issues/356)
-#### [file_target in share response](https://github.com/owncloud/product/issues/203)
 #### [Shares not deleted when user is deleted](hhttps://github.com/owncloud/ocis/issues/1226)
 #### [EOS no displayname owner when creating share](https://github.com/owncloud/ocis/issues/1270)
 #### [EOS mime-type is not set correctly when sharing](https://github.com/owncloud/ocis/issues/1271)

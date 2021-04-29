@@ -48,6 +48,7 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Service Service
+	OcisPublicURL string
 
 	Context    context.Context
 	Supervised bool

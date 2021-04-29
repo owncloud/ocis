@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -10,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 type cs3backend struct {
@@ -57,7 +59,10 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	}
 
 	if len(roleIDs) == 0 {
-		return user, nil
+		roleIDs = append(roleIDs, settingsSvc.BundleUUIDRoleUser, settingsSvc.SelfManagementPermissionID)
+		// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
+		// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
+		//return user, nil
 	}
 
 	enc, err := encodeRoleIDs(roleIDs)
@@ -65,10 +70,14 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		c.logger.Error().Err(err).Msg("Could not encode loaded roles")
 	}
 
-	user.Opaque = &types.Opaque{
-		Map: map[string]*types.OpaqueEntry{
-			"roles": enc,
-		},
+	if user.Opaque == nil {
+		user.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"roles": enc,
+			},
+		}
+	} else {
+		user.Opaque.Map["roles"] = enc
 	}
 
 	return res.User, nil
@@ -76,6 +85,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "basic",
 		ClientId:     username,
 		ClientSecret: password,
 	})

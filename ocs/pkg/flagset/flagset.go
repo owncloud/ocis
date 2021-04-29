@@ -150,6 +150,35 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
+
+		&cli.StringFlag{
+			Name:        "account-backend-type",
+			Value:       flags.OverrideDefaultString(cfg.AccountBackend, "accounts"),
+			Usage:       "account-backend-type",
+			EnvVars:     []string{"OCS_ACCOUNT_BACKEND_TYPE"},
+			Destination: &cfg.AccountBackend,
+		},
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.RevaAddress, "127.0.0.1:9142"),
+			Usage:       "REVA Gateway Endpoint",
+			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
+			Destination: &cfg.RevaAddress,
+		},
+		&cli.StringFlag{
+			Name:        "idm-address",
+			Value:       flags.OverrideDefaultString(cfg.IdentityManagement.Address, "https://localhost:9200"),
+			EnvVars:     []string{"OCS_IDM_ADDRESS", "OCIS_URL"},
+			Usage:       "keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users",
+			Destination: &cfg.IdentityManagement.Address,
+		},
+		&cli.StringFlag{
+			Name:        "users-driver",
+			Value:       flags.OverrideDefaultString(cfg.StorageUsersDriver, "ocis"),
+			Usage:       "storage driver for users mount: eg. local, eos, owncloud, ocis or s3",
+			EnvVars:     []string{"OCS_STORAGE_USERS_DRIVER", "STORAGE_USERS_DRIVER"},
+			Destination: &cfg.StorageUsersDriver,
+		},
 	}
 }
 

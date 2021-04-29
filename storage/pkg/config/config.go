@@ -36,20 +36,24 @@ type StorageRegistry struct {
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
 	HomeProvider string
 	Rules        []string
+	JSON         string
 }
 
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver      string
-	UserJSONFile    string
-	UserSQLUsername string
-	UserSQLPassword string
-	UserSQLHost     string
-	UserSQLPort     int
-	UserSQLName     string
-	PublicDriver    string
-	PublicJSONFile  string
+	UserDriver                       string
+	UserJSONFile                     string
+	UserSQLUsername                  string
+	UserSQLPassword                  string
+	UserSQLHost                      string
+	UserSQLPort                      int
+	UserSQLName                      string
+	PublicDriver                     string
+	PublicJSONFile                   string
+	PublicPasswordHashCost           int
+	PublicEnableExpiredSharesCleanup bool
+	PublicJanitorRunInterval         int
 }
 
 // Port defines the available port configuration.
@@ -109,6 +113,7 @@ type FrontendPort struct {
 	OCDavPrefix       string
 	OCSPrefix         string
 	OCSSharePrefix    string
+	OCSHomeNamespace  string
 	PublicURL         string
 	Middleware        Middleware
 }
@@ -160,6 +165,7 @@ type StorageConfig struct {
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
 	Common   DriverCommon
+	OCIS     DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
 
@@ -235,6 +241,11 @@ type DriverEOS struct {
 
 	// gateway service to use for uid lookups
 	GatewaySVC string
+}
+
+// DriverOCIS defines the available oCIS storage driver configuration.
+type DriverOCIS struct {
+	ServiceUserUUID string
 }
 
 // DriverOwnCloud defines the available ownCloud storage driver configuration.

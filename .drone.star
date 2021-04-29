@@ -188,7 +188,6 @@ def main(ctx):
   build_release_helpers = [
     changelog(ctx),
     docs(ctx),
-    refreshDockerBadges(ctx)
   ]
 
   if ctx.build.event == "cron":
@@ -455,10 +454,10 @@ def localApiTests(ctx, storage = 'owncloud', suite = 'apiBugDemonstration', acco
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
+          'STORAGE_DRIVER': storage,
           'BEHAT_SUITE': suite,
           'BEHAT_FILTER_TAGS': '~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'PATH_TO_CORE': '/srv/app/testrunner',
@@ -502,10 +501,10 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
         'environment' : {
           'TEST_SERVER_URL': 'https://ocis-server:9200',
           'OCIS_REVA_DATA_ROOT': '%s' % ('/srv/app/tmp/ocis/owncloud/data/' if storage == 'owncloud' else ''),
-          'DELETE_USER_DATA_CMD': '%s' % ('' if storage == 'owncloud' else 'rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'),
           'SKELETON_DIR': '/srv/app/tmp/testing/data/apiSkeleton',
           'OCIS_SKELETON_STRATEGY': '%s' % ('copy' if storage == 'owncloud' else 'upload'),
           'TEST_OCIS':'true',
+          'STORAGE_DRIVER': storage,
           'BEHAT_FILTER_TAGS': '~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage' % ('OC' if storage == 'owncloud' else 'OCIS'),
           'DIVIDE_INTO_NUM_PARTS': number_of_parts,
           'RUN_PART': part_number,
@@ -564,7 +563,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
-          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
+          'TESTING_DATA_DIR': '/srv/app/testing/data',
           'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip and not @notToImplementOnOCIS',
           'LOCAL_UPLOAD_DIR': '/uploads',
@@ -709,8 +708,15 @@ def dockerRelease(ctx, arch):
       'arch': arch,
     },
     'steps':
-      makeGenerate('') +
-      build() + [
+      makeGenerate('') + [
+      {
+        'name': 'build',
+        'image': 'owncloudci/golang:1.16',
+        'pull': 'always',
+        'commands': [
+          'make -C ocis release-linux-docker',
+        ],
+      },
       {
         'name': 'dryrun',
         'image': 'plugins/docker:latest',
@@ -1124,19 +1130,18 @@ def releaseDockerReadme(ctx):
     'steps': [
       {
         'name': 'execute',
-        'image': 'sheogorath/readme-to-dockerhub:latest',
+        'image': 'chko/docker-pushrm:1',
         'pull': 'always',
         'environment': {
-          'DOCKERHUB_USERNAME': {
+          'DOCKER_USER': {
             'from_secret': 'docker_username',
           },
-          'DOCKERHUB_PASSWORD': {
+          'DOCKER_PASS': {
             'from_secret': 'docker_password',
           },
-          'DOCKERHUB_REPO_PREFIX': ctx.repo.namespace,
-          'DOCKERHUB_REPO_NAME': ctx.repo.name,
-          'SHORT_DESCRIPTION': 'Docker images for %s' % (ctx.repo.name),
-          'README_PATH': 'README.md',
+          'PUSHRM_TARGET': 'owncloud/${DRONE_REPO_NAME}',
+          'PUSHRM_SHORT': 'Docker images for %s' % (ctx.repo.name),
+          'PUSHRM_FILE': 'README.md',
         },
       },
     ],
@@ -1146,36 +1151,6 @@ def releaseDockerReadme(ctx):
         'refs/tags/v*',
       ],
     },
-  }
-
-def refreshDockerBadges(ctx):
-  return {
-    'kind': 'pipeline',
-    'type': 'docker',
-    'name': 'badges',
-    'platform': {
-      'os': 'linux',
-      'arch': 'amd64',
-    },
-    'steps': [
-      {
-        'name': 'execute',
-        'image': 'plugins/webhook:1',
-        'pull': 'always',
-        'settings': {
-          'urls': {
-            'from_secret': 'microbadger_url',
-          },
-        },
-      },
-    ],
-    'trigger': {
-      'ref': [
-        'refs/heads/master',
-        'refs/tags/v*',
-      ],
-    },
-    'depends_on': getPipelineNames(dockerReleases(ctx)),
   }
 
 def docs(ctx):
@@ -1373,10 +1348,10 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     },
     {
       'name': 'wait-for-ocis-server',
-      'image': 'thegeeklab/wait-for:latest',
+      'image': 'owncloudci/wait-for:latest',
       'pull': 'always',
       'commands': [
-        'wait-for ocis-server:9200 -t 300',
+        'wait-for -it ocis-server:9200 -t 300',
       ],
     },
   ]
@@ -1402,11 +1377,8 @@ def redis():
   return [
     {
       'name': 'redis',
-      'image': 'webhippie/redis',
+      'image': 'redis:6-alpine',
       'pull': 'always',
-      'environment': {
-        'REDIS_DATABASES': 1
-      },
     }
   ]
 
