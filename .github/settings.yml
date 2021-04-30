@@ -37,13 +37,13 @@ branches:
         required_approving_review_count: 1
         dismiss_stale_reviews: false
         require_code_owner_reviews: false
-        dismissal_restrictions: {}
       required_status_checks:
         strict: false
         contexts:
           - continuous-integration/drone/pr
       enforce_admins: null
       restrictions:
+        apps: []
         users: []
         teams:
           - ci
