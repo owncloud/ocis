@@ -42,7 +42,7 @@ branches:
         strict: false
         contexts:
           - continuous-integration/drone/pr
-      enforce_admins: false
+      enforce_admins: null
       restrictions:
         users: []
         teams:
