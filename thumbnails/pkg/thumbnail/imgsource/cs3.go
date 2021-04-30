@@ -11,7 +11,7 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
-	"image"
+	"io"
 	"net/http"
 )
 
@@ -25,7 +25,9 @@ func NewCS3Source(c gateway.GatewayAPIClient) CS3 {
 	}
 }
 
-func (s CS3) Get(ctx context.Context, path string) (image.Image, error) {
+// Get downloads the file from a cs3 service
+// The caller MUST make sure to close the returned ReadCloser
+func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	auth, ok := ContextGetAuthorization(ctx)
 	if !ok {
 		return nil, errors.New("cs3source: authorization missing")
@@ -63,19 +65,14 @@ func (s CS3) Get(ctx context.Context, path string) (image.Image, error) {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
 	client := &http.Client{}
 
-	resp, err := client.Do(httpReq)
+	resp, err := client.Do(httpReq) // nolint:bodyclose
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", path, resp.StatusCode)
 	}
 
-	img, _, err := image.Decode(resp.Body)
-	if err != nil {
-		return nil, errors.Wrapf(err, `could not decode the image "%s"`, path)
-	}
-	return img, nil
+	return resp.Body, nil
 }

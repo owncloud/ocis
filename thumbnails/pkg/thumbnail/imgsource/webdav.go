@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
 	"github.com/pkg/errors"
-	"image"
 	_ "image/gif"  // Import the gif package so that image.Decode can understand gifs
 	_ "image/jpeg" // Import the jpeg package so that image.Decode can understand jpegs
 	_ "image/png"  // Import the png package so that image.Decode can understand pngs
+	"io"
 	"net/http"
 )
 
@@ -26,7 +26,8 @@ type WebDav struct {
 }
 
 // Get downloads the file from a webdav service
-func (s WebDav) Get(ctx context.Context, url string) (image.Image, error) {
+// The caller MUST make sure to close the returned ReadCloser
+func (s WebDav) Get(ctx context.Context, url string) (io.ReadCloser, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
@@ -39,19 +40,14 @@ func (s WebDav) Get(ctx context.Context, url string) (image.Image, error) {
 	}
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) // nolint:bodyclose
 	if err != nil {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
-	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("could not get the image \"%s\". Request returned with statuscode %d ", url, resp.StatusCode)
 	}
 
-	img, _, err := image.Decode(resp.Body)
-	if err != nil {
-		return nil, errors.Wrapf(err, `could not decode the image "%s"`, url)
-	}
-	return img, nil
+	return resp.Body, nil
 }

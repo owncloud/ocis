@@ -8,6 +8,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
@@ -105,12 +106,15 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnai
 	}
 
 	ctx = imgsource.ContextSetAuthorization(ctx, src.Authorization)
-	img, err := g.cs3Source.Get(ctx, src.Path)
+	r, err := g.cs3Source.Get(ctx, src.Path)
 	if err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	if img == nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	defer r.Close() // nolint:errcheck
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	img, err := pp.Convert(r)
+	if img == nil || err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 	if thumb, err = g.manager.Generate(tr, img); err != nil {
 		return nil, err
@@ -176,12 +180,15 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		ctx = imgsource.ContextSetAuthorization(ctx, src.WebdavAuthorization)
 	}
 	imgURL.RawQuery = ""
-	img, err := g.webdavSource.Get(ctx, imgURL.String())
+	r, err := g.webdavSource.Get(ctx, imgURL.String())
 	if err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	if img == nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	defer r.Close() // nolint:errcheck
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	img, err := pp.Convert(r)
+	if img == nil || err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 	if thumb, err = g.manager.Generate(tr, img); err != nil {
 		return nil, err
@@ -223,8 +230,5 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	if !thumbnail.IsMimeTypeSupported(rsp.Info.MimeType) {
 		return nil, merrors.NotFound(g.serviceID, "Unsupported file type")
 	}
-
-
-
 	return rsp, nil
 }

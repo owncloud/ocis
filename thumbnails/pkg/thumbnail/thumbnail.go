@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 	"image"
+	"mime"
 	"strings"
 )
 
@@ -15,6 +16,7 @@ var (
 		"image/jpg",
 		"image/jpeg",
 		"image/gif",
+		"text/plain",
 	}
 )
 
@@ -90,8 +92,12 @@ func mapToStorageRequest(r Request) storage.Request {
 }
 
 func IsMimeTypeSupported(m string) bool {
+	mimeType, _, err := mime.ParseMediaType(m)
+	if err != nil {
+		return false
+	}
 	for _, mt := range SupportedMimeTypes {
-		if strings.EqualFold(mt, m) {
+		if strings.EqualFold(mt, mimeType) {
 			return true
 		}
 	}
