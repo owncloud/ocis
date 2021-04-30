@@ -7,23 +7,61 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: migration.md
 ---
 
-The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the data on disk can be migrated user by user by switching the storage driver.
+The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the global namespace needs to be introduced. Finally, the data on disk can be migrated user by user by switching the storage driver.
+
+{{< hint warning >}}
+@jfd: It might be easier to introduce the spaces api in oc10 and then migrate to ocis. We cannot migrate both at the same time, the architecture to ocis (which will change fileids) and introduce a global namespace (which requires stable fileids to let clients handle moves without redownloading). Either we implement arbitrary mounting of shares in ocis / reva or we make clients and oc10 spaces aware.
+{{< /hint >}}
 
 ## User Stories
-- As an admin I need to avoid downtime.
-- As an admin I want to migrate certain groups of users before others.
+- As an admin, I need to avoid downtime.
+- As an admin, I want to migrate certain groups of users before others.
 - As a user, I need a seamless migration and not lose data by any chance.
 
 ## Migration Stages
 
 ### Stage-0
-Is the pre-migration stage having a functional ownCloud 10 instance.
+Is the pre-migration stage when having a functional ownCloud 10 instance.
 
 ### Stage-1
 Introduce OpenID Connect to ownCloud 10 server and clients.
 
 ### Stage-2
 Install and introduce ownCloud Web and let users test it voluntarily.
+
+
+{{< hint warning >}}
+**Alternative 1**
+Add a routable prefix to fileids in oc10, and replicate the prefix in ocis.
+### Stage-2.1
+Let oc10 render file ids with prefixes: `<instance name>$<numeric storageid>!<fileid>`. This will allow clients to handle moved files.
+
+### Stage-2.2
+Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
+One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API.
+Files can be identified using `<instance name>$<numeric storageid>!<fileid>` and moved to the correct sync pair.
+
+### Stage-2.3
+Enable spaces API in oc10:
+- New clients will get a response from the spaces API and can set up new sync pairs.
+- Legacy clients will still poll `/webdav` or `/dav/files/<username>` where they will see new subfolders instead of the users home. They will move down the users files into `/home` and shares into `/shares`. Custom sync pairs will no longer be available, causing the legacy client to leave local files in place. They can be picked up manually when installing a new client.
+
+{{< /hint >}}
+
+{{< hint warning >}}
+**Alternative 2**
+An additional `uuid` property used only to detect moves. A lookup by uuid is not necessary for this. The `/dav/meta` endpoint would still take the fileid. Clients  would use the `uuid` to detect moves and set up new sync pairs when migrating to a global namespace.
+### Stage-2.1
+Generate a `uuid` for every file as a file property. Clients can submit a `uuid` when creating files. The server will create a `uuid` if the client did not provide one.
+
+### Stage-2.2
+Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
+One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API. Files can be identified using the `uuid`  and moved to the correct sync pair.
+
+### Stage-3.1
+When reading the files from ocis return the same `uuid`. It can be migrated to an extended attribute or it can be read from oc10. If users change it the client will not be able to detect a move and maybe other weird stuff happens. *What if the uuid gets lost on the server side due to a partial restore?* 
+
+{{< /hint >}}
 
 ### Stage-3
 Start oCIS backend and make read only tests on existing data using the `owncloud` storage driver which will read (and write)

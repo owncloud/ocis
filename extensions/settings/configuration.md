@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-04-30T11:44:11+0000"
+date: "2021-04-30T15:20:05+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,18 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### settings version
-
-Print the versions of the running instances
-
-Usage: `settings version [command options] [arguments...]`
-
--grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
--name |  $SETTINGS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
 
 ### settings health
 
@@ -133,4 +121,16 @@ Usage: `settings server [command options] [arguments...]`
 
 -jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET
 : Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4")`.
+
+### settings version
+
+Print the versions of the running instances
+
+Usage: `settings version [command options] [arguments...]`
+
+-grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+-name |  $SETTINGS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
 
