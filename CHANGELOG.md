@@ -8,6 +8,10 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+* Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
+* Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
+* Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
+* Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
 
 ## Details
 
@@ -25,6 +29,37 @@ The following sections list the changes for unreleased.
    `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
 
    https://github.com/owncloud/ocis/pull/1963
+
+* Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
+
+   https://github.com/owncloud/ocis/pull/1991
+
+* Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
+
+   Use the CS3 API and Reva to deprovision users completely.
+
+   Two new environment variables introduced: ``` OCS_IDM_ADDRESS OCS_STORAGE_USERS_DRIVER
+   ```
+
+   `OCS_IDM_ADDRESS` is also an alias for `OCIS_URL`; allows the OCS service to mint jwt tokens
+   for the authenticated user that will be read by the reva authentication middleware.
+
+   `OCS_STORAGE_USERS_DRIVER` determines how a user is deprovisioned. This kind of behavior is
+   needed since every storage driver deals with deleting differently.
+
+   https://github.com/owncloud/ocis/pull/1962
+
+* Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
+
+   Implemented support for thumbnails for txt files in the thumbnails service.
+
+   https://github.com/owncloud/ocis/pull/1988
+
+* Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
+
+   Replace oc-drop with oc select in settings
+
+   https://github.com/owncloud/ocis/pull/1979
 # Changelog for [1.5.0] (2021-04-21)
 
 The following sections list the changes for 1.5.0.
