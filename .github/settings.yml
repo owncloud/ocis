@@ -22,7 +22,7 @@ repository:
 labels:
   - name: OCIS-Fastlane
     color: "#deadbf"
-    description: Something isn't working
+    description: Planned outside of the sprint
   
 teams:
   - name: ci
