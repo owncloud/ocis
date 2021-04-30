@@ -61,3 +61,37 @@ The `/shares` namespace is used to solve two problems:
 {{< hint warning >}}
 *@jfd: Should we split `/shares` into `/collaborations`, `/ocm` and `/links`? We also have `/public` which uses token based authentication. They may have different latencies or polling strategies? Well, I guess we can cache them differently regardless of the mount point.*
 {{< /hint >}}
+
+## Browser URLs vs API URLs
+In ownCloud 10 you can not only create *public links* but also *private links*. Both can be copy pasted into an email or chat to grant others access to a file. Most often though, end users will copy and paste the URL from their browsers location bar.
+
+| URL | description |
+|-|-|
+| https://demo.owncloud.com/apps/files/?dir=/Photos/Vacation&fileid=24 | The normal browser URL |
+| https://demo.owncloud.com/apps/files/?fileid=24 | the `dir` is actually not used to find the directory and will be filled when pasting this URL |
+| https://demo.owncloud.com/f/24 | *private links* are the shortened version of this and workh in the same way |
+| https://demo.owncloud.com/s/piLdAAt1m3Bg0Fk | public link |
+
+{{< hint >}}
+The `dir` parameter alone cannot be used to look up the directory, because the path for a file may be different depending on the currently logged in user:
+- User A shares his `/path/to/Photos` with User X.
+- User B shares his `/other/path/to/Photos` with User X and Y.
+- User A shares his `/path/to/Photos` with User Y.
+
+(Depending on the order in which they accept the shares) X and Y now have two folders `/shares/Photos` and `/shares/Photos (1)`. But if they were to copy paste a link with that path in the URL and if the directory were only looked up by path X and Y would end up in different folders.
+
+You could argue that the path should always use a global path in the CS3 namespace:
+- User A shares his `/users/a/path/to/Photos` with User X.
+- User B shares his `/users/b/other/path/to/Photos` with User X and Y.
+- User A shares his `/users/a/path/to/Photos` with User Y.
+
+By using a global path like this X and Y would always end up in the correct folder. However, there are two caveats:
+- This only works for resources that reside on the instance (because only they have unique and global path). Shares from other instances need to be identified by id, or they cannot be uniquely addressed
+- User A may not want to leak path `path/to` segments leading to `Photos`. They might contain things like `low-priority` or personal data.
+
+That is the reason why URLs always have to contain some kind of stable identifier. By introducing the concept of *storage spaces* and treating user homes, project drives and shares we can create a URL that contains an identifier for the *storage space* and a path relative to the root of it.
+{{< /hint >}}
+
+In ocis we will unify the way links sharing works, however there will always be at least two types of URLs:
+1. the URL you see in the browsers location bar, and
+2. the URL that a client uses to actually access a file.
