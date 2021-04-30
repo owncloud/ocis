@@ -1071,6 +1071,9 @@ cannot share a folder with create permission
 -   [apiShareReshareToShares3/reShareUpdate.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L61)
 -   [apiShareReshareToShares3/reShareUpdate.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L62)
 
+#### [Shares are not always cleaned up on user deletion](https://github.com/owncloud/ocis/issues/1999)
+-   [apiShareReshareToShares3/reShareUpdate.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L152)
+
 #### [Share receiver cannot get share by id](https://github.com/owncloud/product/issues/253)
 
 -   [apiShareReshareToShares3/reShareWithExpiryDate.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L273)

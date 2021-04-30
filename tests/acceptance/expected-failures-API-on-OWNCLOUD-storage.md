@@ -1205,6 +1205,9 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareReshareToShares1/reShare.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L223)
 -   [apiShareReshareToShares1/reShare.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L224)
 
+#### [Shares are not always cleaned up on user deletion](https://github.com/owncloud/ocis/issues/1999)
+-   [apiShareReshareToShares3/reShareUpdate.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L152)
+
 #### [Share receiver cannot get share by id](https://github.com/owncloud/product/issues/253)
 
 -   [apiShareReshareToShares3/reShareWithExpiryDate.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L273)
