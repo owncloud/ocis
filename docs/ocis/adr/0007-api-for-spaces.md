@@ -66,27 +66,25 @@ The reply to both calls is either one or a list of [Drive representation objects
   "createdDateTime": "string (timestamp)",
   "description": "string",
   "driveType": "personal | projectSpaces | shares",
-  "oCDriveStatus": "accepted | pending | mandatory | offline",
   "lastModifiedDateTime": "string (timestamp)",
   "name": "string",
   "owner": { "@odata.type": "microsoft.graph.identitySet" },
   "quota": { "@odata.type": "microsoft.graph.quota" },
   "root":  { "@odata.type": "microsoft.graph.driveItem" },
   "webUrl": "url",
-  "oCCoOwner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
+  "ocCoOwner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
 }
 ```
 
 The meaning of the objects in Open Graph API context are:
 
-1. **id** - a unique ID identifying the space, called Storage Space ID.
+1. **id** - a persistent and unique ID identifying the space, called Storage Space ID.
 2. **driveType** - describing the type of the space.
-3. **oCDriveStatus** - telling the status (*)
-4. **owner** - an owner object to whom the space belongs
-5. **quota** - quota information about this space
-6. **root**  - the root driveItem object.
-7. **webUrl** - The URL to make this space visible in the browser.
-8. **oCCoOwner** - optional array owner objects of the co-owners of a space (*)
+3. **owner** - an owner object to whom the space belongs
+4. **quota** - quota information about this space
+5. **root**  - the root driveItem object.
+6. **webUrl** - The URL to make this space visible in the browser.
+7. **ocCoOwner** - optional array owner objects of the co-owners of a space (*)
 
 The following *driveType* values are available in the first step, but might be enhanced later:
 
@@ -96,16 +94,11 @@ The following *driveType* values are available in the first step, but might be e
 
 Other space types such as backup, hidden etc. can be added later as requested.
 
-The (*) marked types are not defined in the official MS API. They are prefixed with `oC` to avoid namespace clashes.
+> Note: The *projectSpaces* and *shares* space are virtual spaces. They only contain other spaces, and no regular resources.
 
-The following *driveStatus* values are available:
+The (*) marked types are not defined in the official MS API. They are prefixed with `oc` to avoid namespace clashes.
 
-* **accepted**: The user has accepted the space and uses it
-* **pending**: The user has not yet accepted the space , but can use it after having it accepted.
-* **mandatory**: This is an mandatory space. Used for the personal- and shares-space. The user can not influence if it is visible or not, it is always available.
-* **offline**: The space is currently not available.
-
-> Note: the **root** object equals a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root resource (directory) of the space. 
+The `root` object equals a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root resource (directory) of the space. 
 
 This is an example object as it can be expected as `root` element. It is not complete, as not all elements will be implemented so far.
 
@@ -128,7 +121,7 @@ This is an example object as it can be expected as `root` element. It is not com
 
 Meaningful fields of the root element in the context of the Open Graph API:
 
-1. **id** - a unique ID identifying the root directory node.
+1. **id** - a persistent and unique ID identifying the root directory node.
 2. **webDavUrl** - The webdav path of the top item of the space.
 3. **eTag** - an identifier that changes automatically if the content *or* metadata of the node or the underlying resources changes.
 4. **cTag** - an identifier that changes automatically if the content of the root node or of one of the underlying resources changes.
