@@ -75,12 +75,11 @@ The reply to both calls is either one or a list of [Drive representation objects
   "webUrl": "url",
   "oCCoOwner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
 }
-
 ```
 
-The meaning of the object are in ownClouds context:
+The meaning of the objects in Open Graph API context are:
 
-1. **id** - a unique ID identifying the space
+1. **id** - a unique ID identifying the space, called Storage Space ID.
 2. **driveType** - describing the type of the space.
 3. **oCDriveStatus** - telling the status (*)
 4. **owner** - an owner object to whom the space belongs
@@ -88,8 +87,6 @@ The meaning of the object are in ownClouds context:
 6. **root**  - the root driveItem object.
 7. **webUrl** - The URL to make this space visible in the browser.
 8. **oCCoOwner** - optional array owner objects of the co-owners of a space (*)
-
-> Note: the **root** object is a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root of the space. Especially important is the member `webDavUrl` in the root object which provides the full URL to be used by clients to address items within the space. Also it contains the fields `eTag` and `cTag`.
 
 The following *driveType* values are available in the first step, but might be enhanced later:
 
@@ -101,13 +98,43 @@ Other space types such as backup, hidden etc. can be added later as requested.
 
 The (*) marked types are not defined in the official MS API. They are prefixed with `oC` to avoid namespace clashes.
 
-
 The following *driveStatus* values are available:
 
 * **accepted**: The user has accepted the space and uses it
 * **pending**: The user has not yet accepted the space , but can use it after having it accepted.
 * **mandatory**: This is an mandatory space. Used for the personal- and shares-space. The user can not influence if it is visible or not, it is always available.
 * **offline**: The space is currently not available.
+
+> Note: the **root** object equals a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root resource (directory) of the space. 
+
+This is an example object as it can be expected as `root` element. It is not complete, as not all elements will be implemented so far.
+
+```
+{
+  "cTag": "string (etag)",
+  "webDavUrl": "string",
+
+  /* inherited from baseItem */
+  "id": "string (identifier)",
+  "createdBy": {"@odata.type": "microsoft.graph.identitySet"},
+  "createdDateTime": "String (timestamp)",
+  "eTag": "string",
+  "lastModifiedBy": {"@odata.type": "microsoft.graph.identitySet"},
+  "lastModifiedDateTime": "String (timestamp)",
+  "name": "string",
+  "webUrl": "string",
+}
+```
+
+Meaningful fields of the root element in the context of the Open Graph API:
+
+1. **id** - a unique ID identifying the root directory node.
+2. **webDavUrl** - The webdav path of the top item of the space.
+3. **eTag** - an identifier that changes automatically if the content *or* metadata of the node or the underlying resources changes.
+4. **cTag** - an identifier that changes automatically if the content of the root node or of one of the underlying resources changes.
+5. **webUrl** - The URL to make this space visible in the browser.
+
+> Note: To indicate that only the metadata of a resource has changed, the eTag has changed, but the cTag not. 
 
 ### Positive Consequences
 
