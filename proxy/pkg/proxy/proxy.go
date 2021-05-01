@@ -352,22 +352,6 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/onlyoffice.js",
 					Backend:  "http://localhost:9220",
 				},
-				{
-					Endpoint: "/api/v0/wopi/open",
-					Backend:  "http://ocis-wopiserver:9105",
-				},
-				{
-					Endpoint: "/wopiserver.js",
-					Backend:  "http://ocis-wopiserver:9105",
-				},
-				{
-					Endpoint: "/hello.js",
-					Backend:  "http://localhost:9105",
-				},
-				{
-					Endpoint: "/api/v0/greet",
-					Backend:  "http://localhost:9105",
-				},
 			},
 		},
 		{

@@ -22,7 +22,7 @@
       "path": "/accounts.js"
     },
     {
-      "id": "wopiserver",
+      "id": "wopi",
       "path": "/wopi.js"
     }
   ],
