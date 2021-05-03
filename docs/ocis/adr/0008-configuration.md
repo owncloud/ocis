@@ -196,6 +196,24 @@ This is a desired use case that is yet not supported due to lacking of flags for
 
 - Variadic runtime extensions to run (development mostly)
 - Arg forwarding to command (when running in supervised mode, forward any --config-file flag to supervised subcommands)
+- Ability to set `OCIS_URL` from a config file (this would require to extend the ocis-pkg/config/config.go file).
+
+### The case for `OCIS_URL`
+
+`OCIS_URL` is a jack-of-all trades configuration. It is meant to ease up providing defaults and ensuring dependant services are well configured. It is an override to the following env vars:
+
+```
+OCIS_IDM_ADDRESS
+PROXY_OIDC_ISSUER
+STORAGE_OIDC_ISSUER
+STORAGE_FRONTEND_PUBLIC_URL
+STORAGE_LDAP_IDP
+WEB_UI_CONFIG_SERVER
+WEB_OIDC_AUTHORITY
+OCIS_PUBLIC_URL
+```
+
+Because this functionality is only available as an env var, there is no current way to "normalize" its usage with a config file. That is, there is no way to individually set `OCIS_URL` via config file. This is clear technical debt, and should be added functionality.
 
 ### State of the Art
 - [Kubernetes proposal on this very same topic](https://docs.google.com/document/d/1Dvct469xfjkgy3tjWMAKvRAJo4CmGH4cgSVGTDpay6A)
