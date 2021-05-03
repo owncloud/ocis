@@ -140,6 +140,15 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_HTTP_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
+
+		&cli.StringFlag{
+			Name:        "spaces-webdav-base",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.WebDavBase, "https://localhost:9200/dav/spaces/"),
+			Usage:       "spaces webdav base URL",
+			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE"},
+			Destination: &cfg.Spaces.WebDavBase,
+		},
+
 		&cli.StringFlag{
 			Name:        "ldap-network",
 			Value:       flags.OverrideDefaultString(cfg.Ldap.Network, "tcp"),
@@ -182,6 +191,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_LDAP_BASEDN_GROUPS"},
 			Destination: &cfg.Ldap.BaseDNGroups,
 		},
+
 		&cli.StringFlag{
 			Name:        "oidc-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Endpoint, "https://localhost:9200"),
@@ -202,6 +212,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_OIDC_REALM"},
 			Destination: &cfg.OpenIDConnect.Realm,
 		},
+
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
