@@ -156,9 +156,10 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{
-					"share_prefix":   cfg.Reva.Frontend.OCSSharePrefix,
-					"home_namespace": cfg.Reva.Frontend.OCSHomeNamespace,
-					"prefix":         cfg.Reva.Frontend.OCSPrefix,
+					"share_prefix":            cfg.Reva.Frontend.OCSSharePrefix,
+					"home_namespace":          cfg.Reva.Frontend.OCSHomeNamespace,
+					"resource_info_cache_ttl": cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+					"prefix":                  cfg.Reva.Frontend.OCSPrefix,
 					"config": map[string]interface{}{
 						"version": "1.8",
 						"website": "reva",

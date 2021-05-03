@@ -126,6 +126,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_HOME_NAMESPACE"},
 			Destination: &cfg.Reva.Frontend.OCSHomeNamespace,
 		},
+		&cli.IntFlag{
+			Name:        "ocs-resource-info-cache-ttl",
+			Value:       flags.OverrideDefaultInt(cfg.Reva.Frontend.OCSResourceInfoCacheTTL, 0),
+			Usage:       "the TTL for statted resources in the share cache",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL"},
+			Destination: &cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+		},
 		// Gateway
 
 		&cli.StringFlag{

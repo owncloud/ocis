@@ -109,13 +109,14 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
-	DatagatewayPrefix string
-	OCDavPrefix       string
-	OCSPrefix         string
-	OCSSharePrefix    string
-	OCSHomeNamespace  string
-	PublicURL         string
-	Middleware        Middleware
+	DatagatewayPrefix       string
+	OCDavPrefix             string
+	OCSPrefix               string
+	OCSSharePrefix          string
+	OCSHomeNamespace        string
+	OCSResourceInfoCacheTTL int
+	PublicURL               string
+	Middleware              Middleware
 }
 
 // Middleware configures reva middlewares.
