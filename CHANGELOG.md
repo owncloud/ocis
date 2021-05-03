@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+* Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
@@ -29,6 +30,13 @@ The following sections list the changes for unreleased.
    `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
 
    https://github.com/owncloud/ocis/pull/1963
+
+* Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
+
+   Added the dictionary.js file for package settings and accounts which contains strings that
+   should be synced to transifex but not exist in the UI directly.
+
+   https://github.com/owncloud/ocis/pull/2003
 
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 
