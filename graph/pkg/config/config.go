@@ -63,6 +63,10 @@ type Reva struct {
 	Address string
 }
 
+type Spaces struct {
+	WebDavBase string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	File          string
@@ -74,6 +78,7 @@ type Config struct {
 	Ldap          Ldap
 	OpenIDConnect OpenIDConnect
 	Reva          Reva
+	Spaces        Spaces
 
 	Context    context.Context
 	Supervised bool
