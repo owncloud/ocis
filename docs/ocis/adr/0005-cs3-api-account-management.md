@@ -6,8 +6,6 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0004-cs3api-user-management.md
 ---
 
-# 5. Account Management via CS3 API
-
 * Status: proposed
 * Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
 * Date: 2021-04-12
