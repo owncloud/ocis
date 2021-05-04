@@ -3,12 +3,6 @@
 ### File
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
-#### [Implement Trashbin Feature for ocis storage](https://github.com/owncloud/product/issues/209)
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L48)
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L49)
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L90)
--   [apiWebdavEtagPropagation2/restoreFromTrash.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreFromTrash.feature#L91)
-
 #### [href in trashbin PROPFIND response is wrong](https://github.com/owncloud/ocis/issues/1120)
 #### [QA trashcan cannot delete a deep tree](https://github.com/owncloud/ocis/issues/1077)
 -   [apiTrashbin/trashbinDelete.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L107)
@@ -1473,10 +1467,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:525](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L525)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:546](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L546)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:547](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L547)
--   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:566](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L566)
--   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:567](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L567)
--   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:584](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L584)
--   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:585](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L585)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:606](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L606)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:607](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L607)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:631](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L631)
