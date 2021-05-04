@@ -533,7 +533,7 @@ def uiTests(ctx):
   suiteNames = config['uiTests']['suites'].keys()
   return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, suiteName, storage = 'ocis', accounts_hash_difficulty = 4):
   suites = config['uiTests']['suites']
   paths = ""
   suite = suites[suiteName]
@@ -609,7 +609,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
     },
   }
 
-def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
+def accountsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
