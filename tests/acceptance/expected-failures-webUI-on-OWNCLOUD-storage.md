@@ -59,8 +59,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsers/shareWithUsers.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L57)
 -   [webUISharingInternalUsers/shareWithUsers.feature:58](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L58)
 -   [webUISharingInternalUsers/shareWithUsers.feature:59](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L59)
--   [webUISharingInternalUsers/shareWithUsers.feature:112](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L112)
--   [webUISharingInternalUsers/shareWithUsers.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L130)
 -   [webUISharingInternalUsers/shareWithUsers.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L141)
 -   [webUISharingInternalUsers/shareWithUsers.feature:184](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L184)
 -   [webUISharingInternalUsers/shareWithUsers.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L199)
@@ -98,8 +96,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:211](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature#L211)
 -   [webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:228](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature#L228)
 -   [webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature:240](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersExpire/shareWithUsersExpiringShares.feature#L240)
--   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:58](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L58)
--   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L80)
+-   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:121](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L121)
 -   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L100)
 -   [webUISharingPermissionsUsers/sharePermissionsUsers.feature:22](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L22)
 -   [webUISharingPermissionsUsers/sharePermissionsUsers.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L37)
@@ -256,7 +253,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalGroups/shareWithGroups.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L72)
 -   [webUISharingInternalGroups/shareWithGroups.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L73)
 -   [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
--   [webUISharingInternalGroups/shareWithGroups.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L100)
+-   [webUISharingInternalGroups/shareWithGroups.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L245)
 -   [webUISharingInternalGroups/shareWithGroups.feature:182](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L182)
 -   [webUISharingInternalGroups/shareWithGroups.feature:196](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L196)
 -   [webUISharingInternalGroups/shareWithGroups.feature:216](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L216)
@@ -267,7 +264,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalGroups/shareWithGroups.feature:351](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L351)
 -   [webUISharingInternalGroups/shareWithGroups.feature:325](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L325)
 -   [webUISharingInternalGroups/shareWithGroups.feature:326](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L326)
--   [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L42)
+-   [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L80)
 -   [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L61)
 
 ### [renaming a resource does not work](https://github.com/owncloud/ocis-reva/issues/14)
@@ -295,20 +292,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublicManagement/shareByPublicLink.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L146)
 
 ### [Deletion of a recursive folder from trashbin is not possible](https://github.com/owncloud/product/issues/188)
--   [webUITrashbinDelete/trashbinDelete.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L42)
--   [webUITrashbinDelete/trashbinDelete.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L72)
--   [webUITrashbinDelete/trashbinDelete.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L99)
-
-### [Propfind response to trashbin endpoint is different in ocis](https://github.com/owncloud/product/issues/186)
-### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
--   [webUITrashbinRestore/trashbinRestore.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L138)
+-   [webUITrashbinDelete/trashbinDelete.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L50)
+-   [webUITrashbinDelete/trashbinDelete.feature:86](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L86)
+-   [webUITrashbinDelete/trashbinDelete.feature:106](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L106)
 
 ### [Conflict / overwrite issues with TUS](https://github.com/owncloud/ocis/issues/1294)
 -   [webUIUpload/uploadEdgecases.feature:109](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L109)
 -   [webUIUpload/uploadFileGreaterThanQuotaSize.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadFileGreaterThanQuotaSize.feature#L12)
-
-### [restoring a file deleted from a received shared folder is not possible](https://github.com/owncloud/ocis/issues/1124)
--   [webUITrashbinRestore/trashbinRestore.feature:260](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L260)
 
 ### [Adjust web UI test scenarios that demonstrate fixed bugs](https://github.com/owncloud/web/issues/4601)
 -   [webUISharingPublicManagement/shareByPublicLink.feature:183](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L183)
@@ -316,9 +306,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:322](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L322)
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:299](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L299)
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:236](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L236)
-
-### [renamed file cannot be shared](https://github.com/owncloud/web/issues/4192)
--   [webUISharingInternalUsers/shareWithUsers.feature:341](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L341)
 
 ### [Blocked user is not logged out](https://github.com/owncloud/ocis/issues/902)
 -   [webUILogin/adminBlocksUser.feature:13](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L13)

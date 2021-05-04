@@ -48,7 +48,7 @@ config = {
         #   'webUISharingAcceptShares',
         #   'webUISharingAcceptSharesToRoot',
         # ],
-        # 'webUIRestrictSharing': 'webUIRestrictSharing',
+        'webUIRestrictSharing': 'webUIRestrictSharing',
         # 'webUISharingNotifications': [
         #   'webUISharingNotifications',
         #   'webUISharingNotificationsToRoot',
@@ -86,7 +86,7 @@ config = {
         # 'webUISharingPublicDifferentRoles': 'webUISharingPublicDifferentRoles',
         # 'webUITrashbinDelete': 'webUITrashbinDelete',
         # 'webUITrashbinFilesFolders': 'webUITrashbinFilesFolders',
-        'webUITrashbinRestore': 'webUITrashbinRestore',
+        # 'webUITrashbinRestore': 'webUITrashbinRestore',
         # 'webUIUpload': 'webUIUpload',
         # 'webUISharingFilePermissionMultipleUsers': 'webUISharingFilePermissionMultipleUsers',
         # 'webUISharingFolderPermissionMultipleUsers': 'webUISharingFolderPermissionMultipleUsers',
@@ -245,19 +245,14 @@ def testOcisModules(ctx):
   return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
-  pipelines = [
-    localApiTests(ctx, 'owncloud', 'apiBugDemonstration'),
-    localApiTests(ctx, 'ocis', 'apiBugDemonstration'),
-    localApiTests(ctx, 'owncloud', 'apiAccountsHashDifficulty', 'default'),
-    localApiTests(ctx, 'ocis', 'apiAccountsHashDifficulty', 'default')
-  ]
+  pipelines = []
 
-  for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
-    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'owncloud'))
-    pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'ocis'))
+  # for runPart in range(1, config['apiTests']['numberOfParts'] + 1):
+    # pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'owncloud'))
+    # pipelines.append(coreApiTests(ctx, runPart, config['apiTests']['numberOfParts'], 'ocis'))
 
   pipelines += uiTests(ctx)
-  pipelines.append(accountsUITests(ctx))
+  # pipelines.append(accountsUITests(ctx))
   return pipelines
 
 def testOcisModule(ctx, module):
@@ -533,7 +528,7 @@ def uiTests(ctx):
   suiteNames = config['uiTests']['suites'].keys()
   return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, suiteName, storage = 'ocis', accounts_hash_difficulty = 4):
   suites = config['uiTests']['suites']
   paths = ""
   suite = suites[suiteName]
@@ -609,7 +604,7 @@ def uiTestPipeline(ctx, suiteName, storage = 'owncloud', accounts_hash_difficult
     },
   }
 
-def accountsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
+def accountsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
