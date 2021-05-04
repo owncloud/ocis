@@ -38,7 +38,7 @@ With the spaces concept we are planning to introduce a global namespace to the o
 
 ## CS3 global namespaces
 
-The *CS3 global namespace* in oCIS is configured in the [*storage registry*]({{< ref "./terminology.md#storage-registries" >}}). oCIS uses these defaults:
+The *CS3 global namespace* in oCIS is configured in the [*storage space registry*]({{< ref "./terminology.md#storage-space-registries" >}}). oCIS uses these defaults:
 
 | global namespace | description |
 |-|-|
@@ -48,7 +48,7 @@ The *CS3 global namespace* in oCIS is configured in the [*storage registry*]({{<
 | `/public/<token>` | a virtual folder listing public shares |
 | `/spaces/<spacename>` | *TODO: project or group spaces* |
 
-Technically, the `/home` namespace is not necessary: the [*storage registry*]({{< ref "./terminology.md#storage-registries" >}}) knows the path to a users private space in the `/users` namespace and the gateway can forward the requests to the responsible storage provider.
+Technically, the `/home` namespace is not necessary: the [*storage space registry*]({{< ref "./terminology.md#storage-space-registries" >}}) knows the path to a users private space in the `/users` namespace and the gateway can forward the requests to the responsible storage provider.
 
 {{< hint warning >}}
 *@jfd: Why don't we use `/home/<userlayout>` instead of `/users/<userlayout>`. Then the paths would be consistent with most unix systems.
