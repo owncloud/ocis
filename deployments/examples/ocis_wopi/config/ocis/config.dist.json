@@ -9,9 +9,7 @@
     "response_type": "code",
     "scope": "openid profile email"
   },
-  "apps": [
-    "files"
-  ],
+  "apps": ["files"],
   "external_apps": [
     {
       "id": "settings",
