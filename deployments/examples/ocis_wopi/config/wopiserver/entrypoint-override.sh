@@ -10,6 +10,8 @@ sed -i 's/ocis.owncloud.test/'${OCIS_DOMAIN}'/g' /etc/wopi/wopiserver.conf
 sed -i 's/collabora.owncloud.test/'${COLLABORA_DOMAIN}'/g' /etc/wopi/wopiserver.conf
 sed -i 's/wopiserver.owncloud.test/'${WOPISERVER_DOMAIN}'/g' /etc/wopi/wopiserver.conf
 
+touch /var/log/wopi/wopiserver.log
+
 /app/wopiserver.py &
 
 tail -f /var/log/wopi/wopiserver.log
