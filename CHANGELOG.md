@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
+* Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
 * Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
 
 ## Details
@@ -62,6 +63,17 @@ The following sections list the changes for unreleased.
    Implemented support for thumbnails for txt files in the thumbnails service.
 
    https://github.com/owncloud/ocis/pull/1988
+
+* Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
+
+  * Fix recycle to different locations (https://github.com/cs3org/reva/pull/1541)
+  * Fix user share as grantee in json backend (https://github.com/cs3org/reva/pull/1650)
+  * Introduce named services (https://github.com/cs3org/reva/pull/1509)
+  * Improve json marshalling of share protobuf messages (https://github.com/cs3org/reva/pull/1655)
+  * Cache resources from share getter methods in OCS (https://github.com/cs3org/reva/pull/1643)
+  * Fix public file shares (https://github.com/cs3org/reva/pull/1666)
+
+   https://github.com/owncloud/ocis/pull/2010
 
 * Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
 
