@@ -6,12 +6,6 @@ then
 	exit 1
 fi
 
-if [ -z "$OCIS_SKELETON_DIR" ]
-then
-	echo "OCIS_SKELETON_DIR env variable is not set, cannot find skeleton directory"
-	exit 1
-fi
-
 if [ -z "$WEB_UI_CONFIG" ]
 then
 	echo "WEB_UI_CONFIG env variable is not set, cannot find web config file"

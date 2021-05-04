@@ -3,24 +3,28 @@ const filesMenu = {
     'All files',
     'Shared with me',
     'Shared with others',
+    'Shared via link',
     'Deleted files'
   ],
   Deutsch: [
     'Alle Dateien',
     'Mit mir geteilt',
     'Mit anderen geteilt',
+    'Per Link geteilt',
     'Gelöschte Dateien'
   ],
   Español: [
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
+    "Shared via link",
     'Archivos borrados'
   ],
   Français: [
     'Tous les fichiers',
     'Partagé avec moi',
     'Partagé avec autres',
+    "Shared via link",
     'Fichiers supprimés'
   ]
 }
@@ -58,7 +62,7 @@ const filesListHeaderMenu = {
   Deutsch: [
     'Name',
     'Größe',
-    'Erneuert',
+    'Geändert',
     'Aktionen'
   ],
   Español: [

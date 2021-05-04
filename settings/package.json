@@ -77,7 +77,9 @@
     "owncloud-design-system": "^6.0.1"
   },
   "dependencies": {
+    "ldapjs": "^2.2.4",
     "lodash": "^4.17.15",
+    "nightwatch-vrt": "^0.2.10",
     "vuex": "^3.2.0"
   }
 }
