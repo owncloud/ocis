@@ -154,14 +154,16 @@ pipelineVolumeOC10Tests = \
     }
 
 def pipelineDependsOn(pipeline, dependant_pipelines):
-    pipeline["depends_on"] = getPipelineNames(dependant_pipelines)
+    if "depends_on" in pipeline.keys():
+        pipeline["depends_on"] = pipeline["depends_on"] + getPipelineNames(dependant_pipelines)
+    else:
+        pipeline["depends_on"] = getPipelineNames(dependant_pipelines)
     return pipeline
 
 def pipelinesDependsOn(pipelines, dependant_pipelines):
     pipes = []
     for pipeline in pipelines:
-        pipeline["depends_on"] = getPipelineNames(dependant_pipelines)
-        pipes.append(pipeline)
+        pipes.append(pipelineDependsOn(pipeline, dependant_pipelines))
 
     return pipes
 
