@@ -1,0 +1,110 @@
+#
+# wopiserver.conf
+#
+# Default configuration file for the WOPI server for CERNBox
+#
+##############################################################
+
+[general]
+# Storage access layer to be loaded in order to operate this WOPI server
+# Supported values: local, xroot, cs3.
+storagetype = cs3
+
+# Port where to listen for WOPI requests
+port = 8880
+
+# URL of your Microsoft Office Online service
+#oosurl = https://officeonline.owncloud.test
+
+# URL of your Collabora Online service
+codeurl = https://collabora.owncloud.test
+
+# URL of your WOPI bridge service (for CodiMD)
+#wopibridgeurl = https://your-wopi-bridge-server.org:8000
+
+# URL of your WOPI server or your HA proxy in front of it
+wopiurl = https://wopiserver.owncloud.test
+
+# URL for direct download of files. The complete URL that is sent
+# to clients will include the access_token argument
+downloadurl = https://wopiserver.owncloud.test/wopi/cbox/download
+
+# Optional URL prefix for WebDAV access to the files. This enables the
+# 'Edit in Desktop client' action on Windows-based clients
+webdavurl = https://ocis.owncloud.test/webdav
+
+# List of file extensions deemed incompatible with LibreOffice:
+# interoperable locking will be disabled for such files
+nonofficetypes = .md .zmd .txt .epd
+
+# List of file extensions to be supported by Collabora
+codeofficetypes = .odt .ott .ods .ots .odp .otp .odg .otg .doc .dot .xls .xlt .xlm .ppt .pot .pps .vsd .dxf .wmf .cdr .pages .number .key
+
+# WOPI access token expiration time [seconds]
+tokenvalidity = 86400
+
+# WOPI lock expiration time [seconds]
+wopilockexpiration = 7200
+
+# Logging level. Debug enables the Flask debug mode as well.
+# Valid values are: Debug, Info, Warning, Error.
+loglevel = Info
+
+# Location of the lock files. Currently, two modes are supported:
+# if a path is provided, all locks will be stored there with a hashed name,
+# otherwise the lock is stored on the same path as the original file.
+# This latter mode will eventually be dropped once the system is deemed
+# stable enough and lock files are hidden away.
+#lockpath = /your_storage/wopilocks
+
+
+[security]
+# Location of the secret files. Requires a restart of the
+# WOPI server when either the files or their content change.
+wopisecretfile = /etc/wopi/wopisecret
+iopsecretfile = /etc/wopi/iopsecret
+
+# Use https as opposed to http (requires certificate)
+usehttps = no
+
+# Certificate and key for https. Requires a restart
+# to apply a change.
+wopicert = /etc/grid-security/host.crt
+wopikey = /etc/grid-security/host.key
+
+
+[io]
+# Size used for buffered xroot reads [bytes]
+chunksize = 4194304
+
+
+[xroot]
+# URL of the default remote xroot storage server. This can be overridden
+# if the end-point is passed on the /wopi/cbox/open call
+#storageserver = root://your-xrootd-server.org
+
+# Optional EOS top-level path that will be prepended to all user paths. Useful
+# to map the CERNBox-exposed files in a subfolder of the EOS storage. By default,
+# this is not used and storagehomepath is empty.
+#storagehomepath = /your/top/storage/path
+
+
+[local]
+# Location of the folder or mount point used as local storage
+#storagehomepath = /mnt/your_local_storage
+
+
+[cs3]
+# Host and port of the Reva(-like) CS3-compliant GRPC gateway endpoint
+revagateway = ocis:9142
+
+# HTTP (WebDAV) endpoint for uploading files
+#datagateway = http://172.17.0.1:9100
+
+# Reva/gRPC authentication token expiration time [seconds]
+# The default value matches Reva's default
+authtokenvalidity = 3600
+
+# SSL certificate check for reva
+ # oCIS uses self signed certificate in this example
+sslverify = false

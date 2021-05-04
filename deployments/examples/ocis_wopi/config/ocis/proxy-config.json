@@ -92,6 +92,14 @@
         {
           "endpoint": "/onlyoffice.js",
           "backend": "http://localhost:9220"
+        },
+        {
+          "endpoint": "/api/v0/wopi",
+          "backend": "http://ocis-wopiserver:9105"
+        },
+        {
+          "endpoint": "/wopi.js",
+          "backend": "http://ocis-wopiserver:9105"
         }
       ]
     }

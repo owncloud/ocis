@@ -8,7 +8,8 @@ services:
       ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
-          - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
     command:
       #- "--log.level=DEBUG"
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
@@ -51,24 +52,22 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
-      # Keycloak IDP specific configuration
-      PROXY_AUTOPROVISION_ACCOUNTS: "true"
-      PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
-      WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
-      WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
-      WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}/.well-known/openid-configuration
-      STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
-      STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
-      # general config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      # web ui
+      WEB_UI_CONFIG: "/config/config.json"
+      # proxy
+      PROXY_CONFIG_FILE: "/config/proxy-config.json"
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
+      - ./config/ocis/config.dist.json:/config/config.dist.json
+      - ./config/ocis/proxy-config.json:/config/proxy-config.json
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
@@ -87,65 +86,76 @@ services:
       driver: "local"
     restart: always
 
-  postgres:
-    image: postgres:alpine
+  ocis-wopiserver:
+    image: owncloud/ocis-wopiserver:${OCIS_WOPISERVER_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    volumes:
-      - keycloak_postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      WOPISERVER_WOPI_SERVER_HOST: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      WOPISERVER_WOPI_SERVER_SECRET: ${WOPI_JWT_SECRET:-Pive-Fumkiu4}
+      WOPISERVER_WOPI_SERVER_INSECURE: "${INSECURE:-false}"
     logging:
       driver: "local"
     restart: always
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
+  wopiserver:
+    image: cs3org/wopiserver:${CS3ORG_WOPISERVER_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    entrypoint: ["/bin/sh", "/opt/jboss/tools/docker-entrypoint-override.sh"]
-    volumes:
-      - ./config/keycloak/docker-entrypoint-override.sh:/opt/jboss/tools/docker-entrypoint-override.sh
-      - ./config/keycloak/ocis-realm.dist.json:/opt/jboss/keycloak/ocis-realm.dist.json
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
     environment:
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_SCHEMA: public
-      DB_PASSWORD: keycloak
-      KEYCLOAK_USER: ${KEYCLOAK_ADMIN_USER:-admin}
-      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_IMPORT: /opt/jboss/keycloak/ocis-realm.json
+      - WOPISECRET=${WOPI_JWT_SECRET:-Pive-Fumkiu4}
+      - IOPSECRET=${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      - WOPISERVER_DOMAIN=${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      - COLLABORA_DOMAIN=${COLLABORA_DOMAIN:-collabora.owncloud.test}
+    volumes:
+      - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
+      - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
+      - wopi-data:/var/wopi_local_storage
+      - wopi-logs:/var/log/wopi
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.entrypoints=http"
-      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
-      - "traefik.http.middlewares.keycloak-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.keycloak.middlewares=keycloak-https-redirect"
-      - "traefik.http.routers.keycloak-secure.entrypoints=https"
-      - "traefik.http.routers.keycloak-secure.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
-      - "traefik.http.routers.keycloak-secure.tls=true"
-      - "traefik.http.routers.keycloak-secure.tls.certresolver=http"
-      - "traefik.http.routers.keycloak-secure.service=keycloak"
-      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
-      - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
-      # let /.well-known/openid-configuration be served by Keycloak
-      - "traefik.http.routers.idp-wellknown-secure.entrypoints=https"
-      - "traefik.http.routers.idp-wellknown-secure.tls=true"
-      - "traefik.http.routers.idp-wellknown-secure.tls.certresolver=http"
-      - "traefik.http.routers.idp-wellknown-secure.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`) && Path(`/.well-known/openid-configuration`)"
-      - "traefik.http.middlewares.idp-headers.headers.customrequestheaders.X-Forwarded-Host=${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}"
-      - "traefik.http.middlewares.idp-prefix.addprefix.prefix=/auth/realms/${KEYCLOAK_REALM:-oCIS}"
-      - "traefik.http.middlewares.idp-override.chain.middlewares=idp-headers,idp-prefix"
-      - "traefik.http.routers.idp-wellknown-secure.middlewares=idp-override"
-      - "traefik.http.routers.idp-wellknown-secure.service=keycloak"
-    depends_on:
-      - postgres
+      - "traefik.http.routers.wopiserver.entrypoints=http"
+      - "traefik.http.routers.wopiserver.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      - "traefik.http.middlewares.wopiserver-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.wopiserver.middlewares=wopiserver-https-redirect"
+      - "traefik.http.routers.wopiserver-secure.entrypoints=https"
+      - "traefik.http.routers.wopiserver-secure.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      - "traefik.http.routers.wopiserver-secure.tls=true"
+      - "traefik.http.routers.wopiserver-secure.tls.certresolver=http"
+      - "traefik.http.routers.wopiserver-secure.service=wopiserver"
+      - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
+    logging:
+      driver: "local"
+    restart: always
+
+  collabora:
+    image: collabora/code:6.4.8.1
+    networks:
+      ocis-net:
+    environment:
+      - domain=${OCIS_DOMAIN:-ocis.owncloud.test}
+      - DONT_GEN_SSL_CERT=YES
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      - username=${COLLABORA_ADMIN_USER}
+      - password=${COLLABORA_ADMIN_PASSWORD}
+    cap_add:
+      - MKNOD
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.collabora.entrypoints=http"
+      - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      - "traefik.http.middlewares.collabora-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.collabora.middlewares=collabora-https-redirect"
+      - "traefik.http.routers.collabora-secure.entrypoints=https"
+      - "traefik.http.routers.collabora-secure.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      - "traefik.http.routers.collabora-secure.tls=true"
+      - "traefik.http.routers.collabora-secure.tls.certresolver=http"
+      - "traefik.http.routers.collabora-secure.service=collabora"
+      - "traefik.http.services.collabora.loadbalancer.server.port=9980"
     logging:
       driver: "local"
     restart: always
@@ -153,7 +163,8 @@ services:
 volumes:
   certs:
   ocis-data:
-  keycloak_postgres_data:
+  wopi-data:
+  wopi-logs:
 
 networks:
   ocis-net:

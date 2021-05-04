@@ -56,7 +56,7 @@ services:
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
-      OCIS_JWT_SECRET: ${STORAGE_JWT_SECRET:-Pive-Fumkiu4}
+      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis
