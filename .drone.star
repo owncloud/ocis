@@ -469,7 +469,7 @@ def localApiTests(ctx, storage = 'owncloud', suite = 'apiBugDemonstration', acco
       },
     ],
     'services':
-      redis(),
+      redisForOCStorage(storage),
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -517,7 +517,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = 'owncloud'
       },
     ],
     'services':
-      redis(),
+      redisForOCStorage(storage),
     'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
     'trigger': {
       'ref': [
@@ -591,7 +591,6 @@ def uiTestPipeline(ctx, suiteName, storage = 'ocis', accounts_hash_difficulty = 
       },
     ],
     'services':
-      redis() +
       selenium(),
     'volumes':
       [pipelineVolumeOC10Tests] +
@@ -660,7 +659,6 @@ def accountsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
       },
     ],
     'services':
-      redis() +
       selenium(),
     'volumes':
       [stepVolumeOC10Tests] +
@@ -1316,7 +1314,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'STORAGE_DRIVER_LOCAL_ROOT': '/srv/app/tmp/ocis/local/root',
     'STORAGE_METADATA_ROOT': '/srv/app/tmp/ocis/metadata',
     'STORAGE_DRIVER_OWNCLOUD_DATADIR': '/srv/app/tmp/ocis/owncloud/data',
-    'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379',
+    'STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR': 'redis:6379' if storage == 'owncloud' else '',
     'STORAGE_HOME_DATA_SERVER_URL': 'http://ocis-server:9155/data',
     'STORAGE_USERS_DATA_SERVER_URL': 'http://ocis-server:9158/data',
     'STORAGE_SHARING_USER_JSON_FILE': '/srv/app/tmp/ocis/shares.json',
@@ -1381,6 +1379,12 @@ def redis():
       'pull': 'always',
     }
   ]
+
+def redisForOCStorage(storage = 'ocis'):
+  if storage == 'owncloud':
+    return redis()
+  else:
+    return
 
 def selenium():
   return [
