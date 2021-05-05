@@ -78,7 +78,7 @@ module.exports = {
       selector: '#account-info-container'
     },
     fileTableHeaderItems: {
-      selector: '//*[@id="files-table-header"]//span[not(*) and not(ancestor::label)]',
+      selector: '//*[@id="files-personal-table"]//th[not(.//div)]',
       locateStrategy: 'xpath'
     }
   }

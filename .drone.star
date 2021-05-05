@@ -258,6 +258,7 @@ def testPipelines(ctx):
 
   pipelines += uiTests(ctx)
   pipelines.append(accountsUITests(ctx))
+  pipelines.append(settingsUITests(ctx))
   return pipelines
 
 def testOcisModule(ctx, module):
@@ -660,6 +661,92 @@ def accountsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
     ],
     'services':
       selenium(),
+    'volumes':
+      [stepVolumeOC10Tests] +
+      [{
+        'name': 'uploads',
+        'temp': {}
+      }],
+    'depends_on': getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+    'trigger': {
+      'ref': [
+        'refs/heads/master',
+        'refs/tags/v*',
+        'refs/pull/**',
+      ],
+    },
+  }
+
+def settingsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
+  return {
+    'kind': 'pipeline',
+    'type': 'docker',
+    'name': 'settingsUITests',
+    'platform': {
+      'os': 'linux',
+      'arch': 'amd64',
+    },
+    'steps':
+      restoreBuildArtifactCache(ctx, 'ocis-binary-amd64', 'ocis/bin/ocis') +
+      ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
+      {
+        'name': 'WebUIAcceptanceTests',
+        'image': 'webhippie/nodejs:latest',
+        'pull': 'always',
+        'environment': {
+          'SERVER_HOST': 'https://ocis-server:9200',
+          'BACKEND_HOST': 'https://ocis-server:9200',
+          'RUN_ON_OCIS': 'true',
+          'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
+          'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
+          'TEST_TAGS': 'not @skipOnOCIS and not @skip',
+          'LOCAL_UPLOAD_DIR': '/uploads',
+          'NODE_TLS_REJECT_UNAUTHORIZED': 0,
+          'WEB_PATH': '/srv/app/web',
+          'FEATURE_PATH': '/drone/src/settings/ui/tests/acceptance/features',
+          'OCIS_SETTINGS_STORE': '/srv/app/tmp/ocis/settings',
+        },
+        'commands': [
+          '. /drone/src/.drone.env',
+          'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
+          'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
+          'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
+          'cd /srv/app/web',
+          'git checkout $WEB_COMMITID',
+          'yarn install --all',
+          'cd /drone/src/settings',
+          'yarn install --all',
+          'make test-acceptance-webui'
+        ],
+        'volumes':
+          [stepVolumeOC10Tests] +
+          [{
+            'name': 'uploads',
+            'path': '/uploads'
+          }]
+      },
+    ],
+    'services': [
+      {
+        'name': 'redis',
+        'image': 'webhippie/redis',
+        'pull': 'always',
+        'environment': {
+          'REDIS_DATABASES': 1
+        },
+      },
+      {
+        'name': 'selenium',
+        'image': 'selenium/standalone-chrome-debug:3.141.59-20200326',
+        'pull': 'always',
+        'volumes': [
+          {
+            'name': 'uploads',
+            'path': '/uploads'
+          }
+        ],
+      },
+    ],
     'volumes':
       [stepVolumeOC10Tests] +
       [{
@@ -1322,6 +1409,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes=[]):
     'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
     'IDP_IDENTIFIER_REGISTRATION_CONF': '/drone/src/tests/config/drone/identifier-registration.yml',
     'OCIS_LOG_LEVEL': 'warn',
+    'SETTINGS_DATA_PATH': '/srv/app/tmp/ocis/settings',
   }
 
   # Pass in "default" accounts_hash_difficulty to not set this environment variable.

@@ -1,7 +1,7 @@
 const path = require('path')
 const WEB_PATH = process.env.WEB_PATH
 const TEST_INFRA_DIRECTORY = process.env.TEST_INFRA_DIRECTORY
-const OCIS_SETTINGS_STORE = process.env.OCIS_SETTINGS_STORE || './ocis-settings-store'
+const OCIS_SETTINGS_STORE = process.env.OCIS_SETTINGS_STORE || '/var/tmp/ocis/settings'
 
 const config = require(path.join(WEB_PATH, 'nightwatch.conf.js'))
 
