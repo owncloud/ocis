@@ -1413,11 +1413,13 @@ def example_deploys(ctx):
     'cs3_users_ocis/latest.yml',
     'ocis_keycloak/latest.yml',
     'ocis_traefik/latest.yml',
+    'ocis_wopi/latest.yml',
   ]
   released_configs = [
     'cs3_users_ocis/released.yml',
     'ocis_keycloak/released.yml',
     'ocis_traefik/released.yml',
+    'ocis_wopi/released.yml',
   ]
 
   # if on master branch:
