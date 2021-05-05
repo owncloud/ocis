@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-05T08:33:37+0000"
+date: "2021-05-05T12:06:31+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,12 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
 ### accounts ocis-accounts
 
 Provide accounts and groups for oCIS
@@ -56,11 +50,47 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 -log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
 
+### accounts add
+
+Create a new account
+
+Usage: `accounts add [command options] [arguments...]`
+
+### accounts list
+
+List existing accounts
+
+Usage: `accounts list [command options] [arguments...]`
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
 ### accounts remove
 
 Removes an existing account
 
 Usage: `accounts remove [command options] [arguments...]`
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+### accounts inspect
+
+Show detailed data on an existing account
+
+Usage: `accounts inspect [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
@@ -148,36 +178,6 @@ Usage: `accounts update [command options] [arguments...]`
 Print the versions of the running instances
 
 Usage: `accounts version [command options] [arguments...]`
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
-
-### accounts inspect
-
-Show detailed data on an existing account
-
-Usage: `accounts inspect [command options] [arguments...]`
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
-### accounts list
-
-List existing accounts
-
-Usage: `accounts list [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
