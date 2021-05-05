@@ -679,7 +679,7 @@ def accountsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
     },
   }
 
-def settingsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
+def settingsUITests(ctx, storage = 'ocis', accounts_hash_difficulty = 4):
   return {
     'kind': 'pipeline',
     'type': 'docker',
@@ -700,22 +700,22 @@ def settingsUITests(ctx, storage = 'owncloud', accounts_hash_difficulty = 4):
           'BACKEND_HOST': 'https://ocis-server:9200',
           'RUN_ON_OCIS': 'true',
           'OCIS_REVA_DATA_ROOT': '/srv/app/tmp/ocis/owncloud/data',
-          'OCIS_SKELETON_DIR': '/srv/app/testing/data/webUISkeleton',
           'WEB_UI_CONFIG': '/drone/src/tests/config/drone/ocis-config.json',
           'TEST_TAGS': 'not @skipOnOCIS and not @skip',
           'LOCAL_UPLOAD_DIR': '/uploads',
           'NODE_TLS_REJECT_UNAUTHORIZED': 0,
           'WEB_PATH': '/srv/app/web',
           'FEATURE_PATH': '/drone/src/settings/ui/tests/acceptance/features',
+          'OCIS_SETTINGS_STORE': '/srv/app/tmp/ocis/settings',
         },
         'commands': [
-          'source /drone/src/.drone.env',
+          '. /drone/src/.drone.env',
           'git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing',
           'git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web',
           'cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads',
           'cd /srv/app/web',
           'git checkout $WEB_COMMITID',
-          'yarn install-all',
+          'yarn install --all',
           'cd /drone/src/settings',
           'yarn install --all',
           'make test-acceptance-webui'
