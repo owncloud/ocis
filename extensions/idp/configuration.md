@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-05T07:15:48+0000"
+date: "2021-05-05T07:47:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -34,6 +34,15 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### idp health
+
+Check health status
+
+Usage: `idp health [command options] [arguments...]`
+
+-debug-addr |  $IDP_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134")`.
 
 ### idp ocis-idp
 
@@ -211,13 +220,4 @@ Usage: `idp version [command options] [arguments...]`
 
 -name |  $IDP_NAME
 : Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "idp")`.
-
-### idp health
-
-Check health status
-
-Usage: `idp health [command options] [arguments...]`
-
--debug-addr |  $IDP_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134")`.
 
