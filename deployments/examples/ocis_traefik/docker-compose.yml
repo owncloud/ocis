@@ -57,6 +57,7 @@ services:
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION: false # DCR not reliable with konnectd https://github.com/owncloud/openidconnect/issues/142
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis
