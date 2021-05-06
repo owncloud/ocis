@@ -3,7 +3,7 @@ title: "5. Account Management through CS3 API"
 date: 2021-04-12T15:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
-geekdocFilePath: 0004-cs3api-user-management.md
+geekdocFilePath: 0005-cs3api-user-management.md
 ---
 
 * Status: proposed
