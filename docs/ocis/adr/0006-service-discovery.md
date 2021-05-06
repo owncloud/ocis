@@ -6,7 +6,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0006-service-discovery.md
 ---
 
-* Status: proposed
+* Status: accepted
 * Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
 * Date: 2021-04-19
 
