@@ -226,7 +226,7 @@ def main(ctx):
         ),
     )
 
-    pipelines.append(checkStarlark)
+    pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
