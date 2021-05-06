@@ -71,10 +71,10 @@ HTTP/1.1 200 OK
   Content-Type: application/json
 
   {
-   "instance":        "https://cloud.example.com/",
-   "graph_endpoint":  "https://cloud.example.com/graph/",
+   "instance":        "https://cloud.example.com",
+   "graph_endpoint":  "https://cloud.example.com/graph/v0.0",
    "ocis_web_config": "https://cloud.example.com/web/config.json",
-   "issuer":          "https://idp.example.com/",
+   "issuer":          "https://idp.example.com",
   }
 ```
 
