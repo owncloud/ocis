@@ -5,10 +5,13 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/coreos/go-oidc"
+	"github.com/imdario/mergo"
+	"github.com/jinzhu/copier"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
@@ -49,9 +52,61 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			// beforeOverride contains cfg with values parsed by urfavecli,
+			// this should take precedence when merging as they are more explicit.
+			// beforeOverride has the highest priority, as they are inherited values.
+			beforeOverride := config.Config{}
+			if err := copier.Copy(&beforeOverride, cfg); err != nil {
+				return err
 			}
+			defaultConfig := config.DefaultConfig()
+
+			// By the time we unmarshal viper parsed values onto cfg, any value having been set by the cli framework
+			// will get overridden, in order to ensure that this values are accounted for we have to perform a 3-way merge:
+			// 1. merge viper onto cfg
+			// 2. merge defaults onto cfg
+			// 3. merge parsed flags onto cfg
+			// the result of this is the same order of precedence as the cli framework claims, except a new "artificial"
+			// source which accounts for structured configuration. This all goes to the moon when the extension is running
+			// in supervised mode, this is because in such case we want the single config file to take precedence over
+			// the global ocis.yaml config file. This is happening because in supervised mode, sending commands to a hot
+			// runtime, flags forwarding is not possible, because the process is probably running in a machine elsewhere.
+			// It is not impossible to do, it just needs design.
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			fromProxyConfigFile := config.Config{}
+			if err := ParseConfig(ctx, &fromProxyConfigFile); err != nil {
+				return err
+			}
+
+			if err := mergo.Merge(cfg, defaultConfig); err != nil {
+				panic(err)
+			}
+
+			if cfg.Supervised {
+				// When an extension is running supervised, we have the use case where executing `ocis run extension`
+				// we want to ONLY take into consideration fhe existing config file.
+				if !reflect.DeepEqual(fromProxyConfigFile, config.Config{}) {
+					if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
+						panic(err)
+					}
+					return nil
+				}
+			}
+
+			if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
+				panic(err)
+			}
+
+			// preserves the original order from inherited values. This has the drawback that also persists values
+			// inherited from an ocis.yaml global config file, with the side effect of these global values overriding
+			// concrete values from a closer-to-the-process proxy.yaml file.
+			if err := mergo.Merge(cfg, beforeOverride, mergo.WithOverride); err != nil {
+				panic(err)
+			}
+
 			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},

@@ -243,12 +243,12 @@ func (s *Service) generateRunSet(cfg *config.Config) {
 	}
 }
 
-// Start indicates the Service Controller to start a new supervised service as an OS thread.
+// Start indicates the Service Controller to start a new supervised service.
 func (s *Service) Start(name string, reply *int) error {
 	// RPC calls to a Service object will allow for parsing config. Mind that since the runtime is running on a different
 	// machine, the configuration needs to be present in the given machine. RPC does not yet allow providing a config
 	// during transport.
-	s.cfg.Mode = ociscfg.UNSUPERVISED
+	s.cfg.Mode = ociscfg.SUPERVISED
 
 	swap := deepcopy.Copy(s.cfg)
 	if _, ok := s.ServicesRegistry[name]; ok {
