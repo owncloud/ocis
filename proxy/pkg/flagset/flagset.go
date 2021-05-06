@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109"),
+			Value:       cfg.Debug.Addr,
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -61,7 +61,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "config-file",
-			Value:       "",
+			Value:       cfg.File,
 			Usage:       "Path to config file",
 			EnvVars:     []string{"PROXY_CONFIG_FILE"},
 			Destination: &cfg.File,
@@ -74,42 +74,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
+			Value:       cfg.Tracing.Type,
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"PROXY_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       cfg.Tracing.Endpoint,
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"PROXY_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       cfg.Tracing.Collector,
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"PROXY_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "proxy"),
+			Value:       cfg.Tracing.Service,
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"PROXY_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205"),
+			Value:       cfg.Debug.Addr,
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       cfg.Debug.Token,
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"PROXY_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -128,35 +128,35 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9200"),
+			Value:       cfg.HTTP.Addr,
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"PROXY_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
+			Value:       cfg.HTTP.Root,
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"PROXY_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
 			Name:        "asset-path",
-			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
+			Value:       cfg.Asset.Path,
 			Usage:       "Path to custom assets",
 			EnvVars:     []string{"PROXY_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "service-namespace",
-			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
+			Value:       cfg.Service.Namespace,
 			Usage:       "Set the base namespace for the service namespace",
 			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       flags.OverrideDefaultString(cfg.Service.Name, "proxy"),
+			Value:       cfg.Service.Name,
 			Usage:       "Service name",
 			EnvVars:     []string{"PROXY_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
@@ -177,28 +177,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "tls",
-			Value:       flags.OverrideDefaultBool(cfg.HTTP.TLS, true),
+			Value:       cfg.HTTP.TLS,
 			Usage:       "Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).",
 			EnvVars:     []string{"PROXY_TLS"},
 			Destination: &cfg.HTTP.TLS,
 		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",
-			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
+			Value:       cfg.TokenManager.JWTSecret,
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
 			EnvVars:     []string{"PROXY_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
+			Value:       cfg.Reva.Address,
 			Usage:       "REVA Gateway Endpoint",
 			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Address,
 		},
 		&cli.BoolFlag{
 			Name:        "insecure",
-			Value:       flags.OverrideDefaultBool(cfg.InsecureBackends, false),
+			Value:       cfg.InsecureBackends,
 			Usage:       "allow insecure communication to upstream servers",
 			EnvVars:     []string{"PROXY_INSECURE_BACKENDS"},
 			Destination: &cfg.InsecureBackends,
@@ -208,28 +208,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "oidc-issuer",
-			Value:       flags.OverrideDefaultString(cfg.OIDC.Issuer, "https://localhost:9200"),
+			Value:       cfg.OIDC.Issuer,
 			Usage:       "OIDC issuer",
 			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"}, // PROXY_OIDC_ISSUER takes precedence over OCIS_URL
 			Destination: &cfg.OIDC.Issuer,
 		},
 		&cli.BoolFlag{
 			Name:        "oidc-insecure",
-			Value:       flags.OverrideDefaultBool(cfg.OIDC.Insecure, true),
+			Value:       cfg.OIDC.Insecure,
 			Usage:       "OIDC allow insecure communication",
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
 		&cli.IntFlag{
 			Name:        "oidc-userinfo-cache-tll",
-			Value:       flags.OverrideDefaultInt(cfg.OIDC.UserinfoCache.TTL, 10),
+			Value:       cfg.OIDC.UserinfoCache.TTL,
 			Usage:       "Fallback TTL in seconds for caching userinfo, when no token lifetime can be identified",
 			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_TTL"},
 			Destination: &cfg.OIDC.UserinfoCache.TTL,
 		},
 		&cli.IntFlag{
 			Name:        "oidc-userinfo-cache-size",
-			Value:       flags.OverrideDefaultInt(cfg.OIDC.UserinfoCache.Size, 1024),
+			Value:       cfg.OIDC.UserinfoCache.Size,
 			Usage:       "Max entries for caching userinfo",
 			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_SIZE"},
 			Destination: &cfg.OIDC.UserinfoCache.Size,
@@ -239,7 +239,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",
-			Value:       flags.OverrideDefaultBool(cfg.AutoprovisionAccounts, false),
+			Value:       cfg.AutoprovisionAccounts,
 			Usage:       "create accounts from OIDC access tokens to learn new users",
 			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
 			Destination: &cfg.AutoprovisionAccounts,
@@ -262,13 +262,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		// Pre Signed URLs
 		&cli.StringSliceFlag{
 			Name:    "presignedurl-allow-method",
-			Value:   cli.NewStringSlice("GET"),
+			Value:   cli.NewStringSlice(cfg.PreSignedURL.AllowedHTTPMethods...),
 			Usage:   "--presignedurl-allow-method GET [--presignedurl-allow-method POST]",
 			EnvVars: []string{"PRESIGNEDURL_ALLOWED_METHODS"},
 		},
 		&cli.BoolFlag{
 			Name:        "enable-presignedurls",
-			Value:       flags.OverrideDefaultBool(cfg.PreSignedURL.Enabled, true),
+			Value:       cfg.PreSignedURL.Enabled,
 			Usage:       "Enable or disable handling the presigned urls in the proxy",
 			EnvVars:     []string{"PROXY_ENABLE_PRESIGNEDURLS"},
 			Destination: &cfg.PreSignedURL.Enabled,
@@ -277,7 +277,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		// Basic auth
 		&cli.BoolFlag{
 			Name:        "enable-basic-auth",
-			Value:       flags.OverrideDefaultBool(cfg.EnableBasicAuth, false),
+			Value:       cfg.EnableBasicAuth,
 			Usage:       "enable basic authentication",
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,
@@ -285,7 +285,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "account-backend-type",
-			Value:       flags.OverrideDefaultString(cfg.AccountBackend, "accounts"),
+			Value:       cfg.AccountBackend,
 			Usage:       "account-backend-type",
 			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
 			Destination: &cfg.AccountBackend,
@@ -305,14 +305,14 @@ func ListProxyWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "service-namespace",
-			Value:       flags.OverrideDefaultString(cfg.OIDC.Issuer, "com.owncloud.web"),
+			Value:       cfg.Service.Namespace,
 			Usage:       "Set the base namespace for the service namespace",
 			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       flags.OverrideDefaultString(cfg.Service.Name, "proxy"),
+			Value:       cfg.Service.Name,
 			Usage:       "Service name",
 			EnvVars:     []string{"PROXY_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
