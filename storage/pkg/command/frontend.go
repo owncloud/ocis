@@ -160,6 +160,18 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"home_namespace":          cfg.Reva.Frontend.OCSHomeNamespace,
 					"resource_info_cache_ttl": cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
 					"prefix":                  cfg.Reva.Frontend.OCSPrefix,
+					"cache_warmup_driver":     cfg.Reva.Frontend.OCSCacheWarmupDriver,
+					"cache_warmup_drivers": map[string]interface{}{
+						"cbox": map[string]interface{}{
+							"db_username": cfg.Reva.Sharing.UserSQLUsername,
+							"db_password": cfg.Reva.Sharing.UserSQLPassword,
+							"db_host":     cfg.Reva.Sharing.UserSQLHost,
+							"db_port":     cfg.Reva.Sharing.UserSQLPort,
+							"db_name":     cfg.Reva.Sharing.UserSQLName,
+							"namespace":   cfg.Reva.Storages.EOS.Root,
+							"gatewaysvc":  cfg.Reva.Gateway.Endpoint,
+						},
+					},
 					"config": map[string]interface{}{
 						"version": "1.8",
 						"website": "reva",

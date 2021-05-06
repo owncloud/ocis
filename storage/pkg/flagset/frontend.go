@@ -133,6 +133,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL"},
 			Destination: &cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
 		},
+		&cli.StringFlag{
+			Name:        "ocs-cache-warmup-driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.OCSCacheWarmupDriver, "cbox"),
+			Usage:       "the driver to be used for warming up the share cache",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_CACHE_WARMUP_DRIVER"},
+			Destination: &cfg.Reva.Frontend.OCSCacheWarmupDriver,
+		},
 		// Gateway
 
 		&cli.StringFlag{

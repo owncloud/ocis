@@ -115,6 +115,7 @@ type FrontendPort struct {
 	OCSSharePrefix          string
 	OCSHomeNamespace        string
 	OCSResourceInfoCacheTTL int
+	OCSCacheWarmupDriver    string
 	PublicURL               string
 	Middleware              Middleware
 }
