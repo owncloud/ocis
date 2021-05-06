@@ -1371,11 +1371,6 @@ def notify(ctx):
           },
           'channel': config['rocketchat']['channel']
         },
-        'when': {
-          'status': [
-            'failure',
-          ],
-        },
       },
     ],
     'depends_on': [],
