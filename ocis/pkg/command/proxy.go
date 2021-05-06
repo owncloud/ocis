@@ -3,6 +3,9 @@
 package command
 
 import (
+	"github.com/jinzhu/copier"
+
+	"github.com/imdario/mergo"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -23,7 +26,20 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Proxy),
 		},
 		Before: func(ctx *cli.Context) error {
-			return ParseConfig(ctx, cfg)
+			beforeOverride := config.Config{}
+			if err := copier.Copy(&beforeOverride, cfg); err != nil {
+				return err
+			}
+
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			if err := mergo.Merge(cfg, beforeOverride, mergo.WithOverride); err != nil {
+				return err
+			}
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureProxy(cfg))

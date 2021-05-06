@@ -12,6 +12,8 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535
 	github.com/cs3org/reva v1.6.1-0.20210414111318-a4b5148cbfb2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/imdario/mergo v0.3.11
+	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
