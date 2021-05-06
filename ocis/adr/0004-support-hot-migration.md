@@ -6,8 +6,6 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0004-support-hot-migration.md
 ---
 
-# 4. Support Hot Migration
-
 * Status: proposed
 * Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
 * Date: 2021-03-16

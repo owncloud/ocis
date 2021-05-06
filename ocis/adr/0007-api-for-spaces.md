@@ -1,4 +1,10 @@
-# 5. Graph API for Spaces
+---
+title: "7. Open Graph API for oCIS File Spaces"
+date: 2021-05-03T09:00:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0007-api-for-spaces.md
+---
 
 * Status: proposed
 * Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
