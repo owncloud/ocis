@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
 * Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
 * Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
+* Enhancement - Set SameSite settings to Strict for Web: [#2019](https://github.com/owncloud/ocis/pull/2019)
 
 ## Details
 
@@ -80,6 +81,12 @@ The following sections list the changes for unreleased.
    Replace oc-drop with oc select in settings
 
    https://github.com/owncloud/ocis/pull/1979
+
+* Enhancement - Set SameSite settings to Strict for Web: [#2019](https://github.com/owncloud/ocis/pull/2019)
+
+   Changed SameSite settings to Strict for Web to prevent warnings in Firefox
+
+   https://github.com/owncloud/ocis/pull/2019
 # Changelog for [1.5.0] (2021-04-21)
 
 The following sections list the changes for 1.5.0.
