@@ -9,6 +9,12 @@ geekdocFilePath: _index.md
 
 {{< toc >}}
 
+## oCIS online demo
+
+We have an oCIS demo instance running on [ocis.owncloud.com](https://ocis.owncloud.com) where you can get a first impression of it.
+
+We also have some more variations of oCIS running and [continuously deployed]({{< ref "../deployment/continuous_deployment" >}}) to reflect different scenarios in that oCIS might be used.
+
 ## Run oCIS
 
 We are distributing oCIS as binaries and Docker images.
@@ -16,6 +22,7 @@ We are distributing oCIS as binaries and Docker images.
 You can find more deployment examples in the [deployment section]({{< ref "../deployment" >}}).
 
 ### Binaries
+
 You can find the latest official release of oCIS at [our download mirror](https://download.owncloud.com/ocis/ocis/) or on [GitHub](https://github.com/owncloud/ocis/releases).
 The latest build from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
@@ -38,7 +45,6 @@ The default primary storage location is `/var/tmp/ocis`. You can change that val
 {{< hint warning >}}
 oCIS by default relies on Multicast DNS (mDNS), usually via avahi-daemon. If your system has a firewall, make sure mDNS is allowed in your active zone.
 {{< /hint >}}
-
 
 ### Docker
 
