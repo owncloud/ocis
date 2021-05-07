@@ -44,6 +44,8 @@ This the DRAFT for the API.
 
 ownCloud servers provide an API to query for available spaces of an user.
 
+See the openAPI Specification for the [open Graph API](https://owncloud.dev/open-graph-api/).
+
 Most important, the API returns the WebDAV endpoint for each space. With that, clients do not have to make assumptions about WebDAV routes any more.
 
 See [Drive item in Microsoft Graph API](https://docs.microsoft.com/en-us/graph/api/resources/onedrive?view=graph-rest-1.0) for an overview of `drive` and `driveItem` resources. The concrete list of drives / spaces a user has access to can be obtained on multiple endpoints.
