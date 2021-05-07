@@ -46,42 +46,47 @@ config = {
             ],
             "webUISharingBasic": [
                 "webUISharingAcceptShares",
-                "webUISharingAcceptSharesToRoot",
             ],
             "webUIRestrictSharing": "webUIRestrictSharing",
             "webUISharingNotifications": [
                 "webUISharingNotifications",
-                "webUISharingNotificationsToRoot",
             ],
             "webUIFavorites": "webUIFavorites",
-            "webUIFiles": "webUIFiles",
+            "webUIMarkdownEditor": "webUIMarkdownEditor",
+            "webUIFiles1": [
+                "webUIFiles",
+                "webUIFilesActionMenu",
+                "webUIFilesCopy",
+            ],
+            "webUIFiles2": [
+                "webUIFilesDetails",
+                "webUIFilesList",
+                "webUIFilesSearch",
+            ],
             "webUISharingAutocompletion": "webUISharingAutocompletion",
             "webUISharingInternalGroups": [
                 "webUISharingInternalGroups",
                 "webUISharingInternalGroupsEdgeCases",
                 "webUISharingInternalGroupsSharingIndicator",
-                "webUISharingInternalGroupsToRoot",
-                "webUISharingInternalGroupsToRootEdgeCases",
-                "webUISharingInternalGroupsToRootSharingIndicator",
             ],
             "webUISharingInternalUsers": [
                 "webUISharingInternalUsers",
                 "webUISharingInternalUsersBlacklisted",
                 "webUISharingInternalUsersSharingIndicator",
-                "webUISharingInternalUsersToRoot",
-                "webUISharingInternalUsersToRootBlacklisted",
-                "webUISharingInternalUsersToRootSharingIndicator",
+                "webUISharingInternalUsersCollaborator",
+                "webUISharingInternalUsersShareWithPage",
             ],
             "webUISharingInternalUsersExpire": "webUISharingInternalUsersExpire",
-            "webUISharingInternalUsersExpireToRoot": "webUISharingInternalUsersExpireToRoot",
             "webUISharingPermissionsUsers": "webUISharingPermissionsUsers",
             "webUISharingFilePermissionsGroups": "webUISharingFilePermissionsGroups",
             "webUISharingFolderPermissionsGroups": "webUISharingFolderPermissionsGroups",
             "webUISharingFolderAdvPermissionsGrp": "webUISharingFolderAdvancedPermissionsGroups",
-            "webUISharingPermissionToRoot": "webUISharingPermissionToRoot",
-            "webUIResharing": "webUIResharing",
-            "webUIResharingToRoot": "webUIResharingToRoot",
-            "webUISharingPublic": "webUISharingPublic",
+            "webUIResharing": [
+                "webUIResharing1",
+                "webUIResharing2",
+            ],
+            "webUISharingPublicBasic": "webUISharingPublicBasic",
+            "webUISharingPublicManagement": "webUISharingPublicManagement",
             "webUISharingPublicExpire": "webUISharingPublicExpire",
             "webUISharingPublicDifferentRoles": "webUISharingPublicDifferentRoles",
             "webUITrashbinDelete": "webUITrashbinDelete",
@@ -92,6 +97,7 @@ config = {
             "webUISharingFolderPermissionMultipleUsers": "webUISharingFolderPermissionMultipleUsers",
             "webUISharingFolderAdvancedPermissionMU": "webUISharingFolderAdvancedPermissionMultipleUsers",
             "webUIMoveFilesFolders": "webUIMoveFilesFolders",
+            "webUIUserJourney": "webUIUserJourney",
         },
     },
     "rocketchat": {
@@ -241,17 +247,18 @@ def testOcisModules(ctx):
     return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
-    pipelines = [
-        localApiTests(ctx, "owncloud", "apiBugDemonstration"),
-        localApiTests(ctx, "ocis", "apiBugDemonstration"),
-        localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
-        localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-    ]
+    # pipelines = [
+    #     localApiTests(ctx, "owncloud", "apiBugDemonstration"),
+    #     localApiTests(ctx, "ocis", "apiBugDemonstration"),
+    #     localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
+    #     localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
+    # ]
 
-    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
-        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+    # for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
+    #     pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
+    #     pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
 
+    pipelines = []
     pipelines += uiTests(ctx)
     pipelines.append(accountsUITests(ctx))
     pipelines.append(settingsUITests(ctx))
