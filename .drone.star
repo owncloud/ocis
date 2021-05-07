@@ -247,18 +247,17 @@ def testOcisModules(ctx):
     return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
-    # pipelines = [
-    #     localApiTests(ctx, "owncloud", "apiBugDemonstration"),
-    #     localApiTests(ctx, "ocis", "apiBugDemonstration"),
-    #     localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
-    #     localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-    # ]
+    pipelines = [
+        localApiTests(ctx, "owncloud", "apiBugDemonstration"),
+        localApiTests(ctx, "ocis", "apiBugDemonstration"),
+        localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
+        localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
+    ]
 
-    # for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-    #     pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
-    #     pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
+        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
+        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
 
-    pipelines = []
     pipelines += uiTests(ctx)
     pipelines.append(accountsUITests(ctx))
     pipelines.append(settingsUITests(ctx))
