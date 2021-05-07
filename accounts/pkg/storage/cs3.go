@@ -18,6 +18,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -312,7 +313,11 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 			},
 		},
 	}
-	return tm.MintToken(ctx, u)
+	scope, err := scope.GetOwnerScope()
+	if err != nil {
+		return "", err
+	}
+	return tm.MintToken(ctx, u, scope)
 }
 
 func (r CS3Repo) accountURL(id string) string {

@@ -53,7 +53,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 				return
 			}
 
-			u, err := tokenManager.DismantleToken(r.Context(), token)
+			u, _, err := tokenManager.DismantleToken(r.Context(), token)
 			if err != nil {
 				opt.Logger.Error().Err(err)
 				return

@@ -4,6 +4,7 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 
+	"github.com/cs3org/reva/pkg/auth/scope"
 	tokenPkg "github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	revauser "github.com/cs3org/reva/pkg/user"
@@ -91,7 +92,14 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("associated claims with uuid")
 	}
 
-	token, err := m.tokenManager.MintToken(req.Context(), u)
+	scope, err := scope.GetOwnerScope()
+	if err != nil {
+		m.logger.Error().Err(err).Msgf("could not retrieve owner scope")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	token, err := m.tokenManager.MintToken(req.Context(), u, scope)
 
 	if err != nil {
 		m.logger.Error().Err(err).Msgf("could not mint token")

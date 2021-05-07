@@ -16,6 +16,7 @@ import (
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
@@ -507,7 +508,11 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 			},
 		},
 	}
-	return tm.MintToken(ctx, u)
+	scope, err := scope.GetOwnerScope()
+	if err != nil {
+		return "", err
+	}	
+	return tm.MintToken(ctx, u, scope)
 }
 
 // EnableUser enables a user
