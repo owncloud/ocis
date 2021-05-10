@@ -4,7 +4,6 @@ clients:
   - id: web
     name: OCIS
     application_type: web
-    insecure: yes
     trusted: yes
     redirect_uris:
       - https://ocis.owncloud.test/
@@ -17,7 +16,6 @@ clients:
     name: OC10
     application_type: web
     secret: super
-    insecure: yes
     trusted: yes
     redirect_uris:
       - https://oc10.owncloud.test/
@@ -29,7 +27,6 @@ clients:
     name: OCIS Graph Explorer
     trusted: yes
     application_type: web
-    insecure: yes
 
   - id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
     secret: UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
