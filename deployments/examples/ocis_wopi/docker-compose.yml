@@ -20,7 +20,6 @@ services:
       - "--entryPoints.https.address=:443"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
-      - "--serversTransport.insecureSkipVerify=true" # oCIS uses self generated certificate
     ports:
       - "80:80"
       - "443:443"
@@ -56,6 +55,7 @@ services:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
+      PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
@@ -81,7 +81,6 @@ services:
       - "traefik.http.routers.ocis-secure.tls.certresolver=http"
       - "traefik.http.routers.ocis-secure.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
-      - "traefik.http.services.ocis.loadbalancer.server.scheme=https"
     logging:
       driver: "local"
     restart: always
