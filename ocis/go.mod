@@ -36,7 +36,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
-	github.com/thejerf/suture/v4 v4.0.0
+	github.com/thejerf/suture/v4 v4.0.1
 	go.opencensus.io v0.23.0
 	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 )
