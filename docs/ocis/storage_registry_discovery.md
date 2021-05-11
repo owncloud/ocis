@@ -11,7 +11,7 @@ geekdocFilePath: storage_registry_discovery.md
 
 In order for an oCIS client to access oCIS storage spaces for an End-User, the client needs to know where the oCIS instance is. oCIS uses WebFinger [RFC7033](http://tools.ietf.org/html/rfc7033) to locate the oCIS instance for an End-User.
 
-This discovery is optional. If the client has another way of discovering the OpenID instance, e.g. when looging in with a username a static domain might be configured or the domain in the URL might be used.
+This discovery is optional. If the client has another way of discovering the OpenID instance, e.g. when logging in with a username a static domain might be configured or the domain in the URL might be used.
 
 For guest accounts that do not have an OIDC issuer or whose IdP is not part of a trusted federation clients may fall back to a local IdP.
 
