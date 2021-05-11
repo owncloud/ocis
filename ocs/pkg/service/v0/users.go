@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"net/http"
 	"strconv"
 	"strings"
@@ -507,7 +508,11 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 			},
 		},
 	}
-	return tm.MintToken(ctx, u)
+	s, err := scope.GetOwnerScope()
+	if err != nil {
+		return "", err
+	}
+	return tm.MintToken(ctx, u, s)
 }
 
 // EnableUser enables a user
