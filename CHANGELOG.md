@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
 * Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
+* Enhancement - Update reva to v1.7.1-0.20210507160327-e2c3841d0dbc: [#2044](https://github.com/owncloud/ocis/pull/2044)
 * Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
 * Enhancement - Set SameSite settings to Strict for Web: [#2019](https://github.com/owncloud/ocis/pull/2019)
 
@@ -75,6 +76,15 @@ The following sections list the changes for unreleased.
   * Fix public file shares (https://github.com/cs3org/reva/pull/1666)
 
    https://github.com/owncloud/ocis/pull/2010
+
+* Enhancement - Update reva to v1.7.1-0.20210507160327-e2c3841d0dbc: [#2044](https://github.com/owncloud/ocis/pull/2044)
+
+  * Add user profile picture to capabilities (https://github.com/cs3org/reva/pull/1694)
+  * Mint scope-based access tokens for RBAC (https://github.com/cs3org/reva/pull/1669)
+  * Add cache warmup strategy for OCS resource infos (https://github.com/cs3org/reva/pull/1664)
+  * Filter shares based on type in OCS (https://github.com/cs3org/reva/pull/1683)
+
+   https://github.com/owncloud/ocis/pull/2044
 
 * Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
 
