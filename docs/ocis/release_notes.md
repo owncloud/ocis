@@ -7,6 +7,26 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.6.0 Technology Preview
+
+To get the full potential out of the microservice architecture, version 1.6.0 introduces a dynamic service registry to ownCloud Infinite Scale. The dynamic service registry facilitates the configuration and contributes to the scalability of the platform. ownCloud Web 3.1.0 has received further improvements for accessibility like keyboard navigation and it comes with performance improvements by loading certain elements asynchronously.
+
+The most prominent changes in version 1.6.0 comprise:
+
+- Introducing a dynamic service registry: The dynamic service registry takes care of dynamically assigning network addresses between the oCIS services and enables the services to find and work with each other automatically. It replaces the previous hardcoded service configuration which simplifies the initial setup and makes distributed, scale-out environments a lot easier to handle. [#1509](https://github.com/cs3org/reva/pull/1509)
+- User avatars are now fetched asynchronously, enabling a non-blocking loading of the file list and improving user experience [#1295](https://github.com/owncloud/owncloud-design-system/pull/1295)
+- Further accessibility and keyboard navigation improvements have been added [#1979](https://github.com/owncloud/ocis/pull/1979) [#1991](https://github.com/owncloud/ocis/pull/1991) [#4942](https://github.com/owncloud/web/pull/4942) [#4965](https://github.com/owncloud/web/pull/4965) [#4991](https://github.com/owncloud/web/pull/4991)
+- The OCS user deprovisioning endpoint has been added, enabling a full user deprovisioning including storage. [#1962](https://github.com/owncloud/ocis/pull/1962)
+- Text files (.txt) now have previews (thumbnails) [#1988](https://github.com/owncloud/ocis/pull/1988)
+- The translations in the Settings and Accounts extensions have been improved [#2003](https://github.com/owncloud/ocis/pull/2003)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.5.0 Technology Preview
 
 Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
