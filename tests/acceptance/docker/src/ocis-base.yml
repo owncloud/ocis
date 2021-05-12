@@ -22,6 +22,12 @@ services:
       IDP_ISS: https://ocis-server:9200
       IDP_TLS: "true"
       ACCOUNTS_HASH_DIFFICULTY: 4
+      # s3ng specific settings
+      STORAGE_DRIVER_S3NG_ENDPOINT: http://ceph:8080
+      STORAGE_DRIVER_S3NG_REGION: default
+      STORAGE_DRIVER_S3NG_ACCESS_KEY: test
+      STORAGE_DRIVER_S3NG_SECRET_KEY: test
+      STORAGE_DRIVER_S3NG_BUCKET: test
     volumes:
       - ../../../config:/drone/src/ocis/tests/config
       - oCISownCloud10testsuite:/srv
