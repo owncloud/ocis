@@ -14,7 +14,8 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/token"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
+
+	msgraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
 )
 
 func getToken(r *http.Request) string {
@@ -161,15 +162,14 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 }
 
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
-	size := new(int)
-	*size = int(res.Size) // uint64 -> int :boom:
+	size := new(int64)
+	*size = int64(res.Size) // uint64 -> int :boom:
 	name := strings.TrimPrefix(res.Path, "/home/")
 
 	driveItem := &msgraph.DriveItem{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
-				Object: msgraph.Object{},
-				ID:     &res.Id.OpaqueId,
+				Id: &res.Id.OpaqueId,
 			},
 			Name: &name,
 			ETag: &res.Etag,
@@ -209,7 +209,7 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 	drive := &msgraph.Drive{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
-				ID: &space.Id.OpaqueId,
+				Id: &space.Id.OpaqueId,
 			},
 			Name: &space.Name,
 			//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
@@ -217,7 +217,7 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 		},
 		Owner: &msgraph.IdentitySet{
 			User: &msgraph.Identity{
-				ID: &space.Owner.Id.OpaqueId,
+				Id: &space.Owner.Id.OpaqueId,
 				// DisplayName: , TODO read and cache from users provider
 			},
 		},
@@ -226,7 +226,7 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 		Root: &msgraph.DriveItem{
 			BaseItem: msgraph.BaseItem{
 				Entity: msgraph.Entity{
-					ID: &rootId,
+					Id: &rootId,
 				},
 			},
 		},
@@ -237,7 +237,7 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 		// TODO how do we build the url?
 		// for now: read from request
 		webDavURL := baseUrl.String() + rootId
-		drive.Root.WebDavURL = &webDavURL
+		drive.Root.WebDavUrl = &webDavURL
 	}
 
 	if space.Mtime != nil {
@@ -246,11 +246,11 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 	}
 	if space.Quota != nil {
 		// FIXME use https://github.com/owncloud/open-graph-api and return proper int64
-		var t int
-		if space.Quota.QuotaMaxBytes > math.MaxInt32 {
-			t = math.MaxInt32
+		var t int64
+		if space.Quota.QuotaMaxBytes > math.MaxInt64 {
+			t = math.MaxInt64
 		} else {
-			t = int(space.Quota.QuotaMaxBytes)
+			t = int64(space.Quota.QuotaMaxBytes)
 		}
 		drive.Quota = &msgraph.Quota{
 			Total: &t,

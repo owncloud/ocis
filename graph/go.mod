@@ -7,9 +7,11 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
-	github.com/cs3org/reva v1.9.1-0.20210628143859-9d29c36c0c3f
+	github.com/cs3org/go-cs3apis v0.0.0-20210507060801-f176760d55f4
+	github.com/cs3org/reva v1.7.1-0.20210507160327-e2c3841d0dbc
+	github.com/deepmap/oapi-codegen v1.6.1
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi/v5 v5.0.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/micro/cli/v2 v2.1.2
