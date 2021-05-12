@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 
@@ -91,8 +92,12 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("associated claims with uuid")
 	}
 
-	token, err := m.tokenManager.MintToken(req.Context(), u)
-
+	s, err := scope.GetOwnerScope()
+	if err != nil {
+		m.logger.Error().Err(err).Msgf("could not get owner scope")
+		return
+	}
+	token, err := m.tokenManager.MintToken(req.Context(), u, s)
 	if err != nil {
 		m.logger.Error().Err(err).Msgf("could not mint token")
 		w.WriteHeader(http.StatusInternalServerError)

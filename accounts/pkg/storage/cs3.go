@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -312,7 +313,11 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 			},
 		},
 	}
-	return tm.MintToken(ctx, u)
+	s, err := scope.GetOwnerScope()
+	if err != nil {
+		return
+	}
+	return tm.MintToken(ctx, u, s)
 }
 
 func (r CS3Repo) accountURL(id string) string {
