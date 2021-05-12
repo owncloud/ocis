@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+* Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
 * Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
@@ -33,6 +34,16 @@ The following sections list the changes for unreleased.
    `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
 
    https://github.com/owncloud/ocis/pull/1963
+
+* Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.1.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2045
+   https://github.com/owncloud/web/releases/tag/v3.1.0
 
 * Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
 
