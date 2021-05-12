@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
 * Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
 * Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
@@ -51,6 +52,13 @@ The following sections list the changes for unreleased.
    should be synced to transifex but not exist in the UI directly.
 
    https://github.com/owncloud/ocis/pull/2003
+
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
+
+   We made it possible to use the new s3ng storage driver by adding according commandline flags and
+   environment variables.
+
+   https://github.com/owncloud/ocis/pull/1886
 
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 
