@@ -18,8 +18,13 @@ config = {
         "web",
         "webdav",
     ],
+    "localApiTests": {
+        "skip": False,
+    },
     "apiTests": {
         "numberOfParts": 10,
+        "skip": False,
+        "skipExceptParts": [],
     },
     "uiTests": {
         "suites": {
@@ -99,6 +104,14 @@ config = {
             "webUIMoveFilesFolders": "webUIMoveFilesFolders",
             "webUIUserJourney": "webUIUserJourney",
         },
+        "debugSuites": [],
+        "skip": False,
+    },
+    "accountsUITests": {
+        "skip": False,
+    },
+    "settingsUITests": {
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -247,20 +260,27 @@ def testOcisModules(ctx):
     return pipelines + [scan_result_upload]
 
 def testPipelines(ctx):
-    pipelines = [
-        localApiTests(ctx, "owncloud", "apiBugDemonstration"),
-        localApiTests(ctx, "ocis", "apiBugDemonstration"),
-        localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
-        localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-    ]
+    pipelines = []
+    if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
+        pipelines = [
+            localApiTests(ctx, "owncloud", "apiBugDemonstration"),
+            localApiTests(ctx, "ocis", "apiBugDemonstration"),
+            localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
+            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
+        ]
 
-    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
-        pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
+        pipelines += apiTests(ctx)
 
-    pipelines += uiTests(ctx)
-    pipelines.append(accountsUITests(ctx))
-    pipelines.append(settingsUITests(ctx))
+    if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
+        pipelines += uiTests(ctx)
+
+    if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
+        pipelines.append(accountsUITests(ctx))
+
+    if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
+        pipelines.append(settingsUITests(ctx))
+
     return pipelines
 
 def testOcisModule(ctx, module):
@@ -527,8 +547,32 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "owncloud"
         "volumes": [pipelineVolumeOC10Tests],
     }
 
+def apiTests(ctx):
+    pipelines = []
+    debugParts = config["apiTests"]["skipExceptParts"]
+    debugPartsEnabled = (len(debugParts) != 0)
+    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
+        if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
+            pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
+            pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+
+    return pipelines
+
 def uiTests(ctx):
+    default = {
+        "debugSuites": [],
+        "skip": False,
+    }
+
+    params = {}
+    for item in default:
+        params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
+
     suiteNames = config["uiTests"]["suites"].keys()
+
+    if len(params["debugSuites"]) != 0:
+        suiteNames = params["debugSuites"]
+
     return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
 
 def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 4):
