@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-13T06:30:40+0000"
+date: "2021-05-14T16:15:01+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -41,45 +41,6 @@ Create a new account
 
 Usage: `accounts add [command options] [arguments...]`
 
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-### accounts ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
-
-### accounts version
-
-Print the versions of the running instances
-
-Usage: `accounts version [command options] [arguments...]`
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
 ### accounts inspect
 
 Show detailed data on an existing account
@@ -103,6 +64,27 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### accounts remove
 
@@ -184,4 +166,22 @@ Usage: `accounts server [command options] [arguments...]`
 
 -service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
 : username of the internal service user (required on EOS). Default: `flags.OverrideDefaultString(cfg.ServiceUser.Username, "")`.
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
+
+### accounts version
+
+Print the versions of the running instances
+
+Usage: `accounts version [command options] [arguments...]`
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
