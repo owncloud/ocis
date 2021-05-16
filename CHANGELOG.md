@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
 * Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
@@ -63,6 +64,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 
    https://github.com/owncloud/ocis/pull/1991
+
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+
+   Added a new capability (through https://github.com/cs3org/reva/pull/1694) to prevent the
+   web frontend from fetching (nonexistent) user avatar profile pictures which added latency &
+   console errors.
+
+   https://github.com/owncloud/ocis/pull/2036
 
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 
