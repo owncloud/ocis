@@ -219,7 +219,8 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									},
 								},
 								"user": map[string]interface{}{
-									"send_mail": true,
+									"send_mail":       true,
+									"profile_picture": false,
 								},
 								"user_enumeration": map[string]interface{}{
 									"enabled":            true,
