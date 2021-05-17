@@ -27,6 +27,22 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
+#### Changed oCIS JSON share driver storage format
+
+Related: [#1655](https://github.com/cs3org/reva/pull/1655)
+
+The storage format of the oCIS JSON share driver has changed. You will be affected if you plan to update from a previous version of oCIS to oCIS 1.6.0, you have shared files or folders with users or groups and you are using the oCIS JSON share driver, which is currently the default share driver.
+
+Implications:
+- manual action required
+
+Our recommended update strategy to oCIS 1.4.0 is:
+1. let users note all their shares with users and groups they set up in oCIS
+1. stop oCIS
+1. move / delete the JSON share driver storage file `/var/tmp/ocis/storage/shares.json`
+1. update to oCIS 1.6.0
+1. let users recreate their shares
+
 ## ownCloud Infinite Scale 1.5.0 Technology Preview
 
 Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
