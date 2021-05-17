@@ -2,7 +2,34 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.5.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.6.0...master
+
+## Summary
+
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+
+## Details
+
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
+
+   We made it possible to use the new s3ng storage driver by adding according commandline flags and
+   environment variables.
+
+   https://github.com/owncloud/ocis/pull/1886
+
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+
+   Added a new capability (through https://github.com/cs3org/reva/pull/1694) to prevent the
+   web frontend from fetching (nonexistent) user avatar profile pictures which added latency &
+   console errors.
+
+   https://github.com/owncloud/ocis/pull/2036
+# Changelog for [1.6.0] (2021-05-12)
+
+The following sections list the changes for 1.6.0.
+
+[1.6.0]: https://github.com/owncloud/ocis/compare/v1.5.0...v1.6.0
 
 ## Summary
 
@@ -10,9 +37,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
 * Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
 * Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
-* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
-* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 * Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
 * Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
@@ -54,24 +79,9 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2003
 
-* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
-
-   We made it possible to use the new s3ng storage driver by adding according commandline flags and
-   environment variables.
-
-   https://github.com/owncloud/ocis/pull/1886
-
 * Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
 
    https://github.com/owncloud/ocis/pull/1991
-
-* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
-
-   Added a new capability (through https://github.com/cs3org/reva/pull/1694) to prevent the
-   web frontend from fetching (nonexistent) user avatar profile pictures which added latency &
-   console errors.
-
-   https://github.com/owncloud/ocis/pull/2036
 
 * Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
 
