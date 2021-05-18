@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-18T06:24:05+0000"
+date: "2021-05-18T07:37:04+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -180,7 +180,7 @@ Usage: `idp server [command options] [arguments...]`
 : Allow sign in of client controlled guest users.
 
 -allow-dynamic-client-registration |  $IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION
-: Allow dynamic OAuth2 client registration. Default: `flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, true)`.
+: Allow dynamic OAuth2 client registration. Default: `flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, false)`.
 
 -disable-identifier-webapp |  $IDP_DISABLE_IDENTIFIER_WEBAPP
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `flags.OverrideDefaultBool(cfg.IDP.IdentifierClientDisabled, true)`.
