@@ -21,11 +21,13 @@ require (
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
-	stash.kopano.io/kc/konnect v0.33.3
+	stash.kopano.io/kc/konnect v0.34.0
 	stash.kopano.io/kgol/rndm v1.1.0
 )
 
 replace (
+	// broken dependency chain for konnect v0.34.0
+	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/store => ../store
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16

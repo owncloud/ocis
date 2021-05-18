@@ -384,7 +384,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "allow-dynamic-client-registration",
 			Usage:       "Allow dynamic OAuth2 client registration",
 			EnvVars:     []string{"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"},
-			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, true),
+			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, false),
 			Destination: &cfg.IDP.AllowDynamicClientRegistration,
 		},
 		&cli.BoolFlag{
