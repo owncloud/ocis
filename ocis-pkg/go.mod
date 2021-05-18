@@ -50,6 +50,8 @@ require (
 )
 
 replace (
+	// broken dependency chain for konnect v0.34.0
+	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/graph => ../graph
