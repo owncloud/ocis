@@ -163,6 +163,7 @@ type StorageConfig struct {
 	EOS      DriverEOS
 	Local    DriverCommon
 	OwnCloud DriverOwnCloud
+	OwnCloudSql DriverOwnCloudSql
 	S3       DriverS3
 	S3NG     DriverS3NG
 	Common   DriverCommon
@@ -256,6 +257,20 @@ type DriverOwnCloud struct {
 	UploadInfoDir string
 	Redis         string
 	Scan          bool
+}
+
+// DriverOwnCloudSql defines the available ownCloudSql storage driver configuration.
+type DriverOwnCloudSql struct {
+	DriverCommon
+
+	UploadInfoDir string
+	Redis         string
+	Scan          bool
+	DBUsername    string
+	DBPassword    string
+	DBHost        string
+	DBPort        int
+	DBName        string
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
