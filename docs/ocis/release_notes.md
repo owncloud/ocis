@@ -36,7 +36,7 @@ The storage format of the oCIS JSON share driver has changed. You will be affect
 Implications:
 - manual action required
 
-Our recommended update strategy to oCIS 1.4.0 is:
+Our recommended update strategy to oCIS 1.6.0 is:
 1. let users note all their shares with users and groups they set up in oCIS
 1. stop oCIS
 1. move / delete the JSON share driver storage file `/var/tmp/ocis/storage/shares.json`
