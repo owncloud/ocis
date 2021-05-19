@@ -43,6 +43,28 @@ Our recommended update strategy to oCIS 1.6.0 is:
 1. update to oCIS 1.6.0
 1. let users recreate their shares
 
+#### Fixed / changed oCIS metadata storage driver filesystem path
+Related: [#1956](https://github.com/owncloud/ocis/pull/1956)
+
+The filesystem path of the oCIS metadata storage driver has changed (been fixed). You will be affected if you plan to update from a previous version of oCIS to oCIS 1.6.0 and are using the oCIS storage driver for metadata storage.
+
+Implications:
+- manual action required
+
+Our recommended update strategy to oCIS 1.6.0 is:
+1. let users backup all their data stored in oCIS
+1. stop oCIS
+1. prune all oCIS data in `/var/tmp/ocis`
+1. update to oCIS 1.6.0
+1. recreate user accounts (can be skipped if an external IDP is used)
+1. let users upload all their data again
+1. let users recreate their shares
+
+If you want to use 1.6.0 without following our recommended update strategy, you can also keep the (wrong) pre 1.6.0 behaviour by setting this:
+`export STORAGE_METADATA_ROOT=/var/tmp/ocis/storage/users`
+
+This will lead to 
+
 ## ownCloud Infinite Scale 1.5.0 Technology Preview
 
 Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
