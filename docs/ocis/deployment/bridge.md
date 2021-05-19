@@ -168,7 +168,6 @@ Now we need to configure a client we can later use to configure the ownCloud 10 
 clients:
   - id: ocis
     name: ownCloud Infinite Scale
-    insecure: yes
     application_type: web
     redirect_uris:
       - https://cloud.example.com/apps/openidconnect/redirect
@@ -176,8 +175,6 @@ clients:
       - http://localhost:9100
       - http://localhost:9100/
 ```
-You will need the `insecure: yes` if you are using self signed certificates.
-
 Replace `cloud.example.com` in the redirect URI with your ownCloud 10 host and port.
 Replace `localhost:9100` in the redirect URIs with your `ocis-web` host and port.
 
