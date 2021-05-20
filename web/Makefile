@@ -32,4 +32,4 @@ WEB_ASSETS_VERSION = v3.2.0
 
 .PHONY: pull-assets
 pull-assets:
-	@rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/
+	@rm -Rf assets && mkdir assets/ && tar xzf /root/web/release/web.tar.gz -C assets/
