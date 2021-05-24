@@ -24,7 +24,7 @@ config = {
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [9],
+        "skipExceptParts": [],
     },
     "uiTests": {
         "suites": {
@@ -105,13 +105,13 @@ config = {
             "webUIUserJourney": "webUIUserJourney",
         },
         "debugSuites": [],
-        "skip": True,
+        "skip": False,
     },
     "accountsUITests": {
-        "skip": True,
+        "skip": False,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",

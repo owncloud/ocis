@@ -785,22 +785,12 @@ cannot share a folder with create permission
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L44)
 
-#### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
-
--   [apiWebdavPreviews/previews.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L15)
--   [apiWebdavPreviews/previews.feature:17](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L17)
--   [apiWebdavPreviews/previews.feature:18](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L18)
--   [apiWebdavPreviews/previews.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L19)
--   [apiWebdavPreviews/previews.feature:95](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L95)
--   [apiWebdavPreviews/previews.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L104)
--   [apiWebdavPreviews/previews.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L113)
--   [apiWebdavPreviews/previews.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L127)
--   [apiWebdavPreviews/previews.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L135)
--   [apiWebdavPreviews/previews.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L164)
--   [apiWebdavPreviews/previews.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L165)
--   [apiWebdavPreviews/previews.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L166)
--   [apiWebdavPreviews/previews.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L178)
--   [apiWebdavPreviews/previews.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L179)
+#### [cannot download previews of shared files](https://github.com/owncloud/ocis/issues/2067)
+-   [apiWebdavPreviews/previews.feature:109](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L109)
+#### [cannot download previews of shared files](https://github.com/owncloud/ocis/issues/2064)
+-   [apiWebdavPreviews/previews.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L136)
+#### [Requesting a file preview when it is disabled by the administrator](https://github.com/owncloud/ocis/issues/2064)
+-   [apiWebdavPreviews/previews.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L150)
 
 #### [creating public links with permissions fails](https://github.com/owncloud/product/issues/252)
 
