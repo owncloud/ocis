@@ -138,7 +138,7 @@ services:
     environment:
       - domain=${OCIS_DOMAIN:-ocis.owncloud.test}
       - DONT_GEN_SSL_CERT=YES
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
       - username=${COLLABORA_ADMIN_USER}
       - password=${COLLABORA_ADMIN_PASSWORD}
     cap_add:
