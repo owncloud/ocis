@@ -91,6 +91,7 @@ services:
       ocis-net:
     environment:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      WOPISERVER_REVA_GATEWAY: ocis:9142
       WOPISERVER_WOPI_SERVER_HOST: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       WOPISERVER_WOPI_SERVER_SECRET: ${WOPI_JWT_SECRET:-Pive-Fumkiu4}
       WOPISERVER_WOPI_SERVER_INSECURE: "${INSECURE:-false}"
@@ -138,7 +139,7 @@ services:
     environment:
       - domain=${OCIS_DOMAIN:-ocis.owncloud.test}
       - DONT_GEN_SSL_CERT=YES
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
       - username=${COLLABORA_ADMIN_USER}
       - password=${COLLABORA_ADMIN_PASSWORD}
     cap_add:
