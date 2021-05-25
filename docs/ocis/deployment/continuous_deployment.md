@@ -44,6 +44,17 @@ Credentials:
 
 - oCIS: [ocis.ocis-wopi.released.owncloud.works](https://ocis.ocis-wopi.released.owncloud.works)
 
+
+# oCIS with latest ownCloud Web
+
+Credentials:
+
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+
+## Latest
+
+- oCIS: [ocis.ocis-web.latest.owncloud.works](https://ocis.ocis-web.latest.owncloud.works)
+
 # oCIS with Keycloak
 
 Credentials:
