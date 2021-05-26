@@ -29,14 +29,12 @@ then
     if [ "$STORAGE" = "owncloud" ]
     then
         export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data/'
-        export DELETE_USER_DATA_CMD=''
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OC-Storage'
         export OCIS_SKELETON_STRATEGY='copy'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OWNCLOUD-storage.md'
     elif [ "$STORAGE" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
-        export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
         export OCIS_SKELETON_STRATEGY='upload'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
@@ -52,20 +50,18 @@ then
 
     if [ "$STORAGE" = "owncloud" ]
     then
-        export BEHAT_FILTER_TAGS='~@skipOnOcis-OC-Storage'
-        export DELETE_USER_DATA_CMD=''
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OC-Storage'
         export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data/'
         export OCIS_SKELETON_STRATEGY='copy'
     elif [ "$STORAGE" = "ocis" ]
     then
-        export BEHAT_FILTER_TAGS='~@skipOnOcis-OCIS-Storage'
-        export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OCIS-Storage'
+        #export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data'
         export OCIS_REVA_DATA_ROOT=''
         export OCIS_SKELETON_STRATEGY='upload'
     elif [ "$STORAGE" = "s3ng" ]
     then
-        export BEHAT_FILTER_TAGS='~@skipOnOcis-S3NG-Storage'
-        export DELETE_USER_DATA_CMD='rm -rf /srv/app/tmp/ocis/storage/users/nodes/root/* /srv/app/tmp/ocis/storage/users/nodes/*-*-*-*'
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
         export OCIS_REVA_DATA_ROOT=''
         export OCIS_SKELETON_STRATEGY='upload'
     else
@@ -89,7 +85,19 @@ then
     unset DIVIDE_INTO_NUM_PARTS
     unset RUN_PART
     unset EXPECTED_FAILURES_FILE
+else
+    unset BEHAT_FEATURE
 fi
+
+echo "#################"
+echo "#################"
+echo "#################"
+echo "#################"
+printenv
+echo "#################"
+echo "#################"
+echo "#################"
+echo "#################"
 
 ## RUN TEST
 
@@ -100,7 +108,7 @@ elif [ "$TEST_SOURCE" = "ocis" ]
 then
     cd $OCIS_ROOT
     sleep 10
-    make test-acceptance-api
+    make -C /drone/src test-acceptance-api
 else
     echo "non existing TEST_SOURCE selected"
     exit 1
