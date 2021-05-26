@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-26T11:19:13+0000"
+date: "2021-05-26T11:37:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,6 +34,15 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails health
+
+Check health status
+
+Usage: `thumbnails health [command options] [arguments...]`
+
+-debug-addr |  $THUMBNAILS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
 
 ### thumbnails ocis-thumbnails
 
@@ -118,13 +127,4 @@ Usage: `thumbnails version [command options] [arguments...]`
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
-
-### thumbnails health
-
-Check health status
-
-Usage: `thumbnails health [command options] [arguments...]`
-
--debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
 
