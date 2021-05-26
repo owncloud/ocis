@@ -11,8 +11,7 @@ services:
       TEST_SERVER_URL: https://ocis-server:9200
       TESTING_DIR: /srv/app/tmp/testing
 
-      STORAGE_DRIVER: $STORAGE
-      STORAGE: $STORAGE
+      STORAGE_DRIVER: $STORAGE_DRIVER
       TEST_SOURCE: $TEST_SOURCE
       BEHAT_SUITE: ${BEHAT_SUITE:-}
       BEHAT_FEATURE: ${BEHAT_FEATURE:-}

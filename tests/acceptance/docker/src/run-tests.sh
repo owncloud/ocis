@@ -26,13 +26,13 @@ fi
 
 if [ "$TEST_SOURCE" = "oc10" ]
 then
-    if [ "$STORAGE" = "owncloud" ]
+    if [ "$STORAGE_DRIVER" = "owncloud" ]
     then
         export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data/'
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OC-Storage'
         export OCIS_SKELETON_STRATEGY='copy'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OWNCLOUD-storage.md'
-    elif [ "$STORAGE" = "ocis" ]
+    elif [ "$STORAGE_DRIVER" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
@@ -48,18 +48,17 @@ then
 elif [ "$TEST_SOURCE" = "ocis" ]
 then
 
-    if [ "$STORAGE" = "owncloud" ]
+    if [ "$STORAGE_DRIVER" = "owncloud" ]
     then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OC-Storage'
         export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data/'
         export OCIS_SKELETON_STRATEGY='copy'
-    elif [ "$STORAGE" = "ocis" ]
+    elif [ "$STORAGE_DRIVER" = "ocis" ]
     then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-OCIS-Storage'
-        #export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data'
         export OCIS_REVA_DATA_ROOT=''
         export OCIS_SKELETON_STRATEGY='upload'
-    elif [ "$STORAGE" = "s3ng" ]
+    elif [ "$STORAGE_DRIVER" = "s3ng" ]
     then
         export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
         export OCIS_REVA_DATA_ROOT=''
@@ -89,16 +88,6 @@ else
     unset BEHAT_FEATURE
 fi
 
-echo "#################"
-echo "#################"
-echo "#################"
-echo "#################"
-printenv
-echo "#################"
-echo "#################"
-echo "#################"
-echo "#################"
-
 ## RUN TEST
 
 if [ "$TEST_SOURCE" = "oc10" ]
@@ -108,7 +97,7 @@ elif [ "$TEST_SOURCE" = "ocis" ]
 then
     cd $OCIS_ROOT
     sleep 10
-    make -C /drone/src test-acceptance-api
+    make test-acceptance-api
 else
     echo "non existing TEST_SOURCE selected"
     exit 1

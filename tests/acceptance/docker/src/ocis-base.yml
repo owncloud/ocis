@@ -1,8 +1,9 @@
 services:
   ocis-server:
     environment:
-      STORAGE_HOME_DRIVER: $STORAGE
-      STORAGE_USERS_DRIVER: $STORAGE
+      OCIS_URL: "https://ocis-server:9200"
+      STORAGE_HOME_DRIVER: $STORAGE_DRIVER
+      STORAGE_USERS_DRIVER: $STORAGE_DRIVER
       STORAGE_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/users
       STORAGE_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
       STORAGE_METADATA_ROOT: /srv/app/tmp/ocis/metadata
