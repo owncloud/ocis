@@ -482,7 +482,7 @@ def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", acco
                     "TEST_OCIS": "true",
                     "STORAGE_DRIVER": storage,
                     "BEHAT_SUITE": suite,
-                    "BEHAT_FILTER_TAGS": "~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+                    "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "PATH_TO_CORE": "/srv/app/testrunner",
                 },
                 "commands": [
@@ -526,7 +526,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "owncloud"
                     "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                     "TEST_OCIS": "true",
                     "STORAGE_DRIVER": storage,
-                    "BEHAT_FILTER_TAGS": "~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+                    "BEHAT_FILTER_TAGS": "~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper()),
