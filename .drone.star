@@ -482,7 +482,7 @@ def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", acco
                     "TEST_OCIS": "true",
                     "STORAGE_DRIVER": storage,
                     "BEHAT_SUITE": suite,
-                    "BEHAT_FILTER_TAGS": "~@skipOnOcis&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+                    "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "PATH_TO_CORE": "/srv/app/testrunner",
                 },
                 "commands": [
