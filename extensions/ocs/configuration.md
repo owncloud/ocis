@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-26T08:17:13+0000"
+date: "2021-05-26T08:46:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -34,6 +34,27 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+-http-namespace |  $OCS_NAMESPACE
+: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+-name |  $OCS_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
 
 ### ocs ocis-ocs
 
@@ -115,25 +136,4 @@ Usage: `ocs server [command options] [arguments...]`
 
 -users-driver |  $OCS_STORAGE_USERS_DRIVER , $STORAGE_USERS_DRIVER
 : storage driver for users mount: eg. local, eos, owncloud, ocis or s3. Default: `flags.OverrideDefaultString(cfg.StorageUsersDriver, "ocis")`.
-
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
--http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
--name |  $OCS_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "ocs")`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114")`.
 
