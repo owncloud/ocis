@@ -54,6 +54,8 @@ replace (
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
+	github.com/cs3org/go-cs3apis => github.com/refs/go-cs3apis v0.0.0-20210520134557-97cdc479815b
+    github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210526094447-9dfa8ec812ac
 	github.com/owncloud/ocis/graph => ../graph
 	github.com/owncloud/ocis/graph-explorer => ../graph-explorer
 	github.com/owncloud/ocis/idp => ../idp

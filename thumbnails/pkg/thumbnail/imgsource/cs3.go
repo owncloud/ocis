@@ -4,6 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
+	"net/http"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -11,8 +14,6 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
-	"io"
-	"net/http"
 )
 
 type CS3 struct {
@@ -34,11 +35,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 	ctx = metadata.AppendToOutgoingContext(context.Background(), token.TokenHeader, auth)
 	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{
-				Path: path,
-			},
-		},
+		Ref: &provider.Reference{Path: path},
 	})
 
 	if err != nil {

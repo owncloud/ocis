@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
+	github.com/cs3org/reva v1.7.1-0.20210507160327-e2c3841d0dbc // indirect
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -42,8 +43,9 @@ require (
 )
 
 replace (
-	// broken dependency chain for konnect v0.34.0
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	github.com/cs3org/go-cs3apis => github.com/refs/go-cs3apis v0.0.0-20210520134557-97cdc479815b
+	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210526094447-9dfa8ec812ac
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts

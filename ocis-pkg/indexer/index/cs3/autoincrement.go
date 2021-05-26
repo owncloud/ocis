@@ -175,9 +175,7 @@ func (idx *Autoincrement) Remove(id string, v string) error {
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: deletePath},
-		},
+		Ref: &provider.Reference{Path: deletePath},
 	})
 
 	if err != nil {
@@ -213,9 +211,7 @@ func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 	}
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", idx.indexRootDir)},
 	})
 
 	if err != nil {
@@ -225,12 +221,12 @@ func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 	searchPath := idx.indexRootDir
 	matches := make([]string, 0)
 	for _, i := range res.GetInfos() {
-		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
+		if found, err := filepath.Match(pattern, path.Base(i.Ref.GetPath())); found {
 			if err != nil {
 				return nil, err
 			}
 
-			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Path)))
+			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Ref.GetPath())))
 			if err != nil {
 				return nil, err
 			}
@@ -326,9 +322,7 @@ func (idx *Autoincrement) next() (int, error) {
 	}
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", idx.indexRootDir)},
 	})
 
 	if err != nil {
@@ -341,12 +335,12 @@ func (idx *Autoincrement) next() (int, error) {
 
 	infos := res.GetInfos()
 	sort.Slice(infos, func(i, j int) bool {
-		a, _ := strconv.Atoi(path.Base(infos[i].Path))
-		b, _ := strconv.Atoi(path.Base(infos[j].Path))
+		a, _ := strconv.Atoi(path.Base(infos[i].Ref.GetPath()))
+		b, _ := strconv.Atoi(path.Base(infos[j].Ref.GetPath()))
 		return a < b
 	})
 
-	latest, err := strconv.Atoi(path.Base(infos[len(infos)-1].Path)) // would returning a string be a better interface?
+	latest, err := strconv.Atoi(path.Base(infos[len(infos)-1].Ref.GetPath())) // would returning a string be a better interface?
 	if err != nil {
 		return -1, err
 	}

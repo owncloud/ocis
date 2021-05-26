@@ -1,11 +1,12 @@
 package svc
 
 import (
-	"github.com/go-chi/render"
-	"google.golang.org/grpc/metadata"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/go-chi/render"
+	"google.golang.org/grpc/metadata"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -58,15 +59,13 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		ClientSecret: accessToken,
 	}
 
-	authRes, _ := client.Authenticate(ctx, authReq);
+	authRes, _ := client.Authenticate(ctx, authReq)
 	ctx = token.ContextSetToken(ctx, authRes.Token)
 	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", authRes.Token)
 
 	g.logger.Info().Msgf("provides access token %v", ctx)
 
-	ref := &storageprovider.Reference{
-		Spec: &storageprovider.Reference_Path{Path: fn},
-	}
+	ref := &storageprovider.Reference{Path: fn}
 
 	req := &storageprovider.ListContainerRequest{
 		Ref: ref,
@@ -94,11 +93,10 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
-
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
 	size := new(int)
 	*size = int(res.Size) // uint64 -> int :boom:
-	name := strings.TrimPrefix(res.Path, "/home/")
+	name := strings.TrimPrefix(res.Ref.GetPath(), "/home/")
 	lastModified := new(time.Time)
 	*lastModified = time.Unix(int64(res.Mtime.Seconds), int64(res.Mtime.Nanos))
 
@@ -106,11 +104,11 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
 				Object: msgraph.Object{},
-				ID:     &res.Id.OpaqueId,
+				ID:     &res.Id.NodeId,
 			},
-			Name: &name,
+			Name:                 &name,
 			LastModifiedDateTime: lastModified,
-			ETag: &res.Etag,
+			ETag:                 &res.Etag,
 		},
 		Size: size,
 	}
@@ -120,8 +118,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 		}
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
-		driveItem.Folder = &msgraph.Folder{
-		}
+		driveItem.Folder = &msgraph.Folder{}
 	}
 	return driveItem, nil
 }

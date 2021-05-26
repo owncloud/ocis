@@ -36,6 +36,8 @@ require (
 replace (
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
+	github.com/cs3org/go-cs3apis => github.com/refs/go-cs3apis v0.0.0-20210520134557-97cdc479815b
+    github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210526094447-9dfa8ec812ac
 	github.com/owncloud/ocis/proxy => ../proxy
 	github.com/owncloud/ocis/settings => ../settings
 	github.com/owncloud/ocis/store => ../store

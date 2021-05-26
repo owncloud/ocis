@@ -190,9 +190,7 @@ func (idx *Unique) Remove(id string, v string) error {
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: deletePath},
-		},
+		Ref: &provider.Reference{Path: deletePath},
 	})
 
 	if err != nil {
@@ -239,9 +237,7 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", idx.indexRootDir)},
 	})
 
 	if err != nil {
@@ -251,12 +247,12 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 	searchPath := idx.indexRootDir
 	matches := make([]string, 0)
 	for _, i := range res.GetInfos() {
-		if found, err := filepath.Match(pattern, path.Base(i.Path)); found {
+		if found, err := filepath.Match(pattern, path.Base(i.Ref.GetPath())); found {
 			if err != nil {
 				return nil, err
 			}
 
-			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Path)))
+			oldPath, err := idx.resolveSymlink(path.Join(searchPath, path.Base(i.Ref.GetPath())))
 			if err != nil {
 				return nil, err
 			}

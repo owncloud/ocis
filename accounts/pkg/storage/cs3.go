@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/cs3org/reva/pkg/auth/scope"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/cs3org/reva/pkg/auth/scope"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -107,9 +108,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", accountsFolder)},
 	})
 	if err != nil {
 		return err
@@ -118,7 +117,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		acc := &proto.Account{}
-		err := r.loadAccount(filepath.Base(res.Infos[i].Path), t, acc)
+		err := r.loadAccount(filepath.Base(res.Infos[i].Ref.GetPath()), t, acc)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -158,9 +157,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder, id)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", accountsFolder, id)},
 	})
 
 	if err != nil {
@@ -221,9 +218,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", groupsFolder)},
 	})
 	if err != nil {
 		return err
@@ -232,7 +227,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		grp := &proto.Group{}
-		err := r.loadGroup(filepath.Base(res.Infos[i].Path), t, grp)
+		err := r.loadGroup(filepath.Base(res.Infos[i].Ref.GetPath()), t, grp)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -272,9 +267,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder, id)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", groupsFolder, id)},
 	})
 
 	if err != nil {
@@ -334,9 +327,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
-	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
-	}
+	var rootPathRef = &provider.Reference{Path: path.Join("/meta", folder)}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{
 		Ref: rootPathRef,
