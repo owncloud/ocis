@@ -27,83 +27,7 @@ config = {
         "skipExceptParts": [],
     },
     "uiTests": {
-        "suites": {
-            "webUIBasic": [
-                "webUILogin",
-                "webUINotifications",
-                "webUIPrivateLinks",
-                "webUIPreview",
-                "webUIAccount",
-                # The following suites may have all scenarios currently skipped.
-                # The suites are listed here so that scenarios will run when
-                # they are enabled.
-                "webUIAdminSettings",
-                "webUIComments",
-                "webUITags",
-                "webUIWebdavLockProtection",
-                "webUIWebdavLocks",
-            ],
-            "webUICreateFilesFolders": "webUICreateFilesFolders",
-            "webUIDeleteFilesFolders": "webUIDeleteFilesFolders",
-            "webUIRename": [
-                "webUIRenameFiles",
-                "webUIRenameFolders",
-            ],
-            "webUISharingBasic": [
-                "webUISharingAcceptShares",
-            ],
-            "webUIRestrictSharing": "webUIRestrictSharing",
-            "webUISharingNotifications": [
-                "webUISharingNotifications",
-            ],
-            "webUIFavorites": "webUIFavorites",
-            "webUIMarkdownEditor": "webUIMarkdownEditor",
-            "webUIFiles1": [
-                "webUIFiles",
-                "webUIFilesActionMenu",
-                "webUIFilesCopy",
-            ],
-            "webUIFiles2": [
-                "webUIFilesDetails",
-                "webUIFilesList",
-                "webUIFilesSearch",
-            ],
-            "webUISharingAutocompletion": "webUISharingAutocompletion",
-            "webUISharingInternalGroups": [
-                "webUISharingInternalGroups",
-                "webUISharingInternalGroupsEdgeCases",
-                "webUISharingInternalGroupsSharingIndicator",
-            ],
-            "webUISharingInternalUsers": [
-                "webUISharingInternalUsers",
-                "webUISharingInternalUsersBlacklisted",
-                "webUISharingInternalUsersSharingIndicator",
-                "webUISharingInternalUsersCollaborator",
-                "webUISharingInternalUsersShareWithPage",
-            ],
-            "webUISharingInternalUsersExpire": "webUISharingInternalUsersExpire",
-            "webUISharingPermissionsUsers": "webUISharingPermissionsUsers",
-            "webUISharingFilePermissionsGroups": "webUISharingFilePermissionsGroups",
-            "webUISharingFolderPermissionsGroups": "webUISharingFolderPermissionsGroups",
-            "webUISharingFolderAdvPermissionsGrp": "webUISharingFolderAdvancedPermissionsGroups",
-            "webUIResharing": [
-                "webUIResharing1",
-                "webUIResharing2",
-            ],
-            "webUISharingPublicBasic": "webUISharingPublicBasic",
-            "webUISharingPublicManagement": "webUISharingPublicManagement",
-            "webUISharingPublicExpire": "webUISharingPublicExpire",
-            "webUISharingPublicDifferentRoles": "webUISharingPublicDifferentRoles",
-            "webUITrashbinDelete": "webUITrashbinDelete",
-            "webUITrashbinFilesFolders": "webUITrashbinFilesFolders",
-            "webUITrashbinRestore": "webUITrashbinRestore",
-            "webUIUpload": "webUIUpload",
-            "webUISharingFilePermissionMultipleUsers": "webUISharingFilePermissionMultipleUsers",
-            "webUISharingFolderPermissionMultipleUsers": "webUISharingFolderPermissionMultipleUsers",
-            "webUISharingFolderAdvancedPermissionMU": "webUISharingFolderAdvancedPermissionMultipleUsers",
-            "webUIMoveFilesFolders": "webUIMoveFilesFolders",
-            "webUIUserJourney": "webUIUserJourney",
-        },
+        "filterTags": "@ocisSmokeTest",
         "debugSuites": [],
         "skip": False,
     },
@@ -562,6 +486,7 @@ def apiTests(ctx):
 
 def uiTests(ctx):
     default = {
+        "filterTags": "",
         "debugSuites": [],
         "skip": False,
     }
@@ -570,22 +495,36 @@ def uiTests(ctx):
     for item in default:
         params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
 
-    suiteNames = config["uiTests"]["suites"].keys()
+    if "suites" in config["uiTests"]:
+        suiteNames = config["uiTests"]["suites"].keys()
+    else:
+        suiteNames = ["allWebUI"]
 
     if len(params["debugSuites"]) != 0:
         suiteNames = params["debugSuites"]
 
-    return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
+    return [uiTestPipeline(ctx, suiteName, params["filterTags"]) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 4):
-    suites = config["uiTests"]["suites"]
-    paths = ""
-    suite = suites[suiteName]
-    if type(suite) == "list":
-        for path in suite:
-            paths = paths + "tests/acceptance/features/" + path + " "
+def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_difficulty = 4):
+    if "suites" in config["uiTests"]:
+        suites = config["uiTests"]["suites"]
+        paths = ""
+        suite = suites[suiteName]
+        if type(suite) == "list":
+            for path in suite:
+                paths = paths + "tests/acceptance/features/" + path + " "
+        else:
+            paths = paths + "tests/acceptance/features/" + suite + " "
     else:
-        paths = paths + "tests/acceptance/features/" + suite + " "
+        suite = suiteName
+        paths = "tests/acceptance/features"
+
+    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS"
+
+    if filterTags == "":
+        finalFilterTags = standardFilterTags
+    else:
+        finalFilterTags = filterTags + " and " + standardFilterTags
 
     return {
         "kind": "pipeline",
@@ -608,7 +547,7 @@ def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 
                     "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
                     "TESTING_DATA_DIR": "/srv/app/testing/data",
                     "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-                    "TEST_TAGS": "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS",
+                    "TEST_TAGS": finalFilterTags,
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "TEST_PATHS": paths,
