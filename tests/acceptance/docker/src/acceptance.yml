@@ -7,10 +7,11 @@ services:
       PATH_TO_CORE: /srv/app/testrunner
       SKELETON_DIR: /srv/app/tmp/testing/data/apiSkeleton
       TEST_OCIS: "true"
+      RUN_ON_OCIS: "true"
       TEST_SERVER_URL: https://ocis-server:9200
       TESTING_DIR: /srv/app/tmp/testing
 
-      STORAGE: $STORAGE
+      STORAGE_DRIVER: $STORAGE_DRIVER
       TEST_SOURCE: $TEST_SOURCE
       BEHAT_SUITE: ${BEHAT_SUITE:-}
       BEHAT_FEATURE: ${BEHAT_FEATURE:-}
