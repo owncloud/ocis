@@ -28,82 +28,63 @@ config = {
     },
     "uiTests": {
         "suites": {
-            "webUIBasic": [
+            "webUISmokeTest": [
                 "webUILogin",
                 "webUINotifications",
                 "webUIPrivateLinks",
                 "webUIPreview",
                 "webUIAccount",
-                # The following suites may have all scenarios currently skipped.
-                # The suites are listed here so that scenarios will run when
-                # they are enabled.
                 "webUIAdminSettings",
                 "webUIComments",
                 "webUITags",
                 "webUIWebdavLockProtection",
-                "webUIWebdavLocks",
-            ],
-            "webUICreateFilesFolders": "webUICreateFilesFolders",
-            "webUIDeleteFilesFolders": "webUIDeleteFilesFolders",
-            "webUIRename": [
+                "webUICreateFilesFolders",
+                "webUIDeleteFilesFolders",
                 "webUIRenameFiles",
                 "webUIRenameFolders",
-            ],
-            "webUISharingBasic": [
                 "webUISharingAcceptShares",
-            ],
-            "webUIRestrictSharing": "webUIRestrictSharing",
-            "webUISharingNotifications": [
+                "webUIRestrictSharing",
                 "webUISharingNotifications",
-            ],
-            "webUIFavorites": "webUIFavorites",
-            "webUIMarkdownEditor": "webUIMarkdownEditor",
-            "webUIFiles1": [
+                "webUIFavorites",
+                "webUIMarkdownEditor",
                 "webUIFiles",
                 "webUIFilesActionMenu",
                 "webUIFilesCopy",
-            ],
-            "webUIFiles2": [
                 "webUIFilesDetails",
                 "webUIFilesList",
                 "webUIFilesSearch",
-            ],
-            "webUISharingAutocompletion": "webUISharingAutocompletion",
-            "webUISharingInternalGroups": [
+                "webUISharingAutocompletion",
                 "webUISharingInternalGroups",
                 "webUISharingInternalGroupsEdgeCases",
                 "webUISharingInternalGroupsSharingIndicator",
-            ],
-            "webUISharingInternalUsers": [
                 "webUISharingInternalUsers",
                 "webUISharingInternalUsersBlacklisted",
                 "webUISharingInternalUsersSharingIndicator",
                 "webUISharingInternalUsersCollaborator",
                 "webUISharingInternalUsersShareWithPage",
-            ],
-            "webUISharingInternalUsersExpire": "webUISharingInternalUsersExpire",
-            "webUISharingPermissionsUsers": "webUISharingPermissionsUsers",
-            "webUISharingFilePermissionsGroups": "webUISharingFilePermissionsGroups",
-            "webUISharingFolderPermissionsGroups": "webUISharingFolderPermissionsGroups",
-            "webUISharingFolderAdvPermissionsGrp": "webUISharingFolderAdvancedPermissionsGroups",
-            "webUIResharing": [
+                "webUISharingInternalUsersExpire",
+                "webUISharingPermissionsUsers",
+                "webUISharingFilePermissionsGroups",
+                "webUISharingFolderPermissionsGroups",
+                "webUISharingFolderAdvancedPermissionsGroups",
                 "webUIResharing1",
                 "webUIResharing2",
+                "webUISharingPublicBasic",
+                "webUISharingPublicManagement",
+                "webUISharingPublicExpire",
+                "webUISharingPublicDifferentRoles",
+                "webUITrashbinDelete",
+                "webUITrashbinFilesFolders",
+                "webUITrashbinRestore",
+                "webUIUpload",
+                "webUISharingFilePermissionMultipleUsers",
+                "webUISharingFolderPermissionMultipleUsers",
+                "webUISharingFolderAdvancedPermissionMultipleUsers",
+                "webUIMoveFilesFolders",
+                "webUIUserJourney",
             ],
-            "webUISharingPublicBasic": "webUISharingPublicBasic",
-            "webUISharingPublicManagement": "webUISharingPublicManagement",
-            "webUISharingPublicExpire": "webUISharingPublicExpire",
-            "webUISharingPublicDifferentRoles": "webUISharingPublicDifferentRoles",
-            "webUITrashbinDelete": "webUITrashbinDelete",
-            "webUITrashbinFilesFolders": "webUITrashbinFilesFolders",
-            "webUITrashbinRestore": "webUITrashbinRestore",
-            "webUIUpload": "webUIUpload",
-            "webUISharingFilePermissionMultipleUsers": "webUISharingFilePermissionMultipleUsers",
-            "webUISharingFolderPermissionMultipleUsers": "webUISharingFolderPermissionMultipleUsers",
-            "webUISharingFolderAdvancedPermissionMU": "webUISharingFolderAdvancedPermissionMultipleUsers",
-            "webUIMoveFilesFolders": "webUIMoveFilesFolders",
-            "webUIUserJourney": "webUIUserJourney",
         },
+        "filterTags": "@ocisSmokeTest",
         "debugSuites": [],
         "skip": False,
     },
@@ -562,6 +543,7 @@ def apiTests(ctx):
 
 def uiTests(ctx):
     default = {
+        "filterTags": "",
         "debugSuites": [],
         "skip": False,
     }
@@ -575,9 +557,9 @@ def uiTests(ctx):
     if len(params["debugSuites"]) != 0:
         suiteNames = params["debugSuites"]
 
-    return [uiTestPipeline(ctx, suiteName) for suiteName in suiteNames]
+    return [uiTestPipeline(ctx, suiteName, params["filterTags"]) for suiteName in suiteNames]
 
-def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_difficulty = 4):
     suites = config["uiTests"]["suites"]
     paths = ""
     suite = suites[suiteName]
@@ -586,6 +568,12 @@ def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 
             paths = paths + "tests/acceptance/features/" + path + " "
     else:
         paths = paths + "tests/acceptance/features/" + suite + " "
+
+    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS"
+    if filterTags == "":
+        finalFilterTags = standardFilterTags
+    else:
+        finalFilterTags = filterTags + " and " + standardFilterTags
 
     return {
         "kind": "pipeline",
@@ -608,7 +596,7 @@ def uiTestPipeline(ctx, suiteName, storage = "ocis", accounts_hash_difficulty = 
                     "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
                     "TESTING_DATA_DIR": "/srv/app/testing/data",
                     "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-                    "TEST_TAGS": "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS",
+                    "TEST_TAGS": finalFilterTags,
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "TEST_PATHS": paths,
