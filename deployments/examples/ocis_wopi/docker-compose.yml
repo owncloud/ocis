@@ -91,7 +91,7 @@ services:
       ocis-net:
     environment:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      WOPISERVER_REVA_GATEWAY: ocis:9142
+      WOPISERVER_REVA_GATEWAY_ADDR: ocis:9142
       WOPISERVER_WOPI_SERVER_HOST: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       WOPISERVER_WOPI_SERVER_SECRET: ${WOPI_JWT_SECRET:-Pive-Fumkiu4}
       WOPISERVER_WOPI_SERVER_INSECURE: "${INSECURE:-false}"
