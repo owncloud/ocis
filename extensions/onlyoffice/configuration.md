@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-27T07:19:40+0000"
+date: "2021-05-27T08:40:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -59,15 +59,6 @@ Usage: `onlyoffice [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### onlyoffice health
-
-Check health status
-
-Usage: `onlyoffice health [command options] [arguments...]`
-
--debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
-
 ### onlyoffice server
 
 Start integrated server
@@ -115,4 +106,13 @@ Usage: `onlyoffice server [command options] [arguments...]`
 
 -asset-path |  $ONLYOFFICE_ASSET_PATH
 : Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
+
+### onlyoffice health
+
+Check health status
+
+Usage: `onlyoffice health [command options] [arguments...]`
+
+-debug-addr |  $ONLYOFFICE_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
 
