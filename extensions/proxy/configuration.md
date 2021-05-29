@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-28T10:44:14+0000"
+date: "2021-05-29T01:09:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -35,15 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### proxy health
-
-Check health status
-
-Usage: `proxy health [command options] [arguments...]`
-
---debug-addr |  $PROXY_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109")`.
-
 ### proxy ocis-proxy
 
 proxy for oCIS
@@ -76,4 +67,13 @@ Usage: `proxy version [command options] [arguments...]`
 
 --service-name |  $PROXY_SERVICE_NAME
 : Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "proxy")`.
+
+### proxy health
+
+Check health status
+
+Usage: `proxy health [command options] [arguments...]`
+
+--debug-addr |  $PROXY_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109")`.
 
