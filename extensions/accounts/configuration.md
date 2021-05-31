@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-05-29T01:08:14+0000"
+date: "2021-05-31T15:39:18+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -47,20 +47,17 @@ Usage: `accounts inspect [command options] [arguments...]`
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
-### accounts ocis-accounts
+### accounts remove
 
-Provide accounts and groups for oCIS
+Removes an existing account
 
-Usage: `accounts ocis-accounts [command options] [arguments...]`
+Usage: `accounts remove [command options] [arguments...]`
 
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
 ### accounts server
 
@@ -155,17 +152,20 @@ Rebuilds the service's index, i.e. deleting and then re-adding all existing docu
 
 Usage: `accounts rebuildIndex [command options] [arguments...]`
 
-### accounts remove
+### accounts ocis-accounts
 
-Removes an existing account
+Provide accounts and groups for oCIS
 
-Usage: `accounts remove [command options] [arguments...]`
+Usage: `accounts ocis-accounts [command options] [arguments...]`
 
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
 
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
 
 ### accounts update
 
