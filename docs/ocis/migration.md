@@ -20,28 +20,131 @@ The migration happens in subsequent stages while the service is online. First al
 
 ## Migration Stages
 
-### Stage-0
+### Stage 0: _pre migration_
 Is the pre-migration stage when having a functional ownCloud 10 instance.
 
-### Stage-1
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
+
+### Stage 1: _introduce ownCloud Web_
+Install and introduce [ownCloud Web](https://github.com/owncloud/web/) and let users test it voluntarily.
+#### Steps
+Deploy web and enable switching to and from it.
+For more details see: [ownCloud 10 with ownCloud Web]({{< ref "deployment/owncloud10_with_oc_web.md" >}})
+
+#### Validation
+Ensure switching back an forth between the classic ownCloud 10 web UI and ownCloud web works as at our https://demo.owncloud.com. 
+_TODO @butonic is there documentation how to limit the web ui switch to an 'early adopters' group?_
+
+#### Rollback
+Should there be problems with ownCloud web at this point it can simply be removed from the menu and be undeployed. 
+
+#### Notes
+The ownCloud 10 demo instance uses OAuth to obtain a token for ownCloud web. In oCIS the token is provided by the OpenID Connect Identityd Provider, which may skip the consent step for trusted clients for a seamless login experience.
+
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
+
+### Stage 2: _introduce OpenID Connect_
 Introduce OpenID Connect to ownCloud 10 server and clients.
 
-### Stage-2
-Install and introduce ownCloud Web and let users test it voluntarily.
+#### Why does oCIS require OpenID Connect?
+Basic auth requires us to properly store and manage user credentials. Something we would rather like to delegate to a tool specifically built for that task.
+While SAML and Shibboleth are protocols that solve that problem, they are limited to web clients. Desktop and mobile clients were an afterthought and keep running into timeouts. For these reasons, we decided to move to OpenID Connect as our primary authentication protocol.
+_TODO @butonic add ADR for openid Connect._
+
+#### User impact
+When introducing OpenID Connect, the clients will detect the new authentication scheme when their current way of authenticating returns an error. Users will then have to
+reauthorize at the OpenID Connecd IdP, which again, may be configured to skip the consent step for trusted clients.
+
+#### Steps
+1. There are multiple products that can be used as an OpenID Connect IdP. We test with [kopano konnect](https://stash.kopano.io/projects/KC/repos/konnect/browse), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
+
+_TODO @butonic flesh out oCIS IDP documentation._
+
+2. Add [Openid Connect (OIDC)](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/) support to ownCloud 10.
+
+#### Validation
+When OpenID Connect support is enabled verify that all clients can login:
+- web classic
+- ownCloud web
+- desktop
+- android
+- iOS
+
+#### Rollback
+Should there be problems with OpenID Connect at this point you can disable the app. Users will have to reauthenticate in this case.
+
+#### Note
+Legacy clients relying on Basic auth or app passwords need to be migrated to OpenId Connect to work with oCIS. For a transition period Basic auth in oCIS can be enabled with `PROXY_ENABLE_BASIC_AUTH=true`, but we strongly recommend adopting OpenID Connect for other tools as well.
+
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
+
+### Stage 3: _introduce oCIS interally_
+
+#### Why?
+Befor letting oCIS handle end user requests we will first make it available in the internal network. By subsequently adding services we can add functionality and verify the services work as intended.
+
+Start oCIS backend and make read only tests on existing data using the `owncloudsql` storage driver which will read (and write)
+- blobs from the same datadirectory layout as in ownCloud 10
+- metadata from the ownCloud 10 database: 
+The oCIS share manager will read share information from the ownCloud database using an `owncloud` driver as well.
+
+Therefore we need:
+- [ ] *a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
+
+#### User impact
+None, only administrators will be able to explore ocis during this stage.
+
+#### Steps and verifications
+
+We are going to run and explore a series of services that will together handle the same requests as ownCloud 10. For initial exploration the ocis binary is recommended. The services can later be deployed using a single oCIS runtime or in multiple cotainers.
+
+_TODO @butonic What does every service do? Why deploy in this order link to ocis docs_
+
+##### Storage provider for metadata
+1. Deploy OCIS storage provider with owncloudsql driver.
+2. Use cli tool to list files using the Cs3 api
+##### graph API endpoint
+1. Deploy graph api to list spaces
+2. Use curl to list spaces using graph drives endpoint
+##### owncloud flavoured WebDAV endpoint
+1. Deploy Ocdav
+2. Use curl to send PROPFIND
+
+##### data provider for up and download
+1. Deploy dataprovider
+2. Use curl to up and download files
+3. Use tus to upload files
+
+Deploy ...
+
+##### share manager
+Deploy share manager with owncloud driver
+
+##### reva gateway
+1. Deploy gateway to authenticate requests? I guess we need that first... Or we need the to mint a token. Might be a good exercise.
+
+##### automated deployment
+Finally, deploy OCIS with a config to set up everything running in a single oCIS runtime or in multiple containers.
+
+#### Rollback
+You can stop the ocis process at any time.
 
 
 {{< hint warning >}}
 **Alternative 1**
 Add a routable prefix to fileids in oc10, and replicate the prefix in ocis.
-### Stage-2.1
+### Stage-3.1
 Let oc10 render file ids with prefixes: `<instance name>$<numeric storageid>!<fileid>`. This will allow clients to handle moved files.
 
-### Stage-2.2
+### Stage-3.2
 Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
 One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API.
 Files can be identified using `<instance name>$<numeric storageid>!<fileid>` and moved to the correct sync pair.
 
-### Stage-2.3
+### Stage-3.3
 Enable spaces API in oc10:
 - New clients will get a response from the spaces API and can set up new sync pairs.
 - Legacy clients will still poll `/webdav` or `/dav/files/<username>` where they will see new subfolders instead of the users home. They will move down the users files into `/home` and shares into `/shares`. Custom sync pairs will no longer be available, causing the legacy client to leave local files in place. They can be picked up manually when installing a new client.
@@ -51,47 +154,96 @@ Enable spaces API in oc10:
 {{< hint warning >}}
 **Alternative 2**
 An additional `uuid` property used only to detect moves. A lookup by uuid is not necessary for this. The `/dav/meta` endpoint would still take the fileid. Clients  would use the `uuid` to detect moves and set up new sync pairs when migrating to a global namespace.
-### Stage-2.1
+### Stage-3.1
 Generate a `uuid` for every file as a file property. Clients can submit a `uuid` when creating files. The server will create a `uuid` if the client did not provide one.
 
-### Stage-2.2
+### Stage-3.2
 Roll out new clients that understand the spaces API and know how to convert local sync pairs for legacy oc10 `/webdav` or `/dav/files/<username>` home folders into multiple sync pairs.
 One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for every accepted share. The shares will be accessible at `/webdav/shares/` when the server side enables the spaces API. Files can be identified using the `uuid`  and moved to the correct sync pair.
 
-### Stage-3.1
+### Stage-4.1
 When reading the files from ocis return the same `uuid`. It can be migrated to an extended attribute or it can be read from oc10. If users change it the client will not be able to detect a move and maybe other weird stuff happens. *What if the uuid gets lost on the server side due to a partial restore?* 
 
 {{< /hint >}}
 
-### Stage-3
-Start oCIS backend and make read only tests on existing data using the `owncloud` storage driver which will read (and write)
-- blobs from the same datadirectory layout as in ownCloud 10
-- metadata from the ownCloud 10 database: 
-The oCIS share manager will read share information from the ownCloud database as well.
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
 
-Therefore we need:
-- [ ] *a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
+### Stage 4: _internal write access with oCIS_
+Test writing data with oCIS into the existing ownCloud 10 data directory using the `owncloudsql` storage driver.
 
-### Stage-4
-Test writing data with oCIS into the existing ownCloud 10 data directory using the `owncloud` storage driver.
+#### Why?
+#### User impact
+#### Steps 
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
 
 ### Stage-5
 Introduce reverse proxy and switch over early adopters, let admins gain trust in the new backend by comparing metrics of the two systems and having it running in parallel.
 
+#### Why?
+#### User impact
+#### Steps 
+Maybe part of Stage 4? No, leave as dedicated step as we now need to change the dom
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
+
 ### Stage-6
 Voluntary transition period and subsequent hard deadline for all users
+
+#### Why?
+#### User impact
+#### Steps 
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
 
 ### Stage-7
 Disable ownCloud 10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
 
+#### Why?
+#### User impact
+#### Steps 
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
+
 ### Stage-8
 User by user storage migration from `owncloud` driver to `ocis`/`s3ng`/`cephfs`...
+
+#### Why?
+#### User impact
+#### Steps 
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
 
 ### Stage-9
 Migrate share data to &lt;yet to determine&gt; share manager backend and shut down ownCloud database
 
 ### Stage-10
 Profit! (db for file metadata no longer necessary, less maintenance effort)
+
+#### Why?
+#### User impact
+#### Steps 
+#### Verification
+#### Rollback
+#### Notes
+#### FAQ
+_Feel free to add you rquestion as a PR to this document using the link at the top of this page!_ 
 
 
 ## Architectural differences
