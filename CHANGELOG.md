@@ -6,11 +6,22 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
 * Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
 
 ## Details
+
+* Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.2.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2096
+   https://github.com/owncloud/web/releases/tag/v3.2.0
 
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 
