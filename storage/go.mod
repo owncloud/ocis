@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/reva v1.7.1-0.20210507160327-e2c3841d0dbc
+	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
@@ -19,6 +19,4 @@ replace (
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
-	// latest version compatible with etcd
-	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )
