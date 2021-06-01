@@ -27,63 +27,6 @@ config = {
         "skipExceptParts": [],
     },
     "uiTests": {
-        "suites": {
-            "webUISmokeTest": [
-                "webUILogin",
-                "webUINotifications",
-                "webUIPrivateLinks",
-                "webUIPreview",
-                "webUIAccount",
-                "webUIAdminSettings",
-                "webUIComments",
-                "webUITags",
-                "webUIWebdavLockProtection",
-                "webUICreateFilesFolders",
-                "webUIDeleteFilesFolders",
-                "webUIRenameFiles",
-                "webUIRenameFolders",
-                "webUISharingAcceptShares",
-                "webUIRestrictSharing",
-                "webUISharingNotifications",
-                "webUIFavorites",
-                "webUIMarkdownEditor",
-                "webUIFiles",
-                "webUIFilesActionMenu",
-                "webUIFilesCopy",
-                "webUIFilesDetails",
-                "webUIFilesList",
-                "webUIFilesSearch",
-                "webUISharingAutocompletion",
-                "webUISharingInternalGroups",
-                "webUISharingInternalGroupsEdgeCases",
-                "webUISharingInternalGroupsSharingIndicator",
-                "webUISharingInternalUsers",
-                "webUISharingInternalUsersBlacklisted",
-                "webUISharingInternalUsersSharingIndicator",
-                "webUISharingInternalUsersCollaborator",
-                "webUISharingInternalUsersShareWithPage",
-                "webUISharingInternalUsersExpire",
-                "webUISharingPermissionsUsers",
-                "webUISharingFilePermissionsGroups",
-                "webUISharingFolderPermissionsGroups",
-                "webUISharingFolderAdvancedPermissionsGroups",
-                "webUIResharing1",
-                "webUIResharing2",
-                "webUISharingPublicBasic",
-                "webUISharingPublicManagement",
-                "webUISharingPublicExpire",
-                "webUISharingPublicDifferentRoles",
-                "webUITrashbinDelete",
-                "webUITrashbinFilesFolders",
-                "webUITrashbinRestore",
-                "webUIUpload",
-                "webUISharingFilePermissionMultipleUsers",
-                "webUISharingFolderPermissionMultipleUsers",
-                "webUISharingFolderAdvancedPermissionMultipleUsers",
-                "webUIMoveFilesFolders",
-                "webUIUserJourney",
-            ],
-        },
         "filterTags": "@ocisSmokeTest",
         "debugSuites": [],
         "skip": False,
@@ -552,22 +495,18 @@ def uiTests(ctx):
     for item in default:
         params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
 
-    suiteNames = config["uiTests"]["suites"].keys()
-
     if len(params["debugSuites"]) != 0:
         suiteNames = params["debugSuites"]
-
-    return [uiTestPipeline(ctx, suiteName, params["filterTags"]) for suiteName in suiteNames]
+        return [uiTestPipeline(ctx, suiteName, params["filterTags"]) for suiteName in suiteNames]
+    return [uiTestPipeline(ctx, None, params["filterTags"])]
 
 def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_difficulty = 4):
-    suites = config["uiTests"]["suites"]
-    paths = ""
-    suite = suites[suiteName]
-    if type(suite) == "list":
-        for path in suite:
-            paths = paths + "tests/acceptance/features/" + path + " "
+    testFeaturesBaseDir = "tests/acceptance/features/"
+    if suiteName:
+        paths = testFeaturesBaseDir + suiteName
     else:
-        paths = paths + "tests/acceptance/features/" + suite + " "
+        suiteName = "web-ocis-smoke-tests"
+        paths = None
 
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS"
     if filterTags == "":
