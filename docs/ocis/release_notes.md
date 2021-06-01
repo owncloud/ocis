@@ -7,6 +7,24 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.7.0 Technology Preview
+
+Version 1.7.0 is a maintenance and bug fix release. ownCloud Web 3.2.0 has received further performance improvements and minor usability tweaks.
+
+The most prominent changes in version 1.7.0 comprise:
+
+- The S3 storage driver can now be used for testing using the configuration values in the [documentation](https://owncloud.dev/extensions/storage/configuration/#s3ng-driver) [#1886](https://github.com/owncloud/ocis/pull/1886)
+- A confirmation dialog for public link deletion has been added [#5125](https://github.com/owncloud/web/pull/5125)
+- To improve performance, the file types which are being rendered as previews can now be specified using an [allow list in config.json](https://owncloud.dev/clients/web/getting-started/#options) [#5159](https://github.com/owncloud/web/pull/5159)
+- A warning has been added when a user tries to leave the page while an operation is in progress (e.g., an upload) [#2590](https://github.com/owncloud/web/issues/2590)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.6.0 Technology Preview
 
 To get the full potential out of the microservice architecture, version 1.6.0 introduces a dynamic service registry to ownCloud Infinite Scale. The dynamic service registry facilitates the configuration and contributes to the scalability of the platform. ownCloud Web 3.1.0 has received further improvements for accessibility like keyboard navigation and it comes with performance improvements by loading certain elements asynchronously.
