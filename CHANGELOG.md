@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
 * Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+* Enhancement - Update reva to v1.7.1-0.20210531093513-b74a2b156af6: [#2104](https://github.com/owncloud/ocis/pull/2104)
 
 ## Details
 
@@ -51,6 +52,18 @@ The following sections list the changes for unreleased.
    console errors.
 
    https://github.com/owncloud/ocis/pull/2036
+
+* Enhancement - Update reva to v1.7.1-0.20210531093513-b74a2b156af6: [#2104](https://github.com/owncloud/ocis/pull/2104)
+
+   This reva update includes: * [fix move in the owncloud storage
+   driver](https://github.com/cs3org/reva/pull/1696) * [add checksum header to the tus
+   preflight response](https://github.com/cs3org/reva/pull/1702) * [Add reliability
+   calculations support to Mentix](https://github.com/cs3org/reva/pull/1649) * [fix
+   response format when accepting shares](https://github.com/cs3org/reva/pull/1724) *
+   [Datatx createtransfershare](https://github.com/cs3org/reva/pull/1725)
+
+   https://github.com/owncloud/ocis/issues/2102
+   https://github.com/owncloud/ocis/pull/2104
 # Changelog for [1.6.0] (2021-05-12)
 
 The following sections list the changes for 1.6.0.
