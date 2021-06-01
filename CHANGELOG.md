@@ -6,12 +6,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
 * Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
 * Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
 
 ## Details
+
+* Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
+
+   Groups are considered to be case sensitive. The index must handle them case sensitive too
+   otherwise we will have undeterministic behavior while editing or deleting groups.
+
+   https://github.com/owncloud/ocis/pull/2109
 
 * Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
 
