@@ -652,7 +652,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "WebUIAcceptanceTests",
-                "image": "webhippie/nodejs:latest",
+                "image": "owncloudci/nodejs:14",
                 "pull": "always",
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
@@ -689,11 +689,8 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
         "services": [
             {
                 "name": "redis",
-                "image": "webhippie/redis",
+                "image": "redis:6-alpine",
                 "pull": "always",
-                "environment": {
-                    "REDIS_DATABASES": 1,
-                },
             },
             {
                 "name": "selenium",
