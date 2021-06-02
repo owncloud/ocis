@@ -27,7 +27,7 @@ Install and introduce [ownCloud Web](https://github.com/owncloud/web/) and let u
 #### Steps
 Deploy web and enable switching to and from it.
 For more details see: [ownCloud 10 with ownCloud Web]({{< ref "deployment/owncloud10_with_oc_web.md" >}})
-_TODO @butonic is there documentation how to limit the web ui switch to an 'early adopters' group?_
+_TODO allow limiting the web ui switch to an 'early adopters' group_
 
 #### Validation
 Ensure switching back an forth between the classic ownCloud 10 web UI and ownCloud web works as at our https://demo.owncloud.com. 
@@ -36,7 +36,8 @@ Ensure switching back an forth between the classic ownCloud 10 web UI and ownClo
 Should there be problems with ownCloud web at this point it can simply be removed from the menu and be undeployed. 
 
 #### Notes
-The ownCloud 10 demo instance uses OAuth to obtain a token for ownCloud web. In oCIS the token is provided by the OpenID Connect Identityd Provider, which may skip the consent step for trusted clients for a seamless login experience.
+The ownCloud 10 demo instance uses OAuth to obtain a token for ownCloud web and currently always requires explicit consent. In oCIS the token is provided by the OpenID Connect Identity Provider, which may skip the consent step for trusted clients for a more seamless login experience. You may want to introduce OpenID Connect before enabling the new web UI.
+_TODO make oauth2 in oc10 trust the new web ui, based on `redirect_uri` and CSRF so no explicit consent is needed_
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
@@ -45,7 +46,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 Basic auth requires us to properly store and manage user credentials. Something we would rather like to delegate to a tool specifically built for that task.
 While SAML and Shibboleth are protocols that solve that problem, they are limited to web clients. Desktop and mobile clients were an afterthought and keep running into timeouts. For these reasons, we decided to move to OpenID Connect as our primary authentication protocol.
-_TODO @butonic add ADR for openid Connect._
+_TODO @butonic add ADR for OpenID Connect_
 
 #### User impact
 When introducing OpenID Connect, the clients will detect the new authentication scheme when their current way of authenticating returns an error. Users will then have to
@@ -54,7 +55,7 @@ reauthorize at the OpenID Connecd IdP, which again, may be configured to skip th
 #### Steps
 1. There are multiple products that can be used as an OpenID Connect IdP. We test with [kopano konnect](https://stash.kopano.io/projects/KC/repos/konnect/browse), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
 
-_TODO @butonic flesh out oCIS IDP documentation._
+_TODO @butonic flesh out oCIS IDP documentation_
 
 2. Add [Openid Connect (OIDC)](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/) support to ownCloud 10.
 
@@ -88,8 +89,7 @@ The oCIS share manager will read share information from the ownCloud database us
 
 _TODO @butonic add guide on how to configure `owncloudsql`_
 
-Therefore we need:
-- [ ] *a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd*
+_TODO we need a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd_
 
 #### User impact
 None, only administrators will be able to explore oCIS during this stage.
@@ -98,13 +98,12 @@ None, only administrators will be able to explore oCIS during this stage.
 
 We are going to run and explore a series of services that will together handle the same requests as ownCloud 10. For initial exploration the oCIS binary is recommended. The services can later be deployed using a single oCIS runtime or in multiple cotainers.
 
-_TODO @butonic What does every service do? Why deploy in this order link to oCIS docs_
 
 ##### Storage provider for file metadata
 1. Deploy OCIS storage provider with owncloudsql driver.
 2. Set `read_only: true` in the storage provider config.
 _TODO @butonic add read only flag to storage drivers_
-3. Use cli tool to list files using the Cs3 api
+3. Use cli tool to list files using the CS3 api
 
 ##### File ID alternatives
 Multiple ownCloud instances can be merged into one oCIS instance. To prevent the numeric ids fqqrom colliding, the file ids will be prefixed with a new storage space id which is used by oCIS to route requests to the correct storage provider. See Stage 8 below.
@@ -172,7 +171,6 @@ You can stop the oCIS process at any time.
 
 #### Notes
 Multiple ownCloud instances can be merged into one oCIS instance. The file ids will be prefixed with a new storage space id which is used to route requests to the correct storage provider.
-_TODO @butonic find code example for routing or link ADR?_
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
@@ -306,8 +304,6 @@ To switch the storage provider again the same storage space migration can be per
 Multiple ownCloud instances can be merged into one oCIS instance. The file ids will be prefixed with a new storage space id which is used to route requests to the correct storage provider.
 
 The storage space migration will become a seamless feature in the future that allows administrators to move users to storage systems with different capabilities, to implement premium features, deprovisioning strategies or archiving.
-
-_TODO @butonic screenshot for logical file ids and inodes or owncloudsql fileids that decouple storage from the logical uuids_
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
@@ -487,7 +483,7 @@ used to determine if federated shares can automatically be accepted
 ### user data
 
 Users are migrated in two steps:
-1. They should all be authenticated using openid connect, which already moves them to a common identity management system.
+1. They should all be authenticated using OpenID Connect, which already moves them to a common identity management system.
 2. To search share recipients, both, ownCloud 10 and oCIS need access to the same user directory using eg. LDAP.
 
 *TODO: add state to CS3 API, so we can 'disable' users*
@@ -526,7 +522,7 @@ The groups table really only contains the group name.
 
 ### LDAP
 
-TODO clarify if metadata from ldap & user_shibboleth needs to be migrated
+_TODO clarify if metadata from ldap & user_shibboleth needs to be migrated_
 -  the `dn` -> *owncloud internal username* mapping that currently lives in the `oc_ldap_user_mapping` table needs to move into a dedicated ownclouduuid attribute in the LDAP server. The idp should send it as a claim so the proxy does not have to look up the user using LDAP again. The username cannot be changed in ownCloud 10 and the oCIS provisioning API will not allow changing it as well. When we introduce the graph api we may allow changing usernames when all clients have moved to that api.
 
 The problem is that the username in owncloud 10 and in oCIS also need to be the same, which might not be the case when the ldap mapping used a different column. In that case we should add another owncloudusername attribute to the ldap server ...
