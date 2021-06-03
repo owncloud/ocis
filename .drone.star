@@ -19,23 +19,23 @@ config = {
         "webdav",
     ],
     "localApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "debugSuites": [],
         "skip": False,
+        "skipExceptParts": [],
     },
     "accountsUITests": {
-        "skip": False,
+        "skip": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -487,27 +487,32 @@ def apiTests(ctx):
 def uiTests(ctx):
     default = {
         "filterTags": "",
-        "debugSuites": [],
         "skip": False,
+        # only used if 'full ci' is in build title
+        "numberOfParts": 10,
+        "skipExceptParts": [],
     }
-
     params = {}
+    pipelines = []
+
     for item in default:
         params[item] = config["uiTests"][item] if item in config["uiTests"] else default[item]
 
-    if len(params["debugSuites"]) != 0:
-        suiteNames = params["debugSuites"]
-        return [uiTestPipeline(ctx, suiteName, params["filterTags"]) for suiteName in suiteNames]
-    return [uiTestPipeline(ctx, None, params["filterTags"])]
+    filterTags = params["filterTags"]
 
-def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_difficulty = 4):
-    testFeaturesBaseDir = "tests/acceptance/features/"
-    if suiteName:
-        paths = testFeaturesBaseDir + suiteName
+    if ("full-ci" in ctx.build.title.lower()):
+        numberOfParts = params["numberOfParts"]
+        skipExceptParts = params["skipExceptParts"]
+        debugPartsEnabled = (len(skipExceptParts) != 0)
+
+        for runPart in range(1, numberOfParts + 1):
+            if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
+                pipelines.append(uiTestPipeline(ctx, "", runPart, numberOfParts))
+        return pipelines
     else:
-        suiteName = "web-ocis-smoke-tests"
-        paths = None
+        return [uiTestPipeline(ctx, filterTags)]
 
+def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS"
     if filterTags == "":
         finalFilterTags = standardFilterTags
@@ -517,7 +522,7 @@ def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_d
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": suiteName,
+        "name": "Web-Tests-ocis-%s-storage-%s" % (storage, runPart),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -538,7 +543,8 @@ def uiTestPipeline(ctx, suiteName, filterTags, storage = "ocis", accounts_hash_d
                     "TEST_TAGS": finalFilterTags,
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                    "TEST_PATHS": paths,
+                    "RUN_PART": runPart,
+                    "DIVIDE_INTO_NUM_PARTS": numberOfParts,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage.md" % (storage.upper()),
                 },
                 "commands": [
