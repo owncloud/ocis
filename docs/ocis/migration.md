@@ -9,25 +9,40 @@ geekdocFilePath: migration.md
 
 The migration happens in subsequent stages while the service is online. First all users need to migrate to the new architecture, then the global namespace needs to be introduced. Finally, the data on disk can be migrated user by user by switching the storage driver.
 
+<div class="editpage">
+
 {{< hint warning >}}
 @jfd: It might be easier to introduce the spaces api in oc10 and then migrate to oCIS. We cannot migrate both at the same time, the architecture to oCIS (which will change fileids) and introduce a global namespace (which requires stable fileids to let clients handle moves without redownloading). Either we implement arbitrary mounting of shares in oCIS / reva or we make clients and oc10 spaces aware.
 {{< /hint >}}
 
+</div>
+
 ## Migration Stages
 
-### Stage 0: _pre migration_
+### Stage 0: pre migration
 Is the pre-migration stage when having a functional ownCloud 10 instance.
+
+<div class="editpage">
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage 1: _introduce ownCloud Web_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage 1: introduce ownCloud Web
 Install and introduce [ownCloud Web](https://github.com/owncloud/web/) and let users test it voluntarily to gain early feedback on the new UI.
 
 #### Steps
 Deploy web and enable switching to and from it.
 For more details see: [ownCloud 10 with ownCloud Web]({{< ref "deployment/owncloud10_with_oc_web.md" >}})
+
+<div class="editpage">
+
 _TODO allow limiting the web ui switch to an 'early adopters' group_
+
+</div>
 
 #### Validation
 Ensure switching back an forth between the classic ownCloud 10 web UI and ownCloud web works as at our https://demo.owncloud.com. 
@@ -36,17 +51,30 @@ Ensure switching back an forth between the classic ownCloud 10 web UI and ownClo
 Should there be problems with ownCloud web at this point it can simply be removed from the menu and be undeployed. 
 
 #### Notes
+<div style="break-after: avoid"></div>
 The ownCloud 10 demo instance uses OAuth to obtain a token for ownCloud web and currently always requires explicit consent. In oCIS the token is provided by the OpenID Connect Identity Provider, which may skip the consent step for trusted clients for a more seamless login experience. You may want to introduce OpenID Connect before enabling the new web UI.
+
+<div class="editpage">
+
 _TODO make oauth2 in oc10 trust the new web ui, based on `redirect_uri` and CSRF so no explicit consent is needed_
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage 2: _introduce OpenID Connect_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage 2: introduce OpenID Connect
 
 Basic auth requires us to properly store and manage user credentials. Something we would rather like to delegate to a tool specifically built for that task.
 While SAML and Shibboleth are protocols that solve that problem, they are limited to web clients. Desktop and mobile clients were an afterthought and keep running into timeouts. For these reasons, we decided to move to OpenID Connect as our primary authentication protocol.
+
+<div class="editpage">
+
 _TODO @butonic add ADR for OpenID Connect_
+
+</div>
 
 #### User impact
 When introducing OpenID Connect, the clients will detect the new authentication scheme when their current way of authenticating returns an error. Users will then have to
@@ -55,7 +83,11 @@ reauthorize at the OpenID Connecd IdP, which again, may be configured to skip th
 #### Steps
 1. There are multiple products that can be used as an OpenID Connect IdP. We test with [kopano konnect](https://stash.kopano.io/projects/KC/repos/konnect/browse), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
 
+<div class="editpage">
+
 _TODO @butonic flesh out oCIS IDP documentation_
+
+</div>
 
 2. Add [Openid Connect (OIDC)](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/) support to ownCloud 10.
 
@@ -70,15 +102,22 @@ When OpenID Connect support is enabled verify that all clients can login:
 #### Rollback
 Should there be problems with OpenID Connect at this point you can disable the app. Users will have to reauthenticate in this case.
 
-#### Note
+#### Notes
+<div style="break-after: avoid"></div>
 Legacy clients relying on Basic auth or app passwords need to be migrated to OpenId Connect to work with oCIS. For a transition period Basic auth in oCIS can be enabled with `PROXY_ENABLE_BASIC_AUTH=true`, but we strongly recommend adopting OpenID Connect for other tools as well.
 
 While OpenID Connect providers will send an `iss` and `sub` claim that relying parties (services like oCIS or ownCloud 10) can use to identify users we recommend introducing a dedicated, globally unique, persistent, non-reassignable user identifier like a UUID for every user. This `ownclouduuid` shold be sent as an additional claim to save additional lookups on the server side. It will become the user id in oCIS, e.g. when searching for recipients the `ownclouduuid` will be used to persist permissions with the share manager. It has a different purpose than the ownCloud 10 username, which is used to login. Using UUIDs we can not only mitigate username collisions when merging multiple instances but also allow renaming usernames after the migration to oCIS has been completed.
 
+<div class="editpage">
+
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage 3: _introduce oCIS interally_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage 3: introduce oCIS interally
 
 Befor letting oCIS handle end user requests we will first make it available in the internal network. By subsequently adding services we can add functionality and verify the services work as intended.
 
@@ -87,9 +126,13 @@ Start oCIS backend and make read only tests on existing data using the `owncloud
 - metadata from the ownCloud 10 database: 
 The oCIS share manager will read share information from the ownCloud database using an `owncloud` driver as well.
 
+<div class="editpage">
+
 _TODO @butonic add guide on how to configure `owncloudsql`_
 
 _TODO we need a share manager that can read from the ownCloud 10 database as well as from whatever new backend will be used for a pure oCIS setup. Currently, that would be the json file. Or that is migrated after all users have switched to oCIS. -- jfd_
+
+</div>
 
 #### User impact
 None, only administrators will be able to explore oCIS during this stage.
@@ -101,12 +144,13 @@ We are going to run and explore a series of services that will together handle t
 
 ##### Storage provider for file metadata
 1. Deploy OCIS storage provider with owncloudsql driver.
-2. Set `read_only: true` in the storage provider config.
-_TODO @butonic add read only flag to storage drivers_
+2. Set `read_only: true` in the storage provider config. <div class="editpage">_TODO @butonic add read only flag to storage drivers_</div>
 3. Use cli tool to list files using the CS3 api
 
 ##### File ID alternatives
-Multiple ownCloud instances can be merged into one oCIS instance. To prevent the numeric ids fqqrom colliding, the file ids will be prefixed with a new storage space id which is used by oCIS to route requests to the correct storage provider. See Stage 8 below.
+Multiple ownCloud instances can be merged into one oCIS instance. To prevent the numeric ids from colliding, the file ids will be prefixed with a new storage space id which is used by oCIS to route requests to the correct storage provider. See Stage 8 below.
+
+<div class="editpage">
 
 {{< hint warning >}}
 **Alternative 1**
@@ -140,7 +184,10 @@ One pair for `/webdav/home` or `/dav/files/<username>/home` and another pair for
 When reading the files from oCIS return the same `uuid`. It can be migrated to an extended attribute or it can be read from oc10. If users change it the client will not be able to detect a move and maybe other weird stuff happens. *What if the uuid gets lost on the server side due to a partial restore?* 
 
 {{< /hint >}}
+</div>
 
+
+<div style="break-after: page"></div>
 
 ##### graph API endpoint
 1. Deploy graph api to list spaces
@@ -170,12 +217,19 @@ Finally, deploy OCIS with a config to set up everything running in a single oCIS
 You can stop the oCIS process at any time.
 
 #### Notes
+<div style="break-after: avoid"></div>
 Multiple ownCloud instances can be merged into one oCIS instance. The file ids will be prefixed with a new storage space id which is used to route requests to the correct storage provider.
+
+<div class="editpage">
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage 4: _internal write access with oCIS_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage 4: internal write access with oCIS
 Test writing data with oCIS into the existing ownCloud 10 data directory using the `owncloudsql` storage driver.
 
 #### User impact
@@ -183,20 +237,37 @@ Only administrators will be able to explore oCIS during this stage. End users sh
 
 #### Steps
 Set `read_only: false` in the storage provider config.
+
+<div class="editpage">
+
 _TODO @butonic add read only flag to storage drivers_
+
+</div>
 
 #### Verification
 #### Rollback
 Set `read_only: true` in the storage provider config.
+
+<div class="editpage">
+
 _TODO @butonic add read only flag to storage drivers_
 
+</div>
+
 #### Notes
+<div style="break-after: avoid"></div>
 With write access it becomes possible to manipulate existing files and shares.
+
+<div class="editpage">
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage-5: _introduce user aware proxy_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage-5: introduce user aware proxy
 In the previous stages oCIS was only accessible for administrators with access to the network. To expose only a single service to the internet, oCIS comes with a user aware proxy that can be used to route requests to the existing ownCloud 10 installation or oCIS, based on the authenticated user. The proxy uses OIDC to identify the logged in user and route them to the configured backend.
 
 #### User impact
@@ -209,8 +280,7 @@ The IP address of the ownCloud host changes. There is no change for the file syn
 2. Verify the requests are routed based on the ownCloud 10 routing policy `oc10` by default
 
 ##### Test user based routing
-1. Change the routing policy for a user or an early adoptors group to `ocis`
-_TODO @butonic currently, the migration selector will use the `ocis` policy for users that have been added to the accounts service. IMO we need to evaluate a claim from the IdP._
+1. Change the routing policy for a user or an early adoptors group to `ocis` <div class="editpage">_TODO @butonic currently, the migration selector will use the `ocis` policy for users that have been added to the accounts service. IMO we need to evaluate a claim from the IdP._</div>
 2. Verify the requests are routed based on the oCIS routing policy `oc10` for 'migrated' users.
 
 At this point you are ready to rock & roll!
@@ -224,19 +294,31 @@ At this point you are ready to rock & roll!
 Should there be a problem with the oCIS routes the user can be routed to ownCloud by changing his routing policy. In case of unfixable problems with the proxy the DNS needs to be updated to use the ownCloud 10 application servers directly. This could also be done in a load balancer.
 
 #### Notes
+<div style="break-after: avoid"></div>
 The proxy is stateless, multiple instances can be deployed as needed.
+
+<div class="editpage">
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage-6: _parallel deployment_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage-6: parallel deployment
 Running ownCloud 10 and oCIS in parallel is a crucial stage for the migration: it allows users access to group shares regardless of the system that is being used to to access the data. A user by user migration with multiple domains would technically break group shares when users vanish because they (and their data) are no longer available in the old system.
 
 Depending on the amount of power users on an instance, the admin may want to allow users to voluntarily migrate to the oCIS backend. A monitoring system can be used to visualize the behavior for the two systems and gain trust in the overall stability and performance.
 
 #### User impact
-Since the underling data is still stored in the same systems, a similar or performance can be expected. See _TODO hmpf outdated didn't we want to run them nightly? ..._
+Since the underling data is still stored in the same systems, a similar or performance can be expected.
+<div class="editpage">
+
+See _TODO hmpf outdated didn't we want to run them nightly? ..._
 _TODO @butonic update performance comparisons nightly_
+
+</div>
 
 #### Steps
 There are several options to move users to the oCIS backend:
@@ -249,21 +331,38 @@ The same verification steps as for the internal testing stage apply. Just from t
 
 #### Rollback
 Until now, the oCIS configuration mimics ownCloud 10 and uses the old data directory layout and the ownCloud 10 database. Users can seamlessly be switched from ownCloud 10 to oCIS and back again.
+<div class="editpage">
+
 _TODO @butonic we need a canary app that allows users to decide for themself which backend to use_
+
+</div>
+
+<div style="break-after: page"></div>
 
 #### Notes
 Running the two systems in parallel stage 
 Try to keep the duration of this stage short. Until now we only added services and made the system more complex. oCIS aims to reduce the maintenance cost of an ownCloud instance. You will not get there if you keep both systems alive.
 
+<div class="editpage">
+
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage-7: _shut down ownCloud 10_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage-7: shut down ownCloud 10 
 Disable ownCloud 10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
 
 #### User impact
 All users are already sent to the oCIS backend. Shutting down ownCloud 10 will remove the old web UI, apps and functionality that is not yet present in ownCloud web. For example contacts and calendar.
+
+<div class="editpage">
+
 _TODO @butonic recommend alternatives_
+
+</div>
 
 #### Steps 
 1. Shut down the apache servers that are running the ownCloud 10 PHP code.
@@ -276,12 +375,19 @@ The ownCloud 10 classic web UI should no longer be reachable.
 Redeploy ownCloud 10.
 
 #### Notes
+<div style="break-after: avoid"></div>
 The database needs to remain online until the storage layer has been migrated as well. On thing at a time.
+
+<div class="editpage">
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
-### Stage 8: _storage migration_
+</div>
+
+<div style="break-after: page"></div>
+
+### Stage 8: storage migration
 To get rid of the database we will move the metadata from the old ownCloud 10 database into dedicated storage providers. This can happen in a user by user fashion. group drives can properly be migrated to group, project or workspaces in this stage.
 
 #### User impact
@@ -289,10 +395,15 @@ Noticeable performance improvements because we effectively shard the storage log
 
 #### Steps 
 1. User by user storage migration from `owncloud` or `ownclouds3` driver to `ocis`/`s3ng`/`cephfs`... currently this means copying the metadata from one storage provider to another using the cs3 api.
+2. Change the responsible storage provider for a storage space (e.g. a user home, a group or project space are a workspace) in the storage registry.
+
+<div class="editpage">
+
 _TODO @butonic implement `ownclouds3` based on `s3ng`_
 _TODO @butonic implement tiered storage provider for seamless migration_
-2. Change the responsible storage provider for a storage space (e.g. a user home, a group or project space are a workspace) in the storage registry.
 _TODO @butonic document how to manually do that until the storge registry can discover that on its own._
+
+</div>
 
 #### Verification
 Start with a test user, then move to early adoptors and finally migrate all users.
@@ -301,15 +412,25 @@ Start with a test user, then move to early adoptors and finally migrate all user
 To switch the storage provider again the same storage space migration can be performed again: copy medatata and blob data using the CS3 api, then change the responsible storage provider in the storage registry.
 
 #### Notes
+<div style="break-after: avoid"></div>
 Multiple ownCloud instances can be merged into one oCIS instance. The file ids will be prefixed with a new storage space id which is used to route requests to the correct storage provider.
 
 The storage space migration will become a seamless feature in the future that allows administrators to move users to storage systems with different capabilities, to implement premium features, deprovisioning strategies or archiving.
 
+<div class="editpage">
+
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
+</div>
+
+<div style="break-after: page"></div>
+
 ### Stage-9
-Migrate share data to &lt;yet to determine&gt; share manager backend and shut down ownCloud database
+Migrate share data to _yet to determine_ share manager backend and shut down ownCloud database
+
+
+<div class="editpage">
 
 ### Stage-10
 Profit! (db for file metadata no longer necessary, less maintenance effort)
@@ -317,6 +438,9 @@ Profit! (db for file metadata no longer necessary, less maintenance effort)
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
 
+</div>
+
+<div style="break-after: page"></div>
 
 ## Architectural differences
 
@@ -380,9 +504,11 @@ The three types of blobs we need to migrate are stored in
 - `files_trashbin` for trashed files (and their versions) and 
 - `files_versions` for file blobs of older versions.
 
+<div style="break-after: page"></div>
+
 ### Filecache table
 
-In both cases the file metadata, including a full replication of the file tree, is stored in the `oc_filecache`  table of an ownCloud 10 database. The primary key of a row is the file id. It is used to attach additional metadata like shares, tags, favorites or arbitrary file properties.
+In both cases the file metadata, including a full replication of the file tree, is stored in the `oc_filecache` table of an ownCloud 10 database. The primary key of a row is the file id. It is used to attach additional metadata like shares, tags, favorites or arbitrary file properties.
 
 The `filecache` table itself has more metadata:
 
@@ -407,6 +533,8 @@ The `filecache` table itself has more metadata:
 
 
 > Note: for EOS a hot migration only works seamlessly if file ids in oc10 are already read from eos. otherwise either a mapping from the oc10 filecache file id to the new eos file id has to be created under the assumption that these id sets do not intersect or files and corresponding shares need to be exported and imported offline to generate a new set of ids. While this will preserve public links, user, group and even federated shares, old internal links may still point to different files because they contain the oc10 fileid 
+
+<div style="break-after: page"></div>
 
 ### share table
 
@@ -444,6 +572,8 @@ In the CS3 API
 3. federated shares are handled by the OcmShareProvider using the [OCM Share Provider AP](https://cs3org.github.io/cs3apis/#cs3.sharing.ocm.v1beta1.OcmAPI) aka. Open Cloud Mesh.
 
 
+<div style="break-after: page"></div>
+
 ### share_external
 
 Used to store additional metadata for federated shares.
@@ -462,7 +592,13 @@ Used to store additional metadata for federated shares.
 | `remote_id`       | varchar(255)  | NO   |     | -1      |                | |
 | `accepted`        | int(11)       | NO   |     | 0       |                | |
 
-*TODO document how the reva OCM service currently persists the data*
+<div class="editpage">
+
+_TODO document how the reva OCM service currently persists the data_
+
+</div>
+
+<div style="break-after: page"></div>
 
 ### trusted_servers
 
@@ -478,7 +614,13 @@ used to determine if federated shares can automatically be accepted
 | `status`        | int(11)      | NO   |     | 2       |                | current status of the connection |
 | `sync_token`    | varchar(512) | YES  |     | NULL    |                | cardDav sync token |
 
-*TODO clarify how OCM handles this and where we store / configure this. It seems related to trusted IdPs*
+<div class="editpage">
+
+_TODO clarify how OCM handles this and where we store / configure this. It seems related to trusted IdPs_
+
+</div>
+
+<div style="break-after: page"></div>
 
 ### user data
 
@@ -486,8 +628,12 @@ Users are migrated in two steps:
 1. They should all be authenticated using OpenID Connect, which already moves them to a common identity management system.
 2. To search share recipients, both, ownCloud 10 and oCIS need access to the same user directory using eg. LDAP.
 
-*TODO: add state to CS3 API, so we can 'disable' users*
-*TODO: how do we map (sub) admins? -> map to roles & permissions*
+<div class="editpage">
+
+_TODO add state to CS3 API, so we can 'disable' users_
+_TODO how do we map (sub) admins? -> map to roles & permissions_
+
+</div>
 
 accounts:
 
@@ -520,13 +666,22 @@ The groups table really only contains the group name.
 |-------|-------------|------|-----|---------|-------|
 | `gid`   | varchar(64) | NO   | PRI |         |       |
 
+<div style="break-after: page"></div>
+
 ### LDAP
 
+<div class="editpage">
+
 _TODO clarify if metadata from ldap & user_shibboleth needs to be migrated_
--  the `dn` -> *owncloud internal username* mapping that currently lives in the `oc_ldap_user_mapping` table needs to move into a dedicated ownclouduuid attribute in the LDAP server. The idp should send it as a claim so the proxy does not have to look up the user using LDAP again. The username cannot be changed in ownCloud 10 and the oCIS provisioning API will not allow changing it as well. When we introduce the graph api we may allow changing usernames when all clients have moved to that api.
 
-The problem is that the username in owncloud 10 and in oCIS also need to be the same, which might not be the case when the ldap mapping used a different column. In that case we should add another owncloudusername attribute to the ldap server ...
+</div>
 
+The `dn` -> *owncloud internal username* mapping that currently lives in the `oc_ldap_user_mapping` table needs to move into a dedicated ownclouduuid attribute in the LDAP server. The idp should send it as a claim so the proxy does not have to look up the user using LDAP again. The username cannot be changed in ownCloud 10 and the oCIS provisioning API will not allow changing it as well. When we introduce the graph api we may allow changing usernames when all clients have moved to that api.
+
+The problem is that the username in owncloud 10 and in oCIS also need to be the same, which might not be the case when the ldap mapping used a different column. In that case we should add another owncloudusername attribute to the ldap server.
+
+
+<div class="editpage">
 
 ### activities
 
@@ -553,3 +708,5 @@ The problem is that the username in owncloud 10 and in oCIS also need to be the 
 ## Links
 
 The [data_exporter](https://github.com/owncloud/data_exporter) has logic that allows exporting and importing users, including shares. The [model classes](https://github.com/owncloud/data_exporter/tree/master/lib/Model) contain the exact mapping.
+
+</div>
