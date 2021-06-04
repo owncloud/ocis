@@ -516,8 +516,10 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
+        expectedFailuresFileFilterTags = ""
     else:
         finalFilterTags = filterTags + " and " + standardFilterTags
+        expectedFailuresFileFilterTags = "-" + filterTags.lstrip("@")
 
     return {
         "kind": "pipeline",
@@ -545,7 +547,7 @@ def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "o
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "RUN_PART": runPart,
                     "DIVIDE_INTO_NUM_PARTS": numberOfParts,
-                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage.md" % (storage.upper()),
+                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
