@@ -19,7 +19,7 @@ config = {
         "webdav",
     ],
     "localApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "apiTests": {
         "numberOfParts": 10,
