@@ -488,7 +488,7 @@ def uiTests(ctx):
     default = {
         "filterTags": "",
         "skip": False,
-        # only used if 'full ci' is in build title
+        # only used if 'full-ci' is in build title
         "numberOfParts": 10,
         "skipExceptParts": [],
     }
