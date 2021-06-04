@@ -18,7 +18,6 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIPreview/imageMediaViewer.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L140)
 -   [webUIPreview/imageMediaViewer.feature:158](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L158)
 
-
 ### [Exit page re-appears in loop when logged in user is deleted](https://github.com/owncloud/web/issues/4677)
 -   [webUILogin/openidLogin.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L53)
 
@@ -150,7 +149,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIFilesSearch/search.feature:175](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L175)
 -   [webUIFilesSearch/search.feature:184](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L184)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
+### [No occ command in ocis - restrictReSharing](https://github.com/owncloud/ocis/issues/1317)
 -   [webUIRestrictSharing/restrictReSharing.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L23)
 -   [webUIRestrictSharing/restrictReSharing.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L42)
 -   [webUIRestrictSharing/restrictSharing.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L31)
@@ -163,8 +162,8 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingAutocompletion/shareAutocompletion.feature:128](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L128)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L141)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
-### [First request with a recreated user returns a 401 error](https://github.com/owncloud/ocis/issues/1675)
+### [No occ command in ocis - shareAutocompletion](https://github.com/owncloud/ocis/issues/1317)
+### [First request with a recreated user returns a 401 error (2)](https://github.com/owncloud/ocis/issues/1675)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L76)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:115](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L115)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:154](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L154)
@@ -187,7 +186,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L38)
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:39](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L39)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
+### [No occ command in ocis - shareWithUsers and Groups](https://github.com/owncloud/ocis/issues/1317)
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L26)
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L44)
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L62)
@@ -197,7 +196,6 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 
 ### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis/issues/1428)
 -   [webUILogin/openidLogin.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L46)
-
 
 ### webUI-Private-Links
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
@@ -234,14 +232,13 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:361](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L361)
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:370](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L370)
 
-
 ### [Cannot delete a received share](https://github.com/owncloud/ocis/issues/714)
 -   [webUISharingAcceptShares/acceptShares.feature:203](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L203)
 
 ### [Accepting different shares with same filename from different users overwrites one file](https://github.com/owncloud/ocis/issues/713)
 -   [webUISharingAcceptShares/acceptShares.feature:218](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L218)
 
-### [Enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
+### [Enable re-sharing is not possible (1)](https://github.com/owncloud/ocis/issues/1743)
 ### [Share Permissions](https://github.com/owncloud/ocis/issues/1277)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L61)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L62)
@@ -254,7 +251,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L65)
 -   [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
 
-### [Enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
+### [Enable re-sharing is not possible (2)](https://github.com/owncloud/ocis/issues/1743)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L64)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L65)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L64)
@@ -272,15 +269,15 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingInternalGroups/shareWithGroups.feature:182](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L182)
 -   [webUISharingInternalGroups/shareWithGroups.feature:196](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L196)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
+### [No occ command in ocis - shareWithGroups](https://github.com/owncloud/ocis/issues/1317)
 ### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
 -   [webUISharingInternalGroups/shareWithGroups.feature:293](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L293)
 
 ### [Different path for shares inside folder](https://github.com/owncloud/ocis/issues/1231)
-### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
+### [Different share permissions provides varying roles in oc10 and ocis (2)](https://github.com/owncloud/ocis/issues/1277)
 -   [webUISharingInternalGroups/shareWithGroups.feature:228](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L228)
 
-### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
+### [Expiration date set is not implemented in user share (2)](https://github.com/owncloud/ocis/issues/1250)
 -   [webUISharingInternalGroups/shareWithGroups.feature:271](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L271)
 -   [webUISharingInternalGroups/shareWithGroups.feature:324](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L324)
 -   [webUISharingInternalGroups/shareWithGroups.feature:325](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L325)
@@ -307,8 +304,6 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 
 ### [Cannot upload files to the ownCloud storage](https://github.com/owncloud/ocis-reva/issues/398)
 -   [webUISharingPublicBasic/publicLinkPublicActions.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkPublicActions.feature#L12)
-
-
 
 ### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 -   [webUISharingPublicManagement/shareByPublicLink.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L146)
@@ -340,7 +335,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [Moving files in a shared folder causes errors but succeeds](https://github.com/owncloud/ocis/issues/873)
 -   [webUIMoveFilesFolders/moveFiles.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L140)
 
-### [enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
+### [enable re-sharing is not possible (3)](https://github.com/owncloud/ocis/issues/1743)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L71)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L70)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L69)
@@ -404,8 +399,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIFilesList/sort.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesList/sort.feature#L51)
 -   [webUIFilesList/sort.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesList/sort.feature#L72)
 
-
-### [Comments in sidebar] (https://github.com/owncloud/web/issues/1158)
+### [Comments in sidebar](https://github.com/owncloud/web/issues/1158)
 -   [webUIComments/comments.feature:24](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L24)
 -   [webUIComments/comments.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L25)
 -   [webUIComments/comments.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L26)
