@@ -23,7 +23,7 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
     },
     "uiTests": {
@@ -32,10 +32,10 @@ config = {
         "skipExceptParts": [],
     },
     "accountsUITests": {
-        "skip": True,
+        "skip": False,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
     },
     "rocketchat": {
         "channel": "ocis-internal",
