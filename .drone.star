@@ -513,7 +513,7 @@ def uiTests(ctx):
         return [uiTestPipeline(ctx, filterTags)]
 
 def uiTestPipeline(ctx, filterTags, runPart = 1, numberOfParts = 1, storage = "ocis", accounts_hash_difficulty = 4):
-    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS"
+    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
     else:
