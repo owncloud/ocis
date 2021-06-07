@@ -700,18 +700,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 "image": "redis:6-alpine",
                 "pull": "always",
             },
-            {
-                "name": "selenium",
-                "image": "selenium/standalone-chrome-debug:3.141.59-20200326",
-                "pull": "always",
-                "volumes": [
-                    {
-                        "name": "uploads",
-                        "path": "/uploads",
-                    },
-                ],
-            },
-        ],
+        ] + selenium(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
