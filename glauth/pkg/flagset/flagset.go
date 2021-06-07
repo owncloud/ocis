@@ -1,9 +1,8 @@
 package flagset
 
 import (
+	"os"
 	"path"
-
-	"github.com/ProtonMail/go-appdir"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/glauth/pkg/config"
@@ -47,9 +46,16 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	}
 }
 
+func mustUserConfigDir() string {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		panic(err)
+	}
+	return path.Join(dir, "ldap")
+}
+
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
-	dirs := appdir.New("ldap")
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-file",
@@ -163,14 +169,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-cert",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(dirs.UserConfig(), "ldap.crt")),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(mustUserConfigDir(), "ldap.crt")),
 			Usage:       "path to ldaps certificate in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_CERT"},
 			Destination: &cfg.Ldaps.Cert,
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-key",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(dirs.UserConfig(), "ldap.key")),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(mustUserConfigDir(), "ldap.key")),
 			Usage:       "path to ldaps key in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
 			Destination: &cfg.Ldaps.Key,
