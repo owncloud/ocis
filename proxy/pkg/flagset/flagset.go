@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/ProtonMail/go-appdir"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -45,6 +48,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
+	dirs := appdir.New("proxy")
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-file",
@@ -156,14 +160,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(dirs.UserConfig(), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(dirs.UserConfig(), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,

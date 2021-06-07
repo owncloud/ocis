@@ -17,25 +17,19 @@ func Server(opts ...Option) (svc.Service, error) {
 	httpCfg := options.Config.HTTP
 
 	var cer tls.Certificate
-	var certErr error
 
 	var tlsConfig *tls.Config
 	if options.Config.HTTP.TLS {
-		if httpCfg.TLSCert == "" || httpCfg.TLSKey == "" {
-			l.Warn().Msgf("No tls certificate provided, using a generated one")
-			_, certErr := os.Stat("./server.crt")
-			_, keyErr := os.Stat("./server.key")
+		l.Warn().Msgf("No tls certificate provided, using a generated one")
+		_, certErr := os.Stat(httpCfg.TLSCert)
+		_, keyErr := os.Stat(httpCfg.TLSKey)
 
-			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
-				// GenCert has side effects as it writes 2 files to the binary running location
-				if err := crypto.GenCert(l); err != nil {
-					l.Fatal().Err(err).Msgf("Could not generate test-certificate")
-					os.Exit(1)
-				}
+		if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
+			// GenCert has side effects as it writes 2 files to the binary running location
+			if err := crypto.GenCert(httpCfg.TLSCert, httpCfg.TLSKey, l); err != nil {
+				l.Fatal().Err(err).Msgf("Could not generate test-certificate")
+				os.Exit(1)
 			}
-
-			httpCfg.TLSCert = "server.crt"
-			httpCfg.TLSKey = "server.key"
 		}
 
 		cer, certErr = tls.LoadX509KeyPair(httpCfg.TLSCert, httpCfg.TLSKey)

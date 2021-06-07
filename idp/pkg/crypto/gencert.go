@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"net"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -41,13 +42,20 @@ func pemBlockForKey(priv interface{}, l log.Logger) *pem.Block {
 	}
 }
 
-// GenCert generates TLS-Certificates
-func GenCert(l log.Logger) error {
+// GenCert generates TLS-Certificates and persists them to the filesystem.
+func GenCert(certName string, keyName string, l log.Logger) error {
 	var priv interface{}
 	var err error
 
-	priv, err = rsa.GenerateKey(rand.Reader, 2048)
+	_, certErr := os.Stat(certName)
+	_, keyErr := os.Stat(keyName)
 
+	if certErr == nil || keyErr == nil {
+		l.Debug().Msg("IDP certificate or key already present, using these")
+		return nil
+	}
+
+	priv, err = rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		l.Fatal().Err(err).Msg("Failed to generate private key")
 	}
@@ -84,15 +92,20 @@ func GenCert(l log.Logger) error {
 		}
 	}
 
-	//template.IsCA = true
-	//template.KeyUsage |= x509.KeyUsageCertSign
-
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(priv), priv)
 	if err != nil {
 		l.Fatal().Err(err).Msg("Failed to create certificate")
 	}
 
-	certOut, err := os.Create("server.crt")
+	certPath := filepath.Dir(certName)
+	if _, err := os.Stat(certPath); os.IsNotExist(err) {
+		err = os.MkdirAll(certPath, 0700)
+		if err != nil {
+			l.Fatal().Err(err).Msg("Failed to create path " + certPath)
+		}
+	}
+
+	certOut, err := os.Create(certName)
 	if err != nil {
 		l.Fatal().Err(err).Msg("Failed to open server.crt for writing")
 	}
@@ -106,7 +119,15 @@ func GenCert(l log.Logger) error {
 	}
 	l.Info().Msg("Written server.crt")
 
-	keyOut, err := os.OpenFile("server.key", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyPath := filepath.Dir(keyName)
+	if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+		err = os.MkdirAll(keyPath, 0700)
+		if err != nil {
+			l.Fatal().Err(err).Msg("Failed to create path " + keyPath)
+		}
+	}
+
+	keyOut, err := os.OpenFile(keyName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		l.Fatal().Err(err).Msg("Failed to open server.key for writing")
 	}

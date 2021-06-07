@@ -24,7 +24,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 				options.Logger.Info().Msgf("Generating certs")
-				if err := crypto.GenCert(options.Logger); err != nil {
+				if err := crypto.GenCert(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey, options.Logger); err != nil {
 					options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
 					os.Exit(1)
 				}
