@@ -699,7 +699,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 "name": "redis",
                 "image": "redis:6-alpine",
                 "pull": "always",
-            }
+            },
         ] + selenium(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
