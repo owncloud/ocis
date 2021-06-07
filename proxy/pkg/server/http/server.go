@@ -5,9 +5,8 @@ import (
 	"os"
 
 	"github.com/asim/go-micro/v3"
-
+	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/proxy/pkg/crypto"
 )
 
 // Server initializes the http service and server.
@@ -26,7 +25,7 @@ func Server(opts ...Option) (svc.Service, error) {
 
 		if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 			// GenCert has side effects as it writes 2 files to the binary running location
-			if err := crypto.GenCert(httpCfg.TLSCert, httpCfg.TLSKey, l); err != nil {
+			if err := pkgcrypto.GenCert(httpCfg.TLSCert, httpCfg.TLSKey, l); err != nil {
 				l.Fatal().Err(err).Msgf("Could not generate test-certificate")
 				os.Exit(1)
 			}
