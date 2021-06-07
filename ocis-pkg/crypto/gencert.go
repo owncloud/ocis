@@ -33,7 +33,7 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	_, keyErr := os.Stat(keyName)
 
 	if certErr == nil || keyErr == nil {
-		l.Debug().Msg(
+		l.Info().Msg(
 			fmt.Sprintf("%v certificate / key pair already present. skipping acme certificate generation",
 				filepath.Base(certName)))
 		return nil
