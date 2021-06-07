@@ -5,16 +5,17 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"math/big"
 	"net"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
+)
+
+var (
+	DEFAULT_HOSTS = []string{"127.0.0.1", "localhost"}
 )
 
 func publicKey(priv interface{}) interface{} {
@@ -43,7 +44,8 @@ func pemBlockForKey(priv interface{}, l log.Logger) *pem.Block {
 	}
 }
 
-// GenCert generates TLS-Certificates
+// GenCert generates TLS-Certificates. This function has side effects: it creates the respective certificate / key pair at
+// the destination locations unless the tuple already exists, if that is the case, this is a noop.
 func GenCert(certName string, keyName string, l log.Logger) error {
 	var pk *rsa.PrivateKey
 	var err error
@@ -53,7 +55,6 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 		return err
 	}
 
-	// if either the key or certificate already exist skip this entire ordeal
 	_, certErr := os.Stat(certName)
 	_, keyErr := os.Stat(keyName)
 
@@ -67,7 +68,8 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	return nil
 }
 
-func persistCertificate(certName string, l log.Logger, pk *rsa.PrivateKey) {
+// persistCertificate generates a certificate using pk as private key and proceeds to store it into a file named certName.
+func persistCertificate(certName string, l log.Logger, pk interface{}) {
 	if err := ensureExistsDir(certName); err != nil {
 		l.Fatal().Err(err).Msg("creating certificate destination: " + certName)
 	}
@@ -94,7 +96,8 @@ func persistCertificate(certName string, l log.Logger, pk *rsa.PrivateKey) {
 	l.Info().Msg(fmt.Sprintf("written certificate to %v", certName))
 }
 
-func persistKey(keyName string, l log.Logger, pk *rsa.PrivateKey) {
+// persistKey persists the private key used to generate the certificate at the configured location.
+func persistKey(keyName string, l log.Logger, pk interface{}) {
 	if err := ensureExistsDir(keyName); err != nil {
 		l.Fatal().Err(err).Msg("creating certificate destination: " + keyName)
 	}
@@ -116,40 +119,16 @@ func persistKey(keyName string, l log.Logger, pk *rsa.PrivateKey) {
 }
 
 // genCert generates a self signed certificate using a random rsa key.
-func generateCertificate(pk *rsa.PrivateKey) ([]byte, error) {
-	notBefore := time.Now()
-	notAfter := notBefore.Add(24 * time.Hour * 365)
-
-	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
-	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		return nil, err
-	}
-
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			Organization: []string{"Acme Corp"},
-			CommonName:   "OCIS",
-		},
-		NotBefore: notBefore,
-		NotAfter:  notAfter,
-
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-	}
-
-	hosts := []string{"127.0.0.1", "localhost"}
-	for _, h := range hosts {
+func generateCertificate(pk interface{}) ([]byte, error) {
+	for _, h := range DEFAULT_HOSTS {
 		if ip := net.ParseIP(h); ip != nil {
-			template.IPAddresses = append(template.IPAddresses, ip)
+			acmeTemplate.IPAddresses = append(acmeTemplate.IPAddresses, ip)
 		} else {
-			template.DNSNames = append(template.DNSNames, h)
+			acmeTemplate.DNSNames = append(acmeTemplate.DNSNames, h)
 		}
 	}
 
-	return x509.CreateCertificate(rand.Reader, &template, &template, publicKey(pk), pk)
+	return x509.CreateCertificate(rand.Reader, &acmeTemplate, &acmeTemplate, publicKey(pk), pk)
 }
 
 func ensureExistsDir(uri string) error {
