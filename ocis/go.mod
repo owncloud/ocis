@@ -8,8 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
+	github.com/cernbox/ocis-canary v0.0.0-20210414120400-93dbebb00371
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
-	github.com/cernbox/ocis-canary v0.0.0-20210412121333-dc524af13947
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
@@ -18,12 +18,12 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/openzipkin/zipkin-go v0.2.5
-	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/accounts v0.5.3-0.20210412105747-9b95e9b1191b
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph-explorer v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/idp v0.0.0-20210413063522-955bd60edf33
-	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/ocis-pkg v0.0.0-20210412113235-982264811ecb
 	github.com/owncloud/ocis/ocs v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/onlyoffice v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/proxy v0.0.0-20210412105747-9b95e9b1191b
@@ -39,13 +39,12 @@ require (
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/thejerf/suture/v4 v4.0.1
 	go.opencensus.io v0.23.0
-	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 )
 
 replace (
-	github.com/cs3org/reva => ../../reva
 	// broken dependency chain for konnect v0.34.0
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	github.com/cs3org/reva => ../../reva
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts
@@ -66,7 +65,5 @@ replace (
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
-	// latest version compatible with etcd
 	google.golang.org/protobuf => google.golang.org/protobuf v1.25.0
-	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

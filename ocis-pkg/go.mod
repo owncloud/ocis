@@ -16,6 +16,7 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
+	github.com/cernbox/ocis-canary v0.0.0-20210414120400-93dbebb00371
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
 	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
@@ -24,7 +25,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
-	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
+	github.com/owncloud/ocis/accounts v0.5.3-0.20210412105747-9b95e9b1191b
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph-explorer v0.0.0-20210413063522-955bd60edf33
@@ -42,17 +43,15 @@ require (
 	github.com/rs/zerolog v1.22.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
-	go.etcd.io/etcd/api/v3 v3.5.0-pre // indirect
-	go.etcd.io/etcd/pkg/v3 v3.5.0-pre // indirect
 	go.opencensus.io v0.23.0
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	google.golang.org/grpc v1.38.0
 )
 
 replace (
-	github.com/cs3org/reva => ../../reva
 	// broken dependency chain for konnect v0.34.0
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	github.com/cs3org/reva => ../../reva
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/graph => ../graph
@@ -70,7 +69,5 @@ replace (
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
-	// latest version compatible with etcd
 	google.golang.org/protobuf => google.golang.org/protobuf v1.25.0
-	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )
