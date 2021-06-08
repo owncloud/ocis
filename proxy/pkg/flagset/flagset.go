@@ -1,12 +1,11 @@
 package flagset
 
 import (
-	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
@@ -45,14 +44,6 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Debug.Addr,
 		},
 	}
-}
-
-func mustUserConfigDir() string {
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		panic(err)
-	}
-	return filepath.Join(dir, "ocis", "proxy")
 }
 
 // ServerWithConfig applies cfg to the root flagset
@@ -168,14 +159,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(mustUserConfigDir(), "server.crt")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(mustUserConfigDir(), "server.key")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
