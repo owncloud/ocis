@@ -2,12 +2,28 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.6.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.7.0...master
+
+## Summary
+
+* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+
+## Details
+
+* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+
+   The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
+
+   https://github.com/owncloud/ocis/pull/2120
+# Changelog for [1.7.0] (2021-06-04)
+
+The following sections list the changes for 1.7.0.
+
+[1.7.0]: https://github.com/owncloud/ocis/compare/v1.6.0...v1.7.0
 
 ## Summary
 
 * Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
-* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
 * Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 * Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
@@ -22,12 +38,6 @@ The following sections list the changes for unreleased.
    otherwise we will have undeterministic behavior while editing or deleting groups.
 
    https://github.com/owncloud/ocis/pull/2109
-
-* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
-
-   The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
-
-   https://github.com/owncloud/ocis/pull/2120
 
 * Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
 
