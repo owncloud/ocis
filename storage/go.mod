@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0

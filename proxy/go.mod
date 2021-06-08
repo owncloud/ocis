@@ -12,6 +12,7 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
 	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
