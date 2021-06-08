@@ -663,7 +663,6 @@ File and sync features in a shared scenario
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:508](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L508)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L89)
 
-#### [shares are mounted into /Shares folder even after the sharer deletes the collaborator](https://github.com/owncloud/ocis/issues/720)
 #### [deleting share response does not contain `data` field](https://github.com/owncloud/ocis/issues/721)
 
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L43)
@@ -756,7 +755,6 @@ cannot share a folder with create permission
 
 #### [Split old public API webdav tests from new public webdav tests](https://github.com/owncloud/ocis-reva/issues/282)
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-#### [Previews via webDAV API tests fail on OCIS](https://github.com/owncloud/ocis/issues/187)
 
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
@@ -1025,8 +1023,6 @@ cannot share a folder with create permission
 
 #### [deleting a received share-folder moves it to trash-bin but does not unshare it](https://github.com/owncloud/ocis/issues/1123)
 
--   [apiTrashbin/trashbinSharingToShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L23)
--   [apiTrashbin/trashbinSharingToShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L24)
 -   [apiShareManagementToShares/acceptShares.feature:489](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L489)
 -   [apiShareManagementToShares/acceptShares.feature:490](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L490)
 
@@ -1036,6 +1032,8 @@ cannot share a folder with create permission
 -   [apiTrashbin/trashbinSharingToShares.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L40)
 -   [apiTrashbin/trashbinSharingToShares.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L63)
 -   [apiTrashbin/trashbinSharingToShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L64)
+
+#### [Restoring a file to read-only received folder returns incorrect status code](https://github.com/owncloud/ocis/issues/2143)
 -   [apiTrashbin/trashbinSharingToShares.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L82)
 -   [apiTrashbin/trashbinSharingToShares.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L83)
 -   [apiTrashbin/trashbinSharingToShares.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L102)
@@ -1141,6 +1139,12 @@ Scenario Outline: delete a folder when there is a default folder for received sh
 -   [apiShareOperationsToShares/changingFilesShare.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L43)
 -   [apiShareOperationsToShares/changingFilesShare.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L62)
 -   [apiShareOperationsToShares/changingFilesShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares/changingFilesShare.feature#L63)
+-   [apiTrashbin/trashbinSharingToShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L23)
+-   [apiTrashbin/trashbinSharingToShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L24)
+-   [apiTrashbin/trashbinSharingToShares.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L39)
+-   [apiTrashbin/trashbinSharingToShares.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L40)
+-   [apiTrashbin/trashbinSharingToShares.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L63)
+-   [apiTrashbin/trashbinSharingToShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L64)
 
 Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
 -   [apiWebdavMove2/moveFile.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L99)
@@ -1686,7 +1690,7 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 -   [apiMain/status.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/status.feature#L5) Scenario: Status.php is correct
 #### [ocs config endpoint only accessible by authorized users](https://github.com/owncloud/ocis/issues/1338)
 
-#### [HTTP 401 Unauthorized responses don't contain a body](https://github.com/owncloud/ocis/issues/1337)
+#### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 -   [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10) Scenario: send DELETE requests to OCS endpoints as admin with wrong password
 -   [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10) Scenario: using OCS anonymously
 -   [apiAuthOcs/ocsGETAuth.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L33) Scenario: ocs config end point accessible by unauthorized users
@@ -1708,7 +1712,7 @@ _ocdav: api compatibility, return correct status code_
 -   [apiAuthWebDav/webDavPROPFINDAuth.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPROPFINDAuth.feature#L39)  Scenario: send PROPFIND requests to another user's webDav endpoints as normal user
 -   [apiAuthWebDav/webDavPROPPATCHAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPROPPATCHAuth.feature#L40) Scenario: send PROPPATCH requests to another user's webDav endpoints as normal user
 
-#### [renaming a resource does not work](https://github.com/owncloud/ocis-reva/issues/14)
+#### [Renaming a resource to banned name is allowed](https://github.com/owncloud/ocis/issues/1295)
 _ocdav: api compatibility, return correct status code_
 -   [apiAuthWebDav/webDavMOVEAuth.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMOVEAuth.feature#L39) Scenario: send MOVE requests to another user's webDav endpoints as normal user
 
@@ -1886,11 +1890,10 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiAuth/cors.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L184)
 -   [apiAuth/cors.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L185)
 
-#### [HTTP 401 Unauthorized responses don't contain a body](https://github.com/owncloud/ocis/issues/1337)
-#### [app passwords are not possible](https://github.com/owncloud/ocis/issues/1320)
+#### [No way to enforce token auth](https://github.com/owncloud/ocis/issues/1332)
 -   [apiAuthOcs/ocsGETAuth.feature:243](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L243)
 
-#### [app passwords are not possible](https://github.com/owncloud/ocis/issues/1320)
+#### [App Passwords/Tokens for legacy WebDAV clients](https://github.com/owncloud/ocis/issues/197)
 -   [apiAuthWebDav/webDavDELETEAuth.feature:80](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L80)
 -   [apiAuthWebDav/webDavDELETEAuth.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L94)
 
