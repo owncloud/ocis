@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	DEFAULT_HOSTS = []string{"127.0.0.1", "localhost"}
+	defaultHosts = []string{"127.0.0.1", "localhost"}
 )
 
 // GenCert generates TLS-Certificates. This function has side effects: it creates the respective certificate / key pair at
@@ -75,7 +75,7 @@ func persistCertificate(certName string, l log.Logger, pk interface{}) {
 
 // genCert generates a self signed certificate using a random rsa key.
 func generateCertificate(pk interface{}) ([]byte, error) {
-	for _, h := range DEFAULT_HOSTS {
+	for _, h := range defaultHosts {
 		if ip := net.ParseIP(h); ip != nil {
 			acmeTemplate.IPAddresses = append(acmeTemplate.IPAddresses, ip)
 		} else {
