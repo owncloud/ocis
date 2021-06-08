@@ -84,7 +84,9 @@ func Test_persistKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			persistKey(tt.args.keyName, tt.args.l, tt.args.pk)
+			if err := persistKey(tt.args.keyName, tt.args.l, tt.args.pk); err != nil {
+				t.Error(err)
+			}
 		})
 
 		// side effect: tt.args.keyName is created
