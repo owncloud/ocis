@@ -39,38 +39,45 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 		return nil
 	}
 
-	persistCertificate(certName, l, pk)
-	persistKey(keyName, l, pk)
+	if err := persistCertificate(certName, l, pk); err != nil {
+		l.Fatal().Err(err).Msg("failed to store certificate")
+	}
+
+	if err := persistKey(keyName, l, pk); err != nil {
+		l.Fatal().Err(err).Msg("failed to store key")
+	}
 
 	return nil
 }
 
 // persistCertificate generates a certificate using pk as private key and proceeds to store it into a file named certName.
-func persistCertificate(certName string, l log.Logger, pk interface{}) {
+func persistCertificate(certName string, l log.Logger, pk interface{}) error {
 	if err := ensureExistsDir(certName); err != nil {
-		l.Fatal().Err(err).Msg("creating certificate destination: " + certName)
+		return fmt.Errorf("creating certificate destination: " + certName)
 	}
 
 	certificate, err := generateCertificate(pk)
 	if err != nil {
-		l.Fatal().Err(err).Msg("creating certificate: " + filepath.Dir(certName))
+		return fmt.Errorf("creating certificate: " + filepath.Dir(certName))
 	}
 
 	certOut, err := os.Create(certName)
 	if err != nil {
-		l.Fatal().Err(err).Msgf("failed to open `%v` for writing", certName)
+		return fmt.Errorf("failed to open `%v` for writing", certName)
 	}
 
 	err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certificate})
 	if err != nil {
-		l.Fatal().Err(err).Msg("failed to encode certificate")
+		return fmt.Errorf("failed to encode certificate")
 	}
 
 	err = certOut.Close()
 	if err != nil {
-		l.Fatal().Err(err).Msg("failed to write cert")
+		return fmt.Errorf("failed to write cert")
 	}
 	l.Info().Msg(fmt.Sprintf("written certificate to %v", certName))
+
+	return nil
 }
 
 // genCert generates a self signed certificate using a random rsa key.
@@ -87,29 +94,31 @@ func generateCertificate(pk interface{}) ([]byte, error) {
 }
 
 // persistKey persists the private key used to generate the certificate at the configured location.
-func persistKey(keyName string, l log.Logger, pk interface{}) {
-	if err := ensureExistsDir(keyName); err != nil {
-		l.Fatal().Err(err).Msg("creating certificate destination: " + keyName)
+func persistKey(destination string, l log.Logger, pk interface{}) error {
+	if err := ensureExistsDir(destination); err != nil {
+		return fmt.Errorf("creating key destination: " + destination)
 	}
 
-	keyOut, err := os.OpenFile(keyName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		l.Fatal().Err(err).Msgf("failed to open %v for writing", keyName)
+		return fmt.Errorf("failed to open %v for writing", destination)
 	}
 	err = pem.Encode(keyOut, pemBlockForKey(pk, l))
 	if err != nil {
-		l.Fatal().Err(err).Msg("failed to encode key")
+		return fmt.Errorf("failed to encode key")
 	}
 
 	err = keyOut.Close()
 	if err != nil {
-		l.Fatal().Err(err).Msg("failed to write key")
+		return fmt.Errorf("failed to write key")
 	}
-	l.Info().Msg(fmt.Sprintf("written key to %v", keyName))
+	l.Info().Msg(fmt.Sprintf("written key to %v", destination))
+
+	return nil
 }
 
-func publicKey(priv interface{}) interface{} {
-	switch k := priv.(type) {
+func publicKey(pk interface{}) interface{} {
+	switch k := pk.(type) {
 	case *rsa.PrivateKey:
 		return &k.PublicKey
 	case *ecdsa.PrivateKey:
@@ -119,8 +128,8 @@ func publicKey(priv interface{}) interface{} {
 	}
 }
 
-func pemBlockForKey(priv interface{}, l log.Logger) *pem.Block {
-	switch k := priv.(type) {
+func pemBlockForKey(pk interface{}, l log.Logger) *pem.Block {
+	switch k := pk.(type) {
 	case *rsa.PrivateKey:
 		return &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(k)}
 	case *ecdsa.PrivateKey:
