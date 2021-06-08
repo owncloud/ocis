@@ -24,9 +24,9 @@ The lower storage layer of oCIS is defined by the CS3 APIs and implemented in th
 
 You can also find all client sources on [GitHub](https://github.com/owncloud/).
 
-## Join us
+## Join the oCIS Community
 
-The oCIS server repository on GitHub is a good entry point for you to join the project. But we also develop clients for iOS, Android, Desktop and Web.
+The [server repository](https://github.com/owncloud/ocis) on [GitHub](https://www.github.com) is a good entry point to the oCIS project. In addition to that there are also ownCloud projects for clients for [iOS](https://github.com/owncloud/ios-app), [Android](https://github.com/owncloud/android), the major [Desktop](https://github.com/owncloud/desktop) platforms and [ownCloud Web](https://github.com/owncloud/web).
 
 For communication on development, [join our public chat](https://talk.owncloud.com/channel/ocis)
 
