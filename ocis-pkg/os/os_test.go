@@ -1,9 +1,11 @@
-package os
+package os_test
 
 import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 )
 
 func Test_mustUserConfigDir(t *testing.T) {
@@ -53,7 +55,7 @@ func Test_mustUserConfigDir(t *testing.T) {
 				}
 			}()
 
-			if got := MustUserConfigDir(tt.args.prefix, tt.args.extension); got != tt.want {
+			if got := pkgos.MustUserConfigDir(tt.args.prefix, tt.args.extension); got != tt.want {
 				t.Errorf("MustUserConfigDir() = %v, want %v", got, tt.want)
 			}
 
