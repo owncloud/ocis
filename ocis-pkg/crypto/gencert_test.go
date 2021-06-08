@@ -12,7 +12,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
-func Test_ensureExistsDir(t *testing.T) {
+func TestEnsureExistsDir(t *testing.T) {
 	var tmpDir = t.TempDir()
 
 	type args struct {
@@ -47,7 +47,7 @@ func Test_ensureExistsDir(t *testing.T) {
 	}
 }
 
-func Test_persistKey(t *testing.T) {
+func TestPersistKey(t *testing.T) {
 	p256 := elliptic.P256()
 	var (
 		tmpDir     = t.TempDir()
@@ -96,7 +96,7 @@ func Test_persistKey(t *testing.T) {
 	}
 }
 
-func Test_persistCertificate(t *testing.T) {
+func TestPersistCertificate(t *testing.T) {
 	p256 := elliptic.P256()
 	var (
 		tmpDir     = t.TempDir()
