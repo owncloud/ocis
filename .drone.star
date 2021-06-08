@@ -500,7 +500,7 @@ def uiTests(ctx):
 
     filterTags = params["filterTags"]
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
         debugPartsEnabled = (len(skipExceptParts) != 0)
