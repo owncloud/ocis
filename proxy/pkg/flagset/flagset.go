@@ -3,6 +3,7 @@ package flagset
 import (
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
@@ -51,7 +52,7 @@ func mustUserConfigDir() string {
 	if err != nil {
 		panic(err)
 	}
-	return path.Join(dir, "proxy")
+	return filepath.Join(dir, "ocis", "proxy")
 }
 
 // ServerWithConfig applies cfg to the root flagset

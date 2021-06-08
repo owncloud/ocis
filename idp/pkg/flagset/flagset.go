@@ -3,6 +3,7 @@ package flagset
 import (
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/idp/pkg/config"
@@ -51,7 +52,7 @@ func mustUserConfigDir() string {
 	if err != nil {
 		panic(err)
 	}
-	return path.Join(dir, "idp")
+	return filepath.Join(dir, "ocis", "idp")
 }
 
 // ServerWithConfig applies cfg to the root flagset
