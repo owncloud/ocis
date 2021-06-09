@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-09T03:35:13+0000"
+date: "2021-06-09T12:10:44+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -114,10 +114,10 @@ Usage: `glauth server [command options] [arguments...]`
 : Enable ldap server. Default: `flags.OverrideDefaultBool(cfg.Ldaps.Enabled, true)`.
 
 -ldaps-cert |  $GLAUTH_LDAPS_CERT
-: path to ldaps certificate in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Cert, "./ldap.crt")`.
+: path to ldaps certificate in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.crt"))`.
 
 -ldaps-key |  $GLAUTH_LDAPS_KEY
-: path to ldaps key in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Key, "./ldap.key")`.
+: path to ldaps key in PEM format. Default: `flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.key"))`.
 
 -backend-basedn |  $GLAUTH_BACKEND_BASEDN
 : base distinguished name to expose. Default: `flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=example,dc=org")`.

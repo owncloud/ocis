@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-09T03:35:14+0000"
+date: "2021-06-09T12:10:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -147,10 +147,10 @@ Usage: `idp server [command options] [arguments...]`
 : LDAP filter of the oCIS users. Default: `flags.OverrideDefaultString(cfg.Ldap.Filter, "(objectClass=posixaccount)")`.
 
 -transport-tls-cert |  $IDP_TRANSPORT_TLS_CERT
-: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, "")`.
+: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt"))`.
 
 -transport-tls-key |  $IDP_TRANSPORT_TLS_KEY
-: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, "")`.
+: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key"))`.
 
 -iss |  $IDP_ISS , $OCIS_URL
 : OIDC issuer URL. Default: `flags.OverrideDefaultString(cfg.IDP.Iss, "https://localhost:9200")`.
