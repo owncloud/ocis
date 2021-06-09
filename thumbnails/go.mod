@@ -10,6 +10,7 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
 	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
 	github.com/disintegration/imaging v1.6.2
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0

@@ -6,6 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
+	github.com/ProtonMail/go-appdir v1.1.0 // indirect
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect

@@ -24,6 +24,8 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
+	github.com/onsi/ginkgo v1.16.4 // indirect
+	github.com/onsi/gomega v1.13.0 // indirect
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
@@ -46,6 +48,8 @@ require (
 	go.etcd.io/etcd/pkg/v3 v3.5.0-pre // indirect
 	go.opencensus.io v0.23.0
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
+	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
+	golang.org/x/tools v0.1.2 // indirect
 	google.golang.org/grpc v1.38.0
 )
 

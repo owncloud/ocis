@@ -1,9 +1,12 @@
 package flagset
 
 import (
+	"path"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -233,14 +236,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
