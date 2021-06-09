@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+* Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
 
 ## Details
 
@@ -15,6 +16,14 @@ The following sections list the changes for unreleased.
    The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
 
    https://github.com/owncloud/ocis/pull/2120
+
+* Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
+
+   This used to default to the current location of the binary, which is not ideal after a first run as
+   it leaves traces behind. It now uses the system's location for artefacts with the help of
+   https://golang.org/pkg/os/#UserConfigDir.
+
+   https://github.com/owncloud/ocis/pull/2129
 # Changelog for [1.7.0] (2021-06-04)
 
 The following sections list the changes for 1.7.0.
