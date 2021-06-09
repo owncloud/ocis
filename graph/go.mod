@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/graph
 
-go 1.13
+go 1.16
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
