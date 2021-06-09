@@ -131,9 +131,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 	}
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir, v)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", idx.indexRootDir, v)},
 	})
 
 	if err != nil {
@@ -191,9 +189,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: deletePath},
-		},
+		Ref: &provider.Reference{Path: deletePath},
 	})
 
 	if err != nil {
@@ -206,9 +202,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 
 	toStat := path.Join("/meta", idx.indexRootDir, v)
 	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: toStat},
-		},
+		Ref: &provider.Reference{Path: toStat},
 	})
 	if err != nil {
 		return err
@@ -217,9 +211,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	if len(lcResp.Infos) == 0 {
 		deletePath = path.Join("/meta", idx.indexRootDir, v)
 		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{Path: deletePath},
-			},
+			Ref: &provider.Reference{Path: deletePath},
 		})
 		if err != nil {
 			return err
@@ -261,9 +253,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	foldersMatched := make([]string, 0)
 	matches := make([]string, 0)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", idx.indexRootDir)},
 	})
 
 	if err != nil {
@@ -282,9 +272,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 
 	for i := range foldersMatched {
 		res, _ := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{Path: foldersMatched[i]},
-			},
+			Ref: &provider.Reference{Path: foldersMatched[i]},
 		})
 
 		for _, info := range res.Infos {

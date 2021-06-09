@@ -69,16 +69,16 @@ type Spaces struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File          string
-	Log           Log
-	Debug         Debug
-	HTTP          HTTP
-	Server        Server
-	Tracing       Tracing
-	Ldap          Ldap
-	OpenIDConnect OpenIDConnect
-	Reva          Reva
-	Spaces        Spaces
+	File      string
+	Log       Log
+	Debug     Debug
+	HTTP      HTTP
+	Server    Server
+	Tracing   Tracing
+	Ldap      Ldap
+	Reva      Reva
+	Spaces    Spaces
+	JWTSecret string
 
 	Context    context.Context
 	Supervised bool

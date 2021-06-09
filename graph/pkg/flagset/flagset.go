@@ -193,32 +193,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Name:        "oidc-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Endpoint, "https://localhost:9200"),
-			Usage:       "OpenIDConnect endpoint",
-			EnvVars:     []string{"GRAPH_OIDC_ENDPOINT", "OCIS_URL"},
-			Destination: &cfg.OpenIDConnect.Endpoint,
-		},
-		&cli.BoolFlag{
-			Name:        "oidc-insecure",
-			Usage:       "OpenIDConnect endpoint",
-			EnvVars:     []string{"GRAPH_OIDC_INSECURE"},
-			Destination: &cfg.OpenIDConnect.Insecure,
-		},
-		&cli.StringFlag{
-			Name:        "oidc-realm",
-			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Realm, ""),
-			Usage:       "OpenIDConnect realm",
-			EnvVars:     []string{"GRAPH_OIDC_REALM"},
-			Destination: &cfg.OpenIDConnect.Realm,
-		},
-
-		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
 			Usage:       "REVA Gateway Endpoint",
 			EnvVars:     []string{"REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Address,
+		},
+		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       flags.OverrideDefaultString(cfg.JWTSecret, "Pive-Fumkiu4"),
+			Usage:       "Used to unmarshal JWT from the proxy, should equal the proxy's jwt-secret",
+			EnvVars:     []string{"GRAPH_JWT_SECRET", "OCIS_JWT_SECRET"},
+			Destination: &cfg.JWTSecret,
 		},
 	}
 }

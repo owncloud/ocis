@@ -32,7 +32,7 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/web v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
-	github.com/rs/zerolog v1.21.0
+	github.com/rs/zerolog v1.22.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
@@ -42,6 +42,8 @@ require (
 )
 
 replace (
+	github.com/cs3org/go-cs3apis => github.com/butonic/go-cs3apis v0.0.0-20210608111428-0b2c079174c9
+	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210609104920-931c7f1b5850
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts
@@ -62,6 +64,4 @@ replace (
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
-	// latest version compatible with etcd
-	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 )

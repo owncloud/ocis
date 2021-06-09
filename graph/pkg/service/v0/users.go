@@ -7,10 +7,12 @@ import (
 
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/go-ldap/ldap/v3"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
+
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
@@ -43,19 +45,10 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
-	claims := oidc.FromContext(r.Context())
-	g.logger.Info().Interface("Claims", claims).Msg("Claims in /me")
 
-	// TODO make filter configurable
-	filter := fmt.Sprintf("(&(objectClass=posixAccount)(cn=%s))", claims.PreferredUsername)
-	user, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
-	if err != nil {
-		g.logger.Info().Err(err).Msgf("Failed to read user %s", claims.PreferredUsername)
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
-		return
-	}
+	u := user.ContextMustGetUser(r.Context())
 
-	me := createUserModelFromLDAP(user)
+	me := createUserModelFromCS3User(u)
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
@@ -100,4 +93,17 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, createUserModelFromLDAP(user))
+}
+
+func createUserModelFromCS3User(u *userpb.User) *msgraph.User {
+	return &msgraph.User{
+		DisplayName:   &u.DisplayName,
+		Mail:          &u.Mail,
+		PreferredName: &u.Username,
+		DirectoryObject: msgraph.DirectoryObject{
+			Entity: msgraph.Entity{
+				ID: &u.Id.OpaqueId,
+			},
+		},
+	}
 }

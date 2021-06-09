@@ -16,35 +16,13 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 
 	msgraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
+	opengraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 )
-
-func getToken(r *http.Request) string {
-	// 1. check Authorization header
-	hdr := r.Header.Get("Authorization")
-	t := strings.TrimPrefix(hdr, "Bearer ")
-	if t != "" {
-		return t
-	}
-	// TODO 2. check form encoded body parameter for POST requests, see https://tools.ietf.org/html/rfc6750#section-2.2
-
-	// 3. check uri query parameter, see https://tools.ietf.org/html/rfc6750#section-2.3
-	tokens, ok := r.URL.Query()["access_token"]
-	if !ok || len(tokens[0]) < 1 {
-		return ""
-	}
-
-	return tokens[0]
-}
 
 // GetDrives implements the Service interface.
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msgf("Calling GetDrives")
-	accessToken := getToken(r)
-	if accessToken == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+	g.logger.Debug().Msg("Calling GetDrives")
 	ctx := r.Context()
 
 	client, err := g.GetClient()
@@ -53,7 +31,13 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	// TODO refactor this: forward the token to the next service
 	t := r.Header.Get("x-access-token")
+	if t == "" {
+		g.logger.Error().Msg("no access token provided in request")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 	ctx = token.ContextSetToken(ctx, t)
 	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
 
@@ -64,7 +48,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
 				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
 					Id: &storageprovider.StorageSpaceId{
-						OpaqueId: "1284d238-aa92-42ce-bdc4-0b0000009157", // FIXME dynamically discover home and other storages ... actually the storage registry should provide the list of storage spaces
+						OpaqueId: "1284d238-aa92-42ce-bdc4-0b0000009157!*", // FIXME dynamically discover home and other storages ... actually the storage registry should provide the list of storage spaces
 					},
 				},
 			},
@@ -78,21 +62,20 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("error calling grpc list storage spaces")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.HandleErrorStatus(&g.logger.Logger, w, res.Status)
 		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error parsing url", err)
+		g.logger.Error().Err(err).Msg("error parsing url")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	files, err := formatDrives(wdu, res.StorageSpaces)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
+		g.logger.Error().Err(err).Msg("error encoding response as json")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -104,12 +87,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 // GetRootDriveChildren implements the Service interface.
 func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msgf("Calling GetRootDriveChildren")
-	accessToken := getToken(r)
-	if accessToken == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+
 	ctx := r.Context()
 
 	fn := "/home"
@@ -121,19 +99,10 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := r.Header.Get("x-access-token")
-	ctx = token.ContextSetToken(ctx, t)
-	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
-
 	g.logger.Info().Msgf("provides access token %v", ctx)
 
-	ref := &storageprovider.Reference{
-		Spec: &storageprovider.Reference_Path{Path: fn},
-	}
+	req := &storageprovider.ListContainerRequest{Ref: &storageprovider.Reference{Path: fn}}
 
-	req := &storageprovider.ListContainerRequest{
-		Ref: ref,
-	}
 	res, err := client.ListContainer(ctx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Msgf("error sending list container grpc request %s", fn)
@@ -141,8 +110,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msgf("error calling grpc list container %s", fn)
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.HandleErrorStatus(&g.logger.Logger, w, res.Status)
 		return
 	}
 
@@ -166,10 +134,12 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 	*size = int64(res.Size) // uint64 -> int :boom:
 	name := strings.TrimPrefix(res.Path, "/home/")
 
+	id := res.Id.StorageId + "!" + res.Id.NodeId
+
 	driveItem := &msgraph.DriveItem{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
-				Id: &res.Id.OpaqueId,
+				Id: &id,
 			},
 			Name: &name,
 			ETag: &res.Etag,
@@ -205,7 +175,7 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 }
 
 func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
-	rootId := space.Root.StorageId + "!" + space.Root.OpaqueId
+	rootId := space.Root.StorageId + "!" + space.Root.NodeId
 	drive := &msgraph.Drive{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
@@ -261,7 +231,7 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 	return drive, nil
 }
 
-func formatDrives(baseUrl *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
+func formatDrives(baseUrl *url.URL, mds []*storageprovider.StorageSpace) ([]*opengraph.Drive, error) {
 	responses := make([]*msgraph.Drive, 0, len(mds))
 	for i := range mds {
 		res, err := cs3StorageSpaceToDrive(baseUrl, mds[i])

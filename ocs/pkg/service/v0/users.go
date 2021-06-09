@@ -5,10 +5,11 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/cs3org/reva/pkg/auth/scope"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/cs3org/reva/pkg/auth/scope"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
@@ -397,11 +398,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
-			},
+			Ref: &provider.Reference{Path: homeResp.Ref.Path},
 		})
 
 		if err != nil {
@@ -417,13 +414,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		delReq := &provider.DeleteRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Id{
-					Id: statResp.Info.Id,
-				},
-			},
-		}
+		delReq := &provider.DeleteRequest{Ref: statResp.Info.Id}
 
 		delResp, err := gwc.Delete(ctx, delReq)
 		if err != nil {
@@ -439,13 +430,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		req := &gateway.PurgeRecycleRequest{
-			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
-			},
-		}
+		req := &gateway.PurgeRecycleRequest{Ref: homeResp.Ref}
 
 		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
 		if err != nil {

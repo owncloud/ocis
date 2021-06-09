@@ -11,9 +11,7 @@ import (
 
 func deleteIndexRoot(ctx context.Context, storageProvider provider.ProviderAPIClient, indexRootDir string) error {
 	res, err := storageProvider.Delete(ctx, &provider.DeleteRequest{
-		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", indexRootDir)},
-		},
+		Ref: &provider.Reference{Path: path.Join("/meta", indexRootDir)},
 	})
 	if err != nil {
 		return err
