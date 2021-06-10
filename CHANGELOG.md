@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+* Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
 
 ## Details
@@ -16,6 +17,13 @@ The following sections list the changes for unreleased.
    The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
 
    https://github.com/owncloud/ocis/pull/2120
+
+* Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
+
+   The client registration in the `identifier-registration.yaml` for the graph-explorer
+   didn't contain `redirect_uris` nor `origins`. Both were added to prevent exploitation.
+
+   https://github.com/owncloud/ocis/pull/2118
 
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
 
