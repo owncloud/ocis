@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-10T18:11:53+0000"
+date: "2021-06-10T20:02:37+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,35 +35,29 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
-
 ### accounts add
 
 Create a new account
 
 Usage: `accounts add [command options] [arguments...]`
 
-### accounts rebuildIndex
+### accounts list
 
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+List existing accounts
 
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-### accounts remove
-
-Removes an existing account
-
-Usage: `accounts remove [command options] [arguments...]`
+Usage: `accounts list [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 ### accounts server
 
@@ -134,6 +128,12 @@ Usage: `accounts server [command options] [arguments...]`
 -service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
 : username of the internal service user (required on EOS). Default: `flags.OverrideDefaultString(cfg.ServiceUser.Username, "")`.
 
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
+
 ### accounts inspect
 
 Show detailed data on an existing account
@@ -146,11 +146,11 @@ Usage: `accounts inspect [command options] [arguments...]`
 -name |  $ACCOUNTS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
 
-### accounts list
+### accounts remove
 
-List existing accounts
+Removes an existing account
 
-Usage: `accounts list [command options] [arguments...]`
+Usage: `accounts remove [command options] [arguments...]`
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
