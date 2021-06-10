@@ -93,7 +93,7 @@ services:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       WOPISERVER_REVA_GATEWAY_ADDR: ocis:9142
       WOPISERVER_WOPI_SERVER_HOST: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-      WOPISERVER_WOPI_SERVER_SECRET: ${WOPI_JWT_SECRET:-Pive-Fumkiu4}
+      WOPISERVER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       WOPISERVER_WOPI_SERVER_INSECURE: "${INSECURE:-false}"
     logging:
       driver: "local"
@@ -107,6 +107,7 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
+      - OCIS_DOMAIN=${OCIS_DOMAIN:-ocis.owncloud.test}
       - WOPISECRET=${WOPI_JWT_SECRET:-Pive-Fumkiu4}
       - IOPSECRET=${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       - WOPISERVER_DOMAIN=${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
