@@ -57,10 +57,10 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if u == nil && claims != nil {
 		var claim, value string
 		switch {
-		case claims.Email != "":
-			claim, value = "mail", claims.Email
 		case claims.PreferredUsername != "":
 			claim, value = "username", claims.PreferredUsername
+		case claims.Email != "":
+			claim, value = "mail", claims.Email
 		case claims.OcisID != "":
 			//claim, value = "id", claims.OcisID
 		default:

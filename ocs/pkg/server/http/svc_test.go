@@ -644,22 +644,8 @@ func mintToken(ctx context.Context, su *User, roleIds []string) (token string, e
 			OpaqueId: su.ID,
 		},
 		Groups: []string{},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.UIDNumber)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.GIDNumber)),
-				},
-				"roles": {
-					Decoder: "json",
-					Value:   roleIDsJSON,
-				},
-			},
-		},
+		UidNumber: u.UIDNumber,
+		GidNumber: u.GIDNumber,
 	}
 	s, _ := scope.GetOwnerScope()
 	return tokenManager.MintToken(ctx, u, s)
