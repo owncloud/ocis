@@ -11,7 +11,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -643,23 +642,17 @@ func mintToken(ctx context.Context, su *User, roleIds []string) (token string, e
 		Id: &user.UserId{
 			OpaqueId: su.ID,
 		},
-		Groups: []string{},
 		Opaque: &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.UIDNumber)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.GIDNumber)),
-				},
 				"roles": {
 					Decoder: "json",
 					Value:   roleIDsJSON,
 				},
 			},
 		},
+		Groups: []string{},
+		UidNumber: int64(su.UIDNumber),
+		GidNumber: int64(su.GIDNumber),
 	}
 	s, _ := scope.GetOwnerScope()
 	return tokenManager.MintToken(ctx, u, s)

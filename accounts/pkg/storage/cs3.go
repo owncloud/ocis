@@ -10,13 +10,11 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -299,19 +297,9 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 		Id: &user.UserId{
 			OpaqueId: su.UUID,
 		},
-		Groups: []string{},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(su.UID, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(su.GID, 10)),
-				},
-			},
-		},
+		Groups:    []string{},
+		UidNumber: su.UID,
+		GidNumber: su.GID,
 	}
 	s, err := scope.GetOwnerScope()
 	if err != nil {
