@@ -2839,10 +2839,10 @@ duration@^0.2.1:
     d "1"
     es5-ext "~0.10.46"
 
-easygettext@^2.7.0:
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/easygettext/-/easygettext-2.16.1.tgz#0dee54c3776e2bb7ff434dadacb50c93877123e2"
-  integrity sha512-ou7Rac3zlzR58DrfEp1mwuxHV/Y9j6Gq9po/4rNyWK/mJhXCGUTkCmZTQeiC+QKzGcAHXOkYqfEKZvetd6LGgw==
+easygettext@^2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/easygettext/-/easygettext-2.17.0.tgz#af55ec030b9aabf514aadf0e32383a6f45cc43af"
+  integrity sha512-QmMWIu6l83SW2QuEFd4GIDrTey0qOn0haTOMt4NdPKPHEBihAqdo9HHYRDHiPg/msZSKaye7qDOLAcqHlmfo+g==
   dependencies:
     "@babel/core" "^7.11.6"
     acorn "^7.4.0"
@@ -2856,7 +2856,7 @@ easygettext@^2.7.0:
     pofile "^1.1.0"
   optionalDependencies:
     "@vue/compiler-sfc" "^3.0.0"
-    pug "^3.0.0"
+    pug "^3.0.2"
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -6314,7 +6314,7 @@ pug@^2.0.3:
     pug-runtime "^2.0.5"
     pug-strip-comments "^1.0.4"
 
-pug@^3.0.0:
+pug@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/pug/-/pug-3.0.2.tgz#f35c7107343454e43bc27ae0ff76c731b78ea535"
   integrity sha512-bp0I/hiK1D1vChHh6EfDxtndHji55XP/ZJKwsRqrz6lRia6ZC2OZbdAymlxdVFwd1L70ebrVJw4/eZ79skrIaw==
