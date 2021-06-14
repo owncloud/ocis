@@ -6,7 +6,6 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
-	github.com/ProtonMail/go-appdir v1.1.0 // indirect
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
@@ -33,7 +32,7 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/web v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
-	github.com/rs/zerolog v1.22.0
+	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
