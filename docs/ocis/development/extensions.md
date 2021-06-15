@@ -7,227 +7,58 @@ geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: extensions.md
 ---
 
-{{< toc >}}
+oCIS is all about files, sync and share - but most of the time there is some more you want to do with your files, eg. have a different view on your photo collection or edit your office file in an online file editor. ownCloud 10 faced the same problems and tries to solve them with so called "apps". These can extend the functionality of ownCloud 10 in a wide range. oCIS has a similar concept to be extended in its functionality: extensions. Because oCIS is very different in its architecture compared to ownCloud 10 this also applies to the extensions. An extension is basically any running code which satisfies basic interfaces and provides functionality to oCIS and its users. Because extensions are micro services you can choose almost any programming language you like. (even if for some languages the task might be a lot easier - but for ownCloud 10 it was nearly impossible to use a different programming language than php).
 
-## How to build and run ocis-simple
+We will now introduce you to concepts, possibilities and ... of the oCIS extension system.
 
-oCIS uses build tags to build different flavors of the binary. In order to work on a new extension we are going to reduce the scope a little and use the `simple` tag. Let us begin by creating a dedicated folder:
 
-```console
-mkdir ocis-extension-workshop && ocis-extension-workshop
-```
 
-Following https://github.com/owncloud/ocis
+### Extensions outside of the oCIS Monorepo
+Technically every service in oCIS is an extension, even if oCIS would not really work without them. So there are plenty of extensions which you can have a look at in the oCIS Monorepo.
 
-```console
-git clone https://github.com/owncloud/ocis.git
-cd ocis
+Besides these "default" extensions there are also some more extensions:
 
-TAGS=simple make generate build
-```
+- Hello
+- WOPI server
 
-*Q: Can you specify which version of ownCloud Web to use?*
-*A: No, the ownCloud Web that is used is compiled into the [assets of ocis-web](https://github.com/owncloud/ocis/blob/master/web/pkg/assets/embed.go) which is currently not automatically updated. We'll see how to use a custom ownCloud Web later.*
+Difference between extensions living inside the oCIS monorepo and in its own repo are:
+- extensions inside the oCIS monorepo are all written in Go, whereas other extensions may choose the programming language freely
+- extension inside the oCIS monorepo share tooling, whereas other extensions may use different tooling (eg. a different CI system)
+- extensions inside the oCIS monorepo will be all build into one binary and started with the `ocis server` command. Other extensions must be started individually.
 
-`bin/ocis server`
 
-Open the browser at https://localhost:9200
 
-1. You land on the login screen. click login
-2. You are redirected to an idp at https://localhost:9200/signin/v1/identifier with a login mask. Use `einstein:relativity` (one of the three demo users) to log in 
-3. You are redirected to http://localhost:9100/#/hello the ocis-hello app
-4. Replace `World` with something else and submit. You should see `Hello %something else%`
+### Web
+- App
+- Design System
 
-*Q: One of the required ports is already in use. Ocis seems to be trying to restart the service over and over. What gives?*
-*A: Using the ocis binary to start the server will case ocis to keep track of the different services and restart them in case they crash.*
+### Settings
+An extension likely has some behaviour which the user can configure. Fundamental configuration will often be done by admins during deploy time in configuration files or by environment variables. But for other settings - which are supposed to change more often or which are even user specific - this is not a viable way. Therefore you need to offer the users a UI where they can configure your extension to their liking. Because implementing something like this is a repetitive task among extensions, oCIS already offers the settings extensions which does that for your extension. Your extension just needs to register settings bundles and permissions and read the current values from the settings service. You can read more on that on [Settings Extensions]({{< ref "../../extensions/settings" >}}) and see how [oCIS Hello uses settings]().
 
-## Hacking ocis-hello
+### Proxy
+The Proxy acts as an API gateway and is the single connection point where all request from users and devices are sent to.
 
-go back to the ocis-extension-workshop folder
+In order that requests can reach your extensions' api you need to register one or multiple endpoints at the proxy. This is currently done by manually adding routes to a config file but will be done dynamically by service discovery in the future. The registration is a easy task and can be seen best on the [oCIS Hello example]().
 
-```console
-cd ..
-```
+As files you store in your ownCloud must always stay private unless you share them with your friends or coworkers, requests to oCIS have always a user context. This user context is also available to your extension and can be used to interact with the users' files. How to get the user context and authentication can be seen bet on the [oCIS Hello example]() or the [WOPI server example]().
 
-Following https://github.com/owncloud/ocis-hello
 
-```
-git clone https://github.com/owncloud/ocis-hello.git
-cd ocis-hello
 
-yarn install
-# this actually creates the assets
-yarn build
+### Storage
+oCIS leverages the CS3 APIs and REVA as a storage system because it offers a very flexible setup and supports a variety of storage backends like EOS, S3 and of course your local hard disk. REVA makes it easy to support more storage backends as needed.
 
-# this will compile the assets into the binary
-make generate build
-```
+If you need to interact with files, you have the full power of the [CS3 APIs]() in your hand. With the user context and authorization your extensions gets from the proxy you can make these request in behalf of the user.
 
-Two options:
-1. run only the necessary services from ocis and ocis-hello independently
-2. compile ocis with the updated ocis-hello
+If your extension needs to store data which is not supposed to life in the users home folder, there is also so called metadata storage which can be used for that purpose.
 
-### Option 1:
-get a list of ocis services:
+They main point you should get about storage in an oCIS extension is that you should never use the filesystem, but always use the CS3 APIs.
 
-```console
-ps ax | grep ocis
-```
+### Deployment
 
-Try to kill `ocis hello`
 
-Remember: For now, killing a service will cause ocis to restart it. This is subject to change.
+### Outstanding development
 
-In order to be able to manage the processes ourselves we need to start them independently:
-
-`bin/ocis server` starts the same services as:
-
-```
-bin/ocis micro &
-bin/ocis web &
-bin/ocis hello &
-bin/ocis reva &
-```
-
-Now we can kill the `ocis hello` and use our custom built ocis-hello binary:
-
-```console
-cd ../ocis-hello
-bin/ocis-hello server
-```
-
-## Hacking ownCloud Web (and ocis-web)
-
-Following https://github.com/owncloud/web we are going to build the current ownCloud Web
-
-```
-git clone https://github.com/owncloud/web.git
-cd web
-
-yarn install
-yarn dist
-```
-
-We can tell ocis to use the compiled assets:
-
-Kill `ocis web`, then use the compiled assets when starting ownCloud Web.
-
-```console
-cd ../ocis
-WEB_ASSET_PATH="`pwd`/../web/dist" bin/ocis web
-```
-
-## The ownCloud design system
-
-The [ownCloud design system](https://owncloud.design/) contains a set of ownCloud vue components for ownCloud Web or your own ocis extensions. Please use it for a consistent look and feel.
-
-## External ownCloud Web apps
-
-This is what hello is: copy and extend!
-
-1. ownCloud Web is configured using the config.json which is served by the ocis-web service (either `bin/ocis web` or `bin/web server`)
-
-2. point ocis-web to the web config which you extended with an external app:
-`WEB_UI_CONFIG="`pwd`/../web/config.json" ASSET_PATH="`pwd`/../web/dist" bin/ocis web`
-
-```json
-{
-  "server": "https://localhost:9200",
-  "theme": "owncloud",
-  "version": "0.1.0",
-  "openIdConnect": {
-    "metadata_url": "https://localhost:9200/.well-known/openid-configuration",
-    "authority": "https://localhost:9200",
-    "client_id": "web",
-    "response_type": "code",
-    "scope": "openid profile email"
-  },
-  "apps": [],
-  "external_apps": [
-    {
-      "id": "hello",
-      "path": "http://localhost:9105/hello.js",
-      "config": {
-        "url": "http://localhost:9105"
-      }
-    },
-    {
-      "id": "myapp",
-      "path": "http://localhost:6789/superapp.js",
-      "config": {
-        "backend": "http://someserver:1234",
-        "myconfig": "is awesome"
-      }
-    }
-  ]
-}
-```
-
-## ownCloud Web extension points
-
-{{< hint info >}}
-For an up to date list check out [the ownCloud Web documentation](https://github.com/owncloud/web/issues/2423).
-{{< /hint >}}
-
-Several ones available:
-
-### ownCloud Web
-- App switcher (defined in config.json)
-- App container (loads UI of your extension)
-
-### Files app
-- File action
-- Create new file action
-- Sidebar
-- Quick access for sidebar inside of file actions (in the file row)
-
-Example of a file action in the `app.js`:
-```js
-const appInfo = {
-  name: 'MarkdownEditor',
-  id: 'markdown-editor',
-  icon: 'text',
-  isFileEditor: true,
-  extensions: [{
-    extension: 'txt',
-    newFileMenu: {
-      menuTitle ($gettext) {
-        return $gettext('Create new plain text file…')
-      }
-    }
-  },
-  {
-    extension: 'md',
-    newFileMenu: {
-      menuTitle ($gettext) {
-        return $gettext('Create new mark-down file…')
-      }
-    }
-  }]
-}
-```
-
-For the side bar have a look at the files app, `defaults.js` & `fileSideBars`
-
-## API driven development
-
-Until now we only had a look at the ui and how the extensions are managed on the cli. But how do apps actually talk to the server?
-
-Short answer: any way you like
-
-Long answer: micro and ocis-hello follow a protocol driven development:
-
-- specify the API using protobuf
-- generate client and server code
-- evolve based on the protocol
-
-- CS3 api uses protobuf as well and uses GRPC
-
-- ocis uses go-micro, which provides http and grpc gateways
-- the gateways and protocols are optional
-
-- owncloud and kopano are looking into a [MS graph](https://developer.microsoft.com/de-de/graph) like api to handle ownCloud Web requests.
-  - they might be about user, contacts, calendars ... which is covered by the graph api
-  - we want to integrate with eg. kopano and provide a common api (file sync and share is covered as well)
-
-- as an example for protobuf take a look at [ocis-hello](https://github.com/owncloud/ocis-hello/tree/master/pkg/proto/v0)
+- dynamic registration web / proxy
+- entitle service to act in behalf of users without request
+- access to metadata storage
+- Events (eg. callbacks on file create/change/delete events)
