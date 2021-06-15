@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
+	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
 	github.com/cs3org/reva v1.7.1-0.20210507160327-e2c3841d0dbc
 	github.com/deepmap/oapi-codegen v1.6.1
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -28,8 +28,7 @@ require (
 )
 
 replace (
-	github.com/cs3org/go-cs3apis => github.com/butonic/go-cs3apis v0.0.0-20210608111428-0b2c079174c9
-	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210609104920-931c7f1b5850
+	github.com/cs3org/reva => ../../reva
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/store => ../store
 	// taken from https://github.com/asim/go-micro/blob/master/plugins/registry/etcd/go.mod#L14-L16

@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	chim "github.com/go-chi/chi/middleware"
+	"github.com/owncloud/ocis/graph/pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/account"
+	ocism "github.com/owncloud/ocis/ocis-pkg/middleware"
 )
 
 // Service defines the extension handlers.
@@ -29,12 +32,16 @@ func NewService(opts ...Option) Service {
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Use(middleware.StripSlashes)
+		r.Use(chim.StripSlashes)
+		r.Use(ocism.ExtractAccountUUID(
+			account.JWTSecret(options.Config.JWTSecret)),
+		)
+		r.Use(middleware.ForwardToken())
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
-				r.Get("/drive/root/children", svc.GetRootDriveChildren)
+				r.Get("/drive/root/children", svc.GetPersonalDriveChildren)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)

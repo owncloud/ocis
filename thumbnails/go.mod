@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/go-cs3apis v0.0.0-20210507060801-f176760d55f4
+	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
 	github.com/cs3org/reva v1.7.1-0.20210507160327-e2c3841d0dbc
 	github.com/disintegration/imaging v1.6.2
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0

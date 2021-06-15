@@ -32,7 +32,7 @@ require (
 	github.com/owncloud/ocis/thumbnails v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/web v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
-	github.com/rs/zerolog v1.22.0
+	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
@@ -42,8 +42,7 @@ require (
 )
 
 replace (
-	github.com/cs3org/go-cs3apis => github.com/butonic/go-cs3apis v0.0.0-20210608111428-0b2c079174c9
-	github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20210609104920-931c7f1b5850
+	github.com/cs3org/reva => ../../reva
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/owncloud/ocis/accounts => ../accounts

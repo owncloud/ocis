@@ -398,7 +398,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
-			Ref: &provider.Reference{Path: homeResp.Ref.Path},
+			Ref: &provider.Reference{Path: homeResp.Path},
 		})
 
 		if err != nil {
@@ -414,7 +414,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		delReq := &provider.DeleteRequest{Ref: statResp.Info.Id}
+		delReq := &provider.DeleteRequest{Ref: &provider.Reference{ResourceId: statResp.Info.Id}}
 
 		delResp, err := gwc.Delete(ctx, delReq)
 		if err != nil {
@@ -430,7 +430,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		req := &gateway.PurgeRecycleRequest{Ref: homeResp.Ref}
+		req := &gateway.PurgeRecycleRequest{Ref: &provider.Reference{Path: homeResp.Path}}
 
 		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
 		if err != nil {

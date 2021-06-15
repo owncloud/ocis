@@ -8,12 +8,10 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
-	"google.golang.org/grpc/metadata"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/pkg/token"
 
 	msgraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
 	opengraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
@@ -31,15 +29,6 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	// TODO refactor this: forward the token to the next service
-	t := r.Header.Get("x-access-token")
-	if t == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-	ctx = token.ContextSetToken(ctx, t)
-	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
 
 	req := &storageprovider.ListStorageSpacesRequest{
 
@@ -84,9 +73,9 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
-// GetRootDriveChildren implements the Service interface.
-func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msgf("Calling GetRootDriveChildren")
+// GetPersonalDriveChildren implements the Service interface.
+func (g Graph) GetPersonalDriveChildren(w http.ResponseWriter, r *http.Request) {
+	g.logger.Debug().Msgf("Calling GetPersonalDriveChildren")
 
 	ctx := r.Context()
 
@@ -98,8 +87,6 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	g.logger.Info().Msgf("provides access token %v", ctx)
 
 	req := &storageprovider.ListContainerRequest{Ref: &storageprovider.Reference{Path: fn}}
 
@@ -134,7 +121,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 	*size = int64(res.Size) // uint64 -> int :boom:
 	name := strings.TrimPrefix(res.Path, "/home/")
 
-	id := res.Id.StorageId + "!" + res.Id.NodeId
+	id := res.Id.StorageId + "!" + res.Id.OpaqueId
 
 	driveItem := &msgraph.DriveItem{
 		BaseItem: msgraph.BaseItem{
@@ -175,7 +162,7 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 }
 
 func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
-	rootId := space.Root.StorageId + "!" + space.Root.NodeId
+	rootId := space.Root.StorageId + "!" + space.Root.OpaqueId
 	drive := &msgraph.Drive{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
