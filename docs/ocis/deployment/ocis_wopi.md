@@ -48,7 +48,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_wopi
+  `cd ocis/deployments/examples/ocis_wopi`
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
@@ -152,6 +152,6 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://collabora.owncloud.test and https://wopisever.owncloud.test  in your browser and accept the invalid certificate warning.
+Open https://collabora.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
 
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser.
