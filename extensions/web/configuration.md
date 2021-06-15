@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-14T18:11:21+0000"
+date: "2021-06-15T16:11:46+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -43,12 +43,6 @@ Usage: `web [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### web server
-
-Start integrated server
-
-Usage: `web server [command options] [arguments...]`
-
 ### web health
 
 Check health status
@@ -57,4 +51,10 @@ Usage: `web health [command options] [arguments...]`
 
 -debug-addr |  $WEB_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104")`.
+
+### web server
+
+Start integrated server
+
+Usage: `web server [command options] [arguments...]`
 
