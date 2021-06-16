@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+* Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
 
@@ -17,6 +18,16 @@ The following sections list the changes for unreleased.
    The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
 
    https://github.com/owncloud/ocis/pull/2120
+
+* Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+
+   Despite requests without Authentication header being successful, requests with an invalid
+   bearer token in the Authentication header were rejected in the proxy with an 401
+   unauthenticated. Now the Authentication header is completely ignored for the /status.php
+   route.
+
+   https://github.com/owncloud/client/issues/8538
+   https://github.com/owncloud/ocis/pull/2188
 
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 
