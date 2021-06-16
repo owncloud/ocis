@@ -15,7 +15,7 @@ We will now introduce you to the oCIS extension system and how you can use it fo
 
 Technically every service in oCIS is an extension, even if oCIS would not really work without some of them. Therefore, you can draw inspiration from any of the plenty of extensions in the [oCIS monorepo](https://github.com/owncloud/ocis).
 
-Besides these "default" extensions in the oCIS monorepo there are more extensions:
+Besides these "default" extensions in the oCIS monorepo, there are two more extensions you should be aware of:
 
 - [Hello](https://github.com/owncloud/ocis-hello)
 - [WOPI server](https://github.com/owncloud/ocis-wopiserver)
