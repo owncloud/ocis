@@ -294,9 +294,13 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 				Id: &id,
 			},
 			Name: &name,
-			ETag: &res.Etag,
+			// Note: The eTag and cTag properties work differently on containers (folders). The cTag
+			// value is modified when content or metadata of any descendant of the folder is changed.
+			// The eTag value is only modified when the folder's properties are changed, except for
+			// properties that are derived from descendants (like childCount or lastModifiedDateTime).
+			ETag: &res.Etag, // should we drop the enclosing "? ms graph api does not have them
 		},
-		Size: size,
+		Size: size, // oc:size
 	}
 	if res.Mtime != nil {
 		lastModified := cs3TimestampToTime(res.Mtime)
@@ -304,12 +308,89 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
 		driveItem.File = &msgraph.File{
+			// TODO add file facet https://docs.microsoft.com/en-us/graph/api/resources/file?view=graph-rest-1.0
+			// hashes	Hashes	Hashes of the file's binary content, if available. Read-only.
+			// set below
+			// mimeType	string	The MIME type for the file. This is determined by logic on the server and might not be the value provided when the file was uploaded. Read-only.
 			MimeType: &res.MimeType,
+		}
+		// oc:checksum
+		switch res.Checksum.Type {
+		case storageprovider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_SHA1:
+			driveItem.File.Hashes = &msgraph.Hashes{
+				Sha1Hash: &res.Checksum.Sum,
+			}
+			// cTag	String	An eTag for the content of the item. This eTag is not changed if only the metadata is changed. Note This property is not returned if the item is a folder. Read-only.
+			driveItem.CTag = &res.Checksum.Sum
+		case storageprovider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_ADLER32:
+			// TODO add to opengraph
+		case storageprovider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_MD5:
+			// TODO add to opengraph
 		}
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
-		driveItem.Folder = &msgraph.Folder{}
+		driveItem.Folder = &msgraph.Folder{
+			// TODO add folder facet properties https://docs.microsoft.com/en-us/graph/api/resources/folder?view=graph-rest-1.0
+			// childCount	Int32	Number of children contained immediately within this container.
+			// view	folderView	A collection of properties defining the recommended view for the folder.
+		}
+		// Note: The eTag and cTag properties work differently on containers (folders). The cTag
+		// value is modified when content or metadata of any descendant of the folder is changed.
+		// The eTag value is only modified when the folder's properties are changed, except for
+		// properties that are derived from descendants (like childCount or lastModifiedDateTime).
+		driveItem.CTag = &res.Etag
 	}
+	// in comparison to propfind
+	// oc:permissions?
+	//   permissions	permission collection	The set of permissions for the item. Read-only. Nullable.
+	//   https://docs.microsoft.com/en-us/graph/api/driveitem-list-permissions?view=graph-rest-1.0&tabs=http
+
+	// http://open-collaboration-services.org/ns/share-permissions
+	// oc:public-link-permission
+	// oc:public-link-item-type
+	// oc:public-link-share-datetime
+	// oc:public-link-share-owner
+	// oc:public-link-expiration
+	//  remoteItem	remoteItem	Remote item data, if the item is shared from a drive other than the one being accessed. Read-only.
+	//  shared	shared	Indicates that the item has been shared with others and provides information about the shared state of the item. Read-only.
+	//  -> used to indicate a file has been shared in the row of files, when selecting the file
+	//     GET /me/drive/items/{item-id}/permissions can be used to list the actual permissions
+
+	// oc:favorite
+	// oc:owner-id
+	// oc:share-types
+	// oc:owner-display-name
+	// oc:downloadURL -> webdavURL?
+	// TODO driveItem.WebDavUrl
+	//   @microsoft.graph.downloadUrl	string	A URL that can be used to download this file's content. Authentication is not required with this URL. Read-only.
+	//   webDavUrl	String	WebDAV compatible URL for the item.
+	//   webUrl	String	URL that displays the resource in the browser. Read-only.
+	// oc:privatelink
+	// oc:dDC for the desktop? used?
+	// oc:data-fingerprint
+	//   used by admins to indicate a backup has been restored,
+	//   can only occur on the root node
+	//   server implementation in https://github.com/owncloud/core/pull/24054
+	//   see https://doc.owncloud.com/server/admin_manual/configuration/server/occ_command.html#maintenance-commands
+	//   TODO(jfd): double check the client behavior with reva on backup restore
+
+	// quota? -> drive property https://docs.microsoft.com/en-us/graph/api/resources/drive?view=graph-rest-1.0#properties
+	// quota-used-bytes
+	// quota-available-bytes
+
+	// TODO image facet
+	// TODO photo facet
+	// TODO root If this property is non-null, it indicates that the driveItem is the top-most driveItem in the drive.
+
+	// TODO created by
+	// TODO last modified by
+	// TODO parentReference
+
+	// TODO thumbnails	thumbnailSet collection	Collection containing ThumbnailSet objects associated with the item. For more info, see getting thumbnails. Read-only. Nullable.
+	//   https://docs.microsoft.com/en-us/graph/api/driveitem-list-thumbnails?view=graph-rest-1.0&tabs=http
+	// TODO versions	driveItemVersion collection	The list of previous versions of the item. For more info, see getting previous versions. Read-only. Nullable.
+	//   https://docs.microsoft.com/en-us/graph/api/driveitem-list-versions?view=graph-rest-1.0
+
 	return driveItem, nil
 }
 
