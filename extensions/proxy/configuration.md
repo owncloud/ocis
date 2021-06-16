@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-16T11:32:55+0000"
+date: "2021-06-16T19:21:24+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -35,27 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### proxy ocis-proxy
-
-proxy for oCIS
-
-Usage: `proxy ocis-proxy [command options] [arguments...]`
-
---log-level |  $PROXY_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
---log-pretty |  $PROXY_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
---log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-### proxy server
-
-Start integrated server
-
-Usage: `proxy server [command options] [arguments...]`
-
 ### proxy version
 
 Print the versions of the running instances
@@ -76,4 +55,25 @@ Usage: `proxy health [command options] [arguments...]`
 
 --debug-addr |  $PROXY_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109")`.
+
+### proxy ocis-proxy
+
+proxy for oCIS
+
+Usage: `proxy ocis-proxy [command options] [arguments...]`
+
+--log-level |  $PROXY_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+--log-pretty |  $PROXY_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+--log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+### proxy server
+
+Start integrated server
+
+Usage: `proxy server [command options] [arguments...]`
 
