@@ -37,11 +37,23 @@ func NewService(opts ...Option) Service {
 			account.JWTSecret(options.Config.JWTSecret)),
 		)
 		r.Use(middleware.ForwardToken())
+		r.Use(middleware.ExtractRelativePath())
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetPersonalDriveChildren)
+			})
+			r.Route("/drives", func(r chi.Router) {
+				r.Get("/", svc.GetDrives)
+				r.Route("/{drive-id}", func(r chi.Router) {
+					r.Get("/", svc.GetDrive)
+					r.Get("/root*", svc.RootRouter().ServeHTTP)
+					//r.Get("/root", svc.GetDriveItem)         // /me/drive/root:/path/to/file
+					//r.Get("/root/children", svc.GetChildren) // /me/drive/root:/path/to/folder:/children
+					// r.Get("/items/{item-id}:{path:[^:]*}", svc.GetDriveItem)
+
+				})
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)

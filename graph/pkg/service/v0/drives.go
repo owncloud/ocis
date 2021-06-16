@@ -4,9 +4,11 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -38,6 +40,78 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: "1284d238-aa92-42ce-bdc4-0b0000009157!*", // FIXME dynamically discover home and other storages ... actually the storage registry should provide the list of storage spaces
+					},
+				},
+			},
+		},
+	}
+
+	res, err := client.ListStorageSpaces(ctx, req)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		errorcode.HandleErrorStatus(&g.logger.Logger, w, res.Status)
+		return
+	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	files, err := formatDrives(wdu, res.StorageSpaces)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error encoding response as json")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: files})
+}
+
+func (g Graph) RootRouter() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		restOfURL := chi.URLParam(r, "*")
+		switch {
+		case strings.HasSuffix(restOfURL, "/children"):
+			g.GetChildren(w, r)
+		default:
+			g.GetDriveItem(w, r)
+		}
+	})
+}
+
+// GetDrive implements the Service interface.
+func (g Graph) GetDrive(w http.ResponseWriter, r *http.Request) {
+	driveID := chi.URLParam(r, "drive-id")
+	if driveID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
+		return
+	}
+	g.logger.Debug().Str("drive-id", driveID).Msg("Calling GetDrive")
+	ctx := r.Context()
+
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Err(err).Msg("error getting grpc client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	req := &storageprovider.ListStorageSpacesRequest{
+		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
+			{
+				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+					Id: &storageprovider.StorageSpaceId{
+						OpaqueId: driveID,
 					},
 				},
 			},
@@ -112,6 +186,97 @@ func (g Graph) GetPersonalDriveChildren(w http.ResponseWriter, r *http.Request) 
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
+// GetChildren implements the Service interface.
+func (g Graph) GetChildren(w http.ResponseWriter, r *http.Request) {
+	driveID := chi.URLParam(r, "drive-id")
+	relPath := chi.URLParam(r, "relative-path")
+
+	g.logger.Debug().Str("drive-id", driveID).Str("relative-path", relPath).Msg("Calling GetDrive")
+	ctx := r.Context()
+
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Err(err).Msg("error getting grpc client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	parts := strings.SplitN(driveID, "!", 2)
+	if len(parts) != 2 {
+		g.logger.Err(err).Msg("invalid drive id, must contain a !")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	req := &storageprovider.ListContainerRequest{Ref: &storageprovider.Reference{
+		ResourceId: &storageprovider.ResourceId{
+			StorageId: parts[0],
+			OpaqueId:  parts[1],
+		},
+		Path: relPath,
+	}}
+
+	res, err := client.ListContainer(ctx, req)
+	if err != nil {
+		g.logger.Error().Err(err).Msgf("error sending list container grpc request %s", relPath)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		errorcode.HandleErrorStatus(&g.logger.Logger, w, res.Status)
+		return
+	}
+
+	files, err := formatDriveItems(res.Infos)
+	if err != nil {
+		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: files})
+}
+
+// GetPersonalDriveChildren implements the Service interface.
+func (g Graph) GetDriveItem(w http.ResponseWriter, r *http.Request) {
+	g.logger.Debug().Msgf("Calling GetPersonalDriveChildren")
+
+	ctx := r.Context()
+
+	fn := "/home"
+
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Err(err).Msg("error getting grpc client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	req := &storageprovider.ListContainerRequest{Ref: &storageprovider.Reference{Path: fn}}
+
+	res, err := client.ListContainer(ctx, req)
+	if err != nil {
+		g.logger.Error().Err(err).Msgf("error sending list container grpc request %s", fn)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		errorcode.HandleErrorStatus(&g.logger.Logger, w, res.Status)
+		return
+	}
+
+	files, err := formatDriveItems(res.Infos)
+	if err != nil {
+		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: files})
+}
+
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
 	return time.Unix(int64(t.Seconds), int64(t.Nanos))
 }
@@ -119,7 +284,7 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
 	size := new(int64)
 	*size = int64(res.Size) // uint64 -> int :boom:
-	name := strings.TrimPrefix(res.Path, "/home/")
+	name := path.Base(res.Path)
 
 	id := res.Id.StorageId + "!" + res.Id.OpaqueId
 
