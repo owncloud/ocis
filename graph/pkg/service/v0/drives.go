@@ -32,19 +32,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := &storageprovider.ListStorageSpacesRequest{
-
-		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
-			{
-				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-					Id: &storageprovider.StorageSpaceId{
-						OpaqueId: "1284d238-aa92-42ce-bdc4-0b0000009157!*", // FIXME dynamically discover home and other storages ... actually the storage registry should provide the list of storage spaces
-					},
-				},
-			},
-		},
-	}
+	req := &storageprovider.ListStorageSpacesRequest{}
 
 	res, err := client.ListStorageSpaces(ctx, req)
 	if err != nil {
@@ -356,7 +344,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 	//  -> used to indicate a file has been shared in the row of files, when selecting the file
 	//     GET /me/drive/items/{item-id}/permissions can be used to list the actual permissions
 
-	// oc:favorite
+	// oc:favorite hmmm map to following? subscriptions?
 	// oc:owner-id
 	// oc:share-types
 	// oc:owner-display-name
