@@ -63,12 +63,3 @@ oCIS leverages the CS3 APIs and [CS3 REVA](https://github.com/cs3org/reva) as a 
 If you need to interact with files directly, you have the full power of the [CS3 APIs](https://cs3org.github.io/cs3apis/) in your hand. With the user context and the users' authentication token, which your extensions gets from the proxy, your extension can make these request in behalf of the user.
 
 If your extension needs to store persistent data which is not supposed to live in the user's home folder, there is also a so-called metadata storage, intended for exactly that purpose. You should always use the metadata storage in favor of the local filesystem for persistent files, because your extension will then automatically use the storage backend the oCIS admin decides to use. For a temporary cache it is perfectly fine to use the local filesystem.
-
-## Development Roadmap
-
-Whilst reading the above section you might have noticed that some integrations need a manual setup as of now. As mentioned before, we are planning to switch to automatic service discovery in a later development stage of oCIS.
-
-There are some more topics on our roadmap for the extension system:
-
-- Events: Allow extensions to register for some events. On occurrence of the event, they will then receive some kind of notification or a callback. This would for example allow your application to perform actions on the creation, modification or deletion of a file.
-- Entitlement of extensions to act in behalf of users without a request context: user should be able to grant and revoke extensions access to their files even in behalf of them eg. in the background.
