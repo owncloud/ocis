@@ -2088,6 +2088,3 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavProperties1/copyFile.feature:438](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L438)
 -   [apiWebdavProperties1/copyFile.feature:464](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L464)
 -   [apiWebdavProperties1/copyFile.feature:465](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L465)
-
-#### [different error message detail for previews of folder](different error message detail for previews of folder)
--   [apiWebdavPreviews/previews.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L116)
