@@ -647,6 +647,10 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 #### [file_target has unexpected value](https://github.com/owncloud/ocis/issues/2113)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L36)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L37)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:619](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L619)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:620](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L620)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:674](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L674)
+-   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:675](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L675)
 
 #### [no displayname_owner shown when creating a share](https://github.com/owncloud/ocis-reva/issues/301)
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L92)
@@ -758,6 +762,11 @@ cannot share a folder with create permission
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L44)
+
+
+#### [different error message detail for previews of folder](https://github.com/owncloud/ocis/issues/2064)
+
+-   [apiWebdavPreviews/previews.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L116)
 
 #### [creating public links with permissions fails](https://github.com/owncloud/product/issues/252)
 
@@ -1400,8 +1409,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareUpdateToShares/updateShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L63)
 -   [apiShareUpdateToShares/updateShare.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L64)
 
- 
- 
 #### [Share permissions can be updated to any value](https://github.com/owncloud/ocis/issues/2173)
 -   [apiShareUpdateToShares/updateShare.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L120)
 -   [apiShareUpdateToShares/updateShare.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L121)
@@ -1418,12 +1425,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 #### [user can access version metadata of a received share before accepting it](https://github.com/owncloud/ocis/issues/760)
 -   [apiVersions/fileVersionsSharingToShares.feature:278](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L278)
-
-#### [when a share exists its impossible to share a renamed folder](https://github.com/owncloud/ocis/issues/719)
--   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:619](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L619)
--   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:620](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L620)
--   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:674](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L674)
--   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:675](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L675)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:641](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L641)
@@ -1494,7 +1495,7 @@ special character username not valid
 -   [apiProvisioning-v2/disableUser.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L207)
 -   [apiProvisioning-v2/disableUser.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L223)
 
-#### [displayname of user can be changed to empty](https://github.com/owncloud/ocis-ocs/issues/51)
+#### [Update displayname to empty value is successful](https://github.com/owncloud/ocis/issues/2167)
 -   [apiProvisioning-v1/editUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L47)
 -   [apiProvisioning-v2/editUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L47)
 
@@ -1696,7 +1697,7 @@ _ocdav: api compatibility, return correct status code_
 -   [apiAuthWebDav/webDavPROPFINDAuth.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPROPFINDAuth.feature#L39)  Scenario: send PROPFIND requests to another user's webDav endpoints as normal user
 -   [apiAuthWebDav/webDavPROPPATCHAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPROPPATCHAuth.feature#L40) Scenario: send PROPPATCH requests to another user's webDav endpoints as normal user
 -   [apiAuthWebDav/webDavMKCOLAuth.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMKCOLAuth.feature#L36) Scenario: send MKCOL requests to another user's webDav endpoints as normal user
- 
+
 #### [trying to lock file of another user gives http 200](https://github.com/owncloud/ocis/issues/2176)
 -   [apiAuthWebDav/webDavLOCKAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavLOCKAuth.feature#L40) Scenario: send LOCK requests to another user's webDav endpoints as normal user
 
@@ -2057,7 +2058,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L50)
 -   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L53)
 
-#### [blacklisted filenames like .htaccess & file.parts can be uploaded](https://github.com/owncloud/ocis/issues/1345)
+#### [Blacklist files extensions](https://github.com/owncloud/ocis/issues/2177)
 -   [apiWebdavProperties1/copyFile.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L107)
 -   [apiWebdavProperties1/copyFile.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L108)
 -   [apiWebdavProperties1/createFolder.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L71)
@@ -2149,7 +2150,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L66)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L67)
 
-
 #### [Checksum feature](https://github.com/owncloud/ocis/issues/1291)
 -   [apiMain/checksums.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L164) Scenario: Upload new dav chunked file using async MOVE where checksum matches
 -   [apiMain/checksums.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L180) Scenario: Upload new dav chunked file using async MOVE where checksum does not match
@@ -2223,12 +2223,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavProperties1/copyFile.feature:438](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L438)
 -   [apiWebdavProperties1/copyFile.feature:464](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L464)
 -   [apiWebdavProperties1/copyFile.feature:465](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L465)
-
-#### [Public link expiration time is not valid in public link](https://github.com/owncloud/ocis/issues/2181)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L78)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L79)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L174)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L175)
 
 #### [different error message detail for previews of folder](different error message detail for previews of folder)
 -   [apiWebdavPreviews/previews.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L116)
