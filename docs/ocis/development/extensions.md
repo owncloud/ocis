@@ -40,7 +40,7 @@ If your extension is not just doing something in the background, you will need a
 
 ownCloud Web allows you to write an extension for itself and therefore offers a seamless user experience. Upon login, the user will be able to use the application switcher to switch between the files view, settings and other available and installed extensions, yours included. Furthermore it is also possible to register your extension for different file actions. As an example, you could offer your extension to the user for creating and editing office documents. The user will then be able to create or open a file with your application directly from the files view. How to provide create an extension for ownCloud Web can be seen best in [the Hello extension](https://github.com/owncloud/ocis-hello/blob/master/ui/app.js), whereas plain file handling without any web frontend is available in the [WOPI server extension](https://github.com/owncloud/ocis-wopiserver/blob/master/ui/app.js).
 
-To make ownCloud Web pick up your extension, you need to activate it in the configuration like seen in the [Hello extension](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis). As of now this is a manual task, but in the future this will be done automatically by service discovery.
+To make ownCloud Web pick up your extension, you need to activate it in the configuration like seen in the [Hello extension](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
 
 For a consistent look and feel, ownCloud Web uses a external design library, the [ownCloud design system](https://github.com/owncloud/owncloud-design-system). Since its classes and components are available through the wrapping `web runtime`, we highly recommend you to leverage it in your extension as well.
 
@@ -52,7 +52,7 @@ An extension likely has some behaviour which the user can configure. Fundamental
 
 The Proxy is an API gateway and acts as the single connection point where all external request from users and devices need to pass through.
 
-To make sure that requests can reach your extension's API, you need to register one or multiple endpoints at the proxy. This is currently done by manually adding routes to a config file, but will be done dynamically by service discovery in the future. The registration is a easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
+To make sure that requests can reach your extension's API, you need to register one or multiple endpoints at the proxy. The registration is a easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
 
 As files in ownCloud must always stay private (unless you share them with your friends or coworkers), requests to oCIS have an authenticated user context. This user context is also available to your extension and can be used to interact with the user's files. How to get the user context and authentication can be seen on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/settings/#account-uuid).
 
