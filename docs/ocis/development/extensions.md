@@ -7,9 +7,9 @@ geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: extensions.md
 ---
 
-oCIS is all about files, sync and share - but most of the time there is more you want to do with your files, e.g. having a different view on your photo collection or editing your offices files in an online file editor. ownCloud 10 faced the same problem and solved them with applications, which can extend the functionality of ownCloud 10 in a wide range. oCIS has a similar concept to be extended in its functionality: Extensions. Because oCIS is different in its architecture compared to ownCloud 10, this also applies to the extensions. An extension is basically any running code which integrates into oCIS and provides functionality to oCIS and its users. Because extensions are just microservices providing an API, you can technically choose any programming language you like - a huge improvement to ownCloud 10, where it was nearly impossible to use a different programming language than PHP.
+oCIS is all about files, sync and share - but most of the time there is more you want to do with your files, e.g. having a different view on your photo collection or editing your offices files in an online file editor. ownCloud 10 faced the same problem and solved it with `applications`, which can extend the functionality of ownCloud 10 in a wide range. Since oCIS is different in its architecture compared to ownCloud 10, we had to come up with a similiar (yet slightly different) solution. To extend the functionality of oCIS, you can write or install `extensions`. An extension is basically any running code which integrates into oCIS and provides functionality to oCIS and its users. Because extensions are just microservices providing an API, you can technically choose any programming language you like - a huge improvement to ownCloud 10, where it was nearly impossible to use a different programming language than PHP.
 
-We will now introduce you to the oCIS extension system and how you can use it for your extension.
+We will now introduce you to the oCIS extension system and show you how you can create a custom extension yourself.
 
 ## Extension examples
 
@@ -52,14 +52,14 @@ An extension likely has some behaviour which the user can configure. Fundamental
 
 The Proxy is an API gateway and acts as the single connection point where all external request from users and devices need to pass through.
 
-To make sure that requests can reach your extensions' API, you need to register one or multiple endpoints at the proxy. This is currently done by manually adding routes to a config file, but will be done dynamically by service discovery in the future. The registration is a easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
+To make sure that requests can reach your extension's API, you need to register one or multiple endpoints at the proxy. This is currently done by manually adding routes to a config file, but will be done dynamically by service discovery in the future. The registration is a easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
 
-As files in ownCloud must always stay private, unless you share them with your friends or coworkers, requests to oCIS have an authenticated user context. This user context is also available to your extension and can be used to interact with the users' files. How to get the user context and authentication can be seen on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/settings/#account-uuid).
+As files in ownCloud must always stay private (unless you share them with your friends or coworkers), requests to oCIS have an authenticated user context. This user context is also available to your extension and can be used to interact with the user's files. How to get the user context and authentication can be seen on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/settings/#account-uuid).
 
 ### Storage
 
 oCIS leverages the CS3 APIs and [CS3 REVA](https://github.com/cs3org/reva) as a storage system because it offers a very flexible setup and supports a variety of storage backends like EOS, S3 and of course your local hard drive. REVA makes it easy to support more storage backends as needed.
 
-If you need to interact with files directly, you have the full power of the [CS3 APIs](https://cs3org.github.io/cs3apis/) in your hand. With the user context and the users' authentication token, which your extensions gets from the proxy, your extension can make these request in behalf of the user.
+If you need to interact with files directly, you have the full power of the [CS3 APIs](https://cs3org.github.io/cs3apis/) in your hand. With the user context and the user's authentication token, which your extensions gets from the proxy, your extension can make these request in behalf of the user.
 
 If your extension needs to store persistent data which is not supposed to live in the user's home folder, there is also a so-called metadata storage, intended for exactly that purpose. You should always use the metadata storage in favor of the local filesystem for persistent files, because your extension will then automatically use the storage backend the oCIS admin decides to use. For a temporary cache it is perfectly fine to use the local filesystem.
