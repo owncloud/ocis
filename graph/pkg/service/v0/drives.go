@@ -43,7 +43,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 
-	fn := "/home"
+	fn := g.config.WebdavNamespace
 
 	client, err := g.GetClient()
 	if err != nil {

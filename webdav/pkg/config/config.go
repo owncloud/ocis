@@ -49,6 +49,7 @@ type Config struct {
 	Tracing Tracing
 	Service Service
 	OcisPublicURL string
+	WebdavNamespace string
 
 	Context    context.Context
 	Supervised bool

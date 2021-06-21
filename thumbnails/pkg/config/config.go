@@ -64,6 +64,7 @@ type Thumbnail struct {
 	FileSystemStorage   FileSystemStorage
 	WebdavAllowInsecure bool
 	RevaGateway         string
+	WebdavNamespace     string
 }
 
 // New initializes a new configuration with or without defaults.
