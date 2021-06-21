@@ -76,7 +76,7 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^6.0.1"
+    "owncloud-design-system": "^7.4.2"
   },
   "dependencies": {
     "validator": "^13.1.1"
