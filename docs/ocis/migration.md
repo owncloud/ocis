@@ -68,7 +68,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 ### Stage 2: introduce OpenID Connect
 
 Basic auth requires us to properly store and manage user credentials. Something we would rather like to delegate to a tool specifically built for that task.
-While SAML and Shibboleth are protocols that solve that problem, they are limited to web clients. Desktop and mobile clients were an afterthought and keep running into timeouts. For these reasons, we decided to move to OpenID Connect as our primary authentication protocol.
+While SAML and Shibboleth are protocols that solve that problem, they are limited to web clients. Desktop and mobile clients were an afterthought and keep running into timeouts. For these reasons, we decided to move to [OpenID Connect as our primary authentication protocol](https://owncloud.com/news/openid-connect-oidc-app/). 
 
 <div class="editpage">
 
@@ -376,7 +376,7 @@ Redeploy ownCloud 10.
 
 #### Notes
 <div style="break-after: avoid"></div>
-The database needs to remain online until the storage layer has been migrated as well. On thing at a time.
+The database needs to remain online until the storage layer and share metadata have been migrated as well. One thing at a time.
 
 <div class="editpage">
 
@@ -391,7 +391,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 To get rid of the database we will move the metadata from the old ownCloud 10 database into dedicated storage providers. This can happen in a user by user fashion. group drives can properly be migrated to group, project or workspaces in this stage.
 
 #### User impact
-Noticeable performance improvements because we effectively shard the storage logic and persistence.
+Noticeable performance improvements because we effectively shard the storage logic and persistence layer.
 
 #### Steps 
 1. User by user storage migration from `owncloud` or `ownclouds3` driver to `ocis`/`s3ng`/`cephfs`... currently this means copying the metadata from one storage provider to another using the cs3 api.
@@ -426,14 +426,47 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 <div style="break-after: page"></div>
 
-### Stage-9
-Migrate share data to _yet to determine_ share manager backend and shut down ownCloud database
+### Stage-9: share metadata migration
+Migrate share data to _yet to determine_ share manager backend and shut down ownCloud database.
 
+The ownCloud 10 database still holds share information in the `oc_share` and `oc_share_external` tables. They are used to efficiently answer queries about who shared what with whom. In oCIS shares are persisted using a share manager and if desired these grants are also sent to the storage provider so it can set ACLs if possible. Only one system should be responsible for the shares, which in case of treating the storage as the primary source effectively turns the share manager into a cache.
+
+#### User impact
+Depending on chosen the share manager provider some sharing requests should be faster: listing incoming and outgoing shares is no longer bound to the ownCloud 10 database but to whatever technology is used by the share provdier:
+  - For non HA scenarios they can be served from memory, backed by a simple json file.
+  - TODO: implement share manager with redis / nats / ... key value store backend: use the micro store interface please ...
+
+#### Steps 
+1. Start new share manager
+2. Migrate metadata using the CS3 API (copy from old to new)
+3. Shut down old share manager
+4. Shut down ownCloud 10 database
+
+<div class="editpage">
+
+_TODO for HA implement share manager with redis / nats / ... key value store backend: use the micro store interface please ..._
+_TODO for batch migration implement share data migration cli with progress that reads all shares via the cs3 api from one provider and writes them into another provider_
+_TODO for seamless migration implement tiered/chained share provider that reads share data from the old provider and writes newc shares to the new one_
+_TODO for storage provider as source of truth persist ALL share data in the storage provider. Currently, part is stored in the share manager, part is in the storage provider. We can keep both, but the the share manager should directly persist its metadata to the storage system used by the storage provider so metadata is kept in sync_
+
+</div>
+
+#### Verification
+After copying all metadata start a dedicated gateway and change the configuration to use the new share manager. Route a test user, a test group and early adoptors to the new gateway. When no problems occur you can stirt the desired number of share managers and roll out the change to all gateways.
+
+<div class="editpage">
+
+_TODO let the gateway write updates to multiple share managers ... or rely on the tiered/chained share manager provider to persist to both providers_
+
+</div>
+
+#### Rollback
+To switch the share manager to the database one revert routing users to the new share manager. If you already shut down the old share manager start it again. Use the tiered/chained share manager provider in reverse configuration (new share provider as read only, old as write) and migrate the shares again. You can alse restore a database backup if needed.
 
 <div class="editpage">
 
 ### Stage-10
-Profit! (db for file metadata no longer necessary, less maintenance effort)
+Profit! Well, on the one hand you do not need to maintain a clustered database setup and can rely on the storage system. On the other hand you are now in microservice wonderland and will have to relearn how to identify bottlenecks and scale oCIS accordingly. The good thing is that tools like jaeger and prometheus have evolved and will help you understand what is going on. But this is a different Topic. See you on the other side!
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
