@@ -158,6 +158,11 @@ type PublicStorage struct {
 	UserProviderAddr        string
 }
 
+// PublicShares configures a shares storage provider
+type SharesStorage struct {
+	StoragePort
+}
+
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
 	Home        DriverCommon
@@ -387,6 +392,7 @@ type Reva struct {
 	StorageHome       StoragePort
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
+	StorageShares     SharesStorage
 	StorageMetadata   StoragePort
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
