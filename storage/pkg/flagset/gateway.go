@@ -282,6 +282,23 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_PATH"},
 			Destination: &cfg.Reva.StoragePublicLink.MountPath,
 		},
+
+		// register shares storage
+
+		&cli.StringFlag{
+			Name:        "shares-endpoint",
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageShares.Endpoint, "localhost:9182"),
+			Usage:       "endpoint to use for the shares storage service",
+			EnvVars:     []string{"STORAGE_SHARES_ENDPOINT"},
+			Destination: &cfg.Reva.StorageShares.Endpoint,
+		},
+		&cli.StringFlag{
+			Name:        "storage-shares-mount-path",
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageShares.MountPath, "/home/Shares"),
+			Usage:       "mount path to use for the shares storage service",
+			EnvVars:     []string{"STORAGE_SHARES_MOUNT_PATH"},
+			Destination: &cfg.Reva.StorageShares.MountPath,
+		},
 		// public-link has no mount id
 	}
 

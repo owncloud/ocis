@@ -83,6 +83,7 @@ func Execute(cfg *config.Config) error {
 			StorageHome(cfg),
 			StorageUsers(cfg),
 			StoragePublicLink(cfg),
+			StorageShares(cfg),
 			StorageMetadata(cfg),
 			Health(cfg),
 		},

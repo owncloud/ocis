@@ -200,6 +200,11 @@ type PublicStorage struct {
 	UserProviderAddr        string
 }
 
+// PublicShares configures a shares storage provider
+type SharesStorage struct {
+	StoragePort
+}
+
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
 	EOS         DriverEOS
@@ -457,6 +462,7 @@ type Reva struct {
 	StorageHome       StoragePort
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
+	StorageShares     SharesStorage
 	StorageMetadata   StoragePort
 	AppProvider       AppProvider
 	// Configs can be used to configure the reva instance.
