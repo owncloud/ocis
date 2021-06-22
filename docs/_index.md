@@ -28,7 +28,7 @@ You can also find all client sources on [GitHub](https://github.com/owncloud/).
 
 The oCIS server repository on GitHub is a good entry point for you to join the project. But we also develop clients for iOS, Android, Desktop and Web.
 
-For communication on development, join our public chat [talk.owncloud.com](https://talk.owncloud.com)
+For communication on development, [join our public chat](https://talk.owncloud.com/channel/ocis)
 
 If you want to help and improve ownCloud or oCIS, start coding or open issues on GitHub in the related repository.
 
