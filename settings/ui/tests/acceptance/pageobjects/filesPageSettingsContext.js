@@ -57,10 +57,6 @@ module.exports = {
     pageHeader: {
       selector: '.oc-page-title'
     },
-    languageValue: {
-      selector: "//button[@id='single-choice-toggle-profile-language']",
-      locateStrategy: 'xpath'
-    },
     fileSidebarNavItem: {
       selector: '.oc-sidebar-nav-item'
     },

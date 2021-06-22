@@ -17,14 +17,14 @@ const filesMenu = {
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
-    "Shared via link",
+    'Shared via link',
     'Archivos borrados'
   ],
   Français: [
     'Tous les fichiers',
     'Partagé avec moi',
     'Partagé avec autres',
-    "Shared via link",
+    'Shared via link',
     'Fichiers supprimés'
   ]
 }
