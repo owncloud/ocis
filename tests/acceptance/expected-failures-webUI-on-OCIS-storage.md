@@ -1,4 +1,4 @@
-## Scenarios from web tests that are expected to fail on OCIS with OCIS storage
+## Scenarios from web tests that are expected to fail on OCIS with owncloud storage
 
 Lines that contain a format like "[someSuite.someFeature.feature:n](https://github.com/owncloud/web/path/to/feature)"
 are lines that document a specific expected failure. Follow that with a URL to the line in the feature file in GitHub.
@@ -6,9 +6,7 @@ Please follow this format for the actual expected failures.
 
 Level-3 headings should be used for the references to the relevant issues. Include the issue title with a link to the issue in GitHub.
 
-Other free text and Markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
-
-Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The expected-failures here are for when a PR is run with full-ci in the title.
+Other free text and markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
 
 ### [Media Viewer does not support mp3 files](https://github.com/owncloud/ocis/issues/1106)
 -   [webUIPreview/imageMediaViewer.feature:83](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L83)
@@ -17,6 +15,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [Media Viewer preview not visible for files with .jpeg, .ogg, .webm and .gif formats](https://github.com/owncloud/ocis/issues/1490)
 -   [webUIPreview/imageMediaViewer.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L140)
 -   [webUIPreview/imageMediaViewer.feature:158](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L158)
+
 
 ### [Exit page re-appears in loop when logged in user is deleted](https://github.com/owncloud/web/issues/4677)
 -   [webUILogin/openidLogin.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L53)
@@ -51,23 +50,23 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 
 ### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 -   [webUIDeleteFilesFolders/deleteFilesFolders.feature:235](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L235)
--   [webUIFilesDetails/fileDetails.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L99)
--   [webUIFilesDetails/fileDetails.feature:116](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L116)
--   [webUIFilesActionMenu/versions.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L34)
+-   [webUIFilesDetails/fileDetails.feature:97](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L97)
+-   [webUIFilesDetails/fileDetails.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L114)
+-   [webUIFilesActionMenu/versions.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L36)
 -   [webUIRenameFiles/renameFiles.feature:202](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L202)
 -   [webUIRenameFiles/renameFiles.feature:227](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L227)
 -   [webUIRenameFiles/renameFiles.feature:249](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L249)
--   [webUISharingInternalUsers/shareWithUsers.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L57)
--   [webUISharingInternalUsers/shareWithUsers.feature:58](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L58)
--   [webUISharingInternalUsers/shareWithUsers.feature:59](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L59)
--   [webUISharingInternalUsers/shareWithUsers.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L141)
--   [webUISharingInternalUsers/shareWithUsers.feature:184](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L184)
--   [webUISharingInternalUsers/shareWithUsers.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L199)
--   [webUISharingInternalUsers/shareWithUsers.feature:233](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L233)
--   [webUISharingInternalUsers/shareWithUsers.feature:279](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L279)
--   [webUISharingInternalUsers/shareWithUsers.feature:280](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L280)
--   [webUISharingInternalUsers/shareWithUsers.feature:281](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L281)
--   [webUISharingInternalUsers/shareWithUsers.feature:350](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L350)
+-   [webUISharingInternalUsers/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L53)
+-   [webUISharingInternalUsers/shareWithUsers.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L54)
+-   [webUISharingInternalUsers/shareWithUsers.feature:55](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L55)
+-   [webUISharingInternalUsers/shareWithUsers.feature:137](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L137)
+-   [webUISharingInternalUsers/shareWithUsers.feature:180](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L180)
+-   [webUISharingInternalUsers/shareWithUsers.feature:195](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L195)
+-   [webUISharingInternalUsers/shareWithUsers.feature:229](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L229)
+-   [webUISharingInternalUsers/shareWithUsers.feature:275](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L275)
+-   [webUISharingInternalUsers/shareWithUsers.feature:276](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L276)
+-   [webUISharingInternalUsers/shareWithUsers.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L277)
+-   [webUISharingInternalUsers/shareWithUsers.feature:346](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L346)
 -   [webUISharingInternalUsersCollaborator/shareWithUsers.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L35)
 -   [webUISharingInternalUsersCollaborator/shareWithUsers.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L36)
 -   [webUISharingInternalUsersCollaborator/shareWithUsers.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L37)
@@ -132,9 +131,9 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIFilesList/fileList.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesList/fileList.feature#L33)
 
 ### [Versions Cleanup not available](https://github.com/owncloud/ocis/issues/1310)
--   [webUIFilesActionMenu/versions.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L46)
--   [webUIFilesActionMenu/versions.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L57)
--   [webUIFilesActionMenu/versions.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L72)
+-   [webUIFilesActionMenu/versions.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L48)
+-   [webUIFilesActionMenu/versions.feature:59](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L59)
+-   [webUIFilesActionMenu/versions.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L74)
 
 ### [Search feature does not exist](https://github.com/owncloud/ocis/issues/1330)
 -   [webUIFilesSearch/search.feature:27](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L27)
@@ -149,7 +148,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIFilesSearch/search.feature:175](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L175)
 -   [webUIFilesSearch/search.feature:184](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L184)
 
-### [No occ command in ocis - restrictReSharing](https://github.com/owncloud/ocis/issues/1317)
+### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 -   [webUIRestrictSharing/restrictReSharing.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L23)
 -   [webUIRestrictSharing/restrictReSharing.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L42)
 -   [webUIRestrictSharing/restrictSharing.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L31)
@@ -162,8 +161,8 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingAutocompletion/shareAutocompletion.feature:128](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L128)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L141)
 
-### [No occ command in ocis - shareAutocompletion](https://github.com/owncloud/ocis/issues/1317)
-### [First request with a recreated user returns a 401 error (2)](https://github.com/owncloud/ocis/issues/1675)
+### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
+### [First request with a recreated user returns a 401 error](https://github.com/owncloud/ocis/issues/1675)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L76)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:115](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L115)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:154](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L154)
@@ -179,6 +178,8 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [Minimum of three characters required for autocompletion](https://github.com/owncloud/ocis/issues/1961)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L32)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L44)
+-   [webUISharingAutocompletion/shareAutocompletion.feature:87](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L87)
+-   [webUISharingAutocompletion/shareAutocompletion.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L101)
 
 ### [Cannot create users with special characters](https://github.com/owncloud/ocis/issues/1417)
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L36)
@@ -186,23 +187,24 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L38)
 -   [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:39](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L39)
 
-### [No occ command in ocis - shareWithUsers and Groups](https://github.com/owncloud/ocis/issues/1317)
--   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L26)
--   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L44)
--   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L62)
--   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L80)
--   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:92](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L92)
--   [webUISharingInternalGroups/shareWithGroups.feature:216](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L216)
+### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
+-   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L16)
+-   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L34)
+-   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L52)
+-   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L70)
+-   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L82)
+-   [webUISharingInternalGroups/shareWithGroups.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L200)
 
 ### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis/issues/1428)
 -   [webUILogin/openidLogin.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L46)
+
 
 ### webUI-Private-Links
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L34)
--   [webUIPrivateLinks/accessingPrivateLinks.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L50)
+-   [webUIPrivateLinks/accessingPrivateLinks.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L44)
 
 ### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [webUIRestrictSharing/disableSharing.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L16)
@@ -226,11 +228,12 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:106](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L106)
 -   [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L130)
 -   [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:147](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L147)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:335](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L335)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:343](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L343)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:352](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L352)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:361](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L361)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:370](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L370)
+-   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:279](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L279)
+-   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:287](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L287)
+-   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:296](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L296)
+-   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:305](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L305)
+-   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:314](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L314)
+
 
 ### [Cannot delete a received share](https://github.com/owncloud/ocis/issues/714)
 -   [webUISharingAcceptShares/acceptShares.feature:203](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L203)
@@ -238,7 +241,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [Accepting different shares with same filename from different users overwrites one file](https://github.com/owncloud/ocis/issues/713)
 -   [webUISharingAcceptShares/acceptShares.feature:218](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L218)
 
-### [Enable re-sharing is not possible (1)](https://github.com/owncloud/ocis/issues/1743)
+### [Enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
 ### [Share Permissions](https://github.com/owncloud/ocis/issues/1277)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L61)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L62)
@@ -251,7 +254,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L65)
 -   [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
 
-### [Enable re-sharing is not possible (2)](https://github.com/owncloud/ocis/issues/1743)
+### [Enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L64)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L65)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L64)
@@ -266,33 +269,34 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUISharingInternalGroups/shareWithGroups.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L73)
 
 ### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
--   [webUISharingInternalGroups/shareWithGroups.feature:182](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L182)
--   [webUISharingInternalGroups/shareWithGroups.feature:196](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L196)
+-   [webUISharingInternalGroups/shareWithGroups.feature:166](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L166)
+-   [webUISharingInternalGroups/shareWithGroups.feature:180](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L180)
 
-### [No occ command in ocis - shareWithGroups](https://github.com/owncloud/ocis/issues/1317)
+### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 ### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
--   [webUISharingInternalGroups/shareWithGroups.feature:293](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L293)
+-   [webUISharingInternalGroups/shareWithGroups.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L277)
 
 ### [Different path for shares inside folder](https://github.com/owncloud/ocis/issues/1231)
-### [Different share permissions provides varying roles in oc10 and ocis (2)](https://github.com/owncloud/ocis/issues/1277)
--   [webUISharingInternalGroups/shareWithGroups.feature:228](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L228)
+### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
+-   [webUISharingInternalGroups/shareWithGroups.feature:212](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L212)
 
-### [Expiration date set is not implemented in user share (2)](https://github.com/owncloud/ocis/issues/1250)
--   [webUISharingInternalGroups/shareWithGroups.feature:271](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L271)
--   [webUISharingInternalGroups/shareWithGroups.feature:324](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L324)
--   [webUISharingInternalGroups/shareWithGroups.feature:325](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L325)
--   [webUISharingInternalGroups/shareWithGroups.feature:349](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L349)
--   [webUISharingInternalGroups/shareWithGroups.feature:350](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L350)
+### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
+-   [webUISharingInternalGroups/shareWithGroups.feature:255](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L255)
+-   [webUISharingInternalGroups/shareWithGroups.feature:308](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L308)
+-   [webUISharingInternalGroups/shareWithGroups.feature:309](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L309)
+-   [webUISharingInternalGroups/shareWithGroups.feature:333](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L333)
+-   [webUISharingInternalGroups/shareWithGroups.feature:334](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L334)
 
 ### [Sharing Indicator difference](https://github.com/owncloud/ocis/issues/1949)
 -   [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L61)
 
-### [renaming a resource does not work](https://github.com/owncloud/ocis-reva/issues/14)
+### [Notifications endpoint](https://github.com/owncloud/ocis/issues/14)
 -   [webUISharingNotifications/shareWithGroups.feature:24](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithGroups.feature#L24)
 -   [webUISharingNotifications/shareWithUsers.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L21)
 -   [webUISharingNotifications/shareWithUsers.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L32)
 -   [webUISharingNotifications/shareWithUsers.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L40)
 -   [webUISharingNotifications/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L53)
+-   [webUISharingNotifications/notificationLink.feature:18](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/notificationLink.feature#L18)
 
 ### [name of public link is empty and not "Public link" when not specified in the create request](https://github.com/owncloud/ocis/issues/1237)
 -   [webUISharingPublicBasic/publicLinkCreate.feature:11](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L11)
@@ -304,6 +308,8 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 
 ### [Cannot upload files to the ownCloud storage](https://github.com/owncloud/ocis-reva/issues/398)
 -   [webUISharingPublicBasic/publicLinkPublicActions.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkPublicActions.feature#L12)
+
+
 
 ### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 -   [webUISharingPublicManagement/shareByPublicLink.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L146)
@@ -319,13 +325,6 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [restoring a file deleted from a received shared folder is not possible](https://github.com/owncloud/ocis/issues/1124)
 -   [webUITrashbinRestore/trashbinRestore.feature:260](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L260)
 
-### [Adjust web UI test scenarios that demonstrate fixed bugs](https://github.com/owncloud/web/issues/4601)
--   [webUISharingPublicManagement/shareByPublicLink.feature:183](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L183)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:142](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L142)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:322](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L322)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:299](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L299)
--   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:236](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L236)
-
 ### [Blocked user is not logged out](https://github.com/owncloud/ocis/issues/902)
 -   [webUILogin/adminBlocksUser.feature:13](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L13)
 
@@ -335,7 +334,7 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 ### [Moving files in a shared folder causes errors but succeeds](https://github.com/owncloud/ocis/issues/873)
 -   [webUIMoveFilesFolders/moveFiles.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L140)
 
-### [enable re-sharing is not possible (3)](https://github.com/owncloud/ocis/issues/1743)
+### [enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L71)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L70)
 -   [webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionMultipleUsers/sharedFolderWithMultipleUsersAdvancedPermissions.feature#L69)
@@ -399,10 +398,21 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUIFilesList/sort.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesList/sort.feature#L51)
 -   [webUIFilesList/sort.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesList/sort.feature#L72)
 
-### [Comments in sidebar](https://github.com/owncloud/web/issues/1158)
--   [webUIComments/comments.feature:24](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L24)
+
+### [Comments in sidebar] (https://github.com/owncloud/web/issues/1158)
 -   [webUIComments/comments.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L25)
 -   [webUIComments/comments.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L26)
+-   [webUIComments/comments.feature:27](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L27)
+-   [webUIComments/comments.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L40)
+-   [webUIComments/comments.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L41)
+-   [webUIComments/comments.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L42)
+-   [webUIFilesDetails/fileDetails.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L66)
+-   [webUIFilesDetails/fileDetails.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L82)
+-   [webUIFilesDetails/fileDetails.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L99)
+-   [webUIFilesDetails/fileDetails.feature:116](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L116)
+-   [webUIFilesDetails/fileDetails.feature:143](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L143)
+
+
 
 ### [Groups endpoint does not exist](https://github.com/owncloud/ocis-reva/issues/34)
 -   [webUIRestrictSharing/restrictSharing.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature:49)
@@ -416,5 +426,65 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. The e
 -   [webUITrashbinDelete/trashbinDelete.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L50)
 
 ### [Trying to create a (public) link share of the Shares folder throws an error](https://github.com/owncloud/web/issues/5152)
--   [webUISharingInternalUsers/shareWithUsers.feature:364](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L364)
+-   [webUISharingInternalUsers/shareWithUsers.feature:360](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L360)
 -   [webUISharingPublicBasic/publicLinkCreate.feature:195](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L195)
+
+### [Admin settings feature not implemented yet] (https://github.com/owncloud/web/issues/5015)
+-   [webUIAdminSettings/adminAppsSettings.feature:11](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminAppsSettings.feature#L11)
+-   [webUIAdminSettings/adminAppsSettings.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminAppsSettings.feature#L17)
+-   [webUIAdminSettings/adminGeneralSettings.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L12)
+-   [webUIAdminSettings/adminGeneralSettings.feature:30](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L30)
+-   [webUIAdminSettings/adminGeneralSettings.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L36)
+-   [webUIAdminSettings/adminGeneralSettings.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L42)
+-   [webUIAdminSettings/adminGeneralSettings.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L49)
+-   [webUIAdminSettings/adminGeneralSettings.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L56)
+-   [webUIAdminSettings/adminGeneralSettings.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminGeneralSettings.feature#L63)
+-   [webUIAdminSettings/adminSharingSettings.feature:8](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L8)
+-   [webUIAdminSettings/adminSharingSettings.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L14)
+-   [webUIAdminSettings/adminSharingSettings.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L20)
+-   [webUIAdminSettings/adminSharingSettings.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L26)
+-   [webUIAdminSettings/adminSharingSettings.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L32)
+-   [webUIAdminSettings/adminSharingSettings.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L38)
+-   [webUIAdminSettings/adminSharingSettings.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L44)
+-   [webUIAdminSettings/adminSharingSettings.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L50)
+-   [webUIAdminSettings/adminSharingSettings.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L56)
+-   [webUIAdminSettings/adminSharingSettings.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L63)
+-   [webUIAdminSettings/adminSharingSettings.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L69)
+-   [webUIAdminSettings/adminSharingSettings.feature:75](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L75)
+-   [webUIAdminSettings/adminSharingSettings.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L82)
+-   [webUIAdminSettings/adminSharingSettings.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L89)
+-   [webUIAdminSettings/adminSharingSettings.feature:96](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L96)
+-   [webUIAdminSettings/adminSharingSettings.feature:103](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L103)
+-   [webUIAdminSettings/adminSharingSettings.feature:110](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L110)
+-   [webUIAdminSettings/adminSharingSettings.feature:117](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L117)
+-   [webUIAdminSettings/adminSharingSettings.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L124)
+-   [webUIAdminSettings/adminSharingSettings.feature:131](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L131)
+-   [webUIAdminSettings/adminSharingSettings.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L138)
+-   [webUIAdminSettings/adminSharingSettings.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminSharingSettings.feature#L145)
+-   [webUIAdminSettings/adminStorageSettings.feature:8](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L8)
+-   [webUIAdminSettings/adminStorageSettings.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L14)
+-   [webUIAdminSettings/adminStorageSettings.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L20)
+-   [webUIAdminSettings/adminStorageSettings.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L29)
+-   [webUIAdminSettings/adminStorageSettings.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L48)
+-   [webUIAdminSettings/adminStorageSettings.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L64)
+-   [webUIAdminSettings/adminStorageSettings.feature:81](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L81)
+-   [webUIAdminSettings/adminStorageSettings.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L99)
+-   [webUIAdminSettings/adminStorageSettings.feature:109](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L109)
+-   [webUIAdminSettings/adminStorageSettings.feature:120](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L120)
+-   [webUIAdminSettings/adminStorageSettings.feature:135](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminStorageSettings.feature#L135)
+-   [webUIAdminSettings/helpAndTips.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/helpAndTips.feature#L16)
+-   [webUIAdminSettings/helpAndTips.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/helpAndTips.feature#L17)
+-   [webUIAdminSettings/helpAndTips.feature:18](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/helpAndTips.feature#L18)
+-   [webUIAdminSettings/helpAndTips.feature:19](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/helpAndTips.feature#L19)
+-   [webUIAdminSettings/helpAndTips.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/helpAndTips.feature#L20)
+
+### [Tags page not implemented yet] (https://github.com/owncloud/web/issues/5017)
+-   [webUIDeleteFilesFolders/deleteFilesFolders.feature:144](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L144)
+-   [webUIFilesDetails/fileDetails.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L141)
+-   [webUIFilesSearch/search.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L63)
+-   [webUIFilesSearch/search.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L71)
+-   [webUIFilesSearch/search.feature:84](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L84)
+
+### [When a user shares folder to a group, the sharer is shown as group in group member's sharing-sidebar] (https://github.com/owncloud/web/issues/5216)
+-   [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L41)
+-   [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L42)
