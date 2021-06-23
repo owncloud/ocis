@@ -1,4 +1,4 @@
-## Scenarios from web tests that are expected to fail on OCIS with owncloud storage
+## Scenarios from web tests that are expected to fail on OCIS with OCIS storage
 
 Lines that contain a format like "[someSuite.someFeature.feature:n](https://github.com/owncloud/web/path/to/feature)"
 are lines that document a specific expected failure. Follow that with a URL to the line in the feature file in GitHub.
@@ -312,7 +312,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 
 ### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
--   [webUISharingPublicManagement/shareByPublicLink.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L146)
+-   [webUISharingPublicManagement/shareByPublicLink.feature:148](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L148)
 
 ### [Propfind response to trashbin endpoint is different in ocis](https://github.com/owncloud/product/issues/186)
 ### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
