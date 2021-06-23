@@ -81,13 +81,15 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
     ### Wopi server settings ###
     # oCIS Wopi server version. Defaults to "latest"
-    OCIS_WOPISERVER_DOCKER_TAG=custom
+    OCIS_WOPISERVER_DOCKER_TAG=
     # cs3org wopi server version. Defaults to "latest"
     CS3ORG_WOPISERVER_DOCKER_TAG=
     # cs3org wopi server domain. Defaults to "wopiserver.owncloud.test"
     WOPISERVER_DOMAIN=
-    # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "Pive-Fumkiu4"
+    # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum567"
     WOPI_JWT_SECRET=
+    # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum123"
+    WOPI_IOP_SECRET=
 
     ### Collabora settings ###
     # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
@@ -120,13 +122,13 @@ See also [example server setup]({{< ref "preparing_server" >}})
   By default the CS3Org WOPI server will also be started in the `latest` version. If you want to start a specific version of it, you can set the version to `CS3ORG_WOPISERVER_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/cs3org/wopiserver/tags?page=1&ordering=last_updated).
 
   Set your domain for the CS3Org WOPI server in `WOPISERVER_DOMAIN=`, where Collabora can download the files.
-  
-  You also must override the default WOPI JWT secret, in order to have a secure setup. Do this by setting `WOPI_JWT_SECRET` to a long and random string.
-  
+
+  You also must override the default WOPI JWT secret and the WOPI IOP secret, in order to have a secure setup. Do this by setting `WOPI_JWT_SECRET` and `WOPI_IOP_SECRET` to a long and random string.
+
   Now it's time to set up Collabora and you need to configure the Domain of Collabora in `COLLABORA_DOMAIN=`.
 
   If you want to use the Collabora admin panel you need to set user name and passwort for in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
-  
+
   Now you have configured everything and can save the file.
 
 * Start the docker stack
