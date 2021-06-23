@@ -39,6 +39,14 @@ type StorageRegistry struct {
 	JSON         string
 }
 
+// AppProvider defines the available app provider configuration
+type AppProvider struct {
+	Port
+	IopSecret     string
+	WopiUrl       string
+	WopiBridgeUrl string
+}
+
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
@@ -387,6 +395,7 @@ type Reva struct {
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
 	StorageMetadata   StoragePort
+	AppProvider       AppProvider
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}
