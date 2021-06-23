@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
 * Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+* Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
 * Enhancement - Update REVA to v1.8.1-0.20210622125952-b54b15943d02: [#2205](https://github.com/owncloud/ocis/pull/2205)
@@ -29,6 +30,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/client/issues/8538
    https://github.com/owncloud/ocis/pull/2188
+
+* Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.3.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2187
+   https://github.com/owncloud/web/releases/tag/v3.3.0
 
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 
