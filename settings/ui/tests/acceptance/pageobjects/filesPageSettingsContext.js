@@ -34,7 +34,7 @@ module.exports = {
         })
       await this
         .click('@userMenuBtn')
-        .waitForElementNotVisible('@userMenuContainer')
+        .waitForElementNotPresent('@userMenuContainer')
       return menu
     },
     getFileHeaderItems: async function () {
