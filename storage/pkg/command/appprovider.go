@@ -106,6 +106,7 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
+					"driver":        cfg.Reva.AppProvider.Driver,
 					"iopsecret":     cfg.Reva.AppProvider.IopSecret,
 					"wopiurl":       cfg.Reva.AppProvider.WopiUrl,
 					"wopibridgeurl": cfg.Reva.AppProvider.WopiBridgeUrl,

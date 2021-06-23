@@ -42,6 +42,7 @@ type StorageRegistry struct {
 // AppProvider defines the available app provider configuration
 type AppProvider struct {
 	Port
+	Driver        string
 	IopSecret     string
 	WopiUrl       string
 	WopiBridgeUrl string

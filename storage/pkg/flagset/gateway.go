@@ -193,6 +193,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_SHARING_ENDPOINT"},
 			Destination: &cfg.Reva.Sharing.Endpoint,
 		},
+		&cli.StringFlag{
+			Name:        "appprovider-endpoint",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.Endpoint, "localhost:9164"),
+			Usage:       "endpoint to use for the app provider",
+			EnvVars:     []string{"STORAGE_APPPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.AppProvider.Endpoint,
+		},
 
 		// register home storage
 
