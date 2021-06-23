@@ -302,8 +302,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20210325133324-32b03d75a535/go.mod h1:UXha4T
 github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887 h1:X5Se3M/kbh9w6LZQvyLS7djAGKcWGzmaY6IOa7Talpk=
 github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc/go.mod h1:exwJqEJ8lVVnmdY0GrGwuPRQ018xUU9mKVXQBiO0ZlQ=
-github.com/cs3org/reva v1.8.1-0.20210622125952-b54b15943d02 h1:5mG6FRIK8/9zwUVzuO0rVZ6ej0E+husMcEookZa1xi4=
-github.com/cs3org/reva v1.8.1-0.20210622125952-b54b15943d02/go.mod h1:2D2Bq4hjcwibIELp6qQXm6woofJGHdTqZ8nPSH1IUPU=
+github.com/cs3org/reva v1.9.0 h1:CJ4T/YZwTX6zOqnupbrxgOw7fyQt3T4kqDChRS06Mkw=
+github.com/cs3org/reva v1.9.0/go.mod h1:2D2Bq4hjcwibIELp6qQXm6woofJGHdTqZ8nPSH1IUPU=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
