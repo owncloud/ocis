@@ -9,10 +9,9 @@ require (
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
-	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
+	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
+	github.com/cs3org/reva v1.8.1-0.20210622125952-b54b15943d02
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
@@ -23,7 +22,7 @@ require (
 	github.com/owncloud/ocis/settings v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/store v0.0.0-20210413063522-955bd60edf33
 	github.com/prometheus/client_golang v1.10.0
-	github.com/rs/zerolog v1.22.0
+	github.com/rs/zerolog v1.23.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
