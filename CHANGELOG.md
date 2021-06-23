@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
+* Enhancement - Update REVA to v1.8.1-0.20210622125952-b54b15943d02: [#2205](https://github.com/owncloud/ocis/pull/2205)
 
 ## Details
 
@@ -43,6 +44,10 @@ The following sections list the changes for unreleased.
    https://golang.org/pkg/os/#UserConfigDir.
 
    https://github.com/owncloud/ocis/pull/2129
+
+* Enhancement - Update REVA to v1.8.1-0.20210622125952-b54b15943d02: [#2205](https://github.com/owncloud/ocis/pull/2205)
+
+   https://github.com/owncloud/ocis/pull/2205
 # Changelog for [1.7.0] (2021-06-04)
 
 The following sections list the changes for 1.7.0.
