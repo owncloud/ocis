@@ -56,6 +56,8 @@ require (
 replace (
 	// broken dependency chain for konnect v0.34.0
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	// use newest go-sqlite3 without compiler warnings (sidenote: v1.14.x is newer than v2.x)
+	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.6
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/glauth => ../glauth
 	github.com/owncloud/ocis/graph => ../graph

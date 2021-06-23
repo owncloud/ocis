@@ -34,6 +34,8 @@ require (
 )
 
 replace (
+	// use newest go-sqlite3 without compiler warnings (sidenote: v1.14.x is newer than v2.x)
+	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.6
 	github.com/owncloud/ocis/accounts => ../accounts
 	github.com/owncloud/ocis/ocis-pkg => ../ocis-pkg
 	github.com/owncloud/ocis/proxy => ../proxy
