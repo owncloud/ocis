@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/cs3org/reva/pkg/auth/scope"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/cs3org/reva/pkg/auth/scope"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -108,7 +109,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder)},
+			Path: path.Join("/meta", accountsFolder),
 		},
 	})
 	if err != nil {
@@ -159,7 +160,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder, id)},
+			Path: path.Join("/meta", accountsFolder, id),
 		},
 	})
 
@@ -222,7 +223,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder)},
+			Path: path.Join("/meta", groupsFolder),
 		},
 	})
 	if err != nil {
@@ -273,7 +274,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder, id)},
+			Path: path.Join("/meta", groupsFolder, id),
 		},
 	})
 
@@ -335,7 +336,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
+		Path: path.Join("/meta", folder),
 	}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{

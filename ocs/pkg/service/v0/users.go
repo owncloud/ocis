@@ -5,10 +5,11 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/cs3org/reva/pkg/auth/scope"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/cs3org/reva/pkg/auth/scope"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
@@ -398,9 +399,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
+				Path: homeResp.Path,
 			},
 		})
 
@@ -419,9 +418,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		delReq := &provider.DeleteRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Id{
-					Id: statResp.Info.Id,
-				},
+				ResourceId: statResp.Info.Id,
 			},
 		}
 
@@ -441,9 +438,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		req := &gateway.PurgeRecycleRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
+				Path: homeResp.Path,
 			},
 		}
 

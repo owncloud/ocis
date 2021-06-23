@@ -2,6 +2,11 @@ package svc
 
 import (
 	"context"
+	"image"
+	"net/url"
+	"path"
+	"strings"
+
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -14,10 +19,6 @@ import (
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
-	"image"
-	"net/url"
-	"path"
-	"strings"
 )
 
 // NewService returns a service implementation for Service.
@@ -202,7 +203,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 
 	req := &provider.StatRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path},
+			Path: path,
 		},
 	}
 	rsp, err := g.cs3Client.Stat(ctx, req)
@@ -220,7 +221,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 			return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
 		}
 	}
-	if  rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+	if rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return nil, merrors.BadRequest(g.serviceID, "Unsupported file type")
 	}
 	if rsp.Info.GetChecksum().GetSum() == "" {

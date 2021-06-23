@@ -17,15 +17,15 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20210527092509-2b828e94ed4c
-	github.com/cs3org/reva v1.7.1-0.20210531093513-b74a2b156af6
+	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
+	github.com/cs3org/reva v1.8.1-0.20210622125952-b54b15943d02
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/iancoleman/strcase v0.1.3
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
-	github.com/onsi/ginkgo v1.16.4 // indirect
-	github.com/onsi/gomega v1.13.0 // indirect
+	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/gomega v1.13.0
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
@@ -41,7 +41,7 @@ require (
 	github.com/owncloud/ocis/web v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
 	github.com/prometheus/client_golang v1.10.0
-	github.com/rs/zerolog v1.22.0
+	github.com/rs/zerolog v1.23.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	go.etcd.io/etcd/api/v3 v3.5.0-pre // indirect
