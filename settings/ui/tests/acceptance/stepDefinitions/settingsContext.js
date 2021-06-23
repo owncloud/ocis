@@ -32,7 +32,9 @@ Then('the files menu should be listed in language {string}', async function (lan
 })
 
 Then('the account menu should be listed in language {string}', async function (language) {
+  console.log('def:acc')
   const menu = await client.page.filesPageSettingsContext().getUserMenu()
+  console.log(menu)
   const expected = languageHelper.getUserMenuForLanguage(language)
   assert.deepStrictEqual(menu, expected, 'the menu list were not same')
 })

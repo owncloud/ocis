@@ -20,10 +20,12 @@ module.exports = {
     },
     getUserMenu: async function () {
       const menu = []
+      console.log('debug:1')
       await this
         .waitForElementVisible('@userMenuBtn')
         .click('@userMenuBtn')
         .waitForElementVisible('@userMenuContainer')
+      console.log('debug:2')
       await this.api
         .elements('@userMenuItem', result => {
           result.value.map(item => {

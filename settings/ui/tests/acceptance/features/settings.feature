@@ -10,12 +10,12 @@ Feature: Set user specific settings
       | user2    |
 	And user "user1" has created folder "simple-folder"
 
-	Scenario: Check the default settings
-		Given user "user1" has logged in using the webUI
-		And the user browses to the settings page
-		Then the setting "Language" should not have any value
-		When the user browses to the files page
-		Then the files menu should be listed in language "English"
+	# Scenario: Check the default settings
+	# 	Given user "user1" has logged in using the webUI
+	# 	And the user browses to the settings page
+	# 	Then the setting "Language" should not have any value
+	# 	When the user browses to the files page
+	# 	Then the files menu should be listed in language "English"
 
 	Scenario: changing the language (reactive and with page reload)
 		Given user "user1" has logged in using the webUI
@@ -35,12 +35,12 @@ Feature: Set user specific settings
 		And the user browses to the files page
 		Then the files menu should be listed in language "English"
 
-	Scenario: changing the language only affects one user
-		Given user "user2" has logged in using the webUI
-		And the user browses to the settings page
-		When the user changes the language to "Español"
-		Then the setting "Language" should have value "Español"
-		When the user browses to the files page
-		Then the files menu should be listed in language "Español"
-		When the user re-logs in as "user1" using the webUI
-		Then the files menu should be listed in language "English"
+	# Scenario: changing the language only affects one user
+	# 	Given user "user2" has logged in using the webUI
+	# 	And the user browses to the settings page
+	# 	When the user changes the language to "Español"
+	# 	Then the setting "Language" should have value "Español"
+	# 	When the user browses to the files page
+	# 	Then the files menu should be listed in language "Español"
+	# 	When the user re-logs in as "user1" using the webUI
+	# 	Then the files menu should be listed in language "English"

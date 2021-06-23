@@ -1,38 +1,38 @@
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
-        "accounts",
-        "glauth",
-        "graph-explorer",
-        "graph",
-        "idp",
-        "ocis-pkg",
-        "ocis",
-        "ocs",
-        "onlyoffice",
-        "proxy",
-        "settings",
-        "storage",
-        "store",
-        "thumbnails",
-        "web",
-        "webdav",
+        # "accounts",
+        # "glauth",
+        # "graph-explorer",
+        # "graph",
+        # "idp",
+        # "ocis-pkg",
+        # "ocis",
+        # "ocs",
+        # "onlyoffice",
+        # "proxy",
+        # "settings",
+        # "storage",
+        # "store",
+        # "thumbnails",
+        # "web",
+        # "webdav",
     ],
     "localApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "accountsUITests": {
-        "skip": False,
+        "skip": True,
     },
     "settingsUITests": {
         "skip": False,
@@ -171,7 +171,7 @@ def main(ctx):
         ),
     )
 
-    pipelines += checkStarlark()
+    # pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
