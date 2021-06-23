@@ -28,7 +28,7 @@ ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this
 .PHONY: ci-node-generate
 ci-node-generate:
 
-WEB_ASSETS_VERSION = v3.2.0
+WEB_ASSETS_VERSION = v3.3.0
 
 .PHONY: pull-assets
 pull-assets:

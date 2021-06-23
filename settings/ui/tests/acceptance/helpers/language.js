@@ -17,14 +17,14 @@ const filesMenu = {
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
-    "Shared via link",
+    'Shared via link',
     'Archivos borrados'
   ],
   Français: [
     'Tous les fichiers',
     'Partagé avec moi',
     'Partagé avec autres',
-    "Shared via link",
+    'Shared via link',
     'Fichiers supprimés'
   ]
 }
@@ -37,17 +37,17 @@ const accountMenu = {
   ],
   Deutsch: [
     'Profil',
-    'Settings',
+    'Einstellungen',
     'Abmelden'
   ],
   Español: [
-    'Perfil',
-    'Ajustes',
+    'Profile',
+    'Configuración',
     'Salir'
   ],
   Français: [
     'Profil',
-    'Paramètres',
+    'Settings',
     'Se déconnecter'
   ]
 }
@@ -56,7 +56,7 @@ const filesListHeaderMenu = {
   English: [
     'Name',
     'Size',
-    'Updated',
+    'Modified',
     'Actions'
   ],
   Deutsch: [
@@ -68,7 +68,7 @@ const filesListHeaderMenu = {
   Español: [
     'Nombre',
     'Tamaño',
-    'Actualizado',
+    'Modificado',
     'Acciones'
   ],
   Français: [

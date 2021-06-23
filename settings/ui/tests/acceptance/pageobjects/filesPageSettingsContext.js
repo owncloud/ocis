@@ -33,9 +33,8 @@ module.exports = {
           })
         })
       await this
-        .waitForElementVisible('@userMenuBtn')
         .click('@userMenuBtn')
-        .waitForElementNotVisible('@userMenuContainer')
+        .waitForElementNotPresent('@userMenuContainer')
       return menu
     },
     getFileHeaderItems: async function () {
@@ -56,10 +55,6 @@ module.exports = {
   elements: {
     pageHeader: {
       selector: '.oc-page-title'
-    },
-    languageValue: {
-      selector: "//button[@id='single-choice-toggle-profile-language']",
-      locateStrategy: 'xpath'
     },
     fileSidebarNavItem: {
       selector: '.oc-sidebar-nav-item'
