@@ -33,7 +33,6 @@ Feature: Set user specific settings
 		When the user browses to the settings page
 		And the user changes the language to "English"
 		And the user browses to the files page
-		When the user browses to the files page
 		Then the files menu should be listed in language "English"
 
 	Scenario: changing the language only affects one user

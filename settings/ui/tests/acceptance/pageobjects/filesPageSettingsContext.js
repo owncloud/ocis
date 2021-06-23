@@ -33,7 +33,6 @@ module.exports = {
           })
         })
       await this
-        .waitForElementVisible('@userMenuBtn')
         .click('@userMenuBtn')
         .waitForElementNotVisible('@userMenuContainer')
       return menu
