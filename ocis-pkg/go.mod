@@ -26,6 +26,7 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
+	github.com/open-policy-agent/opa v0.29.4 // indirect
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33
