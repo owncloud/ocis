@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/cs3org/reva v1.8.1-0.20210622125952-b54b15943d02
+	github.com/cs3org/reva v1.9.0
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
