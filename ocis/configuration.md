@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-24T07:31:02+0000"
+date: "2021-06-24T10:51:23+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -45,52 +45,67 @@ ownCloud Infinite Scale Stack
 
 Usage: `ocis [global options] command [command options] [arguments...]`
 
+
 -config-file |  $OCIS_CONFIG_FILE
 : Load config file from a non standard location..
+
 
 -ocis-log-level |  $OCIS_LOG_LEVEL
 : Set logging level. Default: `info`.
 
+
 -ocis-log-pretty |  $OCIS_LOG_PRETTY
 : Enable pretty logging. Default: `false`.
+
 
 -ocis-log-color |  $OCIS_LOG_COLOR
 : Enable colored logging. Default: `true`.
 
+
 -ocis-log-file |  $OCIS_LOG_FILE
 : Enable log to file.
+
 
 -tracing-enabled |  $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
+
 -tracing-type |  $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `jaeger`.
+
 
 -tracing-endpoint |  $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent.
 
+
 -tracing-collector |  $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector.
+
 
 -tracing-service |  $OCIS_TRACING_SERVICE
 : Service name for tracing. Default: `ocis`.
 
+
 -jwt-secret |  $OCIS_JWT_SECRET
 : Used to dismantle the access token, should equal reva's jwt-secret. Default: `Pive-Fumkiu4`.
+
 
 -runtime-port |  $OCIS_RUNTIME_PORT
 : Configures which port the runtime starts. Default: `9250`.
 
+
 -runtime-host |  $OCIS_RUNTIME_HOST
 : Configures the host where the runtime process is running. Default: `localhost`.
 
+
+
+
+
+
+
+
+
 ## Sub Commands
-
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
 
 ### ocis server
 
@@ -98,26 +113,74 @@ Start fullstack server
 
 Usage: `ocis server [command options] [arguments...]`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -debug-addr |  $OCIS_DEBUG_ADDR
 : Address to bind debug server. Default: `0.0.0.0:9010`.
+
 
 -debug-token |  $OCIS_DEBUG_TOKEN
 : Token to grant metrics access.
 
+
 -debug-pprof |  $OCIS_DEBUG_PPROF
 : Enable pprof debugging.
+
 
 -debug-zpages |  $OCIS_DEBUG_ZPAGES
 : Enable zpages debugging.
 
+
 -http-addr |  $OCIS_HTTP_ADDR
 : Address to bind http server. Default: `0.0.0.0:9000`.
+
 
 -http-root |  $OCIS_HTTP_ROOT
 : Root path of http server. Default: `/`.
 
+
 -grpc-addr |  $OCIS_GRPC_ADDR
 : Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### ocis kill
 
@@ -125,14 +188,56 @@ Kill an extension by name
 
 Usage: `ocis kill [command options] [arguments...]`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### ocis health
 
 Check health status
 
 Usage: `ocis health [command options] [arguments...]`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -debug-addr |  $OCIS_DEBUG_ADDR
 : Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
 
 ### ocis run
 
@@ -140,45 +245,50 @@ Runs an extension
 
 Usage: `ocis run [command options] [arguments...]`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis settings
+#### ocis glauth
 
-Start settings server
+Start glauth server
 
-#### ocis storage-groupprovider
+#### ocis web
 
-Start storage groupprovider service
+Start web server
 
-#### ocis proxy
+#### ocis storage-home
 
-Start proxy server
+Start storage and data provider for /home mount
 
-#### ocis storage-auth-bearer
+#### ocis webdav
 
-Start storage auth-bearer service
+Start webdav server
 
-#### ocis storage-frontend
+#### ocis storage-auth-basic
 
-Start storage frontend
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis onlyoffice
-
-Start onlyoffice server
-
-#### ocis storage-gateway
-
-Start storage gateway
+Start storage auth-basic service
 
 #### ocis storage-metadata
 
@@ -188,51 +298,67 @@ Start storage and data service for metadata
 
 Start ocs server
 
-#### ocis storage-home
+#### ocis settings
 
-Start storage and data provider for /home mount
+Start settings server
 
-#### ocis storage-sharing
+#### ocis storage-frontend
 
-Start storage sharing service
+Start storage frontend
+
+#### ocis storage-gateway
+
+Start storage gateway
 
 #### ocis storage-userprovider
 
 Start storage userprovider service
 
-#### ocis version
-
-Lists running services with version
-
-#### ocis web
-
-Start web server
-
-#### ocis idp
-
-Start idp server
-
 #### ocis storage-users
 
 Start storage and data provider for /users mount
 
-#### ocis storage-auth-basic
+#### ocis thumbnails
 
-Start storage auth-basic service
+Start thumbnails server
 
-#### ocis storage-public-link
+#### ocis storage-groupprovider
 
-Start storage public link storage
+Start storage groupprovider service
 
 #### ocis store
 
 Start a go-micro store
 
-#### ocis webdav
+#### ocis accounts
 
-Start webdav server
+Start accounts server
 
-#### ocis glauth
+#### ocis storage-auth-bearer
 
-Start glauth server
+Start storage auth-bearer service
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis idp
+
+Start idp server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis onlyoffice
+
+Start onlyoffice server
 

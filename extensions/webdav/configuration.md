@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-24T07:31:03+0000"
+date: "2021-06-24T10:51:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -41,82 +41,29 @@ Serve WebDAV API for oCIS
 
 Usage: `webdav [global options] command [command options] [arguments...]`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Sub Commands
-
-### webdav server
-
-Start integrated server
-
-Usage: `webdav server [command options] [arguments...]`
-
--log-file |  $WEBDAV_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
-
--log-level |  $WEBDAV_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
--log-pretty |  $WEBDAV_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
--log-color |  $WEBDAV_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
--config-file |  $WEBDAV_CONFIG_FILE
-: Path to config file.
-
--tracing-enabled |  $WEBDAV_TRACING_ENABLED
-: Enable sending traces.
-
--tracing-type |  $WEBDAV_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
-
--tracing-endpoint |  $WEBDAV_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
-
--tracing-collector |  $WEBDAV_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
-
--tracing-service |  $WEBDAV_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "webdav")`.
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
-
--debug-token |  $WEBDAV_DEBUG_TOKEN
-: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
-
--debug-pprof |  $WEBDAV_DEBUG_PPROF
-: Enable pprof debugging.
-
--debug-zpages |  $WEBDAV_DEBUG_ZPAGES
-: Enable zpages debugging.
-
--http-addr |  $WEBDAV_HTTP_ADDR
-: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9115")`.
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
-
--http-root |  $WEBDAV_HTTP_ROOT
-: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
-
--ocis-public-url |  $OCIS_PUBLIC_URL , $OCIS_URL
-: The domain under which oCIS is reachable. Default: `flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200")`.
-
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
 
 ### webdav health
 
@@ -124,6 +71,147 @@ Check health status
 
 Usage: `webdav health [command options] [arguments...]`
 
+
 -debug-addr |  $WEBDAV_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### webdav server
+
+Start integrated server
+
+Usage: `webdav server [command options] [arguments...]`
+
+
+
+-log-file |  $WEBDAV_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
+
+
+-log-level |  $WEBDAV_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $WEBDAV_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $WEBDAV_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-config-file |  $WEBDAV_CONFIG_FILE
+: Path to config file.
+
+
+-tracing-enabled |  $WEBDAV_TRACING_ENABLED
+: Enable sending traces.
+
+
+-tracing-type |  $WEBDAV_TRACING_TYPE
+: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+
+
+-tracing-endpoint |  $WEBDAV_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+
+
+-tracing-collector |  $WEBDAV_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+
+
+-tracing-service |  $WEBDAV_TRACING_SERVICE
+: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "webdav")`.
+
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
+
+
+-debug-token |  $WEBDAV_DEBUG_TOKEN
+: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+
+
+-debug-pprof |  $WEBDAV_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $WEBDAV_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $WEBDAV_HTTP_ADDR
+: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9115")`.
+
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
+
+
+-http-root |  $WEBDAV_HTTP_ROOT
+: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+
+
+-ocis-public-url |  $OCIS_PUBLIC_URL , $OCIS_URL
+: The domain under which oCIS is reachable. Default: `flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200")`.
+
+
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
 
