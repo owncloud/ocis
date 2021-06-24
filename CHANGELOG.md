@@ -11,7 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
-* Enhancement - Update REVA to v1.8.1-0.20210622125952-b54b15943d02: [#2205](https://github.com/owncloud/ocis/pull/2205)
+* Enhancement - Update REVA to v1.9: [#2205](https://github.com/owncloud/ocis/pull/2205)
 
 ## Details
 
@@ -56,9 +56,25 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2129
 
-* Enhancement - Update REVA to v1.8.1-0.20210622125952-b54b15943d02: [#2205](https://github.com/owncloud/ocis/pull/2205)
+* Enhancement - Update REVA to v1.9: [#2205](https://github.com/owncloud/ocis/pull/2205)
+
+   This update includes * [set Content-Type
+   correctly](https://github.com/cs3org/reva/pull/1750) * [Return file checksum
+   available from the metadata for the EOS
+   driver](https://github.com/cs3org/reva/pull/1755) * [Sort share entries
+   alphabetically](https://github.com/cs3org/reva/pull/1772) * [Initial work on the
+   owncloudsql driver](https://github.com/cs3org/reva/pull/1710) * [Add user ID cache
+   warmup to EOS storage driver](https://github.com/cs3org/reva/pull/1774) * [Use
+   UidNumber and GidNumber fields in User
+   objects](https://github.com/cs3org/reva/pull/1573) * [EOS GRPC
+   interface](https://github.com/cs3org/reva/pull/1471) * [switch
+   references](https://github.com/cs3org/reva/pull/1721) * [remove user's uuid from
+   trashbin file key](https://github.com/cs3org/reva/pull/1793) * [fix restore behavior of
+   the trashbin API](https://github.com/cs3org/reva/pull/1795) * [eosfs: add arbitrary
+   metadata support](https://github.com/cs3org/reva/pull/1811)
 
    https://github.com/owncloud/ocis/pull/2205
+   https://github.com/owncloud/ocis/pull/2210
 # Changelog for [1.7.0] (2021-06-04)
 
 The following sections list the changes for 1.7.0.
