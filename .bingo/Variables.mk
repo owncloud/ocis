@@ -47,11 +47,11 @@ $(FILEB0X): $(BINGO_DIR)/fileb0x.mod
 	@echo "(re)installing $(GOBIN)/fileb0x-v1.1.4"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=fileb0x.mod -o=$(GOBIN)/fileb0x-v1.1.4 "github.com/UnnoTed/fileb0x"
 
-FLAEX := $(GOBIN)/flaex-v0.2.0
+FLAEX := $(GOBIN)/flaex-v0.2.1-0.20210617060845-d4d3f5180596
 $(FLAEX): $(BINGO_DIR)/flaex.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/flaex-v0.2.0"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=flaex.mod -o=$(GOBIN)/flaex-v0.2.0 "github.com/owncloud/flaex"
+	@echo "(re)installing $(GOBIN)/flaex-v0.2.1-0.20210617060845-d4d3f5180596"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=flaex.mod -o=$(GOBIN)/flaex-v0.2.1-0.20210617060845-d4d3f5180596 "github.com/owncloud/flaex"
 
 GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.37.1
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
