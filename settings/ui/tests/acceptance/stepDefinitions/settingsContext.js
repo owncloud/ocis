@@ -42,34 +42,3 @@ Then('the files header should be displayed in language {string}', async function
   const expected = languageHelper.getFilesHeaderMenuForLanguage(language)
   assert.deepStrictEqual(items, expected, 'the menu list were not same')
 })
-
-After(async function () {
-  let directory = path.join(client.globals.settings_store, 'assignments')
-  try {
-    fs.readdirSync(directory).map(element => {
-      if (!initialLanguageAssignments.includes(element)) {
-        fs.unlinkSync(path.join(client.globals.settings_store, 'assignments', element))
-      }
-    })
-  } catch (err) {
-    console.log('Error while reading the settings values from file system... ')
-  }
-
-  directory = path.join(client.globals.settings_store, 'values')
-  try {
-    fs.emptyDirSync(directory)
-  } catch (err) {
-    console.log('Error while cleaning the settings values from file system... ')
-  }
-})
-
-Before(async function() {
-  const directory = path.join(client.globals.settings_store, 'assignments')
-  try {
-    fs.readdirSync(directory).map(element => {
-      initialLanguageAssignments.push(element)
-    })
-  } catch (err) {
-    console.log('Error while reading the settings values from file system... ')
-  }
-})
