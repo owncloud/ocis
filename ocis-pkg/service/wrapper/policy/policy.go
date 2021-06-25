@@ -2,12 +2,12 @@ package policy
 
 import (
 	"context"
-	"fmt"
+	"os"
+
 	"github.com/asim/go-micro/v3/client"
 	"github.com/asim/go-micro/v3/errors"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	"os"
 )
 
 type clientWrapper struct {
@@ -49,7 +49,7 @@ func (c *clientWrapper) checkPolicy(ctx context.Context, req client.Request) err
 			"ocis_id": standardClaims.OcisID,
 		}
 	}
-	fmt.Println(input)
+	//fmt.Println(input)
 	results, err := query.Eval(ctx, rego.EvalInput(input))
 	if err != nil {
 		return err
