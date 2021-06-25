@@ -7,6 +7,26 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.8.0 Technology Preview
+
+Version 1.8.0 is a maintenance and bug fix release. ownCloud Web 3.3.0 has received further performance and major accessibility improvements.
+
+The most prominent changes in version 1.8.0 comprise:
+
+- ownCloud Web is now fully translatable on Transifex [#5042](https://github.com/owncloud/web/pull/5042)
+- ownCloud Web now supports keyboard navigation [#4937](https://github.com/owncloud/web/pull/4937) [#5013](https://github.com/owncloud/web/pull/5013) [#5027](https://github.com/owncloud/web/pull/5027) [#5147](https://github.com/owncloud/web/pull/5147)
+- ownCloud Web now supports screenreaders [#5182](https://github.com/owncloud/web/pull/5182) [#5166](https://github.com/owncloud/web/pull/5166) [#5058](https://github.com/owncloud/web/pull/5058) [#5046](https://github.com/owncloud/web/pull/5046) [#5010](https://github.com/owncloud/web/pull/5010)
+- ownCloud Web has received many performance improvements (image cache, fixes to avoid duplicate resource loading, asynchronous image loading) [#5194](https://github.com/owncloud/web/pull/5194)
+- The file lists in ownCloud Web are now paginated to control loading times [#5224](https://github.com/owncloud/web/pull/5224) [#5309](https://github.com/owncloud/web/pull/5309)
+- ownCloud Web now supports TypeScript [#5194](https://github.com/owncloud/web/pull/5194)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.7.0 Technology Preview
 
 Version 1.7.0 is a maintenance and bug fix release. ownCloud Web 3.2.0 has received further performance improvements and minor usability tweaks.
