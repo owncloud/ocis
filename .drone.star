@@ -673,7 +673,6 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
                     "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
-                    "OCIS_SETTINGS_STORE": "/srv/app/tmp/ocis/settings",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
