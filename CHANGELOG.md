@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
 * Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
 * Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
@@ -30,6 +31,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/client/issues/8538
    https://github.com/owncloud/ocis/pull/2188
+
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
+
+   The WebDAV namespace is used across various services, but it was previously hardcoded in some
+   of the services. This PR uses the same environment variable to set the config correctly across
+   the services.
+
+   https://github.com/owncloud/ocis/pull/2198
 
 * Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 
