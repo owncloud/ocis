@@ -148,6 +148,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars: []string{"OCIS_PUBLIC_URL", "OCIS_URL"},
 			Destination: &cfg.OcisPublicURL,
 		},
+		&cli.StringFlag{
+			Name: "webdav-namespace",
+			Value: flags.OverrideDefaultString(cfg.WebdavNamespace, "/home"),
+			Usage: "Namespace prefix for the /webdav endpoint",
+			EnvVars: []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.WebdavNamespace,
+		},
 	}
 }
 
