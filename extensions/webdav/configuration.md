@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-25T08:48:20+0000"
+date: "2021-06-25T09:41:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -63,6 +63,7 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 
 
+
 ## Sub Commands
 
 ### webdav health
@@ -74,6 +75,7 @@ Usage: `webdav health [command options] [arguments...]`
 
 -debug-addr |  $WEBDAV_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
+
 
 
 
@@ -180,12 +182,17 @@ Usage: `webdav server [command options] [arguments...]`
 : The domain under which oCIS is reachable. Default: `flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200")`.
 
 
+-webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
+: Namespace prefix for the /webdav endpoint. Default: `flags.OverrideDefaultString(cfg.WebdavNamespace, "/home")`.
+
+
 
 ### webdav version
 
 Print the versions of the running instances
 
 Usage: `webdav version [command options] [arguments...]`
+
 
 
 

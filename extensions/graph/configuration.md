@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-25T08:48:18+0000"
+date: "2021-06-25T09:41:19+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -35,43 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### graph health
-
-Check health status
-
-Usage: `graph health [command options] [arguments...]`
-
-
-
-
-
-
--debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### graph ocis-graph
 
 Serve Graph API for oCIS
@@ -93,6 +56,7 @@ Usage: `graph ocis-graph [command options] [arguments...]`
 
 -log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
 
 
 
@@ -220,4 +184,46 @@ Usage: `graph server [command options] [arguments...]`
 
 -reva-gateway-addr |  $REVA_GATEWAY_ADDR
 : REVA Gateway Endpoint. Default: `flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142")`.
+
+
+-webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
+: Namespace prefix for the webdav endpoint. Default: `flags.OverrideDefaultString(cfg.WebdavNamespace, "/home")`.
+
+### graph health
+
+Check health status
+
+Usage: `graph health [command options] [arguments...]`
+
+
+
+
+
+
+-debug-addr |  $GRAPH_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
