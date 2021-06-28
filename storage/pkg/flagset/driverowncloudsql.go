@@ -31,20 +31,6 @@ func DriverOwnCloudSqlWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Storages.OwnCloudSql.ShareFolder,
 		},
 		&cli.BoolFlag{
-			Name:        "storage-owncloudsql-scan",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.Storages.OwnCloudSql.Scan, true),
-			Usage:       "scan files on startup to add fileids",
-			EnvVars:     []string{"STORAGE_DRIVER_OWNCLOUDSQL_SCAN"},
-			Destination: &cfg.Reva.Storages.OwnCloudSql.Scan,
-		},
-		&cli.StringFlag{
-			Name:        "storage-owncloudsql-redis",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.OwnCloudSql.Redis, ":6379"),
-			Usage:       "the address of the redis server",
-			EnvVars:     []string{"STORAGE_DRIVER_OWNCLOUDSQL_REDIS_ADDR"},
-			Destination: &cfg.Reva.Storages.OwnCloudSql.Redis,
-		},
-		&cli.BoolFlag{
 			Name:        "storage-owncloudsql-enable-home",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.Storages.OwnCloudSql.EnableHome, false),
 			Usage:       "enable the creation of home storages",

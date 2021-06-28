@@ -264,8 +264,6 @@ type DriverOwnCloudSql struct {
 	DriverCommon
 
 	UploadInfoDir string
-	Redis         string
-	Scan          bool
 	DBUsername    string
 	DBPassword    string
 	DBHost        string
