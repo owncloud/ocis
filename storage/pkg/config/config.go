@@ -44,6 +44,7 @@ type Sharing struct {
 	Port
 	UserDriver                       string
 	UserJSONFile                     string
+	UserStorageMountId               string
 	UserSQLUsername                  string
 	UserSQLPassword                  string
 	UserSQLHost                      string
