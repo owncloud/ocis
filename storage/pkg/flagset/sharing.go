@@ -54,6 +54,13 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars: []string{"STORAGE_SHARING_SERVICES"},
 		},
 		&cli.StringFlag{
+			Name:        "gateway-endpoint",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
+			Usage:       "endpoint to use for the storage gateway service",
+			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
+		&cli.StringFlag{
 			Name:        "user-driver",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserDriver, "json"),
 			Usage:       "driver to use for the UserShareProvider",

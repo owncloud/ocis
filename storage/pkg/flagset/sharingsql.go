@@ -10,6 +10,13 @@ import (
 func SharingSQLWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			Name:        "storage-mount-id",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserStorageMountId, "1284d238-aa92-42ce-bdc4-0b0000009157"),
+			Usage:       "mount id of the storage that is used for accessing the shares",
+			EnvVars:     []string{"STORAGE_SHARING_USER_STORAGE_MOUNT_ID"},
+			Destination: &cfg.Reva.Sharing.UserStorageMountId,
+		},
+		&cli.StringFlag{
 			Name:        "user-sql-username",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserSQLUsername, ""),
 			Usage:       "Username to be used to connect to the SQL database",
