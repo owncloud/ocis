@@ -20,7 +20,7 @@ The most prominent changes in version 1.8.0 comprise:
 - The file lists in ownCloud Web are now paginated to control loading times [#5224](https://github.com/owncloud/web/pull/5224) [#5309](https://github.com/owncloud/web/pull/5309)
 - ownCloud Web now supports TypeScript [#5194](https://github.com/owncloud/web/pull/5194)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-330-2021-06-23) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.8.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.3.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -38,7 +38,7 @@ The most prominent changes in version 1.7.0 comprise:
 - To improve performance, the file types which are being rendered as previews can now be specified using an [allow list in config.json](https://owncloud.dev/clients/web/getting-started/#options) [#5159](https://github.com/owncloud/web/pull/5159)
 - A warning has been added when a user tries to leave the page while an operation is in progress (e.g., an upload) [#2590](https://github.com/owncloud/web/issues/2590)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-170-2021-06-04) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-320-2021-05-31) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.7.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.2.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -58,7 +58,7 @@ The most prominent changes in version 1.6.0 comprise:
 - Text files (.txt) now have previews (thumbnails) [#1988](https://github.com/owncloud/ocis/pull/1988)
 - The translations in the Settings and Accounts extensions have been improved [#2003](https://github.com/owncloud/ocis/pull/2003)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-160-2021-05-12) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-310-2021-05-12) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.6.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.1.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -115,7 +115,7 @@ The most prominent changes in version 1.5.0 comprise:
 - User storage quotas will now be enforced [#1557](https://github.com/cs3org/reva/pull/1557)
 - The "owncloud" storage driver now supports file integrity checking with checksums [#1629](https://github.com/cs3org/reva/pull/1629)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-150-2021-04-21) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-300-2021-04-21) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.5.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.0.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -137,7 +137,7 @@ The most prominent changes in version 1.4.0 comprise:
 - Added GIF and JPEG file types for thumbnail generation (allows to display thumbnails and use the media viewer for GIF/JPEG images) [#1791](https://github.com/owncloud/ocis/pull/1791)
 - Fixes for the trash bin feature [#1552](https://github.com/cs3org/reva/pull/1552)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-140-2021-03-30) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.4.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.1.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -197,7 +197,7 @@ These are the major changes in oCIS:
 - Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
 - Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
-More details about this release can be found in the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-130-2021-03-09) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-202-2021-03-08).
+More details about this release can be found in the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.3.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.0.2).
 
 ### Breaking changes
 {{< hint warning >}}
@@ -215,7 +215,7 @@ The most prominent changes in version 1.2.0 comprise:
 - File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums [#1400](https://github.com/cs3org/reva/issues/1400)
 - Public link passwords are now stored as hashes to improve security [#1462](https://github.com/cs3org/reva/issues/1462)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-120-2021-02-17) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.2.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.0.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -268,7 +268,7 @@ The most prominent changes in version 1.1.0 comprise
 - Update ownCloud web to [v1.0.1](https://github.com/owncloud/web/releases/tag/v1.0.1)
 - Update reva to [v1.5.1](https://github.com/cs3org/reva/releases/tag/v1.5.1)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md#changelog-for-110-2021-01-22) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.1.0) for further details on what has changed.
 
 ## ownCloud Infinite Scale 1.0.0 Technology Preview
 
