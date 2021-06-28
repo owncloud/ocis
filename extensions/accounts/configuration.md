@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-28T13:17:03+0000"
+date: "2021-06-28T13:50:17+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -157,263 +157,11 @@ Usage: `accounts server [command options] [arguments...]`
 
 
 
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### accounts version
 
 Print the versions of the running instances
 
 Usage: `accounts version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
-
-
-
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--username | 
-: Username will be written to preferred-name and on_premises_sam_account_name.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-### accounts list
-
-List existing accounts
-
-Usage: `accounts list [command options] [arguments...]`
 
 
 
@@ -533,6 +281,139 @@ Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 
 
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### accounts list
+
+List existing accounts
+
+Usage: `accounts list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+
+
+
+
 ### accounts remove
 
 Removes an existing account
@@ -598,23 +479,11 @@ Usage: `accounts remove [command options] [arguments...]`
 
 
 
-### accounts ocis-accounts
+### accounts update
 
-Provide accounts and groups for oCIS
+Make changes to an existing account
 
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
-
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
+Usage: `accounts update [command options] [arguments...]`
 
 
 
@@ -641,6 +510,48 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
 
 
 
@@ -659,6 +570,95 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
+
+### accounts add
+
+Create a new account
+
+Usage: `accounts add [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `flags.OverrideDefaultString(cfg.Server.Name, "accounts")`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-username | 
+: Username will be written to preferred-name and on_premises_sam_account_name.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
 
 
 
