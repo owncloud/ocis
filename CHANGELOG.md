@@ -1,3 +1,18 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.8.0...master
+
+## Summary
+
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+
+## Details
+
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+
+   https://github.com/owncloud/ocis/pull/2227
 # Changelog for [1.8.0] (2021-06-28)
 
 The following sections list the changes for 1.8.0.
