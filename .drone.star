@@ -1449,6 +1449,8 @@ def example_deploys(ctx):
         "ocis_keycloak/latest.yml",
         "ocis_traefik/latest.yml",
         "ocis_wopi/latest.yml",
+        "ocis_hello/latest.yml",
+        "ocis_s3/latest.yml",
     ]
     released_configs = [
         "cs3_users_ocis/released.yml",
