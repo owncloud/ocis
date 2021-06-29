@@ -329,7 +329,7 @@ func (s Service) createDefaultGroups() (err error) {
 			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // idp
 			{Id: "bc596f3c-c955-4328-80a0-60d018b4ad57"}, // reva
 		}},
-		{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa", GidNumber: 30000, OnPremisesSamAccountName: "users", DisplayName: "Users", Description: "A group every normal user belongs to.", Members: []*proto.Account{
+		{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa", GidNumber: 30000, OnPremisesSamAccountName: "users", DisplayName: "UsersCount", Description: "A group every normal user belongs to.", Members: []*proto.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
