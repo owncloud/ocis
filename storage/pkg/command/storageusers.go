@@ -142,6 +142,12 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 			},
 		},
 	}
+	if cfg.Reva.StorageUsers.ReadOnly {
+		gcfg := rcfg["grpc"].(map[string]interface{})
+		gcfg["interceptors"] = map[string]interface{}{
+			"readonly": map[string]interface{}{},
+		}
+	}
 	return rcfg
 }
 

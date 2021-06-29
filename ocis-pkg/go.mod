@@ -18,14 +18,14 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
-	github.com/cs3org/reva v1.9.1-0.20210708074943-d2f72e0e3b4b
+	github.com/cs3org/reva v1.9.1-0.20210709061124-71f341f383d7
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/iancoleman/strcase v0.1.3
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/oklog/run v1.1.0
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.13.0
+	github.com/onsi/gomega v1.14.0
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d
 	github.com/owncloud/ocis/glauth v0.0.0-20210413063522-955bd60edf33
 	github.com/owncloud/ocis/graph v0.0.0-20210413063522-955bd60edf33

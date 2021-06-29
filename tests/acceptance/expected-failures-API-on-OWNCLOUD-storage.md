@@ -939,14 +939,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
 -   [apiShareOperationsToShares2/uploadToShare.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L256)
 
-#### Copying into a shared folder
-Scenario Outline: Copying a file to a folder with no permissions
--   [apiWebdavProperties1/copyFile.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L68)
--   [apiWebdavProperties1/copyFile.feature:69](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L69)
-Scenario Outline: Copying a file to overwrite a file into a folder with no permissions
--   [apiWebdavProperties1/copyFile.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L90)
--   [apiWebdavProperties1/copyFile.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L91)
-
 #### Share jail related
 Scenario Outline: delete a folder when there is a default folder for received shares
 -   [apiWebdavOperations/deleteFolder.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L67)
@@ -1947,8 +1939,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:445](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L445)
 
 #### [Trying to copy a file into a readonly share gives HTTP 500 error](https://github.com/owncloud/ocis/issues/2166)
--   [apiWebdavProperties1/copyFile.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L68)
--   [apiWebdavProperties1/copyFile.feature:69](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L69)
 -   [apiWebdavProperties1/copyFile.feature:362](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L362)
 -   [apiWebdavProperties1/copyFile.feature:363](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L363)
 -   [apiWebdavProperties1/copyFile.feature:383](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L483)

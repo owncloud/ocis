@@ -74,6 +74,13 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
 			Destination: &cfg.Reva.StorageUsers.Driver,
 		},
+		&cli.BoolFlag{
+			Name:        "read-only",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageUsers.ReadOnly, false),
+			Usage:       "use storage driver in read-only mode",
+			EnvVars:     []string{"STORAGE_USERS_READ_ONLY", "OCIS_STORAGE_READ_ONLY"},
+			Destination: &cfg.Reva.StorageUsers.ReadOnly,
+		},
 		&cli.StringFlag{
 			Name:        "mount-path",
 			Value:       flags.OverrideDefaultString(cfg.Reva.StorageUsers.MountPath, "/users"),
