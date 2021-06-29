@@ -19,7 +19,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.27.0
 )
 
 replace (
