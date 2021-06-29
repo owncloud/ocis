@@ -159,15 +159,15 @@ type PublicStorage struct {
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	Home     DriverCommon
-	EOS      DriverEOS
-	Local    DriverCommon
-	OwnCloud DriverOwnCloud
-	OwnCloudSql DriverOwnCloudSql
-	S3       DriverS3
-	S3NG     DriverS3NG
-	Common   DriverCommon
-	OCIS     DriverOCIS
+	Home        DriverCommon
+	EOS         DriverEOS
+	Local       DriverCommon
+	OwnCloud    DriverOwnCloud
+	OwnCloudSQL DriverOwnCloudSQL
+	S3          DriverS3
+	S3NG        DriverS3NG
+	Common      DriverCommon
+	OCIS        DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
 
@@ -259,8 +259,8 @@ type DriverOwnCloud struct {
 	Scan          bool
 }
 
-// DriverOwnCloudSql defines the available ownCloudSql storage driver configuration.
-type DriverOwnCloudSql struct {
+// DriverOwnCloudSQL defines the available ownCloudSQL storage driver configuration.
+type DriverOwnCloudSQL struct {
 	DriverCommon
 
 	UploadInfoDir string
