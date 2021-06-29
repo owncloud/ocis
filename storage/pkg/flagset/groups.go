@@ -79,7 +79,6 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, LDAPWithConfig(cfg)...)
 	flags = append(flags, RestWithConfig(cfg)...)
-	flags = append(flags, RuntimeConfig(cfg)...)
 
 	return flags
 }

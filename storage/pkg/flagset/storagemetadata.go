@@ -106,7 +106,6 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	f = append(f, DriverOwnCloudWithConfig(cfg)...)
 	f = append(f, DriverOCISWithConfig(cfg)...)
 	f = append(f, DriverS3NGWithConfig(cfg)...)
-	f = append(f, RuntimeConfig(cfg)...)
 
 	return f
 

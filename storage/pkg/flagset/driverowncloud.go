@@ -58,9 +58,5 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_DRIVER_OWNCLOUD_LAYOUT"},
 			Destination: &cfg.Reva.Storages.OwnCloud.UserLayout,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }

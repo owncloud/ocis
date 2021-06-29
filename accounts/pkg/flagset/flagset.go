@@ -239,6 +239,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_GID_INDEX_UPPER_BOUND"},
 			Destination: &cfg.Index.GID.Upper,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
 

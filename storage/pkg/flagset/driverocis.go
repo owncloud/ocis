@@ -37,9 +37,5 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_DRIVER_OCIS_SERVICE_USER_UUID"},
 			Destination: &cfg.Reva.Storages.OCIS.ServiceUserUUID,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }

@@ -208,9 +208,5 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER"},
 			Destination: &cfg.Reva.LDAP.GroupSchema.GIDNumber,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }

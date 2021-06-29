@@ -72,9 +72,5 @@ func RestWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_REST_TARGET_API"},
 			Destination: &cfg.Reva.UserGroupRest.TargetAPI,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }

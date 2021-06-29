@@ -65,9 +65,5 @@ func DriverS3NGWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_DRIVER_S3NG_BUCKET"},
 			Destination: &cfg.Reva.Storages.S3NG.Bucket,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }
