@@ -59,6 +59,13 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"APP_PROVIDER_IOP_SECRET"},
 			Destination: &cfg.Reva.AppProvider.IopSecret,
 		},
+		&cli.BoolFlag{
+			Name:        "wopiinsecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.AppProvider.WopiInsecure, false),
+			Usage:       "Disable SSL certificate verification of WOPI server and WOPI bridge",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_INSECURE"},
+			Destination: &cfg.Reva.AppProvider.WopiInsecure,
+		},
 		&cli.StringFlag{
 			Name:        "wopiurl",
 			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiUrl, ""),

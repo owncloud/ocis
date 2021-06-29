@@ -62,7 +62,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   cli.NewStringSlice("gateway", "authregistry", "storageregistry"), // TODO appregistry
+			Value:   cli.NewStringSlice("gateway", "authregistry", "storageregistry", "appregistry"),
 			Usage:   "--service gateway [--service authregistry]",
 			EnvVars: []string{"STORAGE_GATEWAY_SERVICES"},
 		},

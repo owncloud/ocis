@@ -44,6 +44,7 @@ type AppProvider struct {
 	Port
 	Driver        string
 	IopSecret     string
+	WopiInsecure  bool
 	WopiUrl       string
 	WopiBridgeUrl string
 }

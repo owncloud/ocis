@@ -5,7 +5,6 @@ import (
 	"flag"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -37,13 +36,6 @@ func AppProvider(cfg *config.Config) *cli.Command {
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-
-			// pre-create folders
-			if cfg.Reva.AuthProvider.Driver == "json" && cfg.Reva.AuthProvider.JSON != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Reva.AuthProvider.JSON), os.FileMode(0700)); err != nil {
-					return err
-				}
-			}
 
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
@@ -78,7 +70,7 @@ func AppProvider(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.AppProvider.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -107,6 +99,8 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
 					"driver":        cfg.Reva.AppProvider.Driver,
+					"demo":          map[string]interface{}{},
+					"wopiinsecure":  cfg.Reva.AppProvider.WopiInsecure,
 					"iopsecret":     cfg.Reva.AppProvider.IopSecret,
 					"wopiurl":       cfg.Reva.AppProvider.WopiUrl,
 					"wopibridgeurl": cfg.Reva.AppProvider.WopiBridgeUrl,
