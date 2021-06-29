@@ -44,5 +44,9 @@ func SharingSQLWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_NAME"},
 			Destination: &cfg.Reva.Sharing.UserSQLName,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }

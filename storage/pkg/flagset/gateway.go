@@ -264,6 +264,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, TracingWithConfig(cfg)...)
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
+	flags = append(flags, RuntimeConfig(cfg)...)
 
 	return flags
 }

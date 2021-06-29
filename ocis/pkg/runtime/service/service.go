@@ -22,6 +22,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
@@ -35,6 +36,11 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/rs/zerolog"
 	"github.com/thejerf/suture/v4"
+)
+
+var (
+	// runset keeps track of which extensions to start supervised.
+	runset []string
 )
 
 // Service represents a RPC service.
@@ -180,7 +186,18 @@ func Start(o ...Option) error {
 		}
 	}()
 
-	for name := range s.ServicesRegistry {
+	// prepare runset
+	s.generateRunSet(s.cfg)
+
+	for _, name := range runset {
+
+		// skip delayed services for now
+		if _, ok := s.Delayed[name]; ok {
+			continue
+		}
+
+		// we do this so each service has its own copy. In a perfect world a config object should NOT be edited by
+		// the callers because this might trigger behavioral changes up the tree.
 		swap := deepcopy.Copy(s.cfg)
 		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
 	}
@@ -198,12 +215,35 @@ func Start(o ...Option) error {
 	time.Sleep(1 * time.Second)
 
 	// add services with delayed execution.
-	for name := range s.Delayed {
+	for _, name := range runset {
+		// this time around only run delayed jobs
+		if _, ok := s.Delayed[name]; !ok {
+			continue
+		}
+
 		swap := deepcopy.Copy(s.cfg)
 		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
 	}
 
 	return http.Serve(l, nil)
+}
+
+func (s *Service) generateRunSet(cfg *config.Config) {
+	if cfg.Runtime.Extensions != "" {
+		e := strings.Split(strings.Replace(cfg.Runtime.Extensions, " ", "", -1), ",")
+		for i := range e {
+			runset = append(runset, e[i])
+		}
+		return
+	}
+
+	for name := range s.ServicesRegistry {
+		runset = append(runset, name)
+	}
+
+	for name := range s.Delayed {
+		runset = append(runset, name)
+	}
 }
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.

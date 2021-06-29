@@ -16,5 +16,9 @@ func DriverLocalWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_DRIVER_LOCAL_ROOT"},
 			Destination: &cfg.Reva.Storages.Local.Root,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
