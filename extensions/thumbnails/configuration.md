@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-29T10:43:37+0000"
+date: "2021-06-29T11:00:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,36 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### thumbnails server
 
@@ -203,6 +173,36 @@ Usage: `thumbnails health [command options] [arguments...]`
 
 -debug-addr |  $THUMBNAILS_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
 
 
 

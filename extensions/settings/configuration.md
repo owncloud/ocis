@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-29T10:43:36+0000"
+date: "2021-06-29T11:00:51+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,6 +34,80 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $SETTINGS_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### settings ocis-settings
+
+Provide settings and permissions for oCIS
+
+Usage: `settings ocis-settings [command options] [arguments...]`
+
+
+-log-level |  $SETTINGS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $SETTINGS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $SETTINGS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### settings server
 
@@ -159,78 +233,4 @@ Usage: `settings version [command options] [arguments...]`
 
 -name |  $SETTINGS_NAME
 : service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
-
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### settings ocis-settings
-
-Provide settings and permissions for oCIS
-
-Usage: `settings ocis-settings [command options] [arguments...]`
-
-
--log-level |  $SETTINGS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $SETTINGS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $SETTINGS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
