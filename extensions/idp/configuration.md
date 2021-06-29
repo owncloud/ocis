@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-06-29T07:12:51+0000"
+date: "2021-06-29T07:14:35+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -34,204 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### idp version
-
-Print the versions of the running instances
-
-Usage: `idp version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $IDP_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
-
--name |  $IDP_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "idp")`.
-
-### idp health
-
-Check health status
-
-Usage: `idp health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $IDP_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### idp ocis-idp
-
-Serve IDP API for oCIS
-
-Usage: `idp ocis-idp [command options] [arguments...]`
-
-
--log-level |  $IDP_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $IDP_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $IDP_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### idp server
 
@@ -434,6 +236,204 @@ Usage: `idp server [command options] [arguments...]`
 
 -disable-identifier-webapp |  $IDP_DISABLE_IDENTIFIER_WEBAPP
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `flags.OverrideDefaultBool(cfg.IDP.IdentifierClientDisabled, true)`.
+
+
+
+### idp version
+
+Print the versions of the running instances
+
+Usage: `idp version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $IDP_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+
+-name |  $IDP_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "idp")`.
+
+### idp health
+
+Check health status
+
+Usage: `idp health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $IDP_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### idp ocis-idp
+
+Serve IDP API for oCIS
+
+Usage: `idp ocis-idp [command options] [arguments...]`
+
+
+-log-level |  $IDP_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $IDP_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $IDP_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
