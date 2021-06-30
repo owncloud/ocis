@@ -43,11 +43,13 @@ var (
 	runset []string
 )
 
+type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
+
 // Service represents a RPC service.
 type Service struct {
 	Supervisor       *suture.Supervisor
-	ServicesRegistry map[string]func(*ociscfg.Config) suture.Service
-	Delayed          map[string]func(*ociscfg.Config) suture.Service
+	ServicesRegistry serviceFuncMap
+	Delayed          serviceFuncMap
 	Log              log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
@@ -77,8 +79,8 @@ func NewService(options ...Option) (*Service, error) {
 	globalCtx, cancelGlobal := context.WithCancel(context.Background())
 
 	s := &Service{
-		ServicesRegistry: make(map[string]func(*ociscfg.Config) suture.Service),
-		Delayed:          make(map[string]func(*ociscfg.Config) suture.Service),
+		ServicesRegistry: make(serviceFuncMap),
+		Delayed:          make(serviceFuncMap),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -210,7 +212,7 @@ func Start(o ...Option) error {
 }
 
 // scheduleServiceTokens adds service tokens to the service supervisor.
-func scheduleServiceTokens(s *Service, funcSet map[string]func(*ociscfg.Config) suture.Service) {
+func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 	for _, name := range runset {
 		if _, ok := funcSet[name]; !ok {
 			continue
