@@ -60,7 +60,7 @@ New terms are defined to refer to new mental models:
 
 ### Future ideas
 
-[This proof of concept](https://github.com/owncloud/ocis/tree/poc-enforcement-engine) is very rigid in the sense that the `IStorage` interface only has one implementation that ties it to etcd, meaning running an oCIS cluster without an etcd service will result in a crash. This is by far ideal and less coupled implementations should be done. There is the case of using the storage metadata as a source to store data necessary to the policies, or even using the go-micro store as a kv store to achieve the exact same, since it already runs as its own service. The implementation of this is trivial and left out of the POC since it requires more time than the allotted for this task.
+[This proof of concept](https://github.com/owncloud/ocis/pull/2236) is very rigid in the sense that the `IStorage` interface only has one implementation that ties it to etcd, meaning running an oCIS cluster without an etcd service will result in a crash. This is by far ideal and less coupled implementations should be done. There is the case of using the storage metadata as a source to store data necessary to the policies, or even using the go-micro store as a kv store to achieve the exact same, since it already runs as its own service. The implementation of this is trivial and left out of the POC since it requires more time than the allotted for this task.
 
 #### Message Broker
 
