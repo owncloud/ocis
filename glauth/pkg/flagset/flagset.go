@@ -30,10 +30,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GLAUTH_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }
 
@@ -294,6 +290,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "use Graph API, only for owncloud datastore",
 			EnvVars:     []string{"GLAUTH_FALLBACK_USE_GRAPHAPI"},
 			Destination: &cfg.Fallback.UseGraphAPI,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

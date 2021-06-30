@@ -30,10 +30,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"IDP_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }
 
@@ -421,7 +417,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"IDP_REFRESH_TOKEN_EXPIRATION"},
 			Destination: &cfg.IDP.RefreshTokenDurationSeconds,
 			Value:       flags.OverrideDefaultUint64(cfg.IDP.RefreshTokenDurationSeconds, 60*60*24*365*3), // 1 year
-
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

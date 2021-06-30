@@ -27,10 +27,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_EXPLORER_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }
 
@@ -157,6 +153,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Set the url to the graph api service",
 			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL"},
 			Destination: &cfg.GraphExplorer.GraphURL,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

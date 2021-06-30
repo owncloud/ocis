@@ -34,10 +34,6 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ONLYOFFICE_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
-		&cli.StringFlag{
-			Name:  "extensions",
-			Usage: "Run specific extensions during supervised mode",
-		},
 	}
 }
 
@@ -157,6 +153,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Path to custom assets",
 			EnvVars:     []string{"ONLYOFFICE_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

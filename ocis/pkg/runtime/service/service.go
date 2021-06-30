@@ -186,21 +186,11 @@ func Start(o ...Option) error {
 		}
 	}()
 
-	// prepare runset
+	// prepare the set of services to run
 	s.generateRunSet(s.cfg)
 
-	for _, name := range runset {
-
-		// skip delayed services for now
-		if _, ok := s.Delayed[name]; ok {
-			continue
-		}
-
-		// we do this so each service has its own copy. In a perfect world a config object should NOT be edited by
-		// the callers because this might trigger behavioral changes up the tree.
-		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
-	}
+	// schedule services that we are sure don't have interdependencies.
+	scheduleServiceTokens(s, s.ServicesRegistry)
 
 	// there are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
 	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
@@ -212,22 +202,27 @@ func Start(o ...Option) error {
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
 
-	time.Sleep(1 * time.Second)
-
 	// add services with delayed execution.
-	for _, name := range runset {
-		// this time around only run delayed jobs
-		if _, ok := s.Delayed[name]; !ok {
-			continue
-		}
-
-		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
-	}
+	time.Sleep(1 * time.Second)
+	scheduleServiceTokens(s, s.Delayed)
 
 	return http.Serve(l, nil)
 }
 
+// scheduleServiceTokens adds service tokens to the service supervisor.
+func scheduleServiceTokens(s *Service, funcSet map[string]func(*ociscfg.Config) suture.Service) {
+	for _, name := range runset {
+		if _, ok := funcSet[name]; !ok {
+			continue
+		}
+
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(funcSet[name](swap.(*ociscfg.Config))))
+	}
+}
+
+// generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
+// the runtime.
 func (s *Service) generateRunSet(cfg *config.Config) {
 	if cfg.Runtime.Extensions != "" {
 		e := strings.Split(strings.Replace(cfg.Runtime.Extensions, " ", "", -1), ",")
