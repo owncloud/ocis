@@ -408,6 +408,7 @@ def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", acco
                     "BEHAT_SUITE": suite,
                     "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "PATH_TO_CORE": "/srv/app/testrunner",
+                    "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                 },
                 "commands": [
                     "make test-acceptance-api",
@@ -454,6 +455,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "owncloud"
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper()),
+                    "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                 },
                 "commands": [
                     "make -C /srv/app/testrunner test-acceptance-api",
