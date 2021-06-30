@@ -22,11 +22,11 @@ There should be a way to impose certain limitations in areas of the code that re
 ## Considered Options
 
 1. Build the evaluation engine in-house.
-2. Use third party libraries such as Open Policy Agent (a CNCF aproved project with a Go library)
+2. Use third party libraries such as Open Policy Agent (a CNCF aproved project written in Go)
 
 ## Decision Outcome
 
-Chosen option: option 2; Use third party libraries such as Open Policy Agent (a CNCF aproved project with a Go library)
+Chosen option: option 2; Use third party libraries such as Open Policy Agent (a CNCF aproved project written in Go)
 
 ### Positive Consequences
 
@@ -35,6 +35,7 @@ Chosen option: option 2; Use third party libraries such as Open Policy Agent (a 
 - middleware friendly: we use gRPC clients all over our ecosystem; wrappers (or middlewares) is a viable way to solve this problem instead of a dedicated service or its own package.
 - community support.
 - kubernetes friendly.
+- supports envoy, kong, terraform, traefik, php, node and many more.
 
 ### Negative Consequences
 
