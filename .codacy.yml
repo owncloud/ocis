@@ -12,8 +12,6 @@ exclude_paths:
   - 'idp/scripts/**'
   - 'settings/rollup.config.js'
   - 'accounts/rollup.config.js'
-  - 'ocis/docker/eos-ocis/Dockerfile'
-  - 'ocis/docker/eos-ocis-dev/Dockerfile'
   - 'deployments/**'
   - 'tests/acceptance/expected-failures-*.md'
   - 'tests/acceptance/features/bootstrap/**'
