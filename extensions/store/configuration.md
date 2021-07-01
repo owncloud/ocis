@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T14:06:12+0000"
+date: "2021-07-01T14:18:00+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -64,6 +64,7 @@ Usage: `store health [command options] [arguments...]`
 
 
 
+
 ### store ocis-store
 
 Service to store values for ocis extensions
@@ -85,6 +86,7 @@ Usage: `store ocis-store [command options] [arguments...]`
 
 -log-color |  $STORE_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
 
 
 
@@ -166,12 +168,17 @@ Usage: `store server [command options] [arguments...]`
 : location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, "/var/tmp/ocis/store")`.
 
 
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
+
+
 
 ### store version
 
 Print the versions of the running instances
 
 Usage: `store version [command options] [arguments...]`
+
 
 
 

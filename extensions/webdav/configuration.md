@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T14:06:14+0000"
+date: "2021-07-01T14:18:01+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -64,39 +64,8 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 
 
+
 ## Sub Commands
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### webdav server
 
@@ -186,6 +155,10 @@ Usage: `webdav server [command options] [arguments...]`
 : Namespace prefix for the /webdav endpoint. Default: `flags.OverrideDefaultString(cfg.WebdavNamespace, "/home")`.
 
 
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
+
+
 
 ### webdav version
 
@@ -215,10 +188,44 @@ Usage: `webdav version [command options] [arguments...]`
 
 
 
+
 -http-namespace |  $WEBDAV_HTTP_NAMESPACE
 : Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
 
 
 -service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "webdav")`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119")`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T14:06:10+0000"
+date: "2021-07-01T14:17:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -35,72 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### idp version
-
-Print the versions of the running instances
-
-Usage: `idp version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $IDP_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
-
-
--name |  $IDP_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "idp")`.
-
 ### idp health
 
 Check health status
@@ -113,6 +47,7 @@ Usage: `idp health [command options] [arguments...]`
 
 -debug-addr |  $IDP_DEBUG_ADDR
 : Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134")`.
+
 
 
 
@@ -181,6 +116,7 @@ Usage: `idp ocis-idp [command options] [arguments...]`
 
 -log-color |  $IDP_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
 
 
 
@@ -436,4 +372,75 @@ Usage: `idp server [command options] [arguments...]`
 : Disable built-in identifier-webapp to use a frontend hosted elsewhere.. Default: `flags.OverrideDefaultBool(cfg.IDP.IdentifierClientDisabled, true)`.
 
 
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
+
+
+
+### idp version
+
+Print the versions of the running instances
+
+Usage: `idp version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $IDP_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+
+
+-name |  $IDP_NAME
+: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "idp")`.
 
