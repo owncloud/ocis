@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:08:41+0000"
+date: "2021-07-01T15:13:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -47,7 +47,11 @@ Usage: `proxy health [command options] [arguments...]`
 
 
 -debug-addr |  $PROXY_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109")`.
+: Address to debug endpoint. Default: `"0.0.0.0:9109"`.
+
+
+
+
 
 
 
@@ -132,6 +136,10 @@ Usage: `proxy ocis-proxy [command options] [arguments...]`
 
 
 
+
+
+
+
 ### proxy server
 
 Start integrated server
@@ -169,7 +177,7 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -tracing-type |  $PROXY_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+: Tracing backend type. Default: `"jaeger"`.
 
 
 -tracing-endpoint |  $PROXY_TRACING_ENDPOINT
@@ -181,11 +189,11 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -tracing-service |  $PROXY_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "proxy")`.
+: Service name for tracing. Default: `"proxy"`.
 
 
 -debug-addr |  $PROXY_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205")`.
+: Address to bind debug server. Default: `"0.0.0.0:9205"`.
 
 
 -debug-token |  $PROXY_DEBUG_TOKEN
@@ -201,23 +209,23 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -http-addr |  $PROXY_HTTP_ADDR
-: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9200")`.
+: Address to bind http server. Default: `"0.0.0.0:9200"`.
 
 
 -http-root |  $PROXY_HTTP_ROOT
-: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+: Root path of http server. Default: `"/"`.
 
 
 -asset-path |  $PROXY_ASSET_PATH
-: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
+: Path to custom assets. Default: `""`.
 
 
 -service-namespace |  $PROXY_SERVICE_NAMESPACE
-: Set the base namespace for the service namespace. Default: `flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web")`.
+: Set the base namespace for the service namespace. Default: `"com.owncloud.web"`.
 
 
 -service-name |  $PROXY_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "proxy")`.
+: Service name. Default: `"proxy"`.
 
 
 -transport-tls-cert |  $PROXY_TRANSPORT_TLS_CERT
@@ -229,43 +237,59 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -tls |  $PROXY_TLS
-: Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).. Default: `flags.OverrideDefaultBool(cfg.HTTP.TLS, true)`.
+: Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).. Default: `true`.
 
 
 -jwt-secret |  $PROXY_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4")`.
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
 
 
 -reva-gateway-addr |  $PROXY_REVA_GATEWAY_ADDR
-: REVA Gateway Endpoint. Default: `flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142")`.
+: REVA Gateway Endpoint. Default: `"127.0.0.1:9142"`.
 
 
 -insecure |  $PROXY_INSECURE_BACKENDS
-: allow insecure communication to upstream servers. Default: `flags.OverrideDefaultBool(cfg.InsecureBackends, false)`.
+: allow insecure communication to upstream servers. Default: `false`.
 
 
 -oidc-issuer |  $PROXY_OIDC_ISSUER , $OCIS_URL
-: OIDC issuer. Default: `flags.OverrideDefaultString(cfg.OIDC.Issuer, "https://localhost:9200")`.
+: OIDC issuer. Default: `"https://localhost:9200"`.
 
 
 -oidc-insecure |  $PROXY_OIDC_INSECURE
-: OIDC allow insecure communication. Default: `flags.OverrideDefaultBool(cfg.OIDC.Insecure, true)`.
+: OIDC allow insecure communication. Default: `true`.
+
+
+-oidc-userinfo-cache-tll |  $PROXY_OIDC_USERINFO_CACHE_TTL
+: Fallback TTL in seconds for caching userinfo, when no token lifetime can be identified. Default: `10`.
+
+
+-oidc-userinfo-cache-size |  $PROXY_OIDC_USERINFO_CACHE_SIZE
+: Max entries for caching userinfo. Default: `1024`.
 
 
 -autoprovision-accounts |  $PROXY_AUTOPROVISION_ACCOUNTS
-: create accounts from OIDC access tokens to learn new users. Default: `flags.OverrideDefaultBool(cfg.AutoprovisionAccounts, false)`.
+: create accounts from OIDC access tokens to learn new users. Default: `false`.
+
+
+-presignedurl-allow-method |  $PRESIGNEDURL_ALLOWED_METHODS
+: --presignedurl-allow-method GET [--presignedurl-allow-method POST]. Default: `cli.NewStringSlice("GET")`.
 
 
 -enable-presignedurls |  $PROXY_ENABLE_PRESIGNEDURLS
-: Enable or disable handling the presigned urls in the proxy. Default: `flags.OverrideDefaultBool(cfg.PreSignedURL.Enabled, true)`.
+: Enable or disable handling the presigned urls in the proxy. Default: `true`.
 
 
 -enable-basic-auth |  $PROXY_ENABLE_BASIC_AUTH
-: enable basic authentication. Default: `flags.OverrideDefaultBool(cfg.EnableBasicAuth, false)`.
+: enable basic authentication. Default: `false`.
 
 
 -account-backend-type |  $PROXY_ACCOUNT_BACKEND_TYPE
-: account-backend-type. Default: `flags.OverrideDefaultString(cfg.AccountBackend, "accounts")`.
+: account-backend-type. Default: `"accounts"`.
+
+
+-proxy-user-agent-lock-in |  $PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT
+: --user-agent-whitelist-lock-in=mirall:basic,foo:bearer Given a tuple of [UserAgent:challenge] it locks a given user agent to the authentication challenge. Particularly useful for old clients whose USer-Agent is known and only support one authentication challenge. When this flag is set in the proxy it configures the authentication middlewares..
 
 
 
@@ -309,10 +333,14 @@ Usage: `proxy version [command options] [arguments...]`
 
 
 
+
+
+
+
 -service-namespace |  $PROXY_SERVICE_NAMESPACE
-: Set the base namespace for the service namespace. Default: `flags.OverrideDefaultString(cfg.OIDC.Issuer, "com.owncloud.web")`.
+: Set the base namespace for the service namespace. Default: `"com.owncloud.web"`.
 
 
 -service-name |  $PROXY_SERVICE_NAME
-: Service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "proxy")`.
+: Service name. Default: `"proxy"`.
 

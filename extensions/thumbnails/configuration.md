@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:08:42+0000"
+date: "2021-07-01T15:13:26+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -43,7 +43,8 @@ Usage: `thumbnails health [command options] [arguments...]`
 
 
 -debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
+: Address to debug endpoint. Default: `"0.0.0.0:9189"`.
+
 
 
 
@@ -74,6 +75,7 @@ Usage: `thumbnails health [command options] [arguments...]`
 Example usage
 
 Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
 
 
 
@@ -133,27 +135,27 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -tracing-type |  $THUMBNAILS_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+: Tracing backend type. Default: `"jaeger"`.
 
 
 -tracing-endpoint |  $THUMBNAILS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+: Endpoint for the agent. Default: `""`.
 
 
 -tracing-collector |  $THUMBNAILS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+: Endpoint for the collector. Default: `""`.
 
 
 -tracing-service |  $THUMBNAILS_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "thumbnails")`.
+: Service name for tracing. Default: `"thumbnails"`.
 
 
 -debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189")`.
+: Address to bind debug server. Default: `"0.0.0.0:9189"`.
 
 
 -debug-token |  $THUMBNAILS_DEBUG_TOKEN
-: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+: Token to grant metrics access. Default: `""`.
 
 
 -debug-pprof |  $THUMBNAILS_DEBUG_PPROF
@@ -165,15 +167,15 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -grpc-name |  $THUMBNAILS_GRPC_NAME
-: Name of the service. Default: `flags.OverrideDefaultString(cfg.Server.Name, "thumbnails")`.
+: Name of the service. Default: `"thumbnails"`.
 
 
 -grpc-addr |  $THUMBNAILS_GRPC_ADDR
-: Address to bind grpc server. Default: `flags.OverrideDefaultString(cfg.Server.Address, "0.0.0.0:9185")`.
+: Address to bind grpc server. Default: `"0.0.0.0:9185"`.
 
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
 
 -filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
@@ -181,15 +183,19 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -reva-gateway-addr |  $THUMBNAILS_REVA_GATEWAY , $PROXY_REVA_GATEWAY_ADDR
-: Reva gateway address. Default: `flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "127.0.0.1:9142")`.
+: Reva gateway address. Default: `"127.0.0.1:9142"`.
 
 
 -webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
-: Whether to skip certificate checks. Default: `flags.OverrideDefaultBool(cfg.Thumbnail.WebdavAllowInsecure, true)`.
+: Whether to skip certificate checks. Default: `true`.
+
+
+-thumbnail-resolution |  $THUMBNAILS_RESOLUTIONS
+: --thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]. Default: `cli.NewStringSlice("16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320")`.
 
 
 -webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
-: Namespace prefix for the webdav endpoint. Default: `flags.OverrideDefaultString(cfg.Thumbnail.WebdavNamespace, "/home")`.
+: Namespace prefix for the webdav endpoint. Default: `"/home"`.
 
 
 -extensions | 
@@ -227,10 +233,11 @@ Usage: `thumbnails version [command options] [arguments...]`
 
 
 
+
 -grpc-name |  $THUMBNAILS_GRPC_NAME
-: Name of the service. Default: `flags.OverrideDefaultString(cfg.Server.Name, "thumbnails")`.
+: Name of the service. Default: `"thumbnails"`.
 
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.Server.Namespace, "com.owncloud.api")`.
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 

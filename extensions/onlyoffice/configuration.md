@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:08:41+0000"
+date: "2021-07-01T15:13:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/onlyoffice/templates
@@ -77,36 +77,8 @@ Usage: `onlyoffice [global options] command [command options] [arguments...]`
 
 
 
+
 ## Sub Commands
-
-### onlyoffice health
-
-Check health status
-
-Usage: `onlyoffice health [command options] [arguments...]`
-
-
-
-
-
-
--debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### onlyoffice server
 
@@ -129,27 +101,27 @@ Usage: `onlyoffice server [command options] [arguments...]`
 
 
 -tracing-type |  $ONLYOFFICE_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+: Tracing backend type. Default: `"jaeger"`.
 
 
 -tracing-endpoint |  $ONLYOFFICE_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+: Endpoint for the agent. Default: `""`.
 
 
 -tracing-collector |  $ONLYOFFICE_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+: Endpoint for the collector. Default: `""`.
 
 
 -tracing-service |  $ONLYOFFICE_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "onlyoffice")`.
+: Service name for tracing. Default: `"onlyoffice"`.
 
 
 -debug-addr |  $ONLYOFFICE_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9224")`.
+: Address to bind debug server. Default: `"0.0.0.0:9224"`.
 
 
 -debug-token |  $ONLYOFFICE_DEBUG_TOKEN
-: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+: Token to grant metrics access. Default: `""`.
 
 
 -debug-pprof |  $ONLYOFFICE_DEBUG_PPROF
@@ -161,21 +133,55 @@ Usage: `onlyoffice server [command options] [arguments...]`
 
 
 -http-addr |  $ONLYOFFICE_HTTP_ADDR
-: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9220")`.
+: Address to bind http server. Default: `"0.0.0.0:9220"`.
 
 
 -http-namespace |  $ONLYOFFICE_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web")`.
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
 -http-root |  $ONLYOFFICE_HTTP_ROOT
-: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+: Root path of http server. Default: `"/"`.
+
+
+-http-cache-ttl |  $ONLYOFFICE_CACHE_TTL
+: Set the static assets caching duration in seconds. Default: `604800`.
 
 
 -asset-path |  $ONLYOFFICE_ASSET_PATH
-: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
+: Path to custom assets. Default: `""`.
 
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### onlyoffice health
+
+Check health status
+
+Usage: `onlyoffice health [command options] [arguments...]`
+
+
+
+
+
+
+-debug-addr |  $ONLYOFFICE_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9224"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

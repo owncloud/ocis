@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:08:41+0000"
+date: "2021-07-01T15:13:25+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -46,7 +46,8 @@ Usage: `settings health [command options] [arguments...]`
 
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
+: Address to debug endpoint. Default: `"0.0.0.0:9194"`.
+
 
 
 
@@ -111,6 +112,7 @@ Usage: `settings ocis-settings [command options] [arguments...]`
 
 
 
+
 ### settings server
 
 Start integrated server
@@ -131,27 +133,27 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -tracing-type |  $SETTINGS_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+: Tracing backend type. Default: `"jaeger"`.
 
 
 -tracing-endpoint |  $SETTINGS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+: Endpoint for the agent. Default: `""`.
 
 
 -tracing-collector |  $SETTINGS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+: Endpoint for the collector. Default: `""`.
 
 
 -tracing-service |  $SETTINGS_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "settings")`.
+: Service name for tracing. Default: `"settings"`.
 
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194")`.
+: Address to bind debug server. Default: `"0.0.0.0:9194"`.
 
 
 -debug-token |  $SETTINGS_DEBUG_TOKEN
-: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+: Token to grant metrics access. Default: `""`.
 
 
 -debug-pprof |  $SETTINGS_DEBUG_PPROF
@@ -163,39 +165,43 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -http-addr |  $SETTINGS_HTTP_ADDR
-: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9190")`.
+: Address to bind http server. Default: `"0.0.0.0:9190"`.
 
 
 -http-namespace |  $SETTINGS_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web")`.
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
 -http-root |  $SETTINGS_HTTP_ROOT
-: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+: Root path of http server. Default: `"/"`.
+
+
+-http-cache-ttl |  $SETTINGS_CACHE_TTL
+: Set the static assets caching duration in seconds. Default: `604800`.
 
 
 -grpc-addr |  $SETTINGS_GRPC_ADDR
-: Address to bind grpc server. Default: `flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9191")`.
+: Address to bind grpc server. Default: `"0.0.0.0:9191"`.
 
 
 -asset-path |  $SETTINGS_ASSET_PATH
-: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
+: Path to custom assets. Default: `""`.
 
 
 -grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
 
 -name |  $SETTINGS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
+: service name. Default: `"settings"`.
 
 
 -data-path |  $SETTINGS_DATA_PATH
-: Mount path for the storage. Default: `flags.OverrideDefaultString(cfg.Service.DataPath, "/var/tmp/ocis/settings")`.
+: Mount path for the storage. Default: `"/var/tmp/ocis/settings"`.
 
 
 -jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4")`.
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
 
 
 -extensions | 
@@ -234,10 +240,11 @@ Usage: `settings version [command options] [arguments...]`
 
 
 
+
 -grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api")`.
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
 
 -name |  $SETTINGS_NAME
-: service name. Default: `flags.OverrideDefaultString(cfg.Service.Name, "settings")`.
+: service name. Default: `"settings"`.
 

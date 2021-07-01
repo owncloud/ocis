@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:08:42+0000"
+date: "2021-07-01T15:13:26+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -70,7 +70,49 @@ Usage: `web [global options] command [command options] [arguments...]`
 
 
 
+
+
 ## Sub Commands
+
+### web health
+
+Check health status
+
+Usage: `web health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $WEB_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9104"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### web server
 
@@ -105,27 +147,27 @@ Usage: `web server [command options] [arguments...]`
 
 
 -tracing-type |  $WEB_TRACING_TYPE
-: Tracing backend type. Default: `flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger")`.
+: Tracing backend type. Default: `"jaeger"`.
 
 
 -tracing-endpoint |  $WEB_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `flags.OverrideDefaultString(cfg.Tracing.Endpoint, "")`.
+: Endpoint for the agent. Default: `""`.
 
 
 -tracing-collector |  $WEB_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `flags.OverrideDefaultString(cfg.Tracing.Collector, "")`.
+: Endpoint for the collector. Default: `""`.
 
 
 -tracing-service |  $WEB_TRACING_SERVICE
-: Service name for tracing. Default: `flags.OverrideDefaultString(cfg.Tracing.Service, "web")`.
+: Service name for tracing. Default: `"web"`.
 
 
 -debug-addr |  $WEB_DEBUG_ADDR
-: Address to bind debug server. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104")`.
+: Address to bind debug server. Default: `"0.0.0.0:9104"`.
 
 
 -debug-token |  $WEB_DEBUG_TOKEN
-: Token to grant metrics access. Default: `flags.OverrideDefaultString(cfg.Debug.Token, "")`.
+: Token to grant metrics access. Default: `""`.
 
 
 -debug-pprof |  $WEB_DEBUG_PPROF
@@ -137,95 +179,65 @@ Usage: `web server [command options] [arguments...]`
 
 
 -http-addr |  $WEB_HTTP_ADDR
-: Address to bind http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9100")`.
+: Address to bind http server. Default: `"0.0.0.0:9100"`.
 
 
 -http-root |  $WEB_HTTP_ROOT
-: Root path of http server. Default: `flags.OverrideDefaultString(cfg.HTTP.Root, "/")`.
+: Root path of http server. Default: `"/"`.
 
 
 -http-namespace |  $WEB_NAMESPACE
-: Set the base namespace for the http namespace. Default: `flags.OverrideDefaultString(cfg.HTTP.Namespace, "com.owncloud.web")`.
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
+
+
+-http-cache-ttl |  $WEB_CACHE_TTL
+: Set the static assets caching duration in seconds. Default: `604800`.
 
 
 -asset-path |  $WEB_ASSET_PATH
-: Path to custom assets. Default: `flags.OverrideDefaultString(cfg.Asset.Path, "")`.
+: Path to custom assets. Default: `""`.
 
 
 -web-config |  $WEB_UI_CONFIG
-: Path to web config. Default: `flags.OverrideDefaultString(cfg.Web.Path, "")`.
+: Path to web config. Default: `""`.
 
 
 -web-config-server |  $WEB_UI_CONFIG_SERVER , $OCIS_URL
-: Server URL. Default: `flags.OverrideDefaultString(cfg.Web.Config.Server, "https://localhost:9200")`.
+: Server URL. Default: `"https://localhost:9200"`.
 
 
 -web-config-theme |  $WEB_UI_CONFIG_THEME
-: Theme. Default: `flags.OverrideDefaultString(cfg.Web.Config.Theme, "owncloud")`.
+: Theme. Default: `"owncloud"`.
 
 
 -web-config-version |  $WEB_UI_CONFIG_VERSION
-: Version. Default: `flags.OverrideDefaultString(cfg.Web.Config.Version, "0.1.0")`.
+: Version. Default: `"0.1.0"`.
+
+
+-web-config-app |  $WEB_UI_CONFIG_APPS
+: `--web-config-app files [--web-config-app draw-io]`. Default: `cli.NewStringSlice("files", "media-viewer")`.
 
 
 -oidc-metadata-url |  $WEB_OIDC_METADATA_URL
-: OpenID Connect metadata URL, defaults to <WEB_OIDC_AUTHORITY>/.well-known/openid-configuration. Default: `flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.MetadataURL, "")`.
+: OpenID Connect metadata URL, defaults to <WEB_OIDC_AUTHORITY>/.well-known/openid-configuration. Default: `""`.
 
 
 -oidc-authority |  $WEB_OIDC_AUTHORITY , $OCIS_URL
-: OpenID Connect authority. Default: `flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.Authority, "https://localhost:9200")`.
+: OpenID Connect authority. Default: `"https://localhost:9200"`.
 
 
 -oidc-client-id |  $WEB_OIDC_CLIENT_ID
-: OpenID Connect client ID. Default: `flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.ClientID, "web")`.
+: OpenID Connect client ID. Default: `"web"`.
 
 
 -oidc-response-type |  $WEB_OIDC_RESPONSE_TYPE
-: OpenID Connect response type. Default: `flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.ResponseType, "code")`.
+: OpenID Connect response type. Default: `"code"`.
 
 
 -oidc-scope |  $WEB_OIDC_SCOPE
-: OpenID Connect scope. Default: `flags.OverrideDefaultString(cfg.Web.Config.OpenIDConnect.Scope, "openid profile email")`.
+: OpenID Connect scope. Default: `"openid profile email"`.
 
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
-
-### web health
-
-Check health status
-
-Usage: `web health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $WEB_DEBUG_ADDR
-: Address to debug endpoint. Default: `flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104")`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
