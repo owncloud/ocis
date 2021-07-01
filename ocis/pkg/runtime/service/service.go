@@ -227,7 +227,7 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 // the runtime.
 func (s *Service) generateRunSet(cfg *config.Config) {
 	if cfg.Runtime.Extensions != "" {
-		e := strings.Split(strings.Replace(cfg.Runtime.Extensions, " ", "", -1), ",")
+		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
 		for i := range e {
 			runset = append(runset, e[i])
 		}
