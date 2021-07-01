@@ -6,9 +6,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
 
 ## Details
+
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+
+   Support for running certain extensions supervised via cli flags. Example usage:
+
+   ``` > ocis server --extensions="proxy, idp, storage-metadata, accounts" ```
+
+   https://github.com/owncloud/ocis/pull/2229
 
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
 

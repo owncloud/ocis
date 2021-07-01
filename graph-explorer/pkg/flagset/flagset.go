@@ -154,5 +154,9 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL"},
 			Destination: &cfg.GraphExplorer.GraphURL,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
+		},
 	}
 }
