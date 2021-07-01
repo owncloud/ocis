@@ -6,7 +6,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0008-configuration.md
 ---
 
-# 5. Configuration Management for oCIS
+## 5. Configuration Management for oCIS
 
 * Status: proposed
 * Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
@@ -53,13 +53,13 @@ An issue arises in point 2, in the sense that configuration file refers to a sin
 
 Because we solely rely on [structured configuration](https://github.com/owncloud/ocis/blob/master/ocis-pkg/config/config.go) we need a way to modify values in this struct using the provided means urfave/cli gives us (flags, env variables, config files and default value), but since we have different modes of operation (supervised Vs. unsupervised) we have to define a clear line.
 
-## Decision Drivers
+### Decision Drivers
 - Improve experience for the end user.
 - Improve experience for developers.
 - Sane defaults.
 - Sane overrides.
 
-## Considered Options
+### Considered Options
 
 - Extend [FlagInputSourceExtension interface](https://github.com/urfave/cli/blob/master/altsrc/flag.go#L12-L17)
 - Feature request: support for structured configuration (urfave/cli).
@@ -68,32 +68,32 @@ Because we solely rely on [structured configuration](https://github.com/owncloud
 - Drop support for structure configuration
 - Adapt the "structured config files have the highest priority" within oCIS
 
-## Decision Outcome
+### Decision Outcome
 
 [STILL UNDECIDED]
 
-### Positive Consequences
+#### Positive Consequences
 
 [TBD, depends on Decision Outcome]
 
-## Pros and Cons of the Options
+### Pros and Cons of the Options
 
-### Extend FlagInputSourceExtension interface
+#### Extend FlagInputSourceExtension interface
 - Good, because we could still use Viper to load from config files here and apply values to the flags in the context.
 - Bad, because urfave/cli team are [actively working on v3 of altsrc](https://github.com/urfave/cli/issues/1051#issuecomment-606311923) and we don't want to maintain yet another slice of the codebase.
 
 notes: source is  [FlagInputSourceExtension interface](https://github.com/urfave/cli/blob/master/altsrc/flag.go#L12-L17)
 
-### Feature request: support for structured configuration (urfave/cli).
+#### Feature request: support for structured configuration (urfave/cli).
 - Good, because we could remove Viper off the codebase and solely rely on urfave/cli's native code.
 - Bad, because there are no plans to support this upstream.
 
-### Clearly defined boundaries of what can and cannot be done.
+#### Clearly defined boundaries of what can and cannot be done.
 
 - Good, because no changes to the codebase required (not drastic changes.)
 - Bad, because we're limited by the framework
 
-### Expose structured field values as CLI flags
+#### Expose structured field values as CLI flags
 
 - Good, because it has been already taken into account on large projects (kubernetes) [here.](https://docs.google.com/document/d/1Dvct469xfjkgy3tjWMAKvRAJo4CmGH4cgSVGTDpay6A) in point 5.
 - Bad, because it requires quite a bit<sup>1</sup> of custom logic.
@@ -101,21 +101,21 @@ notes: source is  [FlagInputSourceExtension interface](https://github.com/urfave
 
 *[1] this is a big uncertainty.
 
-### Drop support for structure configuration
+#### Drop support for structure configuration
 
 - Good, because it makes the integration with the cli framework easier to grasp.
 - Good, because it is not encouraged by the 12factor app spec.
 - Bad, because we already support if and users make active use of it. At least for development.
 
-### Adapt the "structured config files have the highest priority" within oCIS
+#### Adapt the "structured config files have the highest priority" within oCIS
 
 - Good, because that would mean little structural changes to the codebase since the Viper config parsing logic already uses the `Before` hook to parse prior to the command's action executes.
 
-## Notes
+### Notes
 
-### Use Cases and Expected Behaviors
+#### Use Cases and Expected Behaviors
 
-#### Supervised (`ocis server` or `ocis run extension`)
+##### Supervised (`ocis server` or `ocis run extension`)
 
 ![grafik](https://user-images.githubusercontent.com/6905948/116872568-62b1a780-ac16-11eb-9f29-030a651ee39b.png)
 
@@ -127,17 +127,17 @@ notes: source is  [FlagInputSourceExtension interface](https://github.com/urfave
 
 *[1] see the development section for more on this topic.
 
-##### Known Gotchas
+###### Known Gotchas
 - `> ocis --config-file /etc/ocis/ocis.yaml server` does not work. It currently only supports reading global config values from the predefined locations.
 
-#### Unsupervised (`ocis proxy`)
+##### Unsupervised (`ocis proxy`)
 
 ![grafik](https://user-images.githubusercontent.com/6905948/116872534-54fc2200-ac16-11eb-8267-ffe7b03177b3.png)
 
 - `ocis.yaml` is parsed first (since `proxy` is a subcommand of `ocis`)
 - `proxy.yaml` is parsed if present, overriding values from `ocis.yaml` and any cli flag or env variable present.
 
-### Other known use cases
+#### Other known use cases
 
 - Configure via env + some configuration files like WEB_UI_CONFIG or proxy routes
 - Configure via flags + some configuration files like WEB_UI_CONFIG or proxy routes
@@ -148,13 +148,13 @@ Each individual use case DOES NOT mix sources (i.e: when using cli flags, do not
 
 _Limitations on urfave/cli prevent us from providing structured configuration and framework support for cli flags + env variables._
 
-### Use Cases for Development
+#### Use Cases for Development
 
-### Config Loading
+#### Config Loading
 
 Sometimes is desired to decouple the main series of services from an individual instance. We want to use the runtime to startup all services, then do work only on a single service. To achieve that one could use `ocis server && ocis kill proxy && ocis run proxy`. This series of commands will 1. load all config from `ocis.yaml`, 2. kill the supervised proxy service and 3. start the same service with the contents from `proxy.yaml`.
 
-### Start an extension multiple times with different configs (in Supervised mode)
+#### Start an extension multiple times with different configs (in Supervised mode)
 
 Flag parsing on subcommands in supervised mode is not yet allowed. The runtime will first parse the global `ocis.yaml` (if any) and run with the loaded configuration. This use case should provide support for having 2 different proxy config files and making use of the runtime start 2 proxy services, with different values.
 
@@ -168,7 +168,7 @@ if err := client.Call("Service.Start", os.Args[2], &reply); err != nil {
 
 This should provide with enough flexibility for interpreting different config sources as: `> bin/ocis run proxy --config-file /etc/ocis/unexpected/proxy.yaml`
 
-### Developing Considered Alternatives Further
+#### Developing Considered Alternatives Further
 
 Let's develop further the following concept: Adapt the "structured config files have the highest priority" within oCIS.
 
@@ -192,13 +192,13 @@ The outcome of the following set of commands should be having all bootstrapped s
 
 This is a desired use case that is yet not supported due to lacking of flags forwarding.
 
-### Follow up PR's
+#### Follow up PR's
 
 - Variadic runtime extensions to run (development mostly)
 - Arg forwarding to command (when running in supervised mode, forward any --config-file flag to supervised subcommands)
 - Ability to set `OCIS_URL` from a config file (this would require to extend the ocis-pkg/config/config.go file).
 
-### The case for `OCIS_URL`
+#### The case for `OCIS_URL`
 
 `OCIS_URL` is a jack-of-all trades configuration. It is meant to ease up providing defaults and ensuring dependant services are well configured. It is an override to the following env vars:
 
@@ -215,7 +215,7 @@ OCIS_PUBLIC_URL
 
 Because this functionality is only available as an env var, there is no current way to "normalize" its usage with a config file. That is, there is no way to individually set `OCIS_URL` via config file. This is clear technical debt, and should be added functionality.
 
-### State of the Art
+#### State of the Art
 - [Kubernetes proposal on this very same topic](https://docs.google.com/document/d/1Dvct469xfjkgy3tjWMAKvRAJo4CmGH4cgSVGTDpay6A)
 - [Configuration \| Pulumi](https://www.pulumi.com/docs/intro/concepts/config/)
   - Configuration can be altered via setters through the CLI.
