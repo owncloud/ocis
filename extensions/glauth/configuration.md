@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-01T15:13:25+0000"
+date: "2021-07-01T15:14:32+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -34,54 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9129"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### glauth ocis-glauth
 
@@ -286,4 +238,52 @@ Usage: `glauth server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $GLAUTH_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9129"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
