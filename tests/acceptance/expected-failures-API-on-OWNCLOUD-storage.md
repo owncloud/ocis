@@ -7,8 +7,7 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiTrashbin/trashbinDelete.feature:106](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L106)
 -   [apiTrashbin/trashbinDelete.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L122)
 
-#### [Review and fix the tests that have sharing step to work with ocis](https://github.com/owncloud/core/issues/38006)
-
+### [Deleting multiple files with the same name but different origin close together in time results in only one file in the trashbin](https://github.com/owncloud/ocis/issues/2219)
 The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 -   [apiTrashbin/trashbinFilesFolders.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L104)
@@ -177,6 +176,9 @@ Synchronization features like etag propagation, setting mtime and locking files
 _ocdav: return checksum in upload response for chunked upload_
 -   [apiMain/checksums.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L144) Scenario: Upload new dav chunked file where checksum matches
 -   [apiMain/checksums.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L153) Scenario: Upload new dav chunked file where checksum does not match
+-   [apiMain/checksums.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L164) Scenario: Upload new dav chunked file using async MOVE where checksum matches
+-   [apiMain/checksums.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L180) Scenario: Upload new dav chunked file using async MOVE where checksum does not match
+-   [apiMain/checksums.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L198) Scenario: Upload new dav chunked file using async MOVE where checksum does not match - retry with correct checksum
 -   [apiMain/checksums.feature:319](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L319) Scenario: Upload overwriting a file with new chunking and correct checksum
 -   [apiMain/checksums.feature:331](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L331) Scenario: Upload overwriting a file with new chunking and invalid checksum
 
@@ -652,7 +654,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L28)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L29)
 
-
 #### [deleting share response does not contain `data` field](https://github.com/owncloud/ocis/issues/721)
 
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L43)
@@ -943,9 +944,24 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareReshareToShares2/reShareSubfolder.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L86)
 -   [apiShareReshareToShares2/reShareSubfolder.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L87)
 
-#### [cannot move from Shares folder](https://github.com/owncloud/ocis/issues/560)
+#### [cannot move/rename an accepted shared resource outside of shares folder](https://github.com/owncloud/ocis/issues/2141)
 
 -   [apiShareReshareToShares2/reShareChain.feature:12](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareChain.feature#L12)
+-   [apiShareOperationsToShares1/changingFilesShare.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L42)
+-   [apiShareOperationsToShares1/changingFilesShare.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L43)
+-   [apiShareOperationsToShares1/changingFilesShare.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L62)
+-   [apiShareOperationsToShares1/changingFilesShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L63)
+-   [apiTrashbin/trashbinSharingToShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L23)
+-   [apiTrashbin/trashbinSharingToShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L24)
+-   [apiTrashbin/trashbinSharingToShares.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L39)
+-   [apiTrashbin/trashbinSharingToShares.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L40)
+-   [apiTrashbin/trashbinSharingToShares.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L63)
+-   [apiTrashbin/trashbinSharingToShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L64)
+-   [apiVersions/fileVersionsSharingToShares.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L133)
+-   [apiVersions/fileVersionsSharingToShares.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L148)
+-   [apiVersions/fileVersionsSharingToShares.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L162)
+-   [apiVersions/fileVersionsSharingToShares.feature:249](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L249)
+-   [apiVersions/fileVersionsSharingToShares.feature:250](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L250)
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature#L27)
@@ -1116,18 +1132,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiShareOperationsToShares1/changingFilesShare.feature:82](https://github.com/owncloud/core/blob/master/test/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L82)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L98)
 
-#### [cannot move from Shares folder](https://github.com/owncloud/ocis/issues/560)
--   [apiShareOperationsToShares1/changingFilesShare.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L42)
--   [apiShareOperationsToShares1/changingFilesShare.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L43)
--   [apiShareOperationsToShares1/changingFilesShare.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L62)
--   [apiShareOperationsToShares1/changingFilesShare.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L63)
--   [apiTrashbin/trashbinSharingToShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L23)
--   [apiTrashbin/trashbinSharingToShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L24)
--   [apiTrashbin/trashbinSharingToShares.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L39)
--   [apiTrashbin/trashbinSharingToShares.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L40)
--   [apiTrashbin/trashbinSharingToShares.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L63)
--   [apiTrashbin/trashbinSharingToShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L64)
-
 Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
 -   [apiWebdavMove2/moveFile.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L99)
 -   [apiWebdavMove2/moveFile.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L100)
@@ -1163,13 +1167,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
 -   [apiShareManagementToShares/acceptShares.feature:490](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L490)
 -   [apiVersions/fileVersionsSharingToShares.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L43)
-
-#### [cannot move from Shares folder](https://github.com/owncloud/ocis/issues/560)
--   [apiVersions/fileVersionsSharingToShares.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L133)
--   [apiVersions/fileVersionsSharingToShares.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L148)
--   [apiVersions/fileVersionsSharingToShares.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L162)
--   [apiVersions/fileVersionsSharingToShares.feature:249](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L249)
--   [apiVersions/fileVersionsSharingToShares.feature:250](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L250)
 
 #### [not possible to move file into a received folder](https://github.com/owncloud/ocis/issues/764)
 -   [apiVersions/fileVersionsSharingToShares.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L221)
@@ -1521,7 +1518,20 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioning-v1/editUser.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L143)
 -   [apiProvisioning-v1/getUser.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L170)
 -   [apiProvisioning-v1/resetUserPassword.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/resetUserPassword.feature#L113)
-
+-   [apiProvisioning-v1/createSubAdmin.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L11)
+-   [apiProvisioning-v1/createSubAdmin.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L19)
+-   [apiProvisioning-v1/createSubAdmin.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L27)
+-   [apiProvisioning-v1/createSubAdmin.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L35)
+-   [apiProvisioning-v1/getSubAdmins.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getSubAdmins.feature#L11)
+-   [apiProvisioning-v1/getSubAdmins.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getSubAdmins.feature#L21)
+-   [apiProvisioning-v2/createSubAdmin.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L11)
+-   [apiProvisioning-v2/createSubAdmin.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L19)
+-   [apiProvisioning-v2/createSubAdmin.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L27)
+-   [apiProvisioning-v2/createSubAdmin.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L35)
+-   [apiProvisioning-v2/getSubAdmins.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L11)
+-   [apiProvisioning-v2/getSubAdmins.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L21)
+-   [apiProvisioning-v2/getSubAdmins.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L30)
+-   [apiProvisioning-v2/getSubAdmins.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L44)
 -   [apiProvisioning-v2/addUser.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L159)
 -   [apiProvisioning-v2/addUser.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L178)
 -   [apiProvisioning-v2/addUser.feature:189](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L189)
@@ -1631,24 +1641,6 @@ _special character username not valid_
 -   [apiProvisioningGroups-v2/getGroup.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L33)
 -   [apiProvisioningGroups-v2/getUserGroups.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L73)
 -   [apiProvisioningGroups-v2/removeFromGroup.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L215)
-
-#### [user-sync endpoint does not exist](https://github.com/owncloud/ocis/issues/1241)
-
--   [apiProvisioning-v1/createSubAdmin.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L11)
--   [apiProvisioning-v1/createSubAdmin.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L19)
--   [apiProvisioning-v1/createSubAdmin.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L27)
--   [apiProvisioning-v1/createSubAdmin.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L35)
--   [apiProvisioning-v1/getSubAdmins.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getSubAdmins.feature#L11)
--   [apiProvisioning-v1/getSubAdmins.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getSubAdmins.feature#L21)
--   [apiProvisioning-v2/createSubAdmin.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L11)
--   [apiProvisioning-v2/createSubAdmin.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L19)
--   [apiProvisioning-v2/createSubAdmin.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L27)
--   [apiProvisioning-v2/createSubAdmin.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/createSubAdmin.feature#L35)
--   [apiProvisioning-v2/getSubAdmins.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L11)
--   [apiProvisioning-v2/getSubAdmins.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L21)
--   [apiProvisioning-v2/getSubAdmins.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L30)
--   [apiProvisioning-v2/getSubAdmins.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getSubAdmins.feature#L44)
-
 
 ### Other
 API, search, favorites, config, capabilities, not existing endpoints, CORS and others
@@ -2130,11 +2122,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L32)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L66)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L67)
-
-#### [Checksum feature](https://github.com/owncloud/ocis/issues/1291)
--   [apiMain/checksums.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L164) Scenario: Upload new dav chunked file using async MOVE where checksum matches
--   [apiMain/checksums.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L180) Scenario: Upload new dav chunked file using async MOVE where checksum does not match
--   [apiMain/checksums.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L198) Scenario: Upload new dav chunked file using async MOVE where checksum does not match - retry with correct checksum
 
 #### [Trying to accept a share with invalid ID gives incorrect OCS and HTTP status](https://github.com/owncloud/ocis/issues/2111)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L85)
