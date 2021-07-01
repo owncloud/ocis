@@ -223,5 +223,9 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"WEB_OIDC_SCOPE"},
 			Destination: &cfg.Web.Config.OpenIDConnect.Scope,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
+		},
 	}
 }

@@ -179,6 +179,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCS_STORAGE_USERS_DRIVER", "STORAGE_USERS_DRIVER"},
 			Destination: &cfg.StorageUsersDriver,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
 

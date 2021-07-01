@@ -154,5 +154,9 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ONLYOFFICE_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
+		},
 	}
 }
