@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -140,18 +139,8 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 		Mail:         account.Mail,
 		MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
 		Groups:       expandGroups(account),
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
-				},
-			},
-		},
+		UidNumber:    account.UidNumber,
+		GidNumber:    account.GidNumber,
 	}
 	return user
 }
@@ -209,7 +198,15 @@ func injectRoles(ctx context.Context, u *cs3.User, ss settings.RoleService) erro
 		return err
 	}
 
-	u.Opaque.Map["roles"] = enc
+	if u.Opaque == nil {
+		u.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"roles": enc,
+			},
+		}
+	} else {
+		u.Opaque.Map["roles"] = enc
+	}
 
 	return nil
 }

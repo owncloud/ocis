@@ -70,8 +70,9 @@ type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
-	Port string
-	Host string
+	Port       string
+	Host       string
+	Extensions string
 }
 
 // Config combines all available configuration parts.

@@ -1,8 +1,11 @@
 package flagset
 
 import (
+	"path"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
@@ -26,6 +29,10 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Enable colored logging",
 			EnvVars:     []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
 		},
 	}
 }
@@ -156,14 +163,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,

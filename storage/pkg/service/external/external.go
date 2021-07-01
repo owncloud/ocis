@@ -19,10 +19,10 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 		Address:  addr,
 		Metadata: make(map[string]string),
 	}
-	r := oregistry.GetRegistry()
+	ocisRegistry := oregistry.GetRegistry()
 
 	node.Metadata["broker"] = broker.String()
-	node.Metadata["registry"] = r.String()
+	node.Metadata["registry"] = ocisRegistry.String()
 	node.Metadata["server"] = "grpc"
 	node.Metadata["transport"] = "grpc"
 	node.Metadata["protocol"] = "grpc"
@@ -37,7 +37,7 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
 	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
-	if err := r.Register(service, rOpts...); err != nil {
+	if err := ocisRegistry.Register(service, rOpts...); err != nil {
 		logger.Fatal().Err(err).Msgf("Registration error for external service %v", serviceID)
 	}
 
@@ -48,14 +48,14 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, log
 			select {
 			case <-t.C:
 				logger.Debug().Interface("service", service).Msg("refreshing external service-registration")
-				err := registry.Register(service, rOpts...)
+				err := ocisRegistry.Register(service, rOpts...)
 				if err != nil {
 					logger.Error().Err(err).Msgf("registration error for external service %v", serviceID)
 				}
 			case <-ctx.Done():
 				logger.Debug().Interface("service", service).Msg("unregistering")
 				t.Stop()
-				err := registry.Deregister(service)
+				err := ocisRegistry.Deregister(service)
 				if err != nil {
 					logger.Err(err).Msgf("Error unregistering external service %v", serviceID)
 				}

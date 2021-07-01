@@ -29,12 +29,17 @@
         },
         {
           "type": "regex",
-          "endpoint": "/ocs/v[12].php/cloud/user/signing-key",
+          "endpoint": "/ocs/v[12].php/cloud/(users?|groups)",
           "backend": "http://localhost:9110"
         },
         {
           "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
+        },
+        {
+          "type": "query",
+          "endpoint": "/remote.php/?preview=1",
+          "backend": "http://localhost:9115"
         },
         {
           "endpoint": "/remote.php/",
@@ -61,6 +66,22 @@
           "backend": "http://localhost:9140"
         },
         {
+          "endpoint": "/graph/",
+          "backend": "http://localhost:9120"
+        },
+        {
+          "endpoint": "/graph-explorer/",
+          "backend": "http://localhost:9135"
+        },
+        {
+          "endpoint": "/api/v0/accounts",
+          "backend": "http://localhost:9181"
+        },
+        {
+          "endpoint": "/accounts.js",
+          "backend": "http://localhost:9181"
+        },
+        {
           "endpoint": "/api/v0/settings",
           "backend": "http://localhost:9190"
         },
@@ -69,12 +90,8 @@
           "backend": "http://localhost:9190"
         },
         {
-          "endpoint": "/api/v0/greet",
-          "backend": "http://localhost:9105"
-        },
-        {
-          "endpoint": "/hello.js",
-          "backend": "http://localhost:9105"
+          "endpoint": "/onlyoffice.js",
+          "backend": "http://localhost:9220"
         }
       ]
     }

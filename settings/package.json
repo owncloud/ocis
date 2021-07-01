@@ -17,7 +17,7 @@
     "watch": "rollup -c -w",
     "test": "echo 'Not implemented'",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/settings.swagger.json --moduleName settings --destination ui/client/settings/index.js",
-    "acceptance-tests": "cucumber-js --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
+    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
@@ -32,7 +32,7 @@
     "@erquhart/rollup-plugin-node-builtins": "^2.1.5",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.0.1",
-    "@rollup/plugin-replace": "^2.3.0",
+    "@rollup/plugin-replace": "^2.4.2",
     "archiver": "^5.3.0",
     "axios": "^0.21.1",
     "core-js": "3.9.1",
@@ -74,10 +74,12 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^6.0.1"
+    "owncloud-design-system": "^7.4.2"
   },
   "dependencies": {
+    "ldapjs": "^2.2.4",
     "lodash": "^4.17.15",
+    "nightwatch-vrt": "^0.2.10",
     "vuex": "^3.2.0"
   }
 }

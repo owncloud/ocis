@@ -3,43 +3,51 @@ const filesMenu = {
     'All files',
     'Shared with me',
     'Shared with others',
-    'Trash bin'
+    'Shared via link',
+    'Deleted files'
   ],
   Deutsch: [
     'Alle Dateien',
     'Mit mir geteilt',
     'Mit anderen geteilt',
-    'Papierkorb'
+    'Per Link geteilt',
+    'Gelöschte Dateien'
   ],
   Español: [
     'Todos los archivos',
     'Compartido conmigo',
     'Compartido con otros',
-    'Papelera de reciclaje'
+    'Shared via link',
+    'Archivos borrados'
   ],
   Français: [
     'Tous les fichiers',
     'Partagé avec moi',
     'Partagé avec autres',
-    'Corbeille'
+    'Shared via link',
+    'Fichiers supprimés'
   ]
 }
 
 const accountMenu = {
   English: [
-    'Manage your account',
+    'Profile',
+    'Settings',
     'Log out'
   ],
   Deutsch: [
-    'Verwalten Sie Ihr Benutzerkonto',
+    'Profil',
+    'Einstellungen',
     'Abmelden'
   ],
   Español: [
-    'Administra tu cuenta',
+    'Profile',
+    'Configuración',
     'Salir'
   ],
   Français: [
-    'Modifier votre compte',
+    'Profil',
+    'Settings',
     'Se déconnecter'
   ]
 }
@@ -48,19 +56,19 @@ const filesListHeaderMenu = {
   English: [
     'Name',
     'Size',
-    'Updated',
+    'Modified',
     'Actions'
   ],
   Deutsch: [
     'Name',
     'Größe',
-    'Erneuert',
+    'Geändert',
     'Aktionen'
   ],
   Español: [
     'Nombre',
     'Tamaño',
-    'Actualizado',
+    'Modificado',
     'Acciones'
   ],
   Français: [
