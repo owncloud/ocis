@@ -141,6 +141,7 @@ type OIDC struct {
 type PolicySelector struct {
 	Static    *StaticSelectorConf
 	Migration *MigrationSelectorConf
+	Claims    *ClaimsSelectorConf
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
@@ -163,6 +164,12 @@ type PreSignedURL struct {
 type MigrationSelectorConf struct {
 	AccFoundPolicy        string `mapstructure:"acc_found_policy"`
 	AccNotFoundPolicy     string `mapstructure:"acc_not_found_policy"`
+	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+}
+
+// ClaimsSelectorConf is the config for the claims-selector
+type ClaimsSelectorConf struct {
+	DefaultPolicy         string `mapstructure:"default_policy"`
 	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
 }
 

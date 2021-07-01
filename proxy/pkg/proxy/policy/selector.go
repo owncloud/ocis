@@ -67,6 +67,10 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 			accounts.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
 	}
 
+	if cfg.Claims != nil {
+		return NewClaimsSelector(cfg.Claims), nil
+	}
+
 	return nil, ErrUnexpectedConfigError
 }
 
@@ -115,5 +119,20 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 		}
 		return cfg.AccFoundPolicy, nil
 
+	}
+}
+
+// NewClaimsSelector selects the policy based on the "ocis.routing.policy" claim
+func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
+	return func(ctx context.Context, r *http.Request) (s string, err error) {
+		if claims := oidc.FromContext(r.Context()); claims != nil {
+			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
+				// TODO check we know the routing policy?
+				return p, nil
+			}
+			return cfg.DefaultPolicy, nil
+		}
+
+		return cfg.UnauthenticatedPolicy, nil
 	}
 }
