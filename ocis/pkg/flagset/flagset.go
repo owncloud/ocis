@@ -162,5 +162,12 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"OCIS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
 		},
+		&cli.StringFlag{
+			Name:        "extensions",
+			Aliases:     []string{"e"},
+			Usage:       "Run specific extensions during supervised mode",
+			EnvVars:     []string{"OCIS_RUN_EXTENSIONS"},
+			Destination: &cfg.Runtime.Extensions,
+		},
 	}
 }

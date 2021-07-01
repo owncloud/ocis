@@ -50,6 +50,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cfg.Reva.Storages.Local.EnableHome = true
 				cfg.Reva.Storages.OwnCloud.EnableHome = true
 				cfg.Reva.Storages.S3.EnableHome = true
+				cfg.Reva.Storages.S3NG.EnableHome = true
 			}
 			rcfg := storageHomeConfigFromStruct(c, cfg)
 

@@ -38,7 +38,7 @@ strong {
 
 .oc-progress > div {
   /* Needs to be important to overwrite material-ui */
-  background-color: #4e85c8 !important;
+  background-color: #4a76ac !important;
 }
 
 .oc-input {
@@ -61,7 +61,11 @@ strong {
 
 .oc-input.error {
   outline: none;
-  border: 1px solid #f44336;
+  border: 1px solid #fe4600;
+}
+
+.MuiTypography-colorError {
+  color: #fe4600 !important;
 }
 
 .oc-input:focus {
@@ -77,6 +81,10 @@ strong {
   margin-top: 15px;
 }
 
+.MuiTouchRipple-root {
+  display: none !important;
+}
+
 .oc-button {
   /* Needs to be important to overwrite material-ui */
   font-size: 1.0625rem !important;
@@ -84,13 +92,15 @@ strong {
 
 .oc-button-primary {
   /* Needs to be important to overwrite material-ui */
-  background-color: #4e85c8 !important;
+  background-color: #4a76ac !important;
+  border: 1px solid transparent !important;
 }
 
 .oc-button-primary:hover,
 .oc-button-primary:focus {
   /* Needs to be important to overwrite material-ui */
-  background-color: #306db5 !important;
+  background-color: #4a76ac !important;
+  border: 1px solid white !important;
 }
 
 .oc-checkbox-dark svg {
@@ -126,4 +136,22 @@ strong {
 
 .oc-login-form div:not(:last-of-type) {
   margin-bottom: 15px;
+}
+
+
+/*
+ * Special SR classes
+ * Used to hide an element visually, but keeping it accessible for accessibility tools.
+ */
+.oc-invisible-sr {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  /* Need to make sure we override any existing styles. */
+  position: absolute !important;
+  top: 0;
+  white-space: nowrap;
+  width: 1px !important;
 }

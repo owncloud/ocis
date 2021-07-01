@@ -209,5 +209,16 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Address,
 		},
+		&cli.StringFlag{
+			Name:        "webdav-namespace",
+			Value:       flags.OverrideDefaultString(cfg.WebdavNamespace, "/home"),
+			Usage:       "Namespace prefix for the webdav endpoint",
+			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.WebdavNamespace,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
+		},
 	}
 }

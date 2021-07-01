@@ -2,21 +2,23 @@ package svc
 
 import (
 	"context"
+	"image"
+	"net/url"
+	"path"
+	"strings"
+
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
-	"image"
-	"net/url"
-	"path"
-	"strings"
 )
 
 // NewService returns a service implementation for Service.
@@ -28,7 +30,8 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
-		serviceID: options.Config.Server.Namespace + "." + options.Config.Server.Name,
+		serviceID:       options.Config.Server.Namespace + "." + options.Config.Server.Name,
+		webdavNamespace: options.Config.Thumbnail.WebdavNamespace,
 		manager: thumbnail.NewSimpleManager(
 			resolutions,
 			options.ThumbnailStorage,
@@ -45,12 +48,13 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID    string
-	manager      thumbnail.Manager
-	webdavSource imgsource.Source
-	cs3Source    imgsource.Source
-	logger       log.Logger
-	cs3Client    gateway.GatewayAPIClient
+	serviceID       string
+	webdavNamespace string
+	manager         thumbnail.Manager
+	webdavSource    imgsource.Source
+	cs3Source       imgsource.Source
+	logger          log.Logger
+	cs3Client       gateway.GatewayAPIClient
 }
 
 // GetThumbnail retrieves a thumbnail for an image
@@ -105,12 +109,15 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnai
 	}
 
 	ctx = imgsource.ContextSetAuthorization(ctx, src.Authorization)
-	img, err := g.cs3Source.Get(ctx, src.Path)
+	r, err := g.cs3Source.Get(ctx, src.Path)
 	if err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	if img == nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	defer r.Close() // nolint:errcheck
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	img, err := pp.Convert(r)
+	if img == nil || err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 	if thumb, err = g.manager.Generate(tr, img); err != nil {
 		return nil, err
@@ -156,7 +163,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
 	} else {
 		auth = src.RevaAuthorization
-		statPath = path.Join("/home", req.Filepath)
+		statPath = path.Join(g.webdavNamespace, req.Filepath)
 	}
 	sRes, err := g.stat(statPath, auth)
 	if err != nil {
@@ -176,12 +183,15 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		ctx = imgsource.ContextSetAuthorization(ctx, src.WebdavAuthorization)
 	}
 	imgURL.RawQuery = ""
-	img, err := g.webdavSource.Get(ctx, imgURL.String())
+	r, err := g.webdavSource.Get(ctx, imgURL.String())
 	if err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	if img == nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source")
+	defer r.Close() // nolint:errcheck
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	img, err := pp.Convert(r)
+	if img == nil || err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 	if thumb, err = g.manager.Generate(tr, img); err != nil {
 		return nil, err
@@ -195,7 +205,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 
 	req := &provider.StatRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path},
+			Path: path,
 		},
 	}
 	rsp, err := g.cs3Client.Stat(ctx, req)
@@ -213,7 +223,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 			return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", rsp.Status.Message)
 		}
 	}
-	if  rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+	if rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return nil, merrors.BadRequest(g.serviceID, "Unsupported file type")
 	}
 	if rsp.Info.GetChecksum().GetSum() == "" {
@@ -223,8 +233,5 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	if !thumbnail.IsMimeTypeSupported(rsp.Info.MimeType) {
 		return nil, merrors.NotFound(g.serviceID, "Unsupported file type")
 	}
-
-
-
 	return rsp, nil
 }

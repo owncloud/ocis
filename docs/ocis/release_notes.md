@@ -7,6 +7,101 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.8.0 Technology Preview
+
+Version 1.8.0 is a maintenance and bug fix release. ownCloud Web 3.3.0 has received further performance and major accessibility improvements.
+
+The most prominent changes in version 1.8.0 comprise:
+
+- ownCloud Web is now fully translatable on Transifex [#5042](https://github.com/owncloud/web/pull/5042)
+- ownCloud Web now supports keyboard navigation [#4937](https://github.com/owncloud/web/pull/4937) [#5013](https://github.com/owncloud/web/pull/5013) [#5027](https://github.com/owncloud/web/pull/5027) [#5147](https://github.com/owncloud/web/pull/5147)
+- ownCloud Web now supports screenreaders [#5182](https://github.com/owncloud/web/pull/5182) [#5166](https://github.com/owncloud/web/pull/5166) [#5058](https://github.com/owncloud/web/pull/5058) [#5046](https://github.com/owncloud/web/pull/5046) [#5010](https://github.com/owncloud/web/pull/5010)
+- ownCloud Web has received many performance improvements (image cache, fixes to avoid duplicate resource loading, asynchronous image loading) [#5194](https://github.com/owncloud/web/pull/5194)
+- The file lists in ownCloud Web are now paginated to control loading times [#5224](https://github.com/owncloud/web/pull/5224) [#5309](https://github.com/owncloud/web/pull/5309)
+- ownCloud Web now supports TypeScript [#5194](https://github.com/owncloud/web/pull/5194)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.8.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.3.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
+## ownCloud Infinite Scale 1.7.0 Technology Preview
+
+Version 1.7.0 is a maintenance and bug fix release. ownCloud Web 3.2.0 has received further performance improvements and minor usability tweaks.
+
+The most prominent changes in version 1.7.0 comprise:
+
+- The S3 storage driver can now be used for testing using the configuration values in the [documentation](https://owncloud.dev/extensions/storage/configuration/#s3ng-driver) [#1886](https://github.com/owncloud/ocis/pull/1886)
+- A confirmation dialog for public link deletion has been added [#5125](https://github.com/owncloud/web/pull/5125)
+- To improve performance, the file types which are being rendered as previews can now be specified using an [allow list in config.json](https://owncloud.dev/clients/web/getting-started/#options) [#5159](https://github.com/owncloud/web/pull/5159)
+- A warning has been added when a user tries to leave the page while an operation is in progress (e.g., an upload) [#2590](https://github.com/owncloud/web/issues/2590)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.7.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.2.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
+## ownCloud Infinite Scale 1.6.0 Technology Preview
+
+To get the full potential out of the microservice architecture, version 1.6.0 introduces a dynamic service registry to ownCloud Infinite Scale. The dynamic service registry facilitates the configuration and contributes to the scalability of the platform. ownCloud Web 3.1.0 has received further improvements for accessibility like keyboard navigation and it comes with performance improvements by loading certain elements asynchronously.
+
+The most prominent changes in version 1.6.0 comprise:
+
+- Introducing a dynamic service registry: The dynamic service registry takes care of dynamically assigning network addresses between the oCIS services and enables the services to find and work with each other automatically. It replaces the previous hardcoded service configuration which simplifies the initial setup and makes distributed, scale-out environments a lot easier to handle. [#1509](https://github.com/cs3org/reva/pull/1509)
+- User avatars are now fetched asynchronously, enabling a non-blocking loading of the file list and improving user experience [#1295](https://github.com/owncloud/owncloud-design-system/pull/1295)
+- Further accessibility and keyboard navigation improvements have been added [#1979](https://github.com/owncloud/ocis/pull/1979) [#1991](https://github.com/owncloud/ocis/pull/1991) [#4942](https://github.com/owncloud/web/pull/4942) [#4965](https://github.com/owncloud/web/pull/4965) [#4991](https://github.com/owncloud/web/pull/4991)
+- The OCS user deprovisioning endpoint has been added, enabling a full user deprovisioning including storage. [#1962](https://github.com/owncloud/ocis/pull/1962)
+- Text files (.txt) now have previews (thumbnails) [#1988](https://github.com/owncloud/ocis/pull/1988)
+- The translations in the Settings and Accounts extensions have been improved [#2003](https://github.com/owncloud/ocis/pull/2003)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.6.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.1.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
+#### Changed oCIS JSON share driver storage format
+
+Related: [#1655](https://github.com/cs3org/reva/pull/1655)
+
+The storage format of the oCIS JSON share driver has changed. You will be affected if you plan to update from a previous version of oCIS to oCIS 1.6.0, you have shared files or folders with users or groups and you are using the oCIS JSON share driver, which is currently the default share driver.
+
+Implications:
+- manual action required
+
+Our recommended update strategy to oCIS 1.6.0 is:
+1. let users note all their shares with users and groups they set up in oCIS
+1. stop oCIS
+1. move / delete the JSON share driver storage file `/var/tmp/ocis/storage/shares.json`
+1. update to oCIS 1.6.0
+1. let users recreate their shares
+
+#### Fixed / changed oCIS metadata storage driver filesystem path
+Related: [#1956](https://github.com/owncloud/ocis/pull/1956)
+
+The filesystem path of the oCIS metadata storage driver has changed (been fixed). You will be affected if you plan to update from a previous version of oCIS to oCIS 1.6.0 and are using the oCIS storage driver for metadata storage.
+
+Implications:
+- manual action required
+
+Our recommended update strategy to oCIS 1.6.0 is:
+1. let users backup all their data stored in oCIS
+1. stop oCIS
+1. prune all oCIS data in `/var/tmp/ocis`
+1. update to oCIS 1.6.0
+1. recreate user accounts (can be skipped if an external IDP is used)
+1. let users upload all their data again
+1. let users recreate their shares
+
+If you want to use oCIS 1.6.0 without following our recommended update strategy, you can also keep the pre 1.6.0 behaviour by setting this environment variable:
+`export STORAGE_METADATA_ROOT=/var/tmp/ocis/storage/users`
+This may lead to faulty behaviour since both the metadata and user storage driver will be storing their data in the same filesystem path.
+
 ## ownCloud Infinite Scale 1.5.0 Technology Preview
 
 Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
@@ -20,7 +115,7 @@ The most prominent changes in version 1.5.0 comprise:
 - User storage quotas will now be enforced [#1557](https://github.com/cs3org/reva/pull/1557)
 - The "owncloud" storage driver now supports file integrity checking with checksums [#1629](https://github.com/cs3org/reva/pull/1629)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.5.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.0.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -42,7 +137,7 @@ The most prominent changes in version 1.4.0 comprise:
 - Added GIF and JPEG file types for thumbnail generation (allows to display thumbnails and use the media viewer for GIF/JPEG images) [#1791](https://github.com/owncloud/ocis/pull/1791)
 - Fixes for the trash bin feature [#1552](https://github.com/cs3org/reva/pull/1552)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.4.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.1.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -102,7 +197,7 @@ These are the major changes in oCIS:
 - Enhancement - Update reva to v1.6.1-0.20210223065028-53f39499762e: [#1683](https://github.com/owncloud/ocis/pull/1683)
 - Enhancement - Add initial nats and kubernetes registry support: [#1697](https://github.com/owncloud/ocis/pull/1697)
 
-More details about this release can be found in the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-202-2021-03-08).
+More details about this release can be found in the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.3.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.0.2).
 
 ### Breaking changes
 {{< hint warning >}}
@@ -120,7 +215,7 @@ The most prominent changes in version 1.2.0 comprise:
 - File integrity checking has been introduced: When uploading files, Infinite Scale now makes sure that the file integrity is protected between server and clients by comparing checksums [#1400](https://github.com/cs3org/reva/issues/1400)
 - Public link passwords are now stored as hashes to improve security [#1462](https://github.com/cs3org/reva/issues/1462)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) and [ownCloud Web changelog](https://github.com/owncloud/web/blob/master/CHANGELOG.md#changelog-for-owncloud-web-200-2021-02-16) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.2.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v2.0.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
@@ -173,7 +268,7 @@ The most prominent changes in version 1.1.0 comprise
 - Update ownCloud web to [v1.0.1](https://github.com/owncloud/web/releases/tag/v1.0.1)
 - Update reva to [v1.5.1](https://github.com/cs3org/reva/releases/tag/v1.5.1)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/blob/master/CHANGELOG.md) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.1.0) for further details on what has changed.
 
 ## ownCloud Infinite Scale 1.0.0 Technology Preview
 

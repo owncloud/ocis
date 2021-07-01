@@ -162,6 +162,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:   "--thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]",
 			EnvVars: []string{"THUMBNAILS_RESOLUTIONS"},
 		},
+		&cli.StringFlag{
+			Name:        "webdav-namespace",
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.WebdavNamespace, "/home"),
+			Usage:       "Namespace prefix for the webdav endpoint",
+			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.Thumbnail.WebdavNamespace,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
 

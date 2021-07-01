@@ -166,5 +166,7 @@ type MigrationSelectorConf struct {
 
 // New initializes a new configuration
 func New() *Config {
-	return &Config{}
+	return &Config{
+		HTTP: HTTP{},
+	}
 }

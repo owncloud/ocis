@@ -4,7 +4,6 @@ clients:
   - id: web
     name: ownCloud web app
     trusted: yes
-    insecure: yes
     redirect_uris:
       - {{OCIS_URL}}/
       - {{OCIS_URL}}/oidc-callback.html
@@ -15,13 +14,19 @@ clients:
   - id: ocis-explorer.js
     name: oCIS Graph Explorer
     trusted: yes
-    insecure: yes
+    redirect_uris:
+      - {{OCIS_URL}}/graph-explorer/
+    origins:
+      - {{OCIS_URL}}
+      
 
   - id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
     secret: UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
     name: ownCloud desktop app
     application_type: native
-    insecure: true
+    redirect_uris:
+      - http://127.0.0.1
+      - http://localhost
 
   - id: e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD
     secret: dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD

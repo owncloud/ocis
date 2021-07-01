@@ -19,6 +19,7 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 - [Basic oCIS setup]({{< ref "basic-remote-setup" >}}) - configure domain, certificates and port
 - [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
+- [oCIS setup with WOPI server to open office documents in your browser]({{< ref "ocis_wopi" >}})
 
 ### Migrate an existing ownCloud 10
 You can run ownCloud 10 and oCIS together. This allows you to use new parts of oCIS already with ownCloud 10 and also to have a smooth transition for users from ownCloud 10 to oCIS.

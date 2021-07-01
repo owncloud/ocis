@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"net/http"
 
 	"github.com/asim/go-micro/v3/metadata"
@@ -53,9 +54,13 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 				return
 			}
 
-			u, err := tokenManager.DismantleToken(r.Context(), token)
+			u, tokenScope, err := tokenManager.DismantleToken(r.Context(), token)
 			if err != nil {
 				opt.Logger.Error().Err(err)
+				return
+			}
+			if ok, err := scope.VerifyScope(tokenScope, r); err != nil || !ok {
+				opt.Logger.Error().Err(err).Msg("verifying scope failed")
 				return
 			}
 

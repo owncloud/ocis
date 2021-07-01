@@ -20,7 +20,7 @@
     "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.13.10",
+    "@babel/core": "^7.14.0",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/plugin-proposal-export-default-from": "^7.7.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
@@ -40,7 +40,7 @@
     "cucumber": "^6.0.5",
     "cucumber-pretty": ">=6.0.0",
     "debounce": "^1.2.1",
-    "easygettext": "^2.7.0",
+    "easygettext": "^2.17.0",
     "eslint": "7.24.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.17.3",
@@ -76,7 +76,7 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^6.0.1"
+    "owncloud-design-system": "^7.4.2"
   },
   "dependencies": {
     "validator": "^13.1.1"

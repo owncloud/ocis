@@ -164,6 +164,7 @@ type StorageConfig struct {
 	Local    DriverCommon
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
+	S3NG     DriverS3NG
 	Common   DriverCommon
 	OCIS     DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
@@ -259,6 +260,17 @@ type DriverOwnCloud struct {
 
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
+	DriverCommon
+
+	Region    string
+	AccessKey string
+	SecretKey string
+	Endpoint  string
+	Bucket    string
+}
+
+// DriverS3NG defines the available s3ng storage driver configuration.
+type DriverS3NG struct {
 	DriverCommon
 
 	Region    string

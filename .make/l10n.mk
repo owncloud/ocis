@@ -42,6 +42,7 @@ $(TEMPLATE_FILE):
 	node ./node_modules/easygettext/src/extract-cli.js --attribute v-translate --output $(OUTPUT_DIR)/template.pot $$GETTEXT_SOURCES;
 
 # Generate translations.json file from .pot template.
+.PHONY: $(OUTPUT_DIR)/translations.json
 $(OUTPUT_DIR)/translations.json:
 	rm -rf $(OUTPUT_DIR)/translations.json
 	gettext-compile --output $(OUTPUT_DIR)/translations.json $(LOCALE_FILES);

@@ -1,36 +1,11 @@
 <template>
-  <div>
-    <oc-button :id="buttonElementId" class="uk-width-expand" justify-content="space-between">
-      <span v-if="selectedOptions !== null && selectedOptions.length > 0">
-        {{ selectedOptionsDisplayValues }}
-      </span>
-      <span v-else>
-        {{ setting.placeholder || $gettext('Please select') }}
-      </span>
-      <oc-icon name="expand_more" />
-    </oc-button>
-    <oc-drop
-      :drop-id="dropElementId"
-      :toggle="`#${buttonElementId}`"
-      mode="click"
-      position="bottom-justify"
-      :options="{ offset: 0, delayHide: 200, flip: false }"
-      >
-      <ul class="uk-list">
-        <li
-          v-for="(option, index) in setting.multiChoiceValue.options"
-          :key="getOptionElementId(index)"
-        >
-          <oc-checkbox
-            v-model="selectedOptions"
-            :option="option"
-            @input="onSelectedOption"
-            :label="option.displayValue"
-          />
-        </li>
-      </ul>
-    </oc-drop>
-  </div>
+  <oc-select
+      v-model="selectedOptions"
+      :clearable="false"
+      :options="displayOptions"
+      @input="onSelectedOption"
+      multiple
+  />
 </template>
 
 <script>
@@ -53,28 +28,21 @@ export default {
   },
   data () {
     return {
-      selectedOptions: null
+      selectedOptions: []
     }
   },
   computed: {
-    selectedOptionsDisplayValues () {
-      return Array.from(this.selectedOptions).map(option => option.displayValue).join(', ')
-    },
-    dropElementId () {
-      return `multi-choice-drop-${this.setting.id}`
-    },
-    buttonElementId () {
-      return `multi-choice-toggle-${this.setting.id}`
+    displayOptions () {
+      return this.setting.multiChoiceValue.options.map(val => val.displayValue)
     }
   },
   methods: {
-    getOptionElementId (index) {
-      return `${this.setting.id}-${index}`
-    },
     async onSelectedOption () {
       const values = []
       if (!isNil(this.selectedOptions)) {
-        this.selectedOptions.forEach(option => {
+        this.selectedOptions.forEach(displayValue => {
+          const option = this.setting.multiChoiceValue.options.find(val => val.displayValue === displayValue)
+
           if (option.value.intValue) {
             values.push({ intValue: option.value.intValue })
           }
@@ -123,13 +91,15 @@ export default {
             return selectedValues.includes(option.value.stringValue)
           }
           return false
-        })
+        }).map(val => val.displayValue)
       }
     }
     // TODO: load the settings value of the authenticated user and set it in `selectedOptions`
     // if not set, yet, apply defaults from settings bundle definition
     if (this.selectedOptions === null) {
-      this.selectedOptions = this.setting.multiChoiceValue.options.filter(option => option.default)
+      this.selectedOptions = this.setting.multiChoiceValue.options
+        .filter(option => option.default)
+        .map(val => val.displayValue)
     }
   }
 }
