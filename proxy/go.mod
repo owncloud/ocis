@@ -27,7 +27,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
+	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	google.golang.org/grpc v1.38.0
 )
