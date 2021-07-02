@@ -19,6 +19,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 )
 
 replace (
