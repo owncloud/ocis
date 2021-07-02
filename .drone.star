@@ -389,6 +389,10 @@ def uploadScanResults(ctx):
 
 def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", accounts_hash_difficulty = 4):
     earlyFail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
+
+    if ("full-ci" in ctx.build.title.lower()):
+        earlyFail = False
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -435,6 +439,10 @@ def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", acco
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "owncloud", accounts_hash_difficulty = 4):
     earlyFail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
+
+    if ("full-ci" in ctx.build.title.lower()):
+        earlyFail = False
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -508,6 +516,9 @@ def uiTests(ctx):
 
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
+
+    if ("full-ci" in ctx.build.title.lower()):
+        earlyFail = False
 
     if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag"):
         numberOfParts = params["numberOfParts"]
@@ -594,6 +605,10 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
 
 def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
+
+    if ("full-ci" in ctx.build.title.lower()):
+        earlyFail = False
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -659,6 +674,10 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
 
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
+
+    if ("full-ci" in ctx.build.title.lower()):
+        earlyFail = False
+
     return {
         "kind": "pipeline",
         "type": "docker",
