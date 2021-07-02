@@ -142,6 +142,7 @@ type PolicySelector struct {
 	Static    *StaticSelectorConf
 	Migration *MigrationSelectorConf
 	Claims    *ClaimsSelectorConf
+	Regex     *RegexSelectorConf
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
@@ -171,6 +172,13 @@ type MigrationSelectorConf struct {
 type ClaimsSelectorConf struct {
 	DefaultPolicy         string `mapstructure:"default_policy"`
 	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+}
+
+// RegexSelectorConf is the config for the regex-selector
+type RegexSelectorConf struct {
+	DefaultPolicy         string                       `mapstructure:"default_policy"`
+	MatchesPolicies       map[string]map[string]string `mapstructure:"matches_policies"`
+	UnauthenticatedPolicy string                       `mapstructure:"unauthenticated_policy"`
 }
 
 // New initializes a new configuration

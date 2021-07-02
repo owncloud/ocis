@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	revauser "github.com/cs3org/reva/pkg/user"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -71,6 +73,10 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 		return NewClaimsSelector(cfg.Claims), nil
 	}
 
+	if cfg.Regex != nil {
+		return NewRegexSelector(cfg.Regex), nil
+	}
+
 	return nil, ErrUnexpectedConfigError
 }
 
@@ -123,12 +129,87 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 }
 
 // NewClaimsSelector selects the policy based on the "ocis.routing.policy" claim
+// The policy for corner cases is configurable:
+// "policy_selector": {
+//    "migration": {
+//      "default_policy" : "ocis",
+//      "unauthenticated_policy": "oc10"
+//    }
+//  },
+//
+// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 	return func(ctx context.Context, r *http.Request) (s string, err error) {
 		if claims := oidc.FromContext(r.Context()); claims != nil {
 			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
+			}
+			return cfg.DefaultPolicy, nil
+		}
+
+		return cfg.UnauthenticatedPolicy, nil
+	}
+}
+
+// NewRegexSelector selects the policy based on a user property
+// The policy for each case is configurable:
+// "policy_selector": {
+//    "migration": {
+//      "matches_policies": {
+//		  "mail": {
+//			"marie@example.com": "oc10"
+//			"[^@]+@example.com": "ocis"
+//        },
+//		  "username": {
+//			"(einstein|feynman)": "ocis"
+//			"marie":    "oc10"
+//        },
+//		  "id": {
+//			"4c510ada-c86b-4815-8820-42cdf82c3d51": "ocis"
+//          "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c": "oc10"
+//        },
+//      },
+//      "unauthenticated_policy": "oc10"
+//    }
+//  },
+//
+// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
+func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
+	var mailRegexPolicies map[*regexp.Regexp]string
+	for m, p := range cfg.MatchesPolicies["mail"] {
+		mailRegexPolicies[regexp.MustCompile(m)] = p
+	}
+	var usernameRegexPolicies map[*regexp.Regexp]string
+	for m, p := range cfg.MatchesPolicies["username"] {
+		usernameRegexPolicies[regexp.MustCompile(m)] = p
+	}
+	var idRegexPolicies map[*regexp.Regexp]string
+	for m, p := range cfg.MatchesPolicies["id"] {
+		usernameRegexPolicies[regexp.MustCompile(m)] = p
+	}
+	return func(ctx context.Context, r *http.Request) (s string, err error) {
+		if u, ok := revauser.ContextGetUser(ctx); ok {
+			if u.Mail != "" {
+				for r, p := range mailRegexPolicies {
+					if r.MatchString(u.Mail) {
+						return p, nil
+					}
+				}
+			}
+			if u.Username != "" {
+				for r, p := range usernameRegexPolicies {
+					if r.MatchString(u.Username) {
+						return p, nil
+					}
+				}
+			}
+			if u.Id != nil && u.Id.OpaqueId != "" {
+				for r, p := range idRegexPolicies {
+					if r.MatchString(u.Id.OpaqueId) {
+						return p, nil
+					}
+				}
 			}
 			return cfg.DefaultPolicy, nil
 		}
