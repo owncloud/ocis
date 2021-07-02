@@ -92,7 +92,7 @@ func Sharing(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.Sharing.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

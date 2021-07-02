@@ -84,7 +84,7 @@ func Groups(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.Groups.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

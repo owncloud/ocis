@@ -68,7 +68,7 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.StoragePublicLink.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
