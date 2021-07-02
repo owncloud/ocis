@@ -34,7 +34,7 @@ require (
 	github.com/owncloud/ocis/webdav v0.0.0-20210413063522-955bd60edf33
 	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cobra v1.1.3
-	github.com/spf13/viper v1.8.0
+	github.com/spf13/viper v1.8.1
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/thejerf/suture/v4 v4.0.1
 	go.etcd.io/etcd/client/v3 v3.5.0 // indirect

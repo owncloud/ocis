@@ -2,12 +2,37 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.7.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.8.0...master
+
+## Summary
+
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+
+## Details
+
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+
+   Support for running certain extensions supervised via cli flags. Example usage:
+
+   ``` > ocis server --extensions="proxy, idp, storage-metadata, accounts" ```
+
+   https://github.com/owncloud/ocis/pull/2229
+
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+
+   https://github.com/owncloud/ocis/pull/2227
+# Changelog for [1.8.0] (2021-06-28)
+
+The following sections list the changes for 1.8.0.
+
+[1.8.0]: https://github.com/owncloud/ocis/compare/v1.7.0...v1.8.0
 
 ## Summary
 
 * Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
 * Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
 * Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 * Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
 * Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
@@ -30,6 +55,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/client/issues/8538
    https://github.com/owncloud/ocis/pull/2188
+
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
+
+   The WebDAV namespace is used across various services, but it was previously hardcoded in some
+   of the services. This PR uses the same environment variable to set the config correctly across
+   the services.
+
+   https://github.com/owncloud/ocis/pull/2198
 
 * Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
 

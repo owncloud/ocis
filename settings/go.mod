@@ -25,7 +25,7 @@ require (
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
 	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.27.0
 	gotest.tools v2.2.0+incompatible
 )
 

@@ -44,7 +44,6 @@ Credentials:
 
 - oCIS: [ocis.ocis-wopi.released.owncloud.works](https://ocis.ocis-wopi.released.owncloud.works)
 
-
 # oCIS with latest ownCloud Web
 
 Credentials:
@@ -73,6 +72,30 @@ Credentials:
 
 - oCIS: [ocis.ocis-keycloak.released.owncloud.works](https://ocis.ocis-keycloak.released.owncloud.works)
 - Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
+
+# oCIS with Hello extension
+
+Credentials:
+
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+
+## Latest
+
+- oCIS: [ocis.ocis-hello.latest.owncloud.works](https://ocis.ocis-hello.latest.owncloud.works)
+
+# oCIS with S3 storage backend (MinIO)
+
+Credentials:
+
+- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- MinIO:
+  - access key: ocis
+  - secret access key: ocis-secret-key
+
+## Latest
+
+- oCIS: [ocis.ocis-s3.latest.owncloud.works](https://ocis.ocis-s3.latest.owncloud.works)
+- MinIO: [minio.ocis-s3.latest.owncloud.works](https://minio.ocis-s3.latest.owncloud.works)
 
 # oCIS with CS3 users
 

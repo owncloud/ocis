@@ -14,11 +14,9 @@ import (
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -54,14 +52,13 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
 		// cs3, we cannot count with the accounts service.
 		if u != nil {
-			uid, gid := o.extractUIDAndGID(u)
 			d := &data.User{
 				UserID:            u.Username,
 				DisplayName:       u.DisplayName,
 				LegacyDisplayName: u.DisplayName,
 				Email:             u.Mail,
-				UIDNumber:         uid,
-				GIDNumber:         gid,
+				UIDNumber:         u.UidNumber,
+				GIDNumber:         u.GidNumber,
 			}
 			mustNotFail(render.Render(w, r, response.DataRender(d)))
 			return
@@ -490,18 +487,8 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 			Idp:      o.config.IdentityManagement.Address,
 		},
 		Groups: []string{},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
-				},
-			},
-		},
+		UidNumber:                account.UidNumber,
+		GidNumber:                account.GidNumber,
 	}
 	s, err := scope.GetOwnerScope()
 	if err != nil {
@@ -745,36 +732,11 @@ func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*acco
 	if err != nil {
 		return nil, err
 	}
-	uid, gid := o.extractUIDAndGID(u)
 	return &accounts.Account{
 		OnPremisesSamAccountName: u.Username,
 		DisplayName:              u.DisplayName,
 		Mail:                     u.Mail,
-		UidNumber:                uid,
-		GidNumber:                gid,
+		UidNumber:                u.UidNumber,
+		GidNumber:                u.GidNumber,
 	}, nil
-}
-
-func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
-	var uid, gid int64
-	var err error
-	if u.Opaque != nil && u.Opaque.Map != nil {
-		if uidObj, ok := u.Opaque.Map["uid"]; ok {
-			if uidObj.Decoder == "plain" {
-				uid, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
-				if err != nil {
-					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract uid for user")
-				}
-			}
-		}
-		if gidObj, ok := u.Opaque.Map["gid"]; ok {
-			if gidObj.Decoder == "plain" {
-				gid, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
-				if err != nil {
-					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract gid for user")
-				}
-			}
-		}
-	}
-	return uid, gid
 }
