@@ -1,6 +1,8 @@
 package config
 
-import "context"
+import (
+	"context"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -176,9 +178,15 @@ type ClaimsSelectorConf struct {
 
 // RegexSelectorConf is the config for the regex-selector
 type RegexSelectorConf struct {
-	DefaultPolicy         string                       `mapstructure:"default_policy"`
-	MatchesPolicies       map[string]map[string]string `mapstructure:"matches_policies"`
-	UnauthenticatedPolicy string                       `mapstructure:"unauthenticated_policy"`
+	DefaultPolicy         string          `mapstructure:"default_policy"`
+	MatchesPolicies       []RegexRuleConf `mapstructure:"matches_policies"`
+	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
+}
+type RegexRuleConf struct {
+	Priority int    `mapstructure:"priority"`
+	Property string `mapstructure:"property"`
+	Match    string `mapstructure:"match"`
+	Policy   string `mapstructure:"policy"`
 }
 
 // New initializes a new configuration

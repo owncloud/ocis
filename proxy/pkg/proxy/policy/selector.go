@@ -3,8 +3,8 @@ package policy
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"regexp"
+	"sort"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	revauser "github.com/cs3org/reva/pkg/user"
@@ -15,9 +15,9 @@ import (
 
 var (
 	// ErrMultipleSelectors in case there is more then one selector configured.
-	ErrMultipleSelectors = fmt.Errorf("only one type of policy-selector (static or migration) can be configured")
+	ErrMultipleSelectors = fmt.Errorf("only one type of policy-selector (static, migration, claim or regex) can be configured")
 	// ErrSelectorConfigIncomplete if policy_selector conf is missing
-	ErrSelectorConfigIncomplete = fmt.Errorf("missing either \"static\" or \"migration\" configuration in policy_selector config ")
+	ErrSelectorConfigIncomplete = fmt.Errorf("missing either \"static\", \"migration\", \"claim\" or \"regex\" configuration in policy_selector config ")
 	// ErrUnexpectedConfigError unexpected config error
 	ErrUnexpectedConfigError = fmt.Errorf("could not initialize policy-selector for given config")
 )
@@ -47,15 +47,29 @@ var (
 //    }
 //  ]
 //}
-type Selector func(ctx context.Context, r *http.Request) (string, error)
+type Selector func(ctx context.Context) (string, error)
 
 // LoadSelector constructs a specific policy-selector from a given configuration
 func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
-	if cfg.Migration != nil && cfg.Static != nil {
+	selCount := 0
+
+	if cfg.Migration != nil {
+		selCount++
+	}
+	if cfg.Static != nil {
+		selCount++
+	}
+	if cfg.Claims != nil {
+		selCount++
+	}
+	if cfg.Regex != nil {
+		selCount++
+	}
+	if selCount > 1 {
 		return nil, ErrMultipleSelectors
 	}
 
-	if cfg.Migration == nil && cfg.Static == nil {
+	if cfg.Migration == nil && cfg.Static == nil && cfg.Claims == nil && cfg.Regex == nil {
 		return nil, ErrSelectorConfigIncomplete
 	}
 
@@ -88,7 +102,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 //    "static": {"policy" : "ocis"}
 //  },
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(ctx context.Context) (s string, err error) {
 		return cfg.Policy, nil
 	}
 }
@@ -107,9 +121,9 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 // thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
 func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
 	var acc = ss
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(ctx context.Context) (s string, err error) {
 		var claims map[string]interface{}
-		if claims = oidc.FromContext(r.Context()); claims == nil {
+		if claims = oidc.FromContext(ctx); claims == nil {
 			return cfg.UnauthenticatedPolicy, nil
 		}
 
@@ -139,8 +153,8 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
-		if claims := oidc.FromContext(r.Context()); claims != nil {
+	return func(ctx context.Context) (s string, err error) {
+		if claims := oidc.FromContext(ctx); claims != nil {
 			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
@@ -156,58 +170,46 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 // The policy for each case is configurable:
 // "policy_selector": {
 //    "migration": {
-//      "matches_policies": {
-//		  "mail": {
-//			"marie@example.com": "oc10"
-//			"[^@]+@example.com": "ocis"
-//        },
-//		  "username": {
-//			"(einstein|feynman)": "ocis"
-//			"marie":    "oc10"
-//        },
-//		  "id": {
-//			"4c510ada-c86b-4815-8820-42cdf82c3d51": "ocis"
-//          "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c": "oc10"
-//        },
-//      },
+//      "matches_policies": [
+//        {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},
+//        {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
+//        {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "ocis"},
+//        {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
+//        {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "ocis"},
+//        {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"},
+//      ],
 //      "unauthenticated_policy": "oc10"
 //    }
 //  },
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
-	var mailRegexPolicies map[*regexp.Regexp]string
-	for m, p := range cfg.MatchesPolicies["mail"] {
-		mailRegexPolicies[regexp.MustCompile(m)] = p
+	regexRules := []*regexRule{}
+	sort.Slice(cfg.MatchesPolicies, func(i, j int) bool {
+		return cfg.MatchesPolicies[i].Priority < cfg.MatchesPolicies[j].Priority
+	})
+	for i := range cfg.MatchesPolicies {
+		regexRules = append(regexRules, &regexRule{
+			property: cfg.MatchesPolicies[i].Property,
+			rule:     regexp.MustCompile(cfg.MatchesPolicies[i].Match),
+			policy:   cfg.MatchesPolicies[i].Policy,
+		})
 	}
-	var usernameRegexPolicies map[*regexp.Regexp]string
-	for m, p := range cfg.MatchesPolicies["username"] {
-		usernameRegexPolicies[regexp.MustCompile(m)] = p
-	}
-	var idRegexPolicies map[*regexp.Regexp]string
-	for m, p := range cfg.MatchesPolicies["id"] {
-		usernameRegexPolicies[regexp.MustCompile(m)] = p
-	}
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(ctx context.Context) (s string, err error) {
 		if u, ok := revauser.ContextGetUser(ctx); ok {
-			if u.Mail != "" {
-				for r, p := range mailRegexPolicies {
-					if r.MatchString(u.Mail) {
-						return p, nil
+			for i := range regexRules {
+				switch regexRules[i].property {
+				case "mail":
+					if regexRules[i].rule.MatchString(u.Mail) {
+						return regexRules[i].policy, nil
 					}
-				}
-			}
-			if u.Username != "" {
-				for r, p := range usernameRegexPolicies {
-					if r.MatchString(u.Username) {
-						return p, nil
+				case "username":
+					if regexRules[i].rule.MatchString(u.Username) {
+						return regexRules[i].policy, nil
 					}
-				}
-			}
-			if u.Id != nil && u.Id.OpaqueId != "" {
-				for r, p := range idRegexPolicies {
-					if r.MatchString(u.Id.OpaqueId) {
-						return p, nil
+				case "id":
+					if u.Id != nil && regexRules[i].rule.MatchString(u.Id.OpaqueId) {
+						return regexRules[i].policy, nil
 					}
 				}
 			}
@@ -216,4 +218,10 @@ func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
 
 		return cfg.UnauthenticatedPolicy, nil
 	}
+}
+
+type regexRule struct {
+	property string
+	rule     *regexp.Regexp
+	policy   string
 }

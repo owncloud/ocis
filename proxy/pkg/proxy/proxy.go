@@ -110,7 +110,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 }
 
 func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
-	pol, err := p.PolicySelector(r.Context(), r)
+	pol, err := p.PolicySelector(r.Context())
 	if err != nil {
 		p.logger.Error().Msgf("Error while selecting pol %v", err)
 		return
