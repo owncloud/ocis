@@ -2,18 +2,21 @@ package command
 
 import (
 	"context"
+	"flag"
 	"os"
-	"os/signal"
 	"path"
-	"time"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
+	"github.com/thejerf/suture/v4"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
@@ -29,151 +32,124 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					logger.Error().
-						Str("type", t).
-						Msg("Storage only supports the jaeger tracing backend")
-
-				case "jaeger":
-					logger.Info().
-						Str("type", t).
-						Msg("configuring storage to use the jaeger tracing backend")
-
-				case "zipkin":
-					logger.Error().
-						Str("type", t).
-						Msg("Storage only supports the jaeger tracing backend")
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
-			}
-
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				//metrics     = metrics.New()
-			)
-
+			tracing.Configure(cfg, logger)
+			gr := run.Group{}
+			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			{
+			uuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			rcfg := authBearerConfigFromStruct(c, cfg)
 
-				uuid := uuid.Must(uuid.NewV4())
-				pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-
-				rcfg := map[string]interface{}{
-					"core": map[string]interface{}{
-						"max_cpus":             cfg.Reva.AuthBearer.MaxCPUs,
-						"tracing_enabled":      cfg.Tracing.Enabled,
-						"tracing_endpoint":     cfg.Tracing.Endpoint,
-						"tracing_collector":    cfg.Tracing.Collector,
-						"tracing_service_name": c.Command.Name,
-					},
-					"shared": map[string]interface{}{
-						"jwt_secret": cfg.Reva.JWTSecret,
-					},
-					"grpc": map[string]interface{}{
-						"network": cfg.Reva.AuthBearer.GRPCNetwork,
-						"address": cfg.Reva.AuthBearer.GRPCAddr,
-						// TODO build services dynamically
-						"services": map[string]interface{}{
-							"authprovider": map[string]interface{}{
-								"auth_manager": "oidc",
-								"auth_managers": map[string]interface{}{
-									"oidc": map[string]interface{}{
-										"issuer":    cfg.Reva.OIDC.Issuer,
-										"insecure":  cfg.Reva.OIDC.Insecure,
-										"id_claim":  cfg.Reva.OIDC.IDClaim,
-										"uid_claim": cfg.Reva.OIDC.UIDClaim,
-										"gid_claim": cfg.Reva.OIDC.GIDClaim,
-									},
-								},
-							},
-						},
-					},
-				}
-
-				gr.Add(func() error {
-					runtime.RunWithOptions(
-						rcfg,
-						pidFile,
-						runtime.WithLogger(&logger.Logger),
-					)
-					return nil
-				}, func(_ error) {
-					logger.Info().
-						Str("server", c.Command.Name).
-						Msg("Shutting down server")
-
-					cancel()
-				})
-			}
-
-			{
-				server, err := debug.Server(
-					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.AuthBearer.DebugAddr),
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
+			gr.Add(func() error {
+				runtime.RunWithOptions(
+					rcfg,
+					pidFile,
+					runtime.WithLogger(&logger.Logger),
 				)
+				return nil
+			}, func(_ error) {
+				logger.Info().
+					Str("server", c.Command.Name).
+					Msg("Shutting down server")
 
-				if err != nil {
-					logger.Info().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
+				cancel()
+			})
 
-					return err
-				}
+			debugServer, err := debug.Server(
+				debug.Name(c.Command.Name+"-debug"),
+				debug.Addr(cfg.Reva.AuthBearer.DebugAddr),
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Info().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
-				})
+			if err != nil {
+				logger.Info().Err(err).Str("server", "debug").Msg("failed to initialize server")
+				return err
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
+			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				cancel()
+			})
 
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Reva.StorageMetadata.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
 		},
 	}
+}
+
+// authBearerConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"core": map[string]interface{}{
+			"max_cpus":             cfg.Reva.AuthBearer.MaxCPUs,
+			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_endpoint":     cfg.Tracing.Endpoint,
+			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service_name": c.Command.Name,
+		},
+		"shared": map[string]interface{}{
+			"jwt_secret": cfg.Reva.JWTSecret,
+		},
+		"grpc": map[string]interface{}{
+			"network": cfg.Reva.AuthBearer.GRPCNetwork,
+			"address": cfg.Reva.AuthBearer.GRPCAddr,
+			// TODO build services dynamically
+			"services": map[string]interface{}{
+				"authprovider": map[string]interface{}{
+					"auth_manager": "oidc",
+					"auth_managers": map[string]interface{}{
+						"oidc": map[string]interface{}{
+							"issuer":     cfg.Reva.OIDC.Issuer,
+							"insecure":   cfg.Reva.OIDC.Insecure,
+							"id_claim":   cfg.Reva.OIDC.IDClaim,
+							"uid_claim":  cfg.Reva.OIDC.UIDClaim,
+							"gid_claim":  cfg.Reva.OIDC.GIDClaim,
+							"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+// AuthBearerSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type AuthBearerSutureService struct {
+	cfg *config.Config
+}
+
+// NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
+func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Storage.Reva.AuthBearer.Supervised = true
+	}
+	return AuthBearerSutureService{
+		cfg: cfg.Storage,
+	}
+}
+
+func (s AuthBearerSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.AuthBearer.Context = ctx
+	f := &flag.FlagSet{}
+	for k := range AuthBearer(s.cfg).Flags {
+		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
+			return err
+		}
+	}
+	cliCtx := cli.NewContext(nil, f, nil)
+	if AuthBearer(s.cfg).Before != nil {
+		if err := AuthBearer(s.cfg).Before(cliCtx); err != nil {
+			return err
+		}
+	}
+	if err := AuthBearer(s.cfg).Action(cliCtx); err != nil {
+		return err
+	}
+
+	return nil
 }

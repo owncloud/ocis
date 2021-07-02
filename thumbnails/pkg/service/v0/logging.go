@@ -22,7 +22,7 @@ type logging struct {
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
 	start := time.Now()
 	err := l.next.GetThumbnail(ctx, req, rsp)
 

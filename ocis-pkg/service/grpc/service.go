@@ -6,14 +6,22 @@ import (
 
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
 	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v3"
+	mbreaker "github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3"
 	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
 	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
 	"github.com/asim/go-micro/v3"
+	"github.com/asim/go-micro/v3/client"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 )
 
-// DefaultClient is a custom ocis grpc configured client.
-var DefaultClient = mgrpcc.NewClient()
+// DefaultClient is a custom oCIS grpc configured client.
+var DefaultClient = getDefaultGrpcClient()
+
+func getDefaultGrpcClient() client.Client {
+	return mgrpcc.NewClient(
+		client.Wrap(mbreaker.NewClientWrapper()),
+	)
+}
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {

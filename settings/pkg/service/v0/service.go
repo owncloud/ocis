@@ -65,6 +65,12 @@ func (g Service) RegisterDefaultRoles() {
 				Msg("failed to register permission")
 		}
 	}
+
+	for _, req := range defaultRoleAssignments() {
+		if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
+			g.logger.Error().Err(err).Msg("failed to register role assignment")
+		}
+	}
 }
 
 // TODO: check permissions on every request

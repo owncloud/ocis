@@ -1,10 +1,13 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.
@@ -40,17 +43,14 @@ type Config struct {
 	Server    Server
 	Tracing   Tracing
 	Thumbnail Thumbnail
+
+	Context    context.Context
+	Supervised bool
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.
 type FileSystemStorage struct {
 	RootDirectory string
-}
-
-// WebDavSource defines the available webdav source configuration.
-type WebDavSource struct {
-	BaseURL  string
-	Insecure bool
 }
 
 // FileSystemSource defines the available filesystem source configuration.
@@ -60,9 +60,11 @@ type FileSystemSource struct {
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions       []string
-	FileSystemStorage FileSystemStorage
-	WebDavSource      WebDavSource
+	Resolutions         []string
+	FileSystemStorage   FileSystemStorage
+	WebdavAllowInsecure bool
+	RevaGateway         string
+	WebdavNamespace     string
 }
 
 // New initializes a new configuration with or without defaults.

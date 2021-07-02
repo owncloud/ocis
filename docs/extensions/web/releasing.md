@@ -16,7 +16,7 @@ To update this package within all the deliveries, we need to update the package 
 
 ### Package Hierarchy
 
-- [ocis](https://githug.com/owncloud/ocis)
+- [ocis](https://github.com/owncloud/ocis)
     - [ocis-web](https://github.com/owncloud/ocis/tree/master/web)
       - [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg)
       - [ownCloud Web](https://github.com/owncloud/web)
@@ -28,16 +28,12 @@ and take note of its release tag name.
 
 #### Updating ocis-web
 
-1. Create a branch `release-$version`. in <https://github.com/owncloud/ocis>
-2. Create a Folder in `changelog` for the release version and date `mkdir $major.$minor.$patchVersion_YYYY-MM-DD`.
-3. Move all changelog items from the `changelog/unreleased/` folder to the `$major.$minor.$patchVersion_YYYY-MM-DD` folder.
-4. Update the go module `ocis-pkg` to the latest version <https://blog.golang.org/using-go-modules> .
-5. Update the ownCloud Web asset by adjusting the value of `WEB_ASSETS_VERSION` at the top of the Makefile and specify the tag name of the latest [ownCloud Web release](https://github.com/owncloud/web/tags).
-6. Run `make clean generate`.
-7. Create a changelog item for the update in the `changelog/$major.$minor.$patchVersion_YYYY-MM-DD` folder.
-8. Commit your changes.
-9. After merging, wait for the CI to run on the merge commit.
-10. Go to "Releases" in GH click "Draft a new Release".
-11. Use `v$major.$minor.$patch` as a tag (the `v` prefix is important) and publish it.
-12. The tag and the Release artifacts will be created automatically.
-
+1. Create a branch `update-web-$version` in the [ocis repository](https://github.com/owncloud/ocis)
+2. Change into web package folder via `cd web`
+3. Inside `web/`, update the `Makefile` so that the WEB_ASSETS_VERSION variable references the currently released version of https://github.com/owncloud/web
+4. Inside `web/`, replace the current assets with newly released ones by running `make pull-assets`
+5. Inside `web/`, run `make generate`. The output should look something like this: `web: embed.go - YYY/MM/DD ... to write [./embed.go] from config file ...`
+6. Move to the changelog (`cd ../changelog/`) and add a changelog file to the `unreleased/` folder (You can copy an old web release changelog item as a template)
+7. Move to the repo root (`cd ..`)and update the WEB_COMMITID in the `/.drone.env` file to the commit id from the released version (unless the existing commit id is already newer)
+8. **Optional:** Test the changes locally by running `cd ocis && go run cmd/ocis/main.go server`, visiting [https://localhost:9200](https://localhost:9200) and confirming everything renders correctly
+9. Commit your changes, push them and [create a PR](https://github.com/owncloud/ocis/pulls)

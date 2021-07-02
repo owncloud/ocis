@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -8,14 +9,15 @@ import (
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/flagset"
 	"github.com/owncloud/ocis/idp/pkg/version"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the ocis-idp command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "ocis-idp",
 		Version:  version.String,
@@ -63,11 +65,14 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Level(cfg.Log.Level),
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
+		log.File(cfg.Log.File),
 	)
 }
 
 // ParseConfig load configuration for every extension
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -104,6 +109,31 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		logger.Fatal().
 			Err(err).
 			Msg("failed to parse config")
+	}
+
+	return nil
+}
+
+// SutureService allows for the idp command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new idp.SutureService
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.IDP.Supervised = true
+	}
+	cfg.IDP.Log.File = cfg.Log.File
+	return SutureService{
+		cfg: cfg.IDP,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
+	if err := Execute(s.cfg); err != nil {
+		return err
 	}
 
 	return nil

@@ -5,9 +5,8 @@ import (
 	"os"
 
 	"github.com/asim/go-micro/v3"
-
-	"github.com/owncloud/ocis/idp/pkg/crypto"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
+	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 )
@@ -24,7 +23,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 				options.Logger.Info().Msgf("Generating certs")
-				if err := crypto.GenCert(options.Logger); err != nil {
+				if err := pkgcrypto.GenCert(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey, options.Logger); err != nil {
 					options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
 					os.Exit(1)
 				}
@@ -40,7 +39,7 @@ func Server(opts ...Option) (http.Service, error) {
 			os.Exit(1)
 		}
 
-		tlsConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
+		tlsConfig = &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{cer}}
 	}
 
 	service := http.NewService(
@@ -79,7 +78,9 @@ func Server(opts ...Option) (http.Service, error) {
 		handle = svc.NewLogging(handle, options.Logger)
 	}
 
-	micro.RegisterHandler(service.Server(), handle)
+	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
+		return http.Service{}, err
+	}
 
 	return service, nil
 }

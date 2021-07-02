@@ -83,7 +83,7 @@ func writeData(m map[string][]interface{}, privateKey string, rootDir string) er
 	for dirName := range m {
 		fileTypePath := path.Join(rootDir, dirName)
 
-		if err := os.MkdirAll(fileTypePath, 0777); err != nil {
+		if err := os.MkdirAll(fileTypePath, 0755); err != nil {
 			return err
 		}
 		for _, u := range m[dirName] {
@@ -93,7 +93,7 @@ func writeData(m map[string][]interface{}, privateKey string, rootDir string) er
 			}
 
 			pkVal := ValueOf(u, privateKey)
-			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0777); err != nil {
+			if err := ioutil.WriteFile(path.Join(fileTypePath, pkVal), data, 0600); err != nil {
 				return err
 			}
 		}

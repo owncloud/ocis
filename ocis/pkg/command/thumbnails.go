@@ -4,7 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/command"
@@ -22,6 +22,9 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 		Flags:    flagset.ServerWithConfig(cfg.Thumbnails),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Thumbnails),
+		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureThumbnails(cfg))

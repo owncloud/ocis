@@ -1,10 +1,13 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.
@@ -66,6 +69,9 @@ type Config struct {
 	Tracing      Tracing
 	Asset        Asset
 	TokenManager TokenManager
+
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

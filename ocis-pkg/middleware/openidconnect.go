@@ -52,7 +52,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 
 			tr := &http.Transport{
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: opt.Insecure,
+					InsecureSkipVerify: opt.Insecure, //nolint:gosec
 				},
 			}
 			customHTTPClient := &http.Client{
@@ -85,7 +85,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 			}
 			userInfo, err := oidcProvider.UserInfo(customCtx, oauth2.StaticTokenSource(oauth2Token))
 			if err != nil {
-				opt.Logger.Error().Err(err).Str("token", string(token)).Msg("Failed to get userinfo")
+				opt.Logger.Error().Err(err).Msg("Failed to get userinfo")
 				http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
 				return
 			}

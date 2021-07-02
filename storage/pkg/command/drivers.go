@@ -91,7 +91,7 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":         cfg.Reva.Storages.Common.UserLayout,
 			"treetime_accounting": true,
 			"treesize_accounting": true,
-			"owner":               "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad", // the accounts service system account uuid
+			"owner":               cfg.Reva.Storages.OCIS.ServiceUserUUID, // the accounts service system account uuid
 		},
 		"s3": map[string]interface{}{
 			"region":     cfg.Reva.Storages.S3.Region,
@@ -100,6 +100,16 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"endpoint":   cfg.Reva.Storages.S3.Endpoint,
 			"bucket":     cfg.Reva.Storages.S3.Bucket,
 			"prefix":     cfg.Reva.Storages.S3.Root,
+		},
+		"s3ng": map[string]interface{}{
+			"root":          cfg.Reva.Storages.Common.Root,
+			"enable_home":   cfg.Reva.Storages.Common.EnableHome,
+			"user_layout":   cfg.Reva.Storages.Common.UserLayout,
+			"s3.region":     cfg.Reva.Storages.S3NG.Region,
+			"s3.access_key": cfg.Reva.Storages.S3NG.AccessKey,
+			"s3.secret_key": cfg.Reva.Storages.S3NG.SecretKey,
+			"s3.endpoint":   cfg.Reva.Storages.S3NG.Endpoint,
+			"s3.bucket":     cfg.Reva.Storages.S3NG.Bucket,
 		},
 	}
 }

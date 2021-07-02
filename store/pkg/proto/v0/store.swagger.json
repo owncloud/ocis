@@ -60,7 +60,7 @@
         }
       }
     },
-    "storeDatabasesResponse": {
+    "v0DatabasesResponse": {
       "type": "object",
       "properties": {
         "databases": {
@@ -71,7 +71,7 @@
         }
       }
     },
-    "storeDeleteOptions": {
+    "v0DeleteOptions": {
       "type": "object",
       "properties": {
         "database": {
@@ -82,10 +82,10 @@
         }
       }
     },
-    "storeDeleteResponse": {
+    "v0DeleteResponse": {
       "type": "object"
     },
-    "storeField": {
+    "v0Field": {
       "type": "object",
       "properties": {
         "type": {
@@ -98,7 +98,7 @@
         }
       }
     },
-    "storeListOptions": {
+    "v0ListOptions": {
       "type": "object",
       "properties": {
         "database": {
@@ -123,7 +123,7 @@
         }
       }
     },
-    "storeListResponse": {
+    "v0ListResponse": {
       "type": "object",
       "properties": {
         "keys": {
@@ -134,7 +134,7 @@
         }
       }
     },
-    "storeReadOptions": {
+    "v0ReadOptions": {
       "type": "object",
       "properties": {
         "database": {
@@ -160,23 +160,23 @@
         "where": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/storeField"
+            "$ref": "#/definitions/v0Field"
           }
         }
       }
     },
-    "storeReadResponse": {
+    "v0ReadResponse": {
       "type": "object",
       "properties": {
         "records": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/storeRecord"
+            "$ref": "#/definitions/v0Record"
           }
         }
       }
     },
-    "storeRecord": {
+    "v0Record": {
       "type": "object",
       "properties": {
         "key": {
@@ -196,13 +196,13 @@
         "metadata": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/storeField"
+            "$ref": "#/definitions/v0Field"
           },
           "title": "the associated metadata"
         }
       }
     },
-    "storeTablesResponse": {
+    "v0TablesResponse": {
       "type": "object",
       "properties": {
         "tables": {
@@ -213,7 +213,7 @@
         }
       }
     },
-    "storeWriteOptions": {
+    "v0WriteOptions": {
       "type": "object",
       "properties": {
         "database": {
@@ -234,12 +234,12 @@
         }
       }
     },
-    "storeWriteResponse": {
+    "v0WriteResponse": {
       "type": "object"
     }
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/store/"
+    "url": "https://owncloud.dev/extensions/store/"
   }
 }

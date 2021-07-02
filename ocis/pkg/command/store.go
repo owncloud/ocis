@@ -4,7 +4,7 @@ package command
 
 import (
 	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/ocis/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/store/pkg/command"
@@ -21,6 +21,9 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 		Flags:    flagset.ServerWithConfig(cfg.Store),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Store),
+		},
+		Before: func(ctx *cli.Context) error {
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureStore(cfg))

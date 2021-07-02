@@ -1,7 +1,11 @@
 package flagset
 
 import (
+	"path"
+
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
@@ -10,24 +14,25 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "log-level",
-			Value:       "info",
 			Usage:       "Set logging level",
-			EnvVars:     []string{"PROXY_LOG_LEVEL"},
+			EnvVars:     []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
-			Value:       true,
 			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"PROXY_LOG_PRETTY"},
+			EnvVars:     []string{"PROXY_LOG_PRETTY", "OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
-			Value:       true,
 			Usage:       "Enable colored logging",
-			EnvVars:     []string{"PROXY_LOG_COLOR"},
+			EnvVars:     []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
 		},
 	}
 }
@@ -37,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9109",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -48,6 +53,12 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "log-file",
+			Usage:       "Enable log to file",
+			EnvVars:     []string{"PROXY_LOG_FILE", "OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
 		&cli.StringFlag{
 			Name:        "config-file",
 			Value:       "",
@@ -63,7 +74,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"PROXY_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
@@ -84,14 +95,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "proxy",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "proxy"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"PROXY_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9205",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -117,77 +128,77 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9200",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9200"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"PROXY_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       "/",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"PROXY_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
 			Name:        "asset-path",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
 			Usage:       "Path to custom assets",
 			EnvVars:     []string{"PROXY_ASSET_PATH"},
 			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "service-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the service namespace",
 			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       "proxy",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "proxy"),
 			Usage:       "Service name",
 			EnvVars:     []string{"PROXY_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
 		},
 		&cli.BoolFlag{
 			Name:        "tls",
+			Value:       flags.OverrideDefaultBool(cfg.HTTP.TLS, true),
 			Usage:       "Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).",
 			EnvVars:     []string{"PROXY_TLS"},
-			Value:       true,
 			Destination: &cfg.HTTP.TLS,
 		},
 		&cli.StringFlag{
 			Name:        "jwt-secret",
-			Value:       "Pive-Fumkiu4",
+			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
 			EnvVars:     []string{"PROXY_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
-			Value:       "127.0.0.1:9142",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
 			Usage:       "REVA Gateway Endpoint",
 			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Address,
 		},
 		&cli.BoolFlag{
 			Name:        "insecure",
-			Value:       false,
+			Value:       flags.OverrideDefaultBool(cfg.InsecureBackends, false),
 			Usage:       "allow insecure communication to upstream servers",
 			EnvVars:     []string{"PROXY_INSECURE_BACKENDS"},
 			Destination: &cfg.InsecureBackends,
@@ -197,28 +208,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "oidc-issuer",
-			Value:       "https://localhost:9200",
+			Value:       flags.OverrideDefaultString(cfg.OIDC.Issuer, "https://localhost:9200"),
 			Usage:       "OIDC issuer",
 			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"}, // PROXY_OIDC_ISSUER takes precedence over OCIS_URL
 			Destination: &cfg.OIDC.Issuer,
 		},
 		&cli.BoolFlag{
 			Name:        "oidc-insecure",
-			Value:       true,
+			Value:       flags.OverrideDefaultBool(cfg.OIDC.Insecure, true),
 			Usage:       "OIDC allow insecure communication",
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
 		&cli.IntFlag{
 			Name:        "oidc-userinfo-cache-tll",
-			Value:       10,
+			Value:       flags.OverrideDefaultInt(cfg.OIDC.UserinfoCache.TTL, 10),
 			Usage:       "Fallback TTL in seconds for caching userinfo, when no token lifetime can be identified",
 			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_TTL"},
 			Destination: &cfg.OIDC.UserinfoCache.TTL,
 		},
 		&cli.IntFlag{
 			Name:        "oidc-userinfo-cache-size",
-			Value:       1024,
+			Value:       flags.OverrideDefaultInt(cfg.OIDC.UserinfoCache.Size, 1024),
 			Usage:       "Max entries for caching userinfo",
 			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_SIZE"},
 			Destination: &cfg.OIDC.UserinfoCache.Size,
@@ -226,7 +237,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",
-			Value:       false,
+			Value:       flags.OverrideDefaultBool(cfg.AutoprovisionAccounts, false),
 			Usage:       "create accounts from OIDC access tokens to learn new users",
 			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
 			Destination: &cfg.AutoprovisionAccounts,
@@ -241,7 +252,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "enable-presignedurls",
-			Value:       true,
+			Value:       flags.OverrideDefaultBool(cfg.PreSignedURL.Enabled, true),
 			Usage:       "Enable or disable handling the presigned urls in the proxy",
 			EnvVars:     []string{"PROXY_ENABLE_PRESIGNEDURLS"},
 			Destination: &cfg.PreSignedURL.Enabled,
@@ -250,7 +261,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		// Basic auth
 		&cli.BoolFlag{
 			Name:        "enable-basic-auth",
-			Value:       false,
+			Value:       flags.OverrideDefaultBool(cfg.EnableBasicAuth, false),
 			Usage:       "enable basic authentication",
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,
@@ -258,7 +269,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "account-backend-type",
-			Value:       "accounts",
+			Value:       flags.OverrideDefaultString(cfg.AccountBackend, "accounts"),
 			Usage:       "account-backend-type",
 			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
 			Destination: &cfg.AccountBackend,
@@ -278,14 +289,14 @@ func ListProxyWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "service-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.OIDC.Issuer, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the service namespace",
 			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       "proxy",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "proxy"),
 			Usage:       "Service name",
 			EnvVars:     []string{"PROXY_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,

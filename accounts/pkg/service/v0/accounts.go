@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"path"
 	"regexp"
 	"strconv"
@@ -19,7 +20,6 @@ import (
 	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/asim/go-micro/v3/metadata"
 	"github.com/gofrs/uuid"
-	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -30,6 +30,7 @@ import (
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
 	"google.golang.org/genproto/protobuf/field_mask"
+	p "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -172,11 +173,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			var suspicious bool
 
 			kh := sha256.New()
-			kh.Write([]byte(a.Id))
+			mustWrite(kh, []byte(a.Id))
 			k := hex.EncodeToString(kh.Sum([]byte(a.PasswordProfile.LastPasswordChangeDateTime.String())))
 
 			vh := sha256.New()
-			vh.Write([]byte(a.PasswordProfile.Password))
+			mustWrite(vh, []byte(a.PasswordProfile.Password))
 			v := vh.Sum([]byte(password))
 
 			e := passwordValidCache.Load(k)
@@ -837,4 +838,10 @@ func isPasswordValid(logger log.Logger, hash string, pwd string) (ok bool) {
 	}()
 
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pwd)) == nil
+}
+
+func mustWrite(w io.Writer, val []byte) {
+	if _, err := w.Write(val); err != nil {
+		panic(err)
+	}
 }

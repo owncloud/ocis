@@ -55,9 +55,15 @@ func (p GraphExplorer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (p GraphExplorer) ConfigJs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/javascript")
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, fmt.Sprintf("window.ClientId = \"%v\";", p.config.GraphExplorer.ClientID))
-	io.WriteString(w, fmt.Sprintf("window.Iss = \"%v\";", p.config.GraphExplorer.Issuer))
-	io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphURL))
+	if _, err := io.WriteString(w, fmt.Sprintf("window.ClientId = \"%v\";", p.config.GraphExplorer.ClientID)); err != nil {
+		p.logger.Error().Err(err).Msg("Could not write to response writer")
+	}
+	if _, err := io.WriteString(w, fmt.Sprintf("window.Iss = \"%v\";", p.config.GraphExplorer.Issuer)); err != nil {
+		p.logger.Error().Err(err).Msg("Could not write to response writer")
+	}
+	if _, err := io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphURL)); err != nil {
+		p.logger.Error().Err(err).Msg("Could not write to response writer")
+	}
 }
 
 // Static simply serves all static files.

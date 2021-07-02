@@ -145,11 +145,8 @@ func assertUserMatchesAccount(t *testing.T, exp *accounts.Account, act *userv1be
 	assert.Equal(t, `["a","b"]`, string(act.Opaque.Map["roles"].GetValue()))
 
 	// UID/GID
-	assert.NotNil(t, act.Opaque.Map["uid"])
-	assert.Equal(t, "1", string(act.Opaque.Map["uid"].GetValue()))
-
-	assert.NotNil(t, act.Opaque.Map["gid"])
-	assert.Equal(t, "2", string(act.Opaque.Map["gid"].GetValue()))
+	assert.Equal(t, int64(1), act.UidNumber)
+	assert.Equal(t, int64(2), act.GidNumber)
 }
 
 func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settings.UserRoleAssignment) UserBackend {

@@ -1,10 +1,13 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.
@@ -33,20 +36,24 @@ type StorageRegistry struct {
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
 	HomeProvider string
 	Rules        []string
+	JSON         string
 }
 
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver      string
-	UserJSONFile    string
-	UserSQLUsername string
-	UserSQLPassword string
-	UserSQLHost     string
-	UserSQLPort     int
-	UserSQLName     string
-	PublicDriver    string
-	PublicJSONFile  string
+	UserDriver                       string
+	UserJSONFile                     string
+	UserSQLUsername                  string
+	UserSQLPassword                  string
+	UserSQLHost                      string
+	UserSQLPort                      int
+	UserSQLName                      string
+	PublicDriver                     string
+	PublicJSONFile                   string
+	PublicPasswordHashCost           int
+	PublicEnableExpiredSharesCleanup bool
+	PublicJanitorRunInterval         int
 }
 
 // Port defines the available port configuration.
@@ -74,6 +81,12 @@ type Port struct {
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
 	Config map[string]interface{}
+
+	// Context allows for context cancellation and propagation
+	Context context.Context
+
+	// Supervised is used when running under an oCIS runtime supervision tree
+	Supervised bool
 }
 
 // Users defines the available users configuration.
@@ -100,6 +113,7 @@ type FrontendPort struct {
 	OCDavPrefix       string
 	OCSPrefix         string
 	OCSSharePrefix    string
+	OCSHomeNamespace  string
 	PublicURL         string
 	Middleware        Middleware
 }
@@ -150,7 +164,9 @@ type StorageConfig struct {
 	Local    DriverCommon
 	OwnCloud DriverOwnCloud
 	S3       DriverS3
+	S3NG     DriverS3NG
 	Common   DriverCommon
+	OCIS     DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
 
@@ -228,6 +244,11 @@ type DriverEOS struct {
 	GatewaySVC string
 }
 
+// DriverOCIS defines the available oCIS storage driver configuration.
+type DriverOCIS struct {
+	ServiceUserUUID string
+}
+
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
 type DriverOwnCloud struct {
 	DriverCommon
@@ -239,6 +260,17 @@ type DriverOwnCloud struct {
 
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
+	DriverCommon
+
+	Region    string
+	AccessKey string
+	SecretKey string
+	Endpoint  string
+	Bucket    string
+}
+
+// DriverS3NG defines the available s3ng storage driver configuration.
+type DriverS3NG struct {
 	DriverCommon
 
 	Region    string

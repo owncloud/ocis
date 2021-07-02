@@ -1,36 +1,34 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+
 	"github.com/micro/cli/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/web/pkg/config"
-	"github.com/owncloud/ocis/web/pkg/flagset"
 	"github.com/owncloud/ocis/web/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/thejerf/suture/v4"
 )
 
 // Execute is the entry point for the web command.
-func Execute() error {
-	cfg := config.New()
-
+func Execute(cfg *config.Config) error {
 	app := &cli.App{
 		Name:     "web",
 		Version:  version.String,
 		Usage:    "Serve ownCloud Web for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
-		Flags: flagset.RootWithConfig(cfg),
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
@@ -57,11 +55,14 @@ func NewLogger(cfg *config.Config) log.Logger {
 		log.Level(cfg.Log.Level),
 		log.Pretty(cfg.Log.Pretty),
 		log.Color(cfg.Log.Color),
+		log.File(cfg.Log.File),
 	)
 }
 
 // ParseConfig loads proxy configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
+	sync.ParsingViperConfig.Lock()
+	defer sync.ParsingViperConfig.Unlock()
 	logger := NewLogger(cfg)
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -98,6 +99,31 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		logger.Fatal().
 			Err(err).
 			Msg("failed to parse config")
+	}
+
+	return nil
+}
+
+// SutureService allows for the web command to be embedded and supervised by a suture supervisor tree.
+type SutureService struct {
+	cfg *config.Config
+}
+
+// NewSutureService creates a new web.SutureService
+func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	if cfg.Mode == 0 {
+		cfg.Web.Supervised = true
+	}
+	cfg.Web.Log.File = cfg.Log.File
+	return SutureService{
+		cfg: cfg.Web,
+	}
+}
+
+func (s SutureService) Serve(ctx context.Context) error {
+	s.cfg.Context = ctx
+	if err := Execute(s.cfg); err != nil {
+		return err
 	}
 
 	return nil

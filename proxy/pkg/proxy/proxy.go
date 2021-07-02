@@ -54,7 +54,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: options.Config.InsecureBackends,
+			InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
 		},
 	}
 
@@ -146,12 +146,12 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 					Str("routeType", string(rt)).
 					Msg("director found")
 
-				p.logger.
-					Info().Fields(map[string]interface{}{
-					"method": r.Method,
-					"path":   r.URL.Path,
-					"from":   r.RemoteAddr,
-				}).Msg("access-log")
+				p.logger.Info().
+					Str("method", r.Method).
+					Str("path", r.Method).
+					Str("from", r.RemoteAddr).
+					Msg("access-log")
+
 				p.Directors[pol][rt][endpoint](r)
 				return
 			}
@@ -322,6 +322,14 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/data",
 					Backend:  "http://localhost:9140",
 				},
+				{
+					Endpoint: "/graph/",
+					Backend:  "http://localhost:9120",
+				},
+				{
+					Endpoint: "/graph-explorer/",
+					Backend:  "http://localhost:9135",
+				},
 				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
 				{
 					Endpoint: "/api/v0/accounts",
@@ -339,14 +347,6 @@ func defaultPolicies() []config.Policy {
 				{
 					Endpoint: "/settings.js",
 					Backend:  "http://localhost:9190",
-				},
-				{
-					Endpoint: "/api/v0/greet",
-					Backend:  "http://localhost:9105",
-				},
-				{
-					Endpoint: "/hello.js",
-					Backend:  "http://localhost:9105",
 				},
 				{
 					Endpoint: "/onlyoffice.js",

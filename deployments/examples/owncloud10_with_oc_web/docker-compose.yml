@@ -165,37 +165,37 @@ services:
     restart: always
 
   db:
-    image: webhippie/mariadb:latest
+    image: mariadb:10.5
     environment:
-      MARIADB_ROOT_PASSWORD: owncloud
-      MARIADB_USERNAME: owncloud
-      MARIADB_PASSWORD: owncloud
-      MARIADB_DATABASE: owncloud
-      MARIADB_MAX_ALLOWED_PACKET: 128M
-      MARIADB_INNODB_LOG_FILE_SIZE: 256M
+      - MYSQL_ROOT_PASSWORD=owncloud
+      - MYSQL_USER=owncloud
+      - MYSQL_PASSWORD=owncloud
+      - MYSQL_DATABASE=owncloud
+    command: ["--max-allowed-packet=128M", "--innodb-log-file-size=64M"]
     healthcheck:
-      test: ["CMD", "/usr/bin/healthcheck"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "--password=owncloud"]
+      interval: 10s
+      timeout: 5s
       retries: 5
     volumes:
       - mysql:/var/lib/mysql
-      - backup:/var/lib/backup
     logging:
       driver: "local"
     restart: always
 
   redis:
-    image: webhippie/redis:latest
-    environment:
-      - REDIS_DATABASES=1
+    image: redis:6
+    command: ["--databases", "1"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
-      - redis:/var/lib/redis
+      - redis:/data
     logging:
       driver: "local"
     restart: always
-
-
 
 volumes:
   certs:

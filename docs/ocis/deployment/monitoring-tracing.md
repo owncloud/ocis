@@ -4,14 +4,14 @@ date: 2020-02-27T20:35:00+01:00
 weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: monitoring_tracing.md
+geekdocFilePath: monitoring-tracing.md
 ---
 
 {{< toc >}}
 
 Monitoring and tracing gives developers and admin insights into a complex system, in this case oCIS.
 
-If you are a developer and want to trace during developing you should have a look at [example server setup]({{< ref "../development/tracing.md" >}}).
+If you are a developer and want to trace during developing you should have a look at [example server setup]({{< ref "../development/tracing" >}}).
 
 This documentation describes how to set up a long running monitoring & tracing infrastructure for one or multiple oCIS servers or deployments. After reading this guide, you also should know everything needed to integrate oCIS into your existing monitoring and tracing infrastructure.
 

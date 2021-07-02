@@ -121,7 +121,9 @@ func (p Web) Config(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(payload)
+	if _, err := w.Write(payload); err != nil {
+		p.logger.Error().Err(err).Msg("could not write config response")
+	}
 }
 
 // Static simply serves all static files.
@@ -175,6 +177,7 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 		w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate, value")
 		w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
 		w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+		w.Header().Set("SameSite", "Strict")
 
 		static.ServeHTTP(w, r)
 	}

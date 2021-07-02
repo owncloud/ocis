@@ -1005,7 +1005,6 @@ func TestListRolesAfterSavingBundle(t *testing.T) {
 					name:        bundle.Name,
 				})
 			}
-			assert.Equal(t, len(tt.expectedBundles), len(rolesRes.Bundles))
 		})
 	}
 }
@@ -1267,13 +1266,19 @@ func TestListFilteredBundle(t *testing.T) {
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 
-			for _, bundle := range listRes.Bundles {
-				assert.Contains(t, tt.expectedBundles, expectedBundle{
-					displayName: bundle.DisplayName,
-					name:        bundle.Name,
+			// we don't want to deep-assert the values returned only add checks on name and displayName
+			// this will suffice.
+			listResAsExpectedBundle := make([]expectedBundle, 0)
+			for i := range listRes.Bundles {
+				listResAsExpectedBundle = append(listResAsExpectedBundle, expectedBundle{
+					displayName: listRes.Bundles[i].DisplayName,
+					name:        listRes.Bundles[i].Name,
 				})
 			}
-			assert.Equal(t, len(tt.expectedBundles), len(listRes.Bundles))
+
+			for _, bundle := range tt.expectedBundles {
+				assert.Contains(t, listResAsExpectedBundle, bundle)
+			}
 		})
 	}
 }
@@ -1568,13 +1573,19 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
 			assert.NoError(t, err)
 
-			for _, setting := range listRes.Bundles[0].Settings {
-				assert.Contains(t, tt.expectedSettings, expectedSetting{
-					displayName: setting.DisplayName,
-					name:        setting.Name,
-				})
+			listedSettings := make([]expectedSetting, 0)
+			for i := range listRes.Bundles {
+				for _, setting := range listRes.Bundles[i].Settings {
+					listedSettings = append(listedSettings, expectedSetting{
+						displayName: setting.DisplayName,
+						name:        setting.Name,
+					})
+				}
 			}
-			assert.Equal(t, len(tt.expectedSettings), len(listRes.Bundles[0].Settings))
+
+			for i := range tt.expectedSettings {
+				assert.Contains(t, listedSettings, tt.expectedSettings[i])
+			}
 
 			getRes, err := bundleService.GetBundle(ctx, &proto.GetBundleRequest{BundleId: bundle.Id})
 			assert.NoError(t, err)
@@ -1585,59 +1596,6 @@ func TestListGetBundleSettingMixedPermission(t *testing.T) {
 					name:        setting.Name,
 				})
 			}
-			assert.Equal(t, len(tt.expectedSettings), len(getRes.Bundle.Settings))
-		})
-	}
-}
-
-func TestListFilteredBundle_SetPermissionsOnSettingAndBundle(t *testing.T) {
-	tests := []struct {
-		name                     string
-		settingPermission        proto.Permission_Operation
-		bundlePermission         proto.Permission_Operation
-		expectedAmountOfSettings int
-	}{
-		{
-			"setting has read permission bundle not",
-			proto.Permission_OPERATION_READ,
-			proto.Permission_OPERATION_UNKNOWN,
-			1,
-		},
-		{
-			"bundle has read permission setting not",
-			proto.Permission_OPERATION_UNKNOWN,
-			proto.Permission_OPERATION_READ,
-			5,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			teardown := setup()
-			defer teardown()
-
-			ctx := metadata.Set(context.Background(), middleware.AccountID, testAccountID)
-			ctx = metadata.Set(ctx, middleware.RoleIDs, getRoleIDAsJSON(svc.BundleUUIDRoleAdmin))
-
-			_, err := bundleService.SaveBundle(ctx, &proto.SaveBundleRequest{
-				Bundle: &bundleStub,
-			})
-			assert.NoError(t, err)
-
-			setPermissionOnBundleOrSetting(
-				ctx, t, bundleStub.Id, proto.Resource_TYPE_BUNDLE, tt.bundlePermission, svc.BundleUUIDRoleAdmin,
-			)
-
-			setPermissionOnBundleOrSetting(
-				ctx, t, bundleStub.Settings[0].Id, proto.Resource_TYPE_SETTING,
-				tt.settingPermission, svc.BundleUUIDRoleAdmin,
-			)
-
-			listRes, err := bundleService.ListBundles(ctx, &proto.ListBundlesRequest{})
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(listRes.Bundles))
-			assert.Equal(t, tt.expectedAmountOfSettings, len(listRes.Bundles[0].Settings))
-			assert.Equal(t, bundleStub.Id, listRes.Bundles[0].Id)
-			assert.Equal(t, bundleStub.Settings[0].Id, listRes.Bundles[0].Settings[0].Id)
 		})
 	}
 }

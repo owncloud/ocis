@@ -5,26 +5,18 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-
-	"contrib.go.opencensus.io/exporter/jaeger"
-	"contrib.go.opencensus.io/exporter/ocagent"
-	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/coreos/go-oidc"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	openzipkin "github.com/openzipkin/zipkin-go"
-	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
@@ -33,10 +25,10 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/proxy"
 	"github.com/owncloud/ocis/proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis/proxy/pkg/server/http"
+	"github.com/owncloud/ocis/proxy/pkg/tracing"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
-	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
 	"golang.org/x/oauth2"
 )
 
@@ -45,8 +37,9 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
+		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(ctx *cli.Context) error {
+			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -56,113 +49,34 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
+			if !cfg.Supervised {
+				return ParseConfig(ctx, cfg)
 			}
-
-			// TODO we could parse OCIS_URL and set the PROXY_HTTP_ADDR port but that would make it harder to deploy with a
-			// reverse proxy ... wouldn't it?
-
+			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if cfg.Tracing.Enabled {
-				switch t := cfg.Tracing.Type; t {
-				case "agent":
-					exporter, err := ocagent.NewExporter(
-						ocagent.WithReconnectionPeriod(5*time.Second),
-						ocagent.WithAddress(cfg.Tracing.Endpoint),
-						ocagent.WithServiceName(cfg.Tracing.Service),
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create agent tracing")
-
-						return err
-					}
-
-					trace.RegisterExporter(exporter)
-					view.RegisterExporter(exporter)
-
-				case "jaeger":
-					exporter, err := jaeger.NewExporter(
-						jaeger.Options{
-							AgentEndpoint:     cfg.Tracing.Endpoint,
-							CollectorEndpoint: cfg.Tracing.Collector,
-							Process: jaeger.Process{
-								ServiceName: cfg.Tracing.Service,
-							},
-						},
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create jaeger tracing")
-
-						return err
-					}
-
-					trace.RegisterExporter(exporter)
-
-				case "zipkin":
-					endpoint, err := openzipkin.NewEndpoint(
-						cfg.Tracing.Service,
-						cfg.Tracing.Endpoint,
-					)
-
-					if err != nil {
-						logger.Error().
-							Err(err).
-							Str("endpoint", cfg.Tracing.Endpoint).
-							Str("collector", cfg.Tracing.Collector).
-							Msg("Failed to create zipkin tracing")
-
-						return err
-					}
-
-					exporter := zipkin.NewExporter(
-						zipkinhttp.NewReporter(
-							cfg.Tracing.Collector,
-						),
-						endpoint,
-					)
-
-					trace.RegisterExporter(exporter)
-
-				default:
-					logger.Warn().
-						Str("type", t).
-						Msg("Unknown tracing backend")
-				}
-
-				trace.ApplyConfig(
-					trace.Config{
-						DefaultSampler: trace.AlwaysSample(),
-					},
-				)
-			} else {
-				logger.Debug().
-					Msg("Tracing is not enabled")
+			if err := tracing.Configure(cfg, logger); err != nil {
+				return err
 			}
 
 			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(context.Background())
-				metrics     = metrics.New()
+				m = metrics.New()
 			)
+
+			gr := run.Group{}
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Context == nil {
+					return context.WithCancel(context.Background())
+				}
+				return context.WithCancel(cfg.Context)
+			}()
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			m.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
@@ -175,9 +89,7 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
-					proxyHTTP.Metrics(metrics),
-					proxyHTTP.Flags(flagset.RootWithConfig(config.New())),
-					proxyHTTP.Flags(flagset.ServerWithConfig(config.New())),
+					proxyHTTP.Metrics(metrics.New()),
 					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
 				)
 
@@ -209,48 +121,18 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Error().
-						Err(err).
-						Str("server", "debug").
-						Msg("Failed to initialize server")
-
+					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
 				}
 
-				gr.Add(func() error {
-					return server.ListenAndServe()
-				}, func(_ error) {
-					ctx, timeout := context.WithTimeout(ctx, 5*time.Second)
-
-					defer timeout()
-					defer cancel()
-
-					if err := server.Shutdown(ctx); err != nil {
-						logger.Error().
-							Err(err).
-							Str("server", "debug").
-							Msg("Failed to shutdown server")
-					} else {
-						logger.Info().
-							Str("server", "debug").
-							Msg("Shutting down server")
-					}
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
 				})
 			}
 
-			{
-				stop := make(chan os.Signal, 1)
-
-				gr.Add(func() error {
-					signal.Notify(stop, os.Interrupt)
-
-					<-stop
-
-					return nil
-				}, func(err error) {
-					close(stop)
-					cancel()
-				})
+			if !cfg.Supervised {
+				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()
@@ -286,7 +168,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	var oidcHTTPClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: cfg.OIDC.Insecure,
+				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
 			},
 			DisableKeepAlives: true,
 		},

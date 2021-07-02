@@ -12,7 +12,7 @@ geekdocFilePath: users.md
 This is a simple user driver for testing. It contains three users:
 ```
 einstein:relativity
-marie:radioactivty
+marie:radioactivity
 richard:superfluidity
 ```
 In order to use the `demo` driver you need to export the relevant environment variable:
@@ -28,7 +28,7 @@ export STORAGE_USERS_DRIVER=json
 export STORAGE_USERS_JSON=/path/to/users.json
 ```
 
-For the format of the users.json have a look at the [reva examples](https://github.com/cs3org/reva/blob/master/examples/separate/users.demo.json)
+For the format of the users.json have a look at the [reva examples](https://github.com/cs3org/reva/blob/master/examples/oc-phoenix/users.demo.json)
 
 ### LDAP driver
 
@@ -43,10 +43,10 @@ export STORAGE_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
 export STORAGE_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
 export STORAGE_LDAP_BIND_DN='cn=reva,ou=sysusers,dc=example,dc=org'
 export STORAGE_LDAP_BIND_PASSWORD=reva
-export STORAGE_LDAP_SCHEMA_UID=uid
-export STORAGE_LDAP_SCHEMA_MAIL=mail
-export STORAGE_LDAP_SCHEMA_DISPLAYNAME=sn
-export STORAGE_LDAP_SCHEMA_CN=cn
+export STORAGE_LDAP_USER_SCHEMA_UID=uid
+export STORAGE_LDAP_USER_SCHEMA_MAIL=mail
+export STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME=sn
+export STORAGE_LDAP_USER_SCHEMA_CN=cn
 ```
 
 Then restart the `bin/storage users` and `bin/storage auth-basic` services for the changes to take effect.

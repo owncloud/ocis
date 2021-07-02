@@ -12,6 +12,9 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
+L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||')
+
+# if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	accounts \
 	glauth \
@@ -30,12 +33,16 @@ OCIS_MODULES = \
 	web \
 	webdav
 
+ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+include .bingo/Variables.mk
+endif
+
 .PHONY: help
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo
 	@echo -e "${GREEN}Testing with test suite natively installed:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
 	@echo -e "\tmake test-acceptance-api\t${BLUE}run API acceptance tests${RESET}"
 	@echo -e "\tmake clean-tests\t\t${BLUE}delete API tests framework dependencies${RESET}"
 	@echo
@@ -44,17 +51,17 @@ help:
 	@echo -e "${RED}You also should have a look at other available Makefiles:${RESET}"
 	@echo
 	@echo -e "${GREEN}oCIS:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/building/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build/${RESET}\n"
 	@echo -e "\tsee ./ocis/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C ocis help${RESET}"
 	@echo
 	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/building-docs/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build-docs/${RESET}\n"
 	@echo -e "\tsee ./docs/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C docs help${RESET}"
 	@echo
 	@echo -e "${GREEN}Testing with test suite in docker:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.github.io/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo -e "\tsee ./tests/acceptance/docker/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C tests/acceptance/docker help${RESET}"
 	@echo
@@ -135,3 +142,56 @@ go-coverage:
 	@for mod in $(OCIS_MODULES); do \
         echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
     done
+
+.PHONY: protobuf
+protobuf:
+	@for mod in $(OCIS_MODULES); do \
+        echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf; \
+    done
+
+.PHONY: bingo-update
+bingo-update: $(BINGO)
+	$(BINGO) get -u
+
+CHANGELOG_VERSION =
+
+.PHONY: changelog
+changelog: $(CALENS)
+ifndef CHANGELOG_VERSION
+	$(error CHANGELOG_VERSION is undefined)
+endif
+	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
+
+.PHONY: l10n-push
+l10n-push:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-push; \
+	done
+
+.PHONY: l10n-pull
+l10n-pull:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-pull; \
+	done
+
+.PHONY: l10n-clean
+l10n-clean:
+	@for extension in $(L10N_MODULES); do \
+		make -C $$extension l10n-clean; \
+	done
+
+.PHONY: l10n-read
+l10n-read:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-read; \
+    done
+
+.PHONY: l10n-write
+l10n-write:
+	@for extension in $(L10N_MODULES); do \
+    	make -C $$extension l10n-write; \
+    done
+
+.PHONY: ci-format
+ci-format: $(BUILDIFIER)
+	$(BUILDIFIER) --mode=fix .drone.star

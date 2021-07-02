@@ -19,14 +19,13 @@ type tracing struct {
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
 	ctx, span := trace.StartSpan(ctx, "Thumbnails.GetThumbnail")
 	defer span.End()
 
 	span.Annotate([]trace.Attribute{
 		trace.StringAttribute("filepath", req.Filepath),
-		trace.StringAttribute("filetype", req.Filetype.String()),
-		trace.StringAttribute("etag", req.Etag),
+		trace.StringAttribute("thumbnail_type", req.ThumbnailType.String()),
 		trace.Int64Attribute("width", int64(req.Width)),
 		trace.Int64Attribute("height", int64(req.Height)),
 	}, "Execute Thumbnails.GetThumbnail handler")

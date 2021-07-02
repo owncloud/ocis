@@ -8,10 +8,11 @@ import (
 
 // Cache is a barebones cache implementation.
 type Cache struct {
+	// capacity and length have to be the first words
+	// in order to be 64-aligned on 32-bit architectures.
+	capacity, length uint64 // access atomically
 	entries  sync.Map
 	pool     sync.Pool
-	capacity uint64
-	length   uint64
 }
 
 // CacheEntry represents an entry on the cache. You can type assert on V.
@@ -49,7 +50,7 @@ func (c *Cache) Store(key string, val interface{}, expiration time.Time) {
 		c.evict()
 	}
 
-	poolEntry := c.pool.Get()
+	poolEntry := c.pool.Get() //nolint: ifshort
 	if mapEntry, loaded := c.entries.LoadOrStore(key, poolEntry); loaded {
 		entry := mapEntry.(*CacheEntry)
 		entry.V = val

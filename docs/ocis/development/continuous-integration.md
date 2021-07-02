@@ -13,7 +13,7 @@ oCIS uses [DRONE](https://www.drone.io/) as CI system. You can find the pipeline
 
 ## Concepts
 
-The pipeline is defined in [Starlark](https://github.com/bazelbuild/starlark) and transformed to YAML upon pipeline run. This enables us to do a highly dynamic and non repeating pipeline configuration.
+The pipeline is defined in [Starlark](https://github.com/bazelbuild/starlark) and transformed to YAML upon pipeline run. This enables us to do a highly dynamic and non repeating pipeline configuration. We enforce Starlark format guidelines with Bazel Buildifier. You can format the .drone.star file by running `make ci-format`.
 
 Upon running the pipeline, your branch gets merged to the master branch. This ensures that we always test your changeset if as it was applied to the master of oCIS. Please note that this does not apply to the pipeline definition (`.drone.star`).
 
@@ -37,8 +37,6 @@ You may add flags to your commit message or PR title in order to speed up pipeli
 
 - `[tests-only]`: please add this flag, if you only changed tests or test-related tooling. You do not need to add a changelog for tests-only changes.
 
-- `[with-benchmarks]`: please add this flag, if you want benchmarks to be run in CI.
-
 ### Knowledge base
 
 - My pipeline fails because some CI related files or commands are missing.
@@ -54,7 +52,7 @@ You may add flags to your commit message or PR title in order to speed up pipeli
   ```
 
   {{< hint info >}}
-  If you experience a `"build" struct has no .title attribute` error you need a patched drone-cli binary.
-  You need to build it yourself from this [source code](https://github.com/micbar/drone-cli/tree/add-more-flags).
-  (There is also an open [PR](https://github.com/drone/drone-cli/pull/175) for that on drone-cli)
+  If you experience a `"build" struct has no .title attribute` you need a newer version of drone-cli.
+
+  You currently need to build it yourself from this [source code](https://github.com/drone/drone-cli). If you are not using master as source, please ensure that this [PR](https://github.com/drone/drone-cli/pull/175) is included.
   {{< /hint >}}

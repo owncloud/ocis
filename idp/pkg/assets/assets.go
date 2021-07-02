@@ -9,7 +9,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
-//go:generate go run github.com/UnnoTed/fileb0x embed.yml
+//go:generate make -C ../.. embed.yml
 
 // assets gets initialized by New and provides the handler.
 type assets struct {

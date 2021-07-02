@@ -9,6 +9,7 @@ type Options struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // newOptions initializes the available default options.
@@ -52,5 +53,12 @@ func Pretty(val bool) Option {
 func Color(val bool) Option {
 	return func(o *Options) {
 		o.Color = val
+	}
+}
+
+// File provides a function to set the color option.
+func File(val string) Option {
+	return func(o *Options) {
+		o.File = val
 	}
 }

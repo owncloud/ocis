@@ -1,10 +1,13 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.
@@ -20,6 +23,12 @@ type HTTP struct {
 	Addr      string
 	Namespace string
 	Root      string
+}
+
+// Server configures a server.
+type Server struct {
+	Version string
+	Name    string
 }
 
 // Tracing defines the available tracing configuration.
@@ -56,14 +65,19 @@ type Reva struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File          string
-	Log           Log
-	Debug         Debug
-	HTTP          HTTP
-	Tracing       Tracing
-	Ldap          Ldap
-	OpenIDConnect OpenIDConnect
-	Reva          Reva
+	File                string
+	WebdavNamespace     string
+	Log                 Log
+	Debug               Debug
+	HTTP                HTTP
+	Server              Server
+	Tracing             Tracing
+	Ldap                Ldap
+	OpenIDConnect       OpenIDConnect
+	Reva                Reva
+
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

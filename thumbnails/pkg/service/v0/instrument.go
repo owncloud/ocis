@@ -22,7 +22,7 @@ type instrument struct {
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (i instrument) GetThumbnail(ctx context.Context, req *v0proto.GetRequest, rsp *v0proto.GetResponse) error {
+func (i instrument) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
 	timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
 		us := v * 1000_000
 		i.metrics.Latency.WithLabelValues().Observe(us)

@@ -3,6 +3,8 @@ package flagset
 import (
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/flags"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
@@ -13,7 +15,7 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "storage-eos-namespace",
-			Value:       "/eos/dockertest/reva",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.Root, "/eos/dockertest/reva"),
 			Usage:       "Namespace for metadata operations",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_NAMESPACE"},
 			Destination: &cfg.Reva.Storages.EOS.Root,
@@ -27,42 +29,42 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-share-folder",
-			Value:       "/Shares",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.ShareFolder, "/Shares"),
 			Usage:       "name of the share folder",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_SHARE_FOLDER"},
 			Destination: &cfg.Reva.Storages.EOS.ShareFolder,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-binary",
-			Value:       "/usr/bin/eos",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.EosBinary, "/usr/bin/eos"),
 			Usage:       "Location of the eos binary",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_BINARY"},
 			Destination: &cfg.Reva.Storages.EOS.EosBinary,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-xrdcopy-binary",
-			Value:       "/usr/bin/xrdcopy",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.XrdcopyBinary, "/usr/bin/xrdcopy"),
 			Usage:       "Location of the xrdcopy binary",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_XRDCOPY_BINARY"},
 			Destination: &cfg.Reva.Storages.EOS.XrdcopyBinary,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-master-url",
-			Value:       "root://eos-mgm1.eoscluster.cern.ch:1094",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.MasterURL, "root://eos-mgm1.eoscluster.cern.ch:1094"),
 			Usage:       "URL of the Master EOS MGM",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_MASTER_URL"},
 			Destination: &cfg.Reva.Storages.EOS.MasterURL,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-slave-url",
-			Value:       "root://eos-mgm1.eoscluster.cern.ch:1094",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.SlaveURL, "root://eos-mgm1.eoscluster.cern.ch:1094"),
 			Usage:       "URL of the Slave EOS MGM",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_SLAVE_URL"},
 			Destination: &cfg.Reva.Storages.EOS.SlaveURL,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-cache-directory",
-			Value:       os.TempDir(),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.CacheDirectory, os.TempDir()),
 			Usage:       "Location on the local fs where to store reads",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_CACHE_DIRECTORY"},
 			Destination: &cfg.Reva.Storages.EOS.CacheDirectory,
@@ -117,14 +119,14 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-layout",
-			Value:       "{{substr 0 1 .Username}}/{{.Username}}",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.UserLayout, "{{substr 0 1 .Username}}/{{.Username}}"),
 			Usage:       `"layout of the users home dir path on disk, in addition to {{.Username}}, {{.UsernameLower}} and {{.Provider}} also supports prefixing dirs: "{{.UsernamePrefixCount.2}}/{{.UsernameLower}}" will turn "Einstein" into "Ei/Einstein" `,
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_LAYOUT"},
 			Destination: &cfg.Reva.Storages.EOS.UserLayout,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-gatewaysvc",
-			Value:       "localhost:9142",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.GatewaySVC, "localhost:9142"),
 			Usage:       "URL to use for the storage gateway service",
 			EnvVars:     []string{"STORAGE_DRIVER_EOS_GATEWAYSVC"},
 			Destination: &cfg.Reva.Storages.EOS.GatewaySVC,

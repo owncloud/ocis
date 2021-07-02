@@ -45,7 +45,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoAssignRoleToUserResponse"
+              "$ref": "#/definitions/v0AssignRoleToUserResponse"
             }
           },
           "default": {
@@ -61,7 +61,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoAssignRoleToUserRequest"
+              "$ref": "#/definitions/v0AssignRoleToUserRequest"
             }
           }
         ],
@@ -77,7 +77,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListRoleAssignmentsResponse"
+              "$ref": "#/definitions/v0ListRoleAssignmentsResponse"
             }
           },
           "default": {
@@ -93,7 +93,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListRoleAssignmentsRequest"
+              "$ref": "#/definitions/v0ListRoleAssignmentsRequest"
             }
           }
         ],
@@ -125,7 +125,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoRemoveRoleFromUserRequest"
+              "$ref": "#/definitions/v0RemoveRoleFromUserRequest"
             }
           }
         ],
@@ -141,7 +141,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetBundleResponse"
+              "$ref": "#/definitions/v0GetBundleResponse"
             }
           },
           "default": {
@@ -157,7 +157,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetBundleRequest"
+              "$ref": "#/definitions/v0GetBundleRequest"
             }
           }
         ],
@@ -173,7 +173,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoSaveBundleResponse"
+              "$ref": "#/definitions/v0SaveBundleResponse"
             }
           },
           "default": {
@@ -189,7 +189,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoSaveBundleRequest"
+              "$ref": "#/definitions/v0SaveBundleRequest"
             }
           }
         ],
@@ -205,7 +205,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoAddSettingToBundleResponse"
+              "$ref": "#/definitions/v0AddSettingToBundleResponse"
             }
           },
           "default": {
@@ -221,7 +221,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoAddSettingToBundleRequest"
+              "$ref": "#/definitions/v0AddSettingToBundleRequest"
             }
           }
         ],
@@ -237,7 +237,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListBundlesResponse"
+              "$ref": "#/definitions/v0ListBundlesResponse"
             }
           },
           "default": {
@@ -253,7 +253,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListBundlesRequest"
+              "$ref": "#/definitions/v0ListBundlesRequest"
             }
           }
         ],
@@ -285,7 +285,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoRemoveSettingFromBundleRequest"
+              "$ref": "#/definitions/v0RemoveSettingFromBundleRequest"
             }
           }
         ],
@@ -301,7 +301,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetPermissionByIDResponse"
+              "$ref": "#/definitions/v0GetPermissionByIDResponse"
             }
           },
           "default": {
@@ -317,7 +317,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetPermissionByIDRequest"
+              "$ref": "#/definitions/v0GetPermissionByIDRequest"
             }
           }
         ],
@@ -333,7 +333,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListPermissionsByResourceResponse"
+              "$ref": "#/definitions/v0ListPermissionsByResourceResponse"
             }
           },
           "default": {
@@ -349,7 +349,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListPermissionsByResourceRequest"
+              "$ref": "#/definitions/v0ListPermissionsByResourceRequest"
             }
           }
         ],
@@ -365,7 +365,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListBundlesResponse"
+              "$ref": "#/definitions/v0ListBundlesResponse"
             }
           },
           "default": {
@@ -381,7 +381,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListBundlesRequest"
+              "$ref": "#/definitions/v0ListBundlesRequest"
             }
           }
         ],
@@ -397,7 +397,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetValueResponse"
+              "$ref": "#/definitions/v0GetValueResponse"
             }
           },
           "default": {
@@ -413,7 +413,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetValueRequest"
+              "$ref": "#/definitions/v0GetValueRequest"
             }
           }
         ],
@@ -429,7 +429,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoGetValueResponse"
+              "$ref": "#/definitions/v0GetValueResponse"
             }
           },
           "default": {
@@ -445,7 +445,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetValueByUniqueIdentifiersRequest"
+              "$ref": "#/definitions/v0GetValueByUniqueIdentifiersRequest"
             }
           }
         ],
@@ -461,7 +461,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoListValuesResponse"
+              "$ref": "#/definitions/v0ListValuesResponse"
             }
           },
           "default": {
@@ -477,7 +477,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoListValuesRequest"
+              "$ref": "#/definitions/v0ListValuesRequest"
             }
           }
         ],
@@ -493,7 +493,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoSaveValueResponse"
+              "$ref": "#/definitions/v0SaveValueResponse"
             }
           },
           "default": {
@@ -509,7 +509,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoSaveValueRequest"
+              "$ref": "#/definitions/v0SaveValueRequest"
             }
           }
         ],
@@ -529,555 +529,6 @@
         "CONSTRAINT_ALL"
       ],
       "default": "CONSTRAINT_UNKNOWN"
-    },
-    "protoAddSettingToBundleRequest": {
-      "type": "object",
-      "properties": {
-        "bundleId": {
-          "type": "string"
-        },
-        "setting": {
-          "$ref": "#/definitions/protoSetting"
-        }
-      }
-    },
-    "protoAddSettingToBundleResponse": {
-      "type": "object",
-      "properties": {
-        "setting": {
-          "$ref": "#/definitions/protoSetting"
-        }
-      }
-    },
-    "protoAssignRoleToUserRequest": {
-      "type": "object",
-      "properties": {
-        "accountUuid": {
-          "type": "string"
-        },
-        "roleId": {
-          "type": "string",
-          "title": "the role_id is a bundle_id internally"
-        }
-      }
-    },
-    "protoAssignRoleToUserResponse": {
-      "type": "object",
-      "properties": {
-        "assignment": {
-          "$ref": "#/definitions/protoUserRoleAssignment"
-        }
-      }
-    },
-    "protoBool": {
-      "type": "object",
-      "properties": {
-        "default": {
-          "type": "boolean"
-        },
-        "label": {
-          "type": "string"
-        }
-      }
-    },
-    "protoBundle": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/protoBundleType"
-        },
-        "extension": {
-          "type": "string"
-        },
-        "displayName": {
-          "type": "string"
-        },
-        "settings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoSetting"
-          }
-        },
-        "resource": {
-          "$ref": "#/definitions/protoResource"
-        }
-      }
-    },
-    "protoBundleType": {
-      "type": "string",
-      "enum": [
-        "TYPE_UNKNOWN",
-        "TYPE_DEFAULT",
-        "TYPE_ROLE"
-      ],
-      "default": "TYPE_UNKNOWN"
-    },
-    "protoGetBundleRequest": {
-      "type": "object",
-      "properties": {
-        "bundleId": {
-          "type": "string"
-        }
-      }
-    },
-    "protoGetBundleResponse": {
-      "type": "object",
-      "properties": {
-        "bundle": {
-          "$ref": "#/definitions/protoBundle"
-        }
-      }
-    },
-    "protoGetPermissionByIDRequest": {
-      "type": "object",
-      "properties": {
-        "permissionId": {
-          "type": "string"
-        }
-      }
-    },
-    "protoGetPermissionByIDResponse": {
-      "type": "object",
-      "properties": {
-        "permission": {
-          "$ref": "#/definitions/protoPermission"
-        }
-      }
-    },
-    "protoGetValueByUniqueIdentifiersRequest": {
-      "type": "object",
-      "properties": {
-        "accountUuid": {
-          "type": "string"
-        },
-        "settingId": {
-          "type": "string"
-        }
-      }
-    },
-    "protoGetValueRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "protoGetValueResponse": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/protoValueWithIdentifier"
-        }
-      }
-    },
-    "protoIdentifier": {
-      "type": "object",
-      "properties": {
-        "extension": {
-          "type": "string"
-        },
-        "bundle": {
-          "type": "string"
-        },
-        "setting": {
-          "type": "string"
-        }
-      }
-    },
-    "protoInt": {
-      "type": "object",
-      "properties": {
-        "default": {
-          "type": "string",
-          "format": "int64"
-        },
-        "min": {
-          "type": "string",
-          "format": "int64"
-        },
-        "max": {
-          "type": "string",
-          "format": "int64"
-        },
-        "step": {
-          "type": "string",
-          "format": "int64"
-        },
-        "placeholder": {
-          "type": "string"
-        }
-      }
-    },
-    "protoListBundlesRequest": {
-      "type": "object",
-      "properties": {
-        "bundleIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "protoListBundlesResponse": {
-      "type": "object",
-      "properties": {
-        "bundles": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoBundle"
-          }
-        }
-      }
-    },
-    "protoListOption": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/protoListOptionValue"
-        },
-        "default": {
-          "type": "boolean"
-        },
-        "displayValue": {
-          "type": "string"
-        }
-      }
-    },
-    "protoListOptionValue": {
-      "type": "object",
-      "properties": {
-        "stringValue": {
-          "type": "string"
-        },
-        "intValue": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "protoListPermissionsByResourceRequest": {
-      "type": "object",
-      "properties": {
-        "resource": {
-          "$ref": "#/definitions/protoResource"
-        }
-      }
-    },
-    "protoListPermissionsByResourceResponse": {
-      "type": "object",
-      "properties": {
-        "permissions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoPermission"
-          }
-        }
-      }
-    },
-    "protoListRoleAssignmentsRequest": {
-      "type": "object",
-      "properties": {
-        "accountUuid": {
-          "type": "string"
-        }
-      }
-    },
-    "protoListRoleAssignmentsResponse": {
-      "type": "object",
-      "properties": {
-        "assignments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoUserRoleAssignment"
-          }
-        }
-      }
-    },
-    "protoListValue": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoListOptionValue"
-          }
-        }
-      }
-    },
-    "protoListValuesRequest": {
-      "type": "object",
-      "properties": {
-        "bundleId": {
-          "type": "string"
-        },
-        "accountUuid": {
-          "type": "string"
-        }
-      }
-    },
-    "protoListValuesResponse": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoValueWithIdentifier"
-          }
-        }
-      }
-    },
-    "protoMultiChoiceList": {
-      "type": "object",
-      "properties": {
-        "options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoListOption"
-          }
-        }
-      }
-    },
-    "protoPermission": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "$ref": "#/definitions/protoPermissionOperation"
-        },
-        "constraint": {
-          "$ref": "#/definitions/PermissionConstraint"
-        }
-      }
-    },
-    "protoPermissionOperation": {
-      "type": "string",
-      "enum": [
-        "OPERATION_UNKNOWN",
-        "OPERATION_CREATE",
-        "OPERATION_READ",
-        "OPERATION_UPDATE",
-        "OPERATION_DELETE",
-        "OPERATION_WRITE",
-        "OPERATION_READWRITE"
-      ],
-      "default": "OPERATION_UNKNOWN"
-    },
-    "protoRemoveRoleFromUserRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "protoRemoveSettingFromBundleRequest": {
-      "type": "object",
-      "properties": {
-        "bundleId": {
-          "type": "string"
-        },
-        "settingId": {
-          "type": "string"
-        }
-      }
-    },
-    "protoResource": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/protoResourceType"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "protoResourceType": {
-      "type": "string",
-      "enum": [
-        "TYPE_UNKNOWN",
-        "TYPE_SYSTEM",
-        "TYPE_FILE",
-        "TYPE_SHARE",
-        "TYPE_SETTING",
-        "TYPE_BUNDLE",
-        "TYPE_USER",
-        "TYPE_GROUP"
-      ],
-      "default": "TYPE_UNKNOWN"
-    },
-    "protoSaveBundleRequest": {
-      "type": "object",
-      "properties": {
-        "bundle": {
-          "$ref": "#/definitions/protoBundle"
-        }
-      },
-      "title": "---\nrequests and responses for settings bundles\n---"
-    },
-    "protoSaveBundleResponse": {
-      "type": "object",
-      "properties": {
-        "bundle": {
-          "$ref": "#/definitions/protoBundle"
-        }
-      }
-    },
-    "protoSaveValueRequest": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/protoValue"
-        }
-      }
-    },
-    "protoSaveValueResponse": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/protoValueWithIdentifier"
-        }
-      }
-    },
-    "protoSetting": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "displayName": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "intValue": {
-          "$ref": "#/definitions/protoInt"
-        },
-        "stringValue": {
-          "$ref": "#/definitions/protoString"
-        },
-        "boolValue": {
-          "$ref": "#/definitions/protoBool"
-        },
-        "singleChoiceValue": {
-          "$ref": "#/definitions/protoSingleChoiceList"
-        },
-        "multiChoiceValue": {
-          "$ref": "#/definitions/protoMultiChoiceList"
-        },
-        "permissionValue": {
-          "$ref": "#/definitions/protoPermission"
-        },
-        "resource": {
-          "$ref": "#/definitions/protoResource"
-        }
-      }
-    },
-    "protoSingleChoiceList": {
-      "type": "object",
-      "properties": {
-        "options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protoListOption"
-          }
-        }
-      }
-    },
-    "protoString": {
-      "type": "object",
-      "properties": {
-        "default": {
-          "type": "string"
-        },
-        "required": {
-          "type": "boolean"
-        },
-        "minLength": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "maxLength": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "placeholder": {
-          "type": "string"
-        }
-      }
-    },
-    "protoUserRoleAssignment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "title": "id is generated upon saving the assignment"
-        },
-        "accountUuid": {
-          "type": "string"
-        },
-        "roleId": {
-          "type": "string",
-          "title": "the role_id is a bundle_id internally"
-        }
-      }
-    },
-    "protoValue": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "id is the id of the Value. It is generated on saving it."
-        },
-        "bundleId": {
-          "type": "string"
-        },
-        "settingId": {
-          "type": "string",
-          "description": "setting_id is the id of the setting from within its bundle."
-        },
-        "accountUuid": {
-          "type": "string"
-        },
-        "resource": {
-          "$ref": "#/definitions/protoResource"
-        },
-        "boolValue": {
-          "type": "boolean"
-        },
-        "intValue": {
-          "type": "string",
-          "format": "int64"
-        },
-        "stringValue": {
-          "type": "string"
-        },
-        "listValue": {
-          "$ref": "#/definitions/protoListValue"
-        }
-      }
-    },
-    "protoValueWithIdentifier": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "$ref": "#/definitions/protoIdentifier"
-        },
-        "value": {
-          "$ref": "#/definitions/protoValue"
-        }
-      }
     },
     "protobufAny": {
       "type": "object",
@@ -1108,10 +559,559 @@
           }
         }
       }
+    },
+    "settingsv0ListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOptionValue"
+          }
+        }
+      }
+    },
+    "settingsv0Value": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the id of the Value. It is generated on saving it."
+        },
+        "bundleId": {
+          "type": "string"
+        },
+        "settingId": {
+          "type": "string",
+          "description": "setting_id is the id of the setting from within its bundle."
+        },
+        "accountUuid": {
+          "type": "string"
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        },
+        "boolValue": {
+          "type": "boolean"
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stringValue": {
+          "type": "string"
+        },
+        "listValue": {
+          "$ref": "#/definitions/settingsv0ListValue"
+        }
+      }
+    },
+    "v0AddSettingToBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/v0Setting"
+        }
+      }
+    },
+    "v0AddSettingToBundleResponse": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v0Setting"
+        }
+      }
+    },
+    "v0AssignRoleToUserRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "v0AssignRoleToUserResponse": {
+      "type": "object",
+      "properties": {
+        "assignment": {
+          "$ref": "#/definitions/v0UserRoleAssignment"
+        }
+      }
+    },
+    "v0Bool": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Bundle": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v0BundleType"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Setting"
+          }
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        }
+      }
+    },
+    "v0BundleType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_DEFAULT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "v0GetBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      }
+    },
+    "v0GetPermissionByIDRequest": {
+      "type": "object",
+      "properties": {
+        "permissionId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetPermissionByIDResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/definitions/v0Permission"
+        }
+      }
+    },
+    "v0GetValueByUniqueIdentifiersRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        },
+        "settingId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetValueRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ValueWithIdentifier"
+        }
+      }
+    },
+    "v0Identifier": {
+      "type": "object",
+      "properties": {
+        "extension": {
+          "type": "string"
+        },
+        "bundle": {
+          "type": "string"
+        },
+        "setting": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Int": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "format": "int64"
+        },
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "max": {
+          "type": "string",
+          "format": "int64"
+        },
+        "step": {
+          "type": "string",
+          "format": "int64"
+        },
+        "placeholder": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListBundlesRequest": {
+      "type": "object",
+      "properties": {
+        "bundleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v0ListBundlesResponse": {
+      "type": "object",
+      "properties": {
+        "bundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Bundle"
+          }
+        }
+      }
+    },
+    "v0ListOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ListOptionValue"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "displayValue": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListOptionValue": {
+      "type": "object",
+      "properties": {
+        "stringValue": {
+          "type": "string"
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v0ListPermissionsByResourceRequest": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        }
+      }
+    },
+    "v0ListPermissionsByResourceResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Permission"
+          }
+        }
+      }
+    },
+    "v0ListRoleAssignmentsRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListRoleAssignmentsResponse": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0UserRoleAssignment"
+          }
+        }
+      }
+    },
+    "v0ListValuesRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListValuesResponse": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ValueWithIdentifier"
+          }
+        }
+      }
+    },
+    "v0MultiChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOption"
+          }
+        }
+      }
+    },
+    "v0Permission": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "$ref": "#/definitions/v0PermissionOperation"
+        },
+        "constraint": {
+          "$ref": "#/definitions/PermissionConstraint"
+        }
+      }
+    },
+    "v0PermissionOperation": {
+      "type": "string",
+      "enum": [
+        "OPERATION_UNKNOWN",
+        "OPERATION_CREATE",
+        "OPERATION_READ",
+        "OPERATION_UPDATE",
+        "OPERATION_DELETE",
+        "OPERATION_WRITE",
+        "OPERATION_READWRITE"
+      ],
+      "default": "OPERATION_UNKNOWN"
+    },
+    "v0RemoveRoleFromUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0RemoveSettingFromBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "settingId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Resource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v0ResourceType"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ResourceType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_SYSTEM",
+        "TYPE_FILE",
+        "TYPE_SHARE",
+        "TYPE_SETTING",
+        "TYPE_BUNDLE",
+        "TYPE_USER",
+        "TYPE_GROUP"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "v0SaveBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      },
+      "title": "---\nrequests and responses for settings bundles\n---"
+    },
+    "v0SaveBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      }
+    },
+    "v0SaveValueRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/settingsv0Value"
+        }
+      }
+    },
+    "v0SaveValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ValueWithIdentifier"
+        }
+      }
+    },
+    "v0Setting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "intValue": {
+          "$ref": "#/definitions/v0Int"
+        },
+        "stringValue": {
+          "$ref": "#/definitions/v0String"
+        },
+        "boolValue": {
+          "$ref": "#/definitions/v0Bool"
+        },
+        "singleChoiceValue": {
+          "$ref": "#/definitions/v0SingleChoiceList"
+        },
+        "multiChoiceValue": {
+          "$ref": "#/definitions/v0MultiChoiceList"
+        },
+        "permissionValue": {
+          "$ref": "#/definitions/v0Permission"
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        }
+      }
+    },
+    "v0SingleChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOption"
+          }
+        }
+      }
+    },
+    "v0String": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "minLength": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "maxLength": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "placeholder": {
+          "type": "string"
+        }
+      }
+    },
+    "v0UserRoleAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is generated upon saving the assignment"
+        },
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "v0ValueWithIdentifier": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "$ref": "#/definitions/v0Identifier"
+        },
+        "value": {
+          "$ref": "#/definitions/settingsv0Value"
+        }
+      }
     }
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.github.io/extensions/settings/"
+    "url": "https://owncloud.dev/extensions/settings/"
   }
 }

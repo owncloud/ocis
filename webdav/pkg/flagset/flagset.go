@@ -2,42 +2,16 @@ package flagset
 
 import (
 	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 )
-
-// RootWithConfig applies cfg to the root flagset
-func RootWithConfig(cfg *config.Config) []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:        "log-level",
-			Value:       "info",
-			Usage:       "Set logging level",
-			EnvVars:     []string{"WEBDAV_LOG_LEVEL"},
-			Destination: &cfg.Log.Level,
-		},
-		&cli.BoolFlag{
-			Value:       true,
-			Name:        "log-pretty",
-			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"WEBDAV_LOG_PRETTY"},
-			Destination: &cfg.Log.Pretty,
-		},
-		&cli.BoolFlag{
-			Value:       true,
-			Name:        "log-color",
-			Usage:       "Enable colored logging",
-			EnvVars:     []string{"WEBDAV_LOG_COLOR"},
-			Destination: &cfg.Log.Color,
-		},
-	}
-}
 
 // HealthWithConfig applies cfg to the root flagset
 func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9119",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"WEBDAV_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -48,6 +22,30 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 // ServerWithConfig applies cfg to the root flagset
 func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "log-file",
+			Usage:       "Enable log to file",
+			EnvVars:     []string{"WEBDAV_LOG_FILE", "OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
+		&cli.StringFlag{
+			Name:        "log-level",
+			Usage:       "Set logging level",
+			EnvVars:     []string{"WEBDAV_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			Destination: &cfg.Log.Level,
+		},
+		&cli.BoolFlag{
+			Name:        "log-pretty",
+			Usage:       "Enable pretty logging",
+			EnvVars:     []string{"WEBDAV_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			Destination: &cfg.Log.Pretty,
+		},
+		&cli.BoolFlag{
+			Name:        "log-color",
+			Usage:       "Enable colored logging",
+			EnvVars:     []string{"WEBDAV_LOG_COLOR", "OCIS_LOG_COLOR"},
+			Destination: &cfg.Log.Color,
+		},
 		&cli.StringFlag{
 			Name:        "config-file",
 			Value:       "",
@@ -63,42 +61,42 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
-			Value:       "jaeger",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
 			EnvVars:     []string{"WEBDAV_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
 			EnvVars:     []string{"WEBDAV_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
 			EnvVars:     []string{"WEBDAV_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-service",
-			Value:       "webdav",
+			Value:       flags.OverrideDefaultString(cfg.Tracing.Service, "webdav"),
 			Usage:       "Service name for tracing",
 			EnvVars:     []string{"WEBDAV_TRACING_SERVICE"},
 			Destination: &cfg.Tracing.Service,
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9119",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"WEBDAV_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "debug-token",
-			Value:       "",
+			Value:       flags.OverrideDefaultString(cfg.Debug.Token, ""),
 			Usage:       "Token to grant metrics access",
 			EnvVars:     []string{"WEBDAV_DEBUG_TOKEN"},
 			Destination: &cfg.Debug.Token,
@@ -117,31 +115,49 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9115",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9115"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"WEBDAV_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for service discovery",
 			EnvVars:     []string{"WEBDAV_HTTP_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       "webdav",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "webdav"),
 			Usage:       "Service name",
 			EnvVars:     []string{"WEBDAV_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		&cli.StringFlag{
 			Name:        "http-root",
-			Value:       "/",
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Root, "/"),
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"WEBDAV_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
+		},
+		&cli.StringFlag{
+			Name:        "ocis-public-url",
+			Value:       flags.OverrideDefaultString(cfg.OcisPublicURL, "https://127.0.0.1:9200"),
+			Usage:       "The domain under which oCIS is reachable",
+			EnvVars:     []string{"OCIS_PUBLIC_URL", "OCIS_URL"},
+			Destination: &cfg.OcisPublicURL,
+		},
+		&cli.StringFlag{
+			Name:        "webdav-namespace",
+			Value:       flags.OverrideDefaultString(cfg.WebdavNamespace, "/home"),
+			Usage:       "Namespace prefix for the /webdav endpoint",
+			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.WebdavNamespace,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }
@@ -151,14 +167,14 @@ func ListWebdavWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "http-namespace",
-			Value:       "com.owncloud.web",
+			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for service discovery",
 			EnvVars:     []string{"WEBDAV_HTTP_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
 			Name:        "service-name",
-			Value:       "webdav",
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "webdav"),
 			Usage:       "Service name",
 			EnvVars:     []string{"WEBDAV_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,

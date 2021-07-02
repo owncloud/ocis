@@ -8,39 +8,29 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides an oCIS extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
 
-It uses the port range 9140-9179 to preconfigure several services.
+## Architecture Overview
 
-| port      | service                                       |
-|-----------|-----------------------------------------------|
-| 9109      | health?                                       |
-| 9140      | frontend                                      |
-| 9141      | frontend debug                                |
-| 9142      | gateway                                       |
-| 9143      | gateway debug                                 |
-| 9144      | users                                         |
-| 9145      | users debug                                   |
-| 9146      | authbasic                                     |
-| 9147      | authbasic debug                               |
-| 9148      | authbearer                                    |
-| 9149      | authbearer debug                              |
-| 9150      | sharing                                       |
-| 9151      | sharing debug                                 |
-| 9152      | storage root                                  |
-| 9153      | storage root debug                            |
-| 9154      | storage home                                  |
-| 9155      | storage home debug                            |
-| 9156      | storage home data                             |
-| 9157      | storage home data debug                       |
-| 9158      | storage eos                                   |
-| 9159      | storage eos debug                             |
-| 9160      | storage eos data                              |
-| 9161      | storage eos data debug                        |
-| 9162      | storage oc                                    |
-| 9163      | storage oc debug                              |
-| 9164      | storage oc data                               |
-| 9165      | storage oc data debug                         |
-| 9166-9177 | reserved for s3, wnd, custom + data providers |
-| 9178      | storage public link                           |
-| 9179      | storage public link data                      |
+The below diagram shows the oCIS services and the contained reva services within as dashed boxes. In general:
+1. A request comes in at the proxy and is authenticated using OIDC.
+2. It is forwarded to the oCIS frontend which handles ocs and ocdav requests by talking to the reva gateway using the CS3 API.
+3. The gateway acts as a facade to the actual CS3 services: storage providers, user providers, group providers and sharing providers.
+
+{{< svg src="extensions/storage/static/overview.drawio.svg" >}}
+
+The dashed lines in the diagram indicate requests that are made to authenticate requests or lookup the storage provider:
+1. After authenticating a request, the proxy may either use the CS3 `userprovider` or the accounts service to fetch the user information that will be minted into the `x-access-token`.
+2. The gateway will verify the JWT signature of the `x-access-token` or try to authenticate the request itself, e.g. using a public link token.
+
+{{< hint warning >}}
+The bottom part is lighter because we will deprecate it in favor of using only the CS3 user and group providers after moving some account functionality into reva and glauth. The metadata storage is not registered in the reva gateway to seperate metadata necessary for running the service from data that is being served directly.
+{{< /hint >}}
+
+## Endpoints and references
+
+In order to reason about the request flow, two aspects in the architecture need to be understood well:
+1. What kind of [*namespaces*]({{< ref "./namespaces.md" >}}) are presented at the different WebDAV and CS3 endpoints?
+2. What kind of [*resource*]({{< ref "./terminology.md#resources" >}}) [*references*]({{< ref "./terminology.md#references" >}}) are exposed or required: path or id based?

@@ -7,10 +7,10 @@ import (
 
 	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/gofrs/uuid"
-	p "github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	p "google.golang.org/protobuf/proto"
 )
 
 func (s Service) expandMembers(g *proto.Group) {

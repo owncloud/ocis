@@ -1,10 +1,13 @@
 package config
 
+import "context"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string
 	Pretty bool
 	Color  bool
+	File   string
 }
 
 // Debug defines the available debug configuration.
@@ -20,6 +23,12 @@ type HTTP struct {
 	Addr      string
 	Root      string
 	Namespace string
+}
+
+// Server configures a server.
+type Server struct {
+	Version string
+	Name    string
 }
 
 // Tracing defines the available tracing configuration.
@@ -44,8 +53,12 @@ type Config struct {
 	Log           Log
 	Debug         Debug
 	HTTP          HTTP
+	Server        Server
 	Tracing       Tracing
 	GraphExplorer GraphExplorer
+
+	Context    context.Context
+	Supervised bool
 }
 
 // New initializes a new configuration with or without defaults.

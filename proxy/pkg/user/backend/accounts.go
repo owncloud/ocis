@@ -3,15 +3,15 @@ package backend
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
+
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // NewAccountsServiceUserBackend creates a user-provider which fetches users from the ocis accounts-service
@@ -139,18 +139,8 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 		Mail:         account.Mail,
 		MailVerified: account.ExternalUserState == "" || account.ExternalUserState == "Accepted",
 		Groups:       expandGroups(account),
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
-				},
-			},
-		},
+		UidNumber:    account.UidNumber,
+		GidNumber:    account.GidNumber,
 	}
 	return user
 }
@@ -208,7 +198,15 @@ func injectRoles(ctx context.Context, u *cs3.User, ss settings.RoleService) erro
 		return err
 	}
 
-	u.Opaque.Map["roles"] = enc
+	if u.Opaque == nil {
+		u.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"roles": enc,
+			},
+		}
+	} else {
+		u.Opaque.Map["roles"] = enc
+	}
 
 	return nil
 }

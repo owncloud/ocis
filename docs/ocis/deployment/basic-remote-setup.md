@@ -18,11 +18,11 @@ If you need to access oCIS running in a docker container, on a VM or a remote ma
 Upon first start of the oCIS fullstack server with `./bin/ocis server` it will generate a file `identifier-registration.yml` in the config folder in your current working directory. This file is used to configure the built-in identity provider and therefore contains the OpenID Connect issuer and also information about relying parties, for example ownCloud Web and our desktop and mobile applications.
 
 {{< hint warning >}}
-The `identifier-registration.yml` file will only be generated if does not exist. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
+The `identifier-registration.yml` file will only be generated if it does not exist yet. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
 {{< /hint >}}
 
 {{< hint warning >}}
-oCIS is currently in a Tech Preview state and is shipped with demo users. In order to secure your oCIS instances please follow following guide: [secure an oCIS instance]({{< ref "_index.md/#secure-an-ocis-instance" >}})
+oCIS is currently in a Tech Preview state and is shipped with demo users. In order to secure your oCIS instances please follow following guide: [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}})
 {{< /hint >}}
 
 For the following examples you need to have the oCIS binary in your current working directory, we assume it is named `ocis` and it needs to be marked as executable. See [Getting Started]({{< ref "../getting-started/#binaries" >}}) for where to get the binary from.
@@ -49,8 +49,8 @@ PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 ./ocis server
 ```
 
-For more configuration options check the configuration section in [oCIS](https://owncloud.github.io/ocis/configuration/) and the oCIS extensions.
+For more configuration options check the configuration section in [oCIS]({{< ref "../configuration" >}}) and the oCIS extensions.
 
 ## Start the oCIS fullstack server with Docker Compose
 
-Please have a look at our other [deployment examples]({{< ref "./_index.md" >}}).
+Please have a look at our other [deployment examples]({{< ref "./" >}}).

@@ -49,21 +49,9 @@ func New() *Metrics {
 		}, []string{"versions"}),
 	}
 
-	prometheus.Register(
-		m.Counter,
-	)
-
-	prometheus.Register(
-		m.Latency,
-	)
-
-	prometheus.Register(
-		m.Duration,
-	)
-
-	prometheus.Register(
-		m.BuildInfo,
-	)
-
+	_ = prometheus.Register(m.Counter)
+	_ = prometheus.Register(m.Latency)
+	_ = prometheus.Register(m.Duration)
+	_ = prometheus.Register(m.BuildInfo)
 	return m
 }

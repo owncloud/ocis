@@ -136,16 +136,17 @@ func TestProxyIntegration(t *testing.T) {
 
 			rr := httptest.NewRecorder()
 			rp.ServeHTTP(rr, tc.input)
+			rsp := rr.Result()
 
-			if rr.Result().StatusCode != 200 {
-				t.Errorf("Expected status 200 from proxy-response got %v", rr.Result().StatusCode)
+			if rsp.StatusCode != 200 {
+				t.Errorf("Expected status 200 from proxy-response got %v", rsp.StatusCode)
 			}
 
-			resultBody, err := ioutil.ReadAll(rr.Result().Body)
+			resultBody, err := ioutil.ReadAll(rsp.Body)
 			if err != nil {
 				t.Fatal("Error reading result body")
 			}
-			if err = rr.Result().Body.Close(); err != nil {
+			if err = rsp.Body.Close(); err != nil {
 				t.Fatal("Error closing result body")
 			}
 

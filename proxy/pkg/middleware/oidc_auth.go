@@ -91,7 +91,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 			oauth2.StaticTokenSource(oauth2Token),
 		)
 		if err != nil {
-			m.logger.Error().Err(err).Str("token", token).Msg("Failed to get userinfo")
+			m.logger.Error().Err(err).Msg("Failed to get userinfo")
 			status = http.StatusUnauthorized
 			return
 		}
@@ -112,7 +112,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 		return
 	}
 
-	var ok = false
+	var ok bool
 	if claims, ok = hit.V.(oidc.StandardClaims); !ok {
 		status = http.StatusInternalServerError
 		return
@@ -155,7 +155,7 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 
 	// todo: looks dirty, check later
 	// TODO: make a PR to coreos/go-oidc for exposing userinfo endpoint on provider, see https://github.com/coreos/go-oidc/issues/248
-	for _, ignoringPath := range []string{"/konnect/v1/userinfo"} {
+	for _, ignoringPath := range []string{"/konnect/v1/userinfo", "/status.php"} {
 		if req.URL.Path == ignoringPath {
 			return false
 		}

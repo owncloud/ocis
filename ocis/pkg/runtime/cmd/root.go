@@ -19,8 +19,12 @@ func RootCmd(cfg *config.Config) *cobra.Command {
 	rootCmd.PersistentFlags().StringVarP(&cfg.Port, "port", "p", "10666", "port to send messages to the rpc oCIS runtime.")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.KeepAlive, "keep-alive", "k", false, "restart supervised processes that abruptly die.")
 
-	viper.BindPFlag("hostname", rootCmd.PersistentFlags().Lookup("hostname"))
-	viper.BindPFlag("port", rootCmd.PersistentFlags().Lookup("port"))
+	if err := viper.BindPFlag("hostname", rootCmd.PersistentFlags().Lookup("hostname")); err != nil {
+		panic(err)
+	}
+	if err := viper.BindPFlag("port", rootCmd.PersistentFlags().Lookup("port")); err != nil {
+		panic(err)
+	}
 
 	rootCmd.AddCommand(List(cfg))
 	rootCmd.AddCommand(Run(cfg))

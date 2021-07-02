@@ -1,4 +1,6 @@
 */coverage.out
+*/checkstyle.xml
+*/package-lock.json
 
 ocis/config/identifier-registration.yaml
 */bin
@@ -8,10 +10,14 @@ dist/
 *crt
 node_modules/
 */assets
+ocis/ocis
+ocis/cmd/ocis/__debug_bin
+ocis/cmd/ocis/config/
 
 .idea
 
 yarn-error.log
+yarn.lock
 
 # Konnectd
 idp/assets/identifier
@@ -24,3 +30,6 @@ vendor-bin/**/composer.lock
 
 # drone CI is in .drone.star, do not let someone accidentally commit a local .drone.yml
 .drone.yml
+
+**/l10n/locale
+**/l10n/template.pot

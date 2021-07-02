@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+
 	"github.com/asim/go-micro/v3/client"
 	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -24,7 +26,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var service = grpc.Service{}
+var service = grpc.NewService()
 
 var dataPath = createTmpDir()
 
@@ -302,18 +304,18 @@ func assertGroupsSame(t *testing.T, grp1, grp2 *proto.Group) {
 	}
 }
 
-func assertGroupHasMember(t *testing.T, grp *proto.Group, memberId string) {
+func assertGroupHasMember(t *testing.T, grp *proto.Group, memberID string) {
 	for _, m := range grp.Members {
-		if m.Id == memberId {
+		if m.Id == memberID {
 			return
 		}
 	}
 
-	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberId, grp.DisplayName)
+	t.Fatalf("Member with id %s expected to be in group '%s', but not found", memberID, grp.DisplayName)
 }
 
 func createAccount(t *testing.T, user string) (*proto.Account, error) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	account := getAccount(user)
@@ -326,7 +328,7 @@ func createAccount(t *testing.T, user string) (*proto.Account, error) {
 }
 
 func createGroup(t *testing.T, group *proto.Group) (*proto.Group, error) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	request := &proto.CreateGroupRequest{Group: group}
@@ -338,7 +340,7 @@ func createGroup(t *testing.T, group *proto.Group) (*proto.Group, error) {
 }
 
 func updateAccount(t *testing.T, account *proto.Account, updateArray []string) (*proto.Account, error) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	updateMask := &field_mask.FieldMask{
@@ -352,7 +354,7 @@ func updateAccount(t *testing.T, account *proto.Account, updateArray []string) (
 
 func listAccounts(t *testing.T) (*proto.ListAccountsResponse, error) {
 	request := &proto.ListAccountsRequest{}
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	response, err := cl.ListAccounts(context.Background(), request)
@@ -361,7 +363,7 @@ func listAccounts(t *testing.T) (*proto.ListAccountsResponse, error) {
 
 func listGroups(t *testing.T) *proto.ListGroupsResponse {
 	request := &proto.ListGroupsRequest{}
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	response, err := cl.ListGroups(context.Background(), request)
@@ -370,7 +372,7 @@ func listGroups(t *testing.T) *proto.ListGroupsResponse {
 }
 
 func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	req := &proto.DeleteAccountRequest{Id: id}
@@ -379,7 +381,7 @@ func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
 }
 
 func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.DeleteGroupRequest{Id: id}
@@ -554,7 +556,8 @@ func TestUpdateAccount(t *testing.T) {
 }
 
 func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
-	_, _ = createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
 
 	tests := []struct {
 		name        string
@@ -622,8 +625,10 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 }
 
 func TestListAccounts(t *testing.T) {
-	createAccount(t, "user1")
-	createAccount(t, "user2")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+	_, err = createAccount(t, "user2")
+	assert.NoError(t, err)
 
 	resp, err := listAccounts(t)
 	assert.NoError(t, err)
@@ -744,7 +749,8 @@ func TestListAccountsWithFilterQuery(t *testing.T) {
 }
 
 func TestGetAccount(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
 
 	req := &proto.GetAccountRequest{Id: getAccount("user1").Id}
 
@@ -762,12 +768,14 @@ func TestGetAccount(t *testing.T) {
 //TODO: This segfaults! WIP
 
 func TestDeleteAccount(t *testing.T) {
-	createAccount(t, "user1")
-	createAccount(t, "user2")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+	_, err = createAccount(t, "user2")
+	assert.NoError(t, err)
 
 	req := &proto.DeleteAccountRequest{Id: getAccount("user1").Id}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewAccountsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.DeleteAccount(context.Background(), req)
@@ -785,7 +793,7 @@ func TestDeleteAccount(t *testing.T) {
 func TestListGroups(t *testing.T) {
 	req := &proto.ListGroupsRequest{}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	resp, err := cl.ListGroups(context.Background(), req)
@@ -812,7 +820,7 @@ func TestListGroups(t *testing.T) {
 }
 
 func TestGetGroups(t *testing.T) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	groups := []string{
@@ -860,7 +868,7 @@ func TestCreateGroup(t *testing.T) {
 }
 
 func TestGetGroupInvalidID(t *testing.T) {
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.GetGroupRequest{Id: "42"}
@@ -876,11 +884,14 @@ func TestDeleteGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	grp2 := getTestGroups("grp2")
 	grp3 := getTestGroups("grp3")
-	createGroup(t, grp1)
-	createGroup(t, grp2)
-	createGroup(t, grp3)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createGroup(t, grp2)
+	assert.NoError(t, err)
+	_, err = createGroup(t, grp3)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.DeleteGroupRequest{Id: grp1.Id}
@@ -909,7 +920,7 @@ func TestDeleteGroupNotExisting(t *testing.T) {
 		"  ",
 	}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	for _, id := range invalidIds {
@@ -932,7 +943,7 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 		"":                                      ".",
 	}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	for id := range invalidIds {
@@ -947,9 +958,10 @@ func TestDeleteGroupInvalidId(t *testing.T) {
 
 func TestUpdateGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	updateGrp := &proto.Group{
@@ -975,10 +987,12 @@ func TestAddMember(t *testing.T) {
 	updatedGroup := grp1
 	updatedGroup.Members = append(updatedGroup.Members, &proto.Account{Id: account.Id})
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.AddMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
@@ -1005,12 +1019,15 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 	updatedGroup := grp1
 	updatedGroup.Members = append(updatedGroup.Members, &proto.Account{Id: account.Id})
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	addMemberToGroup(t, grp1.Id, account.Id)
+	_, err = addMemberToGroup(t, grp1.Id, account.Id)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.AddMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
@@ -1033,9 +1050,10 @@ func TestAddMemberAlreadyInGroup(t *testing.T) {
 func TestAddMemberNonExisting(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	invalidIds := []string{
@@ -1062,11 +1080,11 @@ func TestAddMemberNonExisting(t *testing.T) {
 	cleanUp(t)
 }
 
-func addMemberToGroup(t *testing.T, groupId, memberId string) (*proto.Group, error) {
-	client := service.Client()
+func addMemberToGroup(t *testing.T, groupID, memberID string) (*proto.Group, error) {
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
-	req := &proto.AddMemberRequest{GroupId: groupId, AccountId: memberId}
+	req := &proto.AddMemberRequest{GroupId: groupID, AccountId: memberID}
 
 	res, err := cl.AddMember(context.Background(), req)
 
@@ -1078,12 +1096,15 @@ func TestRemoveMember(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	addMemberToGroup(t, grp1.Id, account.Id)
+	_, err = addMemberToGroup(t, grp1.Id, account.Id)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.RemoveMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
@@ -1104,9 +1125,10 @@ func TestRemoveMember(t *testing.T) {
 func TestRemoveMemberNonExistingUser(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 
-	createGroup(t, grp1)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	invalidIds := []string{
@@ -1137,10 +1159,12 @@ func TestRemoveMemberNotInGroup(t *testing.T) {
 	grp1 := getTestGroups("grp1")
 	account := getAccount("user1")
 
-	createGroup(t, grp1)
-	createAccount(t, account.PreferredName)
+	_, err := createGroup(t, grp1)
+	assert.NoError(t, err)
+	_, err = createAccount(t, account.PreferredName)
+	assert.NoError(t, err)
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	req := &proto.RemoveMemberRequest{GroupId: grp1.Id, AccountId: account.Id}
@@ -1177,7 +1201,7 @@ func TestListMembers(t *testing.T) {
 		"physics-lovers",
 	}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	for _, group := range groups {
@@ -1209,7 +1233,7 @@ func TestListMembers(t *testing.T) {
 func TestListMembersEmptyGroup(t *testing.T) {
 	group := &proto.Group{Id: "5d58e5ec-842e-498b-8800-61f2ec6f911c", GidNumber: 60000, OnPremisesSamAccountName: "quantum-group", DisplayName: "Quantum Group", Members: []*proto.Account{}}
 
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	cl := proto.NewGroupsService("com.owncloud.api.accounts", client)
 
 	request := &proto.CreateGroupRequest{Group: group}
@@ -1229,9 +1253,11 @@ func TestListMembersEmptyGroup(t *testing.T) {
 }
 
 func TestAccountUpdateMask(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+
 	user1 := getAccount("user1")
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	req := &proto.UpdateAccountRequest{
 		// We only want to update the display-name, rest should be ignored
 		UpdateMask: &field_mask.FieldMask{Paths: []string{"DisplayName"}},
@@ -1252,9 +1278,11 @@ func TestAccountUpdateMask(t *testing.T) {
 }
 
 func TestAccountUpdateReadOnlyField(t *testing.T) {
-	createAccount(t, "user1")
+	_, err := createAccount(t, "user1")
+	assert.NoError(t, err)
+
 	user1 := getAccount("user1")
-	client := service.Client()
+	client := mgrpcc.NewClient()
 	req := &proto.UpdateAccountRequest{
 		// We only want to update the display-name, rest should be ignored
 		UpdateMask: &field_mask.FieldMask{Paths: []string{"CreatedDateTime"}},
