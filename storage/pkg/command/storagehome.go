@@ -86,7 +86,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.StorageHome.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
