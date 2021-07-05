@@ -406,7 +406,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [Trying to create a (public) link share of the Shares folder throws an error](https://github.com/owncloud/web/issues/5152)
 -   [webUISharingInternalUsers/shareWithUsers.feature:360](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L360)
--   [webUISharingPublicBasic/publicLinkCreate.feature:187](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L187)
+-   [webUISharingPublicBasic/publicLinkCreate.feature:190](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L190)
 
 ### [Admin settings feature not implemented yet] (https://github.com/owncloud/web/issues/5015)
 -   [webUIAdminSettings/adminAppsSettings.feature:11](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIAdminSettings/adminAppsSettings.feature#L11)
