@@ -176,7 +176,7 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 //        {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "ocis"},
 //        {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
 //        {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "ocis"},
-//        {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"},
+//        {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"}
 //      ],
 //      "unauthenticated_policy": "oc10"
 //    }
