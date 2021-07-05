@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"context"
 	"crypto/tls"
 	"net"
 	"net/http"
@@ -213,12 +212,12 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
+	ctx := r.Context()
 	var span *trace.Span
 
 	// Start root span.
 	if p.config.Tracing.Enabled {
-		ctx, span = trace.StartSpan(context.Background(), r.URL.String())
+		ctx, span = trace.StartSpan(ctx, r.URL.String())
 		defer span.End()
 		p.propagator.SpanContextToRequest(span.SpanContext(), r)
 	}
