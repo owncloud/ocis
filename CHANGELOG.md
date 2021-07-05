@@ -6,10 +6,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
 
 ## Details
+
+* Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
+
+   Tags: runtime
+
+   When attempting to run a service through the runtime that is currently running and fails to
+   start, a race condition still redirect os Interrupt signals to a closed channel.
+
+   https://github.com/owncloud/ocis/pull/2252
 
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 
