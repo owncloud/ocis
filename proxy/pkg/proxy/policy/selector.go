@@ -169,7 +169,7 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 // NewRegexSelector selects the policy based on a user property
 // The policy for each case is configurable:
 // "policy_selector": {
-//    "migration": {
+//    "regex": {
 //      "matches_policies": [
 //        {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},
 //        {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
