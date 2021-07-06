@@ -359,11 +359,10 @@ File and sync features in a shared scenario
 #### [After accepting a share data in the received file cannot be downloaded](https://github.com/owncloud/product/issues/208)
 -   [apiShareManagement/acceptSharesToSharesFolder.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptSharesToSharesFolder.feature#L15)
 
-#### [Response is empty when accepting a share](https://github.com/owncloud/product/issues/207)
--   [apiShareManagement/acceptSharesToSharesFolder.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptSharesToSharesFolder.feature#L30)
+#### [Response is empty when accepting a share](https://github.com/owncloud/ocis/issues/2133)
+-   [apiShareManagement/acceptSharesToSharesFolder.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptSharesToSharesFolder.feature#L31)
 -   [apiShareManagement/acceptSharesToSharesFolder.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagement/acceptSharesToSharesFolder.feature#L52)
 
-#### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 #### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 #### [Fields missing in delete share OCS response](https://github.com/owncloud/ocis-reva/issues/356)
 #### [Shares not deleted when user is deleted](hhttps://github.com/owncloud/ocis/issues/1226)
