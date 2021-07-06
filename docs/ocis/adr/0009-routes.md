@@ -11,9 +11,7 @@ Note that with an OC10 backend ownCloud's Web format remains unchanged: `https:/
 
 Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong and `dir` correct, resolution will fail altogether.
 
-## Proposals
-
-### Use private links as routes
+## Use private links as routes
 
 First of, let's define what a private link is. A private link is:
 
@@ -23,27 +21,34 @@ _[source](https://doc.owncloud.com/server/user_manual/files/webgui/sharing.html#
 
 Private links are preceded by `/f/` to distinguish from `/s/` shares; this is convention.
 
-### How MUST a bookmarked private link work with OCIS
+## Private link path resolution
 
-The following flow chart provides an overview on how this should work.
+Let's have a look at the following scenario:
 
-![img](https://i.imgur.com/bE4xymv.png)
+![img](https://i.imgur.com/hy0gSpB.jpeg)
 
-Regardless of the user being logged in or the private link being "public", ownCloud web receives the following URL:
+_fig. 1_
 
-`https://host/f/2748872` part of a more general format: `https://host/f/<resourceid>`
+We can observe that the private link can still remain the unchanged, this should provide functionality with existing bookmarks. In order for bookmarked private links to work, the migration from OC10 to OCIS should have taken effect, and the recommended SQL storage provider should be in use, this will allow the OCIS backend to resolve the ID's pre-migration.
 
-With an OC10 backend the resolution happens on OC10, and the response is a `3XX` with `Location` set to the actual URL, in this case:
+Let us break down every step of figure 1.
 
-`Location /index.php/apps/files/?dir=/TEST`
+1. `GET https://cloud.ocis.com/index.php/f/5472225`
+    - all the web client has to "remember" is the id of the resource
+2. `[303] Location=/marketing/path/to/file?id=storageid:resourceid`
+    - the server will resolve the file by ID and provide with a URL for the webUI to render of the format: `/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
+3. `PROPFIND https://host/remote.php/webdav/TEST`
+    - To adjust to the new format, this WebDAV URL `MUST` change. If we don't have a namespace we can easily encounter naming collisions with different storage spaces<sup>1</sup>. A proposed WebDAV url format is recommended at this step of the following format: `https://host/remote.php/webdav/space/path/to/file?id=storageid:resourceid` which is provided by the server's original resolution.
 
-The proposed solution on `WEB-551` relies on the URL being of the format:
+When it comes to display the path, in order to avoid leaking parent information because the resource is shared, the rules in the following diagram `MUST` be followed:
 
-`https://xmpl.com/f/<spacealias>/<relative/path>?id=<b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607>`
+ ![img](https://i.imgur.com/bE4xymv.png)
 
-or more blunt:
+## On the server side
 
-`https://host/f/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
+Receiving a GET request to the following resource `GET https://cloud.ocis.com/index.php/f/5472225` will trigger a few hops that `MUST` be cached in order to prevent slow response times. The nature of these requests can be cached because the resources ID are not subject to changes.
+
+The server `MUST` have a way to resolve the `ID=5472225`. The easiest approach that comes to mind is using the SQL storage driver, that provides compatibility when it comes to migrating files from an OC10 to an OCIS backend. The queried ID already exists in the DB, and the storage driver will just pull all the info it needs to construct the URL to set in the `Location` header of the response.
 
 Let us breakdown each section (except the obvious):
 
@@ -52,44 +57,8 @@ Let us breakdown each section (except the obvious):
 `/relative/path/` = path of the target file / folder relative to the storage space.
 `?id=[...]` = combination of `storage_id` + `:` + `resource_id`
 
-With the following information we can uniquely identify any resource within any known storages. This path is conditionally displayed.
+With all the above data we can start building the Location response header.
 
-`https://host/f/fileid` MUST therefore be expanded to the format: `https://host/f/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`, as seen in the previous image.
+## Footnotes
 
-This is achieved in ocis because:
-
-- Admins will use the reva sql storage
-- when OC10 + Web receives `https://host/index.php/f/5472225` -- which the internal resolution is -> `https://host/remote.php/dav/files/aunger/TEST` under an OC10 backend.
-- when OCIS + Web receives `https://host/index.php/f/5472225` -- OCIS MUST
-
-Now we have to do more hops. We have gaps to fill up here, so let us delegate the responsibility to OCIS. Parting from the assumption that there is a sql storage provider (this means we can query the resource by its old OC10 id) we could:
-
-1. fetch the resource by its old ID = `/id=<>:<oc10_id>/`
-2. find out in which storage space the reference exists = `/space/`
-3. find out the storage provider that contains the reference = `/id=<storage_provider>:<>/`
-4. find out the relative path to the root of the storage space of the reference = `/relative/path/`
-
-Here we have essentially reconstructed all the info that we need that was defined in WEB-551, this can then be added to the resolution response for `GET https://host/index.php/f/5472225`
-
-### How would an existing "general purpose" URL bookmark work with an OCIS backend? (WEB requirement)
-
-A "general purpose bookmark" are just common paths we encounter by browsing on the web-ui.
-
-`https://host/index.php/apps/files/?dir=/TEST&fileid=5472225`
-
-Then at some point in the future the admin migrates to OCIS. What would happen to that bookmark? What would OCIS do if a request comes with such format? Well then OCIS has to transform the encoded information within that URL into something its API understand. As we can see here this is NOT a private link, but a simple URL I got just by opening the browser and navigating through my files.
-
-As we mentioned we want OCIS to be backwards compatible with existing bookmarks, but we're now in a broken state. What must be done by OCIS in order to resolve this? As we saw in the "Browser URL - Internal Resolution" table this URL (received by the web client) needs to be adapted to the OCIS format, and we already have all the information we need. The result is:
-
-`https://host/index.php/apps/files/?dir=/TEST&fileid=5472225` -> `https://host/remote.php/webdav/TEST`
-
-## Sources
-
-1. [Concepting: Use private link as route?](https://jira.owncloud.com/browse/WEB-551)
-2. [Translate OC 10 paths to OCIS](https://jira.owncloud.com/browse/OCIS-1765) - fastlane ticket, blocked by (1)
-
-## Assumptions
-
-- <sup>1</sup> please provide input.
-- <sup>2</sup> assumption. please provide input on this topic.
-- <sup></sup>
+- <sup>1</sup> is this a real concern? Need read proof.
