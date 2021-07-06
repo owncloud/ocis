@@ -529,7 +529,7 @@ def uiTests(ctx):
 
         for runPart in range(1, numberOfParts + 1):
             if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
-                pipelines.append(uiTestPipeline(ctx, "", runPart, numberOfParts))
+                pipelines.append(uiTestPipeline(ctx, "", earlyFail, runPart, numberOfParts))
         return pipelines
     else:
         return [uiTestPipeline(ctx, filterTags, earlyFail)]
