@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-06T12:26:35+0000"
+date: "2021-07-06T13:45:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -34,108 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### glauth health
-
-Check health status
-
-Usage: `glauth health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9129"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### glauth ocis-glauth
-
-Serve GLAuth API for oCIS
-
-Usage: `glauth ocis-glauth [command options] [arguments...]`
-
-
--log-level |  $GLAUTH_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $GLAUTH_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $GLAUTH_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### glauth server
 
@@ -286,4 +184,106 @@ Usage: `glauth server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### glauth health
+
+Check health status
+
+Usage: `glauth health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $GLAUTH_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9129"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### glauth ocis-glauth
+
+Serve GLAuth API for oCIS
+
+Usage: `glauth ocis-glauth [command options] [arguments...]`
+
+
+-log-level |  $GLAUTH_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $GLAUTH_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $GLAUTH_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
