@@ -24,7 +24,7 @@ Note that with an OC10 backend ownCloud's Web format remains unchanged: `https:/
 
 Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether.
 
-<spaceid> is composed of `<storage_id>:<node_id>`
+`space_id` = `<storage_id>:<node_id>`
 
 ## Decision Drivers
 
