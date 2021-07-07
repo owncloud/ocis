@@ -1,9 +1,9 @@
 ---
-title: "8. Extensions Policies"
+title: "9. Extensions Policies"
 date: 2021-06-30T14:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
-geekdocFilePath: 0008-policy-enforcement
+geekdocFilePath: 0009-policy-enforcement.md
 ---
 
 * Status: proposed

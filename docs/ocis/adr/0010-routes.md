@@ -1,13 +1,13 @@
 ---
-title: "9. Global URL"
+title: "10. Global URL"
 date: 2021-07-07T14:55:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
-geekdocFilePath: 0009-routes.md
+geekdocFilePath: 0010-routes.md
 ---
 
 * Status: proposed
-* Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
+* Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade
 * Date: 2021-07-07
 
 ## Context and Problem Statement
