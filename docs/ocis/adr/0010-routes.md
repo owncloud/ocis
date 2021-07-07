@@ -24,7 +24,7 @@ Note that with an OC10 backend ownCloud's Web format remains unchanged: `https:/
 
 Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether.
 
-`space_id` = `<storage_id>:<node_id>`
+`space_id` = `<storage_id>!<node_id>`
 
 ## Decision Drivers
 
@@ -47,7 +47,7 @@ Chosen option: "Consistent Global URL Format".
 
 ## Proposed Global URL Format
 
-`https://<host>/#/s/<spaceid>/<relative/path>?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
+`https://<host>/#/s/<space_id>/<relative/path>?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
 
 `/s` denotes that this is a space url.
 
