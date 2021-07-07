@@ -1,4 +1,16 @@
-## Problem Statement
+---
+title: "9. Global URL"
+date: 2021-07-07T14:55:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0009-routes.md
+---
+
+* Status: proposed
+* Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
+* Date: 2021-07-07
+
+## Context and Problem Statement
 
 When we speak about routes we have to make a difference between browser routes and internal API calls. Browser routes are interpreted by the web client (owncloud/web) to construct API calls. With this in mind, this is the mapping on ownCloud Web with OC10 and OCIS backend:
 
@@ -14,13 +26,31 @@ Worth mentioning that on an OC10 backend it seems that `fileid` query parameter 
 
 <spaceid> is composed of `<storage_id>:<node_id>`
 
+## Decision Drivers
+
+* Construct a URL that is not only readable by the user, but it contains all the necessary information to build a query to the backend.
+
+## Considered Options
+
+* Consistent Global URL Format
+
+## Decision Outcome
+
+Chosen option: "Consistent Global URL Format".
+
+### Positive Consequences
+
+* Backwards compatibility with existing bookmarks
+* Complete visibility of the tree in the URL
+* Unify user facing URL
+
 ## Proposed Global URL Format
 
 `https://<host>/#/s/<spaceid>/<relative/path>?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
 
 `/s` denotes that this is a space url.
 
-### URL Semantics
+## URL Semantics
 
 - The relative path and ID are optional. This URL is valid and points to the root of the space with ID = `b78c2044-5b51-446f-82f6-907a664d089`: `https://example.com/#/s/b78c2044-5b51-446f-82f6-907a664d089`
 - The following case is valid and will resolve the correct folder ONLY IF the path exists within the space `https://example.com/#/s/b78c2044-5b51-446f-82f6-907a664d089/path/to/file`
@@ -28,7 +58,7 @@ Worth mentioning that on an OC10 backend it seems that `fileid` query parameter 
 
 With the above explained, let's see some use cases:
 
-#### Example 1: UserA shares something from her Home folder with UserB
+### Example 1: UserA shares something from her Home folder with UserB
 
 - open the browser and go to `ocis.com`
 - the browser's url changes to: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`. You're now in YOUR home folder / personal space.
@@ -42,7 +72,7 @@ As you can see, even if you're the owner of `TEST` and navigate into it, the URL
 
 In short terms, while navigating using the WebUI, the URL has to constantly change whenever we change spaces.
 
-#### Example 2: UserA shares something from a Workspace
+### Example 2: UserA shares something from a Workspace
 
 Assuming we only have one storage provider; a consequence of this, all storage spaces will start with the same storage_id.
 
@@ -79,7 +109,7 @@ Notice that the ID has not changed. Path based resolution should take precedence
 
 Navigating into a folder that is the root of a space changes the url to reflect that we are now in the root of a space.
 
-## Improvements
+## Future Improvements
 
 ### Spaces Registry
 
