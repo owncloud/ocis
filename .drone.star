@@ -530,9 +530,13 @@ def uiTests(ctx):
         for runPart in range(1, numberOfParts + 1):
             if (not debugPartsEnabled or (debugPartsEnabled and runPart in skipExceptParts)):
                 pipelines.append(uiTestPipeline(ctx, "", earlyFail, runPart, numberOfParts))
-        return pipelines
-    else:
-        return [uiTestPipeline(ctx, filterTags, earlyFail)]
+
+    # For ordinary PRs, always run the "minimal" UI test pipeline
+    # That has its own expected-failures file, and we always want to know that it is correct,
+    if (ctx.build.event != "tag"):
+        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail))
+
+    return pipelines
 
 def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
@@ -543,10 +547,15 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
         finalFilterTags = filterTags + " and " + standardFilterTags
         expectedFailuresFileFilterTags = "-" + filterTags.lstrip("@")
 
+    if numberOfParts == 1:
+        pipelineName = "Web-Tests-ocis-%s-storage" % storage
+    else:
+        pipelineName = "Web-Tests-ocis-%s-storage-%s" % (storage, runPart)
+
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "Web-Tests-ocis-%s-storage-%s" % (storage, runPart),
+        "name": pipelineName,
         "platform": {
             "os": "linux",
             "arch": "amd64",
