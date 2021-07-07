@@ -40,9 +40,10 @@ Chosen option: "Consistent Global URL Format".
 
 ### Positive Consequences
 
-* Backwards compatibility with existing bookmarks
 * Complete visibility of the tree in the URL
 * Unify user facing URL
+* Build robust URLs with IDs
+* Path visible in the URL
 
 ## Proposed Global URL Format
 
