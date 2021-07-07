@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-07T08:37:08+0000"
+date: "2021-07-07T15:31:25+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -139,6 +139,58 @@ Usage: `ocis health [command options] [arguments...]`
 
 
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### ocis kill
 
 Kill an extension by name
@@ -195,58 +247,6 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
 ### ocis run
 
 Runs an extension
@@ -279,21 +279,53 @@ Usage: `ocis run [command options] [arguments...]`
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis glauth
+#### ocis storage-userprovider
 
-Start glauth server
+Start storage userprovider service
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-gateway
+
+Start storage gateway
 
 #### ocis storage-sharing
 
 Start storage sharing service
 
+#### ocis proxy
+
+Start proxy server
+
+#### ocis settings
+
+Start settings server
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis store
+
+Start a go-micro store
+
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
-
-#### ocis onlyoffice
-
-Start onlyoffice server
 
 #### ocis storage-frontend
 
@@ -311,57 +343,13 @@ Start storage public link storage
 
 Start storage and data provider for /users mount
 
-#### ocis version
-
-Lists running services with version
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis settings
-
-Start settings server
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
 #### ocis thumbnails
 
 Start thumbnails server
 
-#### ocis storage-gateway
+#### ocis glauth
 
-Start storage gateway
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis store
-
-Start a go-micro store
+Start glauth server
 
 #### ocis idp
 
@@ -370,4 +358,16 @@ Start idp server
 #### ocis web
 
 Start web server
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis version
+
+Lists running services with version
 
