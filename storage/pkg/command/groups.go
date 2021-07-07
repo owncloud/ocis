@@ -69,7 +69,7 @@ func Groups(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.Users.DebugAddr),
+				debug.Addr(cfg.Reva.Groups.DebugAddr),
 				debug.Logger(logger),
 				debug.Context(ctx),
 				debug.Config(cfg),
