@@ -6,60 +6,62 @@ When we speak about routes we have to make a difference between browser routes a
 |------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
 | OC10 | `https://host/index.php/apps/files/?dir=/TEST&fileid=5472225`                                                                                                                 | `https://host/remote.php/dav/files/aunger/TEST`                                                                                              |
 | OCIS | `https://host/#/files/list/all/TEST`                                                                                                                                         | `https://host/remote.php/webdav/TEST`                                                                                                       |
-| OCIS (after this ADR is implemented) | `https://host/#/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`                           | `https://host/remote.php/webdav/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`           |
+| OCIS (after this ADR is implemented) | `https://host/#/s/<space_id>/path/to/file?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`                      | `https://host/remote.php/webdav/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`           |
 
 Note that with an OC10 backend ownCloud's Web format remains unchanged: `https://host/index.html#/files/list/all/TEST` -- still resolves to --> `https://host/remote.php/webdav/TEST`. So here we have to make a distinction and limit the scope of this ADR to "how will a web client deal with the browser url?"
 
 Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether.
 
-## Use private links as routes
+<spaceid> is composed of `<storage_id>:<node_id>`
 
-First of, let's define what a private link is. A private link is:
+## Proposed Global URL Format
 
-> Another way to access a file or folder is via a private link. It’s a handy way of creating a permanent link for yourself or to point others to a file or folder, within a share, more efficiently. To access the private link, in the Sharing Panel for a file or folder, next to its name you’ll see a small link icon (1), as in the screenshot below.
+`https://<host>/#/s/<spaceid>/<relative/path>?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
 
-_[source](https://doc.owncloud.com/server/user_manual/files/webgui/sharing.html#using-private-links)_
+`/s` denotes that this is a space url.
 
-Private links are preceded by `/f/` to distinguish from `/s/` shares; this is convention.
+### URL Semantics
 
-## Private link path resolution
+- The relative path and ID are optional. This URL is valid and points to the root of the space with ID = `b78c2044-5b51-446f-82f6-907a664d089`: `https://example.com/#/s/b78c2044-5b51-446f-82f6-907a664d089`
+- The following case is valid and will resolve the correct folder ONLY IF the path exists within the space `https://example.com/#/s/b78c2044-5b51-446f-82f6-907a664d089/path/to/file`
+- To improve in the previous example and ensure a more resilient link, adding the query string `id` of the target resource (folder or file) is encouraged to prevent always resolving even if the resource is renamed: `https://example.com/#/s/b78c2044-5b51-446f-82f6-907a664d089/path/to/file?id=ba4c1820-df12-11eb-8dcd-ff21f12c1264:beb78dd6-df12-11eb-a05c-a395505126f6`
 
-Let's have a look at the following scenario:
+With the above explained, let's see some use cases:
 
-![img](https://i.imgur.com/hy0gSpB.jpeg)
+#### Example 1: UserA shares something from her Home folder with UserB
 
-_fig. 1_
+- open the browser and go to `ocis.com`
+- the browser's url changes to: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`. You're now in YOUR home folder / personal space.
+- you create a new folder `TEST` and navigate into it
+  - the URL now changes to: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/TEST`
+- You share `TEST` with some else
+- YOU navigate into `TEST`
+  - now the URL would look like: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:3a9305da-df17-11eb-ab99-abe09d93e08a`
 
-We observe that the private link can still remain the unchanged, this should provide functionality with existing bookmarks. In order for bookmarked private links to work, the migration from OC10 to OCIS should have taken effect, and the recommended SQL storage provider should be in use, this will allow the OCIS backend to resolve the IDs pre-migration.
+As you can see, even if you're the owner of `TEST` and navigate into it, the URL changed due to a new space was created. This ensures that while working in your home folder, copying URL and giving them to the person you share the resource with the receiver can still navigate within the new space.
 
-Let us break down every step of _fig. 1_.
+In short terms, while navigating using the WebUI, the URL has to constantly change whenever we change spaces.
 
-1. `GET https://cloud.ocis.com/index.php/f/5472225`
-    - all the web client has to "remember" is the ID of the resource
-2. Server's response: `Status=303 Location=/marketing/path/to/file?id=storageid:resourceid`
-    - the server will resolve the file by ID and provide with a URL for the webUI to render of the format: `/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
-3. `PROPFIND https://host/remote.php/webdav/space/path/to/file?id=storageid:resourceid`
+#### Example 2: UserA shares something from a Workspace
 
-When it comes to display the path, in order to avoid leaking parent information because the resource is shared, the rules in the following diagram `MUST` be followed:
+Assuming we only have one storage provider; a consequence of this, all storage spaces will start with the same storage_id.
 
- ![img](https://i.imgur.com/bE4xymv.png)
+- open the browser and go to `ocis.com`
+- the browser's url changes to: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`. You're now in YOUR home folder / personal space.
+- you have access to a workspace called `foo` (created by an admin)
+- navigate into workspace `foo`
+  - the URL now changes to: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74`. You are now at the root of the workspace `foo`.
+    - because we only have one storage provider, the `space_id` section of the URL only updates the `node_id` part of it.
+    - had we had more than one storage provider, the `space_id` would depend on which storage provider contains the storage space.
+- you create a folder `TEST`
+- you navigate into `TEST`
+  - now the URL would look like: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/TEST`
+  - or a more robust url: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/TEST?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
 
-## On the server side
+## Rules for reference resolution
 
-Receiving a GET request to the following resource `GET https://cloud.ocis.com/index.php/f/5472225` will trigger a few hops that `MUST` be cached in order to prevent slow response times. The nature of these requests can be cached because the resources ID are not subject to changes.
-
-The server `MUST` have a way to resolve the `ID=5472225` (step 2 of the previous paragraph). The easiest approach that comes to mind is using the SQL storage driver, that provides compatibility when it comes to migrating files from an OC10 to an OCIS backend. The queried ID already exists in the DB, and the storage driver will just pull all the info it needs to construct the URL to set in the `Location` header of the response.
-
-Let us breakdown each section:
-
-`/f/` = private link prefix. This is a convention.
-`/space/` = space name. In which storage space does the target file / folder exist.
-`/relative/path/` = path of the target file / folder relative to the storage space.
-`?id=[...]` = combination of `storage_id` + `:` + `resource_id` that are gathered by the driver.
-
-With all the above data we can start building the Location response header.
-
-Support for the following paths `MUST` occur in order to provide power uses path-base navigation using the webUI: ``
+- if path can be resolved, then the path is used as the "locator" (instead of the id)
+- if path cannot be resolved (eg. because of misspelling, folder moved, renamed etc.) then the id is used as a "locator"
 
 ## Manipulating the path in the URL
 
@@ -71,11 +73,19 @@ to
 
 `https://host/space/relative/path/deeper/file/inside?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`
 
-Notice that the ID has not changed. Path based resolution should take precedence over ID resolution<sup>2</sup>. Now we have a `GET` request that the webUI has to adapt to the server's format:
+Notice that the ID has not changed. Path based resolution should take precedence over ID resolution. Now we have a `GET` request that the webUI has to adapt to the server's format:
 
+## Considerations
 
+Navigating into a folder that is the root of a space changes the url to reflect that we are now in the root of a space.
 
-## Footnotes
+## Improvements
 
-- <sup>1</sup> is this a real concern? Need read proof.
-- <sup>2</sup> really? this needs to be discussed, but it makes sense in this context, as the IDs are not human readable.
+### Spaces Registry
+
+A big drawback against this idea is that the length of the URL is increased by a lot, rendering them almost unreadable. Introducing a Spaces Registry (SR) would shorten them. Let's see how.
+
+A URL without a SR would look like: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/TEST?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
+The same URL with a SR `https://ocis.com/#/s/workspaceFoo/TEST?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
+
+Space Registry resolution can happen at the client side (i.e: the client keeps a list of space name -> space id [where space id = storageid + nodeid]; the client queries a SR) or server side. Server side is more resilient due to clients can have limited networking; for instance if they are running on a tight intranet.
