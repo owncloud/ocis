@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+* Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
 
 ## Details
@@ -28,6 +29,13 @@ The following sections list the changes for unreleased.
    ``` > ocis server --extensions="proxy, idp, storage-metadata, accounts" ```
 
    https://github.com/owncloud/ocis/pull/2229
+
+* Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
+
+   As it turns out oCIS already calls this method. Invoking it twice would end in accidentally
+   resetting values.
+
+   https://github.com/owncloud/ocis/pull/1705
 
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
 
