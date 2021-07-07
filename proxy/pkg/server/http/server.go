@@ -56,6 +56,5 @@ func Server(opts ...Option) (svc.Service, error) {
 		return svc.Service{}, err
 	}
 
-	service.Init()
 	return service, nil
 }
