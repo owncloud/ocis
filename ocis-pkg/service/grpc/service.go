@@ -12,6 +12,7 @@ import (
 	"github.com/asim/go-micro/v3"
 	"github.com/asim/go-micro/v3/client"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/ocis-pkg/service/wrapper/policy"
 )
 
 // DefaultClient is a custom oCIS grpc configured client.
@@ -20,6 +21,7 @@ var DefaultClient = getDefaultGrpcClient()
 func getDefaultGrpcClient() client.Client {
 	return mgrpcc.NewClient(
 		client.Wrap(mbreaker.NewClientWrapper()),
+		client.Wrap(policy.NewClientWrapper()),
 	)
 }
 

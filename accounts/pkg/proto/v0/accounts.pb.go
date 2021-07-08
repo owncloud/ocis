@@ -7,6 +7,9 @@
 package proto
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	empty "github.com/golang/protobuf/ptypes/empty"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
@@ -14,8 +17,6 @@ import (
 	field_mask "google.golang.org/genproto/protobuf/field_mask"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -1603,7 +1604,7 @@ type Group struct {
 	// Returned by default. Supports $filter and $orderby.
 	// groupofnames MUST cn
 	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"` // groupofnames MUST/MAY member
-	// Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
+	// UsersCount, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
 	// TODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later
 	Members []*Account `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
 	// groupofnames MAY businessCategory

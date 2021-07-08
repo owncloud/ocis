@@ -21,6 +21,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.0
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	stash.kopano.io/kc/konnect v0.34.0
 	stash.kopano.io/kgol/rndm v1.1.0
 )

@@ -31,6 +31,7 @@ require (
 	google.golang.org/genproto v0.0.0-20210207032614-bba0dbe2a9ea
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.27.0
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 )
 
 replace (

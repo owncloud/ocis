@@ -22,6 +22,7 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.opencensus.io v0.23.0
 	google.golang.org/grpc v1.38.0
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 )
 
 replace (
