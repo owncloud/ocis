@@ -84,13 +84,13 @@ There is no formal guideline to this, just do it :-)
 
 This section guides you through submitting a bug report for ownCloud Infinite Scale. Following these guidelines helps maintainers and the community understand your report :pencil:, reproduce the behavior :computer: :computer:, and find related reports :mag_right:.
 
-Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](https://github.com/owncloud/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md), the information it asks for helps us resolve issues faster.
+Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](https://github.com/owncloud/ocis/issues/new?Type%3ABug&template=bug_report.md), the information it asks for helps us resolve issues faster.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one. If you have permission to reopen the issue, feel free to do so.
 
 #### Before Submitting A Bug Report
 
-*   **Make sure you are running a recent version** Generally developers interest in old versions of a software is dropping very fast once new shiny versions are released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
+*   **Make sure you are running a recent version** Usually, developers' interest in old versions of a software drops very fast once new shiny version has been released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
 *   **Determine [which repository the problem should be reported in](#owncloud-repositories)**.
 *   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** with possibly a more granular filter on the repository, to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one **if you have new information**. Please abstain from adding "plus ones", except using the Github emojis. That might indicate how many users are affected.
 
@@ -106,7 +106,7 @@ Explain the problem and include additional details to help maintainers reproduce
 *   **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 *   **Explain which behavior you expected to see instead and why.**
 *   **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
-*   **If you report an web browser related problem**, consider to use the browsers Web developer tools (such as the debugger, console or network monitor) to check what happened. Make sure to add screenshots of the utilities if you are short of time to interpret it.
+*   **If you report a web browser related problem**, consider to use the browser's Web developer tools (such as the debugger, console or network monitor) to check what happened. Make sure to add screenshots of the utilities if you are short of time to interpret it.
 *   **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and share more information using the guidelines below.
 
 Provide more context by answering these questions:
@@ -156,7 +156,7 @@ All contributions to ownClouds projects use so called pull requests following th
 
 Please follow these steps to have your contribution considered by the maintainers:
 
-*   Follow all instructions in [the template](.github/pull_request_template.md)
+*   Follow all instructions in [the template](https://github.com/owncloud/ocis/blob/master/.github/pull_request_template.md)
 *   Follow the [styleguides](#styleguides) where applicable
 *   After you submit your pull request, verify that all [status checks](https://help.github.com/articles/about-status-checks/) are passing <details><summary>What if the status checks are failing?</summary>If a status check is failing, and you believe that the failure is unrelated to your change, please leave a comment on the pull request explaining why you believe the failure is unrelated. A maintainer will re-run the status check for you. If we conclude that the failure was a false positive, then we will open an issue to track that problem with our status check suite.</details>
 
@@ -170,7 +170,7 @@ See the [Getting Started Guide](https://github.com/owncloud/docs/blob/master/doc
 
 ### Internationalization
 
-ownCloud is translated in many languages to allow people from all oever the world to use ownCloud in their native language. For translations, ownCloud uses [Transifex](https://www.transifex.com) as community based collaboration platform for internationalization.
+Our projects are getting translated into many languages to allow people from all over the world to use ownCloud in their native language. For translations, ownCloud uses [Transifex](https://www.transifex.com) as community based collaboration platform for internationalization.
 
 For contributions please refer to the [Transifex Resources](https://www.transifex.com/resources/) to learn how to improve ownClouds translations there.
 
