@@ -56,28 +56,15 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	ctx = token.ContextSetToken(ctx, t)
 	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
 
-	req := &storageprovider.ListStorageSpacesRequest{
-
-		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{
-			{
-				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-					Id: &storageprovider.StorageSpaceId{
-						OpaqueId: "1284d238-aa92-42ce-bdc4-0b0000009157", // FIXME dynamically discover home and other storages ... actually the storage registry should provide the list of storage spaces
-					},
-				},
-			},
-		},
-	}
-
-	res, err := client.ListStorageSpaces(ctx, req)
+	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{})
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	// TODO handle not found and other status codes
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("error calling grpc list storage spaces")
+		g.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling grpc list storage spaces")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -138,8 +125,9 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	// TODO handle not found and other status codes
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Str("path", fn).Msg("error calling grpc list container")
+		g.logger.Error().Err(err).Str("path", fn).Interface("status", res.Status).Msg("error calling grpc list container")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
