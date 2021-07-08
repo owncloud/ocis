@@ -15,7 +15,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/token"
 
-	msgraph "github.com/owncloud/ocis/graph/pkg/openapi/v0"
+	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
 func getToken(r *http.Request) string {
@@ -181,7 +181,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 		driveItem.BaseItem.LastModifiedDateTime = &lastModified
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-		driveItem.File = &msgraph.File{
+		driveItem.File = &msgraph.OpenGraphFile{
 			MimeType: &res.MimeType,
 		}
 	}
