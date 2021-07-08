@@ -196,7 +196,7 @@ Use the built in golang code formatter before submitting the patch. Also, consul
 
 ### Web Styleguide
 
-See the styleguide document in the [ownCloud Web Repository](https://github.com/owncloud/web).
+Refer to related documents in the [ownCloud Web Repository](https://github.com/owncloud/web).
 
 #### Documentation Styleguide
 
