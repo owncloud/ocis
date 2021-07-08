@@ -38,9 +38,8 @@ func getToken(r *http.Request) string {
 
 // GetDrives implements the Service interface.
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msgf("Calling GetDrives")
-	accessToken := getToken(r)
-	if accessToken == "" {
+	g.logger.Info().Msg("Calling GetDrives")
+	if getToken(r) == "" {
 		g.logger.Error().Msg("no access token provided in request")
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -85,14 +84,14 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error parsing url", err)
+		g.logger.Error().Err(err).Msg("error parsing url")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	files, err := formatDrives(wdu, res.StorageSpaces)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
+		g.logger.Error().Err(err).Msg("error encoding response as json")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -103,9 +102,8 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 
 // GetRootDriveChildren implements the Service interface.
 func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msgf("Calling GetRootDriveChildren")
-	accessToken := getToken(r)
-	if accessToken == "" {
+	g.logger.Info().Msg("Calling GetRootDriveChildren")
+	if getToken(r) == "" {
 		g.logger.Error().Msg("no access token provided in request")
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -125,7 +123,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	ctx = token.ContextSetToken(ctx, t)
 	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
 
-	g.logger.Info().Msgf("provides access token %v", ctx)
+	g.logger.Info().Interface("context", ctx).Msg("provides access token")
 
 	ref := &storageprovider.Reference{
 		Path: fn,
@@ -136,19 +134,19 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	}
 	res, err := client.ListContainer(ctx, req)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error sending list container grpc request %s", fn)
+		g.logger.Error().Err(err).Str("path", fn).Msg("error sending list container grpc request")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msgf("error calling grpc list container %s", fn)
+		g.logger.Error().Err(err).Str("path", fn).Msg("error calling grpc list container")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	files, err := formatDriveItems(res.Infos)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
+		g.logger.Error().Err(err).Msg("error encoding response as json")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -204,8 +202,8 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 	return responses, nil
 }
 
-func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
-	rootId := space.Root.StorageId + "!" + space.Root.OpaqueId
+func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
+	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
 	drive := &msgraph.Drive{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
@@ -226,17 +224,17 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 		Root: &msgraph.DriveItem{
 			BaseItem: msgraph.BaseItem{
 				Entity: msgraph.Entity{
-					Id: &rootId,
+					Id: &rootID,
 				},
 			},
 		},
 	}
 
-	if baseUrl != nil {
+	if baseURL != nil {
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := baseUrl.String() + rootId
+		webDavURL := baseURL.String() + rootID
 		drive.Root.WebDavUrl = &webDavURL
 	}
 
@@ -261,10 +259,10 @@ func cs3StorageSpaceToDrive(baseUrl *url.URL, space *storageprovider.StorageSpac
 	return drive, nil
 }
 
-func formatDrives(baseUrl *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
+func formatDrives(baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
 	responses := make([]*msgraph.Drive, 0, len(mds))
 	for i := range mds {
-		res, err := cs3StorageSpaceToDrive(baseUrl, mds[i])
+		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
 		if err != nil {
 			return nil, err
 		}
