@@ -21,7 +21,7 @@ For simplicity reasons, this document mostly refers to the ownCloud [Infinite Sc
 *   [Pull Requests](#pull-requests)
 *   [Documentation Contributions](#documentation-contributions)
 *   [Internationalization](#internationalization)
-*   [Deployments: Docker, Ansible and friends](#deployments:-docker,-ansible-and-friends)
+*   [Deployments: Docker, Ansible and friends](#deployments-docker-ansible-and-friends)
 
 [Styleguides](#styleguides)
 *   [Git Commit Messages](#git-commit-messages)
