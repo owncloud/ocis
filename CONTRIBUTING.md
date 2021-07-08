@@ -166,7 +166,7 @@ While the prerequisites above must be satisfied prior to having your pull reques
 
 ownCloud is very proud of the documentation it has, which is the work of a great team of people. Of course, also the documentation is open to contributions.
 
-See the [Getting Started Guide](https://github.com/owncloud/docs/blob/master/docs/getting-started.md) on how to get started. Many other useful information is summarized in the [Documentation Readme](https://github.com/owncloud/docs).
+See the [Getting Started Guide](https://owncloud.dev/ocis/development/getting-started/) on how to get started. Many other useful information is summarized in the [Documentation Readme](https://github.com/owncloud/docs).
 
 ### Internationalization
 
