@@ -108,6 +108,7 @@ type Cache struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File                  string
+	PoliciesFile          string
 	Log                   Log
 	Debug                 Debug
 	HTTP                  HTTP

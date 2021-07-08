@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"crypto/tls"
+	"encoding/json"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -57,11 +59,21 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		},
 	}
 
-	if options.Config.Policies == nil {
-		rp.logger.Info().Str("source", "runtime").Msg("Policies")
+	if options.Config.PoliciesFile != "" {
+		b, err := ioutil.ReadFile(options.Config.PoliciesFile)
+		if err != nil {
+			panic(err) // TODO(refs): Don't Panic!
+		}
+
+		if err := json.Unmarshal(b, &options.Config.Policies); err != nil {
+			panic(err) // TODO(refs): Don't Panic!
+		}
+		rp.logger.Info().Str("source", "policies file").Msg("loaded proxy policies")
+	} else if options.Config.Policies == nil {
+		rp.logger.Info().Str("source", "runtime").Msg("loaded proxy policies")
 		options.Config.Policies = defaultPolicies()
 	} else {
-		rp.logger.Info().Str("source", "file").Str("src", options.Config.File).Msg("policies")
+		rp.logger.Info().Str("source", "file").Str("src", options.Config.File).Msg("loaded proxy policies")
 	}
 
 	if options.Config.PolicySelector == nil {
@@ -74,9 +86,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		}
 	}
 
-	rp.logger.Debug().
-		Interface("selector_config", options.Config.PolicySelector).
-		Msg("loading policy-selector")
+	rp.logger.Debug().Interface("selector_config", options.Config.PolicySelector).Msg("loading policy-selector")
 
 	policySelector, err := policy.LoadSelector(options.Config.PolicySelector)
 	if err != nil {

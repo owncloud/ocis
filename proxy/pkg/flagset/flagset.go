@@ -66,6 +66,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_CONFIG_FILE"},
 			Destination: &cfg.File,
 		},
+		&cli.StringFlag{
+			Name:        "policies-file",
+			Value:       cfg.PoliciesFile,
+			Usage:       "Path to policies file",
+			EnvVars:     []string{"PROXY_POLICIES_FILE"},
+			Destination: &cfg.PoliciesFile,
+		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
