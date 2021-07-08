@@ -96,7 +96,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### How Do I Submit A (Good) Bug Report
 
-Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](https://github.com/owncloud) your bug is related to, create an issue on that repository and provide the following information by filling in [the template](https://github.com/owncloud/ocis/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](https://github.com/owncloud) your bug is related to, create an issue on that repository and provide the following information by filling in [the template](https://github.com/owncloud/ocis/issues/new?Type%3ABug&template=bug_report.md).
 
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
