@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-08T09:00:07+0000"
+date: "2021-07-08T21:57:41+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -74,6 +74,7 @@ Usage: `graph health [command options] [arguments...]`
 
 
 
+
 ### graph ocis-graph
 
 Serve Graph API for oCIS
@@ -95,6 +96,7 @@ Usage: `graph ocis-graph [command options] [arguments...]`
 
 -log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
 
 
 
@@ -184,6 +186,10 @@ Usage: `graph server [command options] [arguments...]`
 
 -http-namespace |  $GRAPH_HTTP_NAMESPACE
 : Set the base namespace for the http service for service discovery. Default: `"com.owncloud.web"`.
+
+
+-spaces-webdav-base |  $GRAPH_SPACES_WEBDAV_BASE
+: spaces webdav base URL. Default: `"https://localhost:9200/dav/spaces/"`.
 
 
 -ldap-network |  $GRAPH_LDAP_NETWORK

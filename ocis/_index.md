@@ -13,6 +13,28 @@ geekdocFilePath: _index.md
 
 Welcome to oCIS, the modern file-sync and share platform, which is based on our knowledge and experience with the PHP based [ownCloud server](https://owncloud.com/#server).
 
+### The idea of federated storage
+
+To creata a truly federated storage architecture oCIS breaks down the old ownCloud 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
+
+The below diagram shows the core conceps that are the foundation for the new architecture:
+- End user devices can fetch the list of *storage spaces* a user has access to, by querying one or multiple *storage space registries*. The list contains a unique endpoint for every *storage space*.
+- [*Storage space registries*]({{< ref "../extensions/storage/terminology#storage-space-registries" >}}) manage the list of storage spaces a user has access to. They may subscrible to *storage spaces* in order to receive notifications about changes on behalf of an end users mobile or desktop client.
+- [*Storage spaces*]({{< ref "../extensions/storage/terminology#storage-spaces" >}}) represent a collection of files and folders. A users personal files are a *storage space*, a group or project drive is a *storage space*, and even incoming shares are treated and implemented as *storage spaces*. Each with properties like owners, permissions, quota and type.
+- [*Storage providers*]({{< ref "../extensions/storage/terminology#storage-providers" >}}) can hold multiple *storage spaces*. At an oCIS instance, there might be a dedicated *storage provider* responsible for users personal storage spaces. There might be multiple, sharing the load or there might be just one, hosting all types of *storage spaces*.
+
+{{< svg src="ocis/static/idea.drawio.svg" >}}
+
+As an example, Einstein might want to share something with Marie, who has an account at a different identity provider and uses a different storage space registry. The process makes use of [OpenID Connect (OIDC)](https://openid.net/specs/openid-connect-core-1_0.html) for authentication and would look something like this:
+
+To share something with Marie, Einstein would open `https://cloud.zurich.test`. His browser loads oCIS web and presents a login form that uses the [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html#EmailSyntax) to look up the OIDC issuer. For `einstein@zurich.test` he will end up at `https://idp.zurich.test`, authenticate and get redirected back to `https://cloud.zurich.test`. Now, oCIS web will use a similar discovery to look up the *storage space registry* for the account, based on the email (or username). He will discover that `https://cloud.zurich.test` is also his *storage registry* that the web UI will use to load the list of *storage spaces* that are available to him.
+
+After locating a folder that he wants to share with Marie he enters her email `marie@paris.test` in the sharing dialog to grant her the editor role. This, in effect, creates a new *storage space* that is registered with the *storage space registry* at `https://cloud.zurich.test`.
+
+Einstein copies the URL in the browser (or an email with the same URL is sent automatically, or the storage registries use a backchannel mechanism). It contains the most specific `storage space id` and a path relative to it: `https://cloud.zurich.test/#/spaces/716199a6-00c0-4fec-93d2-7e00150b1c84/a/rel/path`.
+
+When Marie enters that URL she will be presented with a login form on the `https://cloud.zurich.test` instance, because the share was created on that domain. If `https://cloud.zurich.test` trusts her OpenID Connect identity provider `https://idp.paris.test` she can log in. This time, the *storage space registry* discovery will come up with `https://cloud.paris.test` though. Since that registry is different than the registry tied to `https://cloud.zurich.test` oCIS web can look up the *storage space* `716199a6-00c0-4fec-93d2-7e00150b1c84` and register the WebDAV URL `https://cloud.zurich.test/dav/spaces/716199a6-00c0-4fec-93d2-7e00150b1c84/a/rel/path` in Maries *storage space registry* at `https://cloud.paris.test`. When she accepts that share her clients will be able to sync the new *storage space* at `https://cloud.zurich.test`.
+
 ### oCIS microservice runtime
 
 The oCIS runtime allows us to dynamically manage services running in a single process. We use [suture](https://github.com/thejerf/suture) to create a supervisor tree that starts each service in a dedicated goroutine. By default oCIS will start all built-in oCIS extensions in a single process. Individual services can be moved to other nodes to scale-out and meet specific performance requirements. A [go-micro](https://github.com/asim/go-micro/blob/master/registry/registry.go) based registry allows services in multiple nodes to form a distributed microservice architecture.
