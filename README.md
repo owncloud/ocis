@@ -24,7 +24,7 @@ If you find a security issue please contact [security@owncloud.com](mailto:secur
 
 ## Contributing
 
-Fork -> Patch -> Push -> Pull Request
+Please refer to our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## License
 
