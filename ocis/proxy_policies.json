@@ -1,0 +1,11 @@
+[
+  {
+    "name": "ocis",
+    "routes": [
+      {
+        "endpoint": "/",
+        "backend": "http://localhost:9100"
+      }
+    ]
+  }
+]
