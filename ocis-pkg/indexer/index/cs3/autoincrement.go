@@ -176,7 +176,7 @@ func (idx *Autoincrement) Remove(id string, v string) error {
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: deletePath},
+			Path: deletePath,
 		},
 	})
 
@@ -214,7 +214,7 @@ func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+			Path: path.Join("/meta", idx.indexRootDir),
 		},
 	})
 
@@ -327,7 +327,7 @@ func (idx *Autoincrement) next() (int, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+			Path: path.Join("/meta", idx.indexRootDir),
 		},
 	})
 

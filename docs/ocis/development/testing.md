@@ -118,7 +118,6 @@ make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
-DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
 
@@ -158,7 +157,6 @@ If you want to work on a specific issue
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
-    DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 

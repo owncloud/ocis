@@ -11,13 +11,13 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/asim/go-micro/v3/client"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -642,25 +642,20 @@ func mintToken(ctx context.Context, su *User, roleIds []string) (token string, e
 		Id: &user.UserId{
 			OpaqueId: su.ID,
 		},
-		Groups: []string{},
 		Opaque: &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.UIDNumber)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.Itoa(su.GIDNumber)),
-				},
 				"roles": {
 					Decoder: "json",
 					Value:   roleIDsJSON,
 				},
 			},
 		},
+		Groups: []string{},
+		UidNumber: int64(su.UIDNumber),
+		GidNumber: int64(su.GIDNumber),
 	}
-	return tokenManager.MintToken(ctx, u)
+	s, _ := scope.GetOwnerScope()
+	return tokenManager.MintToken(ctx, u, s)
 }
 
 func sendRequest(method, endpoint, body string, u *User, roleIds []string) (*httptest.ResponseRecorder, error) {

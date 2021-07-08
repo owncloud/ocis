@@ -63,11 +63,11 @@ func recreateContainers(idx *indexer.Indexer, cfg *config.Config) error {
 	}
 
 	// Groups
-	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil, true); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "OnPremisesSamAccountName", "Id", "groups", "unique", nil, false); err != nil {
 		return err
 	}
 
-	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil, true); err != nil {
+	if err := idx.AddIndex(&proto.Group{}, "DisplayName", "Id", "groups", "non_unique", nil, false); err != nil {
 		return err
 	}
 

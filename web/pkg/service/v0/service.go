@@ -177,6 +177,7 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 		w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate, value")
 		w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
 		w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+		w.Header().Set("SameSite", "Strict")
 
 		static.ServeHTTP(w, r)
 	}

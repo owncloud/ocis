@@ -1,11 +1,12 @@
 package svc
 
 import (
-	"github.com/go-chi/render"
-	"google.golang.org/grpc/metadata"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/go-chi/render"
+	"google.golang.org/grpc/metadata"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -43,7 +44,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 
-	fn := "/home"
+	fn := g.config.WebdavNamespace
 
 	client, err := g.GetClient()
 	if err != nil {
@@ -65,7 +66,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msgf("provides access token %v", ctx)
 
 	ref := &storageprovider.Reference{
-		Spec: &storageprovider.Reference_Path{Path: fn},
+		Path: fn,
 	}
 
 	req := &storageprovider.ListContainerRequest{

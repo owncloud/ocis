@@ -1,0 +1,32 @@
+{
+  "server": "https://172.17.0.1:9200",
+  "theme": "owncloud",
+  "version": "0.1.0",
+  "openIdConnect": {
+    "metadata_url": "https://172.17.0.1:9200/.well-known/openid-configuration",
+    "authority": "https://172.17.0.1:9200",
+    "client_id": "web",
+    "response_type": "code",
+    "scope": "openid profile email"
+  },
+  "apps": [
+    "files"
+  ],
+  "external_apps": [
+    {
+      "id": "settings",
+      "path": "/settings.js"
+    },
+    {
+      "id": "accounts",
+      "path": "/accounts.js"
+    },
+    {
+      "id": "wopiserver",
+      "path": "/wopiserver.js"
+    }
+  ],
+  "options": {
+    "hideSearchBar": true
+  }
+}

@@ -7,13 +7,15 @@ geekdocEditPath: edit/master/storage/templates
 geekdocFilePath: CONFIGURATION.tmpl
 ---
 {{- define "options"}}
-{{ $fnName := (last . ).Flags -}}
-{{ range $opt := first . }}{{ with list $fnName $opt -}}
+{{ $fnNames := (last . ).Flags -}}
+{{ range $opt := first . }}
+{{ range $fnName := $fnNames }}{{ with list $fnName $opt -}}
 {{ $o := last . -}}
 {{ if eq $o.FnName $fnName -}}
 -{{ $o.Name }} | {{ range $i, $e := $o.Env }} {{ if $i }}, {{ end }}${{ $e }}{{ end }}
 : {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
+{{ end -}}
 {{ end -}}
 {{ end -}}
 {{ end -}}
@@ -108,6 +110,14 @@ Example: Set the home and users Storage Provider to `ocis`
 
 {{ template "option" (list .Options "DriverOwnCloudWithConfig") -}}
 
+### ownCloudSQL Driver
+
+{{ template "option" (list .Options "DriverOwnCloudSQLWithConfig") -}}
+
 ### Ocis Driver
 
 {{ template "option" (list .Options "DriverOCISWithConfig") -}}
+
+### S3ng Driver
+
+{{ template "option" (list .Options "DriverS3NGWithConfig") -}}

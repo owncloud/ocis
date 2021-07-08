@@ -1,9 +1,12 @@
 package flagset
 
 import (
+	"path"
+
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -233,14 +236,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
@@ -384,7 +387,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "allow-dynamic-client-registration",
 			Usage:       "Allow dynamic OAuth2 client registration",
 			EnvVars:     []string{"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"},
-			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, true),
+			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, false),
 			Destination: &cfg.IDP.AllowDynamicClientRegistration,
 		},
 		&cli.BoolFlag{
@@ -414,7 +417,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"IDP_REFRESH_TOKEN_EXPIRATION"},
 			Destination: &cfg.IDP.RefreshTokenDurationSeconds,
 			Value:       flags.OverrideDefaultUint64(cfg.IDP.RefreshTokenDurationSeconds, 60*60*24*365*3), // 1 year
-
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

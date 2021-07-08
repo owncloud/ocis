@@ -9,12 +9,12 @@ import (
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
-	"github.com/owncloud/ocis/glauth/pkg/crypto"
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
 	"github.com/owncloud/ocis/glauth/pkg/server/glauth"
 	"github.com/owncloud/ocis/glauth/pkg/tracing"
+	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 )
@@ -100,7 +100,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				if lscfg.Enabled {
-					if err := crypto.GenCert(cfg.Ldaps.Cert, cfg.Ldaps.Key, logger); err != nil {
+					if err := pkgcrypto.GenCert(cfg.Ldaps.Cert, cfg.Ldaps.Key, logger); err != nil {
 						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
 					}
 				}

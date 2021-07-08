@@ -89,7 +89,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		Height:        tr.Height,
 		Source: &thumbnails.GetThumbnailRequest_Cs3Source{
 			Cs3Source: &thumbnails.CS3Source{
-				Path:          path.Join("/home", tr.Filepath),
+				Path:          path.Join(g.config.WebdavNamespace, tr.Filepath),
 				Authorization: t,
 			},
 		},

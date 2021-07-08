@@ -96,7 +96,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.Gateway.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

@@ -73,7 +73,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.AuthBearer.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

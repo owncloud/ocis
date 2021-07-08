@@ -22,6 +22,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
+	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
@@ -37,11 +38,18 @@ import (
 	"github.com/thejerf/suture/v4"
 )
 
+var (
+	// runset keeps track of which extensions to start supervised.
+	runset []string
+)
+
+type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
+
 // Service represents a RPC service.
 type Service struct {
 	Supervisor       *suture.Supervisor
-	ServicesRegistry map[string]func(*ociscfg.Config) suture.Service
-	Delayed          map[string]func(*ociscfg.Config) suture.Service
+	ServicesRegistry serviceFuncMap
+	Delayed          serviceFuncMap
 	Log              log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
@@ -71,8 +79,8 @@ func NewService(options ...Option) (*Service, error) {
 	globalCtx, cancelGlobal := context.WithCancel(context.Background())
 
 	s := &Service{
-		ServicesRegistry: make(map[string]func(*ociscfg.Config) suture.Service),
-		Delayed:          make(map[string]func(*ociscfg.Config) suture.Service),
+		ServicesRegistry: make(serviceFuncMap),
+		Delayed:          make(serviceFuncMap),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -180,10 +188,11 @@ func Start(o ...Option) error {
 		}
 	}()
 
-	for name := range s.ServicesRegistry {
-		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
-	}
+	// prepare the set of services to run
+	s.generateRunSet(s.cfg)
+
+	// schedule services that we are sure don't have interdependencies.
+	scheduleServiceTokens(s, s.ServicesRegistry)
 
 	// there are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
 	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
@@ -195,15 +204,43 @@ func Start(o ...Option) error {
 	// trap will block on halt channel for interruptions.
 	go trap(s, halt)
 
-	time.Sleep(1 * time.Second)
-
 	// add services with delayed execution.
-	for name := range s.Delayed {
-		swap := deepcopy.Copy(s.cfg)
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
-	}
+	time.Sleep(1 * time.Second)
+	scheduleServiceTokens(s, s.Delayed)
 
 	return http.Serve(l, nil)
+}
+
+// scheduleServiceTokens adds service tokens to the service supervisor.
+func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
+	for _, name := range runset {
+		if _, ok := funcSet[name]; !ok {
+			continue
+		}
+
+		swap := deepcopy.Copy(s.cfg)
+		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(funcSet[name](swap.(*ociscfg.Config))))
+	}
+}
+
+// generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
+// the runtime.
+func (s *Service) generateRunSet(cfg *config.Config) {
+	if cfg.Runtime.Extensions != "" {
+		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
+		for i := range e {
+			runset = append(runset, e[i])
+		}
+		return
+	}
+
+	for name := range s.ServicesRegistry {
+		runset = append(runset, name)
+	}
+
+	for name := range s.Delayed {
+		runset = append(runset, name)
+	}
 }
 
 // Start indicates the Service Controller to start a new supervised service.

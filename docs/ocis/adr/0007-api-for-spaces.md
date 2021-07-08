@@ -1,6 +1,12 @@
-# 5. Graph API for Spaces
+---
+title: "7. Open Graph API for oCIS File Spaces"
+date: 2021-05-03T09:00:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0007-api-for-spaces.md
+---
 
-* Status: proposed
+* Status: accepted
 * Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
 * Date: 2021-03-19
 
@@ -37,6 +43,8 @@ This the DRAFT for the API.
 ### API to Get Info about Spaces
 
 ownCloud servers provide an API to query for available spaces of an user.
+
+See the openAPI Specification for the [open Graph API](https://owncloud.dev/open-graph-api/).
 
 Most important, the API returns the WebDAV endpoint for each space. With that, clients do not have to make assumptions about WebDAV routes any more.
 
@@ -98,7 +106,7 @@ Other space types such as backup, hidden etc. can be added later as requested.
 
 The (*) marked types are not defined in the official MS API. They are prefixed with `oc` to avoid namespace clashes.
 
-The `root` object equals a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root resource (directory) of the space. 
+The `root` object equals a [driveItem](https://docs.microsoft.com/de-de/graph/api/resources/driveitem?view=graph-rest-1.0) and contains information about the root resource (directory) of the space.
 
 This is an example object as it can be expected as `root` element. It is not complete, as not all elements will be implemented so far.
 
@@ -127,7 +135,7 @@ Meaningful fields of the root element in the context of the Open Graph API:
 4. **cTag** - an identifier that changes automatically if the content of the root node or of one of the underlying resources changes.
 5. **webUrl** - The URL to make this space visible in the browser.
 
-> Note: To indicate that only the metadata of a resource has changed, the eTag has changed, but the cTag not. 
+> Note: To indicate that only the metadata of a resource has changed, the eTag has changed, but the cTag not.
 
 ### Positive Consequences
 

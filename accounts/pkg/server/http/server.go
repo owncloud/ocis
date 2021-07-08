@@ -66,6 +66,5 @@ func Server(opts ...Option) http.Service {
 		options.Logger.Fatal().Err(err).Msg("failed to register the handler")
 	}
 
-	service.Init()
 	return service
 }

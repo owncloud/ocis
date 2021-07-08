@@ -191,3 +191,7 @@ l10n-write:
 	@for extension in $(L10N_MODULES); do \
     	make -C $$extension l10n-write; \
     done
+
+.PHONY: ci-format
+ci-format: $(BUILDIFIER)
+	$(BUILDIFIER) --mode=fix .drone.star

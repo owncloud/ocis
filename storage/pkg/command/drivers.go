@@ -85,6 +85,19 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"scan":            cfg.Reva.Storages.OwnCloud.Scan,
 			"userprovidersvc": cfg.Reva.Users.Endpoint,
 		},
+		"owncloudsql": map[string]interface{}{
+			"datadirectory":   cfg.Reva.Storages.OwnCloudSQL.Root,
+			"upload_info_dir": cfg.Reva.Storages.OwnCloudSQL.UploadInfoDir,
+			"sharedirectory":  cfg.Reva.Storages.OwnCloudSQL.ShareFolder,
+			"user_layout":     cfg.Reva.Storages.OwnCloudSQL.UserLayout,
+			"enable_home":     cfg.Reva.Storages.OwnCloudSQL.EnableHome,
+			"dbusername":      cfg.Reva.Storages.OwnCloudSQL.DBUsername,
+			"dbpassword":      cfg.Reva.Storages.OwnCloudSQL.DBPassword,
+			"dbhost":          cfg.Reva.Storages.OwnCloudSQL.DBHost,
+			"dbport":          cfg.Reva.Storages.OwnCloudSQL.DBPort,
+			"dbname":          cfg.Reva.Storages.OwnCloudSQL.DBName,
+			"userprovidersvc": cfg.Reva.Users.Endpoint,
+		},
 		"ocis": map[string]interface{}{
 			"root":                cfg.Reva.Storages.Common.Root,
 			"enable_home":         cfg.Reva.Storages.Common.EnableHome,
@@ -100,6 +113,16 @@ func drivers(cfg *config.Config) map[string]interface{} {
 			"endpoint":   cfg.Reva.Storages.S3.Endpoint,
 			"bucket":     cfg.Reva.Storages.S3.Bucket,
 			"prefix":     cfg.Reva.Storages.S3.Root,
+		},
+		"s3ng": map[string]interface{}{
+			"root":          cfg.Reva.Storages.Common.Root,
+			"enable_home":   cfg.Reva.Storages.Common.EnableHome,
+			"user_layout":   cfg.Reva.Storages.Common.UserLayout,
+			"s3.region":     cfg.Reva.Storages.S3NG.Region,
+			"s3.access_key": cfg.Reva.Storages.S3NG.AccessKey,
+			"s3.secret_key": cfg.Reva.Storages.S3NG.SecretKey,
+			"s3.endpoint":   cfg.Reva.Storages.S3NG.Endpoint,
+			"s3.bucket":     cfg.Reva.Storages.S3NG.Bucket,
 		},
 	}
 }
