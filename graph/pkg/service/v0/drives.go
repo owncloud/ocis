@@ -167,7 +167,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveIt
 		driveItem.BaseItem.LastModifiedDateTime = &lastModified
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-		driveItem.File = &msgraph.OpenGraphFile{
+		driveItem.File = &msgraph.OpenGraphFile{ // FIXME We cannot use msgraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 			MimeType: &res.MimeType,
 		}
 	}
@@ -231,7 +231,6 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		drive.BaseItem.LastModifiedDateTime = &lastModified
 	}
 	if space.Quota != nil {
-		// FIXME use https://github.com/owncloud/open-graph-api and return proper int64
 		var t int64
 		if space.Quota.QuotaMaxBytes > math.MaxInt64 {
 			t = math.MaxInt64

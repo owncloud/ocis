@@ -83,12 +83,6 @@ $(MUTAGEN): $(BINGO_DIR)/mutagen.mod
 	@echo "(re)installing $(GOBIN)/mutagen-v0.11.8"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=mutagen.mod -o=$(GOBIN)/mutagen-v0.11.8 "github.com/mutagen-io/mutagen/cmd/mutagen"
 
-OAPI_CODEGEN := $(GOBIN)/oapi-codegen-v1.6.1
-$(OAPI_CODEGEN): $(BINGO_DIR)/oapi-codegen.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/oapi-codegen-v1.6.1"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=oapi-codegen.mod -o=$(GOBIN)/oapi-codegen-v1.6.1 "github.com/deepmap/oapi-codegen/cmd/oapi-codegen"
-
 PROTOC_GEN_DOC := $(GOBIN)/protoc-gen-doc-v1.4.1
 $(PROTOC_GEN_DOC): $(BINGO_DIR)/protoc-gen-doc.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
