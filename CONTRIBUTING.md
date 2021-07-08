@@ -91,12 +91,12 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 #### Before Submitting A Bug Report
 
 *   **Make sure you are running a recent version** Usually, developers' interest in old versions of a software drops very fast once new shiny version has been released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
-*   **Determine [which repository the problem should be reported in](#owncloud-repositories)**.
+*   **Determine which [repository](https://github.com/owncloud) the problem should be reported in**.
 *   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** with possibly a more granular filter on the repository, to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one **if you have new information**. Please abstain from adding "plus ones", except using the Github emojis. That might indicate how many users are affected.
 
 #### How Do I Submit A (Good) Bug Report
 
-Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](#owncloud-repositories) your bug is related to, create an issue on that repository and provide the following information by filling in [the template](https://github.com/owncloud/ocis/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](https://github.com/owncloud) your bug is related to, create an issue on that repository and provide the following information by filling in [the template](https://github.com/owncloud/ocis/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
@@ -130,7 +130,7 @@ Before creating enhancement suggestions, please check [this list](#before-submit
 
 #### How Do I Submit A (Good) Enhancement Suggestion
 
-Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](#owncloud-repositories) your enhancement suggestion is related to, create an issue on that repository and provide the following information:
+Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com/features/issues/). After you've determined [which repository](https://github.com/owncloud) your enhancement suggestion is related to, create an issue on that repository and provide the following information:
 
 *   **Use a clear and descriptive title** for the issue to identify the suggestion.
 *   **Provide a step-by-step description of the suggested enhancement** in as many details as possible.
