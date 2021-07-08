@@ -2,12 +2,10 @@ package policy
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 
-	"github.com/asim/go-micro/v3/errors"
-
 	"github.com/asim/go-micro/v3/client"
+	"github.com/asim/go-micro/v3/errors"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 )
@@ -17,10 +15,6 @@ type clientWrapper struct {
 	storage    IStorage
 	policyPath string
 }
-
-var (
-	maxAllowedUsers int64 = 5
-)
 
 func (c *clientWrapper) checkPolicy(ctx context.Context, req client.Request) error {
 	if c.policyPath == "" {
@@ -41,6 +35,7 @@ func (c *clientWrapper) checkPolicy(ctx context.Context, req client.Request) err
 		return err
 	}
 
+	// see https://www.openpolicyagent.org/docs/latest/external-data/#option-2-overload-input for the "external" key.
 	input := map[string]interface{}{
 		"service":      req.Service(),
 		"endpoint":     req.Endpoint(),
@@ -68,14 +63,8 @@ func (c *clientWrapper) checkPolicy(ctx context.Context, req client.Request) err
 		return err
 	}
 
-	// all conditions MUST evaluate to false in order to pass the policy checker.
-	checkers := []func(set rego.ResultSet) bool{thumbnailerLicense}
-
-	// all policies apply
-	for _, f := range checkers {
-		if f(results) {
-			return errors.New(req.Service(), "denied policy result", 403)
-		}
+	if results[0].Bindings["deny"].(bool) == true {
+		return errors.New(req.Service(), "denied policy result", 403)
 	}
 
 	return nil
@@ -103,14 +92,4 @@ func NewClientWrapper() client.Wrapper {
 			policyPath: policyPath,
 		}
 	}
-}
-
-// thumbnailerLicense permits requests if:
-// - request is not denied (configured in the policy file)
-// - user count under a threshold (default: 5)
-func thumbnailerLicense(rs rego.ResultSet) bool {
-	if current, err := rs[0].Bindings["users_count"].(json.Number).Int64(); err == nil {
-		return current >= maxAllowedUsers && rs[0].Bindings["deny"].(bool)
-	}
-	return false
 }
