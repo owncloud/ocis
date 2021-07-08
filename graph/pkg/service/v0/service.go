@@ -33,6 +33,7 @@ func NewService(opts ...Option) Service {
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
+				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 			})
 			r.Route("/users", func(r chi.Router) {

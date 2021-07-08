@@ -63,18 +63,23 @@ type Reva struct {
 	Address string
 }
 
+type Spaces struct {
+	WebDavBase string
+}
+
 // Config combines all available configuration parts.
 type Config struct {
-	File                string
-	WebdavNamespace     string
-	Log                 Log
-	Debug               Debug
-	HTTP                HTTP
-	Server              Server
-	Tracing             Tracing
-	Ldap                Ldap
-	OpenIDConnect       OpenIDConnect
-	Reva                Reva
+	File            string
+	WebdavNamespace string
+	Log             Log
+	Debug           Debug
+	HTTP            HTTP
+	Server          Server
+	Tracing         Tracing
+	Ldap            Ldap
+	OpenIDConnect   OpenIDConnect
+	Reva            Reva
+	Spaces          Spaces
 
 	Context    context.Context
 	Supervised bool

@@ -23,7 +23,7 @@ A *reference* is a logical concept that identifies a [*resource*]({{< ref "#reso
 - a [CS3 *id* based reference](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId), uniquely identifying a [*resource*]({{< ref "#resources" >}}) in the [*namespace*]({{< ref "./namespaces.md" >}}) of a [*storage provider*]({{< ref "#storage-providers" >}}). It consists of a `storage provider id` and an `opaque id`. The `storage provider id` must NOT start with a `/`.
 
 {{< hint info >}}
-The `/` is important because currently the static [*storage registry*]({{< ref "#storage-registries" >}}) uses a map to look up which [*storage provider*]({{< ref "#storage-providers" >}}) is responsible for the resource. Paths must be prefixed with `/` so there can be no collisions between paths and storage provider ids in the same map.
+The `/` is important because currently the static [*storage registry*]({{< ref "#storage-space-registries" >}}) uses a map to look up which [*storage provider*]({{< ref "#storage-providers" >}}) is responsible for the resource. Paths must be prefixed with `/` so there can be no collisions between paths and storage provider ids in the same map.
 {{< /hint >}}
 
 
@@ -108,7 +108,7 @@ by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*stora
 By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can get rid of the current `enablehome` flag / hack in reva, which lead to the [spawn of `*home` drivers](https://github.com/cs3org/reva/tree/master/pkg/storage/fs). Furthermore, provisioning a new [*storage space*]({{< ref "#storage-space" >}}) becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
 {{< /hint >}}
 
-## Storage Registries
+## Storage Space Registries
 
 A *storage registry* manages the [*CS3 global namespace*]({{< ref "./namespaces.md#cs3-global-namespaces" >}}):
 It is used by the *gateway*
@@ -119,7 +119,7 @@ that should handle a [*reference*]({{< ref "#references" >}}).
 
 {{< hint warning >}}
 **Proposed Change**
-A *storage registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*:
+A *storage space registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*:
 It is used by the *gateway*
 to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
 that is currently serving a [*storage space*]({{< ref "#storage-space" >}}).
@@ -137,7 +137,7 @@ a *quota* and *permissions*, identified by a `storage space id`.
 
 {{< svg src="extensions/storage/static/storagespace.drawio.svg" >}}
 
-Examples would be every user's home storage space, project storage spaces or group storage spaces. While they all serve different purposes and may or may not have workflows like anti virus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A [*storage registry*]({{< ref "#storage-registries" >}}) then allows listing the capabilities of [*storage spaces*]({{< ref "#storage-spaces" >}}), e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
+Examples would be every user's home storage space, project storage spaces or group storage spaces. While they all serve different purposes and may or may not have workflows like anti virus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A [*storage space registry*]({{< ref "#storage-space-registries" >}}) then allows listing the capabilities of [*storage spaces*]({{< ref "#storage-spaces" >}}), e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
 
 Finally, a logical `storage space id` is not tied to a specific [*storage provider*]({{< ref "#storage-providers" >}}). If the [*storage driver*]({{< ref "#storage-drivers" >}}) supports it, we can import existing files including their `file id`, which makes it possible to move [*storage spaces*]({{< ref "#storage-spaces" >}}) between [*storage providers*]({{< ref "#storage-providers" >}}) to implement storage classes, e.g. with or without archival, workflows, on SSDs or HDDs.
 

@@ -18,7 +18,7 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
-	github.com/cs3org/reva v1.9.1-0.20210628143859-9d29c36c0c3f
+	github.com/cs3org/reva v1.9.1-0.20210708074943-d2f72e0e3b4b
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/iancoleman/strcase v0.1.3
 	github.com/justinas/alice v1.2.0
@@ -50,7 +50,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	golang.org/x/tools v0.1.2 // indirect
-	google.golang.org/grpc v1.38.0
+	google.golang.org/grpc v1.39.0
 )
 
 replace (
