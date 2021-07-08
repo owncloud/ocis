@@ -58,6 +58,5 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, err
 	}
 
-	service.Init()
 	return service, nil
 }

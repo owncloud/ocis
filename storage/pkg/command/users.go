@@ -85,7 +85,7 @@ func Users(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.Users.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

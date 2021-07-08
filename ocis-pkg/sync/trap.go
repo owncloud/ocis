@@ -16,7 +16,6 @@ func Trap(gr *run.Group, cancel context.CancelFunc) {
 		<-stop
 		return nil
 	}, func(err error) {
-		close(stop)
 		cancel()
 	})
 }

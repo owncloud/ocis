@@ -78,7 +78,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.AuthBasic.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 

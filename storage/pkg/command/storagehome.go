@@ -49,6 +49,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cfg.Reva.Storages.EOS.EnableHome = true
 				cfg.Reva.Storages.Local.EnableHome = true
 				cfg.Reva.Storages.OwnCloud.EnableHome = true
+				cfg.Reva.Storages.OwnCloudSQL.EnableHome = true
 				cfg.Reva.Storages.S3.EnableHome = true
 				cfg.Reva.Storages.S3NG.EnableHome = true
 			}
@@ -86,7 +87,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.StorageHome.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
