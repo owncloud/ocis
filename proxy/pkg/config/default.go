@@ -14,7 +14,7 @@ func DefaultConfig() Config {
 			Root:    "/",
 			TLSCert: "",
 			TLSKey:  "",
-			TLS:     true,
+			//TLS:     true,
 		},
 		Service: Service{
 			Name:      "proxy",
@@ -30,8 +30,8 @@ func DefaultConfig() Config {
 			Path: "",
 		},
 		OIDC: OIDC{
-			Issuer:   "https://localhost:9200",
-			Insecure: true,
+			Issuer: "https://localhost:9200",
+			//Insecure: true,
 			UserinfoCache: Cache{
 				Size: 1024,
 				TTL:  10,
@@ -46,12 +46,12 @@ func DefaultConfig() Config {
 		},
 		PreSignedURL: PreSignedURL{
 			AllowedHTTPMethods: []string{"GET"},
-			Enabled:            true,
+			//Enabled:            true,
 		},
-		AccountBackend:        "accounts",
-		AutoprovisionAccounts: false,
-		EnableBasicAuth:       false,
-		InsecureBackends:      false,
-		Context:               nil,
+		AccountBackend: "accounts",
+		//AutoprovisionAccounts: false,
+		//EnableBasicAuth:       false,
+		//InsecureBackends:      false,
+		Context: nil,
 	}
 }

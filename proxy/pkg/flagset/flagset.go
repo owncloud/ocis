@@ -184,7 +184,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "tls",
-			Value:       cfg.HTTP.TLS,
+			Value:       true,
 			Usage:       "Use TLS (disable only if proxy is behind a TLS-terminating reverse-proxy).",
 			EnvVars:     []string{"PROXY_TLS"},
 			Destination: &cfg.HTTP.TLS,
@@ -205,7 +205,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "insecure",
-			Value:       cfg.InsecureBackends,
+			Value:       false,
 			Usage:       "allow insecure communication to upstream servers",
 			EnvVars:     []string{"PROXY_INSECURE_BACKENDS"},
 			Destination: &cfg.InsecureBackends,
@@ -222,7 +222,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "oidc-insecure",
-			Value:       cfg.OIDC.Insecure,
+			Value:       true,
 			Usage:       "OIDC allow insecure communication",
 			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
@@ -246,7 +246,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",
-			Value:       cfg.AutoprovisionAccounts,
+			Value:       false,
 			Usage:       "create accounts from OIDC access tokens to learn new users",
 			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
 			Destination: &cfg.AutoprovisionAccounts,
@@ -275,7 +275,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "enable-presignedurls",
-			Value:       cfg.PreSignedURL.Enabled,
+			Value:       true,
 			Usage:       "Enable or disable handling the presigned urls in the proxy",
 			EnvVars:     []string{"PROXY_ENABLE_PRESIGNEDURLS"},
 			Destination: &cfg.PreSignedURL.Enabled,
@@ -284,7 +284,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		// Basic auth
 		&cli.BoolFlag{
 			Name:        "enable-basic-auth",
-			Value:       cfg.EnableBasicAuth,
+			Value:       false,
 			Usage:       "enable basic authentication",
 			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
 			Destination: &cfg.EnableBasicAuth,

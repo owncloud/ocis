@@ -59,6 +59,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err := copier.Copy(&beforeOverride, cfg); err != nil {
 				return err
 			}
+
 			defaultConfig := config.DefaultConfig()
 
 			// By the time we unmarshal viper parsed values onto cfg, any value having been set by the cli framework
