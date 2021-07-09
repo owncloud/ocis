@@ -20,7 +20,7 @@ func (g Graph) GroupCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		groupID := chi.URLParam(r, "groupID")
 		if groupID == "" {
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "groupID empty")
 			return
 		}
 		// TODO make filter configurable
@@ -28,7 +28,7 @@ func (g Graph) GroupCtx(next http.Handler) http.Handler {
 		group, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNGroups, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read group %s", groupID)
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
+			errorcode.ItemNotFound.Render(w, r, http.StatusInternalServerError, "")
 			return
 		}
 
@@ -42,7 +42,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 	con, err := g.initLdap()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("Failed to initialize ldap")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -51,7 +51,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectClass=posixGroup)'")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
 		return
 	}
 

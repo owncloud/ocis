@@ -17,6 +17,8 @@ const (
 	ActivityLimitReached
 	// GeneralException defines the error if an unspecified error has occurred.
 	GeneralException
+	// InvalidAuthenticationToken defines the error if the access token is missing
+	InvalidAuthenticationToken
 	// InvalidRange defines the error if the specified byte range is invalid or unavailable.
 	InvalidRange
 	// InvalidRequest defines the error if the request is malformed or incorrect.
@@ -47,6 +49,7 @@ var errorCodes = [...]string{
 	"accessDenied",
 	"activityLimitReached",
 	"generalException",
+	"InvalidAuthenticationToken",
 	"invalidRange",
 	"invalidRequest",
 	"itemNotFound",
@@ -62,9 +65,10 @@ var errorCodes = [...]string{
 }
 
 // Render writes an Graph ErrorObject to the response writer
-func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int) {
+func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
 	resp := &msgraph.ErrorObject{
-		Code: e.String(),
+		Code:    e.String(),
+		Message: msg,
 	}
 	render.Status(r, status)
 	render.JSON(w, r, resp)

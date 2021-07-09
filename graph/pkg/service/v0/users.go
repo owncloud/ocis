@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
-
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/go-ldap/ldap/v3"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
 // UserCtx middleware is used to load an User object from
 // the URL parameters passed through as the request. In case
 // the User could not be found, we stop here and return a 404.
+// TODO use cs3 api to look up user
 func (g Graph) UserCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var user *ldap.Entry
@@ -24,7 +25,7 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 
 		userID := chi.URLParam(r, "userID")
 		if userID == "" {
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest)
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "")
 			return
 		}
 		// TODO make filter configurable
@@ -32,7 +33,7 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 		user, err = g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
 		if err != nil {
 			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "")
 			return
 		}
 
@@ -43,30 +44,48 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
-	claims := oidc.FromContext(r.Context())
-	g.logger.Info().Interface("Claims", claims).Msg("Claims in /me")
 
-	// TODO make filter configurable
-	filter := fmt.Sprintf("(&(objectClass=posixAccount)(cn=%s))", claims.PreferredUsername)
-	user, err := g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
-	if err != nil {
-		g.logger.Info().Err(err).Msgf("Failed to read user %s", claims.PreferredUsername)
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound)
+	u, ok := user.ContextGetUser(r.Context())
+	if !ok {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "")
 		return
 	}
 
-	me := createUserModelFromLDAP(user)
+	g.logger.Info().Interface("user", u).Msg("User in /me")
+
+	me := createUserModelFromCS3(u)
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
 }
 
+func createUserModelFromCS3(u *userpb.User) *msgraph.User {
+	return &msgraph.User{
+		DisplayName: &u.DisplayName,
+		Mail:        &u.Mail,
+		// TODO u.Groups
+		OnPremisesSamAccountName: &u.Username,
+		DirectoryObject: msgraph.DirectoryObject{
+			Entity: msgraph.Entity{
+				ID: &u.Id.OpaqueId,
+				Object: msgraph.Object{
+					AdditionalData: map[string]interface{}{
+						"uidnumber": u.UidNumber,
+						"gidnumber": u.GidNumber,
+					},
+				},
+			},
+		},
+	}
+}
+
 // GetUsers implements the Service interface.
+// TODO use cs3 api to look up user
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	con, err := g.initLdap()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("Failed to initialize ldap")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -75,7 +94,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectClass=posixAccount)'")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
 		return
 	}
 

@@ -8,42 +8,17 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
-	"google.golang.org/grpc/metadata"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/pkg/token"
 
 	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
-func getToken(r *http.Request) string {
-	// 1. check Authorization header
-	hdr := r.Header.Get("Authorization")
-	t := strings.TrimPrefix(hdr, "Bearer ")
-	if t != "" {
-		return t
-	}
-	// TODO 2. check form encoded body parameter for POST requests, see https://tools.ietf.org/html/rfc6750#section-2.2
-
-	// 3. check uri query parameter, see https://tools.ietf.org/html/rfc6750#section-2.3
-	tokens, ok := r.URL.Query()["access_token"]
-	if !ok || len(tokens[0]) < 1 {
-		return ""
-	}
-
-	return tokens[0]
-}
-
 // GetDrives implements the Service interface.
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetDrives")
-	if getToken(r) == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
 	ctx := r.Context()
 
 	client, err := g.GetClient()
@@ -52,9 +27,6 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	t := r.Header.Get("x-access-token")
-	ctx = token.ContextSetToken(ctx, t)
-	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
 
 	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{})
 	if err != nil {
@@ -90,11 +62,6 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 // GetRootDriveChildren implements the Service interface.
 func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
-	if getToken(r) == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
 	ctx := r.Context()
 
 	fn := g.config.WebdavNamespace
@@ -105,12 +72,6 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	t := r.Header.Get("x-access-token")
-	ctx = token.ContextSetToken(ctx, t)
-	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", t)
-
-	g.logger.Info().Interface("context", ctx).Msg("provides access token")
 
 	ref := &storageprovider.Reference{
 		Path: fn,

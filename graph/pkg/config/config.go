@@ -63,6 +63,11 @@ type Reva struct {
 	Address string
 }
 
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string
+}
+
 type Spaces struct {
 	WebDavBase string
 }
@@ -79,6 +84,7 @@ type Config struct {
 	Ldap            Ldap
 	OpenIDConnect   OpenIDConnect
 	Reva            Reva
+	TokenManager    TokenManager
 	Spaces          Spaces
 
 	Context    context.Context

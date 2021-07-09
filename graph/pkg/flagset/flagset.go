@@ -214,6 +214,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		&cli.StringFlag{
+			Name:        "jwt-secret",
+			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
+			Usage:       "Used to validate the reva access JWT, should equal reva's jwt-secret",
+			EnvVars:     []string{"GRAPH_JWT_SECRET", "OCIS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
+		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
 			Usage:       "REVA Gateway Endpoint",
