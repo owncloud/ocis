@@ -38,7 +38,7 @@ For simplicity reasons, this document mostly refers to the ownCloud [Infinite Sc
 
 For general questions, please refer to [ownCloud's FAQs](https://owncloud.com/faq/) or ask on the [ownCloud Central Server](https://central.owncloud.org/).
 
-We also have a [Rocket Chat Server](https://talk.owncloud.com/channel/ocis) to answer your questions specifically to ownCloud Infinite Scale.
+We also have a [Rocket Chat Server](https://talk.owncloud.com/channel/ocis) to answer your questions specifically about ownCloud Infinite Scale.
 
 ## What should I know before I get started
 
@@ -90,7 +90,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-*   **Make sure you are running a recent version** Usually, developers' interest in old versions of a software drops very fast once new shiny version has been released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
+*   **Make sure you are running a recent version** Usually, developers' interest in old versions of software drops very fast once a new shiny version has been released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
 *   **Determine which [repository](https://github.com/owncloud) the problem should be reported in**.
 *   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** with possibly a more granular filter on the repository, to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one **if you have new information**. Please abstain from adding "plus ones", except using the Github emojis. That might indicate how many users are affected.
 
@@ -101,12 +101,12 @@ Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
 *   **Use a clear and descriptive title** for the issue to identify the problem.
-*   **Describe the exact steps which reproduce the problem** in as many details as possible. Start with describing from user perspective with what you tried to achieve, ie. "I want to share some pictures with Grandma". When listing steps, **don't just say what you did, but explain how you did it**. For example, if you uploaded a file to ownCloud, say which client you used, which way of uploading you choose, if the name was special somehow and how big it was.
+*   **Describe the exact steps which reproduce the problem** in as many details as possible. Start with describing, from a user perspective, what you tried to achieve, i.e. "I want to share some pictures with Grandma". When listing steps, **don't just say what you did, but explain how you did it**. For example, if you uploaded a file to ownCloud, say which client you used, which way of uploading you chose, if the name was special somehow and how big it was.
 *   **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 *   **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 *   **Explain which behavior you expected to see instead and why.**
 *   **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
-*   **If you report a web browser related problem**, consider to use the browser's Web developer tools (such as the debugger, console or network monitor) to check what happened. Make sure to add screenshots of the utilities if you are short of time to interpret it.
+*   **If you report a web browser related problem**, consider to using the browser's Web developer tools (such as the debugger, console or network monitor) to check what happened. Make sure to add screenshots of the utilities if you are short of time to interpret it.
 *   **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and share more information using the guidelines below.
 
 Provide more context by answering these questions:
@@ -126,7 +126,7 @@ Before creating enhancement suggestions, please check [this list](#before-submit
 #### Before Submitting An Enhancement Suggestion
 
 *   **Check if there's already an extension or other component which provides that enhancement, even in a different way.**
-*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one. Feel free ot use the Github emojis to indicate that you are in favour of an enhancement request.
+*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one. Feel free to use the Github emojis to indicate that you are in favour of an enhancement request.
 
 #### How Do I Submit A (Good) Enhancement Suggestion
 
@@ -142,7 +142,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 
 Unsure where to begin contributing to ownCloud? You can start by looking through these `Needs-help` issues:
 
-*   The [Good first issue](https://github.com/owncloud/ocis/labels/Topic%3Agood-first-issue) label mark good items to start with.
+*   The [Good first issue](https://github.com/owncloud/ocis/labels/Topic%3Agood-first-issue) label marks good items to start with.
 *   [Tests needed](https://github.com/owncloud/ocis/labels/Interaction%3ANeeds-tests) - issues which would benefit from a test.
 *   [Help wanted issues](https://github.com/owncloud/ocis/labels/Interaction%3ANeeds-help) - issues which should be a bit more involved.
 
@@ -166,11 +166,11 @@ While the prerequisites above must be satisfied prior to having your pull reques
 
 ownCloud is very proud of the documentation it has, which is the work of a great team of people. Of course, also the documentation is open to contributions.
 
-See the [Getting Started Guide](https://owncloud.dev/ocis/development/getting-started/) on how to get started. Many other useful information is summarized in the [Documentation Readme](https://github.com/owncloud/docs).
+See the [Getting Started Guide](https://owncloud.dev/ocis/development/getting-started/) on how to get started. Other useful information is summarized in the [Documentation Readme](https://github.com/owncloud/docs).
 
 ### Internationalization
 
-Our projects are getting translated into many languages to allow people from all over the world to use ownCloud in their native language. For translations, ownCloud uses [Transifex](https://www.transifex.com) as community based collaboration platform for internationalization.
+Our projects are getting translated into many languages to allow people from all over the world to use ownCloud in their native language. For translations, ownCloud uses [Transifex](https://www.transifex.com) as a community based collaboration platform for internationalization.
 
 For contributions please refer to the [Transifex Resources](https://www.transifex.com/resources/) to learn how to improve ownClouds translations there.
 
@@ -200,7 +200,7 @@ Refer to related documents in the [ownCloud Web Repository](https://github.com/o
 
 #### Documentation Styleguide
 
-Find the [ownCloud Documentation Styleguide](https://github.com/owncloud/docs/blob/master/docs/style-guide.md).
+See the [ownCloud Documentation Styleguide](https://github.com/owncloud/docs/blob/master/docs/style-guide.md).
 
 ## Additional Notes
 
@@ -248,7 +248,7 @@ Categorizes the issue to also indicate the type of the issue.
 
 #### Status
 
-The status in the ticket live cycle. Keep an eye on that one, especially for the `Waiting-for-Feedback` tag which might indicate that the reporter is asked for feedback.
+The status in the ticket life cycle. Keep an eye on that one, especially for the `Waiting-for-Feedback` tag which might indicate that the reporter is asked for feedback.
 
 #### Interaction
 
