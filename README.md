@@ -24,7 +24,7 @@ If you find a security issue please contact [security@owncloud.com](mailto:secur
 
 ## Contributing
 
-Fork -> Patch -> Push -> Pull Request
+Please refer to our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## License
 
@@ -33,5 +33,5 @@ Apache-2.0
 ## Copyright
 
 ```console
-Copyright (c) 2020 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020-2021 ownCloud GmbH <https://owncloud.com>
 ```
