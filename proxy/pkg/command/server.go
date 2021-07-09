@@ -68,11 +68,7 @@ func Server(cfg *config.Config) *cli.Command {
 			// 2. merge defaults onto cfg
 			// 3. merge parsed flags onto cfg
 			// the result of this is the same order of precedence as the cli framework claims, except a new "artificial"
-			// source which accounts for structured configuration. This all goes to the moon when the extension is running
-			// in supervised mode, this is because in such case we want the single config file to take precedence over
-			// the global ocis.yaml config file. This is happening because in supervised mode, sending commands to a hot
-			// runtime, flags forwarding is not possible, because the process is probably running in a machine elsewhere.
-			// It is not impossible to do, it just needs design.
+			// source which accounts for structured configuration.
 			if !cfg.Supervised {
 				if err := ParseConfig(ctx, cfg); err != nil {
 					return err
@@ -89,7 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			// When an extension is running supervised, we have the use case where executing `ocis run extension`
-			// we want to ONLY take into consideration fhe existing config file.
+			// we want to ONLY take into consideration fhe existing config file. This is a hard requirement.
 			if !reflect.DeepEqual(fromProxyConfigFile, config.Config{}) {
 				if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
 					panic(err)
