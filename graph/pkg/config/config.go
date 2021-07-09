@@ -40,24 +40,6 @@ type Tracing struct {
 	Service   string
 }
 
-// Ldap defined the available LDAP configuration.
-type Ldap struct {
-	Network      string
-	Address      string
-	UserName     string
-	Password     string
-	BaseDNUsers  string
-	BaseDNGroups string
-}
-
-// OpenIDConnect defined the available OpenID Connect configuration.
-type OpenIDConnect struct {
-	Endpoint    string
-	Realm       string
-	SigningAlgs []string
-	Insecure    bool
-}
-
 // Reva defines all available REVA configuration.
 type Reva struct {
 	Address string
@@ -74,18 +56,15 @@ type Spaces struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File            string
-	WebdavNamespace string
-	Log             Log
-	Debug           Debug
-	HTTP            HTTP
-	Server          Server
-	Tracing         Tracing
-	Ldap            Ldap
-	OpenIDConnect   OpenIDConnect
-	Reva            Reva
-	TokenManager    TokenManager
-	Spaces          Spaces
+	File         string
+	Log          Log
+	Debug        Debug
+	HTTP         HTTP
+	Server       Server
+	Tracing      Tracing
+	Reva         Reva
+	TokenManager TokenManager
+	Spaces       Spaces
 
 	Context    context.Context
 	Supervised bool

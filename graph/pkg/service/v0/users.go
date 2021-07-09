@@ -2,15 +2,16 @@ package svc
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+
+	//msgraph "github.com/owncloud/open-graph-api-go" // FIXME needs OnPremisesSamAccountName, OnPremisesDomainName and AdditionalData
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
@@ -20,24 +21,41 @@ import (
 // TODO use cs3 api to look up user
 func (g Graph) UserCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var user *ldap.Entry
-		var err error
 
 		userID := chi.URLParam(r, "userID")
 		if userID == "" {
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "")
-			return
-		}
-		// TODO make filter configurable
-		filter := fmt.Sprintf("(&(objectClass=posixAccount)(ownCloudUUID=%s))", userID)
-		user, err = g.ldapGetSingleEntry(g.config.Ldap.BaseDNUsers, filter)
-		if err != nil {
-			g.logger.Info().Err(err).Msgf("Failed to read user %s", userID)
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), userIDKey, user)
+		client, err := g.GetClient()
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get client")
+			errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		res, err := client.GetUserByClaim(r.Context(), &cs3.GetUserByClaimRequest{
+			Claim: "userid", // FIXME add consts to reva
+			Value: userID,
+		})
+
+		switch {
+		case err != nil:
+			g.logger.Error().Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
+			errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		case res.Status.Code != cs3rpc.Code_CODE_OK:
+			if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+				errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+				return
+			}
+			g.logger.Error().Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), userKey, res.User)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -47,7 +65,8 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 	u, ok := user.ContextGetUser(r.Context())
 	if !ok {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "")
+		g.logger.Error().Msg("user not in context")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "user not in context")
 		return
 	}
 
@@ -59,11 +78,68 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, me)
 }
 
-func createUserModelFromCS3(u *userpb.User) *msgraph.User {
+// GetUsers implements the Service interface.
+// TODO use cs3 api to look up user
+func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
+
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not get client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	search := r.URL.Query().Get("search")
+	if search == "" {
+		search = r.URL.Query().Get("$search")
+	}
+
+	res, err := client.FindUsers(r.Context(), &cs3.FindUsersRequest{
+		// FIXME presence match is currently not implemented, an empty search currently leads to
+		// Unwilling To Perform": Search Error: error parsing filter: (&(objectclass=posixAccount)(|(cn=*)(displayname=*)(mail=*))), error: Present filter match for cn not implemented
+		Filter: search,
+	})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Str("search", search).Msg("error sending find users grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+			return
+		}
+		g.logger.Error().Err(err).Str("search", search).Msg("error sending find users grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	users := make([]*msgraph.User, 0, len(res.Users))
+
+	for _, user := range res.Users {
+		users = append(users, createUserModelFromCS3(user))
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: users})
+}
+
+// GetUser implements the Service interface.
+func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value(userKey).(*cs3.User)
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, createUserModelFromCS3(user))
+}
+
+func createUserModelFromCS3(u *cs3.User) *msgraph.User {
+	if u.Id == nil {
+		u.Id = &cs3.UserId{}
+	}
 	return &msgraph.User{
 		DisplayName: &u.DisplayName,
 		Mail:        &u.Mail,
-		// TODO u.Groups
+		// TODO u.Groups are those ids or group names?
 		OnPremisesSamAccountName: &u.Username,
 		DirectoryObject: msgraph.DirectoryObject{
 			Entity: msgraph.Entity{
@@ -77,46 +153,4 @@ func createUserModelFromCS3(u *userpb.User) *msgraph.User {
 			},
 		},
 	}
-}
-
-// GetUsers implements the Service interface.
-// TODO use cs3 api to look up user
-func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
-	con, err := g.initLdap()
-	if err != nil {
-		g.logger.Error().Err(err).Msg("Failed to initialize ldap")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
-		return
-	}
-
-	// TODO make filter configurable
-	result, err := g.ldapSearch(con, "(objectClass=posixAccount)", g.config.Ldap.BaseDNUsers)
-
-	if err != nil {
-		g.logger.Error().Err(err).Msg("Failed search ldap with filter: '(objectClass=posixAccount)'")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "")
-		return
-	}
-
-	users := make([]*msgraph.User, 0, len(result.Entries))
-
-	for _, user := range result.Entries {
-		users = append(
-			users,
-			createUserModelFromLDAP(
-				user,
-			),
-		)
-	}
-
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: users})
-}
-
-// GetUser implements the Service interface.
-func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(userIDKey).(*ldap.Entry)
-
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, createUserModelFromLDAP(user))
 }

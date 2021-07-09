@@ -2,9 +2,11 @@ package errorcode
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/render"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
+	"github.com/ascarter/requestid"
+	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
 // ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
@@ -66,9 +68,19 @@ var errorCodes = [...]string{
 
 // Render writes an Graph ErrorObject to the response writer
 func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
-	resp := &msgraph.ErrorObject{
-		Code:    e.String(),
-		Message: msg,
+	innererror := map[string]interface{}{
+		"date": time.Now().UTC().Format(time.RFC3339),
+		// TODO return client-request-id?
+	}
+	if id, ok := requestid.FromContext(r.Context()); ok {
+		innererror["request-id"] = id
+	}
+	resp := &msgraph.OdataError{
+		Error: msgraph.OdataErrorMain{
+			Code:    e.String(),
+			Message: msg,
+			Innererror: &innererror,
+		},
 	}
 	render.Status(r, status)
 	render.JSON(w, r, resp)

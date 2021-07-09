@@ -28,6 +28,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			middleware.RequestID,
 			middleware.Version(
 				"graph",
 				version.String,

@@ -4,15 +4,14 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"strings"
+	"path"
 	"time"
-
-	"github.com/go-chi/render"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-
+	"github.com/go-chi/render"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
@@ -24,34 +23,40 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	client, err := g.GetClient()
 	if err != nil {
 		g.logger.Err(err).Msg("error getting grpc client")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{})
-	if err != nil {
+	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+		// TODO add filters?
+	})
+	switch {
+	case err != nil:
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	}
-	// TODO handle not found and other status codes
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling grpc list storage spaces")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			// return an empty list
+			render.Status(r, http.StatusOK)
+			render.JSON(w, r, &listResponse{})
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	files, err := formatDrives(wdu, res.StorageSpaces)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -64,39 +69,58 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	fn := g.config.WebdavNamespace
-
 	client, err := g.GetClient()
 	if err != nil {
-		g.logger.Err(err).Msg("error getting grpc client")
-		w.WriteHeader(http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msg("could not get client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	ref := &storageprovider.Reference{
-		Path: fn,
-	}
-
-	req := &storageprovider.ListContainerRequest{
-		Ref: ref,
-	}
-	res, err := client.ListContainer(ctx, req)
-	if err != nil {
-		g.logger.Error().Err(err).Str("path", fn).Msg("error sending list container grpc request")
-		w.WriteHeader(http.StatusInternalServerError)
+	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
-	}
-	// TODO handle not found and other status codes
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Str("path", fn).Interface("status", res.Status).Msg("error calling grpc list container")
-		w.WriteHeader(http.StatusInternalServerError)
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
 
-	files, err := formatDriveItems(res.Infos)
+	lRes, err := client.ListContainer(ctx, &storageprovider.ListContainerRequest{
+		Ref: &storageprovider.Reference{
+			Path: res.Path,
+		},
+	})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+			return
+		}
+		if res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
+			// TODO check if we should return 404 to not disclose existing items
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, res.Status.Message)
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	files, err := formatDriveItems(lRes.Infos)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -111,7 +135,7 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
 	size := new(int64)
 	*size = int64(res.Size) // uint64 -> int :boom:
-	name := strings.TrimPrefix(res.Path, "/home/")
+	name := path.Base(res.Path)
 
 	driveItem := &msgraph.DriveItem{
 		BaseItem: msgraph.BaseItem{

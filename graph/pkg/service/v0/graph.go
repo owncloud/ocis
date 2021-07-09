@@ -31,8 +31,10 @@ func (g Graph) GetClient() (gateway.GatewayAPIClient, error) {
 // other packages.
 type key int
 
-const userIDKey key = 0
-const groupIDKey key = 1
+const (
+	userKey key = iota
+	groupKey
+)
 
 type listResponse struct {
 	Value interface{} `json:"value,omitempty"`
