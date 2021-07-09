@@ -71,8 +71,10 @@ func Server(cfg *config.Config) *cli.Command {
 			// the global ocis.yaml config file. This is happening because in supervised mode, sending commands to a hot
 			// runtime, flags forwarding is not possible, because the process is probably running in a machine elsewhere.
 			// It is not impossible to do, it just needs design.
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
+			if !cfg.Supervised {
+				if err := ParseConfig(ctx, cfg); err != nil {
+					return err
+				}
 			}
 
 			fromProxyConfigFile := config.Config{}
@@ -84,15 +86,13 @@ func Server(cfg *config.Config) *cli.Command {
 				panic(err)
 			}
 
-			if cfg.Supervised {
-				// When an extension is running supervised, we have the use case where executing `ocis run extension`
-				// we want to ONLY take into consideration fhe existing config file.
-				if !reflect.DeepEqual(fromProxyConfigFile, config.Config{}) {
-					if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
-						panic(err)
-					}
-					return nil
+			// When an extension is running supervised, we have the use case where executing `ocis run extension`
+			// we want to ONLY take into consideration fhe existing config file.
+			if !reflect.DeepEqual(fromProxyConfigFile, config.Config{}) {
+				if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
+					panic(err)
 				}
+				return nil
 			}
 
 			if err := mergo.Merge(cfg, fromProxyConfigFile); err != nil {
