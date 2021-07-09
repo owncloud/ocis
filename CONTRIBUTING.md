@@ -76,7 +76,7 @@ There are many ways to contribute to open source projects, and all are equally v
 
 This way to contribute to the project can not be overestimated: People who talk about their experience with ownCloud Infinite Scale and help others with that are the key to success of the project.
 
-There are too many ways of doing that to line them up here, but examples are answering questions in [ownCloud Central](https://central.owncloud.org/) or on [ownCloud Talk](https://talk.owncloud.com/channel/infinitescale), writing blog posts etc pp.
+There are too many ways of doing that to line them up here, but examples are answering questions in [ownCloud Central](https://central.owncloud.org/) or on [ownCloud Talk](https://talk.owncloud.com/channel/ocis), writing blog posts etc pp.
 
 There is no formal guideline to this, just do it :-)
 
