@@ -88,27 +88,23 @@ notes: source is  [FlagInputSourceExtension interface](https://github.com/urfave
 
 #### Use Cases and Expected Behaviors
 
-##### Supervised (`ocis server` or `ocis run extension`)
+##### Supervised mode (`ocis server`)
 
 ![grafik](https://user-images.githubusercontent.com/6905948/116872568-62b1a780-ac16-11eb-9f29-030a651ee39b.png)
 
 - Use a global config file (ocis.yaml) to configure an entire set of services: `> ocis --config-file /etc/ocis.yaml service`
 - Use a global config file (ocis.yaml) to configure a single extension: `> ocis --config-file /etc/ocis/yaml proxy`
-- When running in supervised mode, config files from extensions are NOT evaluated (only when running `ocis server`, runs with `ocis run extension` do parse individual config files)
-  - i.e: present config files: `ocis.yaml` and `proxy.yaml`; only the contents of `ocis.yaml` are loaded<sup>1</sup>.
 - Flag parsing for subcommands are not allowed in this mode, since the runtime is in control. Configuration has to be done solely using config files.
-
-*[1] see the development section for more on this topic.
 
 ###### Known Gotchas
 - `> ocis --config-file /etc/ocis/ocis.yaml server` does not work. It currently only supports reading global config values from the predefined locations.
 
-##### Unsupervised (`ocis proxy`)
+##### Unsupervised (`ocis proxy` or `ocis run extension`)
 
 ![grafik](https://user-images.githubusercontent.com/6905948/116872534-54fc2200-ac16-11eb-8267-ffe7b03177b3.png)
 
-- `ocis.yaml` is parsed first (since `proxy` is a subcommand of `ocis`)
-- `proxy.yaml` is parsed if present, overriding values from `ocis.yaml` and any cli flag or env variable present.
+- `ocis.yaml` is parsed first.
+- `proxy.yaml` is parsed if present; overrides values from `ocis.yaml`. Overrides CLI values. Does NOT override environment variables.
 
 #### Other known use cases
 
@@ -117,7 +113,7 @@ notes: source is  [FlagInputSourceExtension interface](https://github.com/urfave
 - Configure via global (single file for all extensions) config file + some configuration files like WEB_UI_CONFIG or proxy routes
 - configure via per extension config file + some configuration files like WEB_UI_CONFIG or proxy routes
 
-Each individual use case DOES NOT mix sources (i.e: when using cli flags, do not use environment variables nor cli flags).
+Each individual use case DOES NOT mix sources (i.e: when using cli flags, do not use environment variables).
 
 _Limitations on urfave/cli prevent us from providing structured configuration and framework support for cli flags + env variables._
 
@@ -125,7 +121,10 @@ _Limitations on urfave/cli prevent us from providing structured configuration an
 
 #### Config Loading
 
-Sometimes is desired to decouple the main series of services from an individual instance. We want to use the runtime to startup all services, then do work only on a single service. To achieve that one could use `ocis server && ocis kill proxy && ocis run proxy`. This series of commands will 1. load all config from `ocis.yaml`, 2. kill the supervised proxy service and 3. start the same service with the contents from `proxy.yaml`.
+At times is desired to decouple the main series of services from an individual instance. We want to use the runtime to startup all services, then do work only on a single service. To achieve that one could use `ocis server && ocis kill proxy && ocis run proxy`. This series of commands will:
+1. load all config from `ocis.yaml`
+2. kill the supervised proxy service
+3. start the same service with the contents from `proxy.yaml`.
 
 #### Start an extension multiple times with different configs (in Supervised mode)
 
