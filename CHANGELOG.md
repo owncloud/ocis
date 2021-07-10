@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
 * Bugfix - Dont use port 80 as debug for GroupsProvider: [#2271](https://github.com/owncloud/ocis/pull/2271)
+* Change - Update ownCloud Web to v3.4.0: [#2276](https://github.com/owncloud/ocis/pull/2276)
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 * Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
 * Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
@@ -29,6 +30,16 @@ The following sections list the changes for unreleased.
    present leaves go-micro to start the debug service in port 80 by default.
 
    https://github.com/owncloud/ocis/pull/2271
+
+* Change - Update ownCloud Web to v3.4.0: [#2276](https://github.com/owncloud/ocis/pull/2276)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.4.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2276
+   https://github.com/owncloud/web/releases/tag/v3.4.0
 
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 
