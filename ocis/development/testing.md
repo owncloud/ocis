@@ -117,6 +117,7 @@ Then run the api acceptance tests with the following command from the root of th
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
+STORAGE_DRIVER=OCIS \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
@@ -126,6 +127,8 @@ Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` acc
 This will run all tests that are relevant to oCIS.
 
 To run a single test add `BEHAT_FEATURE=<feature file>`
+
+To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
 ### use existing tests for BDD
 
@@ -157,6 +160,7 @@ If you want to work on a specific issue
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
+    STORAGE_DRIVER=OCIS \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
