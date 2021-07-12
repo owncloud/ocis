@@ -128,7 +128,7 @@ This will run all tests that are relevant to oCIS.
 
 To run a single test add `BEHAT_FEATURE=<feature file>`
 
-To run tests with different storage driver set `STORAGE_DRIVER` to correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as default value.
+To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
 ### use existing tests for BDD
 
