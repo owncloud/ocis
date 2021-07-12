@@ -147,6 +147,7 @@ type StoragePort struct {
 	// for HTTP ports with only one http service
 	HTTPPrefix string
 	TempFolder string
+	ReadOnly bool
 }
 
 // PublicStorage configures a public storage provider

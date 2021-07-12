@@ -8,10 +8,8 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
-	github.com/cs3org/reva v1.9.1-0.20210708074943-d2f72e0e3b4b
-	github.com/deepmap/oapi-codegen v1.6.1
+	github.com/cs3org/reva v1.9.1-0.20210709061124-71f341f383d7
 	github.com/go-chi/chi v4.1.2+incompatible
-	github.com/go-chi/chi/v5 v5.0.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/micro/cli/v2 v2.1.2
@@ -24,6 +22,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.0
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.opencensus.io v0.23.0
+	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	google.golang.org/grpc v1.39.0
 )
 

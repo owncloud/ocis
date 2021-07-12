@@ -75,6 +75,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
 			Destination: &cfg.Reva.StorageHome.Driver,
 		},
+		&cli.BoolFlag{
+			Name:        "read-only",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageHome.ReadOnly, false),
+			Usage:       "use storage driver in read-only mode",
+			EnvVars:     []string{"STORAGE_HOME_READ_ONLY", "OCIS_STORAGE_READ_ONLY"},
+			Destination: &cfg.Reva.StorageHome.ReadOnly,
+		},
 		&cli.StringFlag{
 			Name:        "mount-path",
 			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.MountPath, "/home"),
