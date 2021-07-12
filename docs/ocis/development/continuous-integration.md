@@ -31,7 +31,9 @@ Upon running the pipeline, your branch gets merged to the master branch. This en
 
 You may add flags to your commit message or PR title in order to speed up pipeline runs and take load from the CI runners.
 
-- `[CI SKIP]`: no ci is run on the commit or PR
+- `[CI SKIP]`: no CI is run on the commit or PR
+
+- `[full-ci]`: deactivates the fail early mechanism and runs all available test (as default only smoke tests are run)
 
 - `[docs-only]`: please add this flag, if you only changed documentation. This will only trigger documentation related CI steps.
 
