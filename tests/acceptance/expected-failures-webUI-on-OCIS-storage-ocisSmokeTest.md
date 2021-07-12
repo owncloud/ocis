@@ -10,8 +10,6 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This file lists the expected-failures of those ocisSmokeTest scenarios.
 
-Currently, there are no failures expected.
-
 ### [enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
 -   [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L65)
 -   [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L64)

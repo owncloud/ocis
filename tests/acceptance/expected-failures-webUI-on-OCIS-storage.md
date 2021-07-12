@@ -256,7 +256,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L64)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L66)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L64)
--   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L65) 
+-   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L65)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L66)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L70)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L71)
@@ -386,7 +386,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [apiSharees/sharees.feature:703](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L703)
 
 
-### [Comments in sidebar] (https://github.com/owncloud/web/issues/1158)
+### [Comments in sidebar](https://github.com/owncloud/web/issues/1158)
 -   [webUIComments/comments.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L25)
 -   [webUIComments/comments.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L26)
 -   [webUIComments/comments.feature:27](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIComments/comments.feature#L27)
@@ -412,7 +412,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsers/shareWithUsers.feature:360](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L360)
 -   [webUISharingPublicBasic/publicLinkCreate.feature:190](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L190)
 
-### [Tags page not implemented yet] (https://github.com/owncloud/web/issues/5017)
+### [Tags page not implemented yet](https://github.com/owncloud/web/issues/5017)
 -   [webUIDeleteFilesFolders/deleteFilesFolders.feature:144](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L144)
 -   [webUIFilesSearch/search.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L63)
 -   [webUIFilesSearch/search.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L71)
@@ -426,20 +426,20 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUITags/createTags.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L61)
 -   [webUITags/createTags.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L79)
 
-### [When a user shares folder to a group, the sharer is shown as group in group member's sharing-sidebar] (https://github.com/owncloud/web/issues/5216)
+### [When a user shares folder to a group, the sharer is shown as group in group member's sharing-sidebar](https://github.com/owncloud/web/issues/5216)
 -   [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L41)
 -   [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L42)
 
-### [Cannot determine share source path when sharing same name file from different path in shared-with pages] (https://github.com/owncloud/web/issues/5302)
+### [Cannot determine share source path when sharing same name file from different path in shared-with pages](https://github.com/owncloud/web/issues/5302)
 -   [webUISharingPublicBasic/publicLinkCreate.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L88)
 
-### [impossible to navigate into a folder in the trashbin] (https://github.com/owncloud/web/issues/1725)
+### [impossible to navigate into a folder in the trashbin](https://github.com/owncloud/web/issues/1725)
 -   [webUITrashbinDelete/trashbinDelete.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L29)
 
-### [Saving public share is not possible] (https://github.com/owncloud/web/issues/5321)
+### [Saving public share is not possible](https://github.com/owncloud/web/issues/5321)
 -   [webUISharingPublicManagement/shareByPublicLink.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L31)
 
-### [Public link send by email field] (https://github.com/owncloud/web/issues/2422)
+### [Public link send by email field](https://github.com/owncloud/web/issues/2422)
 -   [webUISharingPublicManagement/publicLinkShareByEmail.feature:15](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L15)
 -   [webUISharingPublicManagement/publicLinkShareByEmail.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L25)
 -   [webUISharingPublicManagement/publicLinkShareByEmail.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L41)
@@ -447,10 +447,10 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublicManagement/publicLinkShareByEmail.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L71)
 -   [webUISharingPublicManagement/publicLinkShareByEmail.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L99)
 
-### [Uploading folders does not work in files-drop] (https://github.com/owncloud/web/issues/2443)
+### [Uploading folders does not work in files-drop](https://github.com/owncloud/web/issues/2443)
 -   [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:248](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L248)
 
-### [Lock information on resources is not present] (https://github.com/owncloud/web/issues/5417)
+### [Lock information on resources is not present](https://github.com/owncloud/web/issues/5417)
 -   [webUIWebdavLocks/locks.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/locks.feature#L20)
 -   [webUIWebdavLocks/locks.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/locks.feature#L32)
 -   [webUIWebdavLocks/locks.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/locks.feature#L42)
@@ -504,7 +504,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIWebdavLockProtection/upload.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L71)
 -   [webUIWebdavLockProtection/upload.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L72)
 
-### [Resources inside locked public shared folder can be altered using new public webdav API] (https://github.com/owncloud/core/issues/38912)
+### [Resources inside locked public shared folder can be altered using new public webdav API](https://github.com/owncloud/core/issues/38912)
 -   [webUIWebdavLockProtection/delete.feature:75](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L75)
 -   [webUIWebdavLockProtection/delete.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L76)
 -   [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)

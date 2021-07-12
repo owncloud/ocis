@@ -1041,6 +1041,16 @@ _ocs: api compatibility, return correct status code_
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L139)
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:171](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L171)
 -   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:172](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L172)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L196)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L218)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L240)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:262](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L262)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L283)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L305)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:327](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L327)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:349](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L349)
+-   [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:370](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L370)
+
 
 #### [Empy OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 -   [apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L20)
