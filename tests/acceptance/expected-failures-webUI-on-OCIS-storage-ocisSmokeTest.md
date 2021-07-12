@@ -40,4 +40,4 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This 
 ### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
 -   [webUISharingInternalUsers/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L53)
 -   [webUISharingInternalUsers/shareWithUsers.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L54)
--   [webUISharingInternalUsers/shareWithUsers.feature:55](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L55)
+-   [webUISharingInternalUsers/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L52)
