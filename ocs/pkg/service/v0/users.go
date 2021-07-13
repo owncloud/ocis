@@ -490,7 +490,7 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 		UidNumber:                account.UidNumber,
 		GidNumber:                account.GidNumber,
 	}
-	s, err := scope.GetOwnerScope()
+	s, err := scope.AddOwnerScope(nil)
 	if err != nil {
 		return "", err
 	}

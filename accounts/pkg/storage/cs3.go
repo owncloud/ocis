@@ -302,7 +302,7 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 		UidNumber: su.UID,
 		GidNumber: su.GID,
 	}
-	s, err := scope.GetOwnerScope()
+	s, err := scope.AddOwnerScope(nil)
 	if err != nil {
 		return
 	}
