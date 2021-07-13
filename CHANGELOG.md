@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [1.9.0] (2021-07-13)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.9.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.8.0...master
+[1.9.0]: https://github.com/owncloud/ocis/compare/v1.8.0...v1.9.0
 
 ## Summary
 
