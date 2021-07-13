@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
 * Bugfix - Dont use port 80 as debug for GroupsProvider: [#2271](https://github.com/owncloud/ocis/pull/2271)
 * Change - Update ownCloud Web to v3.4.0: [#2276](https://github.com/owncloud/ocis/pull/2276)
+* Change - Update WEB to v3.4.1: [#2283](https://github.com/owncloud/ocis/pull/2283)
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 * Enhancement - Add readonly mode for storagehome and storageusers: [#2230](https://github.com/owncloud/ocis/pull/2230)
 * Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
@@ -41,6 +42,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2276
    https://github.com/owncloud/web/releases/tag/v3.4.0
+
+* Change - Update WEB to v3.4.1: [#2283](https://github.com/owncloud/ocis/pull/2283)
+
+  * Fix [5501](https://github.com/owncloud/web/pull/5501): loading previews in the right sidebar
+  * Fix [5493](https://github.com/owncloud/web/pull/5493): view options position
+
+   https://github.com/owncloud/ocis/pull/2283
+   https://github.com/owncloud/web/releases/tag/v3.4.1
 
 * Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
 
