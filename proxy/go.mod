@@ -9,8 +9,8 @@ require (
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20210614143420-5ee2eb1e7887
-	github.com/cs3org/reva v1.9.1-0.20210709061124-71f341f383d7
+	github.com/cs3org/go-cs3apis v0.0.0-20210702091910-85a56bfd027f
+	github.com/cs3org/reva v1.9.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/justinas/alice v1.2.0
 	github.com/micro/cli/v2 v2.1.2
