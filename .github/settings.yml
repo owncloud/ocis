@@ -29,6 +29,8 @@ teams:
     permission: admin
   - name: employees
     permission: push
+  - name: cern
+    permission: triage
 
 branches:
   - name: master
