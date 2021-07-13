@@ -103,8 +103,8 @@ func (m basicAuth) isPublicLink(req *http.Request) bool {
 }
 
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
-	login, password, ok := req.BasicAuth()
-	return m.enabled && ok && login != "" && password != ""
+	_, _, ok := req.BasicAuth()
+	return m.enabled && ok
 }
 
 type code int
