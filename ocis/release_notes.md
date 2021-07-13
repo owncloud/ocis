@@ -7,6 +7,33 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.9.0 Technology Preview
+
+Version 1.9.0 is a Tech Preview release of ownCloud Infinite Scale. More features were added and the platform was more matured.
+
+These are the highlights of the preview:
+
+- The oCIS backend now supports to enable extensions by name: [#2229](https://github.com/owncloud/ocis/pull/2229)
+- Storage drivers can be set to read only. [#2230](https://github.com/owncloud/ocis/pull/2230)
+- A more direct micro service init for faster startup: [#1705](https://github.com/owncloud/ocis/pull/1705)
+
+### Updated subsystems:
+
+- Updated REVA to [v1.9.1](https://github.com/cs3org/reva/releases/tag/v1.9.1): [#2280](https://github.com/owncloud/ocis/pull/2280)
+- Updated ownCloud Web to [v3.4.1](https://github.com/owncloud/web/releases/tag/v3.4.1): [#2283](https://github.com/owncloud/ocis/pull/2283)
+
+### Bugfixes:
+
+- Do not panic when service fails to start: [#2252](https://github.com/owncloud/ocis/issues/2252)
+- Dont use port 80 as debug for GroupsProvider: #2271
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.9.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.4.1) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.8.0 Technology Preview
 
 Version 1.8.0 is a maintenance and bug fix release. ownCloud Web 3.3.0 has received further performance and major accessibility improvements.

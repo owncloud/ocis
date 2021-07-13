@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-13T07:04:56+0000"
+date: "2021-07-13T12:59:45+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -108,6 +108,121 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
+
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis run
+
+Runs an extension
+
+Usage: `ocis run [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### ocis server
 
 Start fullstack server
@@ -160,121 +275,6 @@ Usage: `ocis server [command options] [arguments...]`
 -extensions |  $OCIS_RUN_EXTENSIONS
 : Run specific extensions during supervised mode.
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
@@ -283,53 +283,9 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start storage and data provider for /users mount
 
-#### ocis idp
+#### ocis webdav
 
-Start idp server
-
-#### ocis settings
-
-Start settings server
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis glauth
-
-Start glauth server
+Start webdav server
 
 #### ocis onlyoffice
 
@@ -339,35 +295,79 @@ Start onlyoffice server
 
 Start storage userprovider service
 
-#### ocis storage-auth-basic
+#### ocis store
 
-Start storage auth-basic service
+Start a go-micro store
 
-#### ocis storage-metadata
+#### ocis glauth
 
-Start storage and data service for metadata
+Start glauth server
 
-#### ocis storage-frontend
+#### ocis idp
 
-Start storage frontend
+Start idp server
 
-#### ocis thumbnails
+#### ocis storage-auth-bearer
 
-Start thumbnails server
+Start storage auth-bearer service
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
 
 #### ocis version
 
 Lists running services with version
 
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis settings
+
+Start settings server
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
 #### ocis web
 
 Start web server
 
-#### ocis webdav
-
-Start webdav server
-
 #### ocis accounts
 
 Start accounts server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis storage-frontend
+
+Start storage frontend
 
