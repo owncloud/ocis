@@ -56,6 +56,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	claims := oidc.FromContext(ctx)
 	u, ok := revauser.ContextGetUser(ctx)
+	// TODO what if an X-Access-Token is set? happens eg for download requests to the /data endpoint in the reva frontend
 
 	if claims == nil && !ok {
 		m.next.ServeHTTP(w, req)
