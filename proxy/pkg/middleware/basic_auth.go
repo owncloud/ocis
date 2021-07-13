@@ -1,12 +1,14 @@
 package middleware
 
 import (
+	"encoding/xml"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	"net/http"
-	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -61,7 +63,18 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 						writeSupportedAuthenticateHeader(w, req)
 					}
 
+					// if the request is a PROPFIND return a WebDAV error code.
+					// TODO: The proxy has to be smart enough to detect when a request is directed towards a webdav server
+					// and react accordingly.
+
 					w.WriteHeader(http.StatusUnauthorized)
+
+					b, err := Marshal(exception{
+						code:    SabredavPermissionDenied,
+						message: "Authentication error",
+					})
+
+					HandleWebdavError(w, b, err)
 					return
 				}
 
@@ -92,4 +105,77 @@ func (m basicAuth) isPublicLink(req *http.Request) bool {
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
 	login, password, ok := req.BasicAuth()
 	return m.enabled && ok && login != "" && password != ""
+}
+
+type code int
+
+const (
+	// SabredavBadRequest maps to HTTP 400
+	SabredavBadRequest code = iota
+	// SabredavMethodNotAllowed maps to HTTP 405
+	SabredavMethodNotAllowed
+	// SabredavNotAuthenticated maps to HTTP 401
+	SabredavNotAuthenticated
+	// SabredavPreconditionFailed maps to HTTP 412
+	SabredavPreconditionFailed
+	// SabredavPermissionDenied maps to HTTP 403
+	SabredavPermissionDenied
+	// SabredavNotFound maps to HTTP 404
+	SabredavNotFound
+	// SabredavConflict maps to HTTP 409
+	SabredavConflict
+)
+
+var (
+	codesEnum = []string{
+		"Sabre\\DAV\\Exception\\BadRequest",
+		"Sabre\\DAV\\Exception\\MethodNotAllowed",
+		"Sabre\\DAV\\Exception\\NotAuthenticated",
+		"Sabre\\DAV\\Exception\\PreconditionFailed",
+		"Sabre\\DAV\\Exception\\PermissionDenied",
+		"Sabre\\DAV\\Exception\\NotFound",
+		"Sabre\\DAV\\Exception\\Conflict",
+	}
+)
+
+type exception struct {
+	code    code
+	message string
+	header  string
+}
+
+// Marshal just calls the xml marshaller for a given exception.
+func Marshal(e exception) ([]byte, error) {
+	xmlstring, err := xml.Marshal(&errorXML{
+		Xmlnsd:    "DAV",
+		Xmlnss:    "http://sabredav.org/ns",
+		Exception: codesEnum[e.code],
+		Message:   e.message,
+		Header:    e.header,
+	})
+	if err != nil {
+		return []byte(""), err
+	}
+	return []byte(xml.Header + string(xmlstring)), err
+}
+
+// http://www.webdav.org/specs/rfc4918.html#ELEMENT_error
+type errorXML struct {
+	XMLName   xml.Name `xml:"d:error"`
+	Xmlnsd    string   `xml:"xmlns:d,attr"`
+	Xmlnss    string   `xml:"xmlns:s,attr"`
+	Exception string   `xml:"s:exception"`
+	Message   string   `xml:"s:message"`
+	InnerXML  []byte   `xml:",innerxml"`
+	Header    string   `xml:"s:header,omitempty"`
+}
+
+func HandleWebdavError(w http.ResponseWriter, b []byte, err error) {
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	_, err = w.Write(b)
+	if err != nil {
+	}
 }
