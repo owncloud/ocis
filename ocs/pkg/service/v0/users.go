@@ -486,9 +486,9 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 			OpaqueId: account.Id,
 			Idp:      o.config.IdentityManagement.Address,
 		},
-		Groups: []string{},
-		UidNumber:                account.UidNumber,
-		GidNumber:                account.GidNumber,
+		Groups:    []string{},
+		UidNumber: account.UidNumber,
+		GidNumber: account.GidNumber,
 	}
 	s, err := scope.GetOwnerScope()
 	if err != nil {
