@@ -146,7 +146,6 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 					Str("routeType", string(rt)).
 					Msg("director found")
 
-				r = r.WithContext(policy.ContextSetPolicy(r.Context(), pol))
 				p.Directors[pol][rt][endpoint](r)
 				return
 			}

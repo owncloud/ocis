@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
 )
 
 // AccessLog is a middleware to log http requests at info level logging.
@@ -22,7 +21,6 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 				Str("request", r.Header.Get("X-Request-ID")).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
-				Str("routing-policy", policy.ContextGetPolicy(r.Context())).
 				Int("status", wrap.Status()).
 				Str("path", r.URL.Path).
 				Dur("duration", time.Since(start)).

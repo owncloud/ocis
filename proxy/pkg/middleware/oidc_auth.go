@@ -96,6 +96,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 			return
 		}
 
+		// TODO allow extracting arbitrary claims ... or require idp to send a specific claim
 		if err := userInfo.Claims(&claims); err != nil {
 			m.logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
 			status = http.StatusInternalServerError
