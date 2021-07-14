@@ -20,6 +20,20 @@ var (
 	ErrUnexpectedConfigError = fmt.Errorf("could not initialize policy-selector for given config")
 )
 
+// policyKey serves as key for the routing policy in the context
+var policyKey struct{}
+
+// ContextGetPolicy returns the policy if set in the given context.
+func ContextGetPolicy(ctx context.Context) string {
+	u, _ := ctx.Value(policyKey).(string)
+	return u
+}
+
+// ContextSetPolicy stores the selected policy in the context.
+func ContextSetPolicy(ctx context.Context, p string) context.Context {
+	return context.WithValue(ctx, policyKey, p)
+}
+
 // Selector is a function which selects a proxy-policy based on the request.
 //
 // A policy is a random name which identifies a set of proxy-routes:

@@ -15,6 +15,7 @@ import (
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -176,7 +177,13 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	}
 
 	return alice.New(
+		// first make sure we log all requests and redirect to https if necessary
+		pkgmiddleware.RealIP,
+		pkgmiddleware.RequestID,
+		middleware.AccessLog(l),
 		middleware.HTTPSRedirect,
+
+		// now that we established the basics, on with authentication middleware
 		middleware.Authentication(
 			// OIDC Options
 			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
@@ -211,6 +218,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
+
+		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(l),
 			middleware.TokenManagerConfig(cfg.TokenManager),
