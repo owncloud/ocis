@@ -31,7 +31,6 @@ require (
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	google.golang.org/grpc v1.39.0
-	google.golang.org/grpc/examples v0.0.0-20210712234202-ebfe3be62a82 // indirect
 )
 
 replace (
