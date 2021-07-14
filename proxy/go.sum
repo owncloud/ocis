@@ -301,6 +301,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20210702091910-85a56bfd027f/go.mod h1:UXha4T
 github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc/go.mod h1:exwJqEJ8lVVnmdY0GrGwuPRQ018xUU9mKVXQBiO0ZlQ=
 github.com/cs3org/reva v1.9.1 h1:M1LrYRo0mRk/wAxapqzd7jieGarIA7p6R+rxRbqJrGs=
 github.com/cs3org/reva v1.9.1/go.mod h1:4bpcovnx3EAetafPIp4Fia1GkFvjFDkztacmCWI7cN0=
+github.com/cs3org/reva v1.10.0 h1:8sne7z4pe+9rkGP3ZX2i3Sx1FMQ8hhBs5QCb4VVvZJI=
+github.com/cs3org/reva v1.10.0/go.mod h1:4bpcovnx3EAetafPIp4Fia1GkFvjFDkztacmCWI7cN0=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -654,7 +654,7 @@ func mintToken(ctx context.Context, su *User, roleIds []string) (token string, e
 		UidNumber: int64(su.UIDNumber),
 		GidNumber: int64(su.GIDNumber),
 	}
-	s, _ := scope.GetOwnerScope()
+	s, _ := scope.AddOwnerScope(nil)
 	return tokenManager.MintToken(ctx, u, s)
 }
 

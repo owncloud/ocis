@@ -92,7 +92,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("associated claims with uuid")
 	}
 
-	s, err := scope.GetOwnerScope()
+	s, err := scope.AddOwnerScope(nil)
 	if err != nil {
 		m.logger.Error().Err(err).Msgf("could not get owner scope")
 		return

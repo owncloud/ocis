@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	regexForAccountUUID = regexp.MustCompile(`^[A-Za-z0-9\-_.+@]+$`)
+	regexForAccountUUID = regexp.MustCompile(`^[A-Za-z0-9\-_.+@:]+$`)
 	requireAccountID    = []validation.Rule{
 		// use rule for validation error message consistency (".. must not be blank" on empty strings)
 		validation.Required,

@@ -53,9 +53,12 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		return user, nil
 	}
 
-	roleIDs, err := loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("Could not load roles")
+	var roleIDs []string
+	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
+		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
+		if err != nil {
+			c.logger.Error().Err(err).Msgf("Could not load roles")
+		}
 	}
 
 	if len(roleIDs) == 0 {
