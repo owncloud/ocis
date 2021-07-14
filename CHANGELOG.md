@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.9.0...master
+
+## Summary
+
+* Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
+
+## Details
+
+* Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
+
+  * Fix cs3org/reva#1883: Pass directories with trailing slashes to eosclient.GenerateToken
+  * Fix cs3org/reva#1878: Improve the webdav error handling in the trashbin
+  * Fix cs3org/reva#1884: Do not send body on failed range request
+  * Enh cs3org/reva#1744: Add support for lightweight user types
+
+   https://github.com/owncloud/ocis/pull/2295
 # Changelog for [1.9.0] (2021-07-13)
 
 The following sections list the changes for 1.9.0.
