@@ -6,9 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
 ## Details
+
+* Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
+
+   We now use a dedicated middleware to log all requests, regardless of routing selector outcome.
+   While the log now includes the remote address, the selected routing policy is only logged when
+   log level is set to debug because the request context cannot be changed in the
+   `directorSelectionDirector`, as per the `ReverseProxy.Director` documentation.
+
+   https://github.com/owncloud/ocis/pull/2301
 
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
