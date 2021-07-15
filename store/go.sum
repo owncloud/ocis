@@ -320,8 +320,6 @@ github.com/cs3org/go-cs3apis v0.0.0-20210702091910-85a56bfd027f/go.mod h1:UXha4T
 github.com/cs3org/reva v1.1.0/go.mod h1:fBzTrNuAKdQ62ybjpdu8nyhBin90/3/3s6DGQDCdBp4=
 github.com/cs3org/reva v1.5.2-0.20210212085611-d8aa2eb3ec9c/go.mod h1:24c68Ys3h7srGohymDKSXakN4OrhzABJoKFoMeSIBvk=
 github.com/cs3org/reva v1.6.1-0.20210329145723-ed244aac4ddc/go.mod h1:exwJqEJ8lVVnmdY0GrGwuPRQ018xUU9mKVXQBiO0ZlQ=
-github.com/cs3org/reva v1.9.1 h1:M1LrYRo0mRk/wAxapqzd7jieGarIA7p6R+rxRbqJrGs=
-github.com/cs3org/reva v1.9.1/go.mod h1:4bpcovnx3EAetafPIp4Fia1GkFvjFDkztacmCWI7cN0=
 github.com/cs3org/reva v1.10.0 h1:8sne7z4pe+9rkGP3ZX2i3Sx1FMQ8hhBs5QCb4VVvZJI=
 github.com/cs3org/reva v1.10.0/go.mod h1:4bpcovnx3EAetafPIp4Fia1GkFvjFDkztacmCWI7cN0=
 github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAElF6hxnA=
@@ -2230,8 +2228,8 @@ google.golang.org/grpc v1.36.1/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAG
 google.golang.org/grpc v1.39.0 h1:Klz8I9kdtkIN6EpHHUOMLCYhTn/2WAe5a0s1hcBkdTI=
 google.golang.org/grpc v1.39.0/go.mod h1:PImNr+rS9TWYb2O4/emRugxiyHZ5JyHW5F+RPnDzfrE=
 google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.0/go.mod h1:6Kw0yEErY5E/yWrBtf03jp27GLLJujG4z/JK95pnjjw=
-google.golang.org/grpc/examples v0.0.0-20210708170655-30dfb4b933a5 h1:/nNpSw+ljz9YA+pnTWpmAkpasLbp9ei8kc94UVon31c=
-google.golang.org/grpc/examples v0.0.0-20210708170655-30dfb4b933a5/go.mod h1:bF8wuZSAZTcbF7ZPKrDI/qY52toTP/yxLpRRY4Eu9Js=
+google.golang.org/grpc/examples v0.0.0-20210712234202-ebfe3be62a82 h1:9iXqYJAPd7mfU5KwIFmRQQGLDBr+NxzBfHzUabiKLNA=
+google.golang.org/grpc/examples v0.0.0-20210712234202-ebfe3be62a82/go.mod h1:bF8wuZSAZTcbF7ZPKrDI/qY52toTP/yxLpRRY4Eu9Js=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=
