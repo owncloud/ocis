@@ -1,0 +1,210 @@
+---
+title: "11. WebUI URL format"
+date: 2021-07-07T14:55:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0011-global-url-format.md
+---
+
+* Status: proposed
+* Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade
+* Date: 2021-07-07
+
+## Context and Problem Statement
+
+When we speak about routes we have to make a difference between browser routes and internal API calls. Browser routes are interpreted by the web client (owncloud/web) to construct API calls. With this in mind, this is the mapping on ownCloud Web with OC10 and OCIS backend:
+
+|      | Browser URL                                                                                                                                                                 | Internal Resolution                                                                                                                         |
+|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| OC10 | `https://host/index.php/apps/files/?dir=/TEST&fileid=5472225`                                                                                                                 | `https://host/remote.php/dav/files/aunger/TEST`                                                                                              |
+| OCIS | `https://host/#/files/list/all/TEST`                                                                                                                                         | `https://host/remote.php/webdav/TEST`                                                                                                       |
+| OCIS (after this ADR is implemented) | `https://host/#/s/<space_id>/path/to/file?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`                      | `https://host/remote.php/webdav/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`           |
+
+Note that with an OC10 backend ownCloud's Web format remains unchanged: `https://host/index.html#/files/list/all/TEST` -- still resolves to --> `https://host/remote.php/webdav/TEST`. So here we have to make a distinction and limit the scope of this ADR to "how will a web client deal with the browser url?"
+
+Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether.
+
+`space_id` = `<storage_id>!<node_id>`
+
+## Decision Drivers
+
+* To reveal relevant context to the user URLs should either carry a path component or a meaningful aliases
+* To prevent bookmarks from breaking URLs should have in id component that can be used by the system to lookup the resource
+
+## Considered Options
+
+* Existing ownCloud 10 URLs
+* ID based URLs
+* Path based URLs
+* Space based URLs
+* Mixed Global URLs
+
+## Decision Outcome
+
+Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+
+### Positive Consequences <!-- optional -->
+
+* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
+* …
+
+### Negative Consequences <!-- optional -->
+
+* [e.g., compromising quality attribute, follow-up decisions required, …]
+* …
+
+## Pros and Cons of the Options
+
+### Existing OwnCloud 10 URLs
+
+The existing ownCloud 10 URLs look like this
+
+| URL | comment |
+|-|-|
+| `https://<host>/apps/files/?dir=<path>&fileid=<fileid>` | pattern |
+| `https://demo.owncloud.com/apps/files/?dir=/&fileid=18` | root of the currently logged in user |
+| `https://demo.owncloud.com/index.php/apps/files/?dir=/path/to/resource&fileid=192` | sub folder `/path/to/resource` |
+
+It contains a path and a `fileid` (which takes precedence). 
+
+* Good, because the `fileid` prevents bookmarks from breaking
+* Good, because the `dir` reveals context in the form of a path
+* Bad, because URLs still contain a long prefix `(/index.php)/apps/files`
+* Bad, because the `fileid` needs to be accompanied by a `storageid` to allow efficient routing in ocis
+* Bad, because if not configured properly an additional `/index.php` prefixes the route
+* Bad, because powerusers cannot navigate by updating only the path in the URL, as the `fileid` takes precedence. They have to delete the `fileid` to navigate
+
+### ID based URLs
+
+MS OneDrive has URLs like this:
+
+| URL | comment |
+|-|-|
+| `https://<host>/?id=<fileid>(&cid=<cid>)` | pattern, the `cid` is optional but added automatically |
+| `https://onedrive.live.com/?id=root&cid=A12345A14B0A7750` | root of a personal drive |
+| `https://onedrive.live.com/?id=A12345A14B0A7750%21359&cid=C12644A14B0A7750` | sub folder in a personal drive |
+
+It contains only IDs but no folder names. The `fileid` is a URL encoded `<cid>!<numericid>`. Very similar to the CS3 `resourceid` which consists of `storageid` and `nodeid`.
+
+* Good, because bookmarks cannot break
+* Good, because URLs do not disclose unshared path segments
+* Bad, because URLs reveal no context to users
+
+### Path based URLs
+
+There is a customized ownCluod instance that uses path only based URLs:
+
+| URL | comment |
+|-|-|
+| `https://<host>/apps/files/?dir=/&` | root of the currently logged in user |
+| `https://demo.owncloud.com/apps/files/?dir=/&` | root of the currently logged in user |
+| `https://demo.owncloud.com/apps/files/?dir=/path/to/resource&` | sub folder `/path/to/resource` |
+
+* Good, because the URLs reveal the full path context to users
+* Good, because powerusers can navigate by updating the path in the url
+* Bad, because the bookmarks break when someone renames a folder in the path
+* Bad, because there is no id that can be used as a fallback lookup mechanism
+* Bad, because URLs might leak too much context (parent folders of shared files)
+
+### Space based URLs
+
+| URL | comment |
+|-|-|
+| `https://<host>/#/s/<space_id>(/<relative/path>)(?id=<resource_id>)` | the pattern, relative `path` and `resource_id` are optional |
+| `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607` | root of a storage space, might be the currently logged in users home |
+| `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/relative/path/to/resource` | sub folder `/relative/path/to/resource` in the storage with id `b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`, works ***only*** if path still exists  |
+| `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/relative/path/to/resource?id=ba4c1820-df12-11eb-8dcd-ff21f12c1264:beb78dd6-df12-11eb-a05c-a395505126f6` | sub folder `/relative/path/to/resource` in the storage with id `b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`, lookup can fall back to the `id` |
+
+{{< hint >}}
+* `/#` is used by the current vue router.
+* `/s` denotes that this is a space url.
+* `<space_id>` and `<resource_id>` both consist of `<storage_id>:<node_id>`, but the `space_id` can be replaced with a shorter id or an alias. See furthor down below.
+* `<relative/path>` takes precedence over the `<resource_id>`, both are optional
+{{< /hint >}}
+
+* Good, because the URLs reveal a relevant path context to users
+* Good, because everything after the `#` is not sent to the server, building the webdav request to list the folder is offloaded to the clients
+* Good, because powerusers can navigate by updating the path in the url
+* Bad, because the current ids are uuid based, leading to very long URLs where tha path component nearly vanishes between two very long strings
+* Bad, because the `#` in the URL is just a technical requirement
+* Bad, because ocis web requires a `/#/files/s` at the root of the route to distinguish the files app from other apps
+* Bad, while navigating using the WebUI, the URL has to be updated whenever we change spaces.
+
+With the above explained, let's see some use cases:
+
+#### Example 1: UserA shares something from her Home folder with UserB
+
+- open the browser and go to `demo.owncloud.com`
+- the browser's url changes to: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`. You're now in YOUR home folder / personal space.
+- you create a new folder `/relative/path/to/resource` and navigate into `/relative/path/to`
+  - the URL now changes to: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/relative/path/to`
+- You share `resource` with some else
+- YOU navigate into `/relative/path/to/resource`
+  - now the URL would look like: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:3a9305da-df17-11eb-ab99-abe09d93e08a`
+
+As you can see, even if you're the owner of `/relative/path/to/resource` and navigate into it, the URL changes due to a new space being entered. This ensures that while working in your home folder, copying URLs and giving them to the person you share the resource with, the receiver can still navigate within the new space.
+
+In short terms, while navigating using the WebUI, the URL has to constantly change whenever we change spaces.
+
+#### Example 2: UserA shares something from a Workspace
+
+Assuming we only have one storage provider; a consequence of this, all storage spaces will start with the same storage_id.
+
+- open the browser and go to `demo.owncloud.com`
+- the browser's url changes to: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`. You're now in YOUR home folder / personal space.
+- you have access to a workspace called `foo` (created by an admin)
+- navigate into workspace `foo`
+  - the URL now changes to: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74`. You are now at the root of the workspace `foo`.
+    - because we only have one storage provider, the `space_id` section of the URL only updates the `node_id` part of it.
+    - had we had more than one storage provider, the `space_id` would depend on which storage provider contains the storage space.
+- you create a folder `/relative/path/to/resource`
+- you navigate into `/relative/path/to/resource`
+  - now the URL would look like: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/relative/path/to/resource`
+  - or a more robust url: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/relative/path/to/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
+
+#### Spaces Registry
+
+A big drawback against this idea is that the length of the URL is increased by a lot, rendering them almost unreadable. Introducing a Spaces Registry (SR) would shorten them. Let's see how.
+
+A URL without a SR would look like: `https://ocis.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:d342f9ce-df18-11eb-b319-1b6d9df4bc74/TEST?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
+The same URL with a SR `https://ocis.com/#/s/workspaceFoo/TEST?id=b78c2044-5b51-446f-82f6-907a664d089c:04f1991c-df19-11eb-9cc7-3b09f04f9ca3`
+
+Space Registry resolution can happen at the client side (i.e: the client keeps a list of space name -> space id [where space id = storageid + nodeid]; the client queries a SR) or server side. Server side is more resilient due to clients can have limited networking; for instance if they are running on a tight intranet.
+
+### Mixed Global URLs
+
+While ID based space URLs can be made more readable by shortening the IDs they only start to reveal context when an alias is used instead of the space id. These aliases however have to be unique identifiers. These aliases shouly live in namespaces like `/workspaces/marketing` and `/personal/marketing` to make phishing attacks harder (in this case a user that registered with the username `marketing`). But namespaced aliases is semantically equivalent to ... a path hierarchy.
+
+When every space has a namespaced alias and a relative path we can build a global namespace:
+
+| URL | comment |
+|-|-|
+| `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | the pattern, `/files` might become optional |
+| `https://demo.owncloud.com/files/personal/einstein/?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607` | root of user `einstein` |
+| `https://demo.owncloud.com/files/personal/einstein/relative/path/to/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `/relative/path/to/resource` |
+| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
+| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
+
+`</namespaced/alias></relative/path/to/resource>` is the global path in the CS3 api. The CS3 Storage Registry is responsible by managing the mount points.
+
+In order to be able to copy and paste URLs all resources must be uniquely identifyable:
+
+* Instead of `/home` the URL always has to reflect the user: `/personal/einstein`
+* Public links can use `/public/<token>`
+* workspaces can use `/workspaces/<alias>` or `/workspaces/<additional>/<classification>/<alias>` where the hierarchy is given by the organization
+* experiments can use `/experiments/<alias>`
+* research institutes could set up `/papers/<researchgroup>/<alias>`
+* trash could be accessed by prefixing the namespace alias with `/trash`? or using `/trash/<space_id>`
+* instead of a namespaced alias a storage space id could be used with a generic `/space/<space_id>` namespace
+
+The alias namespace hierarchy and depth can be pre determined by the admin. Even if aliases change the `id` parameter prevents bookmarks from breaking. A user can decide to build a different hierarchy by using his own registry. 
+
+What about shares? Similar to `/home` it must reflect the user: `/shares/einstein` would list all shares *by* einstein for the currently logged in user. The ui needs to apply the same URL rewriting as for space based URLs: when navigating into a share the URL has to switch from `/personal/einstein/relative/path/to/shared/resource` to `/shares/einstein/<unique and potentially namespaced alias for shared resource>`. When more than one `resource` was shared a name collision would occur. To prevent this we can use ids `/shares/einstein/id/<resource_id` or namespaced aliases `/shares/einstein/files/alias`. Similar to the `/trash` prefix we could treat `/shares` as a filter for the shared resources a user has access to, but that would disclose unshared path segments in personal spaces. We could make that a feature and let users create an alias for a shared resource, similar as for public links. Then they can decide if they want to disclose the full path in their personal space (or another workspace) or if they want to use an alias which is then accessed at `/shares/einstein/<alias>`. As a default we could take the alias at creation time from the filename. That way two shares to a resource with the same name, eg.: `/personal/einstein/project AAA/foo` and `/personal/einstein/project BBB/foo` would lead to `/shares/einstein/foo` (a CS3 internal reference to `/personal/einstein/project AAA/foo`) and `/shares/einstein/foo (2)` (a CS3 internal reference to `/personal/einstein/project BBB/foo`). `foo (2)` would keep its name even when `foo` is deleted or renamed. Well an id as the alias might be better then, because users might rename these aliases, which would break URLs if they have been bookmarked. In any case this would make end user more aware of what they share AND it would allow them to choose an arbitrary context for the links they want to send out: personal internal share URLs. 
+
+With these different namespaces the `/files` part in the URL becomes obsolete, because the files application can be registered for multiple namespaces: `/personal`, `/workspaces`, `/shares`, `/trash` ...
+
+* Good, because it contains a global path
+* Good, because spaces with namespaced aliases can by bookmarked and copied into mails or chat without disclosing unshared path segments, as the space is supposed to be shared
+* Good, because the UI can detect broken paths and notify the user to update his bookmark if the resource could be found by `id`
+* Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
+* Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
