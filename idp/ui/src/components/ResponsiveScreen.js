@@ -49,7 +49,7 @@ const ResponsiveScreen = (props) => {
   } = props;
 
   const logo = withoutLogo ? null :
-    <img src={process.env.PUBLIC_URL + '/static/logo.svg'} className="oc-logo" alt="ownCloud"/>;
+    <img src={process.env.PUBLIC_URL + '/static/logo.svg'} className="oc-logo" alt="ownCloud Logo"/>;
 
   const content = loading ? <Loading/> : (withoutPadding ? children : <DialogContent>{children}</DialogContent>);
 
