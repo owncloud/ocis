@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	"net/http"
-	"strings"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -29,7 +30,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
-				if h.isPublicLink(req) || !h.isBasicAuth(req) {
+				if h.isPublicLink(req) || !h.isBasicAuth(req) || h.isOIDCTokenAuth(req) {
 					if !h.isPublicLink(req) {
 						userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "basic")
 					}
@@ -87,6 +88,12 @@ type basicAuth struct {
 func (m basicAuth) isPublicLink(req *http.Request) bool {
 	login, _, ok := req.BasicAuth()
 	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
+}
+
+// The token auth endpoint uses basic auth for clients, see https://openid.net/specs/openid-connect-basic-1_0.html#TokenRequest
+// > The Client MUST authenticate to the Token Endpoint using the HTTP Basic method, as described in 2.3.1 of OAuth 2.0.
+func (m basicAuth) isOIDCTokenAuth(req *http.Request) bool {
+	return req.URL.Path == "/konnect/v1/token"
 }
 
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
