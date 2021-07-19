@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-15T11:44:37+0000"
+date: "2021-07-19T12:39:25+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -108,13 +108,11 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis health
+### ocis run
 
-Check health status
+Runs an extension
 
-Usage: `ocis health [command options] [arguments...]`
-
-
+Usage: `ocis run [command options] [arguments...]`
 
 
 
@@ -128,8 +126,35 @@ Usage: `ocis health [command options] [arguments...]`
 
 
 
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -191,62 +216,6 @@ Usage: `ocis server [command options] [arguments...]`
 -extensions |  $OCIS_RUN_EXTENSIONS
 : Run specific extensions during supervised mode.
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### ocis list
 
 Lists running ocis extensions
@@ -275,77 +244,40 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
+
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis idp
-
-Start idp server
-
-#### ocis onlyoffice
-
-Start onlyoffice server
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis version
-
-Lists running services with version
 
 #### ocis web
 
@@ -359,15 +291,83 @@ Start settings server
 
 Start storage auth-bearer service
 
-#### ocis glauth
+#### ocis storage-gateway
 
-Start glauth server
+Start storage gateway
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis idp
+
+Start idp server
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis proxy
+
+Start proxy server
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis webdav
+#### ocis storage-metadata
 
-Start webdav server
+Start storage and data service for metadata
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis ocs
+
+Start ocs server
 
