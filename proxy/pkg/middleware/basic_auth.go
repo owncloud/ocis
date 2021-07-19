@@ -79,7 +79,6 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 						return
 					}
 
-					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
