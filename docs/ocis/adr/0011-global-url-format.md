@@ -36,7 +36,7 @@ This ADR is limited to the scope of "how will a web client deal with the browser
     }
 }
 ```
-2. TODO to fetch the list of all spaces with their mount points we need an API endpoint that allows clients (not only the web ui) to 'sync' the list of storages a user has access to from the storage registry on the server side. This allows clients to directly talk to a storage provider on another instance, allowing true storage federation. The MS graph api has no notion of mount points, so we will need to add a `mountpath` *(or `mountpoint`? or `alias`?)* to our [`drive` resource properties in the libreGraph spec](https://github.com/owncloud/open-graph-api/blob/dc6da5359eee0345429080b5b59762fd8c57b121/api/openapi-spec/v0.0.yaml#L351-L384).
+2. TODO to fetch the list of all spaces with their mount points we need an API endpoint that allows clients (not only the web ui) to 'sync' the list of storages a user has access to from the storage registry on the server side. This allows clients to directly talk to a storage provider on another instance, allowing true storage federation. The MS graph api has no notion of mount points, so we will need to add a `mountpath` *(or `mountpoint`? or `alias`?)* to our [`drive` resource properties in the libreGraph spec](https://github.com/owncloud/open-graph-api/blob/dc6da5359eee0345429080b5b59762fd8c57b121/api/openapi-spec/v0.0.yaml#L351-L384). Tracked in https://github.com/owncloud/open-graph-api/issues/6
 
 
 {{< hint >}}
