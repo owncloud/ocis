@@ -73,7 +73,5 @@ func HandleWebdavError(w http.ResponseWriter, b []byte, err error) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	_, err = w.Write(b)
-	if err != nil {
-	}
+	_, _ = w.Write(b)
 }
