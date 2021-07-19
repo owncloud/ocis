@@ -1458,6 +1458,7 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v1/addGroup.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L127)
 -   [apiProvisioningGroups-v1/addToGroup.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L150)
 -   [apiProvisioningGroups-v1/addToGroup.feature:189](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L189)
+-   [apiProvisioningGroups-v1/addToGroup.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L203)
 -   [apiProvisioningGroups-v1/deleteGroup.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L99)
 -   [apiProvisioningGroups-v1/getGroup.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroup.feature#L72)
 -   [apiProvisioningGroups-v1/getGroups.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroups.feature#L75)
@@ -1532,6 +1533,7 @@ _special character username not valid_
 -   [apiProvisioningGroups-v2/addToGroup.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L133)
 -   [apiProvisioningGroups-v2/addToGroup.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L141)
 -   [apiProvisioningGroups-v2/addToGroup.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L158)
+-   [apiProvisioningGroups-v2/addToGroup.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L194)
 -   [apiProvisioningGroups-v2/deleteGroup.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L91)
 -   [apiProvisioningGroups-v2/getGroup.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L33)
 -   [apiProvisioningGroups-v2/getUserGroups.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L73)
@@ -1958,6 +1960,7 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiTrashbinRestore/trashbinRestore.feature:503](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L503)
 -   [apiTrashbinRestore/trashbinRestore.feature:521](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L521)
 -   [apiTrashbinRestore/trashbinRestore.feature:522](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L522)
+-   [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
 
 ### Won't fix
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.

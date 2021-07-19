@@ -1289,6 +1289,7 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v1/addGroup.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L127)
 -   [apiProvisioningGroups-v1/addToGroup.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L150)
 -   [apiProvisioningGroups-v1/addToGroup.feature:189](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L189)
+-   [apiProvisioningGroups-v1/addToGroup.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L203)
 -   [apiProvisioningGroups-v1/deleteGroup.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L99)
 -   [apiProvisioningGroups-v1/getGroup.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroup.feature#L72)
 -   [apiProvisioningGroups-v1/getGroups.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroups.feature#L75)
@@ -1304,6 +1305,7 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v2/addGroup.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L144)
 -   [apiProvisioningGroups-v2/addToGroup.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L167)
 -   [apiProvisioningGroups-v2/addToGroup.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L180)
+-   [apiProvisioningGroups-v2/addToGroup.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L194)
 -   [apiProvisioningGroups-v2/deleteGroup.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L101)
 -   [apiProvisioningGroups-v2/getGroup.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L55)
 -   [apiProvisioningGroups-v2/getGroup.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L73)
@@ -1700,6 +1702,7 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 #### [PROPFIND on trashbin with Depth: infinity only shows the first level](https://github.com/owncloud/ocis/issues/1116)
 -   [apiTrashbinRestore/trashbinRestore.feature:478](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L478)
 -   [apiTrashbinRestore/trashbinRestore.feature:479](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L479)
+-   [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
 
 #### [Trying to accept a share with invalid ID gives incorrect OCS and HTTP status](https://github.com/owncloud/ocis/issues/2111)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L85)
