@@ -100,7 +100,7 @@ MS OneDrive has URLs like this:
 |-|-|
 | `https://<host>/?id=<fileid>(&cid=<cid>)` | pattern, the `cid` is optional but added automatically |
 | `https://onedrive.live.com/?id=root&cid=A12345A14B0A7750` | root of a personal drive |
-| `https://onedrive.live.com/?id=A12345A14B0A7750%21359&cid=C12644A14B0A7750` | sub folder in a personal drive |
+| `https://onedrive.live.com/?id=A12345A14B0A7750%21359&cid=A12345A14B0A7750` | sub folder in a personal drive |
 
 It contains only IDs but no folder names. The `fileid` is a URL encoded `<cid>!<numericid>`. Very similar to the CS3 `resourceid` which consists of `storageid` and `nodeid`.
 
