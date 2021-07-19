@@ -1,5 +1,6 @@
 ---
 title: "1. Introduce an accounts service"
+weight: 1
 date: 2020-06-15T20:21:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr

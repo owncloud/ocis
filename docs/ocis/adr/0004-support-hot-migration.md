@@ -1,5 +1,6 @@
 ---
 title: "4. Support Hot Migration"
+weight: 4
 date: 2020-12-09T20:21:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr

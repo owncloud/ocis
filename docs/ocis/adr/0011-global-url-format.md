@@ -1,5 +1,6 @@
 ---
 title: "11. WebUI URL format"
+weight: 11
 date: 2021-07-07T14:55:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
@@ -12,24 +13,40 @@ geekdocFilePath: 0011-global-url-format.md
 
 ## Context and Problem Statement
 
-When we speak about routes we have to make a difference between browser routes and internal API calls. Browser routes are interpreted by the web client (owncloud/web) to construct API calls. With this in mind, this is the mapping on ownCloud Web with OC10 and OCIS backend:
+When speaking about URLs we have to make a difference between browser URLs and API URLs. Browser URLs are interpreted by the web client (owncloud/web) to make API calls. With this in mind, this is the mapping on ownCloud Web with OC10 and OCIS backend:
 
-|      | Browser URL                                                                                                                                                                 | Internal Resolution                                                                                                                         |
-|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| OC10 | `https://host/index.php/apps/files/?dir=/TEST&fileid=5472225`                                                                                                                 | `https://host/remote.php/dav/files/aunger/TEST`                                                                                              |
-| OCIS | `https://host/#/files/list/all/TEST`                                                                                                                                         | `https://host/remote.php/webdav/TEST`                                                                                                       |
-| OCIS (after this ADR is implemented) | `https://host/#/s/<space_id>/path/to/file?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`                      | `https://host/remote.php/webdav/space/relative/path?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`           |
+|      | Browser URL                                                    | API URL                                |
+|------|----------------------------------------------------------------|----------------------------------------------------|
+| OC10 + classic WebUI | `https://demo.owncloud.com/apps/files/?dir=/path/to/resource&fileid=5472225`  | `https://demo.owncloud.com/remote.php/dav/files/demo/path/to/resource`    |
+| OC10 + OCIS WebUI| `https://web.owncloud.com/index.html#/files/list/all/path%2Fto%2Fresource`  | `https://demo.owncloud.com/remote.php/webdav/path/to/resource`    |
+| OCIS | `https://demo.owncloud.com/#/files/list/all/path/to/resource`                           | `https://demo.owncloud.com/remote.php/webdav/path/to/resource`              |
 
-Note that with an OC10 backend ownCloud's Web format remains unchanged: `https://host/index.html#/files/list/all/TEST` -- still resolves to --> `https://host/remote.php/webdav/TEST`. So here we have to make a distinction and limit the scope of this ADR to "how will a web client deal with the browser url?"
 
-Worth mentioning that on an OC10 backend it seems that `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether.
+On an OC10 backend the `fileid` query parameter takes precedence over the `dir`. In fact if `dir` is invalid but `fileid` isn't, the resolution will succeed, as opposed to if the `fileid` is wrong (doesn't exist) and `dir` correct, resolution will fail altogether with a 404.
 
-`space_id` = `<storage_id>!<node_id>`
+This ADR is limited to the scope of "how will a web client deal with the browser URL?". The API URLs will change with the spaces concept to `https://demo.owncloud.com/dav/spaces/<space_id>/relative/path/to/resource`. The Web UI can look up a space id and the mount path using the `/graph/v1.0/drives` API:
+1. TODO for a given resource id as part of the URL the `https://demo.owncloud.com/v1.0/drive/items/123456A14B0A7750!359?$select=parentReference` can be used to retrieve the drive/space:
+```
+{
+    "parentReference": {
+        "driveId": "123456a14b0a7750",
+        "driveType": "personal",
+        "id": "123456A14B0A7750!357",
+        "path": "/drive/root:"
+    }
+}
+```
+2. TODO to fetch the list of all spaces with their mount points we need an API endpoint that allows clients (not only the web ui) to 'sync' the list of storages a user has access to from the storage registry on the server side. This allows clients to directly talk to a storage provider on another instance, allowing true storage federation. The MS graph api has no notion of mount points, so we will need to add a `mountpath` *(or `mountpoint`? or `alias`?)* to our [`drive` resource properties in the libreGraph spec](https://github.com/owncloud/open-graph-api/blob/dc6da5359eee0345429080b5b59762fd8c57b121/api/openapi-spec/v0.0.yaml#L351-L384).
+
+
+{{< hint >}}
+@jfd: The graph api returns a `path` in the `parentReference`, which is part of the `root` in a `drive` resource. But it contains a value in the namespace of the `graph` endpoint, eg.: `/drive/root:/Bilder` for the `/Bilder` folder in the root of the currently logged in users personal drive/space. Which is again relative to the drive. To give the clients a way to determine the mount point we need to add a new `mountpath/point/alias` property.
+{{< /hint >}}
 
 ## Decision Drivers
 
-* To reveal relevant context to the user URLs should either carry a path component or a meaningful aliases
-* To prevent bookmarks from breaking URLs should have in id component that can be used by the system to lookup the resource
+* To reveal relevant context to the user URLs should either carry a path component or a meaningful alias
+* To prevent bookmarks from breaking URLs should have an id component that can be used by the system to lookup the resource
 
 ## Considered Options
 
@@ -69,6 +86,7 @@ It contains a path and a `fileid` (which takes precedence).
 
 * Good, because the `fileid` prevents bookmarks from breaking
 * Good, because the `dir` reveals context in the form of a path
+* Bad, because the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
 * Bad, because URLs still contain a long prefix `(/index.php)/apps/files`
 * Bad, because the `fileid` needs to be accompanied by a `storageid` to allow efficient routing in ocis
 * Bad, because if not configured properly an additional `/index.php` prefixes the route
@@ -88,6 +106,7 @@ It contains only IDs but no folder names. The `fileid` is a URL encoded `<cid>!<
 
 * Good, because bookmarks cannot break
 * Good, because URLs do not disclose unshared path segments
+* Bad, because the web UI needs to look up the space id in a registry to build an API request for the `/dav/space` endpoint
 * Bad, because URLs reveal no context to users
 
 ### Path based URLs
@@ -102,6 +121,7 @@ There is a customized ownCluod instance that uses path only based URLs:
 
 * Good, because the URLs reveal the full path context to users
 * Good, because powerusers can navigate by updating the path in the url
+* Bad, because the web UI needs to look up the space id in a registry to build an API request for the `/dav/space` endpoint
 * Bad, because the bookmarks break when someone renames a folder in the path
 * Bad, because there is no id that can be used as a fallback lookup mechanism
 * Bad, because URLs might leak too much context (parent folders of shared files)
@@ -122,6 +142,7 @@ There is a customized ownCluod instance that uses path only based URLs:
 * `<relative/path>` takes precedence over the `<resource_id>`, both are optional
 {{< /hint >}}
 
+* Good, because the web UI does not need to look up the space id in a registry to build an API request for the `/dav/space` endpoint
 * Good, because the URLs reveal a relevant path context to users
 * Good, because everything after the `#` is not sent to the server, building the webdav request to list the folder is offloaded to the clients
 * Good, because powerusers can navigate by updating the path in the url
@@ -129,6 +150,7 @@ There is a customized ownCluod instance that uses path only based URLs:
 * Bad, because the `#` in the URL is just a technical requirement
 * Bad, because ocis web requires a `/#/files/s` at the root of the route to distinguish the files app from other apps
 * Bad, while navigating using the WebUI, the URL has to be updated whenever we change spaces.
+* Bad, because the technical `<space_id>` is meaningless to end users
 
 With the above explained, let's see some use cases:
 
@@ -208,3 +230,5 @@ With these different namespaces the `/files` part in the URL becomes obsolete, b
 * Good, because the UI can detect broken paths and notify the user to update his bookmark if the resource could be found by `id`
 * Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
 * Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
+* Bad, because the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
+

@@ -1,5 +1,6 @@
 ---
 title: "8. Configuration"
+weight: 8
 date: 2021-05-03T15:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
