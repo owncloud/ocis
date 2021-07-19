@@ -111,7 +111,7 @@ It contains only IDs but no folder names. The `fileid` is a URL encoded `<cid>!<
 
 ### Path based URLs
 
-There is a customized ownCluod instance that uses path only based URLs:
+There is a customized ownCloud instance that uses path only based URLs:
 
 | URL | comment |
 |-|-|
@@ -146,7 +146,7 @@ There is a customized ownCluod instance that uses path only based URLs:
 * Good, because the URLs reveal a relevant path context to users
 * Good, because everything after the `#` is not sent to the server, building the webdav request to list the folder is offloaded to the clients
 * Good, because powerusers can navigate by updating the path in the url
-* Bad, because the current ids are uuid based, leading to very long URLs where tha path component nearly vanishes between two very long strings
+* Bad, because the current ids are uuid based, leading to very long URLs where the path component nearly vanishes between two very long strings
 * Bad, because the `#` in the URL is just a technical requirement
 * Bad, because ocis web requires a `/#/files/s` at the root of the route to distinguish the files app from other apps
 * Bad, while navigating using the WebUI, the URL has to be updated whenever we change spaces.
@@ -166,7 +166,7 @@ With the above explained, let's see some use cases:
 
 As you can see, even if you're the owner of `/relative/path/to/resource` and navigate into it, the URL changes due to a new space being entered. This ensures that while working in your home folder, copying URLs and giving them to the person you share the resource with, the receiver can still navigate within the new space.
 
-In short terms, while navigating using the WebUI, the URL has to constantly change whenever we change spaces.
+In short terms, while navigating using the WebUI, the URL has to constantly change whenever we change spaces to reflect the most explicit one.
 
 #### Example 2: UserA shares something from a Workspace
 
@@ -195,7 +195,7 @@ Space Registry resolution can happen at the client side (i.e: the client keeps a
 
 ### Mixed Global URLs
 
-While ID based space URLs can be made more readable by shortening the IDs they only start to reveal context when an alias is used instead of the space id. These aliases however have to be unique identifiers. These aliases shouly live in namespaces like `/workspaces/marketing` and `/personal/marketing` to make phishing attacks harder (in this case a user that registered with the username `marketing`). But namespaced aliases is semantically equivalent to ... a path hierarchy.
+While ID based space URLs can be made more readable by shortening the IDs they only start to reveal context when an alias is used instead of the space id. These aliases however have to be unique identifiers. These aliases should live in namespaces like `/workspaces/marketing` and `/personal/marketing` to make phishing attacks harder (in this case a user that registered with the username `marketing`). But namespaced aliases is semantically equivalent to ... a path hierarchy.
 
 When every space has a namespaced alias and a relative path we can build a global namespace:
 
@@ -209,7 +209,7 @@ When every space has a namespaced alias and a relative path we can build a globa
 
 `</namespaced/alias></relative/path/to/resource>` is the global path in the CS3 api. The CS3 Storage Registry is responsible by managing the mount points.
 
-In order to be able to copy and paste URLs all resources must be uniquely identifyable:
+In order to be able to copy and paste URLs all resources must be uniquely identifiable:
 
 * Instead of `/home` the URL always has to reflect the user: `/personal/einstein`
 * Public links can use `/public/<token>`
@@ -231,4 +231,3 @@ With these different namespaces the `/files` part in the URL becomes obsolete, b
 * Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
 * Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
 * Bad, because the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
-
