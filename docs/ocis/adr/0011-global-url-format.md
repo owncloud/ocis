@@ -8,12 +8,50 @@ geekdocFilePath: 0011-global-url-format.md
 ---
 
 * Status: proposed
-* Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade
+* Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade, @tbsbdr, @kulmann
 * Date: 2021-07-07
 
 ## Context and Problem Statement
 
-When speaking about URLs we have to make a difference between browser URLs and API URLs. Browser URLs are interpreted by the web client (owncloud/web) to make API calls. With this in mind, this is the mapping on ownCloud Web with OC10 and OCIS backend:
+When speaking about URLs we have to make a difference between browser URLs and API URLs. Only browser URLs are visible to end users and will be bookmarked. The currently existing and bookmarked ownCloud 10 URLs look something like this:
+
+```
+GET https://demo.owncloud.com/apps/files/?dir=/path/to/resource&fileid=5472225
+303 Location: https://demo.owncloud.com/apps/files/?dir=/path/to/resource
+```
+
+When the URL contains a `fileid` parameter the server will look up the corresponding `dir`, overwriting whatever was set before the redirect. The `fileid` always takes precedence and the server is responsible for the lookup.
+
+```
+GET https://demo.owncloud.com/apps/files/?dir=/path/to/resource
+```
+
+The `dir` parameter is then used to make a WebDAV request against the `/dav/files` endpoint of the currently logged in user:
+
+```
+PROPFIND https://demo.owncloud.com/remote.php/dav/files/demo/path/to/resource
+```
+
+The resulting PROPFIND response is used to render the file listing. All good so far.
+
+For the new ocis web UI we want to clean up the user visible Browser URLs. They currently look like this:
+
+```
+https://demo.owncloud.com/#/files/list/all/path/to/resource
+```
+
+Currently, there is no `fileid` like parameter in the browser URL, making bookmarks of it fragile (they break when a bookmarked folder is renamed).
+
+The oCIS web UI just takes the path and uses the `/webdav` endpoint of the currently logged in user:
+
+```
+PROPFIND https://demo.owncloud.com/remote.php/webdav/path/to/resource
+```
+
+
+With the new ownCloud web client (owncloud/web)
+
+ needs to interpret them to make API calls. With this in mind, this is the current mapping on ownCloud Web with OC10 and OCIS backend:
 
 |      | Browser URL                                                    | API URL                                |
 |------|----------------------------------------------------------------|----------------------------------------------------|
@@ -55,6 +93,7 @@ This ADR is limited to the scope of "how will a web client deal with the browser
 * Path based URLs
 * Space based URLs
 * Mixed Global URLs
+* Configurable path component in URLs
 
 ## Decision Outcome
 
@@ -161,7 +200,7 @@ With the above explained, let's see some use cases:
 - you create a new folder `/relative/path/to/resource` and navigate into `/relative/path/to`
   - the URL now changes to: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/relative/path/to`
 - You share `resource` with some else
-- YOU navigate into `/relative/path/to/resource`
+- You navigate into `/relative/path/to/resource`
   - now the URL would look like: `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:3a9305da-df17-11eb-ab99-abe09d93e08a`
 
 As you can see, even if you're the owner of `/relative/path/to/resource` and navigate into it, the URL changes due to a new space being entered. This ensures that while working in your home folder, copying URLs and giving them to the person you share the resource with, the receiver can still navigate within the new space.
@@ -204,8 +243,12 @@ When every space has a namespaced alias and a relative path we can build a globa
 | `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | the pattern, `/files` might become optional |
 | `https://demo.owncloud.com/files/personal/einstein/?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607` | root of user `einstein` |
 | `https://demo.owncloud.com/files/personal/einstein/relative/path/to/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `/relative/path/to/resource` |
+| `https://demo.owncloud.com/files/shares/einstein/somesharename?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | shared URL for `/relative/path/to/resource` |
 | `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
 | `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
+| `https://demo.owncloud.com/files/personal/einstein/marie is stupid/and richard as well/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `marie is stupid/and richard as well/resource` ... something einstein might not want to reveal |
+| `https://demo.owncloud.com/files/shares/einstein/resource (2)?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has an appended counter to avaid a collision |
+| `https://demo.owncloud.com/files/shares/einstein/mybestfriends?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has a custom alias for the share |
 
 `</namespaced/alias></relative/path/to/resource>` is the global path in the CS3 api. The CS3 Storage Registry is responsible by managing the mount points.
 
@@ -231,3 +274,42 @@ With these different namespaces the `/files` part in the URL becomes obsolete, b
 * Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
 * Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
 * Bad, because the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
+
+
+### Configurable path component in URLs
+
+Not every deployment may have the requirement to have the path in the URL. We could use id only based URLs, similar to onedrive and make showing paths configurable.
+
+
+| URL | comment |
+|-|-|
+| `https://<host>/files?id=<resource_id>` | default id based navigation |
+| `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | optional path based navigation with fallback to id |
+
+In contrast to ownCloud 10 path takes precedence and the user is warned when the fileid in his bookmark no longer matches the id on the server: sth. like "The path of the resource has changed, please verify and update your bookmark!"
+
+When a file is selected the filename also becomes part of the URL so individual files can be bookmarked.
+
+If navigation is id based we need to look up the path for the id so we can make a webdav request, or we need to implement the graph drives and driveItem resources.
+
+The URL  `https://<host>/files?id=<resource_id>̀` is sent to the server. It has to look up the correct path and redirect the request, including the the path. But that would make all bookmarks contain tha path again, even if paths were configured to not be part of the URL.
+
+The `/meta/<fileid>` webdav endpoint can be used to look up the path with property `meta-path-for-user`.
+
+For now, we would use path based navigation with URLs like this:
+
+```
+https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>
+```
+
+This means that only the _resource path_ is part of the URL path. Any other parameter, eg. file `id`, `page` or sort order must be given as URL parameters.
+
+- [ ] To make lookup by id possible we need to implement the `/meta/<fileid>` endpoint so the sdk can use it to look up the path. We should not implement a redirect on the ocis server side because the same redirect logic would need to be added to oc10. Having it in ocis web is the right place.
+
+- [ ] The old sharing links and oc10 urls still need to be redirected by ocis/reva as in oc10.
+
+Public links would have the same format: `https://<host>/files?id=<resource_id>` The web UI has to detect if the user is logged in or not and adjust the ui accordingly.
+
+{{< hint warning >}}
+Since there is no difference between public and private files a logged in user cannot see the public version of a link unless he logs out.
+{{< /hint >}}
