@@ -9,6 +9,7 @@
   },
   "policy_selector": {
     "regex": {
+      "selector_cookie_name": "owncloud-selector",
       "default_policy": "oc10",
       "matches_policies": [
         {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},

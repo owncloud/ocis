@@ -174,6 +174,7 @@ type MigrationSelectorConf struct {
 type ClaimsSelectorConf struct {
 	DefaultPolicy         string `mapstructure:"default_policy"`
 	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string `mapstructure:"selector_cookie_name"`
 }
 
 // RegexSelectorConf is the config for the regex-selector
@@ -181,6 +182,7 @@ type RegexSelectorConf struct {
 	DefaultPolicy         string          `mapstructure:"default_policy"`
 	MatchesPolicies       []RegexRuleConf `mapstructure:"matches_policies"`
 	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string          `mapstructure:"selector_cookie_name"`
 }
 type RegexRuleConf struct {
 	Priority int    `mapstructure:"priority"`
