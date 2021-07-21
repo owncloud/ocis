@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/cs3org/go-cs3apis v0.0.0-20210702091910-85a56bfd027f
-	github.com/cs3org/reva v1.10.0
+	github.com/cs3org/reva v1.10.1-0.20210721075634-57d692feea7b
 	github.com/disintegration/imaging v1.6.2
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/protobuf v1.5.2
@@ -26,7 +26,7 @@ require (
 	go.opencensus.io v0.23.0
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8
 	google.golang.org/grpc v1.39.0
-	google.golang.org/grpc/examples v0.0.0-20210712234202-ebfe3be62a82 // indirect
+	google.golang.org/grpc/examples v0.0.0-20210720175814-65cabd74d8e1 // indirect
 	google.golang.org/protobuf v1.27.1
 )
 
