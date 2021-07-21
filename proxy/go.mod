@@ -10,7 +10,7 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210702091910-85a56bfd027f
-	github.com/cs3org/reva v1.10.0
+	github.com/cs3org/reva v1.10.1-0.20210721075634-57d692feea7b
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/justinas/alice v1.2.0
