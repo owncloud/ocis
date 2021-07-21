@@ -2,10 +2,11 @@ package http
 
 import (
 	"github.com/asim/go-micro/v3"
+	graphMiddleware "github.com/owncloud/ocis/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/graph/pkg/version"
+	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 )
 
@@ -27,11 +28,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.RealIP,
 			middleware.RequestID,
-			middleware.NoCache,
-			middleware.Cors,
-			middleware.Secure,
 			middleware.Version(
 				"graph",
 				version.String,
@@ -39,11 +36,9 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Logger(
 				options.Logger,
 			),
-			middleware.OpenIDConnect(
-				oidc.Endpoint(options.Config.OpenIDConnect.Endpoint),
-				oidc.Realm(options.Config.OpenIDConnect.Realm),
-				oidc.Insecure(options.Config.OpenIDConnect.Insecure),
-				oidc.Logger(options.Logger),
+			graphMiddleware.Auth(
+				account.Logger(options.Logger),
+				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			),
 		),
 	)
