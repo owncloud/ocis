@@ -650,7 +650,7 @@ func mintToken(ctx context.Context, su *User, roleIds []string) (token string, e
 				},
 			},
 		},
-		Groups: []string{},
+		Groups:    []string{},
 		UidNumber: int64(su.UIDNumber),
 		GidNumber: int64(su.GIDNumber),
 	}

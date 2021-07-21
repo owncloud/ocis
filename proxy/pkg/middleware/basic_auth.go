@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	"net/http"
-	"strings"
+	"github.com/owncloud/ocis/proxy/pkg/webdav"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -61,7 +63,22 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 						writeSupportedAuthenticateHeader(w, req)
 					}
 
+					// if the request is a PROPFIND return a WebDAV error code.
+					// TODO: The proxy has to be smart enough to detect when a request is directed towards a webdav server
+					// and react accordingly.
+
 					w.WriteHeader(http.StatusUnauthorized)
+
+					if webdav.IsWebdavRequest(req) {
+						b, err := webdav.Marshal(webdav.Exception{
+							Code:    webdav.SabredavPermissionDenied,
+							Message: "Authentication error",
+						})
+
+						webdav.HandleWebdavError(w, b, err)
+						return
+					}
+
 					return
 				}
 
@@ -90,6 +107,6 @@ func (m basicAuth) isPublicLink(req *http.Request) bool {
 }
 
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
-	login, password, ok := req.BasicAuth()
-	return m.enabled && ok && login != "" && password != ""
+	_, _, ok := req.BasicAuth()
+	return m.enabled && ok
 }

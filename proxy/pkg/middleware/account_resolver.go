@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	"net/http"
 
 	tokenPkg "github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
