@@ -1,8 +1,8 @@
-Enhancement: update REVA to v1.10.0
+Enhancement: update REVA to v1.10.1-0.20210721075634-57d692feea7b
 
-* Fix cs3org/reva#1883: Pass directories with trailing slashes to eosclient.GenerateToken
-* Fix cs3org/reva#1878: Improve the webdav error handling in the trashbin
-* Fix cs3org/reva#1884: Do not send body on failed range request
-* Enh cs3org/reva#1744: Add support for lightweight user types
+* Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway
+* Fix cs3org/reva#1899: Bugfix: Fix chunked uploads for new versions
+* Enh cs3org/reva#1888: Refactoring of the webdav code
+* Enh cs3org/reva#1887: Add "a" and "l" filter for grappa queries
 
-https://github.com/owncloud/ocis/pull/2295
+https://github.com/owncloud/ocis/pull/2314
