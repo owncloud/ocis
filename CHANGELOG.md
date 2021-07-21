@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
+* Enhancement - Update REVA to v1.10.1-0.20210721075634-57d692feea7b: [#2314](https://github.com/owncloud/ocis/pull/2314)
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
 ## Details
@@ -29,6 +30,15 @@ The following sections list the changes for unreleased.
    providers / reva gateway / ocis proxy.
 
    https://github.com/owncloud/ocis/pull/2277
+
+* Enhancement - Update REVA to v1.10.1-0.20210721075634-57d692feea7b: [#2314](https://github.com/owncloud/ocis/pull/2314)
+
+  * Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway
+  * Fix cs3org/reva#1899: Bugfix: Fix chunked uploads for new versions
+  * Enh cs3org/reva#1888: Refactoring of the webdav code
+  * Enh cs3org/reva#1887: Add "a" and "l" filter for grappa queries
+
+   https://github.com/owncloud/ocis/pull/2314
 
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
