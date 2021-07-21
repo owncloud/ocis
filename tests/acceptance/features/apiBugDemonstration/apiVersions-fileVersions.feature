@@ -16,16 +16,6 @@ Feature: dav-versions
     Then the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "0" elements
     And as "Alice" file "/davtest.txt-newdav-newchunking" should not exist
 
-  @skipOnOcis-OC-Storage @issue-ocis-reva-17 @issue-ocis-reva-56
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-  Scenario: Upload a file twice and versions are available using various chunking methods
-    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
-    And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
-    Then the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "1" element
-    And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "1" element
-    Then the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "0" element
-    And as "Alice" file "/davtest.txt-newdav-newchunking" should not exist
-
   @files_sharing-app-required
   @issue-ocis-reva-243
   # after fixing all issues delete this Scenario and use the one from oC10 core
