@@ -216,6 +216,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.Logger(l),
 			middleware.UserProvider(userProvider),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
+			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
 

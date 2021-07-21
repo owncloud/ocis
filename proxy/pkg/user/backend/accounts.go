@@ -96,17 +96,28 @@ func (a *accountsServiceBackend) Authenticate(ctx context.Context, username stri
 	return user, nil
 }
 
-func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims *oidc.StandardClaims) (*cs3.User, error) {
-	// TODO check if fields are missing.
+func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	req := &accounts.CreateAccountRequest{
 		Account: &accounts.Account{
-			DisplayName:              claims.DisplayName,
-			PreferredName:            claims.PreferredUsername,
-			OnPremisesSamAccountName: claims.PreferredUsername,
-			Mail:                     claims.Email,
 			CreationType:             "LocalAccount",
 			AccountEnabled:           true,
 		},
+	}
+	var ok bool
+	if req.Account.DisplayName, ok = claims[oidc.Name].(string); !ok {
+		a.logger.Debug().Msg("Missing name claim, trying displayname")
+		if req.Account.DisplayName, ok = claims["displayname"].(string); !ok {
+			a.logger.Debug().Msg("Missing displayname claim")
+		}
+	}
+	if req.Account.PreferredName, ok = claims[oidc.PreferredUsername].(string); !ok {
+		a.logger.Warn().Msg("Missing preferred_username claim")
+	} else {
+		// also use as on premises samaccount name
+		req.Account.OnPremisesSamAccountName = req.Account.PreferredName
+	}
+	if req.Account.Mail, ok = claims[oidc.Email].(string); !ok {
+		a.logger.Warn().Msg("Missing email claim")
 	}
 	created, err := a.accountsClient.CreateAccount(context.Background(), req)
 	if err != nil {
@@ -116,7 +127,7 @@ func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims
 	user := a.accountToUser(created)
 
 	if err := injectRoles(ctx, user, a.settingsRoleService); err != nil {
-		a.logger.Warn().Err(err).Msgf("Could not load roles... continuing without")
+		a.logger.Warn().Err(err).Msg("Could not load roles... continuing without")
 	}
 
 	return user, nil

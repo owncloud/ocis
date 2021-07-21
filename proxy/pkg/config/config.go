@@ -119,6 +119,8 @@ type Config struct {
 	Reva                  Reva
 	PreSignedURL          PreSignedURL
 	AccountBackend        string
+	UserOIDCClaim             string
+	UserCS3Claim         string
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool

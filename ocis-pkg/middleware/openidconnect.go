@@ -77,7 +77,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 			}
 
 			// The claims we want to have
-			var claims ocisoidc.StandardClaims
+			var claims map[string]interface{}
 
 			// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
 			oauth2Token := &oauth2.Token{
@@ -99,7 +99,7 @@ func OpenIDConnect(opts ...ocisoidc.Option) func(http.Handler) http.Handler {
 			opt.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Msg("unmarshalled userinfo")
 			// store claims in context
 			// uses the original context, not the one with probably reduced security
-			nr := r.WithContext(ocisoidc.NewContext(r.Context(), &claims))
+			nr := r.WithContext(ocisoidc.NewContext(r.Context(), claims))
 
 			next.ServeHTTP(w, nr)
 		})

@@ -1,5 +1,17 @@
 package oidc
 
+const (
+	Iss = "iss"
+	Sub = "sub"
+	Email = "email"
+	Name = "name"
+	PreferredUsername = "preferred_username"
+	UIDNumber = "uidnumber"
+	GIDNumber = "gidnumber"
+	Groups = "groups"
+	OwncloudUUID = "ownclouduuid"
+)
+
 // The ProviderMetadata describes an idp.
 // see https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
 type ProviderMetadata struct {
@@ -179,5 +191,5 @@ type StandardClaims struct {
 	GIDNumber string `json:"gidnumber,omitempty"`
 
 	// OcisID is a unique, persistent, non reassignable user id
-	OcisID string `json:"ocis.id,omitempty"`
+	OcisID string `json:"ownclouduuid,omitempty"`
 }

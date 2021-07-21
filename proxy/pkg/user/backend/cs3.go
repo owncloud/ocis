@@ -9,7 +9,6 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
@@ -103,7 +102,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 	return res.User, nil
 }
 
-func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims *oidc.StandardClaims) (*cs3.User, error) {
+func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	return nil, fmt.Errorf("CS3 Backend does not support creating users from claims")
 }
 
