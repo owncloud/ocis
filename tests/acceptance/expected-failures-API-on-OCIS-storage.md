@@ -1781,9 +1781,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 * _Blacklisted ignored files are no longer required because ocis can handle `.htaccess` files without security implications introduced by serving user provided files with apache._
 
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
--   [apiWebdavUpload2/uploadFileUsingOldChunking.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingOldChunking.feature#L43)
-
-#### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
 -   [apiVersions/fileVersions.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L15)
 -   [apiVersions/fileVersions.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L23)
