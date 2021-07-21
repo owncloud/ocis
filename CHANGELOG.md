@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
+* Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
 ## Details
@@ -19,6 +20,15 @@ The following sections list the changes for unreleased.
    `directorSelectionDirector`, as per the `ReverseProxy.Director` documentation.
 
    https://github.com/owncloud/ocis/pull/2301
+
+* Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
+
+   We refactored the `/graph/v1.0/` endpoint which now relies on the internal acces token fer
+   authentication, getting rid of any LDAP or OIDC code to authenticate requests. This allows
+   using the graph api when using basic auth or any other auth mechanism provided by the CS3 auth
+   providers / reva gateway / ocis proxy.
+
+   https://github.com/owncloud/ocis/pull/2277
 
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
