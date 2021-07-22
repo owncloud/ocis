@@ -78,7 +78,15 @@ The storage keeps an activity history, tracking the different actions that have 
 
 ## Storage drivers
 
-Reva currently has four storage driver implementations that can be used for *storage providers* an well as *data providers*.
+Reva currently has several storage driver implementations that can be used for *storage providers* an well as *data providers*.
+
+### OCIS and S3NG Storage Driver
+
+The oCIS storage driver is the default storage driver. It decomposes the metadata and persists it in a POSIX filesystem. Blobs are stored on the filesystem as well. The layout makes extensive use of symlinks and extended attributes. A filesystem like xfs or zfs without inode size limitations is recommended. We will evolve this to further integrate with file systems like cephfs or gpfs.
+
+The S3NG storage driver uses the same metadata layout on a POSIX storage as the oCIS driver, but it uses S3 as the blob storage.
+
+TODO add list of capabilities / tradeoffs 
 
 ### Local Storage Driver
 
