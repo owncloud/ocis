@@ -13,7 +13,7 @@ objectClass: top
 uid: einstein
 givenName: Albert
 sn: Einstein
-cn: Albert Einstein
+cn: einstein
 displayName: Albert Einstein
 description: A German-born theoretical physicist who developed the theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics).
 mail: einstein@example.org
@@ -33,7 +33,7 @@ objectClass: top
 uid: marie
 givenName: Marie
 sn: Curie
-cn: Marie Curie
+cn: marie
 displayName: Marie Skłodowska Curie
 description: A Polish and naturalized-French physicist and chemist who conducted pioneering research on radioactivity.
 mail: marie@example.org
@@ -53,7 +53,7 @@ objectClass: top
 uid: richard
 givenName: Richard
 sn: Feynman
-cn: Richard Feynman
+cn: richard
 displayName: Richard Phillips Feynman
 description: An American theoretical physicist, known for his work in the path integral formulation of quantum mechanics, the theory of quantum electrodynamics, the physics of the superfluidity of supercooled liquid helium, as well as his work in particle physics for which he proposed the parton model.
 mail: richard@example.org

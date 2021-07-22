@@ -372,7 +372,7 @@ For the product transition phase, ownCloud Infinite Scale comes with an operatio
 - The [Graph API](https://marketplace.owncloud.com/apps/graphapi) app is installed on ownCloud Server
 - The latest client versions are rolled-out to users (required for OpenID Connect support). See the [documentation](https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#owncloud-desktop-and-mobile-clients) for more information.
 
-See the [documentation]({{< ref "./deployment/owncloud10_with_oc_web" >}}) on how to deploy Infinite Scale in bridge mode.
+See the [documentation]({{< ref "./deployment/bridge" >}}) on how to deploy Infinite Scale in bridge mode.
 
 {{< hint "warning" >}}
 **Technology Preview**
