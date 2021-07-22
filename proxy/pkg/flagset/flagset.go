@@ -235,12 +235,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.OIDC.UserinfoCache.Size,
 		},
 
+		// account related config
+
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",
 			Value:       flags.OverrideDefaultBool(cfg.AutoprovisionAccounts, false),
 			Usage:       "create accounts from OIDC access tokens to learn new users",
 			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
 			Destination: &cfg.AutoprovisionAccounts,
+		},
+		&cli.StringFlag{
+			Name:        "user-oidc-claim",
+			Value:       flags.OverrideDefaultString(cfg.UserOIDCClaim, "email"),
+			Usage:       "The OIDC claim that is used to identify users, eg. 'ownclouduuid', 'uid', 'cn' or 'email'",
+			EnvVars:     []string{"PROXY_USER_OIDC_CLAIM"},
+			Destination: &cfg.UserOIDCClaim,
+		},
+		&cli.StringFlag{
+			Name:        "user-cs3-claim",
+			Value:       flags.OverrideDefaultString(cfg.UserCS3Claim, "mail"),
+			Usage:       "The claim to use when looking up a user in the CS3 API, eg. 'userid' or 'mail'",
+			EnvVars:     []string{"PROXY_USER_CS3_CLAIM"},
+			Destination: &cfg.UserCS3Claim,
 		},
 
 		// Pre Signed URLs

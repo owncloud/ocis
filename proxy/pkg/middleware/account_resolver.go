@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
@@ -33,6 +34,8 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			logger:                logger,
 			tokenManager:          tokenManager,
 			userProvider:          options.UserProvider,
+			userOIDCClaim:         options.UserOIDCClaim,
+			userCS3Claim:          options.UserCS3Claim,
 			autoProvisionAccounts: options.AutoprovisionAccounts,
 		}
 	}
@@ -44,8 +47,11 @@ type accountResolver struct {
 	tokenManager          tokenPkg.Manager
 	userProvider          backend.UserBackend
 	autoProvisionAccounts bool
+	userOIDCClaim         string
+	userCS3Claim          string
 }
 
+// TODO do not use the context to store values: https://medium.com/@cep21/how-to-correctly-use-context-context-in-go-1-7-8f2c0fafdf39
 func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	claims := oidc.FromContext(req.Context())
 	u, ok := revauser.ContextGetUser(req.Context())
@@ -56,30 +62,31 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if u == nil && claims != nil {
-		var claim, value string
-		switch {
-		case claims.PreferredUsername != "":
-			claim, value = "username", claims.PreferredUsername
-		case claims.Email != "":
-			claim, value = "mail", claims.Email
-		case claims.OcisID != "":
-			//claim, value = "id", claims.OcisID
-		default:
-			// TODO allow lookup by custom claim, eg an id ... or sub
-			m.logger.Error().Msg("Could not lookup account, no mail or preferred_username claim set")
-			w.WriteHeader(http.StatusInternalServerError)
-		}
 
 		var err error
-		u, err = m.userProvider.GetUserByClaims(req.Context(), claim, value, true)
+		var value string
+		var ok bool
+		if value, ok = claims[m.userOIDCClaim].(string); !ok || value == "" {
+			m.logger.Error().Str("claim", m.userOIDCClaim).Interface("claims", claims).Msg("claim not set or empty")
+			w.WriteHeader(http.StatusInternalServerError) // admin needs to make the idp send the right claim
+			return
+		}
 
-		if m.autoProvisionAccounts && err == backend.ErrAccountNotFound {
-			m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("User by claim not found... autoprovisioning.")
+		u, err = m.userProvider.GetUserByClaims(req.Context(), m.userCS3Claim, value, true)
+
+		if errors.Is(err, backend.ErrAccountNotFound) {
+			m.logger.Debug().Str("claim", m.userOIDCClaim).Str("value", value).Msg("User by claim not found")
+			if !m.autoProvisionAccounts {
+				m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning disabled")
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning user")
 			u, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
 		}
 
-		if err == backend.ErrAccountNotFound || err == backend.ErrAccountDisabled {
-			m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("Unautorized")
+		if errors.Is(err, backend.ErrAccountDisabled) {
+			m.logger.Debug().Interface("claims", claims).Msg("Disabled")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -90,17 +97,17 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msgf("associated claims with uuid")
+		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msg("associated claims with user")
 	}
 
 	s, err := scope.AddOwnerScope(nil)
 	if err != nil {
-		m.logger.Error().Err(err).Msgf("could not get owner scope")
+		m.logger.Error().Err(err).Msg("could not get owner scope")
 		return
 	}
 	token, err := m.tokenManager.MintToken(req.Context(), u, s)
 	if err != nil {
-		m.logger.Error().Err(err).Msgf("could not mint token")
+		m.logger.Error().Err(err).Msg("could not mint token")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

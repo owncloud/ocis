@@ -108,13 +108,13 @@ func TestAuthenticateFailed(t *testing.T) {
 func TestCreateUserFromClaims(t *testing.T) {
 	exp := mockAccResp[0]
 	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
-	act, _ := accBackend.CreateUserFromClaims(context.Background(), &oidc.StandardClaims{
-		DisplayName:       mockAccResp[0].DisplayName,
-		PreferredUsername: mockAccResp[0].OnPremisesSamAccountName,
-		Email:             mockAccResp[0].Mail,
-		UIDNumber:         "1",
-		GIDNumber:         "2",
-		Groups:            []string{"g1", "g2"},
+	act, _ := accBackend.CreateUserFromClaims(context.Background(), map[string]interface{}{
+		oidc.Name:              mockAccResp[0].DisplayName,
+		oidc.PreferredUsername: mockAccResp[0].OnPremisesSamAccountName,
+		oidc.Email:             mockAccResp[0].Mail,
+		oidc.UIDNumber:         "1",
+		oidc.GIDNumber:         "2",
+		oidc.Groups:            []string{"g1", "g2"},
 	})
 
 	assert.NotNil(t, act.Id)

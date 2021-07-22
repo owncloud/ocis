@@ -82,11 +82,12 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 					return
 				}
 
-				claims := &oidc.StandardClaims{
-					OcisID:            user.Id.OpaqueId,
-					Iss:               user.Id.Idp,
-					PreferredUsername: user.Username,
-					Email:             user.Mail,
+				// fake oidc claims
+				claims := map[string]interface{}{
+					oidc.OwncloudUUID:      user.Id.OpaqueId,
+					oidc.Iss:               user.Id.Idp,
+					oidc.PreferredUsername: user.Username,
+					oidc.Email:             user.Mail,
 				}
 
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))

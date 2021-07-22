@@ -98,16 +98,22 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
 	var acc = ss
 	return func(ctx context.Context, r *http.Request) (s string, err error) {
-		var userID string
-		if claims := oidc.FromContext(r.Context()); claims != nil {
-			userID = claims.PreferredUsername
-			if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
-				return cfg.AccNotFoundPolicy, nil
-			}
-
-			return cfg.AccFoundPolicy, nil
+		var claims map[string]interface{}
+		if claims = oidc.FromContext(r.Context()); claims == nil {
+			return cfg.UnauthenticatedPolicy, nil
 		}
 
-		return cfg.UnauthenticatedPolicy, nil
+		var userID string
+		var ok bool
+		if userID, ok = claims[oidc.PreferredUsername].(string); !ok {
+			// TODO clarify: what if the user just has no username ...
+			return cfg.AccNotFoundPolicy, nil
+		}
+
+		if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
+			return cfg.AccNotFoundPolicy, nil
+		}
+		return cfg.AccFoundPolicy, nil
+
 	}
 }

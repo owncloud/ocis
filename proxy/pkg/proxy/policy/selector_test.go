@@ -69,7 +69,7 @@ func TestStaticSelector(t *testing.T) {
 
 type testCase struct {
 	AccSvcShouldReturnError bool
-	Claims                  *oidc.StandardClaims
+	Claims                  map[string]interface{}
 	Expected                string
 }
 
@@ -80,8 +80,9 @@ func TestMigrationSelector(t *testing.T) {
 		UnauthenticatedPolicy: "unauth",
 	}
 	var tests = []testCase{
-		{true, &oidc.StandardClaims{PreferredUsername: "Hans"}, "not_found"},
-		{false, &oidc.StandardClaims{PreferredUsername: "Hans"}, "found"},
+		{true, map[string]interface{}{oidc.PreferredUsername: "Hans"}, "not_found"},
+		{true, map[string]interface{}{oidc.Email: "hans@example.test"}, "not_found"},
+		{false, map[string]interface{}{oidc.PreferredUsername: "Hans"}, "found"},
 		{false, nil, "unauth"},
 	}
 

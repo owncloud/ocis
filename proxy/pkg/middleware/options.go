@@ -41,6 +41,10 @@ type Options struct {
 	Store storepb.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
+	// UserOIDCClaim to read from the oidc claims
+	UserOIDCClaim             string
+	// UserCS3Claim to use when looking up a user in the CS3 API
+	UserCS3Claim         string
 	// AutoprovisionAccounts when an accountResolver does not exist.
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
@@ -138,6 +142,20 @@ func Store(sc storepb.StoreService) Option {
 func PreSignedURLConfig(cfg config.PreSignedURL) Option {
 	return func(o *Options) {
 		o.PreSignedURLConfig = cfg
+	}
+}
+
+// UserOIDCClaim provides a function to set the UserClaim config
+func UserOIDCClaim(val string) Option {
+	return func(o *Options) {
+		o.UserOIDCClaim = val
+	}
+}
+
+// UserCS3Claim provides a function to set the UserClaimType config
+func UserCS3Claim(val string) Option {
+	return func(o *Options) {
+		o.UserCS3Claim = val
 	}
 }
 

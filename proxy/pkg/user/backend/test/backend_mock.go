@@ -6,7 +6,6 @@ package test
 import (
 	"context"
 	"github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"sync"
 )
@@ -44,7 +43,7 @@ type UserBackendMock struct {
 	AuthenticateFunc func(ctx context.Context, username string, password string) (*userv1beta1.User, error)
 
 	// CreateUserFromClaimsFunc mocks the CreateUserFromClaims method.
-	CreateUserFromClaimsFunc func(ctx context.Context, claims *oidc.StandardClaims) (*userv1beta1.User, error)
+	CreateUserFromClaimsFunc func(ctx context.Context, claims map[string]interface{}) (*userv1beta1.User, error)
 
 	// GetUserByClaimsFunc mocks the GetUserByClaims method.
 	GetUserByClaimsFunc func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, error)
@@ -68,7 +67,7 @@ type UserBackendMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Claims is the claims argument value.
-			Claims *oidc.StandardClaims
+			Claims map[string]interface{}
 		}
 		// GetUserByClaims holds details about calls to the GetUserByClaims method.
 		GetUserByClaims []struct {
@@ -135,13 +134,13 @@ func (mock *UserBackendMock) AuthenticateCalls() []struct {
 }
 
 // CreateUserFromClaims calls CreateUserFromClaimsFunc.
-func (mock *UserBackendMock) CreateUserFromClaims(ctx context.Context, claims *oidc.StandardClaims) (*userv1beta1.User, error) {
+func (mock *UserBackendMock) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*userv1beta1.User, error) {
 	if mock.CreateUserFromClaimsFunc == nil {
 		panic("UserBackendMock.CreateUserFromClaimsFunc: method is nil but UserBackend.CreateUserFromClaims was just called")
 	}
 	callInfo := struct {
 		Ctx    context.Context
-		Claims *oidc.StandardClaims
+		Claims map[string]interface{}
 	}{
 		Ctx:    ctx,
 		Claims: claims,
@@ -157,11 +156,11 @@ func (mock *UserBackendMock) CreateUserFromClaims(ctx context.Context, claims *o
 //     len(mockedUserBackend.CreateUserFromClaimsCalls())
 func (mock *UserBackendMock) CreateUserFromClaimsCalls() []struct {
 	Ctx    context.Context
-	Claims *oidc.StandardClaims
+	Claims map[string]interface{}
 } {
 	var calls []struct {
 		Ctx    context.Context
-		Claims *oidc.StandardClaims
+		Claims map[string]interface{}
 	}
 	mock.lockCreateUserFromClaims.RLock()
 	calls = mock.calls.CreateUserFromClaims

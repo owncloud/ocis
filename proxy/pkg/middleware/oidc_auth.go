@@ -59,11 +59,11 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			}
 
 			// inject claims to the request context for the account_uuid middleware.
-			req = req.WithContext(oidc.NewContext(req.Context(), &claims))
+			req = req.WithContext(oidc.NewContext(req.Context(), claims))
 
 			// store claims in context
 			// uses the original context, not the one with probably reduced security
-			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), &claims)))
+			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 		})
 	}
 }
@@ -78,7 +78,7 @@ type oidcAuth struct {
 	tokenCacheTTL time.Duration
 }
 
-func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.StandardClaims, status int) {
+func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
 	hit := m.tokenCache.Load(token)
 	if hit == nil {
 		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
@@ -96,15 +96,11 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 			return
 		}
 
-		// TODO allow extracting arbitrary claims ... or require idp to send a specific claim
 		if err := userInfo.Claims(&claims); err != nil {
 			m.logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
 			status = http.StatusInternalServerError
 			return
 		}
-
-		//TODO: This should be read from the token instead of config
-		claims.Iss = m.oidcIss
 
 		expiration := m.extractExpiration(token)
 		m.tokenCache.Store(token, claims, expiration)
@@ -114,7 +110,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 	}
 
 	var ok bool
-	if claims, ok = hit.V.(oidc.StandardClaims); !ok {
+	if claims, ok = hit.V.(map[string]interface{}); !ok {
 		status = http.StatusInternalServerError
 		return
 	}
