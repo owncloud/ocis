@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-22T09:21:06+0000"
+date: "2021-07-22T18:21:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -83,6 +83,8 @@ Usage: `proxy health [command options] [arguments...]`
 
 
 
+
+
 ### proxy ocis-proxy
 
 proxy for oCIS
@@ -104,6 +106,8 @@ Usage: `proxy ocis-proxy [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode.
+
+
 
 
 
@@ -272,6 +276,14 @@ Usage: `proxy server [command options] [arguments...]`
 : create accounts from OIDC access tokens to learn new users. Default: `false`.
 
 
+-user-oidc-claim |  $PROXY_USER_OIDC_CLAIM
+: The OIDC claim that is used to identify users, eg. 'ownclouduuid', 'uid', 'cn' or 'email'. Default: `"email"`.
+
+
+-user-cs3-claim |  $PROXY_USER_CS3_CLAIM
+: The claim to use when looking up a user in the CS3 API, eg. 'userid' or 'mail'. Default: `"mail"`.
+
+
 -presignedurl-allow-method |  $PRESIGNEDURL_ALLOWED_METHODS
 : --presignedurl-allow-method GET [--presignedurl-allow-method POST]. Default: `cli.NewStringSlice("GET")`.
 
@@ -298,6 +310,8 @@ Usage: `proxy server [command options] [arguments...]`
 Print the versions of the running instances
 
 Usage: `proxy version [command options] [arguments...]`
+
+
 
 
 
