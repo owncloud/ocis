@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-21T21:20:23+0000"
+date: "2021-07-22T09:21:08+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -73,46 +73,6 @@ Usage: `web [global options] command [command options] [arguments...]`
 
 
 ## Sub Commands
-
-### web health
-
-Check health status
-
-Usage: `web health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $WEB_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9104"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### web server
 
@@ -240,4 +200,44 @@ Usage: `web server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### web health
+
+Check health status
+
+Usage: `web health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $WEB_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9104"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
