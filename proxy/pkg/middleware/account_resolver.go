@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
@@ -73,7 +74,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		u, err = m.userProvider.GetUserByClaims(req.Context(), m.userCS3Claim, value, true)
 
-		if err == backend.ErrAccountNotFound {
+		if errors.Is(err, backend.ErrAccountNotFound) {
 			m.logger.Debug().Str("claim", m.userOIDCClaim).Str("value", value).Msg("User by claim not found")
 			if !m.autoProvisionAccounts {
 				m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning disabled")
@@ -84,7 +85,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			u, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
 		}
 
-		if err == backend.ErrAccountDisabled {
+		if errors.Is(err, backend.ErrAccountDisabled) {
 			m.logger.Debug().Interface("claims", claims).Msg("Disabled")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
