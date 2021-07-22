@@ -1,0 +1,12 @@
+---
+version: "3.7"
+
+services:
+  ocis:
+    environment:
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+
+networks:
+  ocis-net:
+    external: true
