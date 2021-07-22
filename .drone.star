@@ -129,7 +129,6 @@ def main(ctx):
 
     build_release_pipelines = \
         dockerReleases(ctx) + \
-        [dockerEos(ctx)] + \
         binaryReleases(ctx) + \
         [releaseSubmodule(ctx)]
 
@@ -908,72 +907,6 @@ def dockerRelease(ctx, arch):
                     "dockerfile": "ocis/docker/Dockerfile.linux.%s" % (arch),
                     "repo": ctx.repo.slug,
                     "build_args": build_args,
-                },
-                "when": {
-                    "ref": {
-                        "exclude": [
-                            "refs/pull/**",
-                        ],
-                    },
-                },
-            },
-        ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
-        "volumes": [pipelineVolumeGo],
-    }
-
-def dockerEos(ctx):
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "docker-eos-ocis",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": makeGenerate("ocis") +
-                 build() + [
-            {
-                "name": "dryrun-eos-ocis",
-                "image": "plugins/docker:latest",
-                "pull": "always",
-                "settings": {
-                    "dry_run": True,
-                    "context": "ocis/docker/eos-ocis",
-                    "tags": "linux-eos-ocis",
-                    "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
-                    "repo": "owncloud/eos-ocis",
-                },
-                "when": {
-                    "ref": {
-                        "include": [
-                            "refs/pull/**",
-                        ],
-                    },
-                },
-            },
-            {
-                "name": "docker-eos-ocis",
-                "image": "plugins/docker:latest",
-                "pull": "always",
-                "settings": {
-                    "username": {
-                        "from_secret": "docker_username",
-                    },
-                    "password": {
-                        "from_secret": "docker_password",
-                    },
-                    "auto_tag": True,
-                    "context": "ocis/docker/eos-ocis",
-                    "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
-                    "repo": "owncloud/eos-ocis",
                 },
                 "when": {
                     "ref": {
