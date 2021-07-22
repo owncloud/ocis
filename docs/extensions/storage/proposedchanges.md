@@ -112,3 +112,74 @@ Technically, this means that every storage driver needs to have a map of a `uuid
   - as a fallback a sync job can read the file id from the metadata of the resources and populate the uuid to internal id map.
 
 The TUS upload can take metadata, for PUT we might need a header.
+
+### Space id vs resource id vs storage id
+
+We have `/dav/meta/<fileid>` where the `fileid` is a string that was returned by a PROPFIND or by the `/graph/v1.0/me/drives/` endpoint? That returns a space id and the root drive item which has an `id` 
+
+Does that `id` have a specific format? We currently concatenate as `<storageid>!<nodeid>`.
+
+A request against `/dav/meta/fileid` will use the reva storage registry to look up a path. 
+
+What if the storage space is moved to another storage provider. This happens during a migration:
+
+1. the current oc10 fileids need to be prefixed with at least the numeric storage id to shard them.
+
+`123` becomes `instanceprefix$345!123` if we use a custom prefix that identifies an instance (so we can merge multiple instances into one ocis instance) and append  the numeric storageid `345`. The pattern is `<instanceprefix>$<numericstorageid>!<fileid>`.
+
+Every `<instanceprefix>$<numericstorageid>` identifies a space.
+
+- [ ] the owncloudsql driver can return these spaceids when listing spaces.
+
+Why does it not work if we just use the fileid of the root node in the db?
+
+Say we have a space with three resources:
+`<instanceprefix>$<numericstorageid>!<fileid>`
+`instanceprefix$345!1`
+`instanceprefix$345!2`
+`instanceprefix$345!3`
+
+All users have moved to ocis and the registry contains a regex to route all `instanceprefix.*` references to the storageprovider with the owncloudsql driver. It is up to the driver to locate the correct resource by using the filecache table. In this case the numeric storage id is unnecessary.
+
+Now we migrate the space `345` to another storage driver:
+- the storage registry contains a new entry for `instanceprefix$345` to send all resource ids for that space to the new storage provider
+- the new storage driver has to take into account the full storageid because the nodeid may only be unique per storage space.
+
+If we now have to fetch the path on the `/dav/meta/` endpoint:
+`/dav/meta/instanceprefix$345!1`
+`/dav/meta/instanceprefix$345!2`
+`/dav/meta/instanceprefix$345!3`
+
+This would work because the registry always sees `instanceprefix$345` as the storageid.
+
+Now if we use the fileids directly and leave out the numeric storageid:
+`<instanceprefix>!<fileid>`
+`instanceprefix!1`
+`instanceprefix!2`
+`instanceprefix!3`
+
+This is the current `<storageid>!<nodeid>` format.
+
+The reva storage registry contains a `instanceid` entry pointing to the storage provider with the owncloudsql driver.
+
+Resources can be looked up because the oc_filecache has a unique fileid over all storages.
+
+Now we again migrate the space `345` to another storage driver:
+- the storage registry contains a new entry for `instanceprefix!1` so the storage space root now points to the new storage provider
+- The registry needs to be aware of node ids to route properly. This is a no go. We don't want to keep a cache of *all* nodeids in the registry. Only the root nodes of spaces.
+- The new storage driver only has a nodeid which might collide with other nodeids from other storage spaces, eg when two instances are imported into one ocis instance. Although it would be possible to just set up two storage providers extra care would have to be taken to prevent nodeid collisions when importing a space.
+
+If we now have to fetch the path on the `/dav/meta/` endpoint:
+`/dav/meta/instanceprefix!1` would work because it is the root of a space
+`/dav/meta/instanceprefix!2` would cause the gateway to poll all storage providers because the registry has no way to determine the responsible storage provider
+`/dav/meta/instanceprefix!3` same
+
+The problem is that without a part in the storageid that allows differentiating storage spaces we cannot route them individually.
+
+Now, we could use the nodeid of the root of a storage space as the spaceid ... if it is a uuid. If it is numeric it needs a prefix to distinguish it from other spaces.
+`<space-root-uuid>!<fileid>` would be easy for the decomposedfs.
+eos might use numeric ids: `<eosprefix>$<space-root-fileid>!<fileid>`, but it needs a custom prefix to distinguish multiple eos instances.
+
+Furthermore, when migrating spaces between storage providers we want to stay collision free, which is why we should recommend uuids.
+
+All this has implications for the decomposedfs, because it needs to split the nodes per space to prevent them from colliding.
